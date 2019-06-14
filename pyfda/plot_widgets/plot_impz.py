@@ -56,7 +56,6 @@ class Plot_Impz(QWidget):
         self.f2 = self.ui.f2
         
         self.bottom_t = self.ui.bottom_t
-        self.bottom_f = self.ui.bottom_f
 
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
@@ -569,7 +568,7 @@ class Plot_Impz(QWidget):
         
     def _log_mode_freq(self):
         """
-        Select / deselect log. mode for frequency domain and update self.bottom_f
+        Select / deselect log. mode for frequency domain and update self.ui.bottom_f
         """
 
         log = self.ui.chk_log_freq.isChecked()
@@ -577,11 +576,12 @@ class Plot_Impz(QWidget):
         self.ui.led_log_bottom_freq.setVisible(log)
         self.ui.lbl_dB_freq.setVisible(log)
         if log:
-            self.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(), self.bottom_f,
-                                    return_type='float', sign='neg')
-            self.ui.led_log_bottom_freq.setText(str(self.bottom_f))
+            self.ui.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(), 
+                                         self.ui.bottom_f, return_type='float',
+                                         sign='neg')
+            self.ui.led_log_bottom_freq.setText(str(self.ui.bottom_f))
         else:
-            self.bottom_f = 0
+            self.ui.bottom_f = 0
             
         self.draw_impz()
 
@@ -897,7 +897,8 @@ class Plot_Impz(QWidget):
 
             if plt_stimulus:
                 plot_stim_dict = self.fmt_plot_stim.copy()
-                plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft, plot_stim_dict, self.bottom_f)
+                plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft, 
+                                              plot_stim_dict, self.ui.bottom_f)
                 
                 plot_stim_fnc(F, X, label='$Stim.$',**plot_stim_dict)
 
@@ -908,7 +909,8 @@ class Plot_Impz(QWidget):
  
             if plt_response:
                 plot_resp_dict = self.fmt_plot_resp.copy()
-                plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft, plot_resp_dict, self.bottom_f)
+                plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft,
+                                              plot_resp_dict, self.ui.bottom_f)
                 
                 plot_resp_fnc(F, Y, label='$Resp.$',**plot_resp_dict)
 
