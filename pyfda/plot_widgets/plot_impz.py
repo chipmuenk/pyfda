@@ -194,7 +194,7 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw[:] = [True] * 3
+                self.needs_redraw[:] = [True] * 2
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
