@@ -269,8 +269,10 @@ class FIR(Module):
             src = sreg
             muls.append(c*sreg)
         sum_full = Signal((WA, True))
-#        sum_full_q = Signal((WA, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
+
+#--------------- Quantizer --------------------------------------
+#        sum_full_q = Signal((WA, True))
 #        if quant_o == 'round':
 #            self.comb += sum_full_q.eq(sum_full + (1 << (self.WO - 1)))
 #        else:
@@ -285,6 +287,8 @@ class FIR(Module):
 #                    self.o.eq(MAX_o)
 #                ).Else(self.o.eq(sum_full_q >> (WA-self.WO-1))
 #                )
+#--------------- ------------------------------------------
+
         # rescale for output width
         self.comb += self.o.eq(rescale(self, sum_full, self.WO, quant_o, ovfl_o))
 #------------------------------------------------------------------------------

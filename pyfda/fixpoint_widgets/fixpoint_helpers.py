@@ -27,31 +27,50 @@ from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import qstr, safe_eval, to_html
 
 
-def rescale(self, sig_i, WO, quant=None, ovfl=None):
+def rescale(mod, sig_i, WO, quant=None, ovfl=None):
     """
-    Change word length of input signal `sig_in` to `WO` bits, using the 
+    Change word length of input signal `sig_i` to `WO` bits, using the 
     rounding and saturation methods specified by `quant` and `ovfl`.
+    
+    Parameters
+    ----------
+    
+    mod: instance of migen Module
+    
+    sig_i: Signal (migen)
+    
+    
     """
     WI = sig_i.nbits
+    dW = WI - WO
+    # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
 
     sig_i_q = Signal((WI, True))
     sig_o = Signal((WO, True))
-    if quant == 'round':
-        self.comb += sig_i_q.eq(sig_i + (1 << (WO - 1)))
+    if quant == 'round' and dW > 0:
+        mod.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
     else:
-        self.comb += sig_i_q.eq(sig_i)        
+        mod.comb += sig_i_q.eq(sig_i)        
     if ovfl == 'wrap':
-        self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
+        if dW >= 0: # WI >= WO, shift left
+            mod.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
+        else:
+            mod.comb += sig_o.eq(sig_i_q << -dW)
+        #self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
     else:
-        self.comb += \
-            If(sig_o[self.WO-2:] == 0b10,
-                sig_o.eq(MIN_o)
-            ).Elif(sig_o[WO-2:] == 0b01,
-                sig_o.eq(MAX_o)
-            ).Else(sig_o.eq(sig_i_q >> (WI-WO-1))
-            )
+        if dW > 0:
+            mod.comb += \
+                If(sig_i_q[WO-2:] == 0b10,
+                    sig_o.eq(MIN_o)
+                ).Elif(sig_i_q[WO-2:] == 0b01,
+                    sig_o.eq(MAX_o)
+                ).Else(sig_o.eq(sig_i_q >> (dW-1))
+                )
+        else:
+            mod.comb += sig_o.eq(sig_i_q >> -dW)
+            
     return sig_o
 
 

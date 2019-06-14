@@ -137,7 +137,8 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        self.comb += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
+        #self.comb += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
+        self.sync += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
 
     def rescale(self, sig_i, WO, quant=None, ovfl=None):
         """
@@ -145,24 +146,29 @@ class Delay(Module):
         rounding and saturation methods specified by `quant` and `ovfl`.
         """
         WI = sig_i.nbits
+        dW = WI - WO
+        # max. resp. min, output values
         MIN_o = - 1 << (WO - 1)
         MAX_o = -MIN_o - 1
 
         sig_i_q = Signal((WI, True))
         sig_o = Signal((WO, True))
-        if quant == 'round':
-            self.comb += sig_i_q.eq(sig_i + (1 << (WO - 1)))
+        if quant == 'round' and dW > 0:
+            self.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
         else:
             self.comb += sig_i_q.eq(sig_i)        
         if ovfl == 'wrap':
-            self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
+            if dW >= 0: # WI >= WO, shift left
+                self.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
+            else:
+                self.comb += sig_o.eq(sig_i_q << -dW)
         else:
             self.comb += \
                 If(sig_o[self.WO-2:] == 0b10,
                     sig_o.eq(MIN_o)
                 ).Elif(sig_o[WO-2:] == 0b01,
                     sig_o.eq(MAX_o)
-                ).Else(sig_o.eq(sig_i_q >> (WI-WO-1))
+                ).Else(sig_o.eq(sig_i_q >> (dW))
                 )
         return sig_o
 
