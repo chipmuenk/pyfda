@@ -385,7 +385,7 @@ class Plot_Impz(QWidget):
             self.H_str = r'$y[n]$'
 
         else:
-            logger.error('Unknown stimulus "{0}"'.format(self.ui.stim))
+            logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
         
         # Add noise to stimulus
@@ -517,7 +517,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the figure without recalculation
         """
-        if not hasattr(self, 'cmplx'): # has response been calculated yet?            logger.error("self.y {0}".format(self.y))
+        if not hasattr(self, 'cmplx'): # has response been calculated yet?
             self.calc_stimulus()
             self.calc_response()
             
