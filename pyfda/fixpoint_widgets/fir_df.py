@@ -199,38 +199,16 @@ class FIR_DF_wdg(QWidget):
 class FIR(Module):
     def __init__(self):
         p = fb.fil[0]['fxqc']
-        # -------------- Get generics -----------------------------------------
-#        p = {}
-#           # new Key , Key 1 und 2 in fxqc_dict, default value
-#        p_list = [['WI', 'QI','W', 16],
-#                    ['WO', 'QO','W', 16],
-#                    ['WA', 'QA','W', 31],
-#                    ['WC', 'QC','W', 16],
-#                    ['b',  'QC','b', [1,1,1]]
-#                    ]
-        #Automatic : p['WA'] = p['WC'] + p['WI'] =- 1
-#        for l in p_list:
-#            try:
-#                p[l[0]] = fxqc_dict[l[1]][l[2]]
-#            except (KeyError, TypeError) as e:
-#                logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
-#                p[l[0]] = l[3]
-        # ------------- Define I/Os -------------------------------------------
-        ovfl_o = p['QO']['ovfl']
-        quant_o = p['QO']['quant']
 
+        # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['W']
         self.WO = p['QO']['W']
         # saturation logic doesn't make much sense with a FIR filter, this is 
         # just for demonstration
-        if ovfl_o == 'wrap':
-            WA = p['QA']['W']
-        else:
-            WA = p['QA']['W'] + 1 # add one guard bit
+        WA = p['QA']['W']
+
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
-#        MIN_o = - 1 << (self.WO - 1)
-#        MAX_o = -MIN_o - 1
 
         ###
         muls = []

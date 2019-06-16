@@ -138,22 +138,17 @@ class Delay_wdg(QWidget):
 ###############################################################################
 
 ###############################################################################
-# A synthesizable FIR filter.
+# A delay with quantization and parametrizable length
 class Delay(Module):
     def __init__(self):
         p = fb.fil[0]['fxqc']
         # ------------- Define I/Os -------------------------------------------
-#        ovfl_o = p['QO']['ovfl']
-#        quant_o = p['QO']['quant']
-
         self.WI = p['QI']['W']
         self.WO = p['QO']['W']
         N = len(p['QC']['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
-#        MIN_o = - 1 << (self.WO - 1)
-#        MAX_o = -MIN_o - 1
 
         src = self.i
         for c in range(N):
@@ -162,8 +157,7 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        #self.comb += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
-        self.sync += self.o.eq(rescale(self, self.i, p['QI'], p['QO']))
+        self.comb += self.o.eq(rescale(self, src, p['QI'], p['QO']))
 
 #    def rescale(self, sig_i, WO, quant=None, ovfl=None):
 #        """
