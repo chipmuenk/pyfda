@@ -25,10 +25,7 @@ from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs, rescale
 from functools import reduce
 from operator import add
 
-from math import cos, pi
-#from scipy import signal
-
-from migen import Signal, Module, If, run_simulation
+from migen import Signal, Module, run_simulation
 from migen.fhdl import verilog
 ################################
 
@@ -180,30 +177,6 @@ class FIR_DF_wdg(QWidget):
             outputs.append((yield self.fixp_filter.o)) # append filter output to output list
             yield # ??
 
-    def tb_pulse(self, stimulus, inputs, outputs):
-        """ unit pulse stimulus signal """
-        fscale = 2**(self.fixp_filter.WI - 1)-1
-        for t in range(len(stimulus)):
-            #v = 0.1*cos(2*pi*0.1*t)*fscale
-            if t == 0:
-                v = fscale
-            else:
-                v = 0
-            yield self.fixp_filter.i.eq(int(v))
-            inputs.append(v)
-            outputs.append((yield self.fixp_filter.o))
-            yield
-
-
-    def tb_cos(self, stimulus, inputs, outputs):
-        """ cosine test signal """
-        fscale = 2**(self.fixp_filter.WI - 1)-1
-        for t in range(len(stimulus)):
-            v = 0.1*cos(2*pi*0.1*t)*fscale
-            yield self.fixp_filter.i.eq(int(v))
-            inputs.append(v)
-            outputs.append((yield self.fixp_filter.o))
-            yield
 
 #------------------------------------------------------------------------------           
     def run_sim(self, stimulus):
@@ -245,7 +218,6 @@ class FIR(Module):
         # ------------- Define I/Os -------------------------------------------
         ovfl_o = p['QO']['ovfl']
         quant_o = p['QO']['quant']
-        logger.warning(quant_o)
 
         self.WI = p['QI']['W']
         self.WO = p['QO']['W']
@@ -257,8 +229,8 @@ class FIR(Module):
             WA = p['QA']['W'] + 1 # add one guard bit
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
-        MIN_o = - 1 << (self.WO - 1)
-        MAX_o = -MIN_o - 1
+#        MIN_o = - 1 << (self.WO - 1)
+#        MAX_o = -MIN_o - 1
 
         ###
         muls = []
