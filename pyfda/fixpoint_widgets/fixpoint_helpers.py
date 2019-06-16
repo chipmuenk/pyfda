@@ -27,7 +27,7 @@ from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import qstr, safe_eval, to_html
 
 
-def rescale(mod, sig_i, WO, quant=None, ovfl=None):
+def rescale(mod, sig_i, QI, QO):
     """
     Change word length of input signal `sig_i` to `WO` bits, using the 
     rounding and saturation methods specified by `quant` and `ovfl`.
@@ -39,23 +39,50 @@ def rescale(mod, sig_i, WO, quant=None, ovfl=None):
     
     sig_i: Signal (migen)
     
+    QI: dict
+    
+    QO: dict
+        fixpoint format for input resp. output word, specified as  Q-format, e.g.
+        '2.13' (2 integer, 14 fractional bits, 1 implied sign bit = 16 bits total)
+    
+    quant: str
+        requantization method; 'floor' for truncation (default), 'round' for
+        rounding, 'fix' (not implemented yet)
+        
+        
+    ovfl: str
+        saturation method: 'wrap' for 2s complement wrap-around (no saturation),
+        'sat' for saturation logic
+    
     
     """
-    WI = sig_i.nbits
+    logger.warning(QI)
+    logger.warning(QO)
+    WI_I = QI['WI']
+    WI_F = QI['WF']
+    WI   = QI['W']
+    #logger.warning("WI:{0}:{1}".format(WI, type(WI)))
+
+    WO_I = QO['WI']
+    WO_F = QO['WF']
+    WO   = QO['W']
+
+
     dW = WI - WO
     # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
-    if ovfl == "sat":
-        sig_i_q = Signal((WI+1, True))
-    else:
-        sig_i_q = Signal((WI, True))
+#    if ovfl == "sat":
+#        sig_i_q = Signal((WI+1, True))
+#    else:
+#        sig_i_q = Signal((WI, True))
+    sig_i_q = Signal((WI, True))
     sig_o = Signal((WO, True))
-    if quant == 'round' and dW > 0:
+    if QO['quant'] == 'round' and dW > 0:
         mod.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
     else:
         mod.comb += sig_i_q.eq(sig_i)        
-    if ovfl == 'sat':
+    if QO['ovfl'] == 'sat':
         if dW > 0:
             mod.comb += \
                 If(sig_i_q[WO-1:] == 0b10,

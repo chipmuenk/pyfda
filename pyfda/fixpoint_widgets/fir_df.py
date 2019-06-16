@@ -66,7 +66,7 @@ class FIR_DF_wdg(QWidget):
         if not 'QA' in self.fxqc_dict:
             self.fxqc_dict['QA'] = {}
         set_dict_defaults(self.fxqc_dict['QA'], 
-                          {'WI':30, 'WF':0, 'W':31, 'ovfl':'wrap', 'quant':'floor'})
+                          {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
         
         self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['q_coeff'],
                                         label='Coefficient Format:',
@@ -79,7 +79,7 @@ class FIR_DF_wdg(QWidget):
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
         self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
-                               fractional=False)
+                               fractional=True)
         self.wdg_w_accu.sig_tx.connect(self.sig_tx)       
 
         #self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
@@ -235,6 +235,7 @@ class FIR(Module):
         ###
         muls = []
         src = self.i
+
         for c in p['QC']['b']:
             sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
@@ -262,7 +263,7 @@ class FIR(Module):
 #--------------- ------------------------------------------
 
         # rescale for output width
-        self.comb += self.o.eq(rescale(self, sum_full, self.WO, quant_o, ovfl_o))
+        self.comb += self.o.eq(rescale(self, sum_full, p['QA'], p['QO']))
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
