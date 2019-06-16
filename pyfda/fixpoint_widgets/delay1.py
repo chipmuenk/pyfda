@@ -18,7 +18,10 @@ import pyfda.filterbroker as fb
 from ..compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
 from .fixpoint_helpers import rescale
-from migen import Signal, Module, If, run_simulation
+
+from math import cos, pi
+
+from migen import Signal, Module, run_simulation
 from migen.fhdl import verilog
 ################################
 
@@ -94,6 +97,28 @@ class Delay_wdg(QWidget):
             outputs.append((yield self.fixp_filter.o)) # append filter output to output list
             yield # ??
 
+    def tb_pulse(self, stimulus, inputs, outputs):
+        """ unit pulse stimulus signal """
+        fscale = 2**(self.fixp_filter.WI - 1)-1
+        for t in range(len(stimulus)):
+            if t == 0:
+                v = fscale
+            else:
+                v = 0
+            yield self.fixp_filter.i.eq(int(v))
+            inputs.append(v)
+            outputs.append((yield self.fixp_filter.o))
+            yield
+
+    def tb_cos(self, stimulus, inputs, outputs):
+        """ cosine test signal """
+        fscale = 2**(self.fixp_filter.WI - 1)-1
+        for t in range(len(stimulus)):
+            v = 0.1*cos(2*pi*0.1*t)*fscale
+            yield self.fixp_filter.i.eq(int(v))
+            inputs.append(v)
+            outputs.append((yield self.fixp_filter.o))
+            yield
 
 #------------------------------------------------------------------------------           
     def run_sim(self, stimulus):
@@ -118,8 +143,8 @@ class Delay(Module):
     def __init__(self):
         p = fb.fil[0]['fxqc']
         # ------------- Define I/Os -------------------------------------------
-        ovfl_o = p['QO']['ovfl']
-        quant_o = p['QO']['quant']
+#        ovfl_o = p['QO']['ovfl']
+#        quant_o = p['QO']['quant']
 
         self.WI = p['QI']['W']
         self.WO = p['QO']['W']
@@ -127,8 +152,8 @@ class Delay(Module):
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal
-        MIN_o = - 1 << (self.WO - 1)
-        MAX_o = -MIN_o - 1
+#        MIN_o = - 1 << (self.WO - 1)
+#        MAX_o = -MIN_o - 1
 
         src = self.i
         for c in range(N):
@@ -138,39 +163,39 @@ class Delay(Module):
 
         # rescale for output width
         #self.comb += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
-        self.sync += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
+        self.sync += self.o.eq(rescale(self, self.i, p['QI'], p['QO']))
 
-    def rescale(self, sig_i, WO, quant=None, ovfl=None):
-        """
-        Change word length of input signal `sig_in` to `WO` bits, using the 
-        rounding and saturation methods specified by `quant` and `ovfl`.
-        """
-        WI = sig_i.nbits
-        dW = WI - WO
-        # max. resp. min, output values
-        MIN_o = - 1 << (WO - 1)
-        MAX_o = -MIN_o - 1
-
-        sig_i_q = Signal((WI, True))
-        sig_o = Signal((WO, True))
-        if quant == 'round' and dW > 0:
-            self.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
-        else:
-            self.comb += sig_i_q.eq(sig_i)        
-        if ovfl == 'wrap':
-            if dW >= 0: # WI >= WO, shift left
-                self.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
-            else:
-                self.comb += sig_o.eq(sig_i_q << -dW)
-        else:
-            self.comb += \
-                If(sig_o[self.WO-2:] == 0b10,
-                    sig_o.eq(MIN_o)
-                ).Elif(sig_o[WO-2:] == 0b01,
-                    sig_o.eq(MAX_o)
-                ).Else(sig_o.eq(sig_i_q >> (dW))
-                )
-        return sig_o
+#    def rescale(self, sig_i, WO, quant=None, ovfl=None):
+#        """
+#        Change word length of input signal `sig_in` to `WO` bits, using the 
+#        rounding and saturation methods specified by `quant` and `ovfl`.
+#        """
+#        WI = sig_i.nbits
+#        dW = WI - WO
+#        # max. resp. min, output values
+#        MIN_o = - 1 << (WO - 1)
+#        MAX_o = -MIN_o - 1
+#
+#        sig_i_q = Signal((WI, True))
+#        sig_o = Signal((WO, True))
+#        if quant == 'round' and dW > 0:
+#            self.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
+#        else:
+#            self.comb += sig_i_q.eq(sig_i)        
+#        if ovfl == 'wrap':
+#            if dW >= 0: # WI >= WO, shift left
+#                self.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
+#            else:
+#                self.comb += sig_o.eq(sig_i_q << -dW)
+#        else:
+#            self.comb += \
+#                If(sig_o[self.WO-2:] == 0b10,
+#                    sig_o.eq(MIN_o)
+#                ).Elif(sig_o[WO-2:] == 0b01,
+#                    sig_o.eq(MAX_o)
+#                ).Else(sig_o.eq(sig_i_q >> (dW))
+#                )
+#        return sig_o
 
 #------------------------------------------------------------------------------
 
