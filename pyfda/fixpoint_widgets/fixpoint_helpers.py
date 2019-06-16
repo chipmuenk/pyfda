@@ -79,38 +79,38 @@ def rescale(mod, sig_i, QI, QO):
     WO_F = QO['WF']
     WO   = QO['W']
 
-
-    dW = WI - WO
+    dWF = WI_F - WO_F # difference of fractional lengths
+    dWI = WI_I - WO_I # difference of fractional lengths
     # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
-#    if ovfl == "sat":
-#        sig_i_q = Signal((WI+1, True))
-#    else:
-#        sig_i_q = Signal((WI, True))
-    sig_i_q = Signal((WI, True))
+
+    sig_i_q = Signal((max(WI,WO), True))
     sig_o = Signal((WO, True))
-    if QO['quant'] == 'round' and dW > 0:
-        mod.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
+    if QO['quant'] == 'round' and dWF > 0:
+        mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
+    elif dWF > 0:
+        mod.comb += sig_i_q.eq(sig_i >> dWF)
     else:
-        mod.comb += sig_i_q.eq(sig_i)        
+        mod.comb += sig_i_q.eq(sig_i << -dWF)        
+
     if QO['ovfl'] == 'sat':
-        if dW > 0:
+        if dWI > 0:
             mod.comb += \
                 If(sig_i_q[WO-1:] == 0b10,
                     sig_o.eq(MIN_o)
                 ).Elif(sig_i_q[WO-1:] == 0b01,
                     sig_o.eq(MAX_o)
-                ).Else(sig_o.eq(sig_i_q >> (dW-1))
+                ).Else(sig_o.eq(sig_i_q >> (dWI-1))
                 )
         else:
-            mod.comb += sig_o.eq(sig_i_q >> -dW)
+            mod.comb += sig_o.eq(sig_i_q >> -dWI)
             
     else: # wrap around
-        if dW >= 0: # WI >= WO, shift left
-            mod.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
+        if dWI >= 0: # WI >= WO, shift left
+            mod.comb += sig_o.eq(sig_i_q >> dWI) # rescale for output width
         else:
-            mod.comb += sig_o.eq(sig_i_q << -dW)
+            mod.comb += sig_o.eq(sig_i_q << -dWI)
         #self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
     return sig_o
 
