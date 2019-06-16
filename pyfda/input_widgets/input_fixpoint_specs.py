@@ -24,7 +24,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
-from pyfda.pyfda_lib import qstr, cmp_version
+from pyfda.pyfda_lib import qstr, cmp_version, dict2str
 import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
@@ -84,7 +84,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict2str(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
