@@ -45,15 +45,27 @@ def rescale(mod, sig_i, QI, QO):
         fixpoint format for input resp. output word, specified as  Q-format, e.g.
         '2.13' (2 integer, 14 fractional bits, 1 implied sign bit = 16 bits total)
     
-    quant: str
-        requantization method; 'floor' for truncation (default), 'round' for
-        rounding, 'fix' (not implemented yet)
-        
-        
-    ovfl: str
-        saturation method: 'wrap' for 2s complement wrap-around (no saturation),
-        'sat' for saturation logic
+    Input and output word are aligned at their binary points.
     
+      S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+      0 |  1  |  0  *  1  |  0  |  1  |  1   =  43 (dec), 43/16 = 2 + 11/16 (float)
+                    *
+              |  S  * WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
+                 0  *  1  |  0  |  1         =  7 (dec), 7/8 (float)
+
+              
+    The real (world) value is obtained by dividing the integer value by 2 ** (-WF).
+    
+    For requantizing two numbers to the same WI and WF, imagine both binary numbers
+    to be right-aligned.
+    
+    For reducing the number of fractional bits by `dWF`, simply right-shift the
+    integer number by `dWF`. For rounding, add '1' to the bit below the truncation
+    point before right-shifting. For extending the number of fractional bits,
+    left-shift the integer by `dWF`.
+    
+    For reducing the number of integer bits by `dWI`, simply right-shift the
+    integer by `dWI`.
     
     """
     logger.warning(QI)
