@@ -212,7 +212,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'fxqc':
                 {'QI': {'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
                  'QO': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
-                 'QA': {'WI':30,'WF':0,  'W':31, 'ovfl':'wrap', 'quant':'floor'},
+                 'QA': {'WI':0, 'WF':31, 'W':32, 'ovfl':'wrap', 'quant':'floor'},
                  'QC': {'WI':2, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor',
                         'b':[1,1,1], 'a': [1,0.1,0]}
                  },
