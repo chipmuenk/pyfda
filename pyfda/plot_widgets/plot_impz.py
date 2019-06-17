@@ -655,11 +655,13 @@ class Plot_Impz(QWidget):
         fx_max = 1.
         fx_title = ""
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
-            WI = WO = 1
+            WO = 1
             try:
                 logger.debug("hdl_dict = {0}".format(self.hdl_dict))
-                WI = self.hdl_dict['QI']['W']
-                WO = self.hdl_dict['QO']['W']
+                WI_F = self.hdl_dict['QI']['WF']
+                WO_F = self.hdl_dict['QO']['WF']
+                WO_I = self.hdl_dict['QO']['WI']
+                WO   = self.hdl_dict['QO']['W']
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
@@ -671,14 +673,27 @@ class Plot_Impz(QWidget):
                 logger.error("Value error: {0}".format(e))
 
 
+#            if self.ui.chk_fx_scale.isChecked():
+#                scale_i = 1 << WI-1
+#                fx_min = - (1 << WO-1)
+#                fx_max = (1 << WO-1) - 1
+#            else:
+#                scale_o = 1. / (1 << WO-1)
+#                fx_min = -1
+#                fx_max = 1 - scale_o
             if self.ui.chk_fx_scale.isChecked():
-                scale_i = 1 << WI-1
+                # display stimulus and response as integer values:
+                # - multiply stimulus by 2 ** WF
+                # - display response unscaled
+                scale_i = 1 << WI_F
                 fx_min = - (1 << WO-1)
-                fx_max = (1 << WO-1) - 1
+                fx_max = -fx_min - 1
             else:
-                scale_o = 1. / (1 << WO-1)
-                fx_min = -1
-                fx_max = 1 - scale_o
+                # display values scaled as "real world values"
+                scale_o = 1. / (1 << WO_F)
+                fx_min = -(1 << WO_I)
+                fx_max = -fx_min - scale_o
+
 
             logger.info("scale I:{0} O:{1}".format(scale_i, scale_o))
 

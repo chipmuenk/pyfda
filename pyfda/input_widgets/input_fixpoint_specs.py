@@ -603,7 +603,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)).astype(int)
+            self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.WF)).astype(int)
             logger.info("\n Stim:{0}\nFX stim:{1}\n".format( 
                         dict_sig['fx_stimulus'][0:min(len(dict_sig['fx_stimulus']),9)],
                         self.stim[0:min(len(self.stim),9)]))
