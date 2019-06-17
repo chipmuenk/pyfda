@@ -491,11 +491,6 @@ class Input_Fixpoint_Specs(QWidget):
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
-
-            self.q_i = fx.Fixed(self.fxqc_dict['QI']) # setup quantizer for input quantization
-            self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-            self.q_o = fx.Fixed(self.fxqc_dict['QO']) # setup quantizer for output quantization
-            # TODO:  is the output quantizer really needed? Isn't it part of the migen implementation?
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
@@ -591,19 +586,15 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_set_stimulus(self, dict_sig):
         """
-        - Get fixpoint stimulus from `dict_sig`
-        
-        - Quantize the stimulus with the selected input quantization settings
-        
-		- Scale it with the input word length, i.e. with 2**(W-1) (input) to obtain
-          integer values
+        - Get fixpoint stimulus from `dict_sig` in integer format
           
         - Pass it to the fixpoint filter and calculate the fixpoint response
         
         - Send the reponse to the plotting widget
         """
         try:
-            self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.WF)).astype(int)
+            self.stim = dict_sig['fx_stimulus']
+
             logger.info("\n Stim:{0}\nFX stim:{1}\n".format( 
                         dict_sig['fx_stimulus'][0:min(len(dict_sig['fx_stimulus']),9)],
                         self.stim[0:min(len(self.stim),9)]))

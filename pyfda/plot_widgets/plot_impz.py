@@ -19,6 +19,7 @@ import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval, dict2str
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -57,7 +58,7 @@ class Plot_Impz(QWidget):
         self.fx_sim = False # initial setting for fixpoint simulation
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
-        self.active_tab = 0 # index for active tab
+        self.active_tab = 0 # index for active tab      
 
         self._construct_UI()
         
@@ -159,12 +160,8 @@ class Plot_Impz(QWidget):
                     self.fx_set_hdl_dict(dict_sig) # pass hdl dict
 
                 if dict_sig['fx_sim'] == 'get_stimulus':
-                    # read hdl_dict and calculate stimulus
-                    self.hdl_dict = dict_sig['hdl_dict']
-                    self.calc_stimulus() # calculate selected stimulus with selected length
-                    # pass stimulus in self.x back  via dict
-                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
-                                      'fx_stimulus':self.x})
+                    self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
+
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
@@ -318,6 +315,28 @@ class Plot_Impz(QWidget):
             self.hdl_dict = dict_sig['hdl_dict']
         except (KeyError, ValueError) as e:
             logger.warning(e)
+            
+    def fx_set_stimulus(self, dict_sig):
+        """
+        - Calculate stimulus # TODO: needed?
+        
+        - Quantize the stimulus with the selected input quantization settings
+        
+		- Scale it with the input word length, i.e. with 2**(W-1) (input) to obtain
+          integer values # TODO: correct?
+          
+        - Copy simulation results to `dict_sig` as integer and transfer them to fixpoint filter
+        """
+
+        self.hdl_dict = dict_sig['hdl_dict']
+        self.calc_stimulus() # calculate selected stimulus with selected length
+        # pass stimulus in self.x back  via dict
+        self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
+        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
+
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
+                np.round(self.q_i.fixp(self.x) * (1 << self.q_i.WF)).astype(int)})
+
             
     def fx_get_results(self, dict_sig):
         """
