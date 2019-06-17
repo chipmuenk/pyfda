@@ -26,12 +26,9 @@ from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 from .plot_impz_ui import PlotImpz_UI
 
-# TODO: "Home" calls redraw for all three mpl widgets
+# TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
-# TODO: fixpoint scaling is applied in spite of cmbbox = float
-# TODO: fir fixpoint  scaling is off by 1 bit due to W_c + W_I without -1
-# TODO: Increasing number of data points repeats the previous ones in fixpoint mode
+# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?t
 
 classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
 
