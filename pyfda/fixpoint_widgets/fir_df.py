@@ -112,8 +112,6 @@ class FIR_DF_wdg(QWidget):
         if not 'QA' in fxqc_dict:
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
             logger.warning("empty QA")
-        else:
-            logger.warning("QA:{0}".format(fxqc_dict['QA']))
             
         if not 'QC' in fxqc_dict:
             fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 

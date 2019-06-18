@@ -68,8 +68,6 @@ def rescale(mod, sig_i, QI, QO):
     integer by `dWI`.
     
     """
-    logger.warning(QI)
-    logger.warning(QO)
     WI_I = QI['WI']
     WI_F = QI['WF']
     WI   = QI['W']
