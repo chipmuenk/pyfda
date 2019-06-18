@@ -41,18 +41,18 @@ class Plot_Impz(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, e.g. when stimulus has been calculated
     sig_tx = pyqtSignal(object)
-    
+
 
     def __init__(self, parent):
         super(Plot_Impz, self).__init__(parent)
 
         self.ACTIVE_3D = False
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
-        
+
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
-        
+
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         self.fx_sim = False # initial setting for fixpoint simulation
@@ -61,7 +61,7 @@ class Plot_Impz(QWidget):
         self.active_tab = 0 # index for active tab      
 
         self._construct_UI()
-        
+
         #--------------------------------------------
         # initialize routines and settings
         self._log_mode_time()
@@ -333,7 +333,7 @@ class Plot_Impz(QWidget):
         # pass stimulus in self.x back  via dict
         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-
+        self.x_q =self.q_i.fixp(self.x)
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
                 np.round(self.q_i.fixp(self.x) * (1 << self.q_i.WF)).astype(int)})
 
@@ -479,7 +479,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate ffts X(f) and Y(f) of stimulus and response
         """
-   #if self.plt_freq_resp != "none":
+        #if self.plt_freq_resp != "none":
         # calculate FFT of stimulus / response
         if self.x is None or len(self.x) < self.ui.N_end:
             self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
@@ -551,6 +551,8 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}        
         self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
         self.fmt_mkr_stim = {'color':'blue', 'alpha':0.5}
+        self.fmt_plot_stim_q = {'color':'darkgreen', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_stim_q = {'color':'darkgreen', 'alpha':0.5}
 
         self.fmt_stem_stim = params['mpl_stimuli']
         
@@ -605,8 +607,9 @@ class Plot_Impz(QWidget):
         Return a plot method depending on the parameter `plt_style` (str) 
         and the axis instance `ax`. An optional `plt_dict` is modified in place.
         """
+
         if plt_dict is None:
-            plt_dict = {}
+            plt_dict = {}         
         if plt_style == "line":
             plot_fnc = getattr(ax, "plot")
         elif plt_style == "stem":
@@ -688,15 +691,6 @@ class Plot_Impz(QWidget):
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 
-
-#            if self.ui.chk_fx_scale.isChecked():
-#                scale_i = 1 << WI-1
-#                fx_min = - (1 << WO-1)
-#                fx_max = (1 << WO-1) - 1
-#            else:
-#                scale_o = 1. / (1 << WO-1)
-#                fx_min = -1
-#                fx_max = 1 - scale_o
             if self.ui.chk_fx_scale.isChecked():
                 # display stimulus and response as integer values:
                 # - multiply stimulus by 2 ** WF
@@ -710,8 +704,13 @@ class Plot_Impz(QWidget):
                 fx_min = -(1 << WO_I)
                 fx_max = -fx_min - scale_o
 
+            x_q = self.q_i.fixp(self.x) * scale_i
+            if self.ui.chk_log_time.isChecked():
+                x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
             logger.info("scale I:{0} O:{1}".format(scale_i, scale_o))
+        else:
+            x_q = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
@@ -742,15 +741,24 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
                         
         # --------------- Stimulus plot ----------------------------------
+        # TODO: local copying of dictionary and modifying is _very_ kludgy
         plot_stim_dict = self.fmt_plot_stim.copy()
         plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, 
                                       plot_stim_dict, self.ui.bottom_t)
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
+        if x_q is not None:
+            plot_stim_q_dict = self.fmt_plot_stim_q.copy()
+            plot_stim_q_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, 
+                                      plot_stim_q_dict, self.ui.bottom_t)
+            plot_stim_q_fnc(self.t[self.ui.N_start:], x_q[self.ui.N_start:], label='$x_q[n]$',
+                          **plot_stim_q_dict)
         # Add plot markers, this is way faster than normal stem plotting
         if self.ui.chk_mrk_time_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], **self.fmt_mkr_stim)
+            if x_q is not None:
+                self.ax_r.scatter(self.t[self.ui.N_start:], x_q[self.ui.N_start:], **self.fmt_mkr_stim_q)
 
         # --------------- Response plot ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
