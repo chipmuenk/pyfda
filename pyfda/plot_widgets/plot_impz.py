@@ -49,10 +49,7 @@ class Plot_Impz(QWidget):
         self.ACTIVE_3D = False
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
 
-        # initial settings for line edit widgets
-        self.f1 = self.ui.f1
-        self.f2 = self.ui.f2
-
+        # initial settings
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         self.fx_sim = False # initial setting for fixpoint simulation
@@ -67,7 +64,7 @@ class Plot_Impz(QWidget):
         self._log_mode_time()
         self._log_mode_freq()
         self.fx_select()    # initialize fixpoint or float simulation    
-        self.draw() # initial calculation and drawing
+        self.impz() # initial calculation of stimulus and response and drawing
 
 
     def _construct_UI(self):
@@ -112,7 +109,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
         self.ui.but_run.clicked.connect(self.fx_run)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz_time)
-        self.ui.chk_stim_options.clicked.connect(self._show_stim_options)
+
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
         self.ui.chk_mrk_time_resp.clicked.connect(self.draw_impz_time)
@@ -138,8 +135,9 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
-        # When user has selected a different tab, trigger a draw (incl. maybe recalc) of current tab
-        self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
+        # When user has selected a different tab, trigger a recalculation of current tab
+        self.tabWidget.currentChanged.connect(self.impz) # passes number of active tab
+        # TODO: redraw is sufficient?
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -154,31 +152,32 @@ class Plot_Impz(QWidget):
                      .format(dict2str(dict_sig), self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop, {0}".format(dict2str(dict_sig)))
-        if 'fx_sim' in dict_sig:
-            try:
-                if dict_sig['fx_sim'] == 'set_hdl_dict':
-                    self.fx_set_hdl_dict(dict_sig) # pass hdl dict
-
-                if dict_sig['fx_sim'] == 'get_stimulus':
-                    self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
-
-                elif dict_sig['fx_sim'] == 'set_results':
-                    logger.info("Received fixpoint results.")
-                    self.fx_get_results(dict_sig) # plot fx simulation results 
-
-            except KeyError as e:
-                logger.error('Key {0} missing in "hdl_dict".'.format(e))
-                self.fx_sim = False
 
         if self.isVisible():
-            if 'data_changed' in dict_sig:
+            if 'fx_sim' in dict_sig:
+                try:
+                    if dict_sig['fx_sim'] == 'set_hdl_dict':
+                        self.fx_set_hdl_dict(dict_sig) # pass hdl dict
+    
+                    if dict_sig['fx_sim'] == 'get_stimulus':
+                        self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
+    
+                    elif dict_sig['fx_sim'] == 'set_results':
+                        logger.info("Received fixpoint results.")
+                        self.fx_get_results(dict_sig) # plot fx simulation results 
+
+                except KeyError as e:
+                    logger.error('Key {0} missing in "hdl_dict".'.format(e))
+                    self.fx_sim = False
+
+            if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
+                self.impz()
+
+            elif 'data_changed' in dict_sig:
                 # todo: after 'data_changed' all needs to be set to True except current widget
                 self.needs_draw = True
                 self.needs_redraw[:] = [True] * 2
-                self.draw()
-
-            if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
-                self.draw()
+                self.impz()
 
             elif 'home' in dict_sig:
                 self.redraw()
@@ -214,24 +213,24 @@ class Plot_Impz(QWidget):
         def _store_entry(source):
             if self.spec_edited:
                 if source.objectName() == "stimFreq1":
-                   self.f1 = safe_eval(source.text(), self.f1 * fb.fil[0]['f_S'],
+                   self.ui.f1 = safe_eval(source.text(), self.ui.f1 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
-                   source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                   source.setText(str(params['FMT'].format(self.ui.f1 * fb.fil[0]['f_S'])))
 
                 elif source.objectName() == "stimFreq2":
-                   self.f2 = safe_eval(source.text(), self.f2 * fb.fil[0]['f_S'],
+                   self.ui.f2 = safe_eval(source.text(), self.ui.f2 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
-                   source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                   source.setText(str(params['FMT'].format(self.ui.f2 * fb.fil[0]['f_S'])))
 
                 self.spec_edited = False # reset flag
-                self.draw()
+                self.impz()
 
 #        if isinstance(source, QLineEdit): 
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
         if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_fs()
+                self.ui.load_fs()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -240,54 +239,31 @@ class Plot_Impz(QWidget):
                 elif key == Qt.Key_Escape: # revert changes
                     self.spec_edited = False
                     if source.objectName() == "stimFreq1":                    
-                        source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                        source.setText(str(params['FMT'].format(self.ui.f1 * fb.fil[0]['f_S'])))
                     elif source.objectName() == "stimFreq2":                    
-                        source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                        source.setText(str(params['FMT'].format(self.ui.f2 * fb.fil[0]['f_S'])))
 
             elif event.type() == QEvent.FocusOut:
                 _store_entry(source)
 
         # Call base class method to continue normal event processing:
         return super(Plot_Impz, self).eventFilter(source, event)
-       
-#-------------------------------------------------------------        
-    def load_fs(self):
-        """
-        Reload sampling frequency from filter dictionary and transform
-        the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
-        in the dictionary; when f_S or the unit are changed, only the displayed values
-        of the frequency entries are updated, not the dictionary!
-
-        load_fs() is called during init and when the frequency unit or the
-        sampling frequency have been changed.
-
-        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
-        at another place, indicating that a reload is required.
-        """
-
-        # recalculate displayed freq spec values for (maybe) changed f_S
-        if self.ui.ledFreq1.hasFocus():
-            # widget has focus, show full precision
-            self.ui.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
-        elif self.ui.ledFreq2.hasFocus():
-            # widget has focus, show full precision
-            self.ui.ledFreq2.setText(str(self.f2 * fb.fil[0]['f_S']))
-        else:
-            # widgets have no focus, round the display
-            self.ui.ledFreq1.setText(
-                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
-            self.ui.ledFreq2.setText(
-                str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
-#-------------------------------------------------------------        
-    def _show_stim_options(self):
-        """
-        Hide / show panel with stimulus options
-        """
-        self.ui.wdg_ctrl_stim.setVisible(self.ui.chk_stim_options.isChecked())
-
 
 # =============================================================================
+# Simulation: Calculate stimulus, response and draw them
+# =============================================================================
+
+    def impz(self):
+        """
+        Recalculate response and redraw it
+        """
+        if True: # self.needs_draw: doesn't work yet - number of data points needs to updated
+            self.calc_stimulus()
+            self.calc_response()
+            self.needs_draw = False
+        self.draw_impz()
+
+
     def fx_select(self):
         """
         Select between fixpoint and floating point simulation
@@ -303,7 +279,7 @@ class Plot_Impz(QWidget):
             qstyle_widget(self.ui.but_run, "changed")
             self.fx_run()
         else:
-            self.draw()
+            self.impz()
 
     def fx_run(self):
         """
@@ -349,6 +325,9 @@ class Plot_Impz(QWidget):
         """
         self.calc_response(dict_sig['fx_results'])
         qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
+        
+        #self.sig_tx.emit({'sender':__name__, 'data_changed':'fx_sim'})        
+
         self.calc_fft()
         self.draw_impz()
 
@@ -383,24 +362,24 @@ class Plot_Impz(QWidget):
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif self.ui.stim == "Cos":
-            self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.f1) +\
-                self.ui.A2 * np.cos(2 * np.pi * self.n * self.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.ui.f1) +\
+                self.ui.A2 * np.cos(2 * np.pi * self.n * self.ui.f2 + self.ui.phi2)
             self.title_str = r'System Response to Cosine Signal'
             self.H_str = r'$y[n]$'
                 
         elif self.ui.stim == "Sine":
-            self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.f1 + self.ui.phi1) +\
-                self.ui.A2 * np.sin(2 * np.pi * self.n * self.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.ui.f1 + self.ui.phi1) +\
+                self.ui.A2 * np.sin(2 * np.pi * self.n * self.ui.f2 + self.ui.phi2)
             self.title_str = r'System Response to Sinusoidal Signal'
             self.H_str = r'$y[n]$'
             
         elif self.ui.stim == "Rect":
-            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.f1))
+            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.ui.f1))
             self.title_str = r'System Response to Rect. Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
-            self.x = self.ui.A1 * sig.sawtooth(self.n * self.f1 * 2*np.pi)
+            self.x = self.ui.A1 * sig.sawtooth(self.n * self.ui.f1 * 2*np.pi)
             self.title_str = r'System Response to Sawtooth Signal'
             self.H_str = r'$y[n]$'
 
@@ -521,17 +500,19 @@ class Plot_Impz(QWidget):
 ###############################################################################
 #        PLOTTING
 ###############################################################################
-    def draw(self):
-        """
-        Recalculate response and redraw it
-        """
-        if True: # self.needs_draw: doesn't work yet - number of data points needs to updated
-            self.calc_stimulus()
-            self.calc_response()
-            self.needs_draw = False
-        self.draw_impz()
-
-#------------------------------------------------------------------------------
+# =============================================================================
+#     def draw(self):
+#         """
+#         Recalculate response and redraw it
+#         """
+#         if True: # self.needs_draw: doesn't work yet - number of data points needs to updated
+#             self.calc_stimulus()
+#             self.calc_response()
+#             self.needs_draw = False
+#         self.draw_impz()
+# 
+# #------------------------------------------------------------------------------
+# =============================================================================
     def draw_impz(self):
         """
         (Re-)draw the figure without recalculation
@@ -547,7 +528,7 @@ class Plot_Impz(QWidget):
             unit_frmt = None
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
-        self.load_fs()
+        self.ui.load_fs()
         #self.init_axes()
 
         self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}

@@ -432,12 +432,20 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.editingFinished.connect(self._update_win_fft)
 
         # --- stimulus control ---
+        self.chk_stim_options.clicked.connect(self._show_stim_options)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledDC.editingFinished.connect(self._update_DC)
+
+#-------------------------------------------------------------        
+    def _show_stim_options(self):
+        """
+        Hide / show panel with stimulus options
+        """
+        self.wdg_ctrl_stim.setVisible(self.chk_stim_options.isChecked())
 
 
     def _enable_stim_widgets(self):
@@ -459,6 +467,37 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setVisible(dc_en)
 
         self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
+
+#-------------------------------------------------------------        
+    def load_fs(self):
+        """
+        Reload sampling frequency from filter dictionary and transform
+        the displayed frequency spec input fields according to the units
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        in the dictionary; when f_S or the unit are changed, only the displayed values
+        of the frequency entries are updated, not the dictionary!
+
+        load_fs() is called during init and when the frequency unit or the
+        sampling frequency have been changed.
+
+        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
+        at another place, indicating that a reload is required.
+        """
+
+        # recalculate displayed freq spec values for (maybe) changed f_S
+        if self.ledFreq1.hasFocus():
+            # widget has focus, show full precision
+            self.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
+        elif self.ledFreq2.hasFocus():
+            # widget has focus, show full precision
+            self.ledFreq2.setText(str(self.f2 * fb.fil[0]['f_S']))
+        else:
+            # widgets have no focus, round the display
+            self.ledFreq1.setText(
+                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+            self.ledFreq2.setText(
+                str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+
 
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
