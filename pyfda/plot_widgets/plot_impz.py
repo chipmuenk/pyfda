@@ -29,7 +29,8 @@ from .plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?t
+# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
+# TODO: ui for phases
 
 classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
 

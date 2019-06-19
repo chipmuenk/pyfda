@@ -122,7 +122,6 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setToolTip("<span>Show options for stimulus signal.</span>")
         self.chk_stim_options.setChecked(True)
 
-
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
