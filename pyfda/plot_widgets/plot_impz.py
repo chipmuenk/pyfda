@@ -171,9 +171,13 @@ class Plot_Impz(QWidget):
                 self.fx_sim = False
 
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                or 'view_changed' in dict_sig or self.needs_draw:
+            if 'data_changed' in dict_sig:
                 # todo: after 'data_changed' all needs to be set to True except current widget
+                self.needs_draw = True
+                self.needs_redraw[:] = [True] * 2
+                self.draw()
+
+            if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.draw()
 
             elif 'home' in dict_sig:
@@ -182,7 +186,7 @@ class Plot_Impz(QWidget):
                 self.needs_redraw[self.tabWidget.currentIndex()] = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw[self.tabWidget.currentIndex()]:
-                self.needs_redraw[:] = [True] * 3
+                self.needs_redraw[:] = [True] * 2
                 self.redraw() # redraw current widget
 
         else:
@@ -462,8 +466,7 @@ class Plot_Impz(QWidget):
     
             self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
 
-        self.needs_redraw[0] = True
-        self.needs_redraw[1] = True
+        self.needs_redraw[:] = [True] * 2
 
         # Calculate imag. and real components from response
         self.cmplx = np.any(np.iscomplex(self.y))
