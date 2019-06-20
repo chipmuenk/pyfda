@@ -455,7 +455,7 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def update_view(self):
         """
-        Only update the limits without recalculating the impulse response
+        Only update the limits without recalculating the stimulus and response
         """
         self.draw_impz()
 
@@ -470,6 +470,7 @@ class Plot_Impz(QWidget):
         if not hasattr(self, 'cmplx'): # has response been calculated yet?
             self.calc_stimulus()
             self.calc_response()
+            logger.error("Response should have been calculated by now!")
             
         f_unit = fb.fil[0]['freq_specs_unit']
         if f_unit in {"f_S", "f_Ny"}:
@@ -479,8 +480,6 @@ class Plot_Impz(QWidget):
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.load_fs()
-        #self.init_axes()
-
         
         idx = self.tabWidget.currentIndex()
         if idx == 0:
@@ -808,8 +807,6 @@ class Plot_Impz(QWidget):
         plt_stimulus = self.plt_freq_stim != "none" 
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
         
-
-        #if self.plt_freq != "None":
         if not self.plt_freq_disabled:
             if plt_response and not plt_stimulus:
                 XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
@@ -819,6 +816,10 @@ class Plot_Impz(QWidget):
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             F = np.fft.fftfreq(self.ui.N, d = 1. / fb.fil[0]['f_S'])
 
+        #-----------------------------------------------------------------
+        # - Enforce deep copy, scale and convert to RMS. 
+        # - Calculate total power P
+        # - Correct scale for single-sided spectrum (except at DC)
             if plt_stimulus:
                 X = self.X.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
                 self.Px = np.sum(np.square(self.X))
@@ -841,6 +842,9 @@ class Plot_Impz(QWidget):
                 Win = self.Win.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Win[1:] = 2 * Win[1:] # correct for single-sided spectrum (except DC)
+
+        #-----------------------------------------------------------------
+        # Calculate log FFT and power if selected, set units
 
             if self.ui.chk_log_freq.isChecked():
                 unit = unit_P = "dBW"
@@ -865,6 +869,8 @@ class Plot_Impz(QWidget):
 
             XY_str = XY_str + ' in ' + unit
 
+        #-----------------------------------------------------------------
+        # Set frequency range 
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
                 if plt_response:
@@ -918,7 +924,7 @@ class Plot_Impz(QWidget):
                 if self.plt_freq_stmq_mkr:
                     self.ax_fft.scatter(F, X_q, **self.fmt_mkr_stmq)
 
-                labels.append("$P_Xq$ = {0:.3g} {1}".format(self.Pxq, unit_P))
+                labels.append("$P_{{Xq}}$ = {0:.3g} {1}".format(self.Pxq, unit_P))
 
             if plt_response:
                 plot_resp_dict = self.fmt_plot_resp.copy()
