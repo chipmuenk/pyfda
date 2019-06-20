@@ -57,7 +57,19 @@ class Plot_Impz(QWidget):
         self.fx_sim = False # initial setting for fixpoint simulation
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
-        self.active_tab = 0 # index for active tab      
+        self.active_tab = 0 # index for active tab
+        
+        self.fxqc_dict = fb.fil[0]['fxqc'] # dict with fixpoint infos
+        
+        self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}        
+        self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_stim = {'color':'blue', 'alpha':0.5}
+        self.fmt_plot_stmq = {'color':'darkgreen', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_stmq = {'color':'darkgreen', 'alpha':0.5}
+
+        self.fmt_stem_stim = params['mpl_stimuli']
+
 
         self._construct_UI()
 
@@ -116,18 +128,16 @@ class Plot_Impz(QWidget):
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_mrk_time_resp.clicked.connect(self.draw_impz_time)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_mrk_time_stim.clicked.connect(self.draw_impz_time)
+        self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw_impz_time)        
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
         self.ui.chk_win_time.clicked.connect(self.draw_impz_time)
         # --- frequency domain plotting ---
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz_freq)
-        self.ui.chk_mrk_freq_resp.clicked.connect(self.draw_impz_freq)
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz_freq)
-        self.ui.chk_mrk_freq_stim.clicked.connect(self.draw_impz_freq)
+        self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw_impz_freq)        
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
         self.ui.chk_win_freq.clicked.connect(self.draw_impz_freq)
@@ -419,9 +429,13 @@ class Plot_Impz(QWidget):
                 logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                            .format(len(self.x), self.ui.N_end))
         else:
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win 
             self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
 
+            if self.fx_sim:
+                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
+                self.X_q = np.abs(np.fft.fft(x_q_win)) / self.ui.N            
+            
     #if self.plt_freq_resp != "none":
         if self.y is None or len(self.y) < self.ui.N_end:
             self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
@@ -467,14 +481,6 @@ class Plot_Impz(QWidget):
         self.ui.load_fs()
         #self.init_axes()
 
-        self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}        
-        self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_stim = {'color':'blue', 'alpha':0.5}
-        self.fmt_plot_stim_q = {'color':'darkgreen', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_stim_q = {'color':'darkgreen', 'alpha':0.5}
-
-        self.fmt_stem_stim = params['mpl_stimuli']
         
         idx = self.tabWidget.currentIndex()
         if idx == 0:
@@ -551,9 +557,16 @@ class Plot_Impz(QWidget):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
-        self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower()
-        self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower()
-        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"
+        self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower().replace("*","")
+        self.plt_time_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_resp, data=False)
+
+        self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower().replace("*","")
+        self.plt_time_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stim, data=False)
+
+        self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower().replace("*","")
+        self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False)
+
+        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none" or self.plt_time_stmq != "none"
         
         self.mplwidget_t.fig.clf() # clear figure with axes
             
@@ -592,7 +605,6 @@ class Plot_Impz(QWidget):
         scale_i = scale_o = 1
         fx_min = -1.
         fx_max = 1.
-        fx_title = ""
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
             WO = 1
             try:
@@ -665,20 +677,24 @@ class Plot_Impz(QWidget):
         plot_stim_dict = self.fmt_plot_stim.copy()
         plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, 
                                       plot_stim_dict, self.ui.bottom_t)
-
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
-        if x_q is not None:
-            plot_stim_q_dict = self.fmt_plot_stim_q.copy()
-            plot_stim_q_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, 
-                                      plot_stim_q_dict, self.ui.bottom_t)
-            plot_stim_q_fnc(self.t[self.ui.N_start:], x_q[self.ui.N_start:], label='$x_q[n]$',
-                          **plot_stim_q_dict)
+
         # Add plot markers, this is way faster than normal stem plotting
-        if self.ui.chk_mrk_time_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
+        if self.plt_time_stim_mkr:
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], **self.fmt_mkr_stim)
-            if x_q is not None:
-                self.ax_r.scatter(self.t[self.ui.N_start:], x_q[self.ui.N_start:], **self.fmt_mkr_stim_q)
+
+        #-------------- Stimulus <q> plot --------------------------------
+        if x_q is not None and self.plt_time_stmq != "none":
+            plot_stmq_dict = self.fmt_plot_stmq.copy()
+            plot_stmq_fnc = self.plot_fnc(self.plt_time_stmq, self.ax_r, 
+                                      plot_stmq_dict, self.ui.bottom_t)
+            plot_stmq_fnc(self.t[self.ui.N_start:], x_q[self.ui.N_start:], label='$x_q[n]$',
+                          **plot_stmq_dict)
+            
+            if self.plt_time_stmq_mkr:
+                self.ax_r.scatter(self.t[self.ui.N_start:], x_q[self.ui.N_start:],
+                                  **self.fmt_mkr_stmq)
 
         # --------------- Response plot ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
@@ -688,7 +704,7 @@ class Plot_Impz(QWidget):
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
         # Add plot markers, this is way faster than normal stem plotting
-        if self.ui.chk_mrk_time_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
+        if self.plt_time_resp_mkr:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
 
         # --------------- Window plot ----------------------------------
@@ -706,7 +722,7 @@ class Plot_Impz(QWidget):
             plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
                      **plot_resp_dict)
             # Add plot markers, this is way faster than normal stem plotting
-            if self.ui.chk_mrk_time_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
+            if self.plt_time_resp_mkr:
                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:], 
                                   marker=mkfmt_i, **self.fmt_mkr_resp)
 
@@ -725,7 +741,7 @@ class Plot_Impz(QWidget):
             self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
         
-        self.ax_r.set_title(fx_title + self.title_str)
+        self.ax_r.set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
         
@@ -752,9 +768,18 @@ class Plot_Impz(QWidget):
         Clear the axes of the frequency domain matplotlib widgets and 
         calculate the fft
         """
-        self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False).lower()
-        self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False).lower()
-        self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_resp == "none"
+        self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False).lower().replace("*","")
+        self.plt_freq_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False)
+
+        self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False).lower().replace("*","")
+        self.plt_freq_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False)
+
+        self.plt_freq_stmq = qget_cmb_box(self.ui.cmb_plt_freq_stmq, data=False).lower().replace("*","")
+        self.plt_freq_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq, data=False)
+
+
+        self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_stmq == "none"\
+                                    and self.plt_freq_resp == "none"
        
         if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
             self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
@@ -782,6 +807,8 @@ class Plot_Impz(QWidget):
         self._init_axes_freq()
         plt_response = self.plt_freq_resp != "none" 
         plt_stimulus = self.plt_freq_stim != "none" 
+        plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
+        
 
         #if self.plt_freq != "None":
         if not self.plt_freq_disabled:
@@ -798,6 +825,13 @@ class Plot_Impz(QWidget):
                 self.Px = np.sum(np.square(self.X))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X[1:] = 2 * X[1:] # correct for single-sided spectrum (except DC)
+                    
+            if plt_stimulus_q:
+                X_q = self.X_q.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                self.Pxq = np.sum(np.square(self.X_q))
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    X_q[1:] = 2 * X_q[1:] # correct for single-sided spectrum (except DC)
+
             if plt_response:
                 Y = self.Y.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
                 self.Py = np.sum(np.square(self.Y))
@@ -816,6 +850,9 @@ class Plot_Impz(QWidget):
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
                     self.Px = 10*np.log10(self.Px)
+                if plt_stimulus_q:
+                    X_q = np.maximum(20 * np.log10(X_q), self.ui.bottom_f)
+                    self.Pxq = 10*np.log10(self.Pxq)
                 if plt_response:
                     Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
                     self.Py = 10*np.log10(self.Py)
@@ -835,6 +872,8 @@ class Plot_Impz(QWidget):
                     Y = np.fft.fftshift(Y)
                 if plt_stimulus:
                     X = np.fft.fftshift(X)
+                if plt_stimulus_q:
+                    X_q = np.fft.fftshift(X_q)                    
                 if self.ui.chk_win_freq.isChecked():
                     Win = np.fft.fftshift(Win)
                 F = np.fft.fftshift(F)
@@ -845,6 +884,8 @@ class Plot_Impz(QWidget):
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
                     X = X[0:self.ui.N//2]
+                if plt_stimulus_q:
+                    X_q = X_q[0:self.ui.N//2]
                 if self.ui.chk_win_freq.isChecked():
                     Win = Win[0:self.ui.N//2]
                 F = F[0:self.ui.N//2]
@@ -863,11 +904,23 @@ class Plot_Impz(QWidget):
                 
                 plot_stim_fnc(F, X, label='$Stim.$',**plot_stim_dict)
 
-                if self.ui.chk_mrk_freq_stim.isChecked() and self.plt_freq_stim not in {"dots","none"}:
+                if self.plt_freq_stim_mkr:
                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
 
                 labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
- 
+
+            if plt_stimulus_q:
+                plot_stmq_dict = self.fmt_plot_stmq.copy()
+                plot_stmq_fnc = self.plot_fnc(self.plt_freq_stmq, self.ax_fft, 
+                                              plot_stmq_dict, self.ui.bottom_f)
+                
+                plot_stmq_fnc(F, X_q, label='$Stim<q>.$',**plot_stmq_dict)
+
+                if self.plt_freq_stmq_mkr:
+                    self.ax_fft.scatter(F, X_q, **self.fmt_mkr_stmq)
+
+                labels.append("$P_Xq$ = {0:.3g} {1}".format(self.Pxq, unit_P))
+
             if plt_response:
                 plot_resp_dict = self.fmt_plot_resp.copy()
                 plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft,
@@ -875,11 +928,12 @@ class Plot_Impz(QWidget):
                 
                 plot_resp_fnc(F, Y, label='$Resp.$',**plot_resp_dict)
 
-                if self.ui.chk_mrk_freq_resp.isChecked() and self.plt_freq_resp not in {"dots","none"}:
+                if self.plt_freq_resp_mkr:
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
                 
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
-
+                
+ 
             if self.ui.chk_win_freq.isChecked():
                 self.ax_fft.plot(F, Win, c="gray", label="win")
                 labels.append("{0}".format(self.ui.window_type))
