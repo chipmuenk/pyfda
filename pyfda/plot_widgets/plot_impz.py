@@ -481,6 +481,31 @@ class Plot_Impz(QWidget):
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.load_fs()
         
+        self.scale_i = self.scale_o = 1
+        self.fx_min = -1.
+        self.fx_max = 1.
+        if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
+            try:
+                if self.ui.chk_fx_scale.isChecked():
+                    # display stimulus and response as integer values:
+                    # - multiply stimulus by 2 ** WF
+                    # - display response unscaled
+                    self.scale_i = 1 << self.fxqc_dict['QI']['WF']
+                    self.fx_min = - (1 << self.fxqc_dict['QO']['W']-1)
+                    self.fx_max = -self.fx_min - 1
+                else:
+                    # display values scaled as "real world values"
+                    self.scale_o = 1. / (1 << self.fxqc_dict['QO']['WF'])
+                    self.fx_min = -(1 << self.fxqc_dict['QO']['WI'])
+                    self.fx_max = -self.fx_min - self.scale_o
+                    
+            except AttributeError as e:
+                logger.error("Attribute error: {0}".format(e))
+            except TypeError as e:
+                logger.error("Type error: 'fxqc_dict'={0},\n{1}".format(self.fxqc_dict, e))
+            except ValueError as e:
+                logger.error("Value error: {0}".format(e))
+        
         idx = self.tabWidget.currentIndex()
         if idx == 0:
             self.draw_impz_time()
@@ -489,7 +514,6 @@ class Plot_Impz(QWidget):
         else:
             logger.error("Index {0} out of range!".format(idx))
 
-        
         #================ Plotting routine time domain =========================
     def _log_mode_time(self):
         """
@@ -601,64 +625,33 @@ class Plot_Impz(QWidget):
         mkfmt_i = 'd'
         
         self._init_axes_time()
-        scale_i = scale_o = 1
-        fx_min = -1.
-        fx_max = 1.
+
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
-            WO = 1
-            try:
-                WI_F = self.fxqc_dict['QI']['WF']
-                WO_F = self.fxqc_dict['QO']['WF']
-                WO_I = self.fxqc_dict['QO']['WI']
-                WO   = self.fxqc_dict['QO']['W']
-
-            except AttributeError as e:
-                logger.error("Attribute error: {0}".format(e))
-
-            except TypeError as e:
-                logger.error("Type error: 'fxqc_dict'={0},\n{1}".format(self.fxqc_dict, e))
-
-            except ValueError as e:
-                logger.error("Value error: {0}".format(e))
-
-            if self.ui.chk_fx_scale.isChecked():
-                # display stimulus and response as integer values:
-                # - multiply stimulus by 2 ** WF
-                # - display response unscaled
-                scale_i = 1 << WI_F
-                fx_min = - (1 << WO-1)
-                fx_max = -fx_min - 1
-            else:
-                # display values scaled as "real world values"
-                scale_o = 1. / (1 << WO_F)
-                fx_min = -(1 << WO_I)
-                fx_max = -fx_min - scale_o
-
-            x_q = self.q_i.fixp(self.x) * scale_i
+            x_q = self.q_i.fixp(self.x) * self.scale_i
             if self.ui.chk_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
-            logger.info("scale I:{0} O:{1}".format(scale_i, scale_o))
+            logger.info("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
-            x = np.maximum(20 * np.log10(abs(self.x * scale_i)), self.ui.bottom_t)
-            y = np.maximum(20 * np.log10(abs(self.y_r * scale_o)), self.ui.bottom_t)
+            x = np.maximum(20 * np.log10(abs(self.x * self.scale_i)), self.ui.bottom_t)
+            y = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
             win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
-            fx_min = 20*np.log10(abs(fx_min))
+            fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
-            x = self.x * scale_i
-            y = self.y_r * scale_o
+            x = self.x * self.scale_i
+            y = self.y_r * self.scale_o
             win = self.ui.win
             if self.cmplx:
-                y_i = self.y_i * scale_o
+                y_i = self.y_i * self.scale_o
             
             if self.cmplx:           
                 H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
@@ -821,27 +814,27 @@ class Plot_Impz(QWidget):
         # - Calculate total power P
         # - Correct scale for single-sided spectrum (except at DC)
             if plt_stimulus:
-                X = self.X.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                X = self.X.copy()/np.sqrt(2) * self.scale_i
                 self.Px = np.sum(np.square(self.X))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                    X[1:] = 2 * X[1:] # correct for single-sided spectrum (except DC)
+                    X[1:] = 2 * X[1:]
                     
             if plt_stimulus_q:
-                X_q = self.X_q.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                X_q = self.X_q.copy()/np.sqrt(2) * self.scale_i 
                 self.Pxq = np.sum(np.square(self.X_q))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                    X_q[1:] = 2 * X_q[1:] # correct for single-sided spectrum (except DC)
+                    X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
-                Y = self.Y.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                Y = self.Y.copy()/np.sqrt(2) * self.scale_o
                 self.Py = np.sum(np.square(self.Y))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                    Y[1:] = 2 * Y[1:] # correct for single-sided spectrum (except DC)
+                    Y[1:] = 2 * Y[1:]
 
             if self.ui.chk_win_freq.isChecked():
-                Win = self.Win.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                Win = self.Win.copy()/np.sqrt(2)
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                    Win[1:] = 2 * Win[1:] # correct for single-sided spectrum (except DC)
+                    Win[1:] = 2 * Win[1:]
 
         #-----------------------------------------------------------------
         # Calculate log FFT and power if selected, set units
