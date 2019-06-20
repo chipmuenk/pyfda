@@ -167,17 +167,15 @@ class Plot_Impz(QWidget):
             if 'fx_sim' in dict_sig:
                 if dict_sig['fx_sim'] == 'get_stimulus':
                     self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
-
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
- 
-#                elif not dict_sig['fx_sim']:
-#                    logger.error('Missing value for "fx_sim" key in dict_sig.')
-#                    #self.fx_sim = False
-#                else:
-#                    logger.error('Unknown option "{0}" for "fx_sim" key in dict_sig.'\
-#                                 .format(dict_sig['fx_sim']))
+                elif not dict_sig['fx_sim']:
+                    logger.error('Missing value for "fx_sim" key in dict_sig.')
+                    self.fx_sim = False
+                else:
+                    logger.error('Unknown option "{0}" for "fx_sim" key in dict_sig.'\
+                                .format(dict_sig['fx_sim']))
 #                    self.fx_sim = False                    
 
             if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
