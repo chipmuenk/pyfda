@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
+from numpy import pi
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
@@ -283,6 +284,8 @@ class Plot_Impz(QWidget):
         """
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
+        phi1 = self.ui.phi1 / 180 * pi
+        phi2 = self.ui.phi2 / 180 * pi
 
         # calculate stimuli x[n] ==============================================
         if self.ui.stim == "Pulse":
@@ -307,24 +310,24 @@ class Plot_Impz(QWidget):
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif self.ui.stim == "Cos":
-            self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.ui.f1) +\
-                self.ui.A2 * np.cos(2 * np.pi * self.n * self.ui.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
+                self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str = r'System Response to Cosine Signal'
             self.H_str = r'$y[n]$'
                 
         elif self.ui.stim == "Sine":
-            self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.ui.f1 + self.ui.phi1) +\
-                self.ui.A2 * np.sin(2 * np.pi * self.n * self.ui.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
+                self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str = r'System Response to Sinusoidal Signal'
             self.H_str = r'$y[n]$'
             
         elif self.ui.stim == "Rect":
-            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.ui.f1))
+            self.x = self.ui.A1 * np.sign(np.sin(2*pi * self.n * self.ui.f1 + phi1))
             self.title_str = r'System Response to Rect. Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
-            self.x = self.ui.A1 * sig.sawtooth(self.n * self.ui.f1 * 2*np.pi)
+            self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1)
             self.title_str = r'System Response to Sawtooth Signal'
             self.H_str = r'$y[n]$'
 

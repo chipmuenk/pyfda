@@ -149,7 +149,7 @@ class PlotImpz_UI(QWidget):
         # Controls for time domain
         # ---------------------------------------------------------------
 
-        lbl_plt_time_title = QLabel("<b>Time: Show</b>", self)
+        lbl_plt_time_title = QLabel("<b>Show</b>", self)
         
         self.lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
@@ -223,7 +223,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        lbl_plt_freq_title = QLabel("<b>Freq: Show</b>", self)
+        lbl_plt_freq_title = QLabel("<b>Show</b>", self)
         
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -326,17 +326,17 @@ class PlotImpz_UI(QWidget):
         layVCmb = QVBoxLayout()
         layVCmb.addWidget(self.cmbStimulus)
         layVCmb.addWidget(self.cmbNoise)
-
+        #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
-        self.ledAmp1.setToolTip("Stimulus amplitude.")
+        self.ledAmp1.setToolTip("Stimulus amplitude")
         self.ledAmp1.setObjectName("stimAmp1")
 
         self.lblAmp2 = QLabel(to_html("A_2", frmt='bi') + " =", self)
         self.ledAmp2 = QLineEdit(self)
         self.ledAmp2.setText(str(self.A2))
-        self.ledAmp2.setToolTip("Stimulus amplitude 2.")
+        self.ledAmp2.setToolTip("Stimulus amplitude 2")
         self.ledAmp2.setObjectName("stimAmp2")
 
         layVlblAmp = QVBoxLayout()
@@ -346,18 +346,47 @@ class PlotImpz_UI(QWidget):
         layVledAmp = QVBoxLayout()
         layVledAmp.addWidget(self.ledAmp1)
         layVledAmp.addWidget(self.ledAmp2)
+        
+        #----------------------------------------------
+        self.lblPhi1 = QLabel(to_html("&phi;_1", frmt='bi') + " =", self)
+        self.ledPhi1 = QLineEdit(self)
+        self.ledPhi1.setText(str(self.phi1))
+        self.ledPhi1.setToolTip("Stimulus phase")
+        self.ledPhi1.setObjectName("stimPhi1")
+        self.lblPhU1 = QLabel(to_html("&deg;", frmt='b'), self)
 
+        self.lblPhi2 = QLabel(to_html("&phi;_2", frmt='bi') + " =", self)
+        self.ledPhi2 = QLineEdit(self)
+        self.ledPhi2.setText(str(self.phi2))
+        self.ledPhi2.setToolTip("Stimulus phase 2")
+        self.ledPhi2.setObjectName("stimPhi2")
+        self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
+
+        layVlblPhi = QVBoxLayout()
+        layVlblPhi.addWidget(self.lblPhi1)
+        layVlblPhi.addWidget(self.lblPhi2)
+
+        layVledPhi = QVBoxLayout()
+        layVledPhi.addWidget(self.ledPhi1)
+        layVledPhi.addWidget(self.ledPhi2)
+        
+        layVlblPhU = QVBoxLayout()
+        layVlblPhU.addWidget(self.lblPhU1)
+        layVlblPhU.addWidget(self.lblPhU2)
+
+
+        #----------------------------------------------
         self.lblFreq1 = QLabel(to_html("f_1", frmt='bi') + " =", self)
         self.ledFreq1 = QLineEdit(self)
         self.ledFreq1.setText(str(self.f1))
-        self.ledFreq1.setToolTip("Stimulus frequency 1.")
+        self.ledFreq1.setToolTip("Stimulus frequency 1")
         self.ledFreq1.setObjectName("stimFreq1")
         self.lblFreqUnit1 = QLabel("f_S", self)
 
         self.lblFreq2 = QLabel(to_html("f_2", frmt='bi') + " =", self)
         self.ledFreq2 = QLineEdit(self)
         self.ledFreq2.setText(str(self.f2))
-        self.ledFreq2.setToolTip("Stimulus frequency 2.")
+        self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
         layVlblfreq = QVBoxLayout()
@@ -372,6 +401,7 @@ class PlotImpz_UI(QWidget):
         layVlblfreqU.addWidget(self.lblFreqUnit1)
         layVlblfreqU.addWidget(self.lblFreqUnit2)
 
+        #----------------------------------------------
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setText(str(self.noi))
@@ -390,7 +420,8 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC = QVBoxLayout()
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
-        
+
+        #----------------------------------------------        
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
@@ -399,6 +430,10 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addStretch(1)
         layH_ctrl_stim.addLayout(layVlblAmp)
         layH_ctrl_stim.addLayout(layVledAmp)
+        layH_ctrl_stim.addLayout(layVlblPhi)
+        layH_ctrl_stim.addLayout(layVledPhi)          
+        layH_ctrl_stim.addLayout(layVlblPhU)
+        layH_ctrl_stim.addStretch(1)        
         layH_ctrl_stim.addLayout(layVlblfreq)
         layH_ctrl_stim.addLayout(layVledfreq)
         layH_ctrl_stim.addLayout(layVlblfreqU)
@@ -440,6 +475,8 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
         self.ledAmp2.editingFinished.connect(self._update_amp2)
+        self.ledPhi1.editingFinished.connect(self._update_phi1)
+        self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.ledDC.editingFinished.connect(self._update_DC)
         
 #------------------------------------------------------------------------------
@@ -521,6 +558,12 @@ class PlotImpz_UI(QWidget):
         self.lblFreqUnit2.setVisible(f2_en)
         self.lblAmp2.setVisible(a2_en)
         self.ledAmp2.setVisible(a2_en)
+        self.lblPhi1.setVisible(f1_en)
+        self.ledPhi1.setVisible(f1_en)
+        self.lblPhU1.setVisible(f1_en)
+        self.lblPhi2.setVisible(f2_en)
+        self.ledPhi2.setVisible(f2_en)
+        self.lblPhU2.setVisible(f2_en)        
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
 
@@ -568,6 +611,18 @@ class PlotImpz_UI(QWidget):
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'a2'})
+
+    def _update_phi1(self):
+        """ Update value for self.phi1 from QLineEditWidget"""
+        self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
+        self.ledPhi1.setText(str(self.phi1))
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'phi1'})
+
+    def _update_phi2(self):
+        """ Update value for self.phi2 from the QLineEditWidget"""
+        self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
+        self.ledPhi2.setText(str(self.phi2))
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'phi2'})
 
 
     def _update_noi(self):
