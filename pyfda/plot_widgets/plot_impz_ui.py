@@ -189,10 +189,10 @@ class PlotImpz_UI(QWidget):
         self.chk_win_time.setToolTip("<span>Show FFT windowing function.</span>")
         self.chk_win_time.setChecked(False)
 
-        self.chk_fx_range = QCheckBox("Min/max.", self)
-        self.chk_fx_range.setObjectName("chk_fx_range")
-        self.chk_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
-        self.chk_fx_range.setChecked(False)
+        self.chk_fx_limits = QCheckBox("Min/max.", self)
+        self.chk_fx_limits.setObjectName("chk_fx_limits")
+        self.chk_fx_limits.setToolTip("<span>Display limits of fixpoint range.</span>")
+        self.chk_fx_limits.setChecked(False)
 
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(lbl_plt_time_title)
@@ -214,7 +214,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.chk_win_time)        
         layH_ctrl_time.addStretch(2)        
-        layH_ctrl_time.addWidget(self.chk_fx_range)
+        layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
         
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
