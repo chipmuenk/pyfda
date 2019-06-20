@@ -229,7 +229,6 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_range.setVisible(self.fx_sim)
-        self.hdl_dict = None
 
         if self.fx_sim:
             qstyle_widget(self.ui.but_run, "changed")
@@ -243,15 +242,7 @@ class Plot_Impz(QWidget):
         """        
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'start'})
 
-    def fx_set_hdl_dict(self, dict_sig):
-        """
-        Set local quantization dict
-        """
-        try:
-            self.hdl_dict = dict_sig['hdl_dict']
-        except (KeyError, ValueError) as e:
-            logger.warning(e)
-            
+
     def fx_set_stimulus(self, dict_sig):
         """
         - Calculate stimulus # TODO: needed?
@@ -264,7 +255,6 @@ class Plot_Impz(QWidget):
         - Copy simulation results to `dict_sig` as integer and transfer them to fixpoint filter
         """
 
-        self.hdl_dict = dict_sig['hdl_dict']
         self.calc_stimulus() # calculate selected stimulus with selected length
         # pass stimulus in self.x back  via dict
         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
@@ -608,17 +598,16 @@ class Plot_Impz(QWidget):
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
             WO = 1
             try:
-                logger.debug("hdl_dict = {0}".format(self.hdl_dict))
-                WI_F = self.hdl_dict['QI']['WF']
-                WO_F = self.hdl_dict['QO']['WF']
-                WO_I = self.hdl_dict['QO']['WI']
-                WO   = self.hdl_dict['QO']['W']
+                WI_F = self.fxqc_dict['QI']['WF']
+                WO_F = self.fxqc_dict['QO']['WF']
+                WO_I = self.fxqc_dict['QO']['WI']
+                WO   = self.fxqc_dict['QO']['W']
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
 
             except TypeError as e:
-                logger.error("Type error: 'hdl_dict'={0},\n{1}".format(self.hdl_dict, e))
+                logger.error("Type error: 'fxqc_dict'={0},\n{1}".format(self.fxqc_dict, e))
 
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
