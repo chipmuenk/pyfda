@@ -229,6 +229,8 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
+        self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
+        self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
 
         if self.fx_sim:
             qstyle_widget(self.ui.but_run, "changed")
