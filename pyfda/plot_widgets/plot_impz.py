@@ -165,23 +165,13 @@ class Plot_Impz(QWidget):
 
         if self.isVisible():
             if 'fx_sim' in dict_sig:
-#                try:  
-                    if dict_sig['fx_sim'] == 'get_stimulus':
-                        self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
-    
-                    elif dict_sig['fx_sim'] == 'set_results':
-                        logger.info("Received fixpoint results.")
-                        self.fx_get_results(dict_sig) # plot fx simulation results 
+                if dict_sig['fx_sim'] == 'get_stimulus':
+                    self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
 
-#                except KeyError as e:
-#                    logger.error('Key {0} missing in "hdl_dict".'.format(e))
-
-#                if dict_sig['fx_sim'] == 'get_stimulus':
-#                    self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
-#
-#                elif dict_sig['fx_sim'] == 'set_results':
-#                    logger.info("Received fixpoint results.")
-#                    self.fx_get_results(dict_sig) # plot fx simulation results 
+                elif dict_sig['fx_sim'] == 'set_results':
+                    logger.info("Received fixpoint results.")
+                    self.fx_get_results(dict_sig) # plot fx simulation results 
+ 
 #                elif not dict_sig['fx_sim']:
 #                    logger.error('Missing value for "fx_sim" key in dict_sig.')
 #                    #self.fx_sim = False
