@@ -1525,7 +1525,12 @@ def to_html(text, frmt=None):
         html = "<span>" + html + "</span>"
 
     if frmt != 'log': # this is a label, not a logger message
-        html = re.sub(r'([a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
+        # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
+        html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
+        # don't render numbers as italic
+#        if "<i>" in html:
+#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)', r'\1<span class="font-style:normal">\2</span>', html)
+
     #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
     # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
