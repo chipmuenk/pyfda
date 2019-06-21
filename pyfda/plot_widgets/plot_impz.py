@@ -172,11 +172,9 @@ class Plot_Impz(QWidget):
                     self.fx_get_results(dict_sig) # plot fx simulation results 
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing value for "fx_sim" key in dict_sig.')
-                    self.fx_sim = False
                 else:
                     logger.error('Unknown option "{0}" for "fx_sim" key in dict_sig.'\
-                                .format(dict_sig['fx_sim']))
-#                    self.fx_sim = False                    
+                                .format(dict_sig['fx_sim']))                   
 
             if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.impz()
