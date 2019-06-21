@@ -127,20 +127,20 @@ class Plot_Impz(QWidget):
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
 
         # --- time domain plotting ---
-        self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw_impz_time)        
+        self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz)
+        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz)
+        self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw_impz)        
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_limits.clicked.connect(self.draw_impz)
-        self.ui.chk_win_time.clicked.connect(self.draw_impz_time)
+        self.ui.chk_win_time.clicked.connect(self.draw_impz)
         # --- frequency domain plotting ---
-        self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz_freq)
-        self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz_freq)
-        self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw_impz_freq)        
+        self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz)
+        self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz)
+        self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw_impz)        
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
-        self.ui.chk_win_freq.clicked.connect(self.draw_impz_freq)
+        self.ui.chk_win_freq.clicked.connect(self.draw_impz)
         
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
