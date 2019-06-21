@@ -553,12 +553,13 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Start fix-point simulation: Send the ``fxqc_dict``
         containing all quantization information and request a stimulus signal
+        Not implemented yet
         """
         try:
             logger.info("Started python fixpoint simulation")
             self.update_fxqc_dict()
             self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
         except AttributeError as e:
@@ -575,7 +576,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("Started HDL fixpoint simulation")
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
         except  ValueError as e: # exception
