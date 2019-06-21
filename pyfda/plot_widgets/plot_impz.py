@@ -805,19 +805,19 @@ class Plot_Impz(QWidget):
         # - Correct scale for single-sided spectrum (except at DC)
             if plt_stimulus:
                 X = self.X.copy()/np.sqrt(2) * self.scale_i
-                self.Px = np.sum(np.square(X))
+                Px = np.sum(np.square(X))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X[1:] = 2 * X[1:]
                     
             if plt_stimulus_q:
                 X_q = self.X_q.copy()/np.sqrt(2) * self.scale_i 
-                self.Pxq = np.sum(np.square(X_q))
+                Pxq = np.sum(np.square(X_q))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
                 Y = self.Y.copy()/np.sqrt(2) * self.scale_o
-                self.Py = np.sum(np.square(Y))
+                Py = np.sum(np.square(Y))
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Y[1:] = 2 * Y[1:]
 
@@ -835,13 +835,13 @@ class Plot_Impz(QWidget):
                 nenbw = 10 * np.log10(self.ui.nenbw)
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
-                    self.Px = 10*np.log10(self.Px)
+                    Px = 10*np.log10(Px)
                 if plt_stimulus_q:
                     X_q = np.maximum(20 * np.log10(X_q), self.ui.bottom_f)
-                    self.Pxq = 10*np.log10(self.Pxq)
+                    Pxq = 10*np.log10(Pxq)
                 if plt_response:
                     Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
-                    self.Py = 10*np.log10(self.Py)
+                    Py = 10*np.log10(Py)
                 if self.ui.chk_win_freq.isChecked():
                     Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
             else:
@@ -895,7 +895,7 @@ class Plot_Impz(QWidget):
                 if self.plt_freq_stim_mkr:
                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
 
-                labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
+                labels.append("$P_X$ = {0:.3g} {1}".format(Px, unit_P))
 
             if plt_stimulus_q:
                 plot_stmq_dict = self.fmt_plot_stmq.copy()
@@ -907,7 +907,7 @@ class Plot_Impz(QWidget):
                 if self.plt_freq_stmq_mkr:
                     self.ax_fft.scatter(F, X_q, **self.fmt_mkr_stmq)
 
-                labels.append("$P_{{Xq}}$ = {0:.3g} {1}".format(self.Pxq, unit_P))
+                labels.append("$P_{{Xq}}$ = {0:.3g} {1}".format(Pxq, unit_P))
 
             if plt_response:
                 plot_resp_dict = self.fmt_plot_resp.copy()
@@ -919,7 +919,7 @@ class Plot_Impz(QWidget):
                 if self.plt_freq_resp_mkr:
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
                 
-                labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
+                labels.append("$P_Y$ = {0:.3g} {1}".format(Py, unit_P))
                 
  
             if self.ui.chk_win_freq.isChecked():
