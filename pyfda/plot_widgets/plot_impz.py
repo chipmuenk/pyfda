@@ -178,11 +178,14 @@ class Plot_Impz(QWidget):
 
             if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.impz()
+                
+ #           if 'fx_changed'
 
             elif 'data_changed' in dict_sig:
                 # todo: after 'data_changed' all needs to be set to True except current widget
                 self.needs_draw = True
                 self.needs_redraw[:] = [True] * 2
+                qstyle_widget(self.ui.but_run, "changed")
                 self.impz()
 
             elif 'home' in dict_sig:
@@ -214,6 +217,7 @@ class Plot_Impz(QWidget):
             self.calc_response()
             self.needs_draw = False
         self.draw_impz()
+        #qstyle_widget(self.ui.but_run, "normal")
 
 
     def fx_select(self):
