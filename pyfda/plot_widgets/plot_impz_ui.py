@@ -115,12 +115,12 @@ class PlotImpz_UI(QWidget):
         self.but_run = QPushButton("RUN", self)
         self.but_run.setToolTip("Run fixpoint simulation")
 
-        self.chk_fx_scale = QCheckBox("Integer scale", self)
+        self.chk_fx_scale = QCheckBox("Int. scale", self)
         self.chk_fx_scale.setObjectName("chk_fx_scale")
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
         self.chk_fx_scale.setChecked(False)
         
-        self.chk_stim_options = QCheckBox("Stimulus Options", self)
+        self.chk_stim_options = QCheckBox("Stim. Options", self)
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show options for stimulus signal.</span>")
         self.chk_stim_options.setChecked(True)
@@ -152,8 +152,6 @@ class PlotImpz_UI(QWidget):
         # Controls for time domain
         # ---------------------------------------------------------------
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
-
-        lbl_plt_time_title = QLabel("<b>Show</b>", self)
         
         self.lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
@@ -195,8 +193,6 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_limits.setChecked(False)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(lbl_plt_time_title)
-        layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)      
         layH_ctrl_time.addStretch(1)
@@ -226,8 +222,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        lbl_plt_freq_title = QLabel("<b>Show</b>", self)
-        
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)       
@@ -275,8 +269,6 @@ class PlotImpz_UI(QWidget):
 
         layH_ctrl_freq = QHBoxLayout()
 
-        layH_ctrl_freq.addWidget(lbl_plt_freq_title)
-        layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)      
         layH_ctrl_freq.addStretch(1)

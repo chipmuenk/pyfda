@@ -692,7 +692,7 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_time.isChecked():
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_type)
 
-        self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)
+        self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and self.plt_time_resp != "none":
@@ -717,7 +717,7 @@ class Plot_Impz(QWidget):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
-            self.ax_i.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)            
+            self.ax_i.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.7)            
         else:
             self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
@@ -935,7 +935,7 @@ class Plot_Impz(QWidget):
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0, alpha=0))
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0, alpha=0))
             self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
-                               fancybox=True, framealpha=0.5)
+                               fancybox=True, framealpha=0.7)
             
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
