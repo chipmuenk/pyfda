@@ -75,6 +75,7 @@ class Input_Fixpoint_Specs(QWidget):
 		
 		(1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
 			from fixpoint widget.) # currently not implemented
+        
 		2. ``fx_sim_hdl()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
 		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
