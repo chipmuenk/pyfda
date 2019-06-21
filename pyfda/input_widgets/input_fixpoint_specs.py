@@ -105,8 +105,6 @@ class Input_Fixpoint_Specs(QWidget):
             # Also set RUN button to "changed"
             self.wdg_dict2ui()
 
-        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
-                self.fx_sim_init() # not implemented: what should it do?
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
                 self.fx_sim_hdl()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
