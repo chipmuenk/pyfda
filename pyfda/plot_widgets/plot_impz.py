@@ -639,6 +639,8 @@ class Plot_Impz(QWidget):
         else:
             x = self.x * self.scale_i
             y = self.y_r * self.scale_o
+            fx_max = self.fx_max
+            fx_min = self.fx_min
             win = self.ui.win
             if self.cmplx:
                 y_i = self.y_i * self.scale_o
