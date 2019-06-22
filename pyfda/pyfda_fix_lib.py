@@ -16,6 +16,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
+try:
+    import deltasigma
+    from deltasigma import simulateDSM, synthesizeNTF
+    DS = True
+except ImportError:
+    DS = False
+        
 # from pyfda.pyfda_lib import qstr
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
@@ -653,11 +660,22 @@ class Fixed(object):
              # smallest integer i, such that i >= x
         elif self.quant == 'rint':   yq = np.rint(y)
              # round towards nearest int
+        elif self.quant == 'dsm':
+            if DS:
+                H = synthesizeNTF(order=3, osr=64, opt=1)
+                yq = simulateDSM(y*self.LSB, H)[0]/self.LSB
+                # returns four ndarrays:
+                # v: quantizer output (-1 or 1)
+                # xn: modulator states.
+                # xmax: maximum value that each state reached during simulation
+                # y: The quantizer input (ie the modulator output). 
+            else:
+                raise Exception('"deltasigma" Toolbox is not installed, cannot simulate.')
         elif self.quant == 'none':   yq = y
             # return unquantized value
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
-
+        logger.warning("yq: {0}-{1}-{2}".format(type(yq), np.shape(yq), yq))
         yq = yq * self.LSB
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
