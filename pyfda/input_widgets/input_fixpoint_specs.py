@@ -165,7 +165,7 @@ class Input_Fixpoint_Specs(QWidget):
                                 label='Input Format <i>Q<sub>X </sub></i>:')
         self.wdg_w_input.sig_tx.connect(self.sig_rx)
         
-        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'])
+        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'], cmb_q=['round','floor','dsm'])
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
         self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
