@@ -109,7 +109,6 @@ def rescale(mod, sig_i, QI, QO):
             mod.comb += sig_o.eq(sig_i_q >> dWI) # rescale for output width
         else:
             mod.comb += sig_o.eq(sig_i_q << -dWI)
-        #self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
     return sig_o
 
 
@@ -198,7 +197,7 @@ class UI_W(QWidget):
     def __init__(self, parent, q_dict, **kwargs):
         super(UI_W, self).__init__(parent)
         self.q_dict = q_dict
-        logger.warning(self.q_dict)
+        #logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
         self.ui2dict()
 
