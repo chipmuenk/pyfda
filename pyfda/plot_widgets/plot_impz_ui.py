@@ -72,7 +72,7 @@ class PlotImpz_UI(QWidget):
         self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
         self.noise = "None"
-        self.window = "Hann"
+        self.window = "Rect"
 
         self._construct_UI()
         self._enable_stim_widgets()
