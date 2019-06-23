@@ -311,7 +311,6 @@ class Tree_Builder(object):
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
             fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
-            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
 
             # First check whether fixpoint options of the filter designs are 
             # valid fixpoint classes by comparing them to the verified items of
