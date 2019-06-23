@@ -52,7 +52,7 @@ class PlotImpz_UI(QWidget):
         self.f2 = 0.03
         self.A1 = 1.0
         self.A2 = 0.0
-        self.phi1 = self.phi2 = 0 # not used yet
+        self.phi1 = self.phi2 = 0
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
@@ -104,8 +104,8 @@ class PlotImpz_UI(QWidget):
         self.lbl_N_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N_points))
-        self.led_N_points.setToolTip("<span>Number of points to calculate and display. "
-                                   "N = 0 tries to choose for you.</span>")
+        self.led_N_points.setToolTip("<span>Number of displayed data points. "
+                                   "<i>N</i> = 0 tries to choose for you.</span>")
 
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
@@ -122,7 +122,7 @@ class PlotImpz_UI(QWidget):
         
         self.chk_stim_options = QCheckBox("Stim. Options", self)
         self.chk_stim_options.setObjectName("chk_stim_options")
-        self.chk_stim_options.setToolTip("<span>Show options for stimulus signal.</span>")
+        self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
 
         layH_ctrl_run = QHBoxLayout()
@@ -157,19 +157,19 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
-        self.cmb_plt_time_resp.setToolTip("<span>Choose response plot style.</span>")
+        self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
         
         self.lbl_plt_time_stim = QLabel("Stimulus", self)
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
-        self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
+        self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
         
         self.lbl_plt_time_stmq = QLabel("Stim.<q>", self)
         self.cmb_plt_time_stmq = QComboBox(self)
         self.cmb_plt_time_stmq.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
-        self.cmb_plt_time_stmq.setToolTip("<span>Choose plot style for <em>quantized</em> stimulus.</span>")
+        self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
 
         self.chk_log_time = QCheckBox("dB", self)
         self.chk_log_time.setObjectName("chk_log_time")
@@ -226,19 +226,19 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
-        self.cmb_plt_freq_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
+        self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel("Stim.<q>", self)
         self.cmb_plt_freq_stmq = QComboBox(self)
         self.cmb_plt_freq_stmq.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
-        self.cmb_plt_freq_stmq.setToolTip("<span>Choose plot style for <em>quantized</em> stimulus.</span>")
+        self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
         
         self.lbl_plt_freq_resp = QLabel("Response", self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
-        self.cmb_plt_freq_resp.setToolTip("<span>Choose response plot style.</span>")
+        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
         self.chk_log_freq = QCheckBox("dB", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
@@ -254,7 +254,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
-        self.cmb_win_fft.setToolTip("Select window type.")
+        self.cmb_win_fft.setToolTip("FFT window type.")
         qset_cmb_box(self.cmb_win_fft, self.window)
 
         self.lblWinPar1 = QLabel("Param1")
@@ -305,13 +305,13 @@ class PlotImpz_UI(QWidget):
         self.lblStimulus = QLabel("Signal: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Rect","Saw"])
-        self.cmbStimulus.setToolTip("Select stimulus type.")
+        self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
-        self.cmbNoise.setToolTip("Select type of added noise.")
+        self.cmbNoise.setToolTip("Type of additive noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
 
         layVlblCmb = QVBoxLayout()
