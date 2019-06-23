@@ -813,20 +813,23 @@ class Plot_Impz(QWidget):
         # - Calculate total power P
         # - Correct scale for single-sided spectrum (except at DC)
             if plt_stimulus:
-                X = self.X.copy()/np.sqrt(2) * self.scale_i
-                Px = np.sum(np.square(X))
+                X = self.X.copy()/np.sqrt(2) * self.scale_i 
+                X[0] = X[0] * np.sqrt(2) # correct DC value
+                Px = 2*np.sum(np.square(X[1:])) + np.square(X[0])
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X[1:] = 2 * X[1:]
                     
             if plt_stimulus_q:
                 X_q = self.X_q.copy()/np.sqrt(2) * self.scale_i 
-                Pxq = np.sum(np.square(X_q))
+                X_q[0] = X_q[0] * np.sqrt(2) # correct DC value
+                Pxq = 2 * np.sum(np.square(X_q[1:])) + np.square(X_q[0])
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
                 Y = self.Y.copy()/np.sqrt(2) * self.scale_o
-                Py = np.sum(np.square(Y))
+                Y[0] = Y[0] * np.sqrt(2) # correct DC value
+                Py = np.sum(np.square(Y[1:])) + np.square(Y[0])
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Y[1:] = 2 * Y[1:]
 
