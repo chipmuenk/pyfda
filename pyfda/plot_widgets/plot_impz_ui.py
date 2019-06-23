@@ -310,8 +310,8 @@ class PlotImpz_UI(QWidget):
 
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
-        self.cmbNoise.addItems(["None","Gauss","Uniform"])
-        self.cmbNoise.setToolTip("Select added noise type.")
+        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
+        self.cmbNoise.setToolTip("Select type of added noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
 
         layVlblCmb = QVBoxLayout()
@@ -541,23 +541,27 @@ class PlotImpz_UI(QWidget):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
         f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw"}
-        f2_en = self.stim in {"Cos", "Sine"}
-        a2_en = self.stim in {"Cos", "Sine"}       
+        f2_en = self.stim in {"Cos", "Sine"}               
         dc_en = self.stim not in {"Step", "StepErr"}
-        self.lblFreq1.setVisible(f1_en)
-        self.ledFreq1.setVisible(f1_en)
-        self.lblFreqUnit1.setVisible(f1_en)
-        self.lblFreq2.setVisible(f2_en)
-        self.ledFreq2.setVisible(f2_en)
-        self.lblFreqUnit2.setVisible(f2_en)
-        self.lblAmp2.setVisible(a2_en)
-        self.ledAmp2.setVisible(a2_en)
+        self.lblAmp1.setVisible(self.stim != "None")
+        self.ledAmp1.setVisible(self.stim != "None")
+        
         self.lblPhi1.setVisible(f1_en)
         self.ledPhi1.setVisible(f1_en)
         self.lblPhU1.setVisible(f1_en)
+        self.lblFreq1.setVisible(f1_en)
+        self.ledFreq1.setVisible(f1_en)
+        self.lblFreqUnit1.setVisible(f1_en)
+        
+        self.lblFreq2.setVisible(f2_en)
+        self.ledFreq2.setVisible(f2_en)
+        self.lblFreqUnit2.setVisible(f2_en)
+        self.lblAmp2.setVisible(f2_en)
+        self.ledAmp2.setVisible(f2_en)
         self.lblPhi2.setVisible(f2_en)
         self.ledPhi2.setVisible(f2_en)
-        self.lblPhU2.setVisible(f2_en)        
+        self.lblPhU2.setVisible(f2_en)
+        
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
 
@@ -637,6 +641,11 @@ class PlotImpz_UI(QWidget):
                                        "(e.g. quantization step size for quantization noise), "
                                        "centered around 0. Noise power is "
                                        "<i>P</i> = &Delta;<sup>2</sup>/12.</span>")
+            elif self.noise == 'prbs':
+                self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
+                self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
+                                       "Noise power is <i>P</i> = &Delta;<sup>2</sup>.</span>")
+
         self.sig_tx.emit({'sender':__name__, 'data_changed':'noi'})
 
     def _update_DC(self):

@@ -345,7 +345,11 @@ class Plot_Impz(QWidget):
             self.title_str += r' w/ Gaussian Noise'           
         elif self.ui.noise == "uniform":
             self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
-            self.title_str += r' w/ Uniform Noise' 
+            self.title_str += r' w/ Uniform Noise'
+        elif self.ui.noise == "prbs":
+            self.x[self.ui.N_start:] += self.ui.noi * 2 * \
+                        (np.random.randint(0, 2, self.ui.N)-0.5)
+            self.title_str += r' w/ PRBS' 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
@@ -429,8 +433,7 @@ class Plot_Impz(QWidget):
             if self.fx_sim:
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
                 self.X_q = np.abs(np.fft.fft(x_q_win)) / self.ui.N            
-            
-    #if self.plt_freq_resp != "none":
+
         if self.y is None or len(self.y) < self.ui.N_end:
             self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
             if self.y is None:
