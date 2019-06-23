@@ -36,6 +36,11 @@ if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
     HAS_MIGEN = True
 else:
     HAS_MIGEN = False
+try:
+    import deltasigma
+    HAS_DS = True
+except ImportError:
+    HAS_DS = False
 #------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs':'Fixpoint'} #: Dict containing class name : display name
@@ -165,7 +170,10 @@ class Input_Fixpoint_Specs(QWidget):
                                 label='Input Format <i>Q<sub>X </sub></i>:')
         self.wdg_w_input.sig_tx.connect(self.sig_rx)
         
-        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'], cmb_q=['round','floor','dsm'])
+        cmb_q = ['round','floor']
+        if HAS_DS:
+            cmb_q.append('dsm')
+        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'], cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
         self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
