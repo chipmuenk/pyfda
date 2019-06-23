@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi
+from numpy import pi, sin
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
@@ -286,6 +286,42 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate stimulus `self.x`
         """
+        def sawtooth_bl(t):
+            """
+            Bandlimited sawtooth function as a direct replacement for 
+            `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
+            by summing up all sine wave components up to the Nyquist frequency.
+            """
+            if t.dtype.char in ['fFdD']:
+                ytype = t.dtype.char
+            else:
+                ytype = 'd'
+                y = np.zeros(t.shape, ytype)
+            # Get sampling frequency from timebase
+            fs =  1 / (t[1] - t[0])
+            # Sum all multiple sine waves up to the Nyquist frequency:
+            for h in range(1, int(fs*pi)+1):
+                y += 2 / pi * -sin(h * t) / h
+            return y
+
+        def triangle_bl(t):
+            """
+            Bandlimited sawtooth function as a direct replacement for 
+            `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
+            by summing up all sine wave components up to the Nyquist frequency.
+            """
+            if t.dtype.char in ['fFdD']:
+                ytype = t.dtype.char
+            else:
+                ytype = 'd'
+                y = np.zeros(t.shape, ytype)
+            # Get sampling frequency from timebase
+            fs =  1 / (t[1] - t[0])
+            # Sum all multiple sine waves up to the Nyquist frequency:
+            for h in range(1, int(fs*pi)+1):
+                y += 2 / pi * -sin(h * t) / h
+            return y
+        
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
         phi1 = self.ui.phi1 / 180 * pi
@@ -325,15 +361,27 @@ class Plot_Impz(QWidget):
             self.title_str = r'System Response to Sinusoidal Signal'
             self.H_str = r'$y[n]$'
             
-        elif self.ui.stim == "Rect":
-            self.x = self.ui.A1 * np.sign(np.sin(2*pi * self.n * self.ui.f1 + phi1))
-            self.title_str = r'System Response to Rect. Signal'
+        elif self.ui.stim == "Triang":
+            self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1, width=0.5)
+#            self.x = self.ui.A1 * sawtooth_bl( 2*pi * self.n * self.ui.f1 + phi1)
+            self.title_str = r'System Response to Triangular Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
             self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1)
             self.title_str = r'System Response to Sawtooth Signal'
             self.H_str = r'$y[n]$'
+            
+        elif self.ui.stim == "Saw (BL)":
+            self.x = self.ui.A1 * sawtooth_bl( 2*pi * self.n * self.ui.f1 + phi1)
+            self.title_str = r'System Response to Bandlimited Sawtooth Signal'
+            self.H_str = r'$y[n]$'
+
+        elif self.ui.stim == "Rect":
+            self.x = self.ui.A1 * np.sign(np.sin(2*pi * self.n * self.ui.f1 + phi1))
+            self.title_str = r'System Response to Rect. Signal'
+            self.H_str = r'$y[n]$'
+
 
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
