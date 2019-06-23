@@ -642,9 +642,9 @@ class PlotImpz_UI(QWidget):
                                        "centered around 0. Noise power is "
                                        "<i>P</i> = &Delta;<sup>2</sup>/12.</span>")
             elif self.noise == 'prbs':
-                self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
+                self.lblNoi.setText(to_html("A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
-                                       "Noise power is <i>P</i> = &Delta;<sup>2</sup>.</span>")
+                                       "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
 
         self.sig_tx.emit({'sender':__name__, 'data_changed':'noi'})
 
