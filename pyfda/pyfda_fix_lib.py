@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 try:
-    import deltasigma
+    import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
+    print("DS Backends:", ds.simulation_backends)
     DS = True
 except ImportError:
     DS = False
@@ -662,20 +663,24 @@ class Fixed(object):
              # round towards nearest int
         elif self.quant == 'dsm':
             if DS:
+                # Synthesize DSM loop filter, 
+                # TODO: parameters should be adjustable via quantizer dict
                 H = synthesizeNTF(order=3, osr=64, opt=1)
-                yq = simulateDSM(y*self.LSB, H)[0]/self.LSB
+                # Calculate DSM stream and shift/scale it from -1 ... +1 to
+                # 0 ... 1 sequence
+                yq = (simulateDSM(y*self.LSB, H)[0]+1)/(2*self.LSB)
                 # returns four ndarrays:
                 # v: quantizer output (-1 or 1)
                 # xn: modulator states.
                 # xmax: maximum value that each state reached during simulation
                 # y: The quantizer input (ie the modulator output). 
             else:
-                raise Exception('"deltasigma" Toolbox is not installed, cannot simulate.')
+                raise Exception('"deltasigma" Toolbox not found.\n'
+                                'Try installing it with "pip install deltasigma".')
         elif self.quant == 'none':   yq = y
             # return unquantized value
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
-        logger.warning("yq: {0}-{1}-{2}".format(type(yq), np.shape(yq), yq))
         yq = yq * self.LSB
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
