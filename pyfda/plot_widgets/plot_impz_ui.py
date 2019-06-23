@@ -304,10 +304,17 @@ class PlotImpz_UI(QWidget):
         
         self.lblStimulus = QLabel("Signal: ", self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Rect","Saw"])
+        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Triang","Saw","Rect"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
-
+        
+        self.chk_stim_bl = QCheckBox("BL", self)
+        self.chk_stim_bl.setToolTip("<span>The signal is bandlimited to the Nyquist frequency "
+                                    "to avoid aliasing. However, it is much slower to generate "
+                                    "than the regular version.</span>")        
+        self.chk_stim_bl.setChecked(True)
+        self.chk_stim_bl.setObjectName("stim_bl")
+        
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
@@ -318,7 +325,12 @@ class PlotImpz_UI(QWidget):
         layVlblCmb.addWidget(self.lblStimulus)
         layVlblCmb.addWidget(self.lblNoise)
         layVCmb = QVBoxLayout()
-        layVCmb.addWidget(self.cmbStimulus)
+        layHCmbStim = QHBoxLayout()
+        layHCmbStim.addWidget(self.cmbStimulus)
+        layHCmbStim.addWidget(self.chk_stim_bl)
+        
+        #layVCmb.addWidget(self.cmbStimulus)
+        layVCmb.addLayout(layHCmbStim)
         layVCmb.addWidget(self.cmbNoise)
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
@@ -540,9 +552,12 @@ class PlotImpz_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw"}
+        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang"}
         f2_en = self.stim in {"Cos", "Sine"}               
         dc_en = self.stim not in {"Step", "StepErr"}
+
+        self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
+
         self.lblAmp1.setVisible(self.stim != "None")
         self.ledAmp1.setVisible(self.stim != "None")
         

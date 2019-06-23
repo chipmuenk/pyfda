@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi, sin
+from numpy import pi, sin, cos
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
@@ -129,6 +129,7 @@ class Plot_Impz(QWidget):
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz)
+        self.ui.chk_stim_bl.clicked.connect(self.draw_impz)        
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw_impz)        
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
@@ -285,6 +286,9 @@ class Plot_Impz(QWidget):
     def calc_stimulus(self):
         """
         (Re-)calculate stimulus `self.x`
+
+        Bandlimited periodic functions written by Endolith,
+        https://gist.github.com/endolith/407991
         """
         def sawtooth_bl(t):
             """
@@ -296,7 +300,7 @@ class Plot_Impz(QWidget):
                 ytype = t.dtype.char
             else:
                 ytype = 'd'
-                y = np.zeros(t.shape, ytype)
+            y = np.zeros(t.shape, ytype)
             # Get sampling frequency from timebase
             fs =  1 / (t[1] - t[0])
             # Sum all multiple sine waves up to the Nyquist frequency:
@@ -304,23 +308,57 @@ class Plot_Impz(QWidget):
                 y += 2 / pi * -sin(h * t) / h
             return y
 
-        def triangle_bl(t):
+        def triang_bl(t):
             """
-            Bandlimited sawtooth function as a direct replacement for 
-            `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
+            Bandlimited triangle function as a direct replacement for 
+            `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
             by summing up all sine wave components up to the Nyquist frequency.
             """
             if t.dtype.char in ['fFdD']:
                 ytype = t.dtype.char
             else:
                 ytype = 'd'
-                y = np.zeros(t.shape, ytype)
+            y = np.zeros(t.shape, ytype)
             # Get sampling frequency from timebase
             fs =  1 / (t[1] - t[0])
             # Sum all multiple sine waves up to the Nyquist frequency:
-            for h in range(1, int(fs*pi)+1):
-                y += 2 / pi * -sin(h * t) / h
+            for h in range(1, int(fs * pi) + 1, 2):
+                y += 8 / pi**2 * -cos(h * t) / h**2            
             return y
+            
+        def rect_bl(t, duty=0.5):
+            """
+            Bandlimited rectangular function as a direct replacement for 
+            `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
+            by summing up all sine wave components up to the Nyquist frequency.
+            """
+            if t.dtype.char in ['fFdD']:
+                ytype = t.dtype.char
+            else:
+                ytype = 'd'
+            y = np.zeros(t.shape, ytype)
+            # Get sampling frequency from timebase
+            # Sum all multiple sine waves up to the Nyquist frequency:
+            y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
+            return y
+        def comb_bl(t, duty=0.5):
+            """
+            Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
+            by summing up all cosine components up to the Nyquist frequency.
+            """
+            if t.dtype.char in ['fFdD']:
+                ytype = t.dtype.char
+            else:
+                ytype = 'd'
+            y = np.zeros(t.shape, ytype)
+            # Get sampling frequency from timebase
+            # Sum all multiple sine waves up to the Nyquist frequency:
+            fs =  1 / (t[1] - t[0])            
+            N = int(fs * pi) + 1
+            for h in range(1, N):
+                y += cos(h * t)
+            y /= N
+            return y       
         
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
@@ -362,24 +400,30 @@ class Plot_Impz(QWidget):
             self.H_str = r'$y[n]$'
             
         elif self.ui.stim == "Triang":
-            self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1, width=0.5)
-#            self.x = self.ui.A1 * sawtooth_bl( 2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str = r'System Response to Triangular Signal'
+            if self.ui.chk_stim_bl.isChecked():
+                self.x = self.ui.A1 * triang_bl( 2*pi * self.n * self.ui.f1 + phi1)                
+                self.title_str = r'System Response to Bandlimited Triangular Signal'
+            else:
+                self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1, width=0.5)
+                self.title_str = r'System Response to Triangular Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
-            self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str = r'System Response to Sawtooth Signal'
-            self.H_str = r'$y[n]$'
-            
-        elif self.ui.stim == "Saw (BL)":
-            self.x = self.ui.A1 * sawtooth_bl( 2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str = r'System Response to Bandlimited Sawtooth Signal'
+            if self.ui.chk_stim_bl.isChecked():
+                self.x = self.ui.A1 * sawtooth_bl( 2*pi * self.n * self.ui.f1 + phi1)
+                self.title_str = r'System Response to Bandlimited Sawtooth Signal'                
+            else:
+                self.x = self.ui.A1 * sig.sawtooth( 2*pi * self.n * self.ui.f1 + phi1)
+                self.title_str = r'System Response to Sawtooth Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Rect":
-            self.x = self.ui.A1 * np.sign(np.sin(2*pi * self.n * self.ui.f1 + phi1))
-            self.title_str = r'System Response to Rect. Signal'
+            if self.ui.chk_stim_bl.isChecked():
+                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
+                self.title_str = r'System Response to Bandlimited Rect. Signal'                
+            else:
+                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
+                self.title_str = r'System Response to Rect. Signal'
             self.H_str = r'$y[n]$'
 
 
