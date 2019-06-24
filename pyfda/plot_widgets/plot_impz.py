@@ -522,13 +522,13 @@ class Plot_Impz(QWidget):
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
             # calculate absolute value, scale by N_FFT and convert to RMS
-            self.X = np.abs(np.fft.fft(x_win)) / (self.ui.N * np.sqrt(2))
+            self.X = np.abs(np.fft.fft(x_win)) / (self.ui.N * sqrt(2))
             self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
-                self.X_q = np.abs(np.fft.fft(x_q_win)) / (self.ui.N * np.sqrt(2))       
+                self.X_q = np.abs(np.fft.fft(x_q_win)) / (self.ui.N * sqrt(2))       
                 self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.N_end:
@@ -540,7 +540,8 @@ class Plot_Impz(QWidget):
                            .format(len(self.y), self.ui.N_end))             
         else:
             y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+            self.Y = np.abs(np.fft.fft(y_win)) / (self.ui.N * sqrt(2))
+            self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
             
         if self.ui.chk_win_freq.isChecked():
             self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
