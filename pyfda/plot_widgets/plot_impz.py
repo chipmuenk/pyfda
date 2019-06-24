@@ -341,7 +341,7 @@ class Plot_Impz(QWidget):
             # Sum all multiple sine waves up to the Nyquist frequency:
             y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
             return y
-        def comb_bl(t, duty=0.5):
+        def comb_bl(t):
             """
             Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
             by summing up all cosine components up to the Nyquist frequency.
@@ -426,6 +426,10 @@ class Plot_Impz(QWidget):
                 self.title_str = r'System Response to Rect. Signal'
             self.H_str = r'$y[n]$'
 
+        elif self.ui.stim == "Comb":
+            self.x = self.ui.A1 * comb_bl( 2*pi * self.n * self.ui.f1 + phi1)                
+            self.title_str = r'System Response to Bandlimited Comb Signal'
+            self.H_str = r'$y[n]$'
 
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
