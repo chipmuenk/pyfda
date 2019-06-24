@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi, sin, cos
+from numpy import pi, sin, cos, sqrt
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
@@ -519,12 +519,17 @@ class Plot_Impz(QWidget):
                 logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                            .format(len(self.x), self.ui.N_end))
         else:
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win 
-            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+            # multiply the  time signal with window function
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            # calculate absolute value, scale by N_FFT and convert to RMS
+            self.X = np.abs(np.fft.fft(x_win)) / (self.ui.N * np.sqrt(2))
+            self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
+                # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
-                self.X_q = np.abs(np.fft.fft(x_q_win)) / self.ui.N            
+                self.X_q = np.abs(np.fft.fft(x_q_win)) / (self.ui.N * np.sqrt(2))       
+                self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.N_end:
             self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
@@ -901,27 +906,28 @@ class Plot_Impz(QWidget):
             F = np.fft.fftfreq(self.ui.N, d = 1. / fb.fil[0]['f_S'])
 
         #-----------------------------------------------------------------
-        # - Enforce deep copy, scale and convert to RMS. 
-        # - Calculate total power P
+        # - Enforce deep copy, scale and convert to RMS by dividing by sqrt(2)
+        # - Correct RMS conversion at DC by multiplying with sqrt(2)
+        # - Calculate total power P from 
         # - Correct scale for single-sided spectrum (except at DC)
             if plt_stimulus:
-                X = self.X.copy()/np.sqrt(2) * self.scale_i 
-                X[0] = X[0] * np.sqrt(2) # correct DC value
+                X = self.X.copy() * self.scale_i 
                 Px = 2*np.sum(np.square(X[1:])) + np.square(X[0])
+                Px /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X[1:] = 2 * X[1:]
                     
             if plt_stimulus_q:
-                X_q = self.X_q.copy()/np.sqrt(2) * self.scale_i 
-                X_q[0] = X_q[0] * np.sqrt(2) # correct DC value
+                X_q = self.X_q.copy() * self.scale_i 
                 Pxq = 2 * np.sum(np.square(X_q[1:])) + np.square(X_q[0])
+                Pxq /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
-                Y = self.Y.copy()/np.sqrt(2) * self.scale_o
-                Y[0] = Y[0] * np.sqrt(2) # correct DC value
+                Y = self.Y.copy() * self.scale_o
                 Py = np.sum(np.square(Y[1:])) + np.square(Y[0])
+                Py /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Y[1:] = 2 * Y[1:]
 
