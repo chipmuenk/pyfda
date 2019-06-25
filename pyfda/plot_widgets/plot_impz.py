@@ -162,7 +162,7 @@ class Plot_Impz(QWidget):
         logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
                      .format(dict2str(dict_sig), self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop, {0}".format(dict2str(dict_sig)))
+            logger.warning("Stopped infinite loop:\n{0}".format(dict2str(dict_sig)))
 
         if self.isVisible():
             if 'fx_sim' in dict_sig:
@@ -172,15 +172,13 @@ class Plot_Impz(QWidget):
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
                 elif not dict_sig['fx_sim']:
-                    logger.error('Missing value for "fx_sim" key in dict_sig.')
+                    logger.error('Missing option for "fx_sim".')
                 else:
-                    logger.error('Unknown option "{0}" for "fx_sim" key in dict_sig.'\
-                                .format(dict_sig['fx_sim']))                   
+                    logger.error('Unknown "fx_sim" command option "{0}"\n'\
+                                 '\tsent by "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
 
             if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.impz()
-                
- #           if 'fx_changed'
 
             elif 'data_changed' in dict_sig:
                 # todo: after 'data_changed' all needs to be set to True except current widget
