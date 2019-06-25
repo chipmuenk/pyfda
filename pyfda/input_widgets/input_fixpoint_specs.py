@@ -117,7 +117,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_sim_set_stimulus(dict_sig)
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
-                             '\tsent by "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
+                             '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
 
 #------------------------------------------------------------------------------
 

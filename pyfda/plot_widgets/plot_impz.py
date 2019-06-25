@@ -175,7 +175,7 @@ class Plot_Impz(QWidget):
                     logger.error('Missing option for "fx_sim".')
                 else:
                     logger.error('Unknown "fx_sim" command option "{0}"\n'\
-                                 '\tsent by "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
+                                 '\treceived from "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
 
             if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.impz()
