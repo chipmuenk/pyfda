@@ -110,10 +110,13 @@ class Input_Fixpoint_Specs(QWidget):
             # Also set RUN button to "changed"
             self.wdg_dict2ui()
 
-        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
+        if 'fx_sim' in dict_sig:
+            if dict_sig['fx_sim'] == 'start':
                 self.fx_sim_hdl()
-        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
+            if dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
+            else:
+                logger.error('Unknown "fx_sim" command option "{0}".'.format(dict_sig['fx_sim']))
 
 #------------------------------------------------------------------------------
 
