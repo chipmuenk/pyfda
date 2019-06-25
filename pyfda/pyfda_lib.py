@@ -261,18 +261,29 @@ def set_dict_defaults(d, default_dict):
 
 #------------------------------------------------------------------------------
 
-def dict2str(d, N=10):
+def pprint_log(d, N=10, tab="\t"):
     """
-    Convert dict `d` to string, inserting a CR after each key:value pair. 
+    Provide pretty printed logging messages for dicts or lists.
+    
+    Convert dict `d` to string, inserting a CR+Tab after each key:value pair. 
     Long lists or arrays are truncated to `N` items.
+    
+    If `d` is a list or ndarray, truncate it to `N` items.
     """
-    s = ""
-    for k in d:
-        if type(d[k]) in {list, np.ndarray}:
-            s += k + ':' + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
-        else:
-            s += k + ':' + str(d[k])
-        s += '\n'
+
+    s = tab
+    if type(d) == dict:
+        for k in d:
+            if type(d[k]) in {list, np.ndarray}:
+                s += k + ' : ' + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
+            else:
+                s += k + ' : ' + str(d[k])
+            s += '\n' + tab
+    elif type(d) in {list, np.ndarray}:
+        s += str(d[: min(N-1, len(d))]) + ' ...'        
+    else:
+        s = d
+
     return s
 
 #------------------------------------------------------------------------------

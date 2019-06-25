@@ -24,7 +24,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
-from pyfda.pyfda_lib import qstr, cmp_version, dict2str
+from pyfda.pyfda_lib import qstr, cmp_version, pprint_log
 import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
@@ -90,7 +90,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict2str(dict_sig)))
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
@@ -605,21 +605,19 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            self.stim = dict_sig['fx_stimulus']
+            logger.info('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'.format( 
+                    dict_sig['sender'],
+                    pprint_log(dict_sig['fx_stimulus'], tab=" ")))
 
-            logger.info("\n Stim:{0}\nFX stim:{1}\n".format( 
-                        dict_sig['fx_stimulus'][0:min(len(dict_sig['fx_stimulus']),9)],
-                        self.stim[0:min(len(self.stim),9)]))
-
-            # Get the response from the simulation as  integer values
-            logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
-            self.fx_results=self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
+            # Run fixpoint simulation and
+            # get the response from the simulation as integer values
+            self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])         # Run the simulation
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
-                logger.info("FX response: {0}\n"\
-                            .format(self.fx_results[0:min(len(self.fx_results),9)]))
+                logger.info("fx_results: {0}"\
+                            .format(pprint_log(self.fx_results, tab= " ")))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot

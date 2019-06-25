@@ -21,7 +21,7 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fx
-from pyfda.pyfda_lib import expand_lim, to_html, safe_eval, dict2str
+from pyfda.pyfda_lib import expand_lim, to_html, safe_eval, pprint_log
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -160,9 +160,9 @@ class Plot_Impz(QWidget):
         """
                     
         logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict2str(dict_sig), self.needs_draw, self.isVisible()))
+                     .format(pprint_log(dict_sig), self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop:\n{0}".format(dict2str(dict_sig)))
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
 
         if self.isVisible():
             if 'fx_sim' in dict_sig:
