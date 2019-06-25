@@ -1508,6 +1508,7 @@ def to_html(text, frmt=None):
             text = text.replace(k,v)
     
     mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
+                ('\t','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
                 ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
                 ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
