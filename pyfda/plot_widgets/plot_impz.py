@@ -243,7 +243,7 @@ class Plot_Impz(QWidget):
         """
         self.sim_select = qget_cmb_box(self.ui.cmb_sim_select, data=False)
         self.fx_sim = (self.sim_select == 'Fixpoint')
-        self.ui.but_run.setVisible(self.fx_sim)
+        self.ui.but_run.setEnabled(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
         self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)

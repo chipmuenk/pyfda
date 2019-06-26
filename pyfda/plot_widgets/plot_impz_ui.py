@@ -94,7 +94,18 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.lbl_sim_select = QLabel("<b>Simulate</b>", self)
+        #self.lbl_sim_select = QLabel("<b>Simulate</b>", self)
+
+        self.but_run = QPushButton("RUN", self)
+        self.but_run.setToolTip("Run simulation")
+
+        self.chk_run_auto = QCheckBox("Auto", self)
+        self.chk_run_auto.setObjectName("chk_run_auto")
+        self.chk_run_auto.setToolTip("<span>Update response automatically when "
+                                     "parameters have been changed.</span>")
+        self.chk_run_auto.setChecked(False)
+        self.chk_run_auto.setEnabled(False)
+        
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
         qset_cmb_box(self.cmb_sim_select, "Float")
@@ -110,10 +121,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
-        self.led_N_start.setToolTip("<span>First point to plot.</span>")
-        
-        self.but_run = QPushButton("RUN", self)
-        self.but_run.setToolTip("Run fixpoint simulation")
+        self.led_N_start.setToolTip("<span>First point to plot.</span>")   
 
         self.chk_fx_scale = QCheckBox("Int. scale", self)
         self.chk_fx_scale.setObjectName("chk_fx_scale")
@@ -126,16 +134,16 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setChecked(True)
 
         layH_ctrl_run = QHBoxLayout()
-        layH_ctrl_run.addWidget(self.lbl_sim_select)
+        layH_ctrl_run.addWidget(self.but_run)
+        #layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
+        layH_ctrl_run.addWidget(self.chk_run_auto)
         layH_ctrl_run.addStretch(1)        
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
-        layH_ctrl_run.addStretch(1)
-        layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addStretch(2)        
         layH_ctrl_run.addWidget(self.chk_fx_scale)
         layH_ctrl_run.addStretch(2)        
