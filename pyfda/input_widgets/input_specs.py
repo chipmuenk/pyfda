@@ -19,6 +19,7 @@ from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
+from pyfda.pyfda_lib import pprint_log
 from pyfda.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
 
@@ -46,20 +47,25 @@ class Input_Specs(QWidget):
 
     def process_sig_rx_local(self, dict_sig=None):
         """
-        Flag signals coming in from local subwidgets as "local" before proceeding
-        with processing in `process_sig_rx`.
+        Flag signals coming in from local subwidgets with `propagate=True` before 
+        proceeding with processing in `process_sig_rx`.
         """
-        self.process_sig_rx(dict_sig, local=True)
+        self.process_sig_rx(dict_sig, propagate=True)
 
-    def process_sig_rx(self, dict_sig=None, local=False):
+    def process_sig_rx(self, dict_sig=None, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
+        
+        All signals terminate here unless the flag `propagate=True`.
+        
         The sender name of signals coming in from local subwidgets is changed to
         its parent widget (`input_specs`) to prevent infinite loops.
+
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite Loop!")
+            logger.debug("Stopped infinite loop:\n{0}\tpropagate={1}"\
+                           .format(pprint_log(dict_sig),propagate))
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
@@ -84,7 +90,7 @@ class Input_Specs(QWidget):
             # Pass new filter data from the global filter dict & set button = "ok"
             self.load_dict() 
 
-        if local:
+        if propagate:
             # local signals are propagated with the name of this widget,
             # global signals terminate here
             dict_sig.update({'sender':__name__})

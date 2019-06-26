@@ -154,15 +154,27 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig=None):
         """
-        Process signals coming from the navigation toolbar and input_tab_widgets
+        Flag signals coming in from local subwidgets with `propagate=True` before 
+        proceeding with processing in `process_sig_rx`.
+        """
+        self.process_sig_rx(dict_sig, propagate=True)
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None, propagate=False):
+        """
+        Process signals coming from the navigation toolbar, local widgets and
+        collected from input_tab_widgets
+        
+        All signals terminate here unless the flag `propagate=True`.
         """
                     
         logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
                      .format(pprint_log(dict_sig), self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            #return
 
         if self.isVisible():
             if 'fx_sim' in dict_sig:
@@ -201,6 +213,12 @@ class Plot_Impz(QWidget):
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 2
+                
+        if propagate:
+            # signals of local subwidgets are propagated with the name of this widget,
+            # global signals terminate here
+            dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)
 
 
 # =============================================================================
