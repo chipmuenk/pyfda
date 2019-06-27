@@ -90,7 +90,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, pprint_log(dict_sig)))
+        logger.info("SIG_RX - visible: {0}\n{1}"\
+                    .format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return

@@ -170,8 +170,8 @@ class Plot_Impz(QWidget):
         All signals terminate here unless the flag `propagate=True`.
         """
                     
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(pprint_log(dict_sig), self.needs_draw, self.isVisible()))
+        logger.info("SIG_RX - needs_draw: {0}, visible: {1}\n{2}"\
+                     .format(self.needs_draw, self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             #return
