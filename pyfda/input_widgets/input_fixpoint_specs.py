@@ -51,7 +51,9 @@ class Input_Fixpoint_Specs(QWidget):
     """
     # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
-    # incoming, connected to input_tab_widget.sig_tx
+    # incoming from subwidgets -> process_sig_rx_local
+    sig_rx_local = pyqtSignal(object) 
+    # incoming, connected to input_tab_widget.sig_rx
     sig_rx = pyqtSignal(object)
     # outcgoing
     sig_tx = pyqtSignal(object)
@@ -72,7 +74,15 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             self.state = "deactivated" # "invisible", "disabled"
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig=None):
+        """
+        Flag signals coming in from local subwidgets with `propagate=True` before 
+        proceeding with processing in `process_sig_rx`.
+        """
+        self.process_sig_rx(dict_sig, propagate=True)
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
 		
@@ -119,6 +129,12 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
+
+        if propagate:
+            # signals of local subwidgets are propagated with the name of this widget,
+            # global signals terminate here
+            dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)            
 
 #------------------------------------------------------------------------------
 
@@ -173,20 +189,20 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_w_input.sig_tx.connect(self.sig_rx)
+        self.wdg_w_input.sig_tx.connect(self.sig_rx_local)
         
         cmb_q = ['round','floor']
         if HAS_DS:
             cmb_q.append('dsm')
         self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'], cmb_q=cmb_q)
-        self.wdg_q_input.sig_tx.connect(self.sig_rx)
+        self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
         
         self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_w_output.sig_tx.connect(self.sig_rx)
+        self.wdg_w_output.sig_tx.connect(self.sig_rx_local)
 
         self.wdg_q_output = UI_Q(self, q_dict = self.fxqc_dict['QO'])
-        self.wdg_q_output.sig_tx.connect(self.sig_rx)
+        self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         layVQioWdg = QVBoxLayout()
         layVQioWdg.addLayout(layHBtnsMsg)
@@ -272,7 +288,7 @@ class Input_Fixpoint_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-
+        self.sig_rx_local.connect(self.process_sig_rx_local)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
