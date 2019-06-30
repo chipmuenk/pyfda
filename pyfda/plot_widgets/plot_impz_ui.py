@@ -87,8 +87,7 @@ class PlotImpz_UI(QWidget):
         logger.debug("Processing {0}".format(dict_sig))
         if 'data_changed' in dict_sig:
             self.update_N(dict_sig) # this passes dict_sig on to sig_tx as well
-        else:
-            self.sig_tx.emit(dict_sig)
+        # TODO: dows this make sense?
 
     def _construct_UI(self):
         # ----------- ---------------------------------------------------
@@ -485,7 +484,10 @@ class PlotImpz_UI(QWidget):
 
         # --- stimulus control ---
         self.chk_stim_options.clicked.connect(self._show_stim_options)
+        
+        self.chk_stim_bl.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
+        
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
@@ -681,7 +683,8 @@ class PlotImpz_UI(QWidget):
 
     def update_N(self, dict_sig=None):
         """
-        Update values for self.N and self.N_start from the QLineEditWidget
+        Update values for self.N and self.N_start from the QLineEditWidget,
+        update the window and fire "data_changed"
         """
         self.N_start = safe_eval(self.led_N_start.text(), 0, return_type='int', sign='pos')
         self.led_N_start.setText(str(self.N_start))

@@ -100,32 +100,31 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.info("SIG_RX - visible: {0}\n{1}"\
-                    .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.info("SIG_RX - vis: {0} | prop: {1}\n{2}"\
+                    .format(self.isVisible(), propagate, pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
-        if 'data_changed' in dict_sig:
+        elif 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed and set RUN button to "changed"
             # TODO: This needs to be changed
             self.wdg_dict2ui()
-        if 'filt_changed' in dict_sig:
+        elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
-        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed"
             self.wdg_dict2ui()
-        if 'fixp_changed' in dict_sig:
-            # fixpoint settings have been changed somewhere, 
-            # Also set RUN button to "changed"
-            self.wdg_dict2ui()
-
-        if 'fx_sim' in dict_sig:
+        elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'start':
                 self.fx_sim_hdl()
-            if dict_sig['fx_sim'] == 'set_stimulus':
+            elif dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
+            elif dict_sig['fx_sim'] == 'specs_changed':
+                # fixpoint specification have been changed somewhere, update ui
+                # and set run button to "changed"
+                self.wdg_dict2ui()
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))

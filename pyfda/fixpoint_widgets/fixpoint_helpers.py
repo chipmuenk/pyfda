@@ -298,7 +298,7 @@ class UI_W(QWidget):
 
         self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
         
-        dict_sig = {'sender':__name__, 'fixp_changed':''}
+        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
         self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
@@ -466,7 +466,7 @@ class UI_Q(QWidget):
         self.q_dict.update({'ovfl': self.cmbOvfl.currentText(),
                             'quant': self.cmbQuant.currentText()})
         
-        dict_sig = {'sender':__name__, 'fixp_changed':''}
+        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
         self.sig_tx.emit(dict_sig)
 
     #--------------------------------------------------------------------------
