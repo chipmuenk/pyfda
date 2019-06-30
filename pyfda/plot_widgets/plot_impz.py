@@ -194,7 +194,7 @@ class Plot_Impz(QWidget):
                     logger.error('Unknown "fx_sim" command option "{0}"\n'\
                                  '\treceived from "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
 
-            if 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
+            elif 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
                 self.impz()
 
             elif 'data_changed' in dict_sig or\
