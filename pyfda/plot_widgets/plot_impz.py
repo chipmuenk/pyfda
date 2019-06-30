@@ -275,7 +275,7 @@ class Plot_Impz(QWidget):
         """
         Emit a signal that settings of the widget have changed
         """        
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'changed'})
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
 
     def fx_run(self):
         """
