@@ -146,7 +146,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
         # When user has selected a different tab, trigger a recalculation of current tab
-        self.tabWidget.currentChanged.connect(self.impz) # passes number of active tab
+        self.tabWidget.currentChanged.connect(self.draw_impz) # passes number of active tab
         # TODO: redraw is sufficient?
 
         self.sig_rx.connect(self.process_sig_rx)
@@ -236,11 +236,11 @@ class Plot_Impz(QWidget):
 
     def impz(self):
         """
-        Recalculate response and redraw it
+        If necessary, calculate response and redraw it
         """
         qstyle_widget(self.ui.but_run, "changed")
         if self.ui.chk_run_auto.isChecked():
-            if self.needs_draw: # self.needs_draw: doesn't work yet - number of data points needs to updated
+            if self.needs_draw:
                 logger.error("Draw Impz!")
                 self.calc_stimulus()
                 self.calc_response()
@@ -249,7 +249,7 @@ class Plot_Impz(QWidget):
                 logger.error("not draw Impz")
             self.draw_impz()
             qstyle_widget(self.ui.but_run, "normal")
-
+# =============================================================================
 
     def fx_select(self):
         """
@@ -288,12 +288,13 @@ class Plot_Impz(QWidget):
         """
         - Calculate stimulus # TODO: needed?
         
-        - Quantize the stimulus with the selected input quantization settings
+        - Quantize the stimulus `self.x` with the selected input quantization settings
         
 		- Scale it with the input word length, i.e. with 2**(W-1) (input) to obtain
           integer values # TODO: correct?
           
-        - Copy simulation results to `dict_sig` as integer and transfer them to fixpoint filter
+        - Convert simulation results to integer and copy them to `dict_sig`,
+          and transfer them to fixpoint filter with `'fx_sim':'set_stimulus'`
         """
 
         self.calc_stimulus() # calculate selected stimulus with selected length
@@ -476,9 +477,9 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_fft(self):
         """
-        (Re-)calculate ffts X(f) and Y(f) of stimulus and response
+        (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q` 
+        and response `self.Y`.
         """
-        #if self.plt_freq_resp != "none":
         # calculate FFT of stimulus / response
         if self.x is None or len(self.x) < self.ui.N_end:
             self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
