@@ -147,22 +147,9 @@ class Plot_Impz(QWidget):
         
         # When user has selected a different tab, trigger a recalculation of current tab
         self.tabWidget.currentChanged.connect(self.draw_impz) # passes number of active tab
-        # TODO: redraw is sufficient?
 
         self.sig_rx.connect(self.process_sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
-
-##------------------------------------------------------------------------------
-#    def process_sig_rx_local(self, dict_sig=None):
-#        """
-#        Flag signals coming in from local subwidgets with `propagate=True` before 
-#        proceeding with processing in `process_sig_rx`.
-#        """
-#        logger.info("SIG_RXLOC - needs_draw: {0} | vis: {1}\n{2}"\
-#                     .format(self.needs_draw, self.isVisible(), pprint_log(dict_sig)))
-#
-#        #self.fx_changed()
-#        self.process_sig_rx(dict_sig, propagate=True)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None, propagate=False):
@@ -199,6 +186,9 @@ class Plot_Impz(QWidget):
 
             elif 'data_changed' in dict_sig or\
                     ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
+
+                self.ui.update_N(dict_sig)
+
                 self.needs_draw = True
                 self.needs_redraw[:] = [True] * 2
                 qstyle_widget(self.ui.but_run, "changed")

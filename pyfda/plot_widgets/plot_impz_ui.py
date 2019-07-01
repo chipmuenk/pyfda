@@ -79,15 +79,6 @@ class PlotImpz_UI(QWidget):
         self.update_N() # also updates window function
         self._update_noi()
 
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming from the navigation toolbar
-        """
-        logger.debug("Processing {0}".format(dict_sig))
-        if 'data_changed' in dict_sig:
-            self.update_N(dict_sig) # this passes dict_sig on to sig_tx as well
-        # TODO: dows this make sense?
 
     def _construct_UI(self):
         # ----------- ---------------------------------------------------
@@ -465,10 +456,6 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.installEventFilter(self)
 
         #----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
-        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
@@ -476,8 +463,6 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.editingFinished.connect(self.update_N)
 
         # --- frequency control ---
-        #self.chkLogF.clicked.connect(self._log_mode_freq)
-        #self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._update_win_fft)
@@ -772,8 +757,6 @@ class PlotImpz_UI(QWidget):
 
         if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
-        else:
-            self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
@@ -785,7 +768,6 @@ class PlotImpz_UI(QWidget):
         An improvement would be to calculate the dominant pole and the corresponding
         settling time.
         """
-
         if N_user == 0: # set number of data points automatically
             if fb.fil[0]['ft'] == 'IIR':
                 N = 100
