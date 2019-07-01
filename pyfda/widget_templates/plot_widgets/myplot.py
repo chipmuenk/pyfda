@@ -26,7 +26,7 @@ class Myplot(QWidget):
 
     def __init__(self, parent):
         super(Myplot, self).__init__(parent)
-        self.needs_draw = True   # flag whether plot needs to be updated  
+        self.needs_calc = True   # flag whether plot needs to be recalculated 
         self.needs_redraw = True # flag whether plot needs to be redrawn 
         self.tool_tip = "My first pyfda plot widget"
         self.tab_label = "xxx"

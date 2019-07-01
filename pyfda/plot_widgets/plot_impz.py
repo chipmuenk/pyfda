@@ -52,7 +52,7 @@ class Plot_Impz(QWidget):
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
 
         # initial settings
-        self.needs_draw = True   # flag whether plots need to be updated 
+        self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         self.fx_sim = False # initial setting for fixpoint simulation
         self.tool_tip = "Impulse and transient response"
@@ -160,8 +160,8 @@ class Plot_Impz(QWidget):
         All signals terminate here unless the flag `propagate=True`.
         """
                     
-        logger.info("SIG_RX - needs_draw: {0} | vis: {1}\n{2}"\
-                     .format(self.needs_draw, self.isVisible(), pprint_log(dict_sig)))
+        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
+                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -181,7 +181,7 @@ class Plot_Impz(QWidget):
                     logger.error('Unknown "fx_sim" command option "{0}"\n'\
                                  '\treceived from "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
 
-            elif 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_draw:
+            elif 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_calc:
                 self.impz()
 
             elif 'data_changed' in dict_sig or\
@@ -189,7 +189,7 @@ class Plot_Impz(QWidget):
 
                 self.ui.update_N(dict_sig)
 
-                self.needs_draw = True
+                self.needs_calc = True
                 self.needs_redraw[:] = [True] * 2
                 qstyle_widget(self.ui.but_run, "changed")
                 if 'ui' in dict_sig['sender']:
@@ -209,7 +209,7 @@ class Plot_Impz(QWidget):
         else: # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or\
                     ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
-                self.needs_draw = True
+                self.needs_calc = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 2
                 

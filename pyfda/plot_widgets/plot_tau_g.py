@@ -39,7 +39,7 @@ class Plot_tau_g(QWidget):
     def __init__(self, parent):
         super(Plot_tau_g, self).__init__(parent)
         self.verbose = True # suppress warnings
-        self.needs_draw = True   # flag whether plot needs to be updated
+        self.needs_calc = True   # flag whether plot needs to be recalculated
         self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Group delay"
         self.tab_label = "\U0001D70F(f)"#"tau_g" \u03C4
@@ -94,12 +94,12 @@ class Plot_tau_g(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_draw, self.isVisible()))
+        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
-                self.needs_draw = False
+                self.needs_calc = False
                 self.needs_redraw = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw:
@@ -109,7 +109,7 @@ class Plot_tau_g(QWidget):
                 self.update_view()
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
-                self.needs_draw = True
+                self.needs_calc = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
 
