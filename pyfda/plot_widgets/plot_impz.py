@@ -168,13 +168,17 @@ class Plot_Impz(QWidget):
 
         if self.isVisible():
             if 'fx_sim' in dict_sig:
-                if dict_sig['fx_sim'] == 'get_stimulus':
+                if dict_sig['fx_sim'] == 'specs_changed':
+                    qstyle_widget(self.ui.but_run, "changed")
+                elif dict_sig['fx_sim'] == 'start':
+                    #  TODO: What should it do?
+                    qstyle_widget(self.ui.but_run, "changed")
+                    
+                elif dict_sig['fx_sim'] == 'get_stimulus':
                     self.fx_set_stimulus(dict_sig) # setup stimulus for fxpoint simulation
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
-                elif dict_sig['fx_sim'] == 'specs_changed':
-                    qstyle_widget(self.ui.but_run, "changed")
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing option for "fx_sim".')
                 else:
@@ -226,19 +230,27 @@ class Plot_Impz(QWidget):
 
     def impz(self):
         """
+        Calculate response and redraw it automatically if checkbox is selected
+        """             
+        if self.ui.chk_run_auto.isChecked():
+            self.impz_run()
+
+    def impz_run(self):
+        """
         If necessary, calculate response and redraw it
         """
-        qstyle_widget(self.ui.but_run, "changed")
-        if self.ui.chk_run_auto.isChecked():
-            if self.needs_draw:
-                logger.error("Draw Impz!")
-                self.calc_stimulus()
-                self.calc_response()
-                self.needs_draw = False
-            else:
-                logger.error("not draw Impz")
+        if self.needs_calc:
+            logger.error("Calc Impz!")
+            self.calc_stimulus()
+            self.calc_response()
+            self.needs_calc = False
+            self.needs_redraw = [True] * 2
+        if self.needs_redraw:
+            logger.error("Redraw Impz")
             self.draw_impz()
-            qstyle_widget(self.ui.but_run, "normal")
+            self.needs_redraw[self.tabWidget.currentIndex()] = False
+        qstyle_widget(self.ui.but_run, "normal")
+
 # =============================================================================
 
     def fx_select(self):
