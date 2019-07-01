@@ -152,7 +152,7 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None, propagate=False):
+    def process_sig_rx(self, dict_sig=None):#, propagate=False):
         """
         Process signals coming from the navigation toolbar, local widgets and
         collected from input_tab_widgets
@@ -160,8 +160,8 @@ class Plot_Impz(QWidget):
         All signals terminate here unless the flag `propagate=True`.
         """
                     
-        logger.info("SIG_RX - needs_draw: {0} | vis: {1} | prop: {2}\n{3}"\
-                     .format(self.needs_draw, self.isVisible(), propagate, pprint_log(dict_sig)))
+        logger.info("SIG_RX - needs_draw: {0} | vis: {1}\n{2}"\
+                     .format(self.needs_draw, self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -213,11 +213,11 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 2
                 
-        if propagate:
-            # signals of local subwidgets are propagated with the name of this widget,
-            # global signals terminate here
-            dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
+#        if propagate:
+#            # signals of local subwidgets are propagated with the name of this widget,
+#            # global signals terminate here
+#            dict_sig.update({'sender':__name__})
+#            self.sig_tx.emit(dict_sig)
 
 
 # =============================================================================
