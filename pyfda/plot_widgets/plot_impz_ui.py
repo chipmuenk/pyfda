@@ -46,7 +46,7 @@ class PlotImpz_UI(QWidget):
 
         # initial settings for lineedit widgets
         self.N_start = 0
-        self.N_points = 0
+        self.N = 0
         self.bottom_t = -80
         self.f1 = 0.02
         self.f2 = 0.03
@@ -113,7 +113,7 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_N_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.led_N_points = QLineEdit(self)
-        self.led_N_points.setText(str(self.N_points))
+        self.led_N_points.setText(str(self.N))
         self.led_N_points.setToolTip("<span>Number of displayed data points. "
                                    "<i>N</i> = 0 tries to choose for you.</span>")
 
