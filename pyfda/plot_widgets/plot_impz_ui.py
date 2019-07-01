@@ -46,7 +46,9 @@ class PlotImpz_UI(QWidget):
 
         # initial settings for lineedit widgets
         self.N_start = 0
+        self.N_user = 0
         self.N = 0
+        
         self.bottom_t = -80
         self.f1 = 0.02
         self.f2 = 0.03
@@ -667,17 +669,21 @@ class PlotImpz_UI(QWidget):
     # -------------------------------------------------------------------------
 
     def update_N(self, dict_sig=None):
+        # TODO: dict_Sig not needed here, call directly from impz, distinguish
+        # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
         update the window and fire "data_changed"
         """
-        self.N_start = safe_eval(self.led_N_start.text(), 0, return_type='int', sign='pos')
-        self.led_N_start.setText(str(self.N_start))
-        N_user = safe_eval(self.led_N_points.text(), 0, return_type='int', sign='pos')
-        if N_user == 0: # automatic calculation
-            self.N = self.calc_n_points(N_user) # widget remains set to 0
+        self.N_start = safe_eval(self.led_N_start.text(), self.N_start, return_type='int', sign='pos')
+        self.led_N_start.setText(str(self.N_start)) # update widget
+        self.N_user = safe_eval(self.led_N_points.text(), self.N_user, return_type='int', sign='pos')
+
+        if self.N_user == 0: # automatic calculation
+            self.N = self.calc_n_points(self.N_user) # widget remains set to 0
+            self.led_N_points.setText("0") # update widget
         else:
-            self.N = N_user
+            self.N = self.N_user
             self.led_N_points.setText(str(self.N)) # update widget
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
