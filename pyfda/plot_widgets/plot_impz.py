@@ -15,13 +15,14 @@ logger = logging.getLogger(__name__)
 from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi, sin, cos, sqrt
+from numpy import pi, sqrt
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fx
-from pyfda.pyfda_lib import expand_lim, to_html, safe_eval, pprint_log
+from pyfda.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
+        sawtooth_bl, triang_bl, comb_bl)
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -31,7 +32,6 @@ from .plot_impz_ui import PlotImpz_UI
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 # TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
-# TODO: ui for phases
 
 classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
 
@@ -322,79 +322,7 @@ class Plot_Impz(QWidget):
     def calc_stimulus(self):
         """
         (Re-)calculate stimulus `self.x`
-
-        Bandlimited periodic functions written by Endolith,
-        https://gist.github.com/endolith/407991
         """
-        def sawtooth_bl(t):
-            """
-            Bandlimited sawtooth function as a direct replacement for 
-            `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
-            by summing up all sine wave components up to the Nyquist frequency.
-            """
-            if t.dtype.char in ['fFdD']:
-                ytype = t.dtype.char
-            else:
-                ytype = 'd'
-            y = np.zeros(t.shape, ytype)
-            # Get sampling frequency from timebase
-            fs =  1 / (t[1] - t[0])
-            # Sum all multiple sine waves up to the Nyquist frequency:
-            for h in range(1, int(fs*pi)+1):
-                y += 2 / pi * -sin(h * t) / h
-            return y
-
-        def triang_bl(t):
-            """
-            Bandlimited triangle function as a direct replacement for 
-            `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
-            by summing up all sine wave components up to the Nyquist frequency.
-            """
-            if t.dtype.char in ['fFdD']:
-                ytype = t.dtype.char
-            else:
-                ytype = 'd'
-            y = np.zeros(t.shape, ytype)
-            # Get sampling frequency from timebase
-            fs =  1 / (t[1] - t[0])
-            # Sum all multiple sine waves up to the Nyquist frequency:
-            for h in range(1, int(fs * pi) + 1, 2):
-                y += 8 / pi**2 * -cos(h * t) / h**2            
-            return y
-            
-        def rect_bl(t, duty=0.5):
-            """
-            Bandlimited rectangular function as a direct replacement for 
-            `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
-            by summing up all sine wave components up to the Nyquist frequency.
-            """
-            if t.dtype.char in ['fFdD']:
-                ytype = t.dtype.char
-            else:
-                ytype = 'd'
-            y = np.zeros(t.shape, ytype)
-            # Get sampling frequency from timebase
-            # Sum all multiple sine waves up to the Nyquist frequency:
-            y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
-            return y
-        def comb_bl(t):
-            """
-            Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
-            by summing up all cosine components up to the Nyquist frequency.
-            """
-            if t.dtype.char in ['fFdD']:
-                ytype = t.dtype.char
-            else:
-                ytype = 'd'
-            y = np.zeros(t.shape, ytype)
-            # Get sampling frequency from timebase
-            # Sum all multiple sine waves up to the Nyquist frequency:
-            fs =  1 / (t[1] - t[0])            
-            N = int(fs * pi) + 1
-            for h in range(1, N):
-                y += cos(h * t)
-            y /= N
-            return y       
         
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
@@ -496,7 +424,8 @@ class Plot_Impz(QWidget):
     def calc_response(self, y_fx = None):
         """
         (Re-)calculate filter response `self.y` from either stimulus `self.x`
-        (float mode) or copy fixpoint response. 
+        or from the passed array (e.g. fixpoint response).
+        
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """

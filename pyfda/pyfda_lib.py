@@ -12,12 +12,11 @@ Library with various general functions and variables needed by the pyfda routine
 
 import os, re
 import sys, time
-import six
 import struct
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
-from numpy import pi, log10
+from numpy import pi, log10, sin, cos
 
 import scipy.signal as sig
 
@@ -505,6 +504,83 @@ def cround(x, n_dig = 0):
         else:
             x = np.around(x, n_dig)
     return x
+
+#------------------------------------------------------------------------------
+    """
+    Bandlimited periodic functions written by Endolith,
+    https://gist.github.com/endolith/407991
+    """
+
+def sawtooth_bl(t):
+    """
+    Bandlimited sawtooth function as a direct replacement for 
+    `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
+    by summing up all sine wave components up to the Nyquist frequency.
+    """
+    if t.dtype.char in ['fFdD']:
+        ytype = t.dtype.char
+    else:
+        ytype = 'd'
+    y = np.zeros(t.shape, ytype)
+    # Get sampling frequency from timebase
+    fs =  1 / (t[1] - t[0])
+    # Sum all multiple sine waves up to the Nyquist frequency:
+    for h in range(1, int(fs*pi)+1):
+        y += 2 / pi * -sin(h * t) / h
+    return y
+
+def triang_bl(t):
+    """
+    Bandlimited triangle function as a direct replacement for 
+    `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
+    by summing up all sine wave components up to the Nyquist frequency.
+    """
+    if t.dtype.char in ['fFdD']:
+        ytype = t.dtype.char
+    else:
+        ytype = 'd'
+    y = np.zeros(t.shape, ytype)
+    # Get sampling frequency from timebase
+    fs =  1 / (t[1] - t[0])
+    # Sum all multiple sine waves up to the Nyquist frequency:
+    for h in range(1, int(fs * pi) + 1, 2):
+        y += 8 / pi**2 * -cos(h * t) / h**2            
+    return y
+    
+def rect_bl(t, duty=0.5):
+    """
+    Bandlimited rectangular function as a direct replacement for 
+    `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
+    by summing up all sine wave components up to the Nyquist frequency.
+    """
+    if t.dtype.char in ['fFdD']:
+        ytype = t.dtype.char
+    else:
+        ytype = 'd'
+    y = np.zeros(t.shape, ytype)
+    # Get sampling frequency from timebase
+    # Sum all multiple sine waves up to the Nyquist frequency:
+    y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
+    return y
+def comb_bl(t):
+    """
+    Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
+    by summing up all cosine components up to the Nyquist frequency.
+    """
+    if t.dtype.char in ['fFdD']:
+        ytype = t.dtype.char
+    else:
+        ytype = 'd'
+    y = np.zeros(t.shape, ytype)
+    # Get sampling frequency from timebase
+    # Sum all multiple sine waves up to the Nyquist frequency:
+    fs =  1 / (t[1] - t[0])            
+    N = int(fs * pi) + 1
+    for h in range(1, N):
+        y += cos(h * t)
+    y /= N
+    return y       
+#------------------------------------------------------------------------------
 
 def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     """
