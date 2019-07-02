@@ -107,7 +107,6 @@ class Input_Fixpoint_Specs(QWidget):
             return
         elif 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed and set RUN button to "changed"
-            # TODO: This needs to be changed
             self.wdg_dict2ui()
         elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here
@@ -117,7 +116,7 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed. Also set RUN button to "changed"
             self.wdg_dict2ui()
         elif 'fx_sim' in dict_sig:
-            if dict_sig['fx_sim'] == 'start':
+            if dict_sig['fx_sim'] == 'init':
                 self.fx_sim_hdl()
             elif dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)

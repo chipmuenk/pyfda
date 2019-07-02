@@ -96,7 +96,6 @@ class PlotImpz_UI(QWidget):
         self.chk_run_auto.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
         self.chk_run_auto.setChecked(True)
-        self.chk_run_auto.setEnabled(False)
         
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
