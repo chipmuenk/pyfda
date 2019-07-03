@@ -125,7 +125,7 @@ class Plot_Impz(QWidget):
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
         self.ui.but_run.clicked.connect(self.impz_run)
-        self.ui.chk_run_auto.clicked.connect(self.fx_select)
+        self.ui.chk_run_auto.clicked.connect(self.impz)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
 
         # --- time domain plotting ---
@@ -180,8 +180,10 @@ class Plot_Impz(QWidget):
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
+
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing option for "fx_sim".')
+
                 else:
                     logger.error('Unknown "fx_sim" command option "{0}"\n'\
                                  '\treceived from "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
@@ -226,7 +228,8 @@ class Plot_Impz(QWidget):
     def impz(self):
         """
         Calculate response and redraw it automatically if checkbox is selected
-        """             
+        """
+        
         if self.ui.chk_run_auto.isChecked():
             self.impz_run()
 
@@ -251,22 +254,44 @@ class Plot_Impz(QWidget):
 
 # =============================================================================
 
-    def fx_select(self):
+    def fx_select(self, fx=None):
         """
-        Select between fixpoint and floating point simulation
+        Select between fixpoint and floating point simulation.
+        
+        parameter `fx` can be:
+            
+        str "Fixpoint" or "Float" when called directly or int 0 or 1 when triggered
+        by changing the index of combobox `self.ui.cmb_sim_select` (signal-slot-
+        connection)
+        
+        In any case, the combobox is set and checked whether it has
+        changed since last time.
         """
-        if (qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint') != self.fx_sim:    
+        logger.warning("FX Selected")
+
+        if fx in {0, 1}: # connected to index change of combo box
+            self.ui.cmb_sim_select.setCurrentIndex(fx)
+        elif fx in {"Float", "Fixpoint"}: # direct function call
+            qset_cmb_box(self.ui.cmb_sim_select, fx)
+        elif fx is None:
+            pass
+        elif type(fx) == bool: # triggered by clicking Checkbox for Autorun
+            self.ui.but_run.setEnabled(not fx)            
+        else:
+            logger.error('Unknown argument "{0}".'.format(fx))
+            return
+
+        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint' != self.fx_sim:    
             self.fx_sim = not self.fx_sim
             qstyle_widget(self.ui.but_run, "changed")
-            
+            self.needs_calc = True # needs to recalculate stimulus and response
+
         self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
         self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
         self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
-            
-        self.ui.but_run.setEnabled(not self.ui.chk_run_auto.isChecked())
 
         self.impz()
 
@@ -278,13 +303,12 @@ class Plot_Impz(QWidget):
         
         - initialize stimulus quantizer
         
-        - set fx simulation state to 'init'
+        - set fx simulation state to 'initialized'
         """     
         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-        qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
+        self.fx_select("Fixpoint")
         self.fx_sim_state = 'initialized'
-
 
     def fx_changed(self):
         """
@@ -312,7 +336,8 @@ class Plot_Impz(QWidget):
           `'fx_stimulus':<quantized stimulus>`
         """
 
-        qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
+        self.fx_select("Fixpoint")
+        
         self.calc_stimulus() # calculate selected stimulus with selected length
 
         # pass quantized stimulus back as integer via dict_sig
@@ -325,9 +350,7 @@ class Plot_Impz(QWidget):
         Get simulation results from `dict_sig` and transfer them to plotting
         routine.
         """
-        self.calc_response(dict_sig['fx_results'])
-        
-        #self.sig_tx.emit({'sender':__name__, 'data_changed':'fx_sim'})        
+        self.calc_response(dict_sig['fx_results'])       
 
         self.calc_fft()
         self.draw_impz()
@@ -591,7 +614,8 @@ class Plot_Impz(QWidget):
             self.draw_impz_freq()
         else:
             logger.error("Index {0} out of range!".format(idx))
-        #qstyle_widget(self.ui.but_run, "normal")
+
+        qstyle_widget(self.ui.but_run, "normal")
            
 
     def _log_mode_time(self):
