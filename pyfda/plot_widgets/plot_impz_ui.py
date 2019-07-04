@@ -91,11 +91,11 @@ class PlotImpz_UI(QWidget):
         self.but_run = QPushButton("RUN", self)
         self.but_run.setToolTip("Run simulation")
 
-        self.chk_run_auto = QCheckBox("Auto", self)
-        self.chk_run_auto.setObjectName("chk_run_auto")
-        self.chk_run_auto.setToolTip("<span>Update response automatically when "
+        self.chk_auto_run = QCheckBox("Auto", self)
+        self.chk_auto_run.setObjectName("chk_auto_run")
+        self.chk_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        self.chk_run_auto.setChecked(True)
+        self.chk_auto_run.setChecked(True)
         
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
@@ -128,7 +128,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_run)
         #layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
-        layH_ctrl_run.addWidget(self.chk_run_auto)
+        layH_ctrl_run.addWidget(self.chk_auto_run)
         layH_ctrl_run.addStretch(1)        
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)

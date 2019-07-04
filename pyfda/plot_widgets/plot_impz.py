@@ -125,7 +125,7 @@ class Plot_Impz(QWidget):
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
         self.ui.but_run.clicked.connect(self.impz_run)
-        self.ui.chk_run_auto.clicked.connect(self.impz)
+        self.ui.chk_auto_run.clicked.connect(self.impz)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
 
         # --- time domain plotting ---
@@ -229,8 +229,8 @@ class Plot_Impz(QWidget):
         """
         Calculate response and redraw it automatically if checkbox is selected
         """
-        
-        if self.ui.chk_run_auto.isChecked():
+        self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())        
+        if self.ui.chk_auto_run.isChecked():
             self.impz_run()
 
     def impz_run(self):
@@ -241,7 +241,7 @@ class Plot_Impz(QWidget):
             logger.error("Calc Impz!")
             self.calc_stimulus()
             if self.fx_sim:
-                self.fx_run()
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
             else:
                 self.calc_response()
             self.needs_calc = False
@@ -251,7 +251,7 @@ class Plot_Impz(QWidget):
             self.draw_impz()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
         qstyle_widget(self.ui.but_run, "normal")
-
+        
 # =============================================================================
 
     def fx_select(self, fx=None):
@@ -260,12 +260,14 @@ class Plot_Impz(QWidget):
         
         parameter `fx` can be:
             
-        str "Fixpoint" or "Float" when called directly or int 0 or 1 when triggered
-        by changing the index of combobox `self.ui.cmb_sim_select` (signal-slot-
-        connection)
+        - str "Fixpoint" or "Float" when called directly
         
-        In any case, the combobox is set and checked whether it has
-        changed since last time.
+        - int 0 or 1 when triggered by changing the index of combobox 
+          `self.ui.cmb_sim_select` (signal-slot-connection)
+
+        In both cases, the index of the combobox is updated according to the 
+        passed argument. If the index has been changed since last time, 
+        `self.needs_calc` is set to True and the run button is set to "changed".
         """
         logger.warning("FX Selected")
 
@@ -275,8 +277,6 @@ class Plot_Impz(QWidget):
             qset_cmb_box(self.ui.cmb_sim_select, fx)
         elif fx is None:
             pass
-        elif type(fx) == bool: # triggered by clicking Checkbox for Autorun
-            self.ui.but_run.setEnabled(not fx)            
         else:
             logger.error('Unknown argument "{0}".'.format(fx))
             return
@@ -315,12 +315,6 @@ class Plot_Impz(QWidget):
         Emit a signal that settings of the widget have changed
         """        
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
-
-    def fx_run(self):
-        """
-        Run fixpoint simulation
-        """        
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
 
     def fx_set_stimulus(self):
         """
@@ -455,6 +449,8 @@ class Plot_Impz(QWidget):
         
         if self.fx_sim:
             self.title_str = r'$Fixpoint$ ' + self.title_str
+            self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
+            self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
             self.x_q = self.q_i.fixp(self.x)
         self.needs_redraw[:] = [True] * 2
         
