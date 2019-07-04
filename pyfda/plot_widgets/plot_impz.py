@@ -56,6 +56,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         # initial setting for fixpoint simulation:
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
+        self.fx_sim_old = self.fx_sim
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
         self.active_tab = 0 # index for active tab
@@ -173,7 +174,7 @@ class Plot_Impz(QWidget):
                 if dict_sig['fx_sim'] == 'specs_changed':
                     qstyle_widget(self.ui.but_run, "changed")
                 elif dict_sig['fx_sim'] == 'init' or dict_sig['fx_sim'] == 'get_stimulus':
-                    self.fx_init()
+                    # self.fx_init()
                     qstyle_widget(self.ui.but_run, "changed")
                     self.fx_set_stimulus() # setup stimulus for fxpoint simulation
 
@@ -241,12 +242,14 @@ class Plot_Impz(QWidget):
             logger.error("Calc Impz!")
             self.calc_stimulus()
             if self.fx_sim:
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+#                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
+                    np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
             else:
                 self.calc_response()
             self.needs_calc = False
             self.needs_redraw = [True] * 2
-        if self.needs_redraw:
+        if self.needs_redraw[self.tabWidget.currentIndex()]:
             logger.error("Redraw Impz")
             self.draw_impz()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
@@ -280,12 +283,15 @@ class Plot_Impz(QWidget):
         else:
             logger.error('Unknown argument "{0}".'.format(fx))
             return
-
-        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint' != self.fx_sim:    
-            self.fx_sim = not self.fx_sim
+        
+        self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
+        if self.fx_sim != self.fx_sim_old:    
             qstyle_widget(self.ui.but_run, "changed")
+            logger.warning("FX changed: FX = {0}".format(self.fx_sim))
             self.needs_calc = True # needs to recalculate stimulus and response
 
+        self.fx_sim_old = self.fx_sim
+        
         self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
         self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
         self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
@@ -332,12 +338,15 @@ class Plot_Impz(QWidget):
 
         self.fx_select("Fixpoint")
         
-        self.calc_stimulus() # calculate selected stimulus with selected length
-
-        # pass quantized stimulus back as integer via dict_sig
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
-                np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-        self.fx_sim_state = 'stimulized'
+# =============================================================================
+#         self.calc_stimulus() # calculate selected stimulus with selected length
+# 
+#         # pass quantized stimulus back as integer via dict_sig
+#         self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
+#                 np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+#         self.fx_sim_state = 'stimulized'
+# =============================================================================
+        self.impz()
 
     def fx_get_results(self, dict_sig):
         """
