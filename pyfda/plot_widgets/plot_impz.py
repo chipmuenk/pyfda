@@ -173,8 +173,8 @@ class Plot_Impz(QWidget):
             if 'fx_sim' in dict_sig:
                 if dict_sig['fx_sim'] == 'specs_changed':
                     qstyle_widget(self.ui.but_run, "changed")
-                elif dict_sig['fx_sim'] == 'init' or dict_sig['fx_sim'] == 'get_stimulus':
-                    # self.fx_init()
+
+                elif dict_sig['fx_sim'] == 'get_stimulus':
                     qstyle_widget(self.ui.but_run, "changed")
                     self.fx_set_stimulus() # setup stimulus for fxpoint simulation
 
@@ -301,21 +301,23 @@ class Plot_Impz(QWidget):
 
         self.impz()
 
-    def fx_init(self):
-        """
-        Initialize fixpoint simulation:
-
-        - set simulation selector to "fixpoint"
-        
-        - initialize stimulus quantizer
-        
-        - set fx simulation state to 'initialized'
-        """     
-        self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-        self.fx_select("Fixpoint")
-        self.fx_sim_state = 'initialized'
-
+# =============================================================================
+#     def fx_init(self):
+#         """
+#         Initialize fixpoint simulation:
+# 
+#         - set simulation selector to "fixpoint"
+#         
+#         - initialize stimulus quantizer
+#         
+#         - set fx simulation state to 'initialized'
+#         """     
+#         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
+#         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
+#         self.fx_select("Fixpoint")
+#         self.fx_sim_state = 'initialized'
+# 
+# =============================================================================
     def fx_changed(self):
         """
         Emit a signal that settings of the widget have changed
@@ -324,7 +326,7 @@ class Plot_Impz(QWidget):
 
     def fx_set_stimulus(self):
         """
-        - Calculate stimulus # TODO: needed?
+        - Calculate stimulus
         
         - Quantize the stimulus `self.x` with the selected input quantization settings
         
@@ -337,15 +339,6 @@ class Plot_Impz(QWidget):
         """
 
         self.fx_select("Fixpoint")
-        
-# =============================================================================
-#         self.calc_stimulus() # calculate selected stimulus with selected length
-# 
-#         # pass quantized stimulus back as integer via dict_sig
-#         self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
-#                 np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-#         self.fx_sim_state = 'stimulized'
-# =============================================================================
         self.impz()
 
     def fx_get_results(self, dict_sig):
