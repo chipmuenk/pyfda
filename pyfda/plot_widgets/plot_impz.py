@@ -177,10 +177,12 @@ class Plot_Impz(QWidget):
                 elif dict_sig['fx_sim'] == 'get_stimulus':
                     qstyle_widget(self.ui.but_run, "changed")
                     self.fx_set_stimulus() # setup stimulus for fxpoint simulation
+                    #self.fx_run(dict_sig=None, fx_results=False)
 
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.fx_get_results(dict_sig) # plot fx simulation results 
+                    #self.fx_run(dict_sig, fx_results=True)
 
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing option for "fx_sim".')
@@ -242,7 +244,6 @@ class Plot_Impz(QWidget):
             logger.info("Calc impz started!")
             self.calc_stimulus()
             if self.fx_sim:
-#                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
                     np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
             else:
@@ -301,28 +302,33 @@ class Plot_Impz(QWidget):
 
         self.impz()
 
-# =============================================================================
-#     def fx_init(self):
-#         """
-#         Initialize fixpoint simulation:
-# 
-#         - set simulation selector to "fixpoint"
-#         
-#         - initialize stimulus quantizer
-#         
-#         - set fx simulation state to 'initialized'
-#         """     
-#         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
-#         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-#         self.fx_select("Fixpoint")
-#         self.fx_sim_state = 'initialized'
-# 
-# =============================================================================
+
+    def fx_run(self, dict_sig=None, fx_results=False):
+        """
+        Run the fixpoint simulation
+        """
+        if not self.needs_calc:
+            if not fx_results:
+                self.calc_stimulus()
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
+                    'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+                logger.info("fx stimulus sent")
+                return
+            else:
+                self.y = dict_sig['fx_results']
+                if self.y is None:
+                    qstyle_widget(self.ui.but_run, "error")
+                    state = "error"
+                else:
+                    qstyle_widget(self.ui.but_run, "normal")
+
+
     def fx_changed(self):
         """
         Emit a signal that settings of the widget have changed
         """        
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
+        
 
     def fx_set_stimulus(self):
         """
