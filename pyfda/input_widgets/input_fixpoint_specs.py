@@ -607,7 +607,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.sig_tx.emit(dict_sig)
                         
         except  ValueError as e: # exception
-            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
+            logger.error('Fixpoint stimulus generation failed for dict\n{0}'
+                           '\nwith "{1} "'.format(pprint_log(dict_sig), e))
         return
 
 #------------------------------------------------------------------------------
@@ -642,12 +643,14 @@ class Input_Fixpoint_Specs(QWidget):
 #            self.timer_id.timeout.connect(self.kill_sim)
 
         except ValueError as e:
-            logger.warning("Simulator error {0}".format(e))
+            logger.error("Simulator error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
         except Exception as e:
-            logger.warning("Simulation failed:\n{0}".format(e))
+            logger.error('Fixpoint simulation failed for dict\n{0}'
+                           '\nwith "{1} "'.format(pprint_log(dict_sig), e))
+
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return

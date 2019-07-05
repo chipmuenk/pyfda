@@ -239,7 +239,7 @@ class Plot_Impz(QWidget):
         If necessary, calculate response and redraw it
         """
         if self.needs_calc:
-            logger.error("Calc Impz!")
+            logger.info("Calc impz started!")
             self.calc_stimulus()
             if self.fx_sim:
 #                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
@@ -250,7 +250,7 @@ class Plot_Impz(QWidget):
             self.needs_calc = False
             self.needs_redraw = [True] * 2
         if self.needs_redraw[self.tabWidget.currentIndex()]:
-            logger.error("Redraw Impz")
+            logger.info("Redraw impz started!")
             self.draw_impz()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
         qstyle_widget(self.ui.but_run, "normal")
