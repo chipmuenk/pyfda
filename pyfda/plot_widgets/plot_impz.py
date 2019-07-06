@@ -466,10 +466,11 @@ class Plot_Impz(QWidget):
         and set the flag `self.cmplx`.
         """
         if self.fx_sim: # use fixpoint simulation results instead of floating results
-            if y_fx is not None:
-                self.y = np.array(y_fx)
-            else:
-                self.y = None
+#            if y_fx is not None:
+#                self.y = np.array(y_fx)
+#            else:
+#                self.y = None
+            pass
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
             self.bb = np.asarray(fb.fil[0]['ba'][0])
