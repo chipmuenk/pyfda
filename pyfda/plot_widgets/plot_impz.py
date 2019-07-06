@@ -124,7 +124,7 @@ class Plot_Impz(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.impz)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
@@ -242,6 +242,7 @@ class Plot_Impz(QWidget):
         
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
+        self.fx_select() # check for fixpoint setting and update if needed
         self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())        
         if not self.ui.chk_auto_run.isChecked() and type(arg) != bool:
             return
@@ -326,7 +327,6 @@ class Plot_Impz(QWidget):
                 if self.y is None:
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
-                    state = "error"
                 else:
                     qstyle_widget(self.ui.but_run, "normal")
                     self.needs_calc = False
