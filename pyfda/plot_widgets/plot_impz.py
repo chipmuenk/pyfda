@@ -176,13 +176,14 @@ class Plot_Impz(QWidget):
 
                 elif dict_sig['fx_sim'] == 'get_stimulus':
                     qstyle_widget(self.ui.but_run, "changed")
-                    self.fx_set_stimulus() # setup stimulus for fxpoint simulation
-                    #self.fx_run(dict_sig=None, fx_results=False)
+                    self.fx_select("Fixpoint")
+                    #self.fx_set_stimulus() # setup stimulus for fxpoint simulation
+                    self.fx_run(dict_sig=None, set_stimuli=True)
 
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
-                    self.fx_get_results(dict_sig) # plot fx simulation results 
-                    #self.fx_run(dict_sig, fx_results=True)
+                    #self.fx_get_results(dict_sig) # plot fx simulation results 
+                    self.fx_run(dict_sig, set_stimuli=False)
 
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing option for "fx_sim".')
@@ -303,27 +304,30 @@ class Plot_Impz(QWidget):
 
         self.impz()
 
-
-    def fx_run(self, dict_sig=None, fx_results=False):
+    def fx_run(self, dict_sig=None, set_stimuli=True):
         """
         Run the fixpoint simulation
         """
-        if not self.needs_calc:
-            if not fx_results:
+        if self.needs_calc:
+            if set_stimuli:
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
                 logger.info("fx stimulus sent")
                 return
             else:
-                self.y = dict_sig['fx_results']
+                self.y = np.asarray(dict_sig['fx_results'])
+                logger.info("fx stimulus received")
                 if self.y is None:
                     qstyle_widget(self.ui.but_run, "error")
+                    self.needs_calc = True
                     state = "error"
                 else:
                     qstyle_widget(self.ui.but_run, "normal")
-
-
+                    self.needs_calc = False
+                    self.calc_response()       
+                    self.calc_fft()
+                    self.draw_impz()
         
 
     def fx_set_stimulus(self):
@@ -342,16 +346,6 @@ class Plot_Impz(QWidget):
 
         self.fx_select("Fixpoint")
         self.impz()
-
-    def fx_get_results(self, dict_sig):
-        """
-        Get simulation results from `dict_sig` and transfer them to plotting
-        routine.
-        """
-        self.calc_response(dict_sig['fx_results'])       
-
-        self.calc_fft()
-        self.draw_impz()
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
