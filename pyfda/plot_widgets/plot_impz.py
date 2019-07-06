@@ -172,6 +172,7 @@ class Plot_Impz(QWidget):
         if self.isVisible():
             if 'fx_sim' in dict_sig:
                 if dict_sig['fx_sim'] == 'specs_changed':
+                    self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
 
                 elif dict_sig['fx_sim'] == 'get_stimulus':
