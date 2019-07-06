@@ -292,6 +292,14 @@ class Plot_Impz(QWidget):
             return
         
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
+
+        self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
+        self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
+        self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
+        self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
+        self.ui.chk_fx_scale.setVisible(self.fx_sim)
+        self.ui.chk_fx_limits.setVisible(self.fx_sim)
+
         if self.fx_sim != self.fx_sim_old:    
             qstyle_widget(self.ui.but_run, "changed")
             logger.warning("FX changed: FX = {0}".format(self.fx_sim))
@@ -300,13 +308,6 @@ class Plot_Impz(QWidget):
 
         self.fx_sim_old = self.fx_sim
         
-        self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
-        self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
-        self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
-        self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
-        self.ui.chk_fx_scale.setVisible(self.fx_sim)
-        self.ui.chk_fx_limits.setVisible(self.fx_sim)
-
 
     def fx_run(self, dict_sig=None, set_stimuli=True):
         """
@@ -332,7 +333,6 @@ class Plot_Impz(QWidget):
                     self.calc_response()       
                     self.calc_fft()
                     self.draw_impz()
-        
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
