@@ -207,7 +207,8 @@ class Plot_Impz(QWidget):
                 self.needs_redraw[:] = [True] * 2
                 qstyle_widget(self.ui.but_run, "changed")
                 if 'ui' in dict_sig['sender']:
-                    self.fx_changed() # signal that local stimuli data has changed
+                    # emit signal that local stimuli data has changed
+                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
                 self.impz()
 
             elif 'home' in dict_sig:
