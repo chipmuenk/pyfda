@@ -334,23 +334,6 @@ class Plot_Impz(QWidget):
                     self.draw_impz()
         
 
-    def fx_set_stimulus(self):
-        """
-        - Calculate stimulus
-        
-        - Quantize the stimulus `self.x` with the selected input quantization settings
-        
-		- Scale it with the input word length, i.e. with 2**(W-1) (input) to obtain
-          integer values # TODO: correct?
-          
-        - Convert simulation results to integer and transfer them to the fixpoint
-          filter as a dict_sig with `'fx_sim':'set_stimulus'` and 
-          `'fx_stimulus':<quantized stimulus>`
-        """
-
-        self.fx_select("Fixpoint")
-        self.impz()
-
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
