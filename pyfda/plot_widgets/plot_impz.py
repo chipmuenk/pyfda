@@ -307,7 +307,6 @@ class Plot_Impz(QWidget):
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
 
-        self.impz()
 
     def fx_run(self, dict_sig=None, set_stimuli=True):
         """
