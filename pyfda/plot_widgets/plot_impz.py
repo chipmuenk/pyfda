@@ -125,7 +125,7 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
-        self.ui.but_run.clicked.connect(self.impz_run)
+        self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.impz)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
 
@@ -228,18 +228,19 @@ class Plot_Impz(QWidget):
 # Simulation: Calculate stimulus, response and draw them
 # =============================================================================
 
-    def impz(self):
+    def impz(self, arg=None):
         """
-        Calculate response and redraw it automatically if checkbox is selected
+        Calculate response and redraw it automatically if checkbox "Auto Run" 
+        is selected or if called directly by pressing the "Run" button. In the 
+        latter case, the signal-slot connection passes the state of button (?)
+        as a boolean.
+        
+        Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())        
-        if self.ui.chk_auto_run.isChecked():
-            self.impz_run()
+        if not self.ui.chk_auto_run.isChecked() and type(arg) != bool:
+            return
 
-    def impz_run(self):
-        """
-        If necessary, calculate response and redraw it
-        """
         if self.needs_calc:
             logger.info("Calc impz started!")
             self.calc_stimulus()
