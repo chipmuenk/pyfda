@@ -298,7 +298,7 @@ class UI_W(QWidget):
 
         self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
         
-        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
+        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed', 'ttl':1}
         self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
@@ -322,7 +322,7 @@ class UI_W(QWidget):
 class UI_W_coeffs(UI_W):
     """
     Widget for entering word format (integer and fractional bits) for the 
-    oefficients. The result can be read out via the attributes `self.WI` and 
+    coefficients. The result can be read out via the attributes `self.WI` and 
     `self.WF`. This class inherits from `UI_W`, overloading the methods `dict2ui())`
     and `ui2dict()` for loading / saving the UI from / to the filter dict.
     """
@@ -466,7 +466,7 @@ class UI_Q(QWidget):
         self.q_dict.update({'ovfl': self.cmbOvfl.currentText(),
                             'quant': self.cmbQuant.currentText()})
         
-        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
+        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed', 'ttl':1}
         self.sig_tx.emit(dict_sig)
 
     #--------------------------------------------------------------------------
