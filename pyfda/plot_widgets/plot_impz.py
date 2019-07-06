@@ -324,11 +324,6 @@ class Plot_Impz(QWidget):
                     qstyle_widget(self.ui.but_run, "normal")
 
 
-    def fx_changed(self):
-        """
-        Emit a signal that settings of the widget have changed
-        """        
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
         
 
     def fx_set_stimulus(self):
