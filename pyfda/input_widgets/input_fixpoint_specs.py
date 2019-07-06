@@ -87,9 +87,6 @@ class Input_Fixpoint_Specs(QWidget):
         Process signals coming in via subwidgets and sig_rx
 		
 		Play PingPong with a stimulus & plot widget:
-		
-		(1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
-			from fixpoint widget.) # currently not implemented
         
 		2. ``fx_sim_hdl()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
@@ -299,7 +296,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimHDL.clicked.connect(self.fx_sim_hdl)
-        self.butSimFxPy.clicked.connect(self.fx_sim_py)
+        # self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
@@ -476,11 +473,11 @@ class Input_Fixpoint_Specs(QWidget):
             self.lblTitle.setText(self.fx_wdg_inst.title)
 
             #--- try to reference Python fixpoint filter instance -----
-            if hasattr(self.fx_wdg_inst,'fxpy_filter'):
-                self.fxpy_filter_inst = self.fx_wdg_inst.fxpy_filter
-                self.butSimFxPy.setEnabled(True)
-            else:
-                self.butSimFxPy.setVisible(False)
+#            if hasattr(self.fx_wdg_inst,'fxpy_filter'):
+#                self.fxpy_filter_inst = self.fx_wdg_inst.fxpy_filter
+#                self.butSimFxPy.setEnabled(True)
+#            else:
+#                self.butSimFxPy.setVisible(False)
                 
             #--- Check whether fixpoint widget contains HDL filters -----
             if hasattr(self.fx_wdg_inst,'fixp_filter'):
@@ -575,23 +572,23 @@ class Input_Fixpoint_Specs(QWidget):
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
-#------------------------------------------------------------------------------
-    def fx_sim_py(self):
-        """
-        Start fix-point simulation: Send the ``fxqc_dict``
-        containing all quantization information and request a stimulus signal
-        Not implemented yet
-        """
-        try:
-            logger.info("Started python fixpoint simulation")
-            self.update_fxqc_dict()
-            self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
-            self.sig_tx.emit(dict_sig)
-                        
-        except AttributeError as e:
-            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
-        return
+##------------------------------------------------------------------------------
+#    def fx_sim_py(self):
+#        """
+#        Start fix-point simulation: Send the ``fxqc_dict``
+#        containing all quantization information and request a stimulus signal
+#        Not implemented yet
+#        """
+#        try:
+#            logger.info("Started python fixpoint simulation")
+#            self.update_fxqc_dict()
+#            self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
+#            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
+#            self.sig_tx.emit(dict_sig)
+#                        
+#        except AttributeError as e:
+#            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
+#        return
 
 #------------------------------------------------------------------------------
     def fx_sim_hdl(self):
