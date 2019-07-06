@@ -295,7 +295,8 @@ class Plot_Impz(QWidget):
         if self.fx_sim != self.fx_sim_old:    
             qstyle_widget(self.ui.but_run, "changed")
             logger.warning("FX changed: FX = {0}".format(self.fx_sim))
-            self.needs_calc = True # needs to recalculate stimulus and response
+            # even if nothing else has changed, stimulus and response must be recalculated
+            self.needs_calc = True
 
         self.fx_sim_old = self.fx_sim
         
