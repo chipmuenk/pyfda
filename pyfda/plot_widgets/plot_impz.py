@@ -281,6 +281,7 @@ class Plot_Impz(QWidget):
             logger.info("Redraw impz started!")
             self.draw_impz()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
+
         qstyle_widget(self.ui.but_run, "normal")
         
 # =============================================================================
@@ -343,7 +344,6 @@ class Plot_Impz(QWidget):
                 return
             else:
                 self.y = np.asarray(dict_sig['fx_results'])
-                logger.info("fx stimulus received")
                 if self.y is None:
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
