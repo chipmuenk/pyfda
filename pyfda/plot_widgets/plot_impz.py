@@ -259,8 +259,10 @@ class Plot_Impz(QWidget):
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
-        self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())        
-        if not self.ui.chk_auto_run.isChecked() and type(arg) != bool:
+        self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())
+        if type(arg) == bool:
+            self.needs_calc = True # force recalculation when but_run is pressed
+        elif not self.ui.chk_auto_run.isChecked():
             return
 
         if self.needs_calc:
