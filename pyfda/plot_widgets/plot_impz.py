@@ -348,11 +348,11 @@ class Plot_Impz(QWidget):
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
                 else:
-                    qstyle_widget(self.ui.but_run, "normal")
                     self.calc_response()  
                     self.needs_calc = False                    
                     self.calc_fft()
                     self.draw_impz()
+                    qstyle_widget(self.ui.but_run, "normal")
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -606,8 +606,6 @@ class Plot_Impz(QWidget):
         else:
             logger.error("Index {0} out of range!".format(idx))
 
-        qstyle_widget(self.ui.but_run, "normal")
-           
 
     def _log_mode_time(self):
         """
