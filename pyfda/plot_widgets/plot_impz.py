@@ -469,13 +469,8 @@ class Plot_Impz(QWidget):
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        if self.fx_sim: # use fixpoint simulation results instead of floating results
-#            if y_fx is not None:
-#                self.y = np.array(y_fx)
-#            else:
-#                self.y = None
-            pass
-        else:
+        # for fixpoint simulations, results from fixpoint simulation are used instead:
+        if not self.fx_sim: 
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
             self.bb = np.asarray(fb.fil[0]['ba'][0])
             self.aa = np.asarray(fb.fil[0]['ba'][1])
