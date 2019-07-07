@@ -273,8 +273,11 @@ class Plot_Impz(QWidget):
                     np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
             else:
                 self.calc_response()
+
+            self.calc_fft()
             self.needs_calc = False
             self.needs_redraw = [True] * 2
+            
         if self.needs_redraw[self.tabWidget.currentIndex()]:
             logger.info("Redraw impz started!")
             self.draw_impz()
