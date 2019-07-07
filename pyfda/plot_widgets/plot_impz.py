@@ -187,7 +187,7 @@ class Plot_Impz(QWidget):
                     # TODO: correct?
                       
                       """
-
+                    self.needs_calc = True # always require recalculation when triggered externally
                     qstyle_widget(self.ui.but_run, "changed")
                     self.fx_select("Fixpoint")
                     self.fx_run(dict_sig=None, set_stimuli=True)
