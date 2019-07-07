@@ -176,14 +176,29 @@ class Plot_Impz(QWidget):
                     qstyle_widget(self.ui.but_run, "changed")
 
                 elif dict_sig['fx_sim'] == 'get_stimulus':
+                    """
+                    - Select Fixpoint mode
+
+                    - Start fixpoint simulation using `self.fx_run()` where the stimulus
+                      is calculated, quantized and passed to dict_sig with `'fx_sim':'set_stimulus'` 
+                      and `'fx_stimulus':<quantized stimulus>`. Stimuli are scaled with the input 
+                      fractional word length, i.e. with 2**WF (input) to obtain integer values
+
+                    # TODO: correct?
+                      
+                      """
+
                     qstyle_widget(self.ui.but_run, "changed")
                     self.fx_select("Fixpoint")
-                    #self.fx_set_stimulus() # setup stimulus for fxpoint simulation
                     self.fx_run(dict_sig=None, set_stimuli=True)
 
                 elif dict_sig['fx_sim'] == 'set_results':
+                    """
+                    - Convert simulation results to integer and transfer them to the fixpoint
+                      filter as a 
+                    """
+
                     logger.info("Received fixpoint results.")
-                    #self.fx_get_results(dict_sig) # plot fx simulation results 
                     self.fx_run(dict_sig, set_stimuli=False)
 
                 elif dict_sig['fx_sim'] == 'error':
