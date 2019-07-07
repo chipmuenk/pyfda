@@ -349,8 +349,8 @@ class Plot_Impz(QWidget):
                     self.needs_calc = True
                 else:
                     qstyle_widget(self.ui.but_run, "normal")
-                    self.needs_calc = False
-                    self.calc_response()       
+                    self.calc_response()  
+                    self.needs_calc = False                    
                     self.calc_fft()
                     self.draw_impz()
 
