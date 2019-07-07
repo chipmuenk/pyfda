@@ -484,6 +484,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst, "to_verilog"))
                 self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst, "run_sim"))
                 self.update_fxqc_dict()
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
             else:
                 self.butSimHDL.setEnabled(False)
                 self.butExportHDL.setEnabled(False)
@@ -503,6 +504,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(self.fxqc_dict)
+#            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
+#            self.sig_tx.emit(dict_sig)
 
         qstyle_widget(self.butSimHDL, "changed")
 #------------------------------------------------------------------------------
