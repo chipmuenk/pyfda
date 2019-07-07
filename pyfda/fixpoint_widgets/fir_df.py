@@ -74,13 +74,17 @@ class FIR_DF_wdg(QWidget):
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]['q_coeff']['WI'],
                                         WF = fb.fil[0]['q_coeff']['WF'])
+        self.wdg_w_coeffs.sig_tx.connect(self.process_sig_tx)
+        
         self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['q_coeff'],
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
+        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_tx)
+
         self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
                                fractional=True)
-        self.wdg_w_accu.sig_tx.connect(self.sig_tx)       
+        self.wdg_w_accu.sig_tx.connect(self.process_sig_tx)
 
         #self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
 #------------------------------------------------------------------------------
@@ -97,7 +101,13 @@ class FIR_DF_wdg(QWidget):
         layVWdg.addStretch()
 
         self.setLayout(layVWdg)
+
         
+#------------------------------------------------------------------------------
+    def process_sig_tx(self, dict_sig=None):
+        
+        self.sig_tx.emit(dict_sig)
+         
 #------------------------------------------------------------------------------
     def dict2ui(self, fxqc_dict):
         """
