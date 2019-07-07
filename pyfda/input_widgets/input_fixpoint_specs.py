@@ -88,7 +88,7 @@ class Input_Fixpoint_Specs(QWidget):
 		
 		Play PingPong with a stimulus & plot widget:
         
-		2. ``fx_sim_hdl()``: Request stimulus by sending 'fx_sim':'get_stimulus'
+		2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
 		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
 			and pass it to HDL object for simulation
@@ -114,7 +114,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.wdg_dict2ui()
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
-                self.fx_sim_hdl()
+                self.fx_sim_init()
             elif dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
@@ -295,7 +295,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
 
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimHDL.clicked.connect(self.fx_sim_hdl)
+        self.butSimHDL.clicked.connect(self.fx_sim_init)
         # self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
@@ -594,15 +594,21 @@ class Input_Fixpoint_Specs(QWidget):
 #        return
 
 #------------------------------------------------------------------------------
-    def fx_sim_hdl(self):
+    def fx_sim_init(self):
         """
-        Start fix-point simulation: Send the ``fxqc_dict``
-        containing all quantization information and request a stimulus signal
+        Initialize fix-point simulation: 
+            
+        - Update the `fxqc_dict` containing all quantization information
+        
+        - Setup a filter instance for migen simulation
+        
+        - Request a stimulus signal
         """
         try:
             logger.info("Started HDL fixpoint simulation")
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
+
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
@@ -630,8 +636,7 @@ class Input_Fixpoint_Specs(QWidget):
                             dict_sig['fx_stimulus'].dtype,
                             ))
 
-            # Run fixpoint simulation and
-            # get the response from the simulation as integer values
+            # Run fixpoint simulation and return the results as integer values:
             self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])         # Run the simulation
 
             if len(self.fx_results) == 0:
@@ -652,7 +657,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
-        except Exception as e:
+        except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
                          '\twith msg. "{1}"\n\tStimuli: Shape {2} of type "{3}"'
                          '\n\tResponse: Shape {4} of type "{5}"'\
