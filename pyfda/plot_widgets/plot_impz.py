@@ -550,13 +550,7 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_freq.isChecked():
             self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
 
-        self.needs_redraw[1] = True                
-#------------------------------------------------------------------------------
-    def update_view(self):
-        """
-        Only update the limits without recalculating the stimulus and response
-        """
-        self.draw_impz()
+        self.needs_redraw[1] = True   # redraw of frequency widget needed             
 
 ###############################################################################
 #        PLOTTING
