@@ -269,11 +269,10 @@ class Plot_Impz(QWidget):
             logger.info("Calc impz started!")
             self.calc_stimulus()
             if self.fx_sim:
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus', 'fx_stimulus':
-                    np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+
             else:
                 self.calc_response()
-
             self.calc_fft()
             self.needs_calc = False
             self.needs_redraw = [True] * 2
