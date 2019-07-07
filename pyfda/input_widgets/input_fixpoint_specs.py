@@ -621,9 +621,14 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            logger.info('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'.format( 
-                    dict_sig['sender'],
-                    pprint_log(dict_sig['fx_stimulus'], tab=" ")))
+            logger.info('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'
+                        '\n\tStimuli: Shape {2} of type "{3}"'
+                        .format( 
+                            dict_sig['sender'],
+                            pprint_log(dict_sig['fx_stimulus'], tab=" "),
+                            np.shape(dict_sig['fx_stimulus']),
+                            dict_sig['fx_stimulus'].dtype,
+                            ))
 
             # Run fixpoint simulation and
             # get the response from the simulation as integer values
@@ -649,7 +654,14 @@ class Input_Fixpoint_Specs(QWidget):
             return
         except Exception as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
-                           '\nwith "{1} "'.format(pprint_log(dict_sig), e))
+                         '\twith msg. "{1}"\n\tStimuli: Shape {2} of type "{3}"'
+                         '\n\tResponse: Shape {4} of type "{5}"'\
+                           .format(pprint_log(dict_sig), e, 
+                                   np.shape(dict_sig['fx_stimulus']),
+                                   dict_sig['fx_stimulus'].dtype,
+                                   np.shape(self.fx_results),
+                                   type(self.fx_results)
+                                    ))
 
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
