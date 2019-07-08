@@ -127,29 +127,29 @@ class Plot_Impz(QWidget):
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.calc_auto)
-        self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
+        self.ui.chk_fx_scale.clicked.connect(self.draw)
 
         # --- time domain plotting ---
-        self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz)
-        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz)
-        self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw_impz)        
+        self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)        
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
-        self.ui.chk_fx_limits.clicked.connect(self.draw_impz)
-        self.ui.chk_win_time.clicked.connect(self.draw_impz)
+        self.ui.chk_fx_limits.clicked.connect(self.draw)
+        self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
-        self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz)
-        self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz)
-        self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw_impz)        
+        self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)        
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
-        self.ui.chk_win_freq.clicked.connect(self.draw_impz)
+        self.ui.chk_win_freq.clicked.connect(self.draw)
         
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
         # When user has selected a different tab, trigger a recalculation of current tab
-        self.tabWidget.currentChanged.connect(self.draw_impz) # passes number of active tab
+        self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
 
         self.sig_rx.connect(self.process_sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -299,7 +299,7 @@ class Plot_Impz(QWidget):
             
         if self.needs_redraw[self.tabWidget.currentIndex()]:
             logger.info("Redraw impz started!")
-            self.draw_impz()
+            self.draw()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
@@ -371,7 +371,7 @@ class Plot_Impz(QWidget):
                     self.needs_calc = False
                     
                     self.calc_fft()
-                    self.draw_impz()
+                    self.draw()
                     qstyle_widget(self.ui.but_run, "normal")
 
 #------------------------------------------------------------------------------
@@ -379,7 +379,6 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate stimulus `self.x`
         """
-        
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
         phi1 = self.ui.phi1 / 180 * pi
@@ -477,6 +476,7 @@ class Plot_Impz(QWidget):
             self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
             self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
             self.x_q = self.q_i.fixp(self.x)
+
         self.needs_redraw[:] = [True] * 2
         
 #------------------------------------------------------------------------------
@@ -575,7 +575,7 @@ class Plot_Impz(QWidget):
 #        PLOTTING
 ###############################################################################
 
-    def draw_impz(self, arg=None):
+    def draw(self, arg=None):
         """
         (Re-)draw the figure without recalculation.
         
@@ -650,7 +650,7 @@ class Plot_Impz(QWidget):
         else:
             self.ui.bottom_t = 0
 
-        self.draw_impz()
+        self.draw()
         
     def _log_mode_freq(self):
         """
@@ -669,7 +669,7 @@ class Plot_Impz(QWidget):
         else:
             self.ui.bottom_f = 0
             
-        self.draw_impz()
+        self.draw()
 
     def plot_fnc(self, plt_style, ax, plt_dict=None, bottom=0):
         """
@@ -732,7 +732,7 @@ class Plot_Impz(QWidget):
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
-    def draw_impz_time(self):
+    def draw_time(self):
         """
         (Re-)draw the time domain mplwidget
         """
@@ -913,7 +913,7 @@ class Plot_Impz(QWidget):
 
         self.calc_fft()
 
-    def draw_impz_freq(self):
+    def draw_freq(self):
         """
         (Re-)draw the frequency domain mplwidget
         """
