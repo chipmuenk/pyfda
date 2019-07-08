@@ -310,7 +310,7 @@ class Plot_Impz(QWidget):
         passed argument. If the index has been changed since last time, 
         `self.needs_calc` is set to True and the run button is set to "changed".
         """
-        logger.warning("FX Selected")
+        logger.warning("start fx_select")
 
         if fx in {0, 1}: # connected to index change of combo box
             self.ui.cmb_sim_select.setCurrentIndex(fx)
@@ -333,7 +333,6 @@ class Plot_Impz(QWidget):
 
         if self.fx_sim != self.fx_sim_old:    
             qstyle_widget(self.ui.but_run, "changed")
-            logger.warning("FX changed: FX = {0}".format(self.fx_sim))
             # even if nothing else has changed, stimulus and response must be recalculated
             self.needs_calc = True
 
@@ -564,14 +563,22 @@ class Plot_Impz(QWidget):
 #        PLOTTING
 ###############################################################################
 
-    def draw_impz(self):
+    def draw_impz(self, arg=None):
         """
-        (Re-)draw the figure without recalculation
+        (Re-)draw the figure without recalculation.
+        
+        When `type(arg) == int`, the call has been triggered via a signal-slot 
+        connection by selecting a different tab of the impz widget. 
+        
+        `arg==0`: Time domain
+        `arg==1`: Frequency domain
         """
+        if type(arg) == int:
+            logger.warning("tab {0}".format(arg))
+
         if not hasattr(self, 'cmplx'): # has response been calculated yet?
-            self.calc_stimulus()
-            self.calc_response()
             logger.error("Response should have been calculated by now!")
+            return
             
         f_unit = fb.fil[0]['freq_specs_unit']
         if f_unit in {"f_S", "f_Ny"}:
