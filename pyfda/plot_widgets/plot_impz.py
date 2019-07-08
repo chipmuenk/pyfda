@@ -203,6 +203,7 @@ class Plot_Impz(QWidget):
 
                 elif dict_sig['fx_sim'] == 'error':
                     logger.error('Fixpoint simulation error\n{0}'.format(pprint_log(dict_sig)))
+                    qstyle_widget(self.ui.but_run, "error")
 
                 elif not dict_sig['fx_sim']:
                     logger.error('Missing option for "fx_sim".')
