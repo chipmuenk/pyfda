@@ -126,7 +126,7 @@ class Plot_Impz(QWidget):
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
-        self.ui.chk_auto_run.clicked.connect(self.impz)
+        self.ui.chk_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz)
 
         # --- time domain plotting ---
@@ -248,6 +248,15 @@ class Plot_Impz(QWidget):
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
 # =============================================================================
+    def calc_auto(self, arg=None):
+        if arg:
+            self.impz()
+        """
+        Triggered when checkbox "Autorun" is clicked.
+        When checkbox is checked (`arg = True` passed via signal-
+        slot connection), automatically run `impz()`.
+        """
+
 
     def impz(self, arg=None):
         """
