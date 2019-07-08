@@ -531,7 +531,7 @@ class Plot_Impz(QWidget):
     def calc_fft(self):
         """
         (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q` 
-        and response `self.Y`.
+        and response `self.Y` using the window function `self.ui.win`.
         """
         # calculate FFT of stimulus / response
         if self.x is None or len(self.x) < self.ui.N_end:
@@ -627,10 +627,10 @@ class Plot_Impz(QWidget):
                 logger.error("Value error: {0}".format(e))
         
         idx = self.tabWidget.currentIndex()
-        if idx == 0:
-            self.draw_impz_time()
-        elif idx == 1:
-            self.draw_impz_freq()
+        if idx == 0 and self.needs_redraw[0]:
+            self.draw_time()
+        elif idx == 1 and self.needs_redraw[1]:
+            self.draw_freq()
         else:
             logger.error("Index {0} out of range!".format(idx))
 
