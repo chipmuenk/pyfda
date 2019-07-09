@@ -585,9 +585,7 @@ class Plot_Impz(QWidget):
         `arg==0`: Time domain
         `arg==1`: Frequency domain
         """
-        if type(arg) == int:
-            logger.warning("tab {0}".format(arg))
-
+        if type(arg) is not None:
         if not hasattr(self, 'cmplx'): # has response been calculated yet?
             logger.error("Response should have been calculated by now!")
             return
@@ -631,8 +629,6 @@ class Plot_Impz(QWidget):
             self.draw_time()
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
-        else:
-            logger.error("Index {0} out of range!".format(idx))
 
 
     def _log_mode_time(self):
