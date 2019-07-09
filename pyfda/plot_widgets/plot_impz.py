@@ -211,6 +211,7 @@ class Plot_Impz(QWidget):
 
                 elif dict_sig['fx_sim'] == 'error':
                     logger.error('Fixpoint simulation error\n{0}'.format(pprint_log(dict_sig)))
+                    self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "error")
 
                 elif not dict_sig['fx_sim']:
@@ -220,11 +221,12 @@ class Plot_Impz(QWidget):
                     logger.error('Unknown "fx_sim" command option "{0}"\n'\
                                  '\treceived from "{1}"'.format(dict_sig['fx_sim'],dict_sig['sender']))                   
 
-            elif 'specs_changed' in dict_sig or 'view_changed' in dict_sig or self.needs_calc:
+            elif 'view_changed' in dict_sig:
                 self.impz()
 
-            elif 'data_changed' in dict_sig or\
-                    ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
+            elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or \
+                    ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed')\
+                    or self.needs_calc:
 
                 self.ui.update_N(dict_sig)
 
