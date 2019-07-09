@@ -294,7 +294,6 @@ class Plot_Impz(QWidget):
 
             else:
                 self.calc_response()
-            self.calc_fft()
             self.needs_calc = False
             self.needs_redraw = [True] * 2
             
@@ -372,7 +371,6 @@ class Plot_Impz(QWidget):
                     self.calc_response()  
                     self.needs_calc = False
                     
-                    self.calc_fft()
                     self.draw()
                     qstyle_widget(self.ui.but_run, "normal")
 
