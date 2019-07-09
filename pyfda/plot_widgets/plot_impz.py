@@ -577,15 +577,14 @@ class Plot_Impz(QWidget):
 
     def draw(self, arg=None):
         """
-        (Re-)draw the figure without recalculation.
-        
-        When `type(arg) == int`, the call has been triggered via a signal-slot 
-        connection by selecting a different tab of the impz widget. 
-        
-        `arg==0`: Time domain
-        `arg==1`: Frequency domain
+        (Re-)draw the figure without recalculation. When triggered by a signal-
+        slot connection from a button, combobox etc., arg is a boolean or an 
+        integer representing the state of the widget. In this case, 
+        `needs_redraw` is set to True.
         """
         if type(arg) is not None:
+            self.needs_redraw = [True] * 2
+            
         if not hasattr(self, 'cmplx'): # has response been calculated yet?
             logger.error("Response should have been calculated by now!")
             return
@@ -625,6 +624,7 @@ class Plot_Impz(QWidget):
                 logger.error("Value error: {0}".format(e))
         
         idx = self.tabWidget.currentIndex()
+
         if idx == 0 and self.needs_redraw[0]:
             self.draw_time()
         elif idx == 1 and self.needs_redraw[1]:
@@ -871,6 +871,8 @@ class Plot_Impz(QWidget):
 
         self.redraw() # redraw currently active mplwidget
 
+        self.needs_redraw[0] = False
+
     #--------------------------------------------------------------------------
     def _init_axes_freq(self):
         """
@@ -1082,6 +1084,7 @@ class Plot_Impz(QWidget):
 
         self.redraw() # redraw currently active mplwidget
 
+        self.needs_redraw[1] = False
 #------------------------------------------------------------------------------
     def redraw(self):
         """
