@@ -229,7 +229,6 @@ class Plot_Impz(QWidget):
                 self.ui.update_N(dict_sig)
 
                 self.needs_calc = True
-                self.needs_redraw[:] = [True] * 2
                 qstyle_widget(self.ui.but_run, "changed")
                 #if 'ui' in dict_sig['sender']:
                 if TTL:
@@ -355,6 +354,7 @@ class Plot_Impz(QWidget):
         Run the fixpoint simulation
         """
         if self.needs_calc:
+            self.needs_redraw = [True] * 2
             if set_stimuli:
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
