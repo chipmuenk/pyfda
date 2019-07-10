@@ -105,9 +105,9 @@ class FIR_DF_wdg(QWidget):
         
 #------------------------------------------------------------------------------
     def process_sig_tx(self, dict_sig=None):
-        
+
         self.sig_tx.emit(dict_sig)
-         
+
 #------------------------------------------------------------------------------
     def dict2ui(self, fxqc_dict):
         """
