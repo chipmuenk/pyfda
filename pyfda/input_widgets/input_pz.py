@@ -27,7 +27,7 @@ import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import qstr, fil_save, safe_eval
+from pyfda.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 
 from pyfda.pyfda_rc import params
 
@@ -207,7 +207,9 @@ class Input_PZ(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.warning("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
+                     .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
+
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected (and interrupted)!")
             return

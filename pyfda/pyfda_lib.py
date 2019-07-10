@@ -265,16 +265,17 @@ def pprint_log(d, N=10, tab="\t"):
     Provide pretty printed logging messages for dicts or lists.
     
     Convert dict `d` to string, inserting a CR+Tab after each key:value pair. 
-    Long lists or arrays are truncated to `N` items.
     
-    If `d` is a list or ndarray, truncate it to `N` items.
+    If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
+    truncate it to `N` items.
     """
 
     s = tab
     if type(d) == dict:
         for k in d:
             if type(d[k]) in {list, np.ndarray}:
-                s += k + ' : ' + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
+                s += k + ' (L=' + str(len(d[k])) + ') : '\
+                                + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
             else:
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab

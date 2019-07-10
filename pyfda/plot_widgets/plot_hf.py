@@ -25,7 +25,7 @@ from matplotlib import rcParams
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.pyfda_lib import calc_Hcomplex
+from pyfda.pyfda_lib import calc_Hcomplex, pprint_log
 
 classes = {'Plot_Hf':'|H(f)|'} #: Dict containing class name : display name
 
@@ -50,8 +50,9 @@ class Plot_Hf(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.data_changed, self.isVisible()))
+        logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
+                     .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
+        
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or 'home' in dict_sig or self.data_changed:
