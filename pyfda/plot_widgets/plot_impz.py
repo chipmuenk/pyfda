@@ -260,14 +260,18 @@ class Plot_Impz(QWidget):
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
 # =============================================================================
-    def calc_auto(self, arg=None):
-        if arg:
-            self.impz()
+    def calc_auto(self, autorun=None):
         """
         Triggered when checkbox "Autorun" is clicked.
-        When checkbox is checked (`arg = True` passed via signal-
+        Enable or disable the "Run" button depending on the setting of the 
+        checkbox.
+        When checkbox is checked (`autorun == True` passed via signal-
         slot connection), automatically run `impz()`.
         """
+
+        self.ui.but_run.setEnabled(not autorun)
+        if autorun:
+            self.impz()
 
 
     def impz(self, arg=None):
@@ -280,7 +284,6 @@ class Plot_Impz(QWidget):
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
-        self.ui.but_run.setEnabled(not self.ui.chk_auto_run.isChecked())
         if type(arg) == bool:
             self.needs_calc = True # force recalculation when but_run is pressed
         elif not self.ui.chk_auto_run.isChecked():

@@ -86,16 +86,15 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        #self.lbl_sim_select = QLabel("<b>Simulate</b>", self)
-
-        self.but_run = QPushButton("RUN", self)
-        self.but_run.setToolTip("Run simulation")
-
         self.chk_auto_run = QCheckBox("Auto", self)
         self.chk_auto_run.setObjectName("chk_auto_run")
         self.chk_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
         self.chk_auto_run.setChecked(True)
+        
+        self.but_run = QPushButton("RUN", self)
+        self.but_run.setToolTip("Run simulation")
+        self.but_run.setEnabled(not self.chk_auto_run.isChecked())
         
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
