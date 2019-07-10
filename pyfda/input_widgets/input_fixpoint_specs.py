@@ -99,9 +99,18 @@ class Input_Fixpoint_Specs(QWidget):
 		
         logger.info("SIG_RX - vis: {0} | prop: {1}\n{2}"\
                     .format(self.isVisible(), propagate, pprint_log(dict_sig)))
-        if dict_sig['sender'] == __name__:
+        TTL = False
+        if 'ttl' in dict_sig:
+            if dict_sig['ttl'] > 0:
+                dict_sig['ttl'] = dict_sig['ttl'] - 1
+                TTL = True
+            else:
+                dict_sig.pop('ttl')
+
+        elif dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
+        
         elif 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed and set RUN button to "changed"
             self.wdg_dict2ui()
@@ -125,7 +134,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
 
-        if propagate:
+        if propagate or TTL:
             # signals of local subwidgets are propagated with the name of this widget,
             # global signals terminate here
             dict_sig.update({'sender':__name__})
