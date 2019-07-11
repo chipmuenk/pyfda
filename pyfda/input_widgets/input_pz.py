@@ -207,7 +207,7 @@ class Input_PZ(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.warning("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
+        logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
                      .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:

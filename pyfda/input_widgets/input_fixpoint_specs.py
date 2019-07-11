@@ -127,12 +127,11 @@ class Input_Fixpoint_Specs(QWidget):
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
 
         if propagate:
-            # signals of local subwidgets are propagated with the name of this widget,
-            # global signals terminate here
+            # signals of local subwidgets are propagated,
+            # global signals terminate here.
             # The next event in the queue is only handled when control returns
-            # from this one, i.e. when TTL has counted down to zero?
+            # from this one
             #dict_sig.update({'sender':__name__})
-            logger.info("Emit Prop / TTL\n")
             self.sig_tx.emit(dict_sig)
             return
 

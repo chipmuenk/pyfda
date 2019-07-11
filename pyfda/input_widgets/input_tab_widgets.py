@@ -20,6 +20,7 @@ SCROLL = True
 
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import pprint_log
 
 class InputTabWidgets(QWidget):
     """
@@ -40,8 +41,17 @@ class InputTabWidgets(QWidget):
 
     def _construct_UI(self):
         """
-        Initialize UI with tabbed subwidgets and connect the signals of all
-        subwidgets.
+        Initialize UI with tabbed subwidgets and connect the available signals
+        of all subwidgets (not all widgets have both `sig_rx` and `sig_tx` signals).
+            
+        - `self.sig_rx` is distributed to all `inst.sig_rx` signals
+
+        - all `inst.sig_tx` signals are collected in `self.sig_tx`
+
+        - `self.sig_tx.connect(self.sig_rx)` distributes incoming signals (via
+           pyfdax or coming from the input widgets) among all input widgets. 
+           In order to prevent infinite loops, every widget needs to block in-
+           coming signals with its own name!
         """
         tabWidget = QTabWidget(self)
 
@@ -94,7 +104,7 @@ class InputTabWidgets(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------       
         self.sig_tx.connect(self.sig_rx) # loop back to local inputs
-
+        # self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
         tabWidget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
@@ -116,6 +126,17 @@ class InputTabWidgets(QWidget):
             layVMain.addWidget(tabWidget) # add the tabWidget directly
 
         self.setLayout(layVMain) # set the main layout of the window
+
+#------------------------------------------------------------------------------
+    def log_rx(self, dict_sig=None):
+        """
+        Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
+        """
+        if type(dict_sig) == dict:
+            logger.warning("SIG_RX\n{0}"\
+                .format(pprint_log(dict_sig)))
+        else:
+            logger.warning("empty dict")  
 
 #------------------------------------------------------------------------------
     def current_tab_changed(self):

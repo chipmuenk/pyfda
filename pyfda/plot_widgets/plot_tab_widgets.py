@@ -104,7 +104,7 @@ class PlotTabWidgets(QTabWidget):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
         self.sig_tx.connect(self.sig_rx) # loop back to local inputs
-        self.sig_rx.connect(self.log_rx)
+        # self.sig_rx.connect(self.log_rx) # enable for debugging
 
         # When user has selected a different tab, trigger a redraw of current tab
         tabWidget.currentChanged.connect(self.current_tab_changed)
@@ -145,6 +145,9 @@ class PlotTabWidgets(QTabWidget):
 
 #------------------------------------------------------------------------------
     def log_rx(self, dict_sig=None):
+        """
+        Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
+        """
         if type(dict_sig) == dict:
             logger.warning("SIG_RX\n{0}"\
                 .format(pprint_log(dict_sig)))
