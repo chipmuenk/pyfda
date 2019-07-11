@@ -106,7 +106,7 @@ class Input_Fixpoint_Specs(QWidget):
                 TTL = True
             else:
                 dict_sig.pop('ttl')
-
+                return # needed?
         elif dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
@@ -137,6 +137,8 @@ class Input_Fixpoint_Specs(QWidget):
         if propagate or TTL:
             # signals of local subwidgets are propagated with the name of this widget,
             # global signals terminate here
+            # The next event in the queue is only handled when control returns
+            # from this one, i.e. when TTL has counted down to zero?
             dict_sig.update({'sender':__name__})
             self.sig_tx.emit(dict_sig)            
 
@@ -181,6 +183,7 @@ class Input_Fixpoint_Specs(QWidget):
 
 #------------------------------------------------------------------------------
 #       Input and Output Quantizer
+#------------------------------------------------------------------------------
 #       - instantiate widgets for input and output quantizer
 #       - pass the quantization (sub-?) dictionary to the constructor     
 #------------------------------------------------------------------------------        
