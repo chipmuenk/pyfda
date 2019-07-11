@@ -196,7 +196,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_w_input.sig_tx.connect(self.sig_rx)
+        self.wdg_w_input.sig_tx.connect(self.sig_rx_local)
         
         cmb_q = ['round','floor']
         if HAS_DS:
@@ -459,7 +459,7 @@ class Input_Fixpoint_Specs(QWidget):
             if hasattr(self.fx_wdg_inst, "sig_rx"):
                 self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
             if hasattr(self.fx_wdg_inst, "sig_tx"):
-                self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
+                self.fx_wdg_inst.sig_tx.connect(self.sig_rx_local)
 
             #---- instantiate and scale graphic of filter topology ----        
             if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
