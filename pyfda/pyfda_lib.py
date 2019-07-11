@@ -274,7 +274,7 @@ def pprint_log(d, N=10, tab="\t"):
     if type(d) == dict:
         for k in d:
             if type(d[k]) in {list, np.ndarray}:
-                s += k + ' (L=' + str(len(d[k])) + ') : '\
+                s += k + ' (L=' + str(len(d[k])) + ') :'\
                                 + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
             else:
                 s += k + ' : ' + str(d[k])
