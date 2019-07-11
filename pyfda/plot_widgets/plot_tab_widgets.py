@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 import importlib
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
+from pyfda.pyfda_lib import pprint_log
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
@@ -103,6 +104,7 @@ class PlotTabWidgets(QTabWidget):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
         self.sig_tx.connect(self.sig_rx) # loop back to local inputs
+        self.sig_rx.connect(self.log_rx)
 
         # When user has selected a different tab, trigger a redraw of current tab
         tabWidget.currentChanged.connect(self.current_tab_changed)
@@ -141,6 +143,15 @@ class PlotTabWidgets(QTabWidget):
         resizes itself instead.
         """
 
+#------------------------------------------------------------------------------
+    def log_rx(self, dict_sig=None):
+        if type(dict_sig) == dict:
+            logger.warning("SIG_RX\n{0}"\
+                .format(pprint_log(dict_sig)))
+        else:
+            logger.warning("empty dict")  
+
+        
 #------------------------------------------------------------------------------
     def current_tab_changed(self):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'tab'})
