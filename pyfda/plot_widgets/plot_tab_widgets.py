@@ -36,17 +36,26 @@ class PlotTabWidgets(QTabWidget):
 #---------------------------------------------- --------------------------------
     def _construct_UI(self):
         """
-        Initialize UI with tabbed subwidgets and connect the signals of all
-        subwidgets.
-        This is done by dynamically instantiating each widget from the dict
-        `fb.plot_widget_dict` in one of the packages in `pckg_names`. Try to:
-
-        - connect `sig_tx` and `sig_rx`
+        Initialize UI with tabbed subwidgets: Instantiate dynamically each widget 
+        from the dict `fb.plot_classes` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
         - set the tab label from the instance attribute `tab_label`
           for each widget.
+            
+        - connect the available signals of all subwidgets (not all widgets have
+          both `sig_rx` and `sig_tx` signals).
+            
+            - `self.sig_rx` is distributed to all `inst.sig_rx` signals
+    
+            - all `inst.sig_tx` signals are collected in `self.sig_tx`
+    
+            - `self.sig_tx.connect(self.sig_rx)` distributes incoming signals (via
+               pyfdax or coming from the input widgets) among all input widgets.
+            
+           In order to prevent infinite loops, every widget needs to block in-
+           coming signals with its own name!
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")

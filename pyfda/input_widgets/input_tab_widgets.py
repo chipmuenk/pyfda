@@ -41,15 +41,24 @@ class InputTabWidgets(QWidget):
 
     def _construct_UI(self):
         """
-        Initialize UI with tabbed subwidgets and connect the available signals
-        of all subwidgets (not all widgets have both `sig_rx` and `sig_tx` signals).
+        Initialize UI with tabbed subwidgets: Instantiate dynamically each widget 
+        from the dict `fb.input_classes` and try to
+
+        - set the TabToolTip from the instance attribute `tool_tip`
+
+        - set the tab label from the instance attribute `tab_label`
+          for each widget.
             
-        - `self.sig_rx` is distributed to all `inst.sig_rx` signals
-
-        - all `inst.sig_tx` signals are collected in `self.sig_tx`
-
-        - `self.sig_tx.connect(self.sig_rx)` distributes incoming signals (via
-           pyfdax or coming from the input widgets) among all input widgets. 
+        - connect the available signals of all subwidgets (not all widgets have
+          both `sig_rx` and `sig_tx` signals).
+            
+            - `self.sig_rx` is distributed to all `inst.sig_rx` signals
+    
+            - all `inst.sig_tx` signals are collected in `self.sig_tx`
+    
+            - `self.sig_tx.connect(self.sig_rx)` distributes incoming signals (via
+               pyfdax or coming from the input widgets) among all input widgets.
+            
            In order to prevent infinite loops, every widget needs to block in-
            coming signals with its own name!
         """
