@@ -153,9 +153,18 @@ class Plot_Impz(QWidget):
 
         self.sig_rx.connect(self.process_sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
+#------------------------------------------------------------------------------
+    def process_sig_rx_local(self, dict_sig=None):
+        """
+        Flag signals coming in from local subwidgets with `propagate=True` before 
+        proceeding with processing in `process_sig_rx`.
+        
+        TODO: not used at the moment
+        """
+        self.process_sig_rx(dict_sig, propagate=True)
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):#, propagate=False):
+    def process_sig_rx(self, dict_sig=None, propagate=False):
         """
         Process signals coming from the navigation toolbar, local widgets and
         collected from input_tab_widgets
@@ -244,6 +253,14 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 2
+                
+        if propagate:
+            # signals of local subwidgets are propagated,
+            # global signals terminate here.
+            # The next event in the queue is only handled when control returns
+            # from this one
+            self.sig_tx.emit(dict_sig)
+            return
 
 
 # =============================================================================
