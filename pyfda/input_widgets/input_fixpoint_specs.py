@@ -99,15 +99,7 @@ class Input_Fixpoint_Specs(QWidget):
 		
         logger.info("SIG_RX - vis: {0} | prop: {1}\n{2}"\
                     .format(self.isVisible(), propagate, pprint_log(dict_sig)))
-        TTL = False
-        if 'ttl' in dict_sig:
-            if dict_sig['ttl'] > 0:
-                dict_sig['ttl'] = dict_sig['ttl'] - 1
-                TTL = True
-            else:
-                dict_sig.pop('ttl')
-                return # needed?
-        elif dict_sig['sender'] == __name__:
+        if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
         
@@ -134,13 +126,15 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
 
-        if propagate or TTL:
+        if propagate:
             # signals of local subwidgets are propagated with the name of this widget,
             # global signals terminate here
             # The next event in the queue is only handled when control returns
             # from this one, i.e. when TTL has counted down to zero?
-            dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)            
+            #dict_sig.update({'sender':__name__})
+            logger.info("Emit Prop / TTL\n")
+            self.sig_tx.emit(dict_sig)
+            return
 
 #------------------------------------------------------------------------------
 

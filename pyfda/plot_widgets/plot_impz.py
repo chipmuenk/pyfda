@@ -165,15 +165,8 @@ class Plot_Impz(QWidget):
                     
         logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
-        TTL = False
-        if 'ttl' in dict_sig:
-            if dict_sig['ttl'] > 0:
-                dict_sig['ttl'] = dict_sig['ttl'] - 1
-                TTL = True
-            else:
-                dict_sig.pop('ttl')
 
-        elif dict_sig['sender'] == __name__:  
+        if dict_sig['sender'] == __name__:  
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
@@ -233,10 +226,6 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
                 qstyle_widget(self.ui.but_run, "changed")
                 #if 'ui' in dict_sig['sender']:
-                if TTL:
-                    # emit signal that local stimuli data has changed
-                    # self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
-                    self.sig_tx.emit(dict_sig)
                 self.impz()
 
             elif 'home' in dict_sig:
