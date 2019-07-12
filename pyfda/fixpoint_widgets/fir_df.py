@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import set_dict_defaults
+from pyfda.pyfda_lib import set_dict_defaults, pprint_log
 
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -105,7 +105,13 @@ class FIR_DF_wdg(QWidget):
         
 #------------------------------------------------------------------------------
     def process_sig_tx(self, dict_sig=None):
-
+        logger.warning("TX: {0}".format(pprint_log(dict_sig)))
+        self.sig_tx.emit(dict_sig)
+        
+#------------------------------------------------------------------------------
+    def process_coeff_sig_tx(self, dict_sig=None):
+        logger.warning("TX: {0}".format(pprint_log(dict_sig)))
+        self.fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
         self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------

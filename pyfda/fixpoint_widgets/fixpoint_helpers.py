@@ -196,7 +196,7 @@ class UI_W(QWidget):
 
     def __init__(self, parent, q_dict, **kwargs):
         super(UI_W, self).__init__(parent)
-        self.q_dict = q_dict
+        self.q_dict = q_dict # pass a dict with initial settings for construction
         #logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
         self.ui2dict()
@@ -286,8 +286,8 @@ class UI_W(QWidget):
         Update the attributes `self.WI`, `self.WF` and `self.W` when one of the QLineEdit
         widgets has been edited.
         
-        Return a dict with the three parameters when called directly, cast values
-        to standard python int format (instead of e.g. np.int64) to avoid problems 
+        Emit a signal with dict_sig, containing the three parameters cast to
+        standard python int format (instead of e.g. np.int64) to avoid problems 
         with HDL simulators downstream
         """
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos'))
