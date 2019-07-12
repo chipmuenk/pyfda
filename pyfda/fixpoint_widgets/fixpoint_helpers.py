@@ -221,7 +221,6 @@ class UI_W(QWidget):
                 logger.warning("Unknown key {0}".format(k))
             else:
                 dict_ui.update({k:v})
-        # dict_ui.update(map(kwargs)) # same as above?
 
         if not dict_ui['fractional']:
             dict_ui['WF'] = 0
