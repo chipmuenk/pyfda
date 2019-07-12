@@ -275,9 +275,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
+        layVMain.addWidget(frmHdlBtns)        
         layVMain.addWidget(frmQioWdg)
 #        layVMain.addWidget(frmQoWdg)
-        layVMain.addWidget(frmHdlBtns)
         layVMain.addWidget(splitter)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
