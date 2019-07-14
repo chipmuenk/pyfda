@@ -95,7 +95,7 @@ class Input_Coeffs_UI(QWidget):
         self.lblDigits.setFont(self.bifont)
 
         self.cmbQFrmt = QComboBox(self)
-        q_formats = [('Integer', 'qint' ), ('Norm. Frac.', 'qnfrac'), ('Fractional', 'qfrac')]
+        q_formats = [('Norm. Frac.', 'qnfrac'), ('Integer', 'qint' ), ('Fractional', 'qfrac')]
         for q in q_formats:
             self.cmbQFrmt.addItem(*q)
 
