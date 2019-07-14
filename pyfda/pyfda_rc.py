@@ -281,7 +281,7 @@ qss_light = """
     
     QLineEdit{background: white;
                 border-color: darkgrey;}
-    QLineEdit:disabled{background-color:darkgrey;}
+    QLineEdit:disabled{background-color:lightgrey; color:blue}
   
     QPushButton{
          background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
