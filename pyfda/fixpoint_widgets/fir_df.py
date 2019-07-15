@@ -50,8 +50,6 @@ class FIR_DF_wdg(QWidget):
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
                       "Standard FIR topology.")
         self.img_name = "fir_df.png"
-
-        self.fxqc_dict = fb.fil[0]['fxqc']
         
         self._construct_UI()
         # Construct an instance of the HDL filter object
@@ -94,8 +92,7 @@ class FIR_DF_wdg(QWidget):
         
         layVWdg.addWidget(self.wdg_w_coeffs)
         layVWdg.addWidget(self.wdg_q_coeffs)
-        self.fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
-
+        fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)
         layVWdg.addWidget(self.wdg_w_accu)
 
         layVWdg.addStretch()
@@ -111,7 +108,8 @@ class FIR_DF_wdg(QWidget):
 #------------------------------------------------------------------------------
     def process_coeff_sig_tx(self, dict_sig=None):
         logger.warning("TX: {0}".format(pprint_log(dict_sig)))
-        self.fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
+
+        fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)        
         self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
@@ -164,7 +162,9 @@ class FIR_DF_wdg(QWidget):
                 
         """
    
-        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
+#        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
+        fxqc_dict = self.wdg_w_coeffs.c_dict
+
         
         return fxqc_dict
     
