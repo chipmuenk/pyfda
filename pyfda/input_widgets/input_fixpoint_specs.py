@@ -119,6 +119,8 @@ class Input_Fixpoint_Specs(QWidget):
                 # fixpoint specification have been changed somewhere, update ui
                 # and set run button to "changed"
                 self.wdg_dict2ui()
+            elif dict_sig['fx_sim'] == 'finish':
+                qstyle_widget(self.butSimHDL, "normal")                
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
@@ -659,6 +661,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.error("Simulator error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
+            self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
             return
         except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
@@ -673,6 +676,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
+            self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
             return
 
         logger.debug("Sending fixpoint results")
