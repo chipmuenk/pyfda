@@ -145,7 +145,7 @@ def build_coeff_dict(frmt=None):
     af = fb.fil[0]['ba'][1] # filter dict in float form
     # Create a coefficient quantizer instance using the quantization parameters dict
     # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
-    Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
+    Q_coeff = fix.Fixed(fb.fil[0]['fxqc']['QC'])
     #Q_coeff.setQobj(fb.fil[0]['q_coeff']) # alternative: explicitly call setter
     if not frmt:
         Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
@@ -154,16 +154,21 @@ def build_coeff_dict(frmt=None):
 
     # quantize floating point coefficients and convert them to the
     # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF)
-    c_dict = {}
+
     # convert list of float -> dec (np.int64).
     # item() converts np.int64 -> int 
-    c_dict.update({'b':[b.item() for b in Q_coeff.float2frmt(bf)]}) # convert float -> fixp and
-    c_dict.update({'a':[a.item() for a in Q_coeff.float2frmt(af)]}) # format it as bin, hex, ...
-    c_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
-    c_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
-    c_dict.update({'W':Q_coeff.W})
-    c_dict.update({'scale':Q_coeff.scale}) # for later use 
-    c_dict.update({'frmt':Q_coeff.frmt})
+    c_dict = {'b':[b.item() for b in Q_coeff.float2frmt(bf)]} # convert float -> fixp and
+    c_dict.update({'a':[a.item() for a in Q_coeff.float2frmt(af)]})# format it as bin, hex, ...
+    logger.warning(c_dict['b'])
+
+    qc_dict = {}
+    qc_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
+    qc_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
+    qc_dict.update({'W':Q_coeff.W})
+    qc_dict.update({'scale':Q_coeff.scale}) # for later use 
+    qc_dict.update({'frmt':Q_coeff.frmt})
+    
+    c_dict.update({'QC':qc_dict})
 
     return c_dict
 
@@ -354,7 +359,7 @@ class UI_W_coeffs(UI_W):
         by changing the coefficient format in `input_coeffs.py`.
         """
         if not c_dict:
-            c_dict = fb.fil[0]['q_coeff']
+            c_dict = fb.fil[0]['fxqc']['QC']
         self.WI = c_dict['WI']
         self.WF = c_dict['WF']
         self.ledWI.setText(qstr(self.WI))
@@ -489,8 +494,8 @@ class UI_Q_coeffs(UI_Q):
     #--------------------------------------------------------------------------
     def load_ui(self):
         """ Update UI from filter dict """
-        self.ovfl = fb.fil[0]['q_coeff']['ovfl']
-        self.quant = fb.fil[0]['q_coeff']['quant']
+        self.ovfl = fb.fil[0]['fxqc']['QC']['ovfl']
+        self.quant = fb.fil[0]['fxqc']['QC']['quant']
         qset_cmb_box(self.cmbOvfl,self.ovfl)
         qset_cmb_box(self.cmbQuant,self.quant)
 

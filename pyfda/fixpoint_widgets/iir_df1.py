@@ -97,8 +97,8 @@ class IIR_DF1(QWidget):
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
         self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
 
-        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
-        a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
+        b = [ int(x) for x in self.hdl_dict['b']] # convert np.int64 to python int
+        a = [ int(x) for x in self.hdl_dict['a']] # convert np.int64 to python int
 
         # call setup method of filter widget - this is not implemented (yet)
         # self.fx_wdg_inst.setup_HDL(self.hdl_dict)

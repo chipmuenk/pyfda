@@ -219,11 +219,12 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             # input, output, accu, coeffs, ... fixpoint word formats and quantizer
             # settings as well as coefficients in integer format (scaled with W):
             'fxqc':
-                {'QI': {'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
-                 'QO': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
-                 'QA': {'WI':0, 'WF':31, 'W':32, 'ovfl':'wrap', 'quant':'floor'},
-                 'QC': {'WI':2, 'WF':13, 'W':16, 'ovfl':'wrap', 'quant':'floor',
-                        'b':[32768, 32768, 32768], 'a': [65536, 6553, 0]}
+                {'QI':{'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
+                 'QO':{'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
+                 'QA':{'WI':0, 'WF':31, 'W':32, 'ovfl':'wrap', 'quant':'floor'},
+                 'QC':{'WI':2, 'WF':13, 'W':16, 'ovfl':'wrap', 'quant':'floor', 'scale':1<<16},
+                 'b': [32768, 32768, 32768], 
+                 'a': [65536, 6553, 0]
                  },
 
             'creator':('ba', 'filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)

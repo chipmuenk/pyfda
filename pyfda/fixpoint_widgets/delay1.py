@@ -145,7 +145,7 @@ class Delay(Module):
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['W']
         self.WO = p['QO']['W']
-        N = len(p['QC']['b']) - 1 # number of coefficients = Order + 1
+        N = len(p['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((self.WI, True)) # input signal
         self.o = Signal((self.WO, True)) # output signal

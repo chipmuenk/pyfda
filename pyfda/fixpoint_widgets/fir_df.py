@@ -72,16 +72,16 @@ class FIR_DF_wdg(QWidget):
                                         label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
-                                        WI = fb.fil[0]['q_coeff']['WI'],
-                                        WF = fb.fil[0]['q_coeff']['WF'])
+                                        WI = fb.fil[0]['fxqc']['QC']['WI'],
+                                        WF = fb.fil[0]['fxqc']['QC']['WF'])
         self.wdg_w_coeffs.sig_tx.connect(self.process_sig_tx)
         
-        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['q_coeff'],
-                                        cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
-                                        cur_q=fb.fil[0]['q_coeff']['quant'])
+        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
+                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
+                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
         self.wdg_q_coeffs.sig_tx.connect(self.process_sig_tx)
 
-        self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
+        self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
                                fractional=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_tx)
@@ -228,7 +228,7 @@ class FIR(Module):
         muls = []
         src = self.i
 
-        for c in p['QC']['b']:
+        for c in p['b']:
             sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
