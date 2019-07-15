@@ -65,9 +65,6 @@ class Input_Fixpoint_Specs(QWidget):
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                 " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
-        # initialize the dict with the filter quantization settings and coefficients
-        # from the filterbroker (fb) default by creating a reference to it
-        #self.fxqc_dict = fb.fil[0]['fxqc']
         
         if HAS_MIGEN:
             self._construct_UI()

@@ -351,17 +351,17 @@ class UI_W_coeffs(UI_W):
         fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
         self.W = int(self.WI + self.WF + 1)
 
-    def dict2ui(self, c_dict):
+    def dict2ui(self, qc_dict):
         """ 
         Update the ui and the attributes `self.WI` and `self.WF` from the filter
         dict. `dict2ui()` has to be called when the coefficients or the word
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
-        if not c_dict:
-            c_dict = fb.fil[0]['fxqc']['QC']
-        self.WI = c_dict['WI']
-        self.WF = c_dict['WF']
+        if not qc_dict:
+            qc_dict = fb.fil[0]['fxqc']['QC']
+        self.WI = qc_dict['WI']
+        self.WF = qc_dict['WF']
         self.ledWI.setText(qstr(self.WI))
         self.ledWF.setText(qstr(self.WF))
         self.W = self.WI + self.WF + 1

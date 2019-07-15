@@ -61,8 +61,6 @@ class Plot_Impz(QWidget):
         self.tab_label = "h[n]"
         self.active_tab = 0 # index for active tab
 
-        self.fxqc_dict = fb.fil[0]['fxqc'] # dict with fixpoint infos
-
         self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
         self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}
         self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
@@ -204,8 +202,8 @@ class Plot_Impz(QWidget):
 
                 elif dict_sig['fx_sim'] == 'set_results':
                     """
-                    - Convert simulation results to integer and transfer them to the fixpoint
-                      filter as a
+                    - Convert simulation results to integer and transfer them to the plotting
+                      routine
                     """
 
                     logger.info("Received fixpoint results.")
@@ -618,19 +616,19 @@ class Plot_Impz(QWidget):
                     # display stimulus and response as integer values:
                     # - multiply stimulus by 2 ** WF
                     # - display response unscaled
-                    self.scale_i = 1 << self.fxqc_dict['QI']['WF']
-                    self.fx_min = - (1 << self.fxqc_dict['QO']['W']-1)
+                    self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['W']-1)
                     self.fx_max = -self.fx_min - 1
                 else:
                     # display values scaled as "real world values"
-                    self.scale_o = 1. / (1 << self.fxqc_dict['QO']['WF'])
-                    self.fx_min = -(1 << self.fxqc_dict['QO']['WI'])
+                    self.scale_o = 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
+                    self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
                     self.fx_max = -self.fx_min - self.scale_o
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
             except TypeError as e:
-                logger.error("Type error: 'fxqc_dict'={0},\n{1}".format(self.fxqc_dict, e))
+                logger.error("Type error: 'fxqc_dict'={0},\n{1}".format(fb.fil[0]['fxqc'], e))
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 

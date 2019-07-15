@@ -39,8 +39,6 @@ class Delay_wdg(QWidget):
                  "Just a delay with quantization for testing fixpoint quantization,"
                  "simulation and HDL generation.")
         self.img_name = "delay.png"
-        
-        self.fxqc_dict = fb.fil[0]['fxqc']
 
         self._construct_UI()
         # Construct an instance of the HDL filter object
