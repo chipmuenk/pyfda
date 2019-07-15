@@ -63,11 +63,11 @@ class FIR_DF_wdg(QWidget):
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
         """
-        if not 'QA' in self.fxqc_dict:
-            self.fxqc_dict['QA'] = {}
-        set_dict_defaults(self.fxqc_dict['QA'], 
+        if not 'QA' in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc']['QA'] = {}
+        set_dict_defaults(fb.fil[0]['fxqc']['QA'], 
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
-        
+        logger.warning("fb.fil[0]['fxqc']['QC']:{0}".format(pprint_log(fb.fil[0]['fxqc']['QC'])))        
         self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['q_coeff'],
                                         label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
@@ -86,7 +86,7 @@ class FIR_DF_wdg(QWidget):
                                fractional=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_tx)
 
-        #self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
+        #self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
