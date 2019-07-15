@@ -504,7 +504,6 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
-        fb.fil[0]['fxqc']['QC'] = fb.fil[0]['q_coeff']
         fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(fb.fil[0]['fxqc'])

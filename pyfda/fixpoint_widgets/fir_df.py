@@ -66,7 +66,7 @@ class FIR_DF_wdg(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'], 
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
         logger.warning("fb.fil[0]['fxqc']['QC']:{0}".format(pprint_log(fb.fil[0]['fxqc']['QC'])))        
-        self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['q_coeff'],
+        self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['fxqc']['QC'],
                                         label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',

@@ -51,11 +51,11 @@ class IIR_DF1(QWidget):
         self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
-                                        WI = fb.fil[0]['q_coeff']['WI'],
-                                        WF = fb.fil[0]['q_coeff']['WF'])
+                                        WI = fb.fil[0]['fxqc']['QC']['WI'],
+                                        WF = fb.fil[0]['fxqc']['QC']['WF'])
         self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
-                                        cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
-                                        cur_q=fb.fil[0]['q_coeff']['quant'])
+                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
+                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
         self.wdg_w_accu = UI_W(self, label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
         self.wdg_q_accu = UI_Q(self)
 

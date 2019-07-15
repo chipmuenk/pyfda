@@ -146,7 +146,7 @@ def build_coeff_dict(frmt=None):
     # Create a coefficient quantizer instance using the quantization parameters dict
     # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
     Q_coeff = fix.Fixed(fb.fil[0]['fxqc']['QC'])
-    #Q_coeff.setQobj(fb.fil[0]['q_coeff']) # alternative: explicitly call setter
+    #Q_coeff.setQobj(fb.fil[0]['fxqc']['QC']) # alternative: explicitly call setter
     if not frmt:
         Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
     else:
@@ -348,8 +348,8 @@ class UI_W_coeffs(UI_W):
         self.ledWI.setText(qstr(self.WI))
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))
         self.ledWF.setText(qstr(self.WF))
-        fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
         self.W = int(self.WI + self.WF + 1)
+        fb.fil[0]['fxqc']['QC'].update({'WI':self.WI, 'WF':self.WF, 'W':self.W})      
 
     def dict2ui(self, qc_dict):
         """ 

@@ -213,9 +213,9 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'sos': [],
             # quantizer setting for coefficients
             # TODO: Should be merged with 'fxqc'?
-            'q_coeff':
-                {'WI':0, 'WF': 15,
-                 'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'scale': 1},
+            #'q_coeff':
+            #    {'WI':0, 'WF': 15,
+            #     'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'scale': 1},
             # input, output, accu, coeffs, ... fixpoint word formats and quantizer
             # settings as well as coefficients in integer format (scaled with W):
             'fxqc':
