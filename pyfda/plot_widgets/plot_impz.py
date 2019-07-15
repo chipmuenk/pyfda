@@ -254,6 +254,11 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 2
 
+            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
+                    self.needs_calc = True # always require recalculation when triggered externally
+                    qstyle_widget(self.ui.but_run, "changed")
+                    self.fx_select("Fixpoint")
+
         if propagate:
             # signals of local subwidgets are propagated,
             # global signals terminate here.
