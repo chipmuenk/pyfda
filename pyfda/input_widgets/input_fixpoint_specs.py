@@ -67,7 +67,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.parent = parent
         # initialize the dict with the filter quantization settings and coefficients
         # from the filterbroker (fb) default by creating a reference to it
-        self.fxqc_dict = fb.fil[0]['fxqc']
+        #self.fxqc_dict = fb.fil[0]['fxqc']
         
         if HAS_MIGEN:
             self._construct_UI()
@@ -187,21 +187,21 @@ class Input_Fixpoint_Specs(QWidget):
         layHBtnsMsg.addStretch(1)
         layHBtnsMsg.addWidget(lblHBtnsMsg2)
 
-        self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
+        self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:')
         self.wdg_w_input.sig_tx.connect(self.sig_rx_local)
         
         cmb_q = ['round','floor']
         if HAS_DS:
             cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'], cmb_q=cmb_q)
+        self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'], cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
         
-        self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
+        self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'],
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
         self.wdg_w_output.sig_tx.connect(self.sig_rx_local)
 
-        self.wdg_q_output = UI_Q(self, q_dict = self.fxqc_dict['QO'])
+        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'])
         self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         layVQioWdg = QVBoxLayout()
@@ -507,8 +507,10 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
+        fb.fil[0]['fxqc']['QC'] = fb.fil[0]['q_coeff']
+        fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
-            self.fx_wdg_inst.dict2ui(self.fxqc_dict)
+            self.fx_wdg_inst.dict2ui(fb.fil[0]['fxqc'])
 #            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
 #            self.sig_tx.emit(dict_sig)
 
@@ -521,7 +523,7 @@ class Input_Fixpoint_Specs(QWidget):
         if self.fx_wdg_found:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
-                self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
+                fb.fil[0]['fxqc'].update(self.fx_wdg_inst.ui2dict())
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
@@ -590,7 +592,7 @@ class Input_Fixpoint_Specs(QWidget):
 #        try:
 #            logger.info("Started python fixpoint simulation")
 #            self.update_fxqc_dict()
-#            self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
+#            self.fxpyfilter.setup(fb.fil[0]['fxqc'])   # setup filter instance         
 #            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
 #            self.sig_tx.emit(dict_sig)
 #                        
