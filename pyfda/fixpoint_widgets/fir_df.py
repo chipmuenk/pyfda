@@ -52,8 +52,9 @@ class FIR_DF_wdg(QWidget):
         self.img_name = "fir_df.png"
         
         self._construct_UI()
-        # Construct an instance of the HDL filter object
-        self.construct_fixp_filter() # construct instance self.hdlfilter with dummy data
+        # Construct an instance of the fixpoint filter using the settings from
+        # the 'fxqc' quantizer dict
+        self.construct_fixp_filter()
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -172,7 +173,7 @@ class FIR_DF_wdg(QWidget):
     def construct_fixp_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
-        the quantizer dict
+        the 'fxqc' quantizer dict
         """
         self.fixp_filter = FIR()
 #------------------------------------------------------------------------------
