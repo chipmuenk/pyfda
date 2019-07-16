@@ -42,7 +42,9 @@ for key in pyfda_rc.mpl_rc:
 
 #------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, **kwargs):
-    """ A faster replacement for stem plot
+    """ 
+    A faster replacement for stem plot using vlines (= LineCollection)
+    LineCollection keywords are supported.
     """
     # pop the 'bottom' key-value pair from the dict, provide default value 0
     bottom=kwargs.pop('bottom', 0) 
