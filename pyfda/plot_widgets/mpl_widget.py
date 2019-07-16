@@ -209,6 +209,7 @@ class MplToolbar(NavigationToolbar):
 
     Changing the info:
     http://stackoverflow.com/questions/15876011/add-information-to-matplotlib-navigation-toolbar-status-bar
+    https://stackoverflow.com/questions/53099295/matplotlib-navigationtoolbar-advanced-figure-options
     """
 
 #    toolitems = (
