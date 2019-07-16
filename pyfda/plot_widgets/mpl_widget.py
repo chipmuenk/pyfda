@@ -12,9 +12,7 @@ toolbar.
 """
 import logging
 logger = logging.getLogger(__name__)
-
 import sys
-import six
 import numpy as np
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
@@ -42,7 +40,9 @@ for key in pyfda_rc.mpl_rc:
 
 #------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, **kwargs):
-    """ A faster replacement for stem plot
+    """ 
+    A faster replacement for stem plot using vlines (= LineCollection)
+    LineCollection keywords are supported.
     """
     # pop the 'bottom' key-value pair from the dict, provide default value 0
     bottom=kwargs.pop('bottom', 0) 
@@ -209,6 +209,7 @@ class MplToolbar(NavigationToolbar):
 
     Changing the info:
     http://stackoverflow.com/questions/15876011/add-information-to-matplotlib-navigation-toolbar-status-bar
+    https://stackoverflow.com/questions/53099295/matplotlib-navigationtoolbar-advanced-figure-options
     """
 
 #    toolitems = (
