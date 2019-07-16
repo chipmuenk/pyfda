@@ -112,7 +112,13 @@ class Input_Fixpoint_Specs(QWidget):
             self.wdg_dict2ui()
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
-                self.fx_sim_init()
+                if self.fx_wdg_found:
+                    self.fx_sim_init()
+                else:
+                    logger.error("No fixpoint widget found!")
+                    qstyle_widget(self.butSimHDL, "normal")  
+                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
+                    
             elif dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
