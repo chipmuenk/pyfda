@@ -193,7 +193,8 @@ class Input_Fixpoint_Specs(QWidget):
         layHBtnsMsg.addWidget(lblHBtnsMsg2)
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
-                                label='Input Format <i>Q<sub>X </sub></i>:')
+                                label='Input Format <i>Q<sub>X </sub></i>:',
+                                lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.sig_rx_local)
         
         cmb_q = ['round','floor']
@@ -512,7 +513,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
-        fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
+#        fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(fb.fil[0]['fxqc'])
 #            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}

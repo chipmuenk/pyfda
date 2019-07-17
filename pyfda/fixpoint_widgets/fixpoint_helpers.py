@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fix
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
                       QVBoxLayout, QHBoxLayout, QFrame,
                       pyqtSignal)
 
@@ -200,6 +200,8 @@ class UI_W(QWidget):
     'enabled'       : True                      # Is widget enabled?
     'visible'       : True                      # Is widget visible?
     'fractional'    : True                      # Display WF, otherwise WF=0
+    'lock_visible'  : False                     # Pushbutton for locking visible
+    'tip_lock'      : 'Lock input/output quant.'# Tooltip for  lock push button
     """
     # incoming, 
     #sig_rx = pyqtSignal(object)
@@ -222,7 +224,8 @@ class UI_W(QWidget):
         dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
-                   'enabled':True, 'visible':True, 'fractional':True
+                   'enabled':True, 'visible':True, 'fractional':True, 
+                   'lock_visible':False, 'tip_lock':'Lock input/output quantization.'
                    } #: default values
 
         if self.q_dict:
@@ -245,6 +248,13 @@ class UI_W(QWidget):
             self.q_dict = {'WI':self.WI, 'WF':self.WF, 'W':self.W}
 
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        
+        self.butLock = QPushButton(self)
+        self.butLock.setCheckable(True)
+        self.butLock.setChecked(False)
+        self.butLock.setVisible(dict_ui['lock_visible'])
+        self.butLock.setToolTip(dict_ui['tip_lock'])
+
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
@@ -262,6 +272,7 @@ class UI_W(QWidget):
         layH = QHBoxLayout()
         layH.addWidget(lblW)
         layH.addStretch()
+        layH.addWidget(self.butLock)
         layH.addWidget(self.ledWI)
         layH.addWidget(lblDot)
         layH.addWidget(self.ledWF)
@@ -290,9 +301,25 @@ class UI_W(QWidget):
         #----------------------------------------------------------------------
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
+        self.butLock.clicked.connect(self.but_clicked)
+        
+        self.but_clicked(self.butLock.isChecked())
 
     #--------------------------------------------------------------------------
-    def ui2dict(self): # was: save_ui
+    def but_clicked(self, clicked):
+        """ 
+        Update the icon of the push button depending on its state
+        """
+        if clicked:
+            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+        else:
+            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+            
+        q_icon_size = self.butLock.iconSize() # <- uncomment this for manual sizing
+        self.butLock.setIconSize(q_icon_size)
+
+    #--------------------------------------------------------------------------
+    def ui2dict(self):
         """ 
         Update the attributes `self.WI`, `self.WF` and `self.W` when one of the QLineEdit
         widgets has been edited.
