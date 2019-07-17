@@ -133,8 +133,8 @@ class Input_Fixpoint_Specs(QWidget):
         elif 'ui' in dict_sig:
             if dict_sig['ui'] == 'butLock':
                 if self.wdg_w_input.butLock.isChecked():
-                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
-                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                    fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
+                    fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                 else:
                     return
             else:
