@@ -229,11 +229,11 @@ class FIR(Module):
         muls = []
         src = self.i
 
-        for c in p['b']:
+        for b in p['b']:
             sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
-            muls.append(c*sreg)
+            muls.append(int(b)*sreg)
         sum_full = Signal((WA, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
 
