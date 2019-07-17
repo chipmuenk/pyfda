@@ -74,11 +74,12 @@ class FIR_DF_wdg(QWidget):
                                         WI = fb.fil[0]['fxqc']['QC']['WI'],
                                         WF = fb.fil[0]['fxqc']['QC']['WF'])
         self.wdg_w_coeffs.sig_tx.connect(self.process_sig_tx)
+        self.wdg_w_coeffs.setEnabled(False)
         
-        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
-                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
-                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
-        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_tx)
+#        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
+#                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
+#                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
+#        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_tx)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
@@ -92,7 +93,7 @@ class FIR_DF_wdg(QWidget):
         layVWdg.setContentsMargins(0,0,0,0)
         
         layVWdg.addWidget(self.wdg_w_coeffs)
-        layVWdg.addWidget(self.wdg_q_coeffs)
+#        layVWdg.addWidget(self.wdg_q_coeffs)
         fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)
         layVWdg.addWidget(self.wdg_w_accu)
 
@@ -132,7 +133,7 @@ class FIR_DF_wdg(QWidget):
             fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
-        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
+#        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
         
         self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
         
