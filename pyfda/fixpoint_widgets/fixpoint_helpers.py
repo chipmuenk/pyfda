@@ -224,7 +224,9 @@ class UI_W(QWidget):
         dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
-                   'enabled':True, 'visible':True, 'fractional':True, 
+                   'enabled':True, 'visible':True, 'fractional':True,
+                   'combo_visible':False, 'combo_items':['auto', 'full', 'man'],
+                   'tip_combo':'Calculate Acc. width.',                  
                    'lock_visible':False, 'tip_lock':'Lock input/output quantization.'
                    } #: default values
 
@@ -248,6 +250,11 @@ class UI_W(QWidget):
             self.q_dict = {'WI':self.WI, 'WF':self.WF, 'W':self.W}
 
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+
+        self.cmbW = QComboBox(self)
+        self.cmbW.addItems(dict_ui['combo_items'])
+        self.cmbW.setVisible(dict_ui['combo_visible'])
+        self.cmbW.setToolTip(dict_ui['tip_combo'])
         
         self.butLock = QPushButton(self)
         self.butLock.setCheckable(True)
@@ -272,6 +279,7 @@ class UI_W(QWidget):
         layH = QHBoxLayout()
         layH.addWidget(lblW)
         layH.addStretch()
+        layH.addWidget(self.cmbW)
         layH.addWidget(self.butLock)
         layH.addWidget(self.ledWI)
         layH.addWidget(lblDot)
@@ -302,7 +310,9 @@ class UI_W(QWidget):
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.butLock.clicked.connect(self.but_clicked)
-        
+        self.cmbW.currentIndexChanged.connect(self.cmb_changed)
+
+        # initialize button icon        
         self.but_clicked(self.butLock.isChecked())
 
     #--------------------------------------------------------------------------
@@ -317,6 +327,18 @@ class UI_W(QWidget):
             
         q_icon_size = self.butLock.iconSize() # <- uncomment this for manual sizing
         self.butLock.setIconSize(q_icon_size)
+
+        dict_sig = {'sender':__name__, 'ui':'butLock'}
+        self.sig_tx.emit(dict_sig)
+        
+    #--------------------------------------------------------------------------
+    def cmb_changed(self, clicked):
+        """ 
+        Emit a signal when the index of the combobox has changed
+        """
+
+        dict_sig = {'sender':__name__, 'ui':'cmbW'}
+        self.sig_tx.emit(dict_sig)
 
     #--------------------------------------------------------------------------
     def ui2dict(self):
@@ -342,7 +364,8 @@ class UI_W(QWidget):
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
         """ 
-        Update the widgets `WI` and `WF` from the dict passed as the argument
+        Update the widgets `WI` and `WF` and the corresponding attributes
+        from the dict passed as the argument
         """
         if 'WI' in w_dict:
             self.WI = safe_eval(w_dict['WI'], self.WI, return_type="int", sign='pos')
@@ -355,6 +378,8 @@ class UI_W(QWidget):
             self.ledWF.setText(qstr(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
+        
+        self.W = self.WF + self.WI + 1
 
 #------------------------------------------------------------------------------
 class UI_W_coeffs(UI_W):

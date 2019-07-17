@@ -130,6 +130,17 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
+        elif 'ui' in dict_sig:
+            if dict_sig['ui'] == 'butLock':
+                if self.wdg_w_input.butLock.isChecked():
+                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
+                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                else:
+                    return
+            else:
+                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+            self.wdg_dict2ui()
+            self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
 
         if propagate:
             # signals of local subwidgets are propagated,
@@ -195,7 +206,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:',
                                 lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.sig_rx_local)
+        self.wdg_w_input.sig_tx.connect(self.sig_rx)
         
         cmb_q = ['round','floor']
         if HAS_DS:
@@ -424,6 +435,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.img_fixp = QPixmap("no_fx_filter.png")
             self.resize_img()
             self.lblTitle.setText("")
+
             self.fx_wdg_inst = None
             
         # destruct old fixpoint widget instance
@@ -458,7 +470,7 @@ class Input_Fixpoint_Specs(QWidget):
             if hasattr(self.fx_wdg_inst, "sig_rx"):
                 self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
             if hasattr(self.fx_wdg_inst, "sig_tx"):
-                self.fx_wdg_inst.sig_tx.connect(self.sig_rx_local)
+                self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
 
             #---- instantiate and scale graphic of filter topology ----        
             if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
@@ -514,6 +526,10 @@ class Input_Fixpoint_Specs(QWidget):
         Set the RUN button to "changed".
         """
 #        fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
+        self.wdg_q_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        self.wdg_q_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+        self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(fb.fil[0]['fxqc'])
 #            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}

@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import set_dict_defaults, pprint_log
+from pyfda.pyfda_qt_lib import qget_cmb_box
 
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -73,18 +74,18 @@ class FIR_DF_wdg(QWidget):
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]['fxqc']['QC']['WI'],
                                         WF = fb.fil[0]['fxqc']['QC']['WF'])
-        self.wdg_w_coeffs.sig_tx.connect(self.process_sig_tx)
+        self.wdg_w_coeffs.sig_tx.connect(self.process_sig_rx)
         self.wdg_w_coeffs.setEnabled(False)
         
 #        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
 #                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
 #                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
-#        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_tx)
+#        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_rx)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
-                               fractional=True)
-        self.wdg_w_accu.sig_tx.connect(self.process_sig_tx)
+                               fractional=True, combo_visible=True)
+        self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
         #self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
 #------------------------------------------------------------------------------
@@ -103,16 +104,24 @@ class FIR_DF_wdg(QWidget):
 
         
 #------------------------------------------------------------------------------
-    def process_sig_tx(self, dict_sig=None):
-        logger.warning("TX: {0}".format(pprint_log(dict_sig)))
-        self.sig_tx.emit(dict_sig)
-        
-#------------------------------------------------------------------------------
-    def process_coeff_sig_tx(self, dict_sig=None):
-        logger.warning("TX: {0}".format(pprint_log(dict_sig)))
+    def process_sig_rx(self, dict_sig=None):
+        logger.warning("RX:\n{0}".format(pprint_log(dict_sig)))
+        if 'ui' in dict_sig:
+            if dict_sig['ui'] == 'cmbW':
+                cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
+                self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
+                self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
+                if cmbW == 'full':
+                    logger.warning("something must happen here")
+                
+            elif dict_sig['ui'] == 'ledW':
+                pass
 
-        fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)        
-        self.sig_tx.emit(dict_sig)
+            dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)
+        else:
+            self.sig_tx.emit(dict_sig)
+        
 
 #------------------------------------------------------------------------------
     def dict2ui(self, fxqc_dict):
@@ -134,7 +143,10 @@ class FIR_DF_wdg(QWidget):
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
 #        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
-        
+        if qget_cmb_box(self.wdg_w_accu.cmbW) == "full":
+            fxqc_dict['QA']['WF'] = fxqc_dict['QC']['WF'] + fxqc_dict['QI']['WF']
+            fxqc_dict['QA']['WI'] = fxqc_dict['QC']['WI'] + fxqc_dict['QI']['WI']
+ 
         self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
         
 #------------------------------------------------------------------------------
