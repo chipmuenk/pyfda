@@ -116,7 +116,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.fx_sim_init()
                 else:
                     logger.error("No fixpoint widget found!")
-                    qstyle_widget(self.butSimHDL, "normal")  
+                    qstyle_widget(self.butSimHDL, "error")  
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
                     
             elif dict_sig['fx_sim'] == 'set_stimulus':

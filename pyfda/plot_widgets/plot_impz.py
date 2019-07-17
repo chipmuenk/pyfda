@@ -222,7 +222,7 @@ class Plot_Impz(QWidget):
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
                                                dict_sig['sender']))
 
-        if self.isVisible():
+        elif self.isVisible():
 
             if 'view_changed' in dict_sig:
                 self.impz()
@@ -303,7 +303,6 @@ class Plot_Impz(QWidget):
             self.calc_stimulus()
             if self.fx_sim:
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
-
             else:
                 self.calc_response()
             self.needs_calc = False
