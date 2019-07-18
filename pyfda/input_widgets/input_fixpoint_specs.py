@@ -27,7 +27,7 @@ import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import qstr, cmp_version, pprint_log
 import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
-from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
@@ -339,7 +339,7 @@ class Input_Fixpoint_Specs(QWidget):
         fixpoint implementation combo box `self.cmb_wdg_fixp` when successfull. 
         """
         inst_wdg_str = "" # full names of successfully instantiated widgets for logging
-
+        last_fx_wdg = qget_cmb_box(self.cmb_wdg_fixp, data=False) # remember last fx widget setting
         self.cmb_wdg_fixp.clear()
         fc = fb.fil[0]['fc']
         if 'fix' in fb.filter_classes[fc]:
@@ -357,6 +357,10 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.warning(e)
                     continue
 
+           # restore last fxp widget if possible
+            idx = self.cmb_wdg_fixp.findText(last_fx_wdg)
+            # set to idx 0 if not found (returned -1)
+            self.cmb_wdg_fixp.setCurrentIndex(max(idx,0))
         return inst_wdg_str
         
 #------------------------------------------------------------------------------
