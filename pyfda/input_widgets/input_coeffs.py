@@ -595,7 +595,7 @@ class Input_Coeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ.frmt, title="Import Filter Coefficients")
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ.frmt, title="Export Filter Coefficients")
 
     #------------------------------------------------------------------------------
     def _copy_to_table(self):
@@ -603,7 +603,7 @@ class Input_Coeffs(QWidget):
         Read data from clipboard / file and copy it to `self.ba` as float / cmplx
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, 'ba', title="Export Filter Coefficients")
+        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")
         if data_str is None: # file operation has been aborted or some other error
             return
 
