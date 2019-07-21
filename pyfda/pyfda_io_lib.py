@@ -204,7 +204,7 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
-def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
+def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
@@ -371,7 +371,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        export_data(parent, text, fkey, comment=comment)
+        export_data(parent, text, fkey, title=title)
 
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -392,7 +392,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
 
 
 #------------------------------------------------------------------------------
-def qtext2table(parent, fkey, comment = ""):
+def qtext2table(parent, fkey, title = "Import"):
     """
     Copy data from clipboard or file to table
 
@@ -405,9 +405,8 @@ def qtext2table(parent, fkey, comment = ""):
     fkey: str
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
 
-    comment: str
-            comment string stating the type of data to be copied (e.g.
-            "filter coefficients ")
+    title: str
+        title string for the file dialog box
 
 
     The following keys from the global dict ``params['CSV']`` are evaluated:
@@ -451,7 +450,7 @@ def qtext2table(parent, fkey, comment = ""):
             # pass handle to text and convert to numpy array:
             data_arr = csv2array(io.StringIO(text))
     else: # data from file
-        data_arr = import_data(parent, fkey, comment)
+        data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
         if type(data_arr) == int and data_arr == -1: # file operation cancelled
@@ -576,7 +575,7 @@ def csv2array(f):
         return None
 
 #------------------------------------------------------------------------------
-def import_data(parent, fkey, comment):
+def import_data(parent, fkey, title="Import"):
     """
     Import data from a file and convert it to a numpy array.
 
@@ -587,9 +586,8 @@ def import_data(parent, fkey, comment):
     fkey: string
         Key for accessing data in *.npz or Matlab workspace (*.mat) file.
 
-    comment: string
-        comment string stating the type of data to be copied (e.g.
-        "filter coefficients ") for user message while opening file
+    title: str
+        title string for the file dialog box (e.g. "filter coefficients ")
 
     Returns
     -------
@@ -599,7 +597,7 @@ def import_data(parent, fkey, comment):
     file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat);;"
     "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
     dlg = QFD(parent) # create instance for QFileDialog
-    dlg.setWindowTitle("Import " + comment + " file")
+    dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
     dlg.setNameFilter(file_filters)
@@ -611,12 +609,6 @@ def import_data(parent, fkey, comment):
         sel_filt = dlg.selectedNameFilter()
     else:
         return
-
-#    dlg = QFD(parent)
-#    file_name, sel_filt = dlg.getOpenFileName_(
-#            caption = "Import "+ comment + "file",
-#            directory = dirs.save_dir, filter = file_filters)
-#    file_name = str(file_name) # QString -> str
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
         if t in str(sel_filt):
@@ -663,7 +655,7 @@ def import_data(parent, fkey, comment):
     else:
         return -1 # operation cancelled
 #------------------------------------------------------------------------------
-def export_data(parent, data, fkey, comment=""):
+def export_data(parent, data, fkey, title="Export"):
     """
     Export coefficients or pole/zero data in various formats
 
@@ -679,9 +671,8 @@ def export_data(parent, data, fkey, comment=""):
         Key for accessing data in ``*.npz`` or Matlab workspace (``*.mat``) file.
         When fkey == 'ba', exporting to FPGA coefficients format is enabled.
 
-    comment: str
-        comment string stating the type of data to be copied (e.g.
-        "filter coefficients ") for user message while opening file
+    title: str
+        title string for the file dialog box (e.g. "filter coefficients ")
 
     """
     
@@ -704,11 +695,11 @@ def export_data(parent, data, fkey, comment=""):
 
     # return selected file name (with or without extension) and filter (Linux: full text)
     dlg = QFD(parent) # create instance for QFileDialog
-    dlg.setWindowTitle("Export filter coefficients as")
+    dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
     dlg.setNameFilter(file_filters)
-    dlg.setDefaultSuffix('csv') # default suffix when none is given
+    # dlg.setDefaultSuffix('csv') # default suffix when none is given
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
 
     if dlg.exec_() == QFD.Accepted:

@@ -765,7 +765,7 @@ class Input_PZ(QWidget):
         """
         # pass table instance, numpy data and current class for accessing the 
         # clipboard instance or for constructing a QFileDialog instance
-        qtable2text(self.tblPZ, self.zpk, self, 'zpk')
+        qtable2text(self.tblPZ, self.zpk, self, 'zpk', title="Export Poles / Zeros")
 
     #------------------------------------------------------------------------------
     def _copy_to_table(self):
@@ -773,7 +773,7 @@ class Input_PZ(QWidget):
         Read data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, 'zpk', comment="poles / zeros ")
+        data_str = qtext2table(self, 'zpk', title="Import Poles / Zeros ")
         if data_str is None: # file operation has been aborted
             return
         
