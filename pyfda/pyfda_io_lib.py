@@ -28,7 +28,7 @@ from .pyfda_rc import params
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
+from .compat import (QtGui, QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QFD, QHBoxLayout, QVBoxLayout)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
@@ -596,16 +596,30 @@ def import_data(parent, fkey, comment):
     numpy array
 
     """
-    file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
-    "Zipped Binary Numpy Array(*.npz);;Comma / Tab Separated Values (*.csv)")
-    dlg = QFD(parent)
-    file_name, file_type = dlg.getOpenFileName_(
-            caption = "Import "+ comment + "file",
-            directory = dirs.save_dir, filter = file_filters)
-    file_name = str(file_name) # QString -> str
+    file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat);;"
+    "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
+    dlg = QFD(parent) # create instance for QFileDialog
+    dlg.setWindowTitle("Import " + comment + " file")
+    dlg.setDirectory(dirs.save_dir)
+    #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+    dlg.setNameFilter(file_filters)
+    dlg.setDefaultSuffix('csv') # default suffix when none is given
+    dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
+
+    if dlg.exec_() == QFD.Accepted:
+        file_name = dlg.selectedFiles()[0]
+        sel_filt = dlg.selectedNameFilter()
+    else:
+        return
+
+#    dlg = QFD(parent)
+#    file_name, sel_filt = dlg.getOpenFileName_(
+#            caption = "Import "+ comment + "file",
+#            directory = dirs.save_dir, filter = file_filters)
+#    file_name = str(file_name) # QString -> str
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
-        if t in str(file_type):
+        if t in str(sel_filt):
             file_type = t
 
     if file_name != '': # cancelled file operation returns empty string
@@ -640,6 +654,7 @@ def import_data(parent, fkey, comment):
             if not file_type_err:
                 logger.info('Successfully loaded \n"{0}"'.format(file_name))
                 dirs.save_dir = os.path.dirname(file_name)
+                dirs.save_filt = sel_filt
                 return data_arr # returns numpy array
 
         except IOError as e:
@@ -669,12 +684,11 @@ def export_data(parent, data, fkey, comment=""):
         "filter coefficients ") for user message while opening file
 
     """
-    dlg = QFD(parent) # create instance for QFileDialog
-
+    
     logger.debug("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
-    file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
+    file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat)"
         ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
     if fb.fil[0]['ft'] == 'FIR':
@@ -689,13 +703,22 @@ def export_data(parent, data, fkey, comment=""):
 #            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
 
     # return selected file name (with or without extension) and filter (Linux: full text)
-    file_name, file_type = dlg.getSaveFileName_(
-            caption = "Export filter coefficients as",
-            directory = dirs.save_dir, filter = file_filters)
-    file_name = str(file_name) # QString -> str needed for Python 2
+    dlg = QFD(parent) # create instance for QFileDialog
+    dlg.setWindowTitle("Export filter coefficients as")
+    dlg.setDirectory(dirs.save_dir)
+    #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+    dlg.setNameFilter(file_filters)
+    dlg.setDefaultSuffix('csv') # default suffix when none is given
+    dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
+
+    if dlg.exec_() == QFD.Accepted:
+        file_name = dlg.selectedFiles()[0]
+        sel_filt = dlg.selectedNameFilter()
+    else:
+        return
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
-        if t in str(file_type):
+        if t in str(sel_filt):
             file_type = t
 
     if file_name != '': # cancelled file operation returns empty string
@@ -776,6 +799,7 @@ def export_data(parent, data, fkey, comment=""):
                     if not file_type_err:
                         logger.info('Filter saved as "{0}"'.format(file_name))
                         dirs.save_dir = os.path.dirname(file_name) # save new dir
+                        dirs.save_filt = sel_filt
 
         except IOError as e:
             logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))

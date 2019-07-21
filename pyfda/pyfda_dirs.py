@@ -160,7 +160,7 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
         print(e)
 
 #------------------------------------------------------------------------------
-
-save_dir = HOME_DIR
 """ Place holder for storing the directory location where the last file was saved"""
-
+save_dir = HOME_DIR
+""" Place holder for default file filter in file dialog"""
+save_filt = ''
