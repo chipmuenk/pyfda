@@ -615,46 +615,42 @@ def import_data(parent, fkey, title="Import"):
         if t in str(sel_filt):
             file_type = t
 
-    if file_name != '': # cancelled file operation returns empty string
+    # strip extension from returned file name (if any) + append file type:
+    file_name = os.path.splitext(file_name)[0] + file_type
 
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] + file_type
-
-        file_type_err = False
-        try:
-            if file_type == '.csv':
-                with io.open(file_name, 'r') as f:
-                    data_arr = csv2array(f)
-            else:
-                with io.open(file_name, 'rb') as f:
-                    if file_type == '.mat':
-                        data_arr = loadmat(f)[fkey]
-                    elif file_type == '.npy':
-                        data_arr = np.load(f)
-                        # contains only one array
-                    elif file_type == '.npz':
-                        fdict = np.load(f)
-                        if fkey not in fdict:
-                            file_type_err = True
-                            raise IOError("Key '{0}' not in file '{1}'.\nKeys found: {2}"\
-                                         .format(fkey, file_name, fdict.files))
-                        else:
-                            data_arr = fdict[fkey] # pick the array `fkey` from the dict
-                    else:
-                        logger.error('Unknown file type "{0}"'.format(file_type))
+    file_type_err = False
+    try:
+        if file_type == '.csv':
+            with io.open(file_name, 'r') as f:
+                data_arr = csv2array(f)
+        else:
+            with io.open(file_name, 'rb') as f:
+                if file_type == '.mat':
+                    data_arr = loadmat(f)[fkey]
+                elif file_type == '.npy':
+                    data_arr = np.load(f)
+                    # contains only one array
+                elif file_type == '.npz':
+                    fdict = np.load(f)
+                    if fkey not in fdict:
                         file_type_err = True
+                        raise IOError("Key '{0}' not in file '{1}'.\nKeys found: {2}"\
+                                     .format(fkey, file_name, fdict.files))
+                    else:
+                        data_arr = fdict[fkey] # pick the array `fkey` from the dict
+                else:
+                    logger.error('Unknown file type "{0}"'.format(file_type))
+                    file_type_err = True
 
-            if not file_type_err:
-                logger.info('Successfully loaded \n"{0}"'.format(file_name))
-                dirs.save_dir = os.path.dirname(file_name)
-                dirs.save_filt = sel_filt
-                return data_arr # returns numpy array
+        if not file_type_err:
+            logger.info('Successfully loaded \n"{0}"'.format(file_name))
+            dirs.save_dir = os.path.dirname(file_name)
+            dirs.save_filt = sel_filt
+            return data_arr # returns numpy array
 
-        except IOError as e:
-            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
-            return None
-    else:
-        return -1 # operation cancelled
+    except IOError as e:
+        logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+        return None
 #------------------------------------------------------------------------------
 def export_data(parent, data, fkey, title="Export"):
     """
@@ -714,88 +710,87 @@ def export_data(parent, data, fkey, title="Export"):
         if t in str(sel_filt):
             file_type = t
 
-    if file_name != '': # cancelled file operation returns empty string
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] +  file_type
-        file_type_err = False
+    # strip extension from returned file name (if any) + append file type:
+    file_name = os.path.splitext(file_name)[0] +  file_type
+    file_type_err = False
 
-        try:
-            if file_type in {'.coe', '.csv', '.txt', '.vhd'}: # text / string format
-                with io.open(file_name, 'w', encoding="utf8") as f:
-                    if file_type == '.coe':
-                        export_coe_xilinx(f)
-                    elif file_type == '.txt':
-                        export_coe_microsemi(f)
-                    elif file_type == '.vhd':
-                        export_coe_vhdl_package(f)
-                    else: # csv format
-                        f.write(data)
+    try:
+        if file_type in {'.coe', '.csv', '.txt', '.vhd'}: # text / string format
+            with io.open(file_name, 'w', encoding="utf8") as f:
+                if file_type == '.coe':
+                    export_coe_xilinx(f)
+                elif file_type == '.txt':
+                    export_coe_microsemi(f)
+                elif file_type == '.vhd':
+                    export_coe_vhdl_package(f)
+                else: # csv format
+                    f.write(data)
 
-            else: # binary format
-                np_data = csv2array(io.StringIO(data))
+        else: # binary format
+            np_data = csv2array(io.StringIO(data))
 
-                with io.open(file_name, 'wb') as f:
-                    if file_type == '.mat':
-                        savemat(f, mdict={fkey:np_data})
-                        # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                    elif file_type == '.npy':
-                        # can only store one array in the file, no pickled data
-                        # for Py2 <-> 3 compatibility
-                        np.save(f, np_data, allow_pickle=False)
-                    elif file_type == '.npz':
-                        # would be possible to store multiple arrays in the file
-                        fdict = {fkey:np_data}
-                        np.savez(f, **fdict) # unpack kw list (only one here)
-                    elif file_type == '.xls':
-                        # see
-                        # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
-                        # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
-                        # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
-                        workbook = xlwt.Workbook(encoding="utf-8")
-                        worksheet = workbook.add_sheet("Python Sheet 1")
-                        bold = xlwt.easyxf('font: bold 1')
-                        worksheet.write(0, 0, 'b', bold)
-                        worksheet.write(0, 1, 'a', bold)
-                        for col in range(2):
-                            for row in range(np.shape(data)[1]):
-                                worksheet.write(row+1, col, data[col][row]) # vertical
-                        workbook.save(f)
+            with io.open(file_name, 'wb') as f:
+                if file_type == '.mat':
+                    savemat(f, mdict={fkey:np_data})
+                    # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
+                elif file_type == '.npy':
+                    # can only store one array in the file, no pickled data
+                    # for Py2 <-> 3 compatibility
+                    np.save(f, np_data, allow_pickle=False)
+                elif file_type == '.npz':
+                    # would be possible to store multiple arrays in the file
+                    fdict = {fkey:np_data}
+                    np.savez(f, **fdict) # unpack kw list (only one here)
+                elif file_type == '.xls':
+                    # see
+                    # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+                    # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
+                    # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
+                    workbook = xlwt.Workbook(encoding="utf-8")
+                    worksheet = workbook.add_sheet("Python Sheet 1")
+                    bold = xlwt.easyxf('font: bold 1')
+                    worksheet.write(0, 0, 'b', bold)
+                    worksheet.write(0, 1, 'a', bold)
+                    for col in range(2):
+                        for row in range(np.shape(data)[1]):
+                            worksheet.write(row+1, col, data[col][row]) # vertical
+                    workbook.save(f)
 
-                    elif file_type == '.xlsx':
-                        # from https://pypi.python.org/pypi/XlsxWriter
-                        # Create an new Excel file and add a worksheet.
-                        workbook = xlsx.Workbook(f)
-                        worksheet = workbook.add_worksheet()
-                        # Widen the first column to make the text clearer.
-                        worksheet.set_column('A:A', 20)
-                        # Add a bold format to use to highlight cells.
-                        bold = workbook.add_format({'bold': True})
-                        # Write labels with formatting.
-                        worksheet.write('A1', 'b', bold)
-                        worksheet.write('B1', 'a', bold)
+                elif file_type == '.xlsx':
+                    # from https://pypi.python.org/pypi/XlsxWriter
+                    # Create an new Excel file and add a worksheet.
+                    workbook = xlsx.Workbook(f)
+                    worksheet = workbook.add_worksheet()
+                    # Widen the first column to make the text clearer.
+                    worksheet.set_column('A:A', 20)
+                    # Add a bold format to use to highlight cells.
+                    bold = workbook.add_format({'bold': True})
+                    # Write labels with formatting.
+                    worksheet.write('A1', 'b', bold)
+                    worksheet.write('B1', 'a', bold)
 
-                        # Write some numbers, with row/column notation.
-                        for col in range(2):
-                            for row in range(np.shape(data)[1]):
-                                worksheet.write(row+1, col, data[col][row]) # vertical
-            #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+                    # Write some numbers, with row/column notation.
+                    for col in range(2):
+                        for row in range(np.shape(data)[1]):
+                            worksheet.write(row+1, col, data[col][row]) # vertical
+        #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
 
-                        # Insert an image - useful for documentation export ?!.
-            #            worksheet.insert_image('B5', 'logo.png')
+                    # Insert an image - useful for documentation export ?!.
+        #            worksheet.insert_image('B5', 'logo.png')
 
-                        workbook.close()
+                    workbook.close()
 
-                    else:
-                        logger.error('Unknown file type "{0}"'.format(file_type))
-                        file_type_err = True
+                else:
+                    logger.error('Unknown file type "{0}"'.format(file_type))
+                    file_type_err = True
 
-                    if not file_type_err:
-                        logger.info('Filter saved as "{0}"'.format(file_name))
-                        dirs.save_dir = os.path.dirname(file_name) # save new dir
-                        dirs.save_filt = sel_filt
+        if not file_type_err:
+            logger.info('Filter saved as "{0}"'.format(file_name))
+            dirs.save_dir = os.path.dirname(file_name) # save new dir
+            dirs.save_filt = sel_filt # save new filter selection
 
-        except IOError as e:
-            logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
+    except IOError as e:
+        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
 
 
         # Download the Simple ods py module:
