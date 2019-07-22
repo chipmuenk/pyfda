@@ -28,8 +28,8 @@ from .pyfda_rc import params
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from .compat import (QtGui, QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
-                     QFD, QHBoxLayout, QVBoxLayout)
+from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
+                     QFileDialog, QHBoxLayout, QVBoxLayout)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
     """
@@ -596,7 +596,7 @@ def import_data(parent, fkey, title="Import"):
     """
     file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat);;"
     "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
-    dlg = QFD(parent) # create instance for QFileDialog
+    dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
@@ -604,9 +604,10 @@ def import_data(parent, fkey, title="Import"):
     dlg.setDefaultSuffix('csv') # default suffix when none is given
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
 
-    if dlg.exec_() == QFD.Accepted:
+    if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]
         sel_filt = dlg.selectedNameFilter()
+        logger.warning(sel_filt)
     else:
         return
 
@@ -694,7 +695,7 @@ def export_data(parent, data, fkey, title="Export"):
 #            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
 
     # return selected file name (with or without extension) and filter (Linux: full text)
-    dlg = QFD(parent) # create instance for QFileDialog
+    dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
@@ -702,9 +703,10 @@ def export_data(parent, data, fkey, title="Export"):
     # dlg.setDefaultSuffix('csv') # default suffix when none is given
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
 
-    if dlg.exec_() == QFD.Accepted:
+    if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]
         sel_filt = dlg.selectedNameFilter()
+        logger.warning(sel_filt)
     else:
         return
 
