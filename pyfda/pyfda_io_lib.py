@@ -605,11 +605,10 @@ def import_data(parent, fkey, title="Import"):
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]
+        file_name = dlg.selectedFiles()[0] # pick only first selected file
         sel_filt = dlg.selectedNameFilter()
-        logger.warning(sel_filt)
     else:
-        return
+        return -1  # operation cancelled
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
         if t in str(sel_filt):
@@ -700,11 +699,10 @@ def export_data(parent, data, fkey, title="Export"):
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]
+        file_name = dlg.selectedFiles()[0] # pick only first selected file
         sel_filt = dlg.selectedNameFilter()
-        logger.warning(sel_filt)
     else:
-        return
+        return -1
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
         if t in str(sel_filt):
