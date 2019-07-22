@@ -599,7 +599,7 @@ def import_data(parent, fkey, title="Import"):
     dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
-    #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+    dlg.setAcceptMode(QFileDialog.AcceptOpen) # set dialog to "file open" mode
     dlg.setNameFilter(file_filters)
     dlg.setDefaultSuffix('csv') # default suffix when none is given
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
@@ -698,7 +698,7 @@ def export_data(parent, data, fkey, title="Export"):
     dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
-    #dlg.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+    dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
     # dlg.setDefaultSuffix('csv') # default suffix when none is given
     dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
