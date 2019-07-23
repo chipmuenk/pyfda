@@ -54,6 +54,7 @@ class Plot_Impz(QWidget):
         # initial settings
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
+        self.error = False
         # initial setting for fixpoint simulation:
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
         self.fx_sim_old = self.fx_sim
@@ -180,6 +181,7 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
                 self.needs_calc = True
+                self.error = False
                 self.ui.update_N(dict_sig) # needed?
                 qstyle_widget(self.ui.but_run, "changed")
                 if self.isVisible():
@@ -197,6 +199,7 @@ class Plot_Impz(QWidget):
                 # TODO: correct?
                   """
                 self.needs_calc = True # always require recalculation when triggered externally
+                self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
@@ -212,6 +215,7 @@ class Plot_Impz(QWidget):
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
+                self.error = True
                 qstyle_widget(self.ui.but_run, "error")
 
             elif not dict_sig['fx_sim']:
@@ -222,8 +226,7 @@ class Plot_Impz(QWidget):
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
                                                dict_sig['sender']))
 
-        elif self.isVisible():
-
+        elif self.isVisible(): # all signals except 'fx_sim'
             if 'view_changed' in dict_sig:
                 self.impz()
 
