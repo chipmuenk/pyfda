@@ -114,6 +114,9 @@ class FIR_DF_wdg(QWidget):
                 self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
                 if cmbW in {'full', 'auto'}:
                     self.dict2ui()
+                    self.sig_tx.emit({'sender':__name__, 'specs_changed':'cmbW'})
+                else:
+                    return
                 
             elif dict_sig['ui'] == 'ledW':
                 pass
@@ -145,13 +148,13 @@ class FIR_DF_wdg(QWidget):
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
 #        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
-        if qget_cmb_box(self.wdg_w_accu.cmbW) == "full":
-            fxqc_dict['QA']['WF'] = fxqc_dict['QC']['WF'] + fxqc_dict['QI']['WF']
-            fxqc_dict['QA']['WI'] = fxqc_dict['QC']['WI'] + fxqc_dict['QI']['WI']
-        elif qget_cmb_box(self.wdg_w_accu.cmbW) == "full":
-            fxqc_dict['QA']['WF'] = fxqc_dict['QC']['WF'] + fxqc_dict['QI']['WF']
-            A_coeff = np.sum(np.abs(fxqc_dict['b']))
-            fxqc_dict['QA']['WI'] = int(np.ceil(A_coeff)) + fxqc_dict['QI']['WI']
+        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
+            fxqc_dict['QA']['WF'] = fxqc_dict['QI']['WF'] + fxqc_dict['QC']['WF']
+            fxqc_dict['QA']['WI'] = fxqc_dict['QI']['WI'] + fxqc_dict['QC']['WI'] + np.log2(len(fxqc_dict['b']))
+        elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+            fxqc_dict['QA']['WF'] = fxqc_dict['QI']['WF'] + fxqc_dict['QC']['WF']
+            A_coeff = np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))#fxqc_dict['b'])))
+            fxqc_dict['QA']['WI'] = fxqc_dict['QI']['WI'] + fxqc_dict['QC']['WI'] + int(np.ceil(A_coeff))
             logger.warning("coeff. area = {0}".format(A_coeff))                
  
         self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
