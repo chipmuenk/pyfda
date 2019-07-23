@@ -520,7 +520,7 @@ class Input_Fixpoint_Specs(QWidget):
     def wdg_dict2ui(self):
         """
         Trigger an update of the fixpoint widget UI when view (i.e. fixpoint 
-        coefficient format) has been changed outside this class. Additionally,
+        coefficient format) or data have been changed outside this class. Additionally,
         pass the fixpoint quantization widget to update / restore other subwidget
         settings.
         
@@ -532,7 +532,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
-            self.fx_wdg_inst.dict2ui(fb.fil[0]['fxqc'])
+            self.fx_wdg_inst.dict2ui()
 #            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
 #            self.sig_tx.emit(dict_sig)
 

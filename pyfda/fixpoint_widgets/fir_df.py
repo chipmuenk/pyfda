@@ -124,7 +124,7 @@ class FIR_DF_wdg(QWidget):
         
 
 #------------------------------------------------------------------------------
-    def dict2ui(self, fxqc_dict):
+    def dict2ui(self):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
