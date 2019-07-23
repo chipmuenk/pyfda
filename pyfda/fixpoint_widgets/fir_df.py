@@ -89,6 +89,10 @@ class FIR_DF_wdg(QWidget):
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
         #self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
+        # initial setting for accumulator
+        cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)        
+        self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
+        self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -126,6 +130,20 @@ class FIR_DF_wdg(QWidget):
         else:
             self.sig_tx.emit(dict_sig)
         
+    def update_accu_settings(self):
+        
+        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
+            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
+        elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        else:
+            return
+        fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
+            + fb.fil[0]['fxqc']['QC']['WF']
+        fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
+            + fb.fil[0]['fxqc']['QC']['WI'] + A_coeff
+
+        self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
 #------------------------------------------------------------------------------
     def dict2ui(self):
@@ -147,18 +165,8 @@ class FIR_DF_wdg(QWidget):
             fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
-#        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
-        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
-            fxqc_dict['QA']['WF'] = fxqc_dict['QI']['WF'] + fxqc_dict['QC']['WF']
-            fxqc_dict['QA']['WI'] = fxqc_dict['QI']['WI'] + fxqc_dict['QC']['WI'] + np.log2(len(fxqc_dict['b']))
-        elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
-            fxqc_dict['QA']['WF'] = fxqc_dict['QI']['WF'] + fxqc_dict['QC']['WF']
-            A_coeff = np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))#fxqc_dict['b'])))
-            fxqc_dict['QA']['WI'] = fxqc_dict['QI']['WI'] + fxqc_dict['QC']['WI'] + int(np.ceil(A_coeff))
-            logger.warning("coeff. area = {0}".format(A_coeff))                
- 
-        self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
-        
+
+        self.update_accu_settings()        
 #------------------------------------------------------------------------------
     def ui2dict(self):
         """
