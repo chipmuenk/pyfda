@@ -13,6 +13,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
+import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import set_dict_defaults, pprint_log
 from pyfda.pyfda_qt_lib import qget_cmb_box
@@ -111,8 +112,8 @@ class FIR_DF_wdg(QWidget):
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
-                if cmbW == 'full':
-                    logger.warning("something must happen here")
+                if cmbW in {'full', 'auto'}:
+                    self.dict2ui()
                 
             elif dict_sig['ui'] == 'ledW':
                 pass
@@ -134,6 +135,7 @@ class FIR_DF_wdg(QWidget):
         This is called from one level above by 
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
+        fxqc_dict = fb.fil[0]['fxqc']
         if not 'QA' in fxqc_dict:
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
             logger.warning("empty QA")
@@ -146,6 +148,11 @@ class FIR_DF_wdg(QWidget):
         if qget_cmb_box(self.wdg_w_accu.cmbW) == "full":
             fxqc_dict['QA']['WF'] = fxqc_dict['QC']['WF'] + fxqc_dict['QI']['WF']
             fxqc_dict['QA']['WI'] = fxqc_dict['QC']['WI'] + fxqc_dict['QI']['WI']
+        elif qget_cmb_box(self.wdg_w_accu.cmbW) == "full":
+            fxqc_dict['QA']['WF'] = fxqc_dict['QC']['WF'] + fxqc_dict['QI']['WF']
+            A_coeff = np.sum(np.abs(fxqc_dict['b']))
+            fxqc_dict['QA']['WI'] = int(np.ceil(A_coeff)) + fxqc_dict['QI']['WI']
+            logger.warning("coeff. area = {0}".format(A_coeff))                
  
         self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
         
