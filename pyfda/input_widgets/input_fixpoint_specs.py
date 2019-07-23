@@ -99,14 +99,11 @@ class Input_Fixpoint_Specs(QWidget):
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
             return
-        
-        elif 'data_changed' in dict_sig:
-            # update hdl_dict when filter has been designed and set RUN button to "changed"
-            self.wdg_dict2ui()
         elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
+        elif 'data_changed' or\
+            ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed"
             self.wdg_dict2ui()
