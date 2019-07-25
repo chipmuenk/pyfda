@@ -203,7 +203,7 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
-                    self.fx_run(dict_sig=None, set_stimuli=True)
+                    self.fx_run(phase='set_stimuli')
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -211,7 +211,7 @@ class Plot_Impz(QWidget):
                   routine
                 """
                 logger.info("Received fixpoint results.")
-                self.fx_run(dict_sig, set_stimuli=False)
+                self.fx_run('set_results', dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -366,19 +366,19 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
 
-    def fx_run(self, dict_sig=None, set_stimuli=True):
+    def fx_run(self, phase, dict_sig=None):
         """
         Run the fixpoint simulation
         """
         if self.needs_calc:
             self.needs_redraw = [True] * 2
-            if set_stimuli:
+            if phase == 'set_stimuli':
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
                 logger.info("fx stimulus sent")
                 return
-            else:
+            elif phase == 'set_results':
                 self.y = np.asarray(dict_sig['fx_results'])
                 if self.y is None:
                     qstyle_widget(self.ui.but_run, "error")
@@ -389,6 +389,9 @@ class Plot_Impz(QWidget):
 
                     self.draw()
                     qstyle_widget(self.ui.but_run, "normal")
+                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
+            else:
+                logger.error("Unknown argument {0} for fx_run phase".format(phase))
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
