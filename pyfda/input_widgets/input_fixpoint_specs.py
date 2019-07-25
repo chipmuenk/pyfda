@@ -102,10 +102,10 @@ class Input_Fixpoint_Specs(QWidget):
         elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
-        elif 'data_changed' or\
+        elif 'data_changed' in dict_sig or\
             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
-            # been changed. Also set RUN button to "changed"
+            # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
@@ -120,10 +120,10 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui
-                # and set run button to "changed"
+                # and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
-                qstyle_widget(self.butSimHDL, "normal")                
+                qstyle_widget(self.butSimHDL, "normal") 
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
