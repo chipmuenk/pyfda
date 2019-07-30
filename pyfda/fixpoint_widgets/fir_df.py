@@ -131,7 +131,16 @@ class FIR_DF_wdg(QWidget):
             self.sig_tx.emit(dict_sig)
         
     def update_accu_settings(self):
+        """
+        Calculate number of extra integer bits needed in the accumulator (bit 
+        growth) depending on the coefficient area (sum of absolute coefficient
+        values) for `cmbW == 'auto'` or depending on the number of coefficients
+        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
+        requires more bits.
         
+        The new values are written to the fixpoint coefficient dict 
+        `fb.fil[0]['fxqc']['QA']`.
+        """        
         if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
             A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
         elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
@@ -142,6 +151,8 @@ class FIR_DF_wdg(QWidget):
             + fb.fil[0]['fxqc']['QC']['WF']
         fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
             + fb.fil[0]['fxqc']['QC']['WI'] + A_coeff
+        fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
+            + fb.fil[0]['fxqc']['QA']['WF'] + 1
 
         self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
