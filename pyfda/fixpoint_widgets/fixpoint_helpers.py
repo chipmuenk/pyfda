@@ -346,10 +346,9 @@ class UI_W(QWidget):
         Update the attributes `self.WI`, `self.WF` and `self.W` when one of the QLineEdit
         widgets has been edited.
         
-        Emit a signal with dict_sig, containing the three parameters cast to
-        standard python int format (instead of e.g. np.int64) to avoid problems 
-        with HDL simulators downstream
+        Emit a signal with the name of the sender.
         """
+
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos'))
         self.ledWI.setText(qstr(self.WI))
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))

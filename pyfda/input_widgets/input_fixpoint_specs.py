@@ -31,11 +31,14 @@ from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
+# when migen is present, instantiate the fixpoint widget
 if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
     import migen
     HAS_MIGEN = True
 else:
     HAS_MIGEN = False
+
+# when deltasigma module is present, add a corresponding entry to the combobox
 try:
     import deltasigma
     HAS_DS = True
