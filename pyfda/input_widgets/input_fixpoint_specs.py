@@ -82,6 +82,37 @@ class Input_Fixpoint_Specs(QWidget):
         self.process_sig_rx(dict_sig, propagate=True)
 
 #------------------------------------------------------------------------------
+    def process_sig_rx_w_i(self, dict_sig=None):
+        """
+        Input fixpoint format has been changed. When I/O lock is active, copy
+        input fixpoint word format to output word format.
+        
+        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
+        for signal propagation.
+        """
+        if self.wdg_w_input.butLock.isChecked():
+            fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
+            fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
+            fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
+
+        self.process_sig_rx(dict_sig, propagate=True)
+
+#------------------------------------------------------------------------------
+    def process_sig_rx_w_o(self, dict_sig=None):
+        """
+        Output fixpoint format has been changed.
+        
+        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
+        for signal propagation.
+        """
+        if self.wdg_w_input.butLock.isChecked():
+            fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
+            fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+            fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
+
+        self.process_sig_rx(dict_sig, propagate=True)
+
+#------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
@@ -135,6 +166,7 @@ class Input_Fixpoint_Specs(QWidget):
                 if self.wdg_w_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
+                    fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
                 else:
                     return
             else:
@@ -206,7 +238,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:',
                                 lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.sig_rx)
+        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
         
         cmb_q = ['round','floor']
         if HAS_DS:
@@ -216,7 +248,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'],
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_w_output.sig_tx.connect(self.sig_rx_local)
+        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
 
         self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'])
         self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
