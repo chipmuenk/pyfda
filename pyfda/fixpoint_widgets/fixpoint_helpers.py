@@ -213,7 +213,7 @@ class UI_W(QWidget):
         self.q_dict = q_dict # pass a dict with initial settings for construction
         #logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
-        self.ui2dict()
+        self.ui2dict() # initialize the class attributes
 
     def _construct_UI(self, **kwargs):
         """ 
@@ -255,6 +255,7 @@ class UI_W(QWidget):
         self.cmbW.addItems(dict_ui['combo_items'])
         self.cmbW.setVisible(dict_ui['combo_visible'])
         self.cmbW.setToolTip(dict_ui['tip_combo'])
+        self.cmbW.setObjectName("cmbW")
         
         self.butLock = QPushButton(self)
         self.butLock.setCheckable(True)
@@ -266,6 +267,7 @@ class UI_W(QWidget):
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWI.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
+        self.ledWI.setObjectName("WI")
 
         lblDot = QLabel(dict_ui['lbl_sep'], self)
         lblDot.setVisible(dict_ui['fractional'])
@@ -275,6 +277,7 @@ class UI_W(QWidget):
         self.ledWF.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWF.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
         self.ledWF.setVisible(dict_ui['fractional'])
+        self.ledWF.setObjectName("WF")
         
         layH = QHBoxLayout()
         layH.addWidget(lblW)
@@ -310,7 +313,7 @@ class UI_W(QWidget):
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.butLock.clicked.connect(self.but_clicked)
-        self.cmbW.currentIndexChanged.connect(self.cmb_changed)
+        self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
         # initialize button icon        
         self.but_clicked(self.butLock.isChecked())
@@ -332,21 +335,12 @@ class UI_W(QWidget):
         self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
-    def cmb_changed(self, clicked):
-        """ 
-        Emit a signal when the index of the combobox has changed
-        """
-
-        dict_sig = {'sender':__name__, 'ui':'cmbW'}
-        self.sig_tx.emit(dict_sig)
-
-    #--------------------------------------------------------------------------
     def ui2dict(self):
         """ 
-        Update the attributes `self.WI`, `self.WF` and `self.W` when one of the QLineEdit
-        widgets has been edited.
+        Update the attributes `self.WI`, `self.WF` and `self.W` when one of the
+        QLineEdit widgets has been edited.
         
-        Emit a signal with the name of the sender.
+        Emit a signal with the object name of the sender.
         """
 
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos'))
@@ -356,9 +350,12 @@ class UI_W(QWidget):
         self.W = int(self.WI + self.WF + 1)
 
         self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
-        
-        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
-        self.sig_tx.emit(dict_sig)
+
+        if self.sender():
+            name = self.sender().objectName()
+            logger.warning("sender: {0}".format(name))
+            dict_sig = {'sender':__name__, 'ui':name}
+            self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
