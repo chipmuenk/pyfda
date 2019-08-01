@@ -33,9 +33,9 @@ from scipy import __version__ as VERSION_SCI
 from matplotlib import __version__ as VERSION_MPL
 from .compat import QT_VERSION_STR # imports pyQt
 
-__all__ = ['cmp_version', 'mod_version', 
+__all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
-           'dB', 'lin2unit', 'unit2lin', 
+           'dB', 'lin2unit', 'unit2lin',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots', 'impz',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd','ceil_even', 'floor_even',
@@ -102,22 +102,22 @@ def cmp_version(mod, version):
 
     mod : str
         name of the module to be compared
-        
+
     version : str
         version number in the form e.g. "0.1.6"
 
     Returns
     -------
-    
+
     result : int
         one of the following error codes:
-            
+
          :-2: module is not installed
-         
+
          :-1: version of installed module is lower than the specified version
-         
+
          :0: version of installed module is equal to specied version
-         
+
          :1: version of installed module is higher than specified version
 
     """
@@ -133,7 +133,7 @@ def cmp_version(mod, version):
     except TypeError:
         logger.warning("Version number of {0} could not be determined.".format(mod))
         return -1
-        
+
 
 def mod_version(mod = None):
     """
@@ -155,7 +155,7 @@ def mod_version(mod = None):
             else:
                 v += "<tr><td>{0}</td><td>missing</td></tr>".format(k)
         return v
-   
+
 #------------------------------------------------------------------------------
 
 logger.info("Found the following modules:" + "\n" + mod_version())
@@ -179,18 +179,18 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
 def clean_ascii(arg):
     """
-    Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it 
+    Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it
     is a `str`. Otherwise, return `arg` unchanged.
-    
+
     Parameters
     ----------
     arg: str
         This is a unicode string under Python 3 and a "normal" string under Python 2.
 
     Returns
-    ------- 
+    -------
     A string, cleaned from Non-ASCII characters
-    
+
     """
     if isinstance(arg, str):
         return re.sub(r'[^\x00-\x7f]',r'', arg)
@@ -204,20 +204,20 @@ def qstr(text):
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" (itemData) e.g. in a QComboBox and converted back when
-    retrieving to QString. 
+    retrieving to QString.
     In Python 2, QVariant is returned when itemData is retrieved.
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
     Parameters
     ----------
-    
+
     text: QVariant, QString, string or numeric data type that can be converted
       to string
-    
+
     Returns
     -------
-    
+
     The current `text` data as a unicode (utf8) string
     """
     return str(text)# tjos should be sufficient for Python 3 ?!
@@ -263,9 +263,9 @@ def set_dict_defaults(d, default_dict):
 def pprint_log(d, N=10, tab="\t"):
     """
     Provide pretty printed logging messages for dicts or lists.
-    
-    Convert dict `d` to string, inserting a CR+Tab after each key:value pair. 
-    
+
+    Convert dict `d` to string, inserting a CR+Tab after each key:value pair.
+
     If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
     truncate it to `N` items.
     """
@@ -280,7 +280,7 @@ def pprint_log(d, N=10, tab="\t"):
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
     elif type(d) in {list, np.ndarray}:
-        s += str(d[: min(N-1, len(d))]) + ' ...'        
+        s += str(d[: min(N-1, len(d))]) + ' ...'
     else:
         s = d
 
@@ -310,14 +310,14 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     Returns
     -------
-    the evaluated result or 0 when both arguments fail: float (default) / complex / int 
+    the evaluated result or 0 when both arguments fail: float (default) / complex / int
 
 
     Function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
     # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
-    expr = clean_ascii(qstr(expr)) 
+    expr = clean_ascii(qstr(expr))
 
     result = None
     fallback = ""
@@ -328,16 +328,26 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
             result = None
             logger.error("Empty string passed to safe_eval!")
         else:
+            if not return_type in {'float', 'int', 'cmplx', 'auto', ''}:
+                logger.error('Unknown return type "{0}", setting result to 0.'.format(return_type))
             try:
                 ex_num = se.simple_eval(ex)
+
                 if return_type == 'cmplx':
                     result = ex_num
                 elif return_type == '' or return_type =='auto':
                     result = np.real_if_close(ex_num).item()
-                elif return_type == 'float':
+                else: # return_type == 'float' or 'int'
                     result = ex_num.real
-                elif return_type == 'int':
-                    result = np.int64(ex_num)
+
+                if sign == 'pos':
+                    result = np.abs(result)
+                elif sign == 'neg':
+                    result = -np.abs(result)
+
+                if return_type == 'int':
+                    result = int(ex_num) # convert to standard int type, not np.int64
+
             except SyntaxError:
                 logger.warning(fallback + ' Syntax error in expression "{0}".'.format(ex))
             except ZeroDivisionError:
@@ -350,7 +360,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 logger.warning(fallback + ' Type error in "{0}", {1}.'.format(ex, e))
 
             except (se.NameNotDefined, se.FunctionNotDefined) as e:
-                logger.warning(fallback + '{0}'.format(e))                
+                logger.warning(fallback + '{0}'.format(e))
             except (se.InvalidExpression, IndexError) as e:
                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
 
@@ -361,10 +371,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     if result is None:
         result = 0
-    if sign == 'pos':
-        result = np.abs(result)
-    elif sign == 'neg':
-        result = -np.abs(result)
     return result
 
 #------------------------------------------------------------------------------
@@ -388,14 +394,14 @@ def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
 
     - Passband:
         .. math::
-            
+
             \\text{IIR:}\quad A_{dB} &= -20 \log_{10}(1 - lin\_value)
 
             \\text{FIR:}\quad A_{dB} &=  20 \log_{10}\\frac{1 + lin\_value}{1 - lin\_value}
 
     - Stopband:
         .. math::
-            
+
             A_{dB} = -20 \log_{10}(lin\_value)
 
     Returns the result as a float.
@@ -422,7 +428,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
 
     - Passband:
         .. math::
-            
+
             \\text{IIR:}\quad A_{PB,lin} &= 1 - 10 ^{-unit\_value/20}
 
             \\text{FIR:}\quad A_{PB,lin} &= \\frac{10 ^ {unit\_value/20} - 1}{10 ^ {unit\_value/20} + 1}
@@ -514,7 +520,7 @@ def cround(x, n_dig = 0):
 
 def sawtooth_bl(t):
     """
-    Bandlimited sawtooth function as a direct replacement for 
+    Bandlimited sawtooth function as a direct replacement for
     `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
     """
@@ -532,7 +538,7 @@ def sawtooth_bl(t):
 
 def triang_bl(t):
     """
-    Bandlimited triangle function as a direct replacement for 
+    Bandlimited triangle function as a direct replacement for
     `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
     """
@@ -545,12 +551,12 @@ def triang_bl(t):
     fs =  1 / (t[1] - t[0])
     # Sum all multiple sine waves up to the Nyquist frequency:
     for h in range(1, int(fs * pi) + 1, 2):
-        y += 8 / pi**2 * -cos(h * t) / h**2            
+        y += 8 / pi**2 * -cos(h * t) / h**2
     return y
-    
+
 def rect_bl(t, duty=0.5):
     """
-    Bandlimited rectangular function as a direct replacement for 
+    Bandlimited rectangular function as a direct replacement for
     `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
     """
@@ -575,12 +581,12 @@ def comb_bl(t):
     y = np.zeros(t.shape, ytype)
     # Get sampling frequency from timebase
     # Sum all multiple sine waves up to the Nyquist frequency:
-    fs =  1 / (t[1] - t[0])            
+    fs =  1 / (t[1] - t[0])
     N = int(fs * pi) + 1
     for h in range(1, N):
         y += cos(h * t)
     y /= N
-    return y       
+    return y
 #------------------------------------------------------------------------------
 
 def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
@@ -1365,9 +1371,9 @@ def fil_convert(fil_dict, format_in):
          filter dictionary containing a.o. all formats to be read and written.
 
     format_in :  string or set of strings
-    
+
          format(s) generated by the filter design routine. Must be one of
-         
+
          :'sos': a list of second order sections - all other formats can easily
                  be derived from this format
          :'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
@@ -1594,7 +1600,7 @@ def to_html(text, frmt=None):
         mapping = [ ('<','&lt;'), ('>','&gt;')]
         for k,v in mapping:
             text = text.replace(k,v)
-    
+
     mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
                 ('\t','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
