@@ -88,7 +88,8 @@ class FIR_DF_wdg(QWidget):
                                fractional=True, combo_visible=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
-        #self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
+        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
+        self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)        
         self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')

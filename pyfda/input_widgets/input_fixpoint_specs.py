@@ -250,8 +250,9 @@ class Input_Fixpoint_Specs(QWidget):
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
         self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
 
-        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'])
-        self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
+        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'],\
+                                 cmb_q=['floor'], cmb_ov=['wrap'], visible=False)
+        #self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         layVQioWdg = QVBoxLayout()
         layVQioWdg.addLayout(layHBtnsMsg)
