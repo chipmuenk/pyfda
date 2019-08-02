@@ -84,7 +84,7 @@ class FIR_DF_wdg(QWidget):
 #        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_rx)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
-                               label='Accumulator Width <i>W<sub>A </sub></i>:',
+                               label='Accumulator Frmt <i>Q<sub>A </sub></i>:',
                                fractional=True, combo_visible=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
