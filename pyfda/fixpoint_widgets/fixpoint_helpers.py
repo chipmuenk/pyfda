@@ -85,14 +85,14 @@ def rescale(mod, sig_i, QI, QO):
 
     sig_i_q = Signal((max(WI,WO), True))
     sig_o = Signal((WO, True))
-    if QO['quant'] == 'round' and dWF > 0:
+    if QI['quant'] == 'round' and dWF > 0:
         mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
     elif dWF > 0:
         mod.comb += sig_i_q.eq(sig_i >> dWF)
     else:
         mod.comb += sig_i_q.eq(sig_i << -dWF)        
 
-    if QO['ovfl'] == 'sat':
+    if QI['ovfl'] == 'sat':
         if dWI > 0:
             mod.comb += \
                 If(sig_i_q[WO-1:] == 0b10,
