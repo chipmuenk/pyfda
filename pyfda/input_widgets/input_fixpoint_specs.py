@@ -228,12 +228,12 @@ class Input_Fixpoint_Specs(QWidget):
 #       - instantiate widgets for input and output quantizer
 #       - pass the quantization (sub-?) dictionary to the constructor     
 #------------------------------------------------------------------------------        
-        lblHBtnsMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
-        lblHBtnsMsg2 = QLabel("<b>WI.WF  </b>", self)
-        layHBtnsMsg = QHBoxLayout()
-        layHBtnsMsg.addWidget(lblHBtnsMsg1)
-        layHBtnsMsg.addStretch(1)
-        layHBtnsMsg.addWidget(lblHBtnsMsg2)
+        lblIOMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
+        lblIOMsg2 = QLabel("<b>WI.WF  </b>", self)
+        layIOMsg = QHBoxLayout()
+        layIOMsg.addWidget(lblIOMsg1)
+        layIOMsg.addStretch(1)
+        layIOMsg.addWidget(lblIOMsg2)
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:',
@@ -255,7 +255,7 @@ class Input_Fixpoint_Specs(QWidget):
         #self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         layVQioWdg = QVBoxLayout()
-        layVQioWdg.addLayout(layHBtnsMsg)
+        layVQioWdg.addLayout(layIOMsg)
         layVQioWdg.addWidget(self.wdg_w_input)
         layVQioWdg.addWidget(self.wdg_q_input)
         layVQioWdg.addWidget(self.wdg_w_output)
