@@ -103,6 +103,7 @@ class FIR_DF_wdg(QWidget):
 #        layVWdg.addWidget(self.wdg_q_coeffs)
         fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)
         layVWdg.addWidget(self.wdg_w_accu)
+        layVWdg.addWidget(self.wdg_q_accu)
 
         layVWdg.addStretch()
 
