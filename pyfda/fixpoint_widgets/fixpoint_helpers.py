@@ -20,7 +20,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
                       QVBoxLayout, QHBoxLayout, QFrame,
                       pyqtSignal)
 
-from migen import Signal, If
+from migen import Cat, If, Replicate, Signal
 
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
@@ -85,30 +85,41 @@ def rescale(mod, sig_i, QI, QO):
 
     sig_i_q = Signal((max(WI,WO), True))
     sig_o = Signal((WO, True))
-    if QI['quant'] == 'round' and dWF > 0:
-        mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
-    elif dWF > 0:
-        mod.comb += sig_i_q.eq(sig_i >> dWF)
-    else:
-        mod.comb += sig_i_q.eq(sig_i << -dWF)        
 
-    if QI['ovfl'] == 'sat':
-        if dWI > 0:
-            mod.comb += \
-                If(sig_i_q[WO-1:] == 0b10,
-                    sig_o.eq(MIN_o)
-                ).Elif(sig_i_q[WO-1:] == 0b01,
-                    sig_o.eq(MAX_o)
-                ).Else(sig_o.eq(sig_i_q >> (dWI-1))
-                )
+
+    logger.warning("dWI = {0}, dWF = {1}".format(dWI, dWF))
+    if dWF <= 0: # extend fractional word length of output word
+        mod.comb += sig_i_q.eq(sig_i << -dWF) # shift input right by -dWF   
+    else: # dWF > 0, fractional output word length needs to be shortened
+        if QI['quant'] == 'round':
+            # add half an LSB (1 << (dWF - 1)) and divide by 2^dWF (shift left by dWF)
+            mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
+        elif QI['quant'] == 'floor': # just divide by 2^dWF (shift left by dWF)
+            mod.comb += sig_i_q.eq(sig_i >> dWF)
         else:
-            mod.comb += sig_o.eq(sig_i_q >> -dWI)
-            
-    else: # wrap around
-        if dWI >= 0: # WI >= WO, shift left
-            mod.comb += sig_o.eq(sig_i_q >> dWI) # rescale for output width
-        else:
-            mod.comb += sig_o.eq(sig_i_q << -dWI)
+            raise Exception(u'Unknown quantization method "%s"!'%(QI['quant']))
+ 
+    if dWI < 0: # WI_I < WO_I, sign extend integer part
+        #mod.comb += sig_o.eq(sig_i_q >> -dWI)
+        #mod.comb += sig_o.eq(Cat(Replicate(0, -dWI), sig_i_q)) # Replicate(sig_i_q[-1], -dWI)
+        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(0, -dWI)))
+        #mod.comb += sig_o.eq(23)
+    elif dWI == 0: # WI = WO, don't change integer part
+        mod.comb += sig_o.eq(sig_i_q)
+    elif QI['ovfl'] == 'sat':
+        mod.comb += \
+            If(sig_i_q[WO-1:] == 0b10,
+                sig_o.eq(MIN_o)
+            ).Elif(sig_i_q[WO-1:] == 0b01,
+                sig_o.eq(MAX_o)
+            ).Else(sig_o.eq(sig_i_q >> (dWI-1))
+            )
+    elif QI['ovfl'] == 'wrap': # wrap around (shift left)
+        mod.comb += sig_o.eq(sig_i_q >> dWI)
+
+    else:
+        raise Exception(u'Unknown overflow method "%s"!'%(QI['ovfl']))
+
     return sig_o
 
 
