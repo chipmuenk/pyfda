@@ -78,7 +78,7 @@ def rescale(mod, sig_i, QI, QO):
     WO   = QO['W']
 
     dWF = WI_F - WO_F # difference of fractional lengths
-    dWI = WI_I - WO_I # difference of fractional lengths
+    dWI = WI_I - WO_I # difference of integer lengths
     # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
