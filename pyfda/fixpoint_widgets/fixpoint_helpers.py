@@ -484,13 +484,15 @@ class UI_Q(QWidget):
         self.cmbQuant.addItems(dict_ui['cmb_q'])
         qset_cmb_box(self.cmbQuant, dict_ui['cur_q'])
         self.cmbQuant.setToolTip(dict_ui['tip_q'])
+        self.cmbQuant.setObjectName('quant')        
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         self.cmbOvfl.addItems(dict_ui['cmb_ov'])
         qset_cmb_box(self.cmbOvfl, dict_ui['cur_ov'])
         self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
-
+        self.cmbOvfl.setObjectName('ovfl')
+        
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -536,8 +538,11 @@ class UI_Q(QWidget):
         self.q_dict.update({'ovfl': self.cmbOvfl.currentText(),
                             'quant': self.cmbQuant.currentText()})
         
-        dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
-        self.sig_tx.emit(dict_sig)
+        if self.sender():
+            name = self.sender().objectName()
+            logger.warning("sender: {0}".format(name))
+            dict_sig = {'sender':__name__, 'ui':name}
+            self.sig_tx.emit(dict_sig)
 
     #--------------------------------------------------------------------------
     def dict2ui(self, q_dict):
