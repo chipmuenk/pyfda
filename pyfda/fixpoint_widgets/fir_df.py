@@ -113,6 +113,8 @@ class FIR_DF_wdg(QWidget):
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.warning("RX:\n{0}".format(pprint_log(dict_sig)))
+        # check whether anything needs to be done locally
+        # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         if 'ui' in dict_sig:
             if dict_sig['ui'] == 'cmbW':
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
@@ -123,9 +125,6 @@ class FIR_DF_wdg(QWidget):
                     self.sig_tx.emit({'sender':__name__, 'specs_changed':'cmbW'})
                 else:
                     return
-                
-            elif dict_sig['ui'] == 'ledW':
-                pass
 
             dict_sig.update({'sender':__name__})
             self.sig_tx.emit(dict_sig)
