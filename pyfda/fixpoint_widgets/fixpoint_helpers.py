@@ -125,7 +125,8 @@ def rescale(mod, sig_i, QI, QO):
 
 def build_coeff_dict():
     """
-    Read and quantize the coefficients and return them as a dictionary.
+    Quantize the coefficients, scale and convert them to integer and return them
+    as a dictionary.
     
     This is called every time one of the coefficient subwidgets is edited or changed.
 
@@ -136,23 +137,25 @@ def build_coeff_dict():
     Returns:
     --------
     A dictionary with the followig keys and values:
+        
+        - 'QC': quantization dict with the following sub-dictionaries
 
-        - WI: integer
+            - 'WI', 'WF', 'W': integer
+                coefficient word format
+    
+            - 'scale': float
+                fixpoint scaling
+    
+            - 'frmt': string
+                display format, always set to 'dec'
 
-        - WF: integer
-
-        - scale: float
-
-        - frmt: string
-
-        - f_fix: np.array
-
-        - a_fix: np.array
+        - 'b', 'a': lists of int
+            quantized coefficients
 
     """
     bf = fb.fil[0]['ba'][0] # get coefficients from 
     af = fb.fil[0]['ba'][1] # filter dict in float form
-    # Create a coefficient quantizer instance using the quantization parameters dict
+    # Create coefficient quantizer instances using the quantization parameters dict
     # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
     if 'QCB' in fb.fil[0]['fxqc']:
         Q_coeff_b = fix.Fixed(fb.fil[0]['fxqc']['QCB'])
@@ -178,7 +181,8 @@ def build_coeff_dict():
     c_dict.update({'a':[a.item() for a in Q_coeff_a.float2frmt(af)]})# format it as bin, hex, ...
     logger.warning(c_dict['b'])
 
-    # TODO: same settings for b, a here: needs to be updated
+    # TODO: common settings for b, a in dict {'QC': ...} need to be split into 
+    #       separate dicts QCA and QCB or fxqc_dict['QC']['b'] etc.
     qc_dict = {}
     qc_dict.update({'WF':Q_coeff_b.WF}) # read parameters from quantizer instance
     qc_dict.update({'WI':Q_coeff_b.WI}) # and pass them to the coefficient dict
@@ -533,7 +537,10 @@ class UI_Q(QWidget):
 
     #--------------------------------------------------------------------------
     def ui2dict(self):
-        """ Update the attributes `self.ovfl` and `self.quant` from the UI"""
+        """ 
+        Update the quantization dict and the attributes `self.ovfl` and 
+        `self.quant` from the UI
+        """
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
         
