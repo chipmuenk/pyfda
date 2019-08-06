@@ -156,8 +156,6 @@ def build_coeff_dict():
             quantized coefficients
 
     """
-    bf = fb.fil[0]['ba'][0] # get coefficients from 
-    af = fb.fil[0]['ba'][1] # filter dict in float form
     # Create coefficient quantizer instances using the quantization parameters dict
     # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
     if 'QCB' in fb.fil[0]['fxqc']:
@@ -172,17 +170,15 @@ def build_coeff_dict():
     #Q_coeff.setQobj(fb.fil[0]['fxqc']['QC']) # alternative: explicitly call setter
     Q_coeff_b.frmt = 'dec' # always use decimal format for coefficients
     Q_coeff_a.frmt = 'dec'
-        
 
     # quantize floating point coefficients and convert them to the
     # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF)
+    bf = fb.fil[0]['ba'][0] # get coefficients from filter dict
+    af = fb.fil[0]['ba'][1] # as numpy array of floats
 
-    # convert list of float -> dec (np.int64).
-    # item() converts np.int64 -> int 
-    c_dict = {'b':[b.item() for b in Q_coeff_b.float2frmt(bf)]} # convert float -> fixp and
-    c_dict = {'b': list(Q_coeff_b.float2frmt(bf) * (1 << Q_coeff_b.WF))} # convert float -> fixp and
-    c_dict.update({'a':[a.item() for a in Q_coeff_a.float2frmt(af)]})# format it as bin, hex, ...
-    logger.warning(c_dict['b'])
+    # convert array float -> array of fixp - > list of int (scaled by 2^WF)
+    c_dict = {'b': list(Q_coeff_b.float2frmt(bf) * (1 << Q_coeff_b.WF))} 
+    c_dict.update({'a':list(Q_coeff_a.float2frmt(af) * (1 << Q_coeff_a.WF))})
 
     # TODO: common settings for b, a in dict {'QC': ...} need to be split into 
     #       separate dicts QCA and QCB or fxqc_dict['QC']['b'] etc.
@@ -547,8 +543,8 @@ class UI_Q(QWidget):
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
         
-        self.q_dict.update({'ovfl': self.cmbOvfl.currentText(),
-                            'quant': self.cmbQuant.currentText()})
+        self.q_dict.update({'ovfl': self.ovfl,
+                            'quant': self.quant})
         
         if self.sender():
             name = self.sender().objectName()
