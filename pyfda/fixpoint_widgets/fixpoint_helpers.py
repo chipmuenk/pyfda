@@ -87,7 +87,7 @@ def rescale(mod, sig_i, QI, QO):
     sig_o = Signal((WO, True))
 
 
-    logger.warning("dWI = {0}, dWF = {1}".format(dWI, dWF))
+    logger.debug("rescale: dWI = {0}, dWF = {1}".format(dWI, dWF))
     if dWF <= 0: # extend fractional word length of output word
         mod.comb += sig_i_q.eq(sig_i << -dWF) # shift input right by -dWF   
     else: # dWF > 0, fractional output word length needs to be shortened
@@ -364,9 +364,11 @@ class UI_W(QWidget):
 
         if self.sender():
             name = self.sender().objectName()
-            logger.warning("sender: {0}".format(name))
+            logger.debug("sender: {0}".format(name))
             dict_sig = {'sender':__name__, 'ui':name}
             self.sig_tx.emit(dict_sig)
+        else:
+            logger.error("ui2dict, shouldn't happen")
         
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
@@ -540,7 +542,6 @@ class UI_Q(QWidget):
         
         if self.sender():
             name = self.sender().objectName()
-            logger.warning("sender: {0}".format(name))
             dict_sig = {'sender':__name__, 'ui':name}
             self.sig_tx.emit(dict_sig)
 

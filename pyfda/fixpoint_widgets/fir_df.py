@@ -68,7 +68,7 @@ class FIR_DF_wdg(QWidget):
             fb.fil[0]['fxqc']['QA'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QA'], 
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
-        logger.warning("fb.fil[0]['fxqc']['QC']:{0}".format(pprint_log(fb.fil[0]['fxqc']['QC'])))        
+      
         self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['fxqc']['QC'],
                                         label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
@@ -112,7 +112,7 @@ class FIR_DF_wdg(QWidget):
         
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.warning("RX:\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         if 'ui' in dict_sig:
