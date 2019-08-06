@@ -96,6 +96,9 @@ def rescale(mod, sig_i, QI, QO):
             mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
         elif QI['quant'] == 'floor': # just divide by 2^dWF (shift left by dWF)
             mod.comb += sig_i_q.eq(sig_i >> dWF)
+        elif QI['quant'] == 'fix':
+            # add sign bit as LSB (1 << dWF) and divide by 2^dWF (shift left by dWF)
+            mod.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
         else:
             raise Exception(u'Unknown quantization method "%s"!'%(QI['quant']))
  
