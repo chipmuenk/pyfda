@@ -657,7 +657,7 @@ class Input_Coeffs(QWidget):
         load the quantization settings from the filter dict and set the widgets
         accordingly. Update the fixpoint object.
         """
-        self.myQ.setQobj(fb.fil[0]['fxqc']['QC'])
+        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])
         q_coeff = self.myQ.q_obj
 
         self.ui.ledWI.setText(qstr(q_coeff['WI']))

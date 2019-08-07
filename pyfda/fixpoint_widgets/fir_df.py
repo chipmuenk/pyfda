@@ -78,9 +78,9 @@ class FIR_DF_wdg(QWidget):
         self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
 #        self.wdg_w_coeffs.setEnabled(False)
         
-#        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
-#                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
-#                                        cur_q=fb.fil[0]['fxqc']['QC']['quant'])
+#        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QCB'],
+#                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'], 
+#                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
 #        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_rx)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
@@ -183,7 +183,7 @@ class FIR_DF_wdg(QWidget):
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
             logger.warning("empty QA")
             
-        if not 'QC' in fxqc_dict:
+        if not 'QCB' in fxqc_dict:
             fxqc_dict.update({'QCB':{}}) # no coefficient settings in dict yet 
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QCB']) # update coefficient wordlength
@@ -219,7 +219,7 @@ class FIR_DF_wdg(QWidget):
                 
         """
    
-#        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
+#        fxqc_dict = {'QCB':self.wdg_w_coeffs.c_dict}
         fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
         logger.error('b = {0}'.format(self.wdg_w_coeffs.coeffs_int))
         fxqc_dict.update({'b':self.wdg_w_coeffs.coeffs_int})

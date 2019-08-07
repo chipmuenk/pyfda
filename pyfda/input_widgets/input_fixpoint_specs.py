@@ -554,7 +554,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
-#        fb.fil[0]['fxqc']['QC'].update({'scale':(1 << fb.fil[0]['fxqc']['QC']['W'])})
+#        fb.fil[0]['fxqc']['QCB'].update({'scale':(1 << fb.fil[0]['fxqc']['QCB']['W'])})
         self.wdg_q_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_q_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
