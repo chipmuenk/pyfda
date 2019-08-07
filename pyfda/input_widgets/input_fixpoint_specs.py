@@ -93,7 +93,8 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def process_sig_rx_w_o(self, dict_sig=None):
         """
-        Output fixpoint format has been changed.
+        Output fixpoint format has been changed. When I/O lock is active, copy
+        output fixpoint word format to input word format.
         
         Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
         for signal propagation.
