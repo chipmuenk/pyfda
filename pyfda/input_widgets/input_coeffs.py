@@ -327,7 +327,7 @@ class Input_Coeffs(QWidget):
 
         self.setLayout(layVMain)
 
-        self.myQ = fix.Fixed(fb.fil[0]['fxqc']['QC']) # initialize fixpoint object
+        self.myQ = fix.Fixed(fb.fil[0]['fxqc']['QCB']) # initialize fixpoint object
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
@@ -406,7 +406,7 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def _W_changed(self):
         """
-        Set fractional and integer length `WF` and `WI` when wordlength Ẁ` has
+        Set fractional and integer length `WF` and `WI` when wordlength `W` has
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
@@ -678,7 +678,7 @@ class Input_Coeffs(QWidget):
         Read out the settings of the quantization comboboxes and store them in
         the filter dict. Update the fixpoint object and refresh table
         """
-        fb.fil[0]['fxqc']['QC'] = {
+        fb.fil[0]['fxqc']['QCB'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
                 'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
                 'W':safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos'),
