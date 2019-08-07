@@ -73,13 +73,6 @@ class Input_Fixpoint_Specs(QWidget):
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
-#------------------------------------------------------------------------------
-    def process_sig_rx_local(self, dict_sig=None):
-        """
-        Flag signals coming in from local subwidgets with `propagate=True` before 
-        proceeding with processing in `process_sig_rx`.
-        """
-        self.process_sig_rx(dict_sig, propagate=True)
 
 #------------------------------------------------------------------------------
     def process_sig_rx_w_i(self, dict_sig=None):
@@ -240,20 +233,20 @@ class Input_Fixpoint_Specs(QWidget):
                                 lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
         
-        cmb_q = ['round','floor']
+        cmb_q = ['round','floor','fix']
+
+        self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'],
+                                 label='Output Format <i>Y<sub>I.F&nbsp;</sub></i>:')
+        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
+        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'],\
+                                 cmb_q=cmb_q, cmb_ov=['wrap','sat'], visible=True)
+        self.wdg_q_output.sig_tx.connect(self.sig_rx)
+
         if HAS_DS:
             cmb_q.append('dsm')
         self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'], cmb_q=cmb_q)
-        self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
+        self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
-        self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'],
-                                 label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
-
-        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'],\
-                                 cmb_q=['floor'], cmb_ov=['wrap'], visible=False)
-        #self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
-
         layVQioWdg = QVBoxLayout()
         layVQioWdg.addLayout(layIOMsg)
         layVQioWdg.addWidget(self.wdg_w_input)
@@ -338,7 +331,7 @@ class Input_Fixpoint_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        self.sig_rx_local.connect(self.process_sig_rx_local)
+#        self.sig_rx_local.connect(self.process_sig_rx_local)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
