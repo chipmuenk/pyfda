@@ -69,14 +69,14 @@ class FIR_DF_wdg(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'], 
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
       
-        self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['fxqc']['QC'],
+        self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['fxqc']['QCB'], fb.fil[0]['ba'][0],
                                         label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
-                                        WI = fb.fil[0]['fxqc']['QC']['WI'],
-                                        WF = fb.fil[0]['fxqc']['QC']['WF'])
-        self.wdg_w_coeffs.sig_tx.connect(self.process_sig_rx)
-        self.wdg_w_coeffs.setEnabled(False)
+                                        WI = fb.fil[0]['fxqc']['QCB']['WI'],
+                                        WF = fb.fil[0]['fxqc']['QCB']['WF'])
+        self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
+#        self.wdg_w_coeffs.setEnabled(False)
         
 #        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QC'],
 #                                        cur_ov=fb.fil[0]['fxqc']['QC']['ovfl'], 
@@ -101,7 +101,6 @@ class FIR_DF_wdg(QWidget):
         
         layVWdg.addWidget(self.wdg_w_coeffs)
 #        layVWdg.addWidget(self.wdg_q_coeffs)
-        fb.fil[0]['fxqc'].update(self.wdg_w_coeffs.c_dict)
         layVWdg.addWidget(self.wdg_w_accu)
         layVWdg.addWidget(self.wdg_q_accu)
 
@@ -109,7 +108,6 @@ class FIR_DF_wdg(QWidget):
 
         self.setLayout(layVWdg)
 
-        
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
@@ -127,10 +125,22 @@ class FIR_DF_wdg(QWidget):
                     return
 
             dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
-        else:
-            self.sig_tx.emit(dict_sig)
+
+        self.sig_tx.emit(dict_sig)
         
+    def update_q_coeff(self):
+        """
+        Update coefficient quantization settings.
+        
+        The new values are written to the fixpoint coefficient dict 
+        `fb.fil[0]['fxqc']['QCB']`.
+        """        
+        fb.fil[0]['fxqc']['b'] = self.wdg_w_coeffs.coeffs_int
+        fb.fil[0]['fxqc']['QCB'].update(self.wdg_w_coeffs.q_dict)
+
+        self.sig_tx.emit({'sender':__name__, 'specs_changed':'coeff'})
+
+
     def update_accu_settings(self):
         """
         Calculate number of extra integer bits needed in the accumulator (bit 
@@ -149,9 +159,9 @@ class FIR_DF_wdg(QWidget):
         else:
             return
         fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
-            + fb.fil[0]['fxqc']['QC']['WF']
+            + fb.fil[0]['fxqc']['QCB']['WF']
         fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
-            + fb.fil[0]['fxqc']['QC']['WI'] + A_coeff
+            + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
 
@@ -174,9 +184,9 @@ class FIR_DF_wdg(QWidget):
             logger.warning("empty QA")
             
         if not 'QC' in fxqc_dict:
-            fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
+            fxqc_dict.update({'QCB':{}}) # no coefficient settings in dict yet 
             
-        self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
+        self.wdg_w_coeffs.dict2ui(fxqc_dict['QCB']) # update coefficient wordlength
 
         self.update_accu_settings()        
 #------------------------------------------------------------------------------
@@ -202,14 +212,18 @@ class FIR_DF_wdg(QWidget):
 
            containing the following keys:
 
-               :'QC': dictionary with coefficients quantization settings
+        - 'QCB': dictionary with coefficients quantization settings
+        
+        - 'b' : list of coefficients in integer format
+               
                 
         """
    
 #        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
-        fxqc_dict = self.wdg_w_coeffs.c_dict
+        fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
+        logger.error('b = {0}'.format(self.wdg_w_coeffs.coeffs_int))
+        fxqc_dict.update({'b':self.wdg_w_coeffs.coeffs_int})
 
-        
         return fxqc_dict
     
 #------------------------------------------------------------------------------

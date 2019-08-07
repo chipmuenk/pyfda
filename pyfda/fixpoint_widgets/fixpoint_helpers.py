@@ -401,11 +401,58 @@ class UI_W_coeffs(UI_W):
     `self.WF`. This class inherits from `UI_W`, overloading the methods `dict2ui())`
     and `ui2dict()` for loading / saving the UI from / to the filter dict.
     """
-    def __init__(self, parent, q_dict, **kwargs):
+    def __init__(self, parent, q_dict, coeffs, **kwargs):
+        self.q_dict = q_dict
+        self.coeffs = coeffs
+
         super(UI_W_coeffs, self).__init__(parent, q_dict, **kwargs)
         # __init__ method of parent is used, additionally initialize coefficient dict
-        self.c_dict = build_coeff_dict()
+        self.coeffs_int = self.quant_coeffs(q_dict, self.coeffs)
+
+    def quant_coeffs(self, q_dict, coeffs):
+        """
+        Quantize the coefficients, scale and convert them to integer and return them
+        as a list of integers
         
+        This is called every time one of the coefficient subwidgets is edited or changed.
+    
+        Parameters:
+        -----------
+        None
+    
+        Returns:
+        --------
+        A dictionary with the followig keys and values:
+            
+            - 'QC': quantization dict with the following sub-dictionaries
+    
+                - 'WI', 'WF', 'W': integer
+                    coefficient word format
+        
+                - 'scale': float
+                    fixpoint scaling
+        
+                - 'frmt': string
+                    display format, always set to 'dec'
+    
+            - 'b', 'a': lists of int
+                quantized coefficients
+    
+        """
+        # Create coefficient quantizer instances using the quantization parameters dict
+        # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
+        Q_coeff = fix.Fixed(q_dict)
+    
+        #Q_coeff.setQobj(fb.fil[0]['fxqc']['QC']) # alternative: explicitly call setter
+        Q_coeff.frmt = 'dec' # always use decimal format for coefficients
+
+        if coeffs is None:
+            logger.error("Coeffs empty!")
+        # quantize floating point coefficients and convert them to the
+        # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF),
+        # next convert array float -> array of fixp - > list of int (scaled by 2^WF)
+        return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
+
     #--------------------------------------------------------------------------
     def ui2dict(self):
         """ 
@@ -420,24 +467,24 @@ class UI_W_coeffs(UI_W):
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))
         self.ledWF.setText(qstr(self.WF))
         self.W = int(self.WI + self.WF + 1)
-        fb.fil[0]['fxqc']['QC'].update({'WI':self.WI, 'WF':self.WF, 'W':self.W})      
+        self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})   
+        
+        self.coeffs_int = self.quant_coeffs(self.q_dict, self.coeffs)
 
-    def dict2ui(self, qc_dict):
+    def dict2ui(self, q_dict):
         """ 
         Update the ui and the attributes `self.WI` and `self.WF` from the filter
         dict. `dict2ui()` has to be called when the coefficients or the word
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
-        if not qc_dict:
-            qc_dict = fb.fil[0]['fxqc']['QC']
-        self.WI = qc_dict['WI']
-        self.WF = qc_dict['WF']
+        self.WI = q_dict['WI']
+        self.WF = q_dict['WF']
         self.ledWI.setText(qstr(self.WI))
         self.ledWF.setText(qstr(self.WF))
         self.W = self.WI + self.WF + 1
 
-        self.c_dict = build_coeff_dict()
+        self.coeffs_int = self.quant_coeffs(q_dict, self.coeffs)
         
 #==============================================================================
 class UI_Q(QWidget):

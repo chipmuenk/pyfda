@@ -155,6 +155,7 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
+        # ---- Process local widget signals
         elif 'ui' in dict_sig:
             if dict_sig['ui'] == 'butLock':
                 if self.wdg_w_input.butLock.isChecked():
@@ -163,6 +164,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
                 else:
                     return
+
             else:
                 logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
             self.wdg_dict2ui()
@@ -242,19 +244,24 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'], cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
+        # Layout and frame for input quantization 
         layVQioWdg = QVBoxLayout()
-        layVQioWdg.addLayout(layIOMsg)
         layVQioWdg.addWidget(self.wdg_w_input)
         layVQioWdg.addWidget(self.wdg_q_input)
-        layVQioWdg.addWidget(self.wdg_w_output)
-        layVQioWdg.addWidget(self.wdg_q_output)
-        
-        # This frame encompasses the HDL buttons sim and convert
         frmQioWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQioWdg.setLayout(layVQioWdg)
         frmQioWdg.setContentsMargins(*params['wdg_margins'])
         
+        # Layout and frame for output quantization
+        layVQoWdg = QVBoxLayout()        
+        layVQoWdg.addWidget(self.wdg_w_output)
+        layVQoWdg.addWidget(self.wdg_q_output)        
+        frmQoWdg = QFrame(self)
+        #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmQoWdg.setLayout(layVQoWdg)
+        frmQoWdg.setContentsMargins(*params['wdg_margins'])        
+  
 #------------------------------------------------------------------------------        
 #       Dynamically updated image of filter topology
 #------------------------------------------------------------------------------        
@@ -287,7 +294,6 @@ class Input_Fixpoint_Specs(QWidget):
         self.butSimFxPy.setToolTip("Simulate filter with fixpoint effects.")
         self.butSimFxPy.setText("Sim. FixPy")
 
-
         self.layHHdlBtns = QHBoxLayout()
         self.layHHdlBtns.addWidget(self.butSimFxPy)
         self.layHHdlBtns.addWidget(self.butSimHDL)
@@ -304,18 +310,18 @@ class Input_Fixpoint_Specs(QWidget):
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(frmHDL_wdg)
+        splitter.addWidget(frmQoWdg)
         splitter.addWidget(self.frmImg)
 
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
-        splitter.setSizes([3000, 5000])
+        splitter.setSizes([3000, 3000, 5000])
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)        
         layVMain.addWidget(frmQioWdg)
-#        layVMain.addWidget(frmQoWdg)
         layVMain.addWidget(splitter)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
@@ -326,7 +332,6 @@ class Input_Fixpoint_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-#        self.sig_rx_local.connect(self.process_sig_rx_local)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
@@ -339,7 +344,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimHDL.clicked.connect(self.fx_sim_init)
-        # self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
@@ -570,6 +574,7 @@ class Input_Fixpoint_Specs(QWidget):
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 fb.fil[0]['fxqc'].update(self.fx_wdg_inst.ui2dict())
+                logger.warning(pprint_log(fb.fil[0]['fxqc']))
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
