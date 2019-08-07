@@ -220,16 +220,10 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
 #       - instantiate widgets for input and output quantizer
 #       - pass the quantization (sub-?) dictionary to the constructor     
-#------------------------------------------------------------------------------        
-        lblIOMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
-        lblIOMsg2 = QLabel("<b>WI.WF  </b>", self)
-        layIOMsg = QHBoxLayout()
-        layIOMsg.addWidget(lblIOMsg1)
-        layIOMsg.addStretch(1)
-        layIOMsg.addWidget(lblIOMsg2)
+#------------------------------------------------------------------------------
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
-                                label='Input Format <i>Q<sub>X </sub></i>:',
+                                label='<i>Input Format X<sub>I.F&nbsp;</sub></i>:',
                                 lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
         
