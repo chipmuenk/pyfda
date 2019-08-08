@@ -335,19 +335,22 @@ class UI_W(QWidget):
             logger.error("sender without name, shouldn't happen!")
         
     #--------------------------------------------------------------------------
-    def dict2ui(self, w_dict):
+    def dict2ui(self, q_dict=None):
         """ 
         Update the widgets `WI` and `WF` and the corresponding attributes
         from the dict passed as the argument
         """
-        if 'WI' in w_dict:
-            self.WI = safe_eval(w_dict['WI'], self.WI, return_type="int", sign='pos')
+        if q_dict is None:
+            q_dict = self.q_dict
+            
+        if 'WI' in q_dict:
+            self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='pos')
             self.ledWI.setText(qstr(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
-        if 'WF' in w_dict:
-            self.WF = safe_eval(w_dict['WF'], self.WF, return_type="int", sign='pos')
+        if 'WF' in q_dict:
+            self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='pos')
             self.ledWF.setText(qstr(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")
@@ -564,9 +567,11 @@ class UI_Q_coeffs(UI_Q):
                
     #--------------------------------------------------------------------------
     def load_ui(self):
-        """ Update UI from filter dict """
-        self.ovfl = fb.fil[0]['fxqc']['QC']['ovfl']
-        self.quant = fb.fil[0]['fxqc']['QC']['quant']
+        """ Update UI from filter dict 
+        shouldn't be called at the moment
+        """
+        self.ovfl = fb.fil[0]['fxqc']['QCx']['ovfl']
+        self.quant = fb.fil[0]['fxqc']['QCx']['quant']
         qset_cmb_box(self.cmbOvfl,self.ovfl)
         qset_cmb_box(self.cmbQuant,self.quant)
 
