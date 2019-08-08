@@ -312,10 +312,10 @@ class UI_W(QWidget):
     #--------------------------------------------------------------------------
     def ui2dict(self):
         """ 
-        Update the attributes `self.WI`, `self.WF` and `self.W` when one of the
-        QLineEdit widgets has been edited.
+        Update the attributes `self.WI`, `self.WF` and `self.W` and `self.q_dict`
+        when one of the QLineEdit widgets has been edited.
         
-        Emit a signal with the object name of the sender.
+        Emit a signal with `{'ui':objectName of the sender}`.
         """
 
         self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos'))
@@ -332,7 +332,7 @@ class UI_W(QWidget):
             dict_sig = {'sender':__name__, 'ui':name}
             self.sig_tx.emit(dict_sig)
         else:
-            logger.error("ui2dict, shouldn't happen")
+            logger.error("sender without name, shouldn't happen!")
         
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
