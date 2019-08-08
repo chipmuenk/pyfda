@@ -354,28 +354,13 @@ class UI_W_coeffs(UI_W):
     
         Returns:
         --------
-        A dictionary with the followig keys and values:
-            
-            - 'QC': quantization dict with the following sub-dictionaries
-    
-                - 'WI', 'WF', 'W': integer
-                    coefficient word format
-        
-                - 'scale': float
-                    fixpoint scaling
-        
-                - 'frmt': string
-                    display format, always set to 'dec'
-    
-            - 'b', 'a': lists of int
-                quantized coefficients
-    
+        A list of integer coeffcients, quantized and scaled with the settings
+        of the passed quantization dict
+               
         """
         # Create coefficient quantizer instances using the quantization parameters dict
         # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
         Q_coeff = fix.Fixed(q_dict)
-    
-        #Q_coeff.setQobj(fb.fil[0]['fxqc']['QC']) # alternative: explicitly call setter
         Q_coeff.frmt = 'dec' # always use decimal format for coefficients
 
         if coeffs is None:
