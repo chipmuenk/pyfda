@@ -264,6 +264,35 @@ class UI_W(QWidget):
         # initialize button icon        
         self.but_clicked(self.butLock.isChecked())
 
+    def quant_coeffs(self, q_dict, coeffs):
+        """
+        Quantize the coefficients, scale and convert them to integer and return them
+        as a list of integers
+        
+        This is called every time one of the coefficient subwidgets is edited or changed.
+    
+        Parameters:
+        -----------
+        None
+    
+        Returns:
+        --------
+        A list of integer coeffcients, quantized and scaled with the settings
+        of the passed quantization dict
+               
+        """
+        # Create coefficient quantizer instances using the quantization parameters dict
+        # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
+        Q_coeff = fix.Fixed(q_dict)
+        Q_coeff.frmt = 'dec' # always use decimal format for coefficients
+
+        if coeffs is None:
+            logger.error("Coeffs empty!")
+        # quantize floating point coefficients and convert them to the
+        # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF),
+        # next convert array float -> array of fixp - > list of int (scaled by 2^WF)
+        return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
+
     #--------------------------------------------------------------------------
     def but_clicked(self, clicked):
         """ 
