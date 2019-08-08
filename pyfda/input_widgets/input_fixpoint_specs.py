@@ -155,7 +155,7 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
-        # ---- Process local widget signals
+        # ---- Process local widget signals 
         elif 'ui' in dict_sig:
             if dict_sig['ui'] == 'butLock':
                 if self.wdg_w_input.butLock.isChecked():
@@ -164,7 +164,8 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
                 else:
                     return
-
+            elif dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW'}:
+                pass
             else:
                 logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
             self.wdg_dict2ui()
