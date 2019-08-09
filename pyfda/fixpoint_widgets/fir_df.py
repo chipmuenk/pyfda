@@ -21,7 +21,7 @@ from pyfda.pyfda_qt_lib import qget_cmb_box
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
 #import pyfda.pyfda_fix_lib as fx
-from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs, rescale
+from .fixpoint_helpers import UI_W, UI_Q, rescale
 
 #####################
 from functools import reduce
@@ -128,7 +128,7 @@ class FIR_DF_wdg(QWidget):
 
         self.sig_tx.emit(dict_sig)
         
-    def update_q_coeff(self):
+    def update_q_coeff(self, dict_sig=None):
         """
         Update coefficient quantization settings and coefficients.
         
@@ -137,6 +137,7 @@ class FIR_DF_wdg(QWidget):
         `fb.fil[0]['fxqc']['b']`.
         """  
         logger.error("update q_coeff")
+        logger.debug("dict_sig:\n{0}".format(pprint_log(dict_sig)))
         fb.fil[0]['fxqc'].update(self.ui2dict())
 
         self.sig_tx.emit({'sender':__name__, 'specs_changed':'coeff'})
@@ -305,4 +306,4 @@ if __name__ == '__main__':
 
     app.exec_()
     
-    # test using "python -m pyfda.fixpoint_widgets.fir_df_migen"
+    # test using "python -m pyfda.fixpoint_widgets.fir_df"
