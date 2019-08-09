@@ -553,31 +553,6 @@ class UI_Q(QWidget):
         pass
 
 #==============================================================================
-class UI_Q_coeffs(UI_Q):
-    """
-    Widget for selecting quantization / overflow options. The result can be read out
-    via the attributes `self.ovfl` and `self.quant`. This class inherits from `UI_Q`,
-    overloading the method `load_ui()` for updating the UI from the filter dict.
-    """
-    def __init__(self, parent, q_dict, **kwargs):
-        super(UI_Q_coeffs, self).__init__(parent, q_dict, **kwargs)
-
-        # __init__ method of parent is used, additionally initialize coefficient dict
-        self.c_dict = build_coeff_dict()
-               
-    #--------------------------------------------------------------------------
-    def load_ui(self):
-        """ Update UI from filter dict 
-        shouldn't be called at the moment
-        """
-        self.ovfl = fb.fil[0]['fxqc']['QCx']['ovfl']
-        self.quant = fb.fil[0]['fxqc']['QCx']['quant']
-        qset_cmb_box(self.cmbOvfl,self.ovfl)
-        qset_cmb_box(self.cmbQuant,self.quant)
-
-        self.c_dict = build_coeff_dict()
-
-#==============================================================================
 
 if __name__ == '__main__':
 
