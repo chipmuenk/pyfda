@@ -195,14 +195,12 @@ class FIR_DF_wdg(QWidget):
 #------------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Read out the subwidgets and return a dict with their settings
+        - Read out the subwidgets and return a dict with their settings
         
-        Return a dictionary with infos for the fixpoint implementation
-        concerning coefficients and their quantization format.
+        - quantize coefficients with new settings
         
-        This dictionary is merged with the input and output quantization settings
-        that are entered in ``input_fixpoint_specs``.
-
+        - return both subdictionaries to the caller (``input_fixpoint_specs``)
+          where they are used to update ``fb.fil[0]['fxqc']``
         
         Parameters
         ----------
@@ -213,19 +211,17 @@ class FIR_DF_wdg(QWidget):
         -------
         fxqc_dict : dict
 
-           containing the following keys:
+           containing the following keys and values:
 
         - 'QCB': dictionary with coefficients quantization settings
         
         - 'b' : list of coefficients in integer format
-               
-                
+            
         """
    
         fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
-        # TODO: Replace
-        #logger.error('b = {0}'.format(self.wdg_w_coeffs.coeffs_int))
-        #fxqc_dict.update({'b':self.wdg_w_coeffs.coeffs_int})
+        fxqc_dict.update({'b':self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
+                                                        fb.fil[0]['ba'][0])})
 
         return fxqc_dict
     
