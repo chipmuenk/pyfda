@@ -130,16 +130,14 @@ class FIR_DF_wdg(QWidget):
         
     def update_q_coeff(self):
         """
-        Update coefficient quantization settings.
+        Update coefficient quantization settings and coefficients.
         
         The new values are written to the fixpoint coefficient dict as
         `fb.fil[0]['fxqc']['QCB']` and
         `fb.fil[0]['fxqc']['b']`.
         """  
         logger.error("update q_coeff")
-        fb.fil[0]['fxqc']['QCB'].update(self.wdg_w_coeffs.q_dict)
-        fb.fil[0]['fxqc']['b'] = self.wdg_w_coeffs.quant_coeffs(fb.fil[0]['fxqc']['QCB'],
-              fb.fil[0]['ba'][0])
+        fb.fil[0]['fxqc'].update(self.ui2dict())
 
         self.sig_tx.emit({'sender':__name__, 'specs_changed':'coeff'})
 
@@ -218,6 +216,7 @@ class FIR_DF_wdg(QWidget):
         - 'b' : list of coefficients in integer format
             
         """
+        # TODO: this should also update 'QA'
    
         fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
         fxqc_dict.update({'b':self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
