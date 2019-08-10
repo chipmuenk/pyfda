@@ -291,8 +291,10 @@ class Input_Coeffs(QWidget):
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self._load_q_settings()
 
-
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
