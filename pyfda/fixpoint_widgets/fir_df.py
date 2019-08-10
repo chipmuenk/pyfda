@@ -70,7 +70,7 @@ class FIR_DF_wdg(QWidget):
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
       
         self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'],
-                                        label='Coefficient Format:',
+                                        label='Coeff. Format <i>QB<sub>I.F&nbsp;</sub></i>:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]['fxqc']['QCB']['WI'],
@@ -84,7 +84,7 @@ class FIR_DF_wdg(QWidget):
 #        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_rx)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
-                               label='Accu Format <i>A<sub>I.F&nbsp;</sub></i>:',
+                               label='Accu Format <i>QA<sub>I.F&nbsp;</sub></i>:',
                                fractional=True, combo_visible=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
@@ -128,7 +128,7 @@ class FIR_DF_wdg(QWidget):
 
         self.sig_tx.emit(dict_sig)
         
-    def update_q_coeff(self, dict_sig=None):
+    def update_q_coeff(self, dict_sig):
         """
         Update coefficient quantization settings and coefficients.
         
@@ -138,10 +138,10 @@ class FIR_DF_wdg(QWidget):
         """  
         logger.error("update q_coeff")
         logger.debug("dict_sig:\n{0}".format(pprint_log(dict_sig)))
+        dict_sig.update({'ui':'C'+dict_sig['ui']})
         fb.fil[0]['fxqc'].update(self.ui2dict())
-
-        self.sig_tx.emit({'sender':__name__, 'specs_changed':'coeff'})
-
+        
+        self.process_sig_rx(dict_sig)
 
     def update_accu_settings(self):
         """
