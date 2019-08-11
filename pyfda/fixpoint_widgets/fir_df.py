@@ -221,11 +221,20 @@ class FIR_DF_wdg(QWidget):
             
         """
         fxqc_dict = fb.fil[0]['fxqc']
+        if not 'QA' in fxqc_dict:
+            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
+            logger.warning("Empty dict 'fxqc['QA]'!")
+        else:
+            fxqc_dict['QA'].update(self.wdg_w_accu.q_dict)
+            
+        if not 'QCB' in fxqc_dict:
+            fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict} # no coefficient settings in dict yet
+            logger.warning("Empty dict 'fxqc['QCB]'!")
+        else:
+            fxqc_dict['QCB'].update(self.wdg_w_coeffs.q_dict)
    
-        fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
         fxqc_dict.update({'b':self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
                                                         fb.fil[0]['ba'][0])})
-
         return fxqc_dict
     
 #------------------------------------------------------------------------------
