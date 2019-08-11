@@ -136,8 +136,7 @@ class FIR_DF_wdg(QWidget):
         `fb.fil[0]['fxqc']['QCB']` and
         `fb.fil[0]['fxqc']['b']`.
         """  
-        logger.error("update q_coeff")
-        logger.debug("dict_sig:\n{0}".format(pprint_log(dict_sig)))
+        logger.error("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
         dict_sig.update({'ui':'C'+dict_sig['ui']})
         fb.fil[0]['fxqc'].update(self.ui2dict())
         
@@ -194,12 +193,14 @@ class FIR_DF_wdg(QWidget):
 #------------------------------------------------------------------------------
     def ui2dict(self):
         """
-        - Read out the subwidgets and return a dict with their settings
+        Read out the quantization subwidgets and store their settings in the central 
+        fixpoint dictionary `fb.fil[0]['fxqc']` using the keys described below.
         
-        - quantize coefficients with new settings
+        Coefficients are quantized with these settings in the subdictionary under
+        the key 'b'.
         
-        - return both subdictionaries to the caller (``input_fixpoint_specs``)
-          where they are used to update ``fb.fil[0]['fxqc']``
+        Additionally, these subdictionaries are returned  to the caller 
+        (``input_fixpoint_specs``) where they are used to update ``fb.fil[0]['fxqc']``
         
         Parameters
         ----------
@@ -214,10 +215,12 @@ class FIR_DF_wdg(QWidget):
 
         - 'QCB': dictionary with coefficients quantization settings
         
+        - 'QA': dictionary with accumulator quantization settings
+        
         - 'b' : list of coefficients in integer format
             
         """
-        # TODO: this should also update 'QA'
+        fxqc_dict = fb.fil[0]['fxqc']
    
         fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict}
         fxqc_dict.update({'b':self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
