@@ -83,9 +83,9 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flag) # find index for data = string
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
     else:
-        idx = cmb_box.findText(str(string), flag) # find index for text = string    
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
 
     ret = idx
 
