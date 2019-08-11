@@ -76,7 +76,7 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
-        flag = Qt.MatchFixedString
+        flag = Qt.MatchFixedString # string based matching (case insensitive)
 
     # Other more or less self explanatory flags:
     # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
