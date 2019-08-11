@@ -656,8 +656,9 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def qdict2ui(self):
         """
-        load the quantization settings from the filter dict and set the widgets
-        accordingly. Update the fixpoint object.
+        Set the UI from the quantization dict and update the fixpoint object.
+        When neither WI == 0 nor WF == 0, set the quantization format to general
+        fractional format qfrac.
         """
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])
         q_coeff = self.myQ.q_obj
