@@ -23,8 +23,6 @@ try:
     DS = True
 except ImportError:
     DS = False
-        
-# from pyfda.pyfda_lib import qstr
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 # TODO: Vecorization for hex / csd functions (frmt2float)
@@ -367,7 +365,9 @@ class Fixed(object):
 
     scale : float
         The factor between integer fixpoint representation and the floating point
-        value.
+        value, RWV = FXP / scale. By default, scale = 1 << WI. Examples:
+            WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
+            WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
 
     LSB : float
         value of LSB (smallest quantization step)
@@ -454,12 +454,12 @@ class Fixed(object):
 
         # missing key-value pairs are either taken from default dict or from
         # instance attributes
-        for k in q_obj_default.keys():
-            if k not in q_obj.keys():
-                if not hasattr(self, k):
-                    q_obj[k] = q_obj_default[k]
+        for k in q_obj_default.keys(): # loop over all defined keys
+            if k not in q_obj.keys():  # key is not in passed dict, get key: value pair from ...
+                if hasattr(self, k):
+                    q_obj[k] = getattr(self, k) # ... class attribute
                 else:
-                    q_obj[k] = getattr(self, k)
+                    q_obj[k] = q_obj_default[k] # ... default dict
 
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
