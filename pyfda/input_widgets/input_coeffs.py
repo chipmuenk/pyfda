@@ -292,7 +292,7 @@ class Input_Coeffs(QWidget):
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self._load_q_settings()
+            self.qdict2ui()
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -362,11 +362,11 @@ class Input_Coeffs(QWidget):
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # store new settings and refresh table
-        self.ui.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
-        self.ui.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
-        self.ui.cmbQuant.currentIndexChanged.connect(self._store_q_settings)
-        self.ui.ledWF.editingFinished.connect(self._store_q_settings)
-        self.ui.ledWI.editingFinished.connect(self._store_q_settings)
+        self.ui.cmbFormat.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmbQOvfl.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmbQuant.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.ledWF.editingFinished.connect(self.ui2qdict)
+        self.ui.ledWI.editingFinished.connect(self.ui2qdict)
         self.ui.ledW.editingFinished.connect(self._W_changed)
 
         self.ui.ledScale.editingFinished.connect(self._set_scale)
@@ -430,35 +430,7 @@ class Input_Coeffs(QWidget):
                 WF = 0
             self.ui.ledWF.setText(str(WF))
 
-        self._store_q_settings()
-
-#------------------------------------------------------------------------------
-    def _set_number_format(self):
-        """
-        Set one of three number formats: Integer, fractional, normalized fractional
-        """
-
-        qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
-        is_qfrac = False
-        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
-        if qfrmt == 'qint':
-            self.ui.ledWI.setText(str(W - 1))
-            self.ui.ledWF.setText("0")
-            self.ui.ledScale.setText(str(1 << (W-1)))
-        elif qfrmt == 'qnfrac': # normalized fractional format
-            self.ui.ledWI.setText("0")
-            self.ui.ledWF.setText(str(W - 1))
-            self.ui.ledScale.setText("1")
-        else: # qfrmt == 'qfrac':
-            is_qfrac = True
-
-        self.ui.ledWI.setEnabled(is_qfrac)
-        self.ui.lblDot.setEnabled(is_qfrac)
-        self.ui.ledWF.setEnabled(is_qfrac)
-        self.ui.ledW.setEnabled(not is_qfrac)
-        self.ui.ledScale.setEnabled(is_qfrac)
-
-        self._store_q_settings()
+        self.ui2qdict()
 
         #------------------------------------------------------------------------------
     def _set_scale(self):
@@ -469,7 +441,7 @@ class Input_Coeffs(QWidget):
         # if self.ui.ledScale.isModified() ... self.ui.ledScale.setModified(False)
         scale = safe_eval(self.ui.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
         self.ui.ledScale.setText(str(scale))
-        self._store_q_settings()
+        self.ui2qdict()
 
 #------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -577,7 +549,7 @@ class Input_Coeffs(QWidget):
         self.ba[1] = np.array(fb.fil[0]['ba'][1]) # coefficient register
 
         # set comboBoxes from dictionary
-        self._load_q_settings()
+        self.qdict2ui()
 
         self._refresh_table()
         qstyle_widget(self.ui.butSave, 'normal')
@@ -652,9 +624,37 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
+#------------------------------------------------------------------------------
+    def _set_number_format(self):
+        """
+        Set one of three number formats: Integer, fractional, normalized fractional
+        (triggered by self.ui.cmbQFrmt combobox)
+        """
+
+        qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
+        is_qfrac = False
+        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
+        if qfrmt == 'qint':
+            self.ui.ledWI.setText(str(W - 1))
+            self.ui.ledWF.setText("0")
+            self.ui.ledScale.setText(str(1 << (W-1)))
+        elif qfrmt == 'qnfrac': # normalized fractional format
+            self.ui.ledWI.setText("0")
+            self.ui.ledWF.setText(str(W - 1))
+            self.ui.ledScale.setText("1")
+        else: # qfrmt == 'qfrac':
+            is_qfrac = True
+
+        self.ui.ledWI.setEnabled(is_qfrac)
+        self.ui.lblDot.setEnabled(is_qfrac)
+        self.ui.ledWF.setEnabled(is_qfrac)
+        self.ui.ledW.setEnabled(not is_qfrac)
+        self.ui.ledScale.setEnabled(is_qfrac)
+
+        self.ui2qdict() # save UI to dict and to class attributes
 
 #------------------------------------------------------------------------------
-    def _load_q_settings(self):
+    def qdict2ui(self):
         """
         load the quantization settings from the filter dict and set the widgets
         accordingly. Update the fixpoint object.
@@ -675,7 +675,7 @@ class Input_Coeffs(QWidget):
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
 
 #------------------------------------------------------------------------------
-    def _store_q_settings(self):
+    def ui2qdict(self):
         """
         Read out the settings of the quantization comboboxes and store them in
         the filter dict. Update the fixpoint object and refresh table
@@ -691,7 +691,6 @@ class Input_Coeffs(QWidget):
                 }
         self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
 
-        self._load_q_settings() # update widgets and the fixpoint object self.myQ
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -704,7 +703,7 @@ class Input_Coeffs(QWidget):
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
-        self._store_q_settings()
+        self.ui2qdict()
 
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
