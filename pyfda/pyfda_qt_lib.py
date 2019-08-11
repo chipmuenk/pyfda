@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 from .pyfda_lib import qstr
 
-from .compat import QFrame, QMessageBox
+from .compat import QFrame, QMessageBox, Qt
 
 #------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):
@@ -44,12 +44,13 @@ def qget_cmb_box(cmb_box, data=True):
     return cmb_str
 
 #------------------------------------------------------------------------------
-def qset_cmb_box(cmb_box, string, data=False, fireSignals=False):
+def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
     """
     Set combobox to the index corresponding to `string` in a text field (`data = False`)
     or in a data field (`data=True`). When `string` is not found in the combobox entries,
     select the first entry. Signals are blocked during the update of the combobox unless
-    `fireSignals` is set `True`.
+    `fireSignals` is set `True`. By default, the search is case insensitive, this
+    can be changed by passing `caseSensitive=False`.
 
     Parameters
     ----------
@@ -61,18 +62,30 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False):
     data: bool (default: False)
         Whether the string refers to the data or text fields of the combo box
 
-    fireSignals: bool (default: True)
+    fireSignals: bool (default: False)
         When False, fire a signal if the index is changed (useful for GUI testing)
+        
+    caseInsensitive: bool (default: False)
+        When true, perform case sensitive search.
 
     Returns
     -------
         The index of the string. When the string was not found in the combo box,
         return index -1.
     """
-    if data:
-        idx = cmb_box.findData(str(string)) # find index for data = string
+    if caseSensitive:
+        flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
-        idx = cmb_box.findText(str(string)) # find index for text = string    
+        flag = Qt.MatchFixedString
+
+    # Other more or less self explanatory flags:
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchRegExp, MatchWildcard, MatchRecursive
+
+    if data:
+        idx = cmb_box.findData(str(string), flag) # find index for data = string
+    else:
+        idx = cmb_box.findText(str(string), flag) # find index for text = string    
 
     ret = idx
 
