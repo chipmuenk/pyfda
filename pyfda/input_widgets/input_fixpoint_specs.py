@@ -575,7 +575,7 @@ class Input_Fixpoint_Specs(QWidget):
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 fb.fil[0]['fxqc'].update(self.fx_wdg_inst.ui2dict())
-                logger.warning(pprint_log(fb.fil[0]['fxqc']))
+                logger.warning("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
