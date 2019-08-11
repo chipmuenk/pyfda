@@ -687,7 +687,7 @@ class Input_Coeffs(QWidget):
                 'W':safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos'),
                 'quant':qstr(self.ui.cmbQuant.currentText()),
                 'ovfl':qstr(self.ui.cmbQOvfl.currentText()),
-                'frmt':qstr(self.ui.cmbFormat.currentText()),
+                'frmt':qstr(self.ui.cmbFormat.currentText().lower()),
                 'scale':qstr(self.ui.ledScale.text())
                 }
         self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
