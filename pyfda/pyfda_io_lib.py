@@ -714,16 +714,17 @@ def export_data(parent, data, fkey, title="Export"):
     file_type_err = False
 
     try:
-        if file_type in {'.coe', '.csv', '.txt', '.vhd'}: # text / string format
+        if file_type == '.csv':
+            with open(file_name, 'w', encoding="utf8", newline='') as f:
+                f.write(data)
+        elif file_type in {'.coe', '.txt', '.vhd'}: # text / string format
             with io.open(file_name, 'w', encoding="utf8") as f:
                 if file_type == '.coe':
                     export_coe_xilinx(f)
                 elif file_type == '.txt':
                     export_coe_microsemi(f)
-                elif file_type == '.vhd':
+                else: #file_type == '.vhd':
                     export_coe_vhdl_package(f)
-                else: # csv format
-                    f.write(data)
 
         else: # binary format
             np_data = csv2array(io.StringIO(data))
