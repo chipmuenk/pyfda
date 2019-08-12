@@ -284,7 +284,7 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite Loop!")
         elif 'data_changed' in dict_sig:
@@ -632,6 +632,7 @@ class Input_Coeffs(QWidget):
         """
 
         qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
+        logger.error('fx format {0}'.format(qfrmt))
         is_qfrac = False
         W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
         if qfrmt == 'qint':
@@ -660,17 +661,22 @@ class Input_Coeffs(QWidget):
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
         """
-        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])
-        q_coeff = self.myQ.q_obj
+        self.ui.ledWI.setText(qstr(fb.fil[0]['fxqc']['QCB']['WI']))
+        self.ui.ledWF.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
+        self.ui.ledW.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
+        if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
+            logger.warning(qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True))
+            logger.warning("Text: {0} Data:{1} Type: {2}".format(self.ui.cmbQFrmt.currentText(),
+                         self.ui.cmbQFrmt.currentData(), type(self.ui.cmbQFrmt.currentData())))
+            logger.error(self.ui.cmbQFrmt.currentText())
+        self._set_number_format() # quant format has been changed, update display
+        logger.error("frmt {0}-{1}".format(qset_cmb_box(self.ui.cmbFormat, fb.fil[0]['fxqc']['QCB']['frmt']),
+                      fb.fil[0]['fxqc']['QCB']['frmt']))
+        self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))        
+        qset_cmb_box(self.ui.cmbQuant, fb.fil[0]['fxqc']['QCB']['quant'])
+        qset_cmb_box(self.ui.cmbQOvfl,  fb.fil[0]['fxqc']['QCB']['ovfl'])
 
-        self.ui.ledWI.setText(qstr(q_coeff['WI']))
-        self.ui.ledWF.setText(qstr(q_coeff['WF']))
-        qset_cmb_box(self.ui.cmbQuant, q_coeff['quant'])
-        qset_cmb_box(self.ui.cmbQOvfl,  q_coeff['ovfl'])
-        qset_cmb_box(self.ui.cmbFormat, q_coeff['frmt'])
-        self.ui.ledScale.setText(qstr(q_coeff['scale']))
-
-        self.ui.ledW.setText(qstr(self.myQ.W))
+        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update class attributes
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
@@ -690,6 +696,10 @@ class Input_Coeffs(QWidget):
                 'frmt':qstr(self.ui.cmbFormat.currentText().lower()),
                 'scale':qstr(self.ui.ledScale.text())
                 }
+        logger.debug('ui2qdict format: {0}'.format(self.ui.cmbFormat.currentText()))
+
+        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update fixpoint object
+
         self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
 
         self._refresh_table()
