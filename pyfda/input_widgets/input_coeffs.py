@@ -20,7 +20,7 @@ from ..compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import qstr, fil_save, safe_eval
+from pyfda.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
 from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
  
@@ -249,6 +249,7 @@ class ItemDelegate(QStyledItemDelegate):
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
+###############################################################################
 
 class Input_Coeffs(QWidget):
     """
@@ -284,7 +285,8 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite Loop!")
         elif 'data_changed' in dict_sig:
@@ -632,7 +634,6 @@ class Input_Coeffs(QWidget):
         """
 
         qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
-        logger.error('fx format {0}'.format(qfrmt))
         is_qfrac = False
         W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
         if qfrmt == 'qint':
@@ -665,13 +666,9 @@ class Input_Coeffs(QWidget):
         self.ui.ledWF.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
         self.ui.ledW.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
-            logger.warning(qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True))
-            logger.warning("Text: {0} Data:{1} Type: {2}".format(self.ui.cmbQFrmt.currentText(),
-                         self.ui.cmbQFrmt.currentData(), type(self.ui.cmbQFrmt.currentData())))
-            logger.error(self.ui.cmbQFrmt.currentText())
         self._set_number_format() # quant format has been changed, update display
-        logger.error("frmt {0}-{1}".format(qset_cmb_box(self.ui.cmbFormat, fb.fil[0]['fxqc']['QCB']['frmt']),
-                      fb.fil[0]['fxqc']['QCB']['frmt']))
+            qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True)
+
         self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))        
         qset_cmb_box(self.ui.cmbQuant, fb.fil[0]['fxqc']['QCB']['quant'])
         qset_cmb_box(self.ui.cmbQOvfl,  fb.fil[0]['fxqc']['QCB']['ovfl'])
@@ -684,8 +681,14 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the settings of the quantization comboboxes and store them in
-        the filter dict. Update the fixpoint object and refresh table
+        Read out the settings of the quantization comboboxes.
+
+        - Store them in the filter dict `fb.fil[0]['fxqc']['QCB']` and as class
+            attributes in the fixpoint object `self.myQ`
+
+        - Emit a signal with `'view_changed':'q_coeff'`
+
+        - Refresh the table
         """
         fb.fil[0]['fxqc']['QCB'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
@@ -696,7 +699,6 @@ class Input_Coeffs(QWidget):
                 'frmt':qstr(self.ui.cmbFormat.currentText().lower()),
                 'scale':qstr(self.ui.ledScale.text())
                 }
-        logger.debug('ui2qdict format: {0}'.format(self.ui.cmbFormat.currentText()))
 
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update fixpoint object
 

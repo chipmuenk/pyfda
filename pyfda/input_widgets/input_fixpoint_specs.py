@@ -133,8 +133,10 @@ class Input_Fixpoint_Specs(QWidget):
         elif 'data_changed' in dict_sig or\
             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
-            # been changed. Also set RUN button to "changed" in wdg_dict2ui()
+            # been changed. Also set RUN button to "changed" in wdg_dict2ui() and 
+            # enable propagate so that 
             self.wdg_dict2ui()
+            #self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
                 if self.fx_wdg_found:
