@@ -666,7 +666,6 @@ class Input_Coeffs(QWidget):
         self.ui.ledWF.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
         self.ui.ledW.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
-        self._set_number_format() # quant format has been changed, update display
             qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True)
 
         self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))        
@@ -677,6 +676,8 @@ class Input_Coeffs(QWidget):
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
+        
+        self._set_number_format() # quant format has been changed, update display
 
 #------------------------------------------------------------------------------
     def ui2qdict(self):
