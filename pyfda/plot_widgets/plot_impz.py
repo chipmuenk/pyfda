@@ -178,6 +178,8 @@ class Plot_Impz(QWidget):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
+        self.error = False
+
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
                 self.needs_calc = True
@@ -217,6 +219,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
                 self.error = True
                 qstyle_widget(self.ui.but_run, "error")
+                return
 
             elif not dict_sig['fx_sim']:
                 logger.error('Missing option for "fx_sim".')
@@ -308,6 +311,10 @@ class Plot_Impz(QWidget):
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
             else:
                 self.calc_response()
+
+            if self.error:
+                return
+
             self.needs_calc = False
             self.needs_redraw = [True] * 2
 
