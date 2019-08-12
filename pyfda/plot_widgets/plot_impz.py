@@ -340,7 +340,7 @@ class Plot_Impz(QWidget):
         logger.warning("start fx_select")
 
         if fx in {0, 1}: # connected to index change of combo box
-            self.ui.cmb_sim_select.setCurrentIndex(fx)
+            pass
         elif fx in {"Float", "Fixpoint"}: # direct function call
             qset_cmb_box(self.ui.cmb_sim_select, fx)
         elif fx is None:
