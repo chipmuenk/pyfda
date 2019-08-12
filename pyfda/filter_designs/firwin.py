@@ -190,12 +190,12 @@ class Firwin(QWidget):
         self.fir_window_name = str(self.cmb_firwin_win.currentText()).lower()
         self.alg = str(self.cmb_firwin_alg.currentText())
 
-        mod_ = import_module('scipy.signal')
+        mod_ = import_module('scipy.signal.windows')
 #        mod = __import__('scipy.signal') # works, but not with the next line
         
          # construct window class, e.g. scipy.signal.boxcar :
         class_ = getattr(mod_, self.fir_window_name)
-        win_doc = getattr(class_, '__doc__') # read docstring attribute from class
+        win_doc = getattr(class_, '__doc__') # read docstring attribute from window class
         
         self.info_doc = []
         self.info_doc.append('firwin()\n========')
