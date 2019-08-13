@@ -78,10 +78,10 @@ class FIR_DF_wdg(QWidget):
         self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
 #        self.wdg_w_coeffs.setEnabled(False)
         
-#        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['fxqc']['QCB'],
+#        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
 #                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'], 
 #                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
-#        self.wdg_q_coeffs.sig_tx.connect(self.process_sig_rx)
+#        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
                                label='Accu Format <i>A<sub>I.F&nbsp;</sub></i>:',
@@ -127,7 +127,8 @@ class FIR_DF_wdg(QWidget):
             dict_sig.update({'sender':__name__})
 
         self.sig_tx.emit(dict_sig)
-        
+
+#------------------------------------------------------------------------------        
     def update_q_coeff(self, dict_sig):
         """
         Update coefficient quantization settings and coefficients.
@@ -142,6 +143,7 @@ class FIR_DF_wdg(QWidget):
         
         self.process_sig_rx(dict_sig)
 
+#------------------------------------------------------------------------------
     def update_accu_settings(self):
         """
         Calculate number of extra integer bits needed in the accumulator (bit 
@@ -222,17 +224,19 @@ class FIR_DF_wdg(QWidget):
         """
         fxqc_dict = fb.fil[0]['fxqc']
         if not 'QA' in fxqc_dict:
-            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
+            fxqc_dict.update({'QA':self.wdg_w_accu.q_dict}) # no accumulator settings in dict yet
             logger.warning("Empty dict 'fxqc['QA]'!")
         else:
             fxqc_dict['QA'].update(self.wdg_w_accu.q_dict)
+        fxqc_dict['QA'].update(self.wdg_q_accu.q_dict)
             
         if not 'QCB' in fxqc_dict:
-            fxqc_dict = {'QCB':self.wdg_w_coeffs.q_dict} # no coefficient settings in dict yet
+            fxqc_dict.update({'QCB':self.wdg_w_coeffs.q_dict}) # no coefficient settings in dict yet
             logger.warning("Empty dict 'fxqc['QCB]'!")
         else:
             fxqc_dict['QCB'].update(self.wdg_w_coeffs.q_dict)
-   
+        #fxqc_dict.update({'QCB':self.wdg_q_coeffs.q_dict}) 
+        
         fxqc_dict.update({'b':self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
                                                         fb.fil[0]['ba'][0])})
         return fxqc_dict
