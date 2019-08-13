@@ -109,20 +109,42 @@ def rescale(mod, sig_i, QI, QO):
     if dWI < 0: # WI_I < WO_I, sign extend integer part
         #mod.comb += sig_o.eq(sig_i_q >> -dWI)
         #mod.comb += sig_o.eq(Cat(Replicate(0, -dWI), sig_i_q)) # Replicate(sig_i_q[-1], -dWI)
-        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(0, -dWI)))
+        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(sig_i_q[-1], -dWI)))
         #mod.comb += sig_o.eq(23)
     elif dWI == 0: # WI = WO, don't change integer part
         mod.comb += sig_o.eq(sig_i_q)
     elif QI['ovfl'] == 'sat':
         mod.comb += \
-            If(sig_i_q[WO-1:] == 0b10,
-                sig_o.eq(MIN_o)
-            ).Elif(sig_i_q[WO-1:] == 0b01,
+            If(sig_i_q[-1] == 1,
+               If(sig_i_q < MIN_o,
+               #If(sig_i_q[-dWI-1:-1] != Replicate(sig_i_q[-1], dWI),
+                    sig_o.eq(MIN_o)
+                ).Else(sig_o.eq(sig_i_q[:-dWI-1]))# >> dWI
+            ).Elif(sig_i_q > MAX_o,
+            #).Elif(sig_i_q[WO-1:] == 0b01,
                 sig_o.eq(MAX_o)
-            ).Else(sig_o.eq(sig_i_q >> (dWI-1))
+            ).Else(sig_o.eq(sig_i_q[:-dWI-1])# >> dWI)
             )
     elif QI['ovfl'] == 'wrap': # wrap around (shift left)
+        mod.comb += sig_o.eq(sig_i_q)# >> dWI)
+        #mod.comb += sig_o.eq(Replicate(sig_i_q[-1], abs(dWI)))
+        #mod.comb += sig_o.eq(sig_i_q[-dWI-1:-1])
+# =============================================================================
+#             If(sig_i_q[-1] == 1,
+#                If(sig_i_q[-1:-dWI-1] != Replicate(sig_i_q[-1], dWI),
+#             #If(sig_i_q < MIN_o,
+#             #If(sig_i_q[WO-1:] == 0b10,
+#                     sig_o.eq(MIN_o)
+#                 ).Else(sig_o.eq(sig_i_q)# >> dWI
+#             ).Elif(sig_i_q > MAX_o,
+#             #).Elif(sig_i_q[WO-1:] == 0b01,
+#                 sig_o.eq(MAX_o)
+#             ).Else(sig_o.eq(sig_i_q)# >> dWI)
+#             )
+# =============================================================================
+    elif QI['ovfl'] == 'wrap': # wrap around (shift left)
         mod.comb += sig_o.eq(sig_i_q >> dWI)
+
 
     else:
         raise Exception(u'Unknown overflow method "%s"!'%(QI['ovfl']))
