@@ -1,6 +1,4 @@
-pyFDA
-======
-## Python Filter Design Analysis Tool
+## pyFDA - Python Filter Design Analysis Tool
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. When the migen module ist installed, fixpoint implementations (for some filter types) can be simulated and exported as synthesizable Verilog netlists. 
 
@@ -18,7 +16,7 @@ For more info see the [`Github Repo`](https://github.com/chipmuenk/pyFDA).
   * **scipy**
   * **matplotlib**: **2.0** or higher
 
-### Optional libraries:
+### Optional libraries
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden.
 * **docutils** for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files

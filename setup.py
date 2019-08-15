@@ -18,11 +18,9 @@ with open("pyfda/version.py") as fp:
 
 setup(
     name = 'pyfda',
-    # see PEP440 for versioning information
     version = version_nr['__version__'],
-    description = ('pyFDA is a python tool with a user-friendly GUI for designing '
-                 'and analysing discrete time filters.'),
-    long_description_content_type='text/markdown',
+    description = 'pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
+    #long_description_content_type='text/markdown',
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
