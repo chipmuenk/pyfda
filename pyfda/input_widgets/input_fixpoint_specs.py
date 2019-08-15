@@ -122,7 +122,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.info("SIG_RX - vis: {0} | prop: {1}\n{2}"\
+        logger.debug("SIG_RX - vis: {0} | prop: {1}\n{2}"\
                     .format(self.isVisible(), propagate, pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
@@ -577,7 +577,7 @@ class Input_Fixpoint_Specs(QWidget):
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 fb.fil[0]['fxqc'].update(self.fx_wdg_inst.ui2dict())
-                logger.warning("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
+                logger.debug("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           

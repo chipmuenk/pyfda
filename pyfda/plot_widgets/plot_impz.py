@@ -171,7 +171,7 @@ class Plot_Impz(QWidget):
         All signals terminate here unless the flag `propagate=True`.
         """
 
-        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
+        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
@@ -344,7 +344,7 @@ class Plot_Impz(QWidget):
         passed argument. If the index has been changed since last time,
         `self.needs_calc` is set to True and the run button is set to "changed".
         """
-        logger.warning("start fx_select")
+        logger.debug("start fx_select")
 
         if fx in {0, 1}: # connected to index change of combo box
             pass
