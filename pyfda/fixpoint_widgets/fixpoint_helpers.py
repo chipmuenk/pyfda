@@ -95,12 +95,12 @@ def rescale(mod, sig_i, QI, QO):
     if dWF <= 0: # extend fractional word length of output word
         mod.comb += sig_i_q.eq(sig_i << -dWF) # shift input right by -dWF   
     else: # dWF > 0, fractional output word length needs to be shortened
-        if QI['quant'] == 'round':
+        if QO['quant'] == 'round':
             # add half an LSB (1 << (dWF - 1)) and divide by 2^dWF (shift left by dWF)
             mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
-        elif QI['quant'] == 'floor': # just divide by 2^dWF (shift left by dWF)
+        elif QO['quant'] == 'floor': # just divide by 2^dWF (shift left by dWF)
             mod.comb += sig_i_q.eq(sig_i >> dWF)
-        elif QI['quant'] == 'fix':
+        elif QO['quant'] == 'fix':
             # add sign bit as LSB (1 << dWF) and divide by 2^dWF (shift left by dWF)
             mod.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
         else:
@@ -113,7 +113,7 @@ def rescale(mod, sig_i, QI, QO):
         #mod.comb += sig_o.eq(23)
     elif dWI == 0: # WI = WO, don't change integer part
         mod.comb += sig_o.eq(sig_i_q)
-    elif QI['ovfl'] == 'sat':
+    elif QO['ovfl'] == 'sat':
         mod.comb += \
             If(sig_i_q[-1] == 1,
                If(sig_i_q < MIN_o,
@@ -125,7 +125,7 @@ def rescale(mod, sig_i, QI, QO):
                 sig_o.eq(MAX_o)
             ).Else(sig_o.eq(sig_i_q[:-dWI-1])# >> dWI)
             )
-    elif QI['ovfl'] == 'wrap': # wrap around (shift left)
+    elif QO['ovfl'] == 'wrap': # wrap around (shift left)
         mod.comb += sig_o.eq(sig_i_q)# >> dWI)
         #mod.comb += sig_o.eq(Replicate(sig_i_q[-1], abs(dWI)))
         #mod.comb += sig_o.eq(sig_i_q[-dWI-1:-1])
@@ -142,9 +142,6 @@ def rescale(mod, sig_i, QI, QO):
 #             ).Else(sig_o.eq(sig_i_q)# >> dWI)
 #             )
 # =============================================================================
-    elif QI['ovfl'] == 'wrap': # wrap around (shift left)
-        mod.comb += sig_o.eq(sig_i_q >> dWI)
-
 
     else:
         raise Exception(u'Unknown overflow method "%s"!'%(QI['ovfl']))
