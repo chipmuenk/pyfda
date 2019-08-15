@@ -30,7 +30,7 @@ from pyfda.pyfda_lib import qstr, safe_eval, to_html
 def rescale(mod, sig_i, QI, QO):
     """
     Change word length of input signal `sig_i` to `WO` bits, using the 
-    rounding and saturation methods specified by `quant` and `ovfl`.
+    quantization and saturation methods specified by QO[`quant`] and QO[`ovfl`].
     
     Parameters
     ----------
@@ -39,13 +39,13 @@ def rescale(mod, sig_i, QI, QO):
     
     sig_i: Signal (migen)
     
-    QI: dict
+    QI: quantization dict for input word
     
     QO: dict
         fixpoint format for input resp. output word, specified as  Q-format, e.g.
         '2.13' (2 integer, 14 fractional bits, 1 implied sign bit = 16 bits total)
     
-    Input and output word are aligned at their binary points.
+    #### Input and output word are aligned at their binary points. ####
     
       S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
       0 |  1  |  0  *  1  |  0  |  1  |  1   =  43 (dec), 43/16 = 2 + 11/16 (float)
@@ -54,18 +54,22 @@ def rescale(mod, sig_i, QI, QO):
                  0  *  1  |  0  |  1         =  7 (dec), 7/8 (float)
 
               
-    The real (world) value is obtained by dividing the integer value by 2 ** (-WF).
+    The real (world) value is obtained by multiplying the integer value by 2 ** (-WF).
     
     For requantizing two numbers to the same WI and WF, imagine both binary numbers
     to be right-aligned.
     
     For reducing the number of fractional bits by `dWF`, simply right-shift the
     integer number by `dWF`. For rounding, add '1' to the bit below the truncation
-    point before right-shifting. For extending the number of fractional bits,
-    left-shift the integer by `dWF`.
+    point before right-shifting. 
+    
+    Extend the number of fractional bits by left-shifting the integer by `dWF`.
     
     For reducing the number of integer bits by `dWI`, simply right-shift the
     integer by `dWI`.
+    
+    The number of fractional bits is SIGN-EXTENDED by filling up the left-most
+    bits with the sign bit.
     
     """
     WI_I = QI['WI']
@@ -105,20 +109,42 @@ def rescale(mod, sig_i, QI, QO):
     if dWI < 0: # WI_I < WO_I, sign extend integer part
         #mod.comb += sig_o.eq(sig_i_q >> -dWI)
         #mod.comb += sig_o.eq(Cat(Replicate(0, -dWI), sig_i_q)) # Replicate(sig_i_q[-1], -dWI)
-        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(0, -dWI)))
+        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(sig_i_q[-1], -dWI)))
         #mod.comb += sig_o.eq(23)
     elif dWI == 0: # WI = WO, don't change integer part
         mod.comb += sig_o.eq(sig_i_q)
     elif QI['ovfl'] == 'sat':
         mod.comb += \
-            If(sig_i_q[WO-1:] == 0b10,
-                sig_o.eq(MIN_o)
-            ).Elif(sig_i_q[WO-1:] == 0b01,
+            If(sig_i_q[-1] == 1,
+               If(sig_i_q < MIN_o,
+               #If(sig_i_q[-dWI-1:-1] != Replicate(sig_i_q[-1], dWI),
+                    sig_o.eq(MIN_o)
+                ).Else(sig_o.eq(sig_i_q[:-dWI-1]))# >> dWI
+            ).Elif(sig_i_q > MAX_o,
+            #).Elif(sig_i_q[WO-1:] == 0b01,
                 sig_o.eq(MAX_o)
-            ).Else(sig_o.eq(sig_i_q >> (dWI-1))
+            ).Else(sig_o.eq(sig_i_q[:-dWI-1])# >> dWI)
             )
     elif QI['ovfl'] == 'wrap': # wrap around (shift left)
+        mod.comb += sig_o.eq(sig_i_q)# >> dWI)
+        #mod.comb += sig_o.eq(Replicate(sig_i_q[-1], abs(dWI)))
+        #mod.comb += sig_o.eq(sig_i_q[-dWI-1:-1])
+# =============================================================================
+#             If(sig_i_q[-1] == 1,
+#                If(sig_i_q[-1:-dWI-1] != Replicate(sig_i_q[-1], dWI),
+#             #If(sig_i_q < MIN_o,
+#             #If(sig_i_q[WO-1:] == 0b10,
+#                     sig_o.eq(MIN_o)
+#                 ).Else(sig_o.eq(sig_i_q)# >> dWI
+#             ).Elif(sig_i_q > MAX_o,
+#             #).Elif(sig_i_q[WO-1:] == 0b01,
+#                 sig_o.eq(MAX_o)
+#             ).Else(sig_o.eq(sig_i_q)# >> dWI)
+#             )
+# =============================================================================
+    elif QI['ovfl'] == 'wrap': # wrap around (shift left)
         mod.comb += sig_o.eq(sig_i_q >> dWI)
+
 
     else:
         raise Exception(u'Unknown overflow method "%s"!'%(QI['ovfl']))
