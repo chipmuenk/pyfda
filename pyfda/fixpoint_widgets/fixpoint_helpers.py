@@ -119,11 +119,11 @@ def rescale(mod, sig_i, QI, QO):
                If(sig_i_q < MIN_o,
                #If(sig_i_q[-dWI-1:-1] != Replicate(sig_i_q[-1], dWI),
                     sig_o.eq(MIN_o)
-                ).Else(sig_o.eq(sig_i_q[:-dWI-1]))# >> dWI
+                ).Else(sig_o.eq(sig_i_q))#[:-dWI-1]))# >> dWI
             ).Elif(sig_i_q > MAX_o,
             #).Elif(sig_i_q[WO-1:] == 0b01,
                 sig_o.eq(MAX_o)
-            ).Else(sig_o.eq(sig_i_q[:-dWI-1])# >> dWI)
+            ).Else(sig_o.eq(sig_i_q)#[:-dWI-1])# >> dWI)
             )
     elif QO['ovfl'] == 'wrap': # wrap around (shift left)
         mod.comb += sig_o.eq(sig_i_q)# >> dWI)
