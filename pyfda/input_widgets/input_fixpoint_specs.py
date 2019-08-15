@@ -229,22 +229,25 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
-                                label='<i>Input Format X<sub>I.F&nbsp;</sub></i>:',
+                                label='',
                                 lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
         
         cmb_q = ['round','floor','fix']
 
         self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'],
-                                 label='Output Format <i>Y<sub>I.F&nbsp;</sub></i>:')
+                                 label='')
         self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
         self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'],\
-                                 cmb_q=cmb_q, cmb_ov=['wrap','sat'], visible=True)
+                                 label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
+                                 cmb_q=cmb_q, cmb_ov=['wrap','sat'])
         self.wdg_q_output.sig_tx.connect(self.sig_rx)
 
         if HAS_DS:
             cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'], cmb_q=cmb_q)
+        self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'],
+                                label='Input Format <i>Q<sub>X&nbsp;</sub></i>:',
+                                cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
         # Layout and frame for input quantization 

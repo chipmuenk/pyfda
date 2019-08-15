@@ -411,7 +411,8 @@ class UI_Q(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
 
-        dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
+        dict_ui = {'label':'',
+                   'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
                    'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
@@ -446,9 +447,13 @@ class UI_Q(QWidget):
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         layH = QHBoxLayout()
+        if dict_ui['label'] != "":
+            lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+            layH.addWidget(lblW)
+        layH.addStretch()
         layH.addWidget(lblOvfl)
         layH.addWidget(self.cmbOvfl)
-        layH.addStretch()
+        #layH.addStretch(1)
         layH.addWidget(lblQuant)
         layH.addWidget(self.cmbQuant)
         layH.setContentsMargins(0,0,0,0)
@@ -458,7 +463,7 @@ class UI_Q(QWidget):
 
         layVMain = QVBoxLayout() # Widget main layout
         layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(5,0,0,0)#*params['wdg_margins'])
+        layVMain.setContentsMargins(0,0,0,0)#*params['wdg_margins'])
 
         self.setLayout(layVMain)
 
