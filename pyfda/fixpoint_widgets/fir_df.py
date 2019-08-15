@@ -84,11 +84,12 @@ class FIR_DF_wdg(QWidget):
 #        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
-                               label='Accu Format <i>A<sub>I.F&nbsp;</sub></i>:',
+                               label='',
                                fractional=True, combo_visible=True)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
-        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'])
+        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'],
+                               label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
         self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)        
@@ -101,8 +102,8 @@ class FIR_DF_wdg(QWidget):
         
         layVWdg.addWidget(self.wdg_w_coeffs)
 #        layVWdg.addWidget(self.wdg_q_coeffs)
-        layVWdg.addWidget(self.wdg_w_accu)
         layVWdg.addWidget(self.wdg_q_accu)
+        layVWdg.addWidget(self.wdg_w_accu)
 
         layVWdg.addStretch()
 
@@ -289,7 +290,7 @@ class FIR(Module):
 
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['W']
-        self.WO = p['QO']['W']
+        self.WO = p['QA']['W']
         # saturation logic doesn't make much sense with a FIR filter, this is 
         # just for demonstration
         WA = p['QA']['W']
