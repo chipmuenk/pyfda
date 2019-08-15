@@ -249,8 +249,8 @@ class Input_Fixpoint_Specs(QWidget):
         
         # Layout and frame for input quantization 
         layVQioWdg = QVBoxLayout()
-        layVQioWdg.addWidget(self.wdg_w_input)
         layVQioWdg.addWidget(self.wdg_q_input)
+        layVQioWdg.addWidget(self.wdg_w_input)
         frmQioWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQioWdg.setLayout(layVQioWdg)
@@ -258,8 +258,8 @@ class Input_Fixpoint_Specs(QWidget):
         
         # Layout and frame for output quantization
         layVQoWdg = QVBoxLayout()        
-        layVQoWdg.addWidget(self.wdg_w_output)
-        layVQoWdg.addWidget(self.wdg_q_output)        
+        layVQoWdg.addWidget(self.wdg_q_output) 
+        layVQoWdg.addWidget(self.wdg_w_output)      
         frmQoWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQoWdg.setLayout(layVQoWdg)
