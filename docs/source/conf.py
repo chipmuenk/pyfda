@@ -24,7 +24,7 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'pyfda'
-copyright = '2018, Christian Muenker'
+copyright = '2019, Christian Muenker'
 author = 'Christian Muenker'
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
