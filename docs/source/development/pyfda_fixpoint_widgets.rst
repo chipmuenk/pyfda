@@ -48,16 +48,16 @@ The widget's methods
 
 are used for bit-true simulations and for generating Verilog code for the filter. 
 
+.. _dev_input_fixpoint_specs:
+
+input_widgets.input_fixpoint_specs
+------------------------------------
+
+A fixpoint filter for a given filter design is selected in this widget 
 
 .. automodule:: pyfda.input_widgets.input_fixpoint_specs
 	:members:
 
-
-are used for bit-true simulations and for generating Verilog code for the filter. 
-
-
-A fixpoint filter for a given filter design is selected in the widget 
-:mod:`pyfda.input_widgets.input_fixpoint_specs` resp.  :ref:`dev_input_fixpoint_specs`
 
 
 .. _dev_fixpoint_widgets_fir_df:

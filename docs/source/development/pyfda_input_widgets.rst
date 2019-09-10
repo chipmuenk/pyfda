@@ -67,8 +67,7 @@ input_files
 .. automodule:: pyfda.input_widgets.input_files
 	:members:
 	
-	
-.. _dev_input_fixpoint_specs:
+
 
 input_fixpoint_specs
 ---------------------
@@ -88,20 +87,5 @@ fixpoint specifications like word lengths and formats for input, output and
 internal structures (like an accumulator) for each class. It also contains a 
 reference to a picture showing the filter topology.
 
-First, a filter widget is instantiated as ``self.fx_wdg_inst`` (after the previous
-one has been destroyed).
-
-Next, ``fx_wdg_inst.construct_fixp_filter()`` constructs an instance ``fixp_filter``
-of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
-
-The widget's methods 
-
-* ``response = fx_wdg_inst.run_sim(stimulus)``
-* ``fx_wdg_inst.to_verilog()``
-
-are used for bit-true simulations and for generating Verilog code for the filter. 
-
-
-.. automodule:: pyfda.input_widgets.input_fixpoint_specs
-	:members:
+Details of the mechanism and the module are described in :ref:`dev_input_fixpoint_specs`.
 
