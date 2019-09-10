@@ -6,6 +6,7 @@ matplotlib
 PyQt5 # only for readthedocs.org
 docutils
 nose
+migen
 # pytest
 # coverage
 # coveralls
