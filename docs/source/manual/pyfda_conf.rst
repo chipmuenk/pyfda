@@ -1,2 +1,2 @@
-.. include:: ../.pyfda/pyfda.conf
-
+.. include:: ../../pyfda/pyfda.conf
+   :literal:
