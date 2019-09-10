@@ -374,8 +374,11 @@ class Fixed(object):
     MSB : float
         value of most significant bit (MSB)
 
+
     digits : integer
         number of digits required for selected number format and wordlength
+
+
 
     ovr_flag : integer or integer array (same shape as input argument)
         overflow flag, meaning:
