@@ -16,7 +16,7 @@ for the filter design.
 
 .. _dev_input_specs:
 
-:mod:`pyfda.input_widgets.input_specs`
+:mod:`input_specs`
 ---------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_specs
@@ -26,7 +26,7 @@ for the filter design.
 
 .. _dev_select_filter:
 
-:mod:`pyfda.input_widgets.select_filter`
+:mod:`select_filter`
 -----------------------------------------
 
 .. automodule:: pyfda.input_widgets.select_filter
@@ -103,7 +103,7 @@ with references to all successfully imported fixpoint modules. The currently
 selected fixpoint widget (e.g. `FIR_DF`) is imported from :mod:`pyfda.fixpoint_widgets` 
 together with the referenced picture.
 
-A myhdl filter instance `self.hdlfilter` of e.g. :ref:`dev_fixpoint_widgets_fir_df`
+A migen filter instance `self.hdlfilter` of e.g. :ref:`dev_fixpoint_widgets_fir_df`
 is instantiated as ``hdlfilter``.  Its methods 
 
 * ``hdlfilter.set_stimulus(self.stim)``
@@ -111,7 +111,7 @@ is instantiated as ``hdlfilter``.  Its methods
 * ``self.fx_results = hdlfilter.get_response()``
 * ``hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)``
 
-are used for bit-true simulations and for generating VHDL or Verilog code for the filter. 
+are used for bit-true simulations and for generating Verilog code for the filter. 
 
 
 .. automodule:: pyfda.input_widgets.input_fixpoint_specs
