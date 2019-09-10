@@ -26,7 +26,7 @@ for the filter design.
 .. _dev_select_filter:
 
 :mod:`select_filter`
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.input_widgets.select_filter
     :show-inheritance:
@@ -35,8 +35,8 @@ for the filter design.
 
 .. _dev_input_coeffs:
 
-:mod:`pyfda.input_widgets.input_coeffs`
-----------------------------------------
+:mod:`input_coeffs`
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.input_widgets.input_coeffs
     :show-inheritance:
@@ -78,15 +78,14 @@ pyfda.input_widgets.input_files
 :mod:`pyfda.input_widgets.input_fixpoint_specs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This package contains all fixpoint classes, i.e. classes which define filter 
-topologies that can be implemented in hardware. The filter topologies use the 
-order and the coefficients that have been determined by a filter design algorithm
-from the `pyfda.filter_designs` package. The coefficients have been calculated 
-for a desired filter specification (usually in the frequency domain).
-
-Hardware implementations for discrete-time filters usually imply fixpoint 
-arithmetics but this could change in the future as floating point arithmetics 
-can be implemented on FPGAs using dedicated floating point units (FPUs).
+The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
+and ``IIR_DF1``) can be used with which filter design algorithm.
+`tree_builder` parses this file and writes all fixpoint modules
+into the list `fb.fixpoint_widgets_list`. The input widget 
+`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
+with references to all successfully imported fixpoint modules. The currently 
+selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets` 
+together with the referenced picture.
 
 Each fixpoint module / class contains a widget that is constructed using helper
 classes from `fixpoint_widgets.fixpoint_helpers.py`. The widgets allow entering
@@ -94,16 +93,9 @@ fixpoint specifications like word lengths and formats for input, output and
 internal structures (like an accumulator) for each class. It also contains a 
 reference to a picture showing the filter topology.
 
-The configuration file `pyfda.conf` lists the fixpoint classes to be used, e.g. 
-``FIR_DF`` and ``IIR_DF1``. `tree_builder` parses this file and writes all fixpoint modules
-into the list `fb.fixpoint_widgets_list`. The input widget 
-`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
-with references to all successfully imported fixpoint modules. The currently 
-selected fixpoint widget (e.g. `FIR_DF`) is imported from :mod:`pyfda.fixpoint_widgets` 
-together with the referenced picture.
 
 A migen filter instance `self.hdlfilter` of e.g. :ref:`dev_fixpoint_widgets_fir_df`
-is instantiated as ``hdlfilter``.  Its methods 
+is instantiated as ``hdlfilter``. Its methods 
 
 * ``hdlfilter.set_stimulus(self.stim)``
 * ``hdlfilter.run_sim()``
