@@ -104,10 +104,10 @@ def dec2hex(val, nbits, WF=0):
     Parameters
     ----------
     val: integer
-            The value to be converted in decimal integer format.
+        The value to be converted in decimal integer format.
 
     nbits: integer
-            The wordlength
+        The wordlength
 
     Returns
     -------
@@ -227,9 +227,8 @@ def csd2dec(csd_str):
     ----------
 
     csd_str : string
-
-     A string with the CSD value to be converted, consisting of '+', '-', '.'
-     and '0' characters.
+        A string with the CSD value to be converted, consisting of '+', '-', '.'
+        and '0' characters.
 
     Returns
     -------
@@ -379,7 +378,9 @@ class Fixed(object):
         number of digits required for selected number format and wordlength
 
     ovr_flag : integer or integer array (same shape as input argument)
-        overflow flag   0 : no overflow
+        overflow flag, meaning:
+            
+                        0 : no overflow
 
                         +1: positive overflow
 

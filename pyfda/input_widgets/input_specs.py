@@ -289,6 +289,7 @@ class Input_Specs(QWidget):
     def start_design_filt(self):
         """
         Start the actual filter design process:
+            
         - store the entries of all input widgets in the global filter dict.
         - call the design method, passing the whole dictionary as the
           argument: let the design method pick the needed specs
