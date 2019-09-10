@@ -364,7 +364,9 @@ class Fixed(object):
 
     scale : float
         The factor between integer fixpoint representation and the floating point
-        value, RWV = FXP / scale. By default, scale = 1 << WI. Examples:
+        value, RWV = FXP / scale. By default, scale = 1 << WI. 
+
+        Examples:
             WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
             WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
 
@@ -378,7 +380,6 @@ class Fixed(object):
         number of digits required for selected number format and wordlength
 
     ovr_flag : integer or integer array (same shape as input argument)
-        xxx
         overflow flag, meaning:
             
                         0 : no overflow
