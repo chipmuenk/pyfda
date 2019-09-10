@@ -26,20 +26,18 @@ for the filter design.
 .. _dev_select_filter:
 
 :mod:`select_filter`
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 .. automodule:: pyfda.input_widgets.select_filter
-    :show-inheritance:
 	:members:
 
 
 .. _dev_input_coeffs:
 
 :mod:`input_coeffs`
-~~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. automodule:: pyfda.input_widgets.input_coeffs
-    :show-inheritance:
 	:members:
 
 
@@ -49,34 +47,31 @@ for the filter design.
 ------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_pz
-    :show-inheritance:
 	:members:
 
 
 .. _dev_input_info:
 
 :mod:`pyfda.input_widgets.input_info`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_info
-    :show-inheritance:
 	:members:
 
 
 .. _dev_input_files:
 
 pyfda.input_widgets.input_files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 .. automodule:: pyfda.input_widgets.input_files
-    :show-inheritance:
 	:members:
 	
 	
 .. _dev_input_fixpoint_specs:
 
 :mod:`pyfda.input_widgets.input_fixpoint_specs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
 and ``IIR_DF1``) can be used with which filter design algorithm.
