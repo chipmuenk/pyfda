@@ -1,4 +1,4 @@
-Package :mod:`pyfda.input_widgets`
+Package input_widgets
 ==================================
 This package contains the widgets for entering / selecting parameters
 for the filter design.
@@ -7,8 +7,8 @@ for the filter design.
 
 .. _dev_input_tab_widgets:
 
-:mod:`input_tab_widgets`
---------------------------------------------------------------
+input_tab_widgets
+--------------------------------
 
 .. automodule:: pyfda.input_widgets.input_tab_widgets
 	:members:
@@ -16,8 +16,8 @@ for the filter design.
 
 .. _dev_input_specs:
 
-:mod:`input_specs`
--------------------
+input_specs
+--------------
 
 .. automodule:: pyfda.input_widgets.input_specs
 	:members:
@@ -25,8 +25,8 @@ for the filter design.
 
 .. _dev_select_filter:
 
-:mod:`select_filter`
----------------------
+select_filter
+----------------
 
 .. automodule:: pyfda.input_widgets.select_filter
 	:members:
@@ -34,7 +34,7 @@ for the filter design.
 
 .. _dev_input_coeffs:
 
-:mod:`input_coeffs`
+input_coeffs
 --------------------
 
 .. automodule:: pyfda.input_widgets.input_coeffs
@@ -43,7 +43,7 @@ for the filter design.
 
 .. _dev_input_pz:
 
-:mod:`pyfda.input_widgets.input_pz`
+input_pz
 ------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_pz
@@ -52,8 +52,8 @@ for the filter design.
 
 .. _dev_input_info:
 
-:mod:`input_info`
---------------------------------------
+input_info
+--------------
 
 .. automodule:: pyfda.input_widgets.input_info
 	:members:
@@ -77,7 +77,7 @@ The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`
 and ``IIR_DF1``) can be used with which filter design algorithm.
 `tree_builder` parses this file and writes all fixpoint modules
 into the list `fb.fixpoint_widgets_list`. The input widget 
-`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
+:mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
 with references to all successfully imported fixpoint modules. The currently 
 selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets` 
 together with the referenced picture.
@@ -92,7 +92,7 @@ First, a filter widget is instantiated as ``self.fx_wdg_inst`` (after the previo
 one has been destroyed).
 
 Next, ``fx_wdg_inst.construct_fixp_filter()`` constructs an instance ``fixp_filter``
-of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df.FIR`).
+of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
 
 The widget's methods 
 
