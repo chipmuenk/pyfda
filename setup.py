@@ -8,7 +8,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
-with open(path.join(here, 'README_PYPI.md'), encoding='utf-8') as f:
+with open(path.join(here, 'README_PYPI.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
