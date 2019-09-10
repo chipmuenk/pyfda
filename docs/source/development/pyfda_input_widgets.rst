@@ -52,7 +52,7 @@ for the filter design.
 
 .. _dev_input_info:
 
-:mod:`pyfda.input_widgets.input_info`
+:mod:`input_info`
 --------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_info
@@ -61,8 +61,8 @@ for the filter design.
 
 .. _dev_input_files:
 
-pyfda.input_widgets.input_files
---------------------------------
+input_files
+------------
 
 .. automodule:: pyfda.input_widgets.input_files
 	:members:
@@ -70,8 +70,8 @@ pyfda.input_widgets.input_files
 	
 .. _dev_input_fixpoint_specs:
 
-:mod:`pyfda.input_widgets.input_fixpoint_specs`
--------------------------------------------------
+input_fixpoint_specs
+---------------------
 
 The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
 and ``IIR_DF1``) can be used with which filter design algorithm.
@@ -91,13 +91,13 @@ reference to a picture showing the filter topology.
 First, a filter widget is instantiated as ``self.fx_wdg_inst`` (after the previous
 one has been destroyed).
 
-A migen filter instance `self.hdlfilter` of e.g. :ref:`dev_fixpoint_widgets_fir_df`
-is instantiated as ``hdlfilter``. Its methods 
+Next, ``fx_wdg_inst.construct_fixp_filter()`` constructs an instance ``fixp_filter``
+of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df.FIR`).
 
-* ``hdlfilter.set_stimulus(self.stim)``
-* ``hdlfilter.run_sim()``
-* ``self.fx_results = hdlfilter.get_response()``
-* ``hdlfilter.fx_wdg_inst.construct_fixp_filter()``
+The widget's methods 
+
+* ``response = fx_wdg_inst.run_sim(stimulus)``
+* ``fx_wdg_inst.to_verilog()``
 
 are used for bit-true simulations and for generating Verilog code for the filter. 
 
