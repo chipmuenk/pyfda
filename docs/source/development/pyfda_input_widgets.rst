@@ -17,7 +17,7 @@ for the filter design.
 .. _dev_input_specs:
 
 :mod:`input_specs`
-~~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. automodule:: pyfda.input_widgets.input_specs
 	:members:
