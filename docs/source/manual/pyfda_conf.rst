@@ -1,0 +1,2 @@
+.. include:: ../.pyfda/pyfda.conf
+

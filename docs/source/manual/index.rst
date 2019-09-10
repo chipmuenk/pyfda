@@ -34,5 +34,5 @@ Customization
   directory for integration of your own widgets in ``<USER_HOME>/.pyfda/pyfda.conf``
 - Control logging behaviour with ``<USER_HOME>/.pyfda/pyfda_log.conf``
 
-.. include:: ../pyfda/pyfda.conf
+.. include:: pyfda_conf
    :literal:
