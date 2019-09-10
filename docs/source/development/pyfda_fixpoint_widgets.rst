@@ -10,9 +10,9 @@ A fixpoint filter for a given filter design is selected in the widget
 
 .. _dev_fixpoint_specs:
 
-:mod:`pyfda.fixpoint_widgets.input_fixpoint_specs`
+:mod:`pyfda.input_widgets.input_fixpoint_specs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. automodule:: pyfda.fixpoint_widgets.input_fixpoint_specs
+.. automodule:: pyfda.input_widgets.input_fixpoint_specs
 	:members:
 
 .. _dev_fixpoint_fir_df:
