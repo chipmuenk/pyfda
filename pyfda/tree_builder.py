@@ -427,7 +427,7 @@ class Tree_Builder(object):
         ----------
         section: str
             Name of the section in the configuration file to be parsed by
-            `self.parse_conf_section`.
+            ``self.parse_conf_section``.
         
         subpackage: str
             Name of the subpackage containing the module to be imported. Module
