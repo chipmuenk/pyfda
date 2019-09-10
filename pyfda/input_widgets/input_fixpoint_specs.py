@@ -7,10 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for simulating fixpoint filters and
-generating VHDL and Verilog Code
+Widget for simulating fixpoint filters and generating Verilog Code
 
-see https://bitbucket.org/cfelton/examples
 """
 import sys, os, io, importlib
 import logging
