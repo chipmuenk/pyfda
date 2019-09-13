@@ -18,7 +18,7 @@
 Welcome to pyfda's documentation!
 =================================
 
-Version: 0.2rc3
+Version: 0.2rc4
 
 .. toctree::
    :maxdepth: 2
