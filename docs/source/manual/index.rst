@@ -24,14 +24,34 @@ The two parts can be resized using the handles (red dots).
    input_specs
    fixpoint_specs
 
+.. _man_customization:
 
 Customization
+--------------
+You can customize pyfda behaviour in some configuration files:
+
+pyfda.conf
 ~~~~~~~~~~~~~
 
-- Layout and some parameters can be customized with the file
-  ``pyfda/pyfda_rc.py`` (within the install directory right now). 
-- Select which widgets and filters will be included, define a user
-  directory for integration of your own widgets in ``<USER_HOME>/.pyfda/pyfda.conf``
-- Control logging behaviour with ``<USER_HOME>/.pyfda/pyfda_log.conf``
+A copy of ``pyfda/pyfda.conf`` is created in ``<USER_HOME>/.pyfda/pyfda.conf``
+where it can be edited by the user to choose which widgets and filters will be included.
+Fixpoint widgets can be assigned to filter designs and one or more user directories can 
+be defined if you want to develop and integrate your own widgets (it's not so hard!).
 
 .. include:: pyfda_conf.rst
+
+pyfda_log.conf
+~~~~~~~~~~~~~~~
+
+A copy of ``pyfda/pyfda_log.conf`` is created in ``<USER_HOME>/.pyfda/pyfda_log.conf``
+where it can be edited to control logging behaviour.
+
+pyfda_rc.py
+~~~~~~~~~~~~~~~
+
+Layout and some parameters can be customized with the file
+``pyfda/pyfda_rc.py`` (within the install directory right now, no user copy). 
+
+
+
+
