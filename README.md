@@ -24,12 +24,12 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
         <td><img src = "img/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
    </tr>
     <tr>
-        <td><img src = "img/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "img/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "img/pyFDA_screenshot_spec_error.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_3d_3.png" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_pz.png" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_spec_error.png" alt="Screenshot" width=300px></td>
     </tr>
   <tr>
-        <td><img src = "img/pyfda_scr_shot_3d5_info.PNG" alt="Screenshot" width=300px></td> 
+        <td><img src = "img/pyfda_scr_shot_3d5_info.png" alt="Screenshot" width=300px></td> 
         <td><img src = "img/pyfda_screenshot_hn_fix_t.png" alt="Screenshot" width=300px></td> 
         <td><img src = "img/pyfda_screenshot_hn_fix_f.png" alt="Screenshot" width=300px></td> 
   <tr>
