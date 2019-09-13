@@ -1,6 +1,6 @@
 .. _dev_mod_fixpoint_widgets:
 
-Package pyfda.fixpoint_widgets
+Package fixpoint_widgets
 ======================================
 This package contains widgets and fixpoint descriptions for simulating filter 
 designs with fixpoint arithmetics and for converting filter designs to Verilog 
