@@ -36,7 +36,7 @@ pyfda.conf
 A copy of ``pyfda/pyfda.conf`` is created in ``<USER_HOME>/.pyfda/pyfda.conf``
 where it can be edited by the user to choose which widgets and filters will be included.
 Fixpoint widgets can be assigned to filter designs and one or more user directories can 
-be defined if you want to develop and integrate your own widgets (it's not so hard!).
+be defined if you want to develop and integrate your own widgets (it's not so hard!):
 
 .. include:: pyfda_conf.rst
 
@@ -44,7 +44,9 @@ pyfda_log.conf
 ~~~~~~~~~~~~~~~
 
 A copy of ``pyfda/pyfda_log.conf`` is created in ``<USER_HOME>/.pyfda/pyfda_log.conf``
-where it can be edited to control logging behaviour.
+where it can be edited to control logging behaviour:
+
+.. include:: pyfda_conf_log.rst
 
 pyfda_rc.py
 ~~~~~~~~~~~~~~~
