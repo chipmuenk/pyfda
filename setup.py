@@ -4,11 +4,9 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-# @todo: WIP see https://packaging.python.org/en/latest/index.html
-
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
-with open(path.join(here, 'README_PYPI.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README_PYPI.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
@@ -20,7 +18,7 @@ setup(
     name = 'pyfda',
     version = version_nr['__version__'],
     description = 'pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
-    #long_description_content_type='text/markdown',
+    long_description_content_type='text/markdown',
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
