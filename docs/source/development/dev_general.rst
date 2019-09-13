@@ -17,7 +17,7 @@ The software is organized as shown in the following figure
     Common data is stored in dicts that can be accessed globally (see: :ref:`dev_persistence`).
 
 **Customization:** 
-    The software can be customized via the file ``conf.py`` (see: :ref:`dev_customization`).
+    The software can be customized a.o. via the file ``conf.py`` (see: :ref:`man_customization`).
 
 .. _dev_signalling:
 
