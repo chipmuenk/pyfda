@@ -94,7 +94,7 @@ as needed.
        The sender name is needed a.o. to prevent infinite loops which may occur
        when the rx event is connected to the tx signal.
 
-:filt_changed': A different filter type (response type, algorithm, ...) has been
+:'filt_changed': A different filter type (response type, algorithm, ...) has been
     selected or loaded, requiring an update of the UI in some widgets.
 
 :'data_changed': A filter has been designed and the actual data (e.g. coefficients) 
@@ -118,6 +118,7 @@ as needed.
     
      - ``'ui_changed':'tab'`` when a different tab has been selected
 
+:'fx_sim': Signal the phase / status of a fixpoint simulation ('finished', 'error')
 
 
 .. _dev_persistence:

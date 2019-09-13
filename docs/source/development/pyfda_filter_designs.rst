@@ -1,4 +1,4 @@
-package filter_designs
+Package filter_designs
 ======================
 
 Package providing various algorithms for FIR and IIR filter design.
