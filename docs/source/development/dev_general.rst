@@ -8,7 +8,7 @@ The software is organized as shown in the following figure
    :width: 100%
    :align: center
 
-   pyfda organization
+   pyfda Organization
 
 **Communication:** 
     The modules communicate via Qt's signal-slot mechanism (see: :ref:`dev_signalling`).

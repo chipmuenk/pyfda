@@ -20,6 +20,8 @@ simulated:
    :alt: Screenshot of fixpoint simulation results (time domain)
    :width: 100%
    :align: center
+   
+   Fixpoint simulation results (time domain)
 
 Fixpoint filters are inherently non-linear due to quantization and saturation effects,
 that's why frequency characteristics can only be derived by running a transient
@@ -30,6 +32,7 @@ simulation and calculating the Fourier response afterwards:
    :width: 100%
    :align: center
 
+   Fixpoint simulation results (frequency domain)
 
 Configuration
 -------------
