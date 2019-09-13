@@ -9,9 +9,27 @@ can be implemented in hardware. Hardware implementations for discrete-time filte
 usually imply fixpoint arithmetics but this could change over time as floating point
 arithmetics can be implemented on FPGAs using dedicated floating point units (FPUs).
 
-Currently, pyfda supports only fixpoint filters. Order and the coefficients have been
+Order and the coefficients have been
 calculated by a filter design algorithm from the `pyfda.filter_designs` package to meet
 target filter specifications (usually in the frequency domain).
+
+Word length and saturation / quantization behaviour can be selected in the widget and
+simulated:
+
+.. figure:: ../img/pyfda_screenshot_hn_fix_t.png
+   :alt: Screenshot of fixpoint simulation results (time domain)
+   :width: 100%
+   :align: center
+
+Fixpoint filters are inherently non-linear due to quantization and saturation effects,
+that's why frequency characteristics can only be derived by running a transient
+simulation and calculating the Fourier response afterwards:
+   
+.. figure:: ../img/pyfda_screenshot_hn_fix_f.png
+   :alt: Screenshot of fixpoint simulation results (time domain)
+   :width: 100%
+   :align: center
+
 
 Configuration
 -------------
