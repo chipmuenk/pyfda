@@ -289,10 +289,6 @@ class FIR(Module):
         p = fb.fil[0]['fxqc']
 
         # ------------- Define I/Os -------------------------------------------
-        # self.WI = p['QI']['W'] # word length of input signal
-        #self.WO = p['QO']['W'] # word length of output signal
-        WA = p['QA']['W']
-
         self.i = Signal((p['QI']['W'], True)) # input signal
         self.o = Signal((p['QO']['W'], True)) # output signal
 
@@ -311,7 +307,7 @@ class FIR(Module):
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
 
         # rescale for output width
-        self.comb += self.o.eq(rescale(self, sum_full, p['QA'], p['QO']))
+        # rescale from full product format to accumulator format 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
