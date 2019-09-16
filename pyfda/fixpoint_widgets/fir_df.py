@@ -293,6 +293,9 @@ class FIR(Module):
         self.o = Signal((p['QO']['W'], True)) # output signal
 
         ###
+        prod_len = p['QI']['W']  + p['QCB']['W']
+        QP = {'WI':p['QI']['WI'] + p['QCB']['WI'], 
+              'WF':p['QI']['WF'] + p['QCB']['WF']}
         muls = []    # list for multiplication results
         src = self.i # first register is connected to input signal
 
@@ -301,13 +304,19 @@ class FIR(Module):
             self.sync += sreg.eq(src)      # with input word lenth
             src = sreg
             muls.append(int(b)*sreg)
-        sum_full = Signal((WA, True))
+
         # saturation logic doesn't make much sense with a FIR filter, this is 
         # just for demonstration
+        sum_full = Signal((prod_len, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
 
-        # rescale for output width
         # rescale from full product format to accumulator format 
+        sum_accu = Signal((p['QA']['W'], True))
+        self.comb += sum_accu.eq(rescale(self, sum_full, QP, p['QA']))
+
+        # rescale from accumulator format to output width
+        self.comb += self.o.eq(rescale(self, sum_accu, p['QA'], p['QO']))
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
