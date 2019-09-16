@@ -95,11 +95,11 @@ def rescale(mod, sig_i, QI, QO):
     """
     WI_I = QI['WI']
     WI_F = QI['WF']
-    #logger.warning("WI:{0}:{1}".format(WI, type(WI)))
+    WI   = WI_I + WI_F + 1
 
     WO_I = QO['WI']
     WO_F = QO['WF']
-    WO   = QO['W']
+    WO   = WO_I + WO_F + 1
 
     dWF = WI_F - WO_F # difference of fractional lengths
     dWI = WI_I - WO_I # difference of integer lengths
@@ -109,7 +109,6 @@ def rescale(mod, sig_i, QI, QO):
 
     sig_i_q = Signal((max(WI,WO), True))
     sig_o = Signal((WO, True))
-
 
     logger.debug("rescale: dWI = {0}, dWF = {1}".format(dWI, dWF))
     if dWF <= 0: # extend fractional word length of output word
@@ -128,9 +127,7 @@ def rescale(mod, sig_i, QI, QO):
  
     if dWI < 0: # WI_I < WO_I, sign extend integer part
         #mod.comb += sig_o.eq(sig_i_q >> -dWI)
-        #mod.comb += sig_o.eq(Cat(Replicate(0, -dWI), sig_i_q)) # Replicate(sig_i_q[-1], -dWI)
         mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(sig_i_q[-1], -dWI)))
-        #mod.comb += sig_o.eq(23)
     elif dWI == 0: # WI = WO, don't change integer part
         mod.comb += sig_o.eq(sig_i_q)
     elif QO['ovfl'] == 'sat':
