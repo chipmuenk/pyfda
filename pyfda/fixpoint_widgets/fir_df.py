@@ -289,25 +289,25 @@ class FIR(Module):
         p = fb.fil[0]['fxqc']
 
         # ------------- Define I/Os -------------------------------------------
-        self.WI = p['QI']['W']
-        self.WO = p['QA']['W']
-        # saturation logic doesn't make much sense with a FIR filter, this is 
-        # just for demonstration
+        # self.WI = p['QI']['W'] # word length of input signal
+        #self.WO = p['QO']['W'] # word length of output signal
         WA = p['QA']['W']
 
-        self.i = Signal((self.WI, True)) # input signal
-        self.o = Signal((self.WO, True)) # output signal
+        self.i = Signal((p['QI']['W'], True)) # input signal
+        self.o = Signal((p['QO']['W'], True)) # output signal
 
         ###
-        muls = []
-        src = self.i
+        muls = []    # list for multiplication results
+        src = self.i # first register is connected to input signal
 
         for b in p['b']:
-            sreg = Signal((self.WI, True)) # registers for input signal 
-            self.sync += sreg.eq(src)
+            sreg = Signal((p['QI']['W'], True)) # create chain of registers  
+            self.sync += sreg.eq(src)      # with input word lenth
             src = sreg
             muls.append(int(b)*sreg)
         sum_full = Signal((WA, True))
+        # saturation logic doesn't make much sense with a FIR filter, this is 
+        # just for demonstration
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
 
         # rescale for output width
