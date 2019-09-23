@@ -110,7 +110,7 @@ def rescale(mod, sig_i, QI, QO):
     sig_i_q = Signal((max(WI,WO), True))
     sig_o = Signal((WO, True))
 
-    logger.debug("rescale: dWI = {0}, dWF = {1}".format(dWI, dWF))
+    logger.debug("rescale: dWI={0}, dWF={1}, QU:{2}, OV:{3}".format(dWI, dWF, QO['quant'], QO['ovfl'] ))
     if dWF <= 0: # extend fractional word length of output word
         mod.comb += sig_i_q.eq(sig_i << -dWF) # shift input right by -dWF   
     else: # dWF > 0, fractional output word length needs to be shortened

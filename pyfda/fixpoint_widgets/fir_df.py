@@ -138,7 +138,7 @@ class FIR_DF_wdg(QWidget):
         `fb.fil[0]['fxqc']['QCB']` and
         `fb.fil[0]['fxqc']['b']`.
         """  
-        logger.error("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
         dict_sig.update({'ui':'C'+dict_sig['ui']})
         fb.fil[0]['fxqc'].update(self.ui2dict())
         
