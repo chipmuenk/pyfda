@@ -172,6 +172,8 @@ class FIR_DF_wdg(QWidget):
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
             
+        # update quantization settings
+        fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)
 
         self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
