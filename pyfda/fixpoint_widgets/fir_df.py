@@ -160,14 +160,18 @@ class FIR_DF_wdg(QWidget):
             A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
         elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
             A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
-        else:
-            return
-        fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
-            + fb.fil[0]['fxqc']['QCB']['WF']
-        fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
-            + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
+
+        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full" or\
+            qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+            fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
+                + fb.fil[0]['fxqc']['QCB']['WF']
+            fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
+                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff                
+
+        # calculate total accumulator word length
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
+            
 
         self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
