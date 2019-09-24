@@ -51,14 +51,27 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ## Installing and Starting pyFDA
-There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
+You need to have a working Python installation on your computer, preferrably including the libraries listed above. I plan to provide binaries / flatpacks but haven't found the time yet. 
+
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: You can simply download and unpack the zip file from here and start the program from the top project directory with
+
+    > python -m pyfda.pyfdax     # Plain Python interpreter 
+or
+    In [1]: %run -m pyfda.pyfdax # IPython
+    
+Most individual files from pyFDA can be run using e.g.
+
+    > python -m pyfda.input_widgets.input_pz       # Plain python interpreter
+or
+    In [2]: %run -m pyfda.input_widgets.input_pz   # IPython 
+    
+However, installing pyfda makes life easier by creating a run script in your path. This can be done in different ways:
 
 ### conda
 If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
 
     > conda install -c Chipmuenk pyfda
 resp.
-
     > conda update  -c Chipmuenk pyfda
 
 ### pip
@@ -70,14 +83,14 @@ or upgrade using
 
     > pip install pyfda -U
 	
-or install locally using
+or install locally (development mode) using
 
     > pip install -e <YOUR_PATH_TO_PYFDA>
 	
-where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
+where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git (see below). Now you can edit the code, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
 ### setup.py   
-You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
+You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
 
     > python setup.py install
 
@@ -85,20 +98,26 @@ or just create a link to where you have copied the python source files (for test
 
     > python setup.py develop
 
+### git
+For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
+
+	> git clone https://github.com/<your pyfda fork>
+
+This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it.
+
+The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point. Now, you can install pyfda locally as 
+described above using either 
+
+    > pip install -e <YOUR_PATH_TO_PYFDA>
+ or
+    > python setup.py develop
+    
+as described above.
+
 ### Starting pyFDA
 In any case, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
-
-For development and debugging, you can also run pyFDA using
-
-    In [1]: %run -m pyfda.pyfdax # IPython or
-    > python -m pyfda.pyfdax    # plain python interpreter
-    
-All individual files from pyFDA can be run using e.g.
-
-    In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
-    > python -m pyfda.input_widgets.input_pz       # plain python interpreter
    
 ### Customization
 
