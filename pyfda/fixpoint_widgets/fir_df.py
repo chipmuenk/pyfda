@@ -299,21 +299,26 @@ class FIR(Module):
         self.o = Signal((p['QO']['W'], True)) # output signal
 
         ###
-        prod_len = p['QI']['W']  + p['QCB']['W']
-        QP = {'WI':p['QI']['WI'] + p['QCB']['WI'], 
+        muls = []    # list for partial products b_i * x_i
+        DW = int(np.ceil(np.log2(len(p['b'])))) # word growth 
+        # word format for sum of partial products b_i * x_i
+        QP = {'WI':p['QI']['WI'] + p['QCB']['WI'] + DW, 
               'WF':p['QI']['WF'] + p['QCB']['WF']}
-        muls = []    # list for multiplication results
+        QP.update({'W':QP['WI'] + QP['WF'] + 1})
+
         src = self.i # first register is connected to input signal
 
         for b in p['b']:
             sreg = Signal((p['QI']['W'], True)) # create chain of registers  
-            self.sync += sreg.eq(src)      # with input word lenth
+            self.sync += sreg.eq(src)           # with input word length
             src = sreg
             muls.append(int(b)*sreg)
 
+        logger.debug("b = {0}\nW(b) = {1}".format(pprint_log(p['b']), p['QCB']['W']))
+
         # saturation logic doesn't make much sense with a FIR filter, this is 
         # just for demonstration
-        sum_full = Signal((prod_len, True))
+        sum_full = Signal((QP['W'], True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
 
         # rescale from full product format to accumulator format 
