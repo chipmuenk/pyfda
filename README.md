@@ -95,6 +95,10 @@ or install locally (development mode) using
 	
 where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git (see below).
 
+To select a specific version (by default, pip selects the latest stable version) use e.g.
+
+    > pip install pyfda==0.2b3
+
 ### setup.py   
 You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
 
