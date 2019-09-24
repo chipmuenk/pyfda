@@ -53,7 +53,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ## Installing and Starting pyFDA
 You need to have a working Python installation on your computer, preferrably including the libraries listed above. I plan to provide binaries / flatpacks but haven't found the time yet. 
 
-There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: You can simply download and unpack the zip file from here and start the program from the top project directory with
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: You can simply download and unpack the zip file from here and start the program from the top project directory using `pyfda/pyfdax.py` with
 
     > python -m pyfda.pyfdax     # Plain Python interpreter 
 
@@ -93,7 +93,7 @@ or install locally (development mode) using
 
     > pip install -e <YOUR_PATH_TO_PYFDA>
 	
-where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git (see below).
+where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git (see below).
 
 ### setup.py   
 You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
