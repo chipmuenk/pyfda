@@ -141,6 +141,7 @@ class FIR_DF_wdg(QWidget):
         logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
         dict_sig.update({'ui':'C'+dict_sig['ui']})
         fb.fil[0]['fxqc'].update(self.ui2dict())
+        logger.debug("b = {0}".format(pprint_log(fb.fil[0]['fxqc']['b'])))
         
         self.process_sig_rx(dict_sig)
 
