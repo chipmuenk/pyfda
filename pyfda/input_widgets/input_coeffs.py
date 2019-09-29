@@ -879,7 +879,8 @@ class Input_Coeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fixp(self.ba, scaling='multdiv')
+            self.ba[0] = self.myQ.fixp(self.ba, scaling='multdiv')[0]
+            self.ba[1] = self.myQ.fixp(self.ba, scaling='multdiv')[0]
         else:
             for i in idx:
                 self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'multdiv')
