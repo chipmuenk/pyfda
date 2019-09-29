@@ -23,7 +23,7 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 from pyfda.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
 from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
- 
+
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
@@ -218,7 +218,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         When editor has finished, read the updated data from the editor,
         convert it back to floating point format and store it in both the model
-        (= QTableWidget) and in self.ba. Finally, refresh the table item to 
+        (= QTableWidget) and in self.ba. Finally, refresh the table item to
         display it in the selected format (via `float2frmt()`).
 
         editor: instance of e.g. QLineEdit
@@ -234,7 +234,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(qstr(editor.text()), 
+            data = safe_eval(qstr(editor.text()),
                              self.parent.ba[index.column()][index.row()], return_type='auto') # raw data without fixpoint formatting
         else:
             data = self.parent.myQ.frmt2float(qstr(editor.text()),
@@ -266,54 +266,54 @@ class Input_Coeffs(QWidget):
     The length of both lists can be egalized with `self._equalize_ba_length()`.
 
     Views / formats are handled by the ItemDelegate() class.
-    
+
     Fixpoint Formats
     ~~~~~~~~~~~~~~~~
-    Coefficients can be displayed in float format (the format returned by the 
+    Coefficients can be displayed in float format (the format returned by the
     filter design algorithm) with the maximum precision. This is also called
     "Real World Value" (RWV).
-    
+
     Any other format (Binary,
     Hex, Decimal, CSD) is a fixpoint format with a fixed number of binary places
     which triggers the display of further options. These formats (except for CSD)
     are based on the integer value i.e. by simply interpreting the bits as an
     integer value ``INT``with the MSB as the sign bit
-    
-    The scale between floating and fixpoint format is determined by partitioning 
+
+    The scale between floating and fixpoint format is determined by partitioning
     of the word length ``W`` into integer and fractional places ``WI`` and ``WF``.
     In general, ``W = WI + WF + 1`` where the "``+ 1``" accounts for the sign bit.
-    
+
     Two common partionings can be selected in a combo box:
-        
-        - The **integer format** has no fractional bits, ``WF = 0`` and 
+
+        - The **integer format** has no fractional bits, ``WF = 0`` and
         ``W = WI + 1``. This is the format used by migen as well, ``RWV = INT``
-        
-        - The **normalized fractional format** has no integer bits, ``WI = 0`` and 
+
+        - The **normalized fractional format** has no integer bits, ``WI = 0`` and
         ``W = WF + 1``. Scaling is determined by the position
-    
+
     It is important to understand that these settings only influence the *display*
     of the coefficients, the frequency response etc. is only updated when the quantize
     icon (the staircase) is clicked AND afterwards the changed coefficients are
     saved to the dict (downwards arrow). However, when you do a fixpoint simulation
     or generate Verilog code from the fixpoint tab, the selected word format is
     used for the coefficients.
-    
+
     In addition to setting the position of the binary point you can select the
     behaviour for:
-        
+
         - **Quantization:** The very high precision of the floating point format
         needs to be reduced for the fixpoint representation. Here you can select
         between ``floor`` (truncate the LSBs), ``round`` (classical rounding) and
         ``fix`` (always round to the next smallest magnitude value)
-        
-        - **Saturation:** When the floating point number is outside the range of 
+
+        - **Saturation:** When the floating point number is outside the range of
         the fixpoint format, either two's complement overflow occurs (``wrap``)
         or the value is clipped to the maximum resp. minimum ("saturation", ``sat``)
-    
+
     The following shows an example of rescaling an input word from Q2.4 to Q0.3
     using wrap-around and truncation. It's easy to see that for simple wrap-around
     logic, the sign of the result may change.
-    
+
     ::
 
       S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
@@ -336,7 +336,7 @@ class Input_Coeffs(QWidget):
 
         self.ui = Input_Coeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
-        
+
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -392,7 +392,7 @@ class Input_Coeffs(QWidget):
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
-        
+
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -431,7 +431,7 @@ class Input_Coeffs(QWidget):
         self.ui.ledScale.editingFinished.connect(self._set_scale)
 
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
-        
+
         self.ui.sig_tx.connect(self.sig_tx)
         # =====================================================================
 
@@ -725,7 +725,7 @@ class Input_Coeffs(QWidget):
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
             qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True)
 
-        self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))        
+        self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))
         qset_cmb_box(self.ui.cmbQuant, fb.fil[0]['fxqc']['QCB']['quant'])
         qset_cmb_box(self.ui.cmbQOvfl,  fb.fil[0]['fxqc']['QCB']['ovfl'])
 
@@ -733,7 +733,7 @@ class Input_Coeffs(QWidget):
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
-        
+
         self._set_number_format() # quant format has been changed, update display
 
 #------------------------------------------------------------------------------
