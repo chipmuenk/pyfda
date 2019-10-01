@@ -22,6 +22,7 @@ The two parts can be resized using the handles (red dots).
    :caption: Contents
 
    input_specs
+   input_coeffs
    fixpoint_specs
 
 .. _man_customization:
