@@ -52,18 +52,19 @@ vals = rnd.randn(100) + 1j * rnd.randn(100)
 Navg = 1000
 rtype = 'min'
 print('============ dsp.unique_roots() ================================')
-t1 = time.clock()
+t1 = time.process_time()
+
 for i in range(Navg):
     roots, mult = dsp.unique_roots(vals, rtype = rtype, rdist='manhattan')
-t2 = time.clock()
+t2 = time.process_time()
 T_dsp = (t2 - t1)/Navg
 print (mult)
 
 print('============ signal.unique_roots() =============================')
-t1 = time.clock()
+t1 = time.process_time()
 for i in range(Navg):
     roots, mult = sig.unique_roots(vals, rtype = rtype)
-t2 = time.clock()
+t2 = time.process_time()
 T_sig = (t2 - t1)/Navg
 print (mult)
 
