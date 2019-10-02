@@ -1,10 +1,9 @@
 Input Coeffs
 ============
 
-:numref:`fig_input_coeffs_float` shows a typical view of the **Coeffs** tab where 
+:numref:`fig_input_coeffs_float` shows a typical view of the **b,a** tab where 
 you can view and edit the filter coefficients. Coefficient values are updated 
 every time you design a new filter or update the poles / zeros.
-
 
 .. _fig_input_coeffs_float:
 
@@ -15,6 +14,8 @@ every time you design a new filter or update the poles / zeros.
 
    Screenshot of the coefficients tab for floating point coefficients
 
+In the top row, the display of the coefficients can be disabled as a coefficient
+update can be time consuming for high order filters (:math:`N > 100`).
 
 Fixpoint
 ---------
@@ -23,7 +24,7 @@ When the format is not float, the fixpoint options are displayed as in
 
 .. _fig_input_coeffs_fixpoint:
 
-.. figure:: ../img/manual/pyfda_input_coeffs_float.png
+.. figure:: ../img/manual/pyfda_input_coeffs_fixpoint.png
    :alt: Screenshot of the coefficients tab for fixpoint formats
    :align: center
    :width: 50%
@@ -49,13 +50,13 @@ In general, ``W = WI + WF + 1`` where the "``+ 1``" accounts for the sign bit.
 Three kinds of partioning can be selected in a combo box:
 
     - The **integer format** has no fractional bits, ``WF = 0`` and
-    ``W = WI + 1``. This is the format used by migen as well, ``RWV = INT``
+        ``W = WI + 1``. This is the format used by migen as well, ``RWV = INT``
 
     - The **normalized fractional format** has no integer bits, ``WI = 0`` and
-    ``W = WF + 1``. 
+        ``W = WF + 1``. 
     
-    - The general **fractional** format has an arbitrary number of fractional
-    and integer bits, ``W = WI + WF + 1``. 
+    - The **general fractional** format has an arbitrary number of fractional
+        and integer bits, ``W = WI + WF + 1``. 
     
 In any case, scaling is determined by the number of fractional bits,
 :math:`RWV = INT \cdot 2^{-WF}`.
@@ -75,13 +76,13 @@ In addition to setting the position of the binary point you can select the
 behaviour for:
 
     - **Quantization:** The very high precision of the floating point format
-    needs to be reduced for the fixpoint representation. Here you can select
-    between ``floor`` (truncate the LSBs), ``round`` (classical rounding) and
-    ``fix`` (always round to the next smallest magnitude value)
+        needs to be reduced for the fixpoint representation. Here you can select
+        between ``floor`` (truncate the LSBs), ``round`` (classical rounding) and
+        ``fix`` (always round to the next smallest magnitude value)
 
     - **Saturation:** When the floating point number is outside the range of
-    the fixpoint format, either two's complement overflow occurs (``wrap``)
-    or the value is clipped to the maximum resp. minimum ("saturation", ``sat``)
+        the fixpoint format, either two's complement overflow occurs (``wrap``)
+        or the value is clipped to the maximum resp. minimum ("saturation", ``sat``)
 
 The following shows an example of a coefficient in Q2.4 and Q0.3 format
 using wrap-around and truncation. It's easy to see that for simple wrap-around
