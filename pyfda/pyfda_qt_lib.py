@@ -201,6 +201,26 @@ def qfilter_warning(self, N, fil_class):
     else:
         return False
 
+# The following is taken from
+# https://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
+# It is used to create horizontal resp. vertical lines
+class QHLine(QFrame):
+    """
+    Create a thin horizontal line utilizing the HLine property of QFrames
+    Usage:
+    mylayout.addWidget(QHLine(), 1, 2)
+    """
+    def __init__(self):
+        super(QHLine, self).__init__()
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
+
+
+class QVLine(QFrame):
+    def __init__(self):
+        super(QVLine, self).__init__()
+        self.setFrameShape(QFrame.VLine)
+        self.setFrameShadow(QFrame.Sunken)
     
 #==============================================================================
 
