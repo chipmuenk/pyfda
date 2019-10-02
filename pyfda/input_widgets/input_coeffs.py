@@ -643,21 +643,32 @@ class Input_Coeffs(QWidget):
         if qfrmt == 'qint':
             self.ui.ledWI.setText(str(W - 1))
             self.ui.ledWF.setText("0")
-            self.ui.ledScale.setText(str(1 << (W-1)))
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ui.ledWI.setText("0")
             self.ui.ledWF.setText(str(W - 1))
-            self.ui.ledScale.setText("1")
         else: # qfrmt == 'qfrac':
             is_qfrac = True
+            
+        WI = safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int')
 
+        self.ui.ledScale.setText(str(1 << WI))
         self.ui.ledWI.setEnabled(is_qfrac)
         self.ui.lblDot.setEnabled(is_qfrac)
         self.ui.ledWF.setEnabled(is_qfrac)
         self.ui.ledW.setEnabled(not is_qfrac)
-        self.ui.ledScale.setEnabled(is_qfrac)
+        self.ui.ledScale.setEnabled(False)
 
         self.ui2qdict() # save UI to dict and to class attributes
+        
+#------------------------------------------------------------------------------
+    def _update_MSB_LSB(self):
+        """
+        Update the infos (LSB, MSB, Max)
+        """
+        self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+        self.ui.lblMAX.setText("{0:.6g}".format(self.myQ.MAX))
+
 
 #------------------------------------------------------------------------------
     def qdict2ui(self):
@@ -677,11 +688,9 @@ class Input_Coeffs(QWidget):
         qset_cmb_box(self.ui.cmbQOvfl,  fb.fil[0]['fxqc']['QCB']['ovfl'])
 
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update class attributes
-        self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
 
         self._set_number_format() # quant format has been changed, update display
+        self._update_MSB_LSB()
 
 #------------------------------------------------------------------------------
     def ui2qdict(self):
@@ -708,6 +717,8 @@ class Input_Coeffs(QWidget):
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update fixpoint object
 
         self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
+        
+        self._update_MSB_LSB()
 
         self._refresh_table()
 
