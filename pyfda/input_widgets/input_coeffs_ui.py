@@ -119,6 +119,11 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.ledW)
         layHDisplay.addStretch()
 
+        #######################################################################
+        # frmButtonsCoeffs
+        #
+        # This frame contains all buttons for manipulating coefficients
+        #######################################################################
         # -----------------------------------------------------------------
         # layHButtonsCoeffs1
         #
@@ -207,6 +212,18 @@ class Input_Coeffs_UI(QWidget):
         layHButtonsCoeffs2.addWidget(lblEps)
         layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
+        
+        #-------------------------------------------------------------------
+        # Now put the ButtonsCoeffs HBoxes into frmButtonsCoeffs
+        # ---------------------------------------------------------------------
+        layVButtonsCoeffs = QVBoxLayout()
+        layVButtonsCoeffs.addLayout(layHButtonsCoeffs1)
+        layVButtonsCoeffs.addLayout(layHButtonsCoeffs2)
+        layVButtonsCoeffs.setContentsMargins(0,5,0,0)
+        # This frame encompasses all Quantization Settings
+        self.frmButtonsCoeffs = QFrame(self)
+        self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
+
 
         #######################################################################
         # frmQSettings
@@ -241,6 +258,7 @@ class Input_Coeffs_UI(QWidget):
         self.ledScale = QLineEdit(self)
         self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.")
         self.ledScale.setText(str(1))
+        self.ledScale.setEnabled(False)
 
         layHWI_WF = QHBoxLayout()
         layHWI_WF.addWidget(lbl_Q)
@@ -347,14 +365,16 @@ class Input_Coeffs_UI(QWidget):
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
 
+        #######################################################################
         # ########################  Main UI Layout ############################
+        #######################################################################
         # layout for frame (UI widget)
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHDisplay)
-        layVMainF.addLayout(layHButtonsCoeffs1)
-        layVMainF.addLayout(layHButtonsCoeffs2)
         layVMainF.addWidget(self.frmQSettings)
         layVMainF.addWidget(QHLine())
+        layVMainF.addWidget(self.frmButtonsCoeffs)
+
         # This frame encompasses all UI elements
         frmMain = QFrame(self)
         frmMain.setLayout(layVMainF)

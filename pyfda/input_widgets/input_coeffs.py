@@ -490,9 +490,11 @@ class Input_Coeffs(QWidget):
         self.ui.lbl_W.setVisible(not is_float)
         self.ui.ledW.setVisible(not is_float)
 
+        self.ui.frmQSettings.setVisible(not is_float) # hide all q-settings for float
+
         if self.ui.butEnable.isChecked():
-            self.ui.frmQSettings.setVisible(not is_float) # hide all q-settings for float
             self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+            self.ui.frmButtonsCoeffs.setVisible(True)
             self.tblCoeff.setVisible(True)
 
             # check whether filter is FIR and only needs one column
@@ -533,7 +535,7 @@ class Input_Coeffs(QWidget):
             self.tblCoeff.clearSelection()
 
         else:
-            self.ui.frmQSettings.setVisible(False)
+            self.ui.frmButtonsCoeffs.setVisible(False)
             self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(False)
 
