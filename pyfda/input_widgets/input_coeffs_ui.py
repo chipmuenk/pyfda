@@ -17,7 +17,7 @@ from ..compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboB
                       QPushButton, QFrame, QSpinBox, QFont, QIcon,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
-from pyfda.pyfda_qt_lib import qset_cmb_box
+from pyfda.pyfda_qt_lib import qset_cmb_box, QHLine
 from pyfda.pyfda_io_lib import CSV_option_box
  
 from pyfda.pyfda_rc import params
@@ -342,7 +342,7 @@ class Input_Coeffs_UI(QWidget):
         layVButtonsQ.addLayout(layHW_Scale)
         layVButtonsQ.addLayout(layGQOpt)
         layVButtonsQ.addLayout(layHCoeffs_MAX)
-        layVButtonsQ.setContentsMargins(0,5,0,0)
+        layVButtonsQ.setContentsMargins(0,0,0,0)
         # This frame encompasses all Quantization Settings
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
@@ -354,6 +354,7 @@ class Input_Coeffs_UI(QWidget):
         layVMainF.addLayout(layHButtonsCoeffs1)
         layVMainF.addLayout(layHButtonsCoeffs2)
         layVMainF.addWidget(self.frmQSettings)
+        layVMainF.addWidget(QHLine())
         # This frame encompasses all UI elements
         frmMain = QFrame(self)
         frmMain.setLayout(layVMainF)
