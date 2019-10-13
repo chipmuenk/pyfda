@@ -1,5 +1,5 @@
+
 pyFDA - Python Filter Design Analysis Tool
-==========================================
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. 
 
