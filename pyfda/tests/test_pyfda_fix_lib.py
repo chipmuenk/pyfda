@@ -199,13 +199,13 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Test wrap around
         """
-        y_list_ovfl = [-np.inf, -3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2, np.inf]
+        y_list_ovfl = [-3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2]
 
         # Integer representation, wrap
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = self.myQ.fixp(y_list_ovfl)
-        yq_list_goal = [np.nan, 6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0, np.nan]
+        yq_list_goal = [ 6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0]
         np.testing.assert_array_equal(yq_list, yq_list_goal)
 
         # wrap around behaviour / floor quantization
