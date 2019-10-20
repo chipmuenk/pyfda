@@ -37,7 +37,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.y_list_validate = ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
 
         self.fix_in = [0,1,15,32767,-1,-64,0] # last zero isn't tested due to latency of 1
-        self.fix_out = [0,1,15,32767,-1,-64]
+        self.fix_out = [0,1,15,32768,-1,-64]
 
     def tb_dut(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
@@ -84,17 +84,6 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
         self.myQ.setQobj(q_obj)
-        self.assertEqual(q_obj, self.myQ.q_obj)
-        # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
-        q_obj2 = {'Q': '6.2'}
-        self.myQ.setQobj(q_obj2)
-        self.assertEqual(q_obj2, self.myQ.q_obj)
-
-        self.myQ.setQobj({'W': 13})
-        self.assertEqual(12, self.myQ.WI)
-        self.assertEqual(0, self.myQ.WF)
-        self.assertEqual('12.0', self.myQ.Q)
-
 
         # check whether option 'norm' sets the correct scale
         self.myQ.setQobj({'scale':'norm'})
@@ -292,14 +281,14 @@ class TestSequenceFunctions(unittest.TestCase):
         response = self.run_sim(self.fix_in[:])
         self.assertEqual(self.fix_in[:-1], response[1:])
 
-    def test_fix_trunc_wf(self):
+    def test_fix_round_wf(self):
         """
         Test rescaling when fractional word is shortened by 4 bits
         """
-        self.p_in =  {'WI':0, 'WF':19, 'W':20, 'ovfl':'wrap', 'quant':'round'}
-        self.p_out = {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
+        self.p_in =  {'WI':0, 'WF':9, 'W':10, 'ovfl':'wrap', 'quant':'round'}
+        self.p_out = {'WI':0, 'WF':5, 'W':6, 'ovfl':'wrap', 'quant':'round'}
         q_out = self.p_out.copy()
-        q_out.update({'WI':15, 'WF':0, 'W':16, 'scale':1/16})
+        q_out.update({'WI':9, 'WF':0, 'W':10, 'scale':1/16})
         self.dut = DUT(self.p_in, self.p_out)
 
         # Integer representation, wrap
@@ -309,6 +298,9 @@ class TestSequenceFunctions(unittest.TestCase):
         response = self.run_sim(self.fix_in[:])
         #self.assertEqual(self.fix_in[:-1], response[1:])
         self.assertEqual(fixq_in[:-1], response[1:])
+        self.assertEqual(fixq_in[:-1], response[1:])
+        self.assertEqual(fix_out[:-1], response[1:])
+        
 
 ###############################################################################
 # migen class for testing rescale operation
