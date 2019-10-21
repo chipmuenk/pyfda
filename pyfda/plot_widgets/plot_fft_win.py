@@ -21,23 +21,35 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 #import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from pyfda.compat import (QWidget, QFrame, QLabel, pyqtSignal,
-                     QCheckBox, QComboBox, QPushButton, QRadioButton,
+from pyfda.compat import (QMainWindow, QtCore, QFrame, QLabel, pyqtSignal,
+                     QCheckBox, QComboBox, QPushButton,
                      QHBoxLayout, QVBoxLayout)
 #------------------------------------------------------------------------------
-class Plot_FFT_win(QWidget):
+class Plot_FFT_win(QMainWindow):
     """
     Create a pop-up widget for displaying time and frequency view of an FFT 
     window.
     """
-    # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
+    # incoming
     sig_rx = pyqtSignal(object)
-
+    # outgoing
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         super(Plot_FFT_win, self).__init__(parent)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
 
+    def closeEvent(self, event):
+        """
+        Catch closeEvent (user has tried to close the window) and send a 
+        signal to parent where window closing is registered before actually
+        closing the window.
+        """
+        self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
+        event.accept()
+        
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -102,12 +114,15 @@ class Plot_FFT_win(QWidget):
         #----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # main widget, encompassing the other widgets
+        # main widget: Layout layVMainMpl (VBox) is defined with MplWidget,
+        #              additional widgets can be added (like self.frmControls)
+        #              The widget encompasses all other widgets.
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(self.mplwidget.layVMainMpl)
+        
+        self.setCentralWidget(self.mplwidget)
 
         self.init_axes()
 
@@ -221,4 +236,15 @@ class Plot_FFT_win(QWidget):
 #==============================================================================
 
 if __name__=='__main__':
-    pass
+    import sys
+    from pyfda.compat import QApplication
+    
+    """ Test with python -m pyfda.plot_widgets.plot_fft_win"""
+    app = QApplication(sys.argv)
+    mainw = Plot_FFT_win(None)
+
+    app.setActiveWindow(mainw)
+    mainw.show()
+
+    sys.exit(app.exec_())
+

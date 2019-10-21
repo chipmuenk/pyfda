@@ -12,7 +12,7 @@ Widget for plotting impulse and general transient responses
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
+from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QtCore, Qt
 
 import numpy as np
 from numpy import pi, sqrt
@@ -181,6 +181,9 @@ class Plot_Impz(QWidget):
             return
 
         self.error = False
+        
+        if 'closeEvent' in dict_sig:
+            self.close_FFT_win()
 
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
@@ -277,13 +280,22 @@ class Plot_Impz(QWidget):
         """
         Pop-up FFT window
         """
-        self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
-        self.fft_window.show() # modeless dialog, i.e. non-blocking
-        #self.fft_window.exec_() # modal dialog (blocking)
+        if self.fft_window is None:
+            if self.ui.chk_win_freq.isChecked():
+                self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
+                self.ui.sig_tx.connect(self.fft_window.sig_rx)
+                self.fft_window.sig_tx.connect(self.close_FFT_win)
+                self.fft_window.show() # modeless i.e. non-blocking popup window
+        else:
+            if not self.ui.chk_win_freq.isChecked():
+                if self.fft_window is None:
+                    logger.warning("FFT window is already closed!")
+                else:
+                    self.fft_window.close()
 
-        #self._set_load_save_icons()
-        #self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
-
+    def close_FFT_win(self):
+        self.fft_window = None
+        self.ui.chk_win_freq.setChecked(False)
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -669,8 +681,7 @@ class Plot_Impz(QWidget):
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
-        if self.ui.chk_win_freq:
-            self.show_FFT_win()
+        self.show_FFT_win()
 
     def _log_mode_time(self):
         """
