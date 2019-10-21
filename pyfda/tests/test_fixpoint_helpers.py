@@ -12,6 +12,7 @@ Test suite for fixpoint_helpers.py
 
 import unittest
 import numpy as np
+from numpy.testing import assert_array_equal
 from pyfda import pyfda_fix_lib as fix_lib
 try:
     from migen import Cat, If, Replicate, Signal, Module, run_simulation
@@ -24,20 +25,17 @@ except ImportError:
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.p_in =  {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
-        self.p_out = {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
+        self.q_in =  {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
+        self.q_out = {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'round'}
         if HAS_MIGEN:
-            self.dut = DUT(self.p_in, self.p_out)
+            self.dut = DUT(self.q_in, self.q_out)
+
+        self.stim = np.array([0,1,15,64,32767,-1,-64,0]) # last zero isn't tested due to latency of 1
+
+        # initialize a pyfda fixpoint quantizer
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
 
-        self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
-        self.y_list_cmplx = [-1.1j + 0.1, -1.0 - 0.3j, -0.5-0.5j, 0j, 0.5j, 0.9, 0.99+0.3j, 1j, 1.1]
-        # list with various invalid strings
-        self.y_list_validate = ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
-
-        self.fix_in = [0,1,15,32767,-1,-64,0] # last zero isn't tested due to latency of 1
-        self.fix_out = [0,1,15,32768,-1,-64]
 
     def tb_dut(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
@@ -82,6 +80,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
+
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
         self.myQ.setQobj(q_obj)
 
@@ -92,214 +91,71 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ.setQobj({'scale':'int'})
         self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
 
-    def test_fix_no_ovfl(self):
-        """
-        Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
-        keyword is not regarded here.
-        """
-        # return fixpoint numbers as float (no saturation, no quantization)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
-        self.myQ.setQobj(q_obj)
-        # test handling of invalid inputs - scalar inputs
-        yq_list = list(map(self.myQ.fixp, self.y_list_validate))
-        yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
-        self.assertEqual(yq_list, yq_list_goal)
-        # same in vector format
-        yq_list = list(self.myQ.fixp(self.y_list_validate))
-        yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
-        self.assertListEqual(yq_list, yq_list_goal)
+    #==========================================================================
+    # Test rescale routine, this needs a migen class (DUT)
+    #--------------------------------------------------------------------------
+    # - The input to the run_sim method needs to be an iterable of integers, 
+    #    the output is a list of integers
+    # - migen moduls only use integer arithmetics, fractional arithmetics is 
+    #    only provided by the rescale method. It accepts quantization dicts in
+    #    the same format as the pyfda quantization library
+    # - Due to latency of one, strip last element of input and first of output
+    # 
 
-        # return fixpoint numbers as float (no saturation, no quantization)
-        # use global list
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = self.y_list
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # test scaling (multiply by scaling factor)
-        q_obj = {'scale': 2}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list) / 2.)
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # test scaling (divide by scaling factor)
-        yq_list = list(self.myQ.fixp(self.y_list, scaling='div') * 2.)
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # return fixpoint numbers as float (rounding)
-        q_obj = {'quant':'round', 'scale': 1}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # wrap around behaviour with 'fix' quantization; fractional representation
-        q_obj = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # return fixpoint numbers as integer (rounding), overflow 'none'
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # input list of strings
-        y_string = ['-1.1', '-1.0', '-0.5', '0', '0.5', '0.9', '0.99', '1.0', '1.1']
-        yq_list = list(self.myQ.fixp(y_string))
-        yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # frmt float
-        q_obj = {'frmt': 'float'}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(y_string))
-        self.assertEqual(yq_list, yq_list_goal)
-
-    def test_fix_no_ovfl_cmplx(self):
-        """
-        Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
-        keyword is not regarded here.
-        """
-        # return fixpoint numbers as float (no saturation, no quantization)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
-        self.myQ.setQobj(q_obj)
-        # test handling of complex inputs - scalar inputs
-        yq_list = list(map(self.myQ.fixp, self.y_list_cmplx))
-        yq_list_goal = [0.1, -1.0, -0.5, 0.0, 0.0, 0.9, 0.99, 0.0, 1.1]
-        self.assertEqual(yq_list, yq_list_goal)
-        # same in array format
-        yq_list = list(self.myQ.fixp(self.y_list_cmplx))
-        self.assertListEqual(yq_list, yq_list_goal)
-#==============================================================================
-    def test_fix_saturation(self):
-        """
-        Test saturation
-        """
-        y_list_ovfl = [-np.inf, -3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2, np.inf]
-
-        # Integer representation, saturation
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(y_list_ovfl))
-        yq_list_goal = [-8.0, -8.0, -8.0, -8.0, -8.0, -4.0, 0.0, 4.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # Fractional representation, saturation
-        q_obj = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(y_list_ovfl))
-        yq_list_goal = [-8, -8, -8, -8, -8, -4, 0, 4, 6.5, 7.5, 7.5, 7.5, 7.5, 7.5]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # normalized fractional representation, saturation
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [-1, -1, -0.5, 0, 0.5, 0.875, 0.875, 0.875, 0.875]
-        self.assertEqual(yq_list, yq_list_goal)
-
-        # saturation, one extra int bit
-        q_obj = {'WI':1, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [-1.125, -1.0, -0.5, 0.0, 0.5, 0.875, 1.0, 1.0, 1.125]
-        self.assertEqual(yq_list, yq_list_goal)
-
-
-    def test_fix_wrap(self):
-        """
-        Test wrap around -np.inf, , np.inf ,np.nan, , np.nan
-        """
-        y_list_ovfl = [-3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2]
-
-        # Integer representation, wrap
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = self.myQ.fixp(y_list_ovfl)
-        yq_list_goal = [6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0]
-        np.testing.assert_array_equal(yq_list, yq_list_goal)
-
-        # wrap around behaviour / floor quantization
-        q_obj = {'WI':3, 'WF':1, 'ovfl':'wrap', 'quant':'floor', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fixp(self.y_list))
-        yq_list_goal = [7.0, -8.0, -4, 0, 4, 7, 7.5, -8, -7.5]
-        self.assertEqual(yq_list, yq_list_goal)
-
-
-    def test_float2frmt_bin(self):
-        """
-        Conversion from float to binary format
-        """
-        # Integer case: Q3.0, scale = 1, scalar parameter
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-
-        # test handling of invalid inputs - scalar inputs
-        yq_list = list(map(self.myQ.float2frmt, self.y_list_validate))
-        yq_list_goal = ["0000", "0000", "0111", "0111", "0000", "0111", "0111"]
-        self.assertEqual(yq_list, yq_list_goal)
-        # same in vector format
-        yq_list = list(self.myQ.float2frmt(self.y_list_validate))
-        # input       ['1.1.1', 'xxx', '123', '1.23',    '', 1.23j + 3.21, '3.21 + 1.23 j']
-        self.assertListEqual(yq_list, yq_list_goal)
-
-        # Integer case: Q3.0, scale = 8, wrap, scalar inputs
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(map(self.myQ.float2frmt, self.y_list))
-        yq_list_goal = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
-        self.assertEqual(yq_list, yq_list_goal)
-        # same but vectorized function
-        yq_arr = list(self.myQ.float2frmt(self.y_list))
-        self.assertEqual(yq_arr, yq_list_goal)
-
-        # Q1.2 format and scale = 2, saturation, scalar inputs
-        q_obj = {'WI':1, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 2}
-        self.myQ.setQobj(q_obj)
-        yq_list = list(map(self.myQ.float2frmt, self.y_list))
-        yq_list_goal = ['10.00', '10.00', '11.00', '00.00', '01.00', '01.11', '01.11', '01.11', '01.11']
-        self.assertEqual(yq_list, yq_list_goal)
-        # same but vectorized function
-        yq_list = list(self.myQ.float2frmt(self.y_list))
-        self.assertEqual(yq_list, yq_list_goal)
-
-    #==============================================================================
-    #   Test rescale routine, this needs a migen class (DUT)
-    #   The input to the run_sim methods needs to be an iterable, output is a list of integer
-    # due to latency of one, strip last element of input and first of output
-
+    # np.testing.assert_array_equal(yq_list, yq_list_goal) # compare arrays or lists
+    # assert_array_almost_equal
 
     def test_fix_id(self):
         """
         test identity of input integer list and output list, passed thru migen 
         instance
         """
-        response = self.run_sim(self.fix_in[:])
-        self.assertEqual(self.fix_in[:-1], response[1:])
+        response = self.run_sim(self.stim[:])
+        assert_array_equal(self.stim[:-1], response[1:])
+
+    def test_fix_round_wi(self):
+        """
+        Test rescaling for fixpoint integer representation when integer word 
+        is shortened by 3 bits.
+        """
+        # Input quantization format, range: -512 ... 511:
+        q_in =  {'WI':9, 'WF':0, 'W':10, 'ovfl':'wrap', 'quant':'round'}
+        # Output quantization format, range: -64 ... 63:
+        q_out = {'WI':6, 'WF':0, 'W':7, 'ovfl':'wrap', 'quant':'round'}
+        targ_out = np.array([0,1,15,-64,-1,-1,-64,0])
+
+        q_out_pyfda = q_out.copy()
+        q_out_pyfda.update({'scale':'int'}) 
+        self.myQ.setQobj(q_out_pyfda)      
+
+        self.dut = DUT(q_in, q_out) # pass quantization dicts
+        response = self.run_sim(self.stim)
+
+        # compare pyfda fixpoint quantization to migen fixpoint quantization:
+        assert_array_equal(self.myQ.fixp(self.stim)[:-1],response[1:])
+        # compare target list to migen fixpoint quantization:
+        assert_array_equal(targ_out[:-1], response[1:])
 
     def test_fix_round_wf(self):
         """
-        Test rescaling when fractional word is shortened by 4 bits
+        Test rescaling for fixpoint fractional representation when 3 fractional
+        bits are thrown away.
         """
-        self.p_in =  {'WI':0, 'WF':9, 'W':10, 'ovfl':'wrap', 'quant':'round'}
-        self.p_out = {'WI':0, 'WF':5, 'W':6, 'ovfl':'wrap', 'quant':'round'}
-        q_out = self.p_out.copy()
-        q_out.update({'WI':9, 'WF':0, 'W':10, 'scale':1/16})
-        self.dut = DUT(self.p_in, self.p_out)
+        q_in =  {'WI':0, 'WF':9, 'W':10, 'ovfl':'wrap', 'quant':'round'}
+        q_out = {'WI':0, 'WF':6, 'W':7, 'ovfl':'wrap', 'quant':'round'}
+        targ_out = np.array([0,0,2,8,0,0,-8,0])
 
-        # Integer representation, wrap
-        self.myQ.setQobj(q_out)
-        fixq_in = list(self.myQ.fixp(self.fix_in))
-
-        response = self.run_sim(self.fix_in[:])
-        #self.assertEqual(self.fix_in[:-1], response[1:])
-        self.assertEqual(fixq_in[:-1], response[1:])
-        self.assertEqual(fixq_in[:-1], response[1:])
-        self.assertEqual(fix_out[:-1], response[1:])
+        q_out_pyfda = q_out.copy()
+        q_out_pyfda.update({'WI':6, 'WF':0, 'W':7}) # use integer representation
+        self.myQ.setQobj(q_out_pyfda)
+      
+        self.dut = DUT(q_in, q_out)
+        response = self.run_sim(self.stim)
+        
+        # Throwing away 3 LSBs reduces fixpoint value by a factor of 8
+        assert_array_equal(self.myQ.fixp(self.stim/8)[:-1],response[1:])
+        # compare target list to migen fixpoint quantization:
+        assert_array_equal(targ_out[:-1], response[1:])
         
 
 ###############################################################################
