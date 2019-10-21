@@ -28,6 +28,7 @@ from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 from .plot_impz_ui import PlotImpz_UI
+from .plot_fft_win import Plot_FFT_win
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
@@ -49,6 +50,7 @@ class Plot_Impz(QWidget):
         super(Plot_Impz, self).__init__(parent)
 
         self.ACTIVE_3D = False
+        self.fft_window = None # handle for FFT window pop-up widget
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
 
         # initial settings
@@ -264,12 +266,23 @@ class Plot_Impz(QWidget):
 #                    self.fx_select("Fixpoint")
 
         if propagate:
-            # signals of local subwidgets are propagated,
-            # global signals terminate here.
+            # signals of local subwidgets are propagated, global signals terminate here.
             # The next event in the queue is only handled when control returns
             # from this one
             self.sig_tx.emit(dict_sig)
             return
+
+    #------------------------------------------------------------------------------
+    def show_FFT_win(self):
+        """
+        Pop-up FFT window
+        """
+        self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
+        self.fft_window.show() # modeless dialog, i.e. non-blocking
+        #self.fft_window.exec_() # modal dialog (blocking)
+
+        #self._set_load_save_icons()
+        #self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
 
 
 # =============================================================================
@@ -656,6 +669,8 @@ class Plot_Impz(QWidget):
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
+        if self.ui.chk_win_freq:
+            self.show_FFT_win()
 
     def _log_mode_time(self):
         """
