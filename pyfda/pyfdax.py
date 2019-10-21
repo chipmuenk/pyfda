@@ -18,14 +18,10 @@ logger = logging.getLogger(__name__)
 import pyfda.pyfda_dirs as dirs # initial import constructs file paths
 
 import matplotlib
+matplotlib.use("Qt5Agg")
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
-# to avoid 
+# to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
-try:
-    import PyQt5
-    matplotlib.use("Qt5Agg")
-except ImportError:
-    matplotlib.use("Qt4Agg")
 
 from .compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
                      QMessageBox, QPlainTextEdit, QAction, QMenu, pyqtSignal)
