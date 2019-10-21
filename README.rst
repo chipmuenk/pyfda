@@ -12,11 +12,10 @@ discrete time filters.
 Prerequisites
 -------------
 
--  Python versions: **2.7** or **3.3 ... 3.6**
+-  Python versions: **3.3 ... 3.7**
 -  All operating systems - there should be no OS specific requirements.
 -  Libraries:
--  **(Py)Qt4** or **(Py)Qt5**. When both libraries are installed, PyQt5
-   is used.
+-  **(Py)Qt5**
 -  **numpy**, **scipy**, **matplotlib**
 
 Optional libraries: \* **docutils** for rich text in documentation \*
@@ -120,14 +119,16 @@ or upgrade using
 ::
 
     pip install pyfda -U
-	
+
 or install locally using
 
 ::
 
 	pip install -e <YOUR_PATH_TO_PYFDA>
-	
-where the specified path is the one your `setup.py` sits in. In this case, you need to have a local copy of the pyfda project, preferrably using git. Now you can edit your local copy, test it and e.g. push it to your own git fork.
+
+where the specified path is the one your `setup.py` sits in. In this case, 
+you need to have a local copy of the pyfda project, preferrably using git. 
+Now you can edit your local copy, test it and e.g. push it to your own git fork.
 
 Starting pyFDA
 --------------
