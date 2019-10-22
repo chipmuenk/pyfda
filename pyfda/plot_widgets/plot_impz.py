@@ -411,6 +411,9 @@ class Plot_Impz(QWidget):
         phi2 = self.ui.phi2 / 180 * pi
 
         # calculate stimuli x[n] ==============================================
+        self.H_str = r'$y[n]$'
+        self.title_str = r'System Response '
+
         if self.ui.stim == "Pulse":
             self.x = np.zeros(self.ui.N_end)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
@@ -419,7 +422,7 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "None":
             self.x = np.zeros(self.ui.N_end)
-            self.title_str = r'System Response to Zero Input'
+            self.title_str = r'Zero Input System Response'
             self.H_str = r'$h_0[n]$' # default
 
         elif self.ui.stim == "Step":
@@ -435,46 +438,40 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str = r'System Response to Cosine Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Cosine Signal'
 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str = r'System Response to Sinusoidal Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Sinusoidal Signal '
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Bandlimited Triangular Signal'
+                self.title_str += r'to Bandlim. Triangular Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1, width=0.5)
-                self.title_str = r'System Response to Triangular Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Triangular Signal'
 
         elif self.ui.stim == "Saw":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Bandlimited Sawtooth Signal'
+                self.title_str += r'to Bandlim. Sawtooth Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Sawtooth Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Sawtooth Signal'
 
         elif self.ui.stim == "Rect":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str = r'System Response to Bandlimited Rect. Signal'
+                self.title_str += r'to Bandlimited Rect. Signal'
             else:
                 self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str = r'System Response to Rect. Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Rect. Signal'
 
         elif self.ui.stim == "Comb":
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str = r'System Response to Bandlimited Comb Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Bandlim. Comb Signal'
 
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
