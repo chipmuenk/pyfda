@@ -1139,4 +1139,3 @@ def main():
 if __name__ == "__main__":
     main()
     # module test using python -m pyfda.plot_widgets.plot_impz
-    
