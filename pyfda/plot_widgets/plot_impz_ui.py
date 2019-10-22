@@ -151,7 +151,8 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
         
-        self.lbl_plt_time_resp = QLabel("<b>View:</b> Response", self)
+        lbl_plt_time_title = QLabel("<b>View:</b>", self)
+        lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
@@ -191,7 +192,9 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_limits.setChecked(False)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
+        layH_ctrl_time.addWidget(lbl_plt_time_title)
+        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)      
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
@@ -220,6 +223,13 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
+        lbl_plt_freq_title = QLabel("<b>View:</b>", self)
+        lbl_plt_freq_resp = QLabel("Response", self)
+        self.cmb_plt_freq_resp = QComboBox(self)
+        self.cmb_plt_freq_resp.addItems(plot_styles_list)       
+        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
+        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
+        
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)       
@@ -231,12 +241,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_stmq.addItems(plot_styles_list)       
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
-        
-        self.lbl_plt_freq_resp = QLabel("<b>View:</b> Response", self)
-        self.cmb_plt_freq_resp = QComboBox(self)
-        self.cmb_plt_freq_resp.addItems(plot_styles_list)       
-        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
-        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
+
 
         self.chk_log_freq = QCheckBox("dB", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
@@ -266,8 +271,9 @@ class PlotImpz_UI(QWidget):
         self.chk_win_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
-
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
+        layH_ctrl_freq.addWidget(lbl_plt_freq_title)
+        layH_ctrl_freq.addStretch(1)        
+        layH_ctrl_freq.addWidget(lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)      
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
