@@ -3,7 +3,7 @@ Plot 3D
 
 :numref:`fig_plot_3d` shows a typical view of the **3D** tab for 3D visualizations
 of the magnitude frequency response and poles / zeros. :numref:`fig_plot_3d` is a
-surface plot which takes the longest time to compute.
+surface plot which looks nice but takes the longest time to compute.
 
 .. _fig_plot_3d:
 
@@ -14,8 +14,8 @@ surface plot which takes the longest time to compute.
 
    Screenshot of the 3D tab (surface plot)
 
-You can plot 3D visualizations of :math:`\abs{H(z)}` as well as :math:`\abs{H(e^{j\omega})}`
-along the unit circle (UC) magnitude.
+You can plot 3D visualizations of :math:`|H(z)|` as well as :math:`|H(e^{j\omega})|`
+along the unit circle (UC).
 
 For faster visualizations, start with a mesh plot (:numref:`fig_plot_3d_mesh`)
 or a contour plot
