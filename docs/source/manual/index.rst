@@ -36,6 +36,7 @@ The invidual windows can be resized using the handles (red dots).
    :caption: Plotting Widgets
 
    plot_hf
+   plot_phi
 
 .. _man_customization:
 
