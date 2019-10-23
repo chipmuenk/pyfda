@@ -19,8 +19,8 @@ In this tab, a fixpoint implementation can be selected in the upper left corner
 are available only for a few filter design algorithms at the moment, most notably
 IIR filters are missing). 
 
-The fixpoint format of input word $Q_X$ and output word
-::math`Q_Y` can be adjusted for all fixpoint filters, pressing the "lock" button
+The fixpoint format of input word :math:`Q_X` and output word
+:math:`Q_Y` can be adjusted for all fixpoint filters, pressing the "lock" button
 makes the format of input and output word identical. Depending on the fixpoint
 filter, other formats (coefficients, accumulator) can be set as well.
 
@@ -37,7 +37,7 @@ limit cycles in recursive filters.
 
 .. figure:: ../img/manual/pyfda_input_fixpoint.png
    :alt: Fixpoint parameter entry widget
-   :width: 50%
+   :width: 40%
    :align: center
    
    Fixpoint parameter entry widget
