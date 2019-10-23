@@ -659,14 +659,15 @@ class Plot_Impz(QWidget):
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
         log = self.ui.chk_log_time.isChecked()
-        self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
-        self.ui.lbl_dB_time.setVisible(log)
+
         if log:
             self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
                                          self.ui.bottom_t, return_type='float', sign='neg')
             self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
+            self.ui.chk_log_time.setText("dB : min.")
         else:
+            self.ui.chk_log_time.setText("dB")
             self.ui.bottom_t = 0
 
         self.draw()

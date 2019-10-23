@@ -175,11 +175,9 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom_time = QLabel("Min.", self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB_time = QLabel("dB", self)
 
         self.chk_win_time = QCheckBox("FFT Window", self)
         self.chk_win_time.setObjectName("chk_win_time")
@@ -204,10 +202,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_plt_time_stmq)
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_log_time)
-        layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
-        layH_ctrl_time.addWidget(self.lbl_dB_time)
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.chk_win_time)
         layH_ctrl_time.addStretch(2)
