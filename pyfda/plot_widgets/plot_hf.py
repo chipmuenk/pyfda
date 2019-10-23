@@ -102,9 +102,9 @@ class Plot_Hf(QWidget):
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkLinphase = QCheckBox("Zero phase", self)
-        self.chkLinphase.setToolTip("<span>Subtract linear phase according to filter order.\n"
-           "Attention: this makes no sense for a non-linear phase system!</span>")
+        self.chkZerophase = QCheckBox("Zero phase", self)
+        self.chkZerophase.setToolTip("<span>Remove linear phase calculated from filter order.\n"
+           "Attention: This makes no sense for a non-linear phase system!</span>")
 
         self.lblInset = QLabel("Inset", self)
         self.cmbInset = QComboBox(self)
@@ -132,7 +132,7 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.lblIn)
         layHControls.addWidget(self.cmbUnitsA)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chkLinphase)
+        layHControls.addWidget(self.chkZerophase)
         layHControls.addStretch(1)
         layHControls.addWidget(self.lblInset)
         layHControls.addWidget(self.cmbInset)
@@ -170,7 +170,7 @@ class Plot_Hf(QWidget):
         self.cmbUnitsA.currentIndexChanged.connect(self.draw)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
-        self.chkLinphase.clicked.connect(self.draw)
+        self.chkZerophase.clicked.connect(self.draw)
         self.cmbInset.currentIndexChanged.connect(self.draw_inset)
 
         self.chkSpecs.clicked.connect(self.draw)
@@ -387,7 +387,7 @@ class Plot_Hf(QWidget):
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
-                if self.specs:
+                if self.chkSpecs.isChecked():
                     self.plot_spec_limits(self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
@@ -522,12 +522,12 @@ class Plot_Hf(QWidget):
         else:
             self.unitA = self.cmbUnitsA.currentText()
 
-        # Linphase settings only makes sense for amplitude plot
-        self.chkLinphase.setCheckable(self.unitA == 'V')
-        self.chkLinphase.setEnabled(self.unitA == 'V')
+        # Linphase settings only makes sense for amplitude plot and 
+        # for plottin real/imag. part of H, not its magnitude
+        self.chkZerophase.setCheckable(self.unitA == 'V')
+        self.chkZerophase.setEnabled(self.unitA == 'V')
 
         self.specs = self.chkSpecs.isChecked()
-        self.linphase = self.chkLinphase.isChecked()
 
         self.f_S  = fb.fil[0]['f_S']
         self.F_PB = fb.fil[0]['F_PB'] * self.f_S
@@ -557,7 +557,7 @@ class Plot_Hf(QWidget):
             self.H_c = self.H_cmplx
             
         # now calculate mag / real / imaginary part of H_c:
-        if self.linphase: # remove the linear phase
+        if self.chkZerophase.isChecked(): # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
 
         if self.cmbShowH.currentIndex() == 0: # show magnitude of H
@@ -579,8 +579,12 @@ class Plot_Hf(QWidget):
                 self.H_plt = 20*np.log10(abs(H))
                 H_str += ' in dB ' + r'$\rightarrow$'
             elif self.unitA == 'V': #  'lin'
-                A_lim = [0, (1.05 + A_max)]
                 self.H_plt = H
+                if self.cmbShowH.currentIndex() != 0: # H can be less than zero
+                    A_min = np.min(self.H_plt)
+                else:
+                    A_min = 0
+                A_lim = [A_min, (1.05 + A_max)]
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
             else: # unit is W
@@ -596,7 +600,7 @@ class Plot_Hf(QWidget):
             #-----------------------------------------------------------
             
             #============= Set Limits and draw specs =========================
-            if self.specs: 
+            if self.chkSpecs.isChecked(): 
                 self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
