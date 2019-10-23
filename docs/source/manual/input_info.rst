@@ -9,7 +9,7 @@ information on the current filter design and design algorithm is displayed.
 .. figure:: ../img/manual/pyfda_input_info.png
    :alt: Screenshot of the info tab
    :align: center
-   :width: 50%
+   :width: 40%
 
    Screenshot of the info tab
 
