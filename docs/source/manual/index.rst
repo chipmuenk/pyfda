@@ -18,8 +18,7 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
         or completely closed. The content of the logger window can be selected, copied
         or cleared with a right mouse button context menu.
 
-The two parts can be resized using the handles (red dots).
-
+The invidual windows can be resized using the handles (red dots).
 
 .. toctree::
    :maxdepth: 1

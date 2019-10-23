@@ -24,6 +24,15 @@ The fixpoint format of input word $Q_X$ and output word
 makes the format of input and output word identical. Depending on the fixpoint
 filter, other formats (coefficients, accumulator) can be set as well.
 
+In general, **Ovfl.** combo boxes determine overflow behaviour (Two's complement
+wrap around or saturation), **Quant.** combo boxes select quantization behaviour
+between rounding, truncation ("floor") or round-towards-zero ("fix"). These methods
+may not all be implemented for each fixpoint filter. Truncation is easiest to
+implement but has an average bias of -1/2 LSB, in contrast, rounding has no bias
+but requires an additional adder. Only rounding-towards-zero guarantees that the
+magnitude of the rounded number is not larger than the input, thus preventing
+limit cycles in recursive filters.
+
 .. _fig_input_fixpoint:
 
 .. figure:: ../img/pyfda_input_fixpoint.png
