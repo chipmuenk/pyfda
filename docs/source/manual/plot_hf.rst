@@ -9,7 +9,7 @@ magnitude frequency response.
 .. figure:: ../img/manual/pyfda_plot_hf.png
    :alt: Screenshot of the plot hf tab
    :align: center
-   :width: 50%
+   :width: 70%
 
    Screenshot of the plot H(f) tab
 
