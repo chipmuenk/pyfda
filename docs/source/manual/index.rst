@@ -23,6 +23,7 @@ The two parts can be resized using the handles (red dots).
 
    input_specs
    input_coeffs
+   input_pz
    fixpoint_specs
 
 .. _man_customization:
