@@ -1,7 +1,7 @@
-Plot :math:`tau_g(f)`
+Plot tau_g(f)
 =======================
 
-:numref:`fig_plot_tau_g` shows a typical view of the **:math:`\tau_g(f)`** tab for plotting the
+:numref:`fig_plot_tau_g` shows a typical view of the :math:`\bm{\tau_g(f)}` tab for plotting the
 group delay, here, an elliptical filter (IIR) is shown.
 
 .. _fig_plot_tau_g:

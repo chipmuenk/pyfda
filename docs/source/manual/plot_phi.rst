@@ -1,7 +1,7 @@
 Plot Phi(f)
 ============
 
-:numref:`fig_plot_phi` shows a typical view of the **:math:`\phi(f)`** tab for plotting the
+:numref:`fig_plot_phi` shows a typical view of the :math:`\pmb{\varphi(f)}` tab for plotting the
 phase response of an elliptical filter (IIR).
 
 .. _fig_plot_phi:
@@ -11,7 +11,7 @@ phase response of an elliptical filter (IIR).
    :align: center
    :width: 70%
 
-   Screenshot of the plot :math:`\phi(f)` tab
+   Screenshot of the plot :math:`\varphi(f)` tab
 
 You can select the unit for the phase and whether the phase shall be wrapped 
 between :math:`-\pi \ldots \pi` or not.

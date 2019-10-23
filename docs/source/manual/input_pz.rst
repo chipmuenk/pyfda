@@ -20,7 +20,7 @@ Cartesian format
 
    Screenshot of the pole/zero tab in cartesian format
 
-Poles and zeros are displayed in cartesian format ($x$ and $y$) by default as shown
+Poles and zeros are displayed in cartesian format (:math:`x` and `y`) by default as shown
 in :numref:`fig_input_pz_cartesian`.
 
 Polar format
