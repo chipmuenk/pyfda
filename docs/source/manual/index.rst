@@ -39,6 +39,7 @@ The invidual windows can be resized using the handles (red dots).
    plot_phi
    plot_tau_g
    plot_pz
+   plot_impz
 
 .. _man_customization:
 
