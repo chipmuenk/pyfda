@@ -175,7 +175,7 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom_time = QLabel("Min. = ", self)
+        self.lbl_log_bottom_time = QLabel("Min.", self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
@@ -242,17 +242,14 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
 
-
-        self.chk_log_freq = QCheckBox("dB", self)
+        self.chk_log_freq = QCheckBox("dB : Min.", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setChecked(True)
 
-        self.lbl_log_bottom_freq = QLabel("Min. = ", self)
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB_freq = QLabel("dB", self)
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
@@ -283,9 +280,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stmq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.chk_log_freq)
-        layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
-        layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)

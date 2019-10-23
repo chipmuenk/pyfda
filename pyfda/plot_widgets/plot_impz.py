@@ -677,16 +677,16 @@ class Plot_Impz(QWidget):
         """
 
         log = self.ui.chk_log_freq.isChecked()
-        self.ui.lbl_log_bottom_freq.setVisible(log)
         self.ui.led_log_bottom_freq.setVisible(log)
-        self.ui.lbl_dB_freq.setVisible(log)
         if log:
             self.ui.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(),
                                          self.ui.bottom_f, return_type='float',
                                          sign='neg')
             self.ui.led_log_bottom_freq.setText(str(self.ui.bottom_f))
+            self.ui.chk_log_freq.setText("dB : min.")
         else:
             self.ui.bottom_f = 0
+            self.ui.chk_log_freq.setText("dB")
 
         self.draw()
 
