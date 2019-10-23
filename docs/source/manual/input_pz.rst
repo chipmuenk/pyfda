@@ -1,7 +1,7 @@
 Input P/Z
 ==========
 
-:numref:`fig_input_coeffs_float` shows a typical view of the **P/Z** tab where 
+:numref:`fig_input_pz_cartesian` shows a typical view of the **P/Z** tab where 
 you can view and edit the filter poles and zeros. Pole / zero values are updated 
 every time you design a new filter or update the coefficients.
 
