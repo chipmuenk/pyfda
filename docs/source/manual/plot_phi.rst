@@ -7,13 +7,13 @@ phase response of an elliptical filter (IIR).
 .. _fig_plot_phi:
 
 .. figure:: ../img/manual/pyfda_plot_phi.png
-   :alt: Screenshot of the plot phi tab
+   :alt: Screenshot of the phi tab
    :align: center
    :width: 70%
 
-   Screenshot of the plot :math:`\varphi(f)` tab
+   Screenshot of the :math:`\varphi(f)` tab
 
-You can select the unit for the phase and whether the phase shall be wrapped 
+You can select the unit for the phase and whether the phase will be wrapped 
 between :math:`-\pi \ldots \pi` or not.
 
    
