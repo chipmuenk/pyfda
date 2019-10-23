@@ -9,7 +9,7 @@ filter designs can be saved and loaded.
 .. figure:: ../img/manual/pyfda_input_files.png
    :alt: Screenshot of the files tab
    :align: center
-   :width: 50%
+   :width: 40%
 
    Screenshot of the files tab
 
