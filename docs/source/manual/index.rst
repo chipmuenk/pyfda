@@ -14,6 +14,10 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 *	**Plotting widgets** can be selected on the right hand side of the application.
 
+*   **Logger window** is in the lower part of the plotting window, it can be resized
+        or completely closed. The content of the logger window can be selected, copied
+        or cleared with a right mouse button context menu.
+
 The two parts can be resized using the handles (red dots).
 
 
@@ -26,7 +30,7 @@ The two parts can be resized using the handles (red dots).
    input_pz
    input_info
    input_files
-   fixpoint_specs
+   input_fixpoint_specs
 
 .. _man_customization:
 

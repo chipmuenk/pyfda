@@ -4,17 +4,39 @@ Fixpoint Specs
 Overview
 --------
 
-This tab provides options for generating and simulating discrete-time filters that 
+The **Fixpoint** tab (:numref:`fig_input_fixpoint`) provides options for 
+generating and simulating discrete-time filters that 
 can be implemented in hardware. Hardware implementations for discrete-time filters 
-usually imply fixpoint arithmetics but this could change over time as floating point
+usually imply fixpoint arithmetics but this could change in the future as floating point
 arithmetics can be implemented on FPGAs using dedicated floating point units (FPUs).
 
 Order and the coefficients have been
 calculated by a filter design algorithm from the `pyfda.filter_designs` package to meet
 target filter specifications (usually in the frequency domain).
 
-Word length and saturation / quantization behaviour can be selected in the widget and
-simulated:
+In this tab, a fixpoint implementation can be selected in the upper left corner
+(fixpoint filter implementations
+are available only for a few filter design algorithms at the moment, most notably
+IIR filters are missing). 
+
+The fixpoint format of input word $Q_X$ and output word
+::math`Q_Y` can be adjusted for all fixpoint filters, pressing the "lock" button
+makes the format of input and output word identical. Depending on the fixpoint
+filter, other formats (coefficients, accumulator) can be set as well.
+
+.. _fig_input_fixpoint:
+
+.. figure:: ../img/pyfda_input_fixpoint.png
+   :alt: Fixpoint parameter entry widget
+   :width: 50%
+   :align: center
+   
+   Fixpoint parameter entry widget
+
+Typical simulation results are shown in :numref:`fig_pyfda_screenshot_hn_fix_t`
+(time domain) and :numref:`fig_pyfda_screenshot_hn_fix_f` (frequency domain).
+
+.. _fig_pyfda_screenshot_hn_fix_t:
 
 .. figure:: ../img/pyfda_screenshot_hn_fix_t.png
    :alt: Screenshot of fixpoint simulation results (time domain)
@@ -27,8 +49,10 @@ Fixpoint filters are inherently non-linear due to quantization and saturation ef
 that's why frequency characteristics can only be derived by running a transient
 simulation and calculating the Fourier response afterwards:
    
+.. _fig_pyfda_screenshot_hn_fix_t:
+
 .. figure:: ../img/pyfda_screenshot_hn_fix_f.png
-   :alt: Screenshot of fixpoint simulation results (time domain)
+   :alt: Screenshot of fixpoint simulation results (frequency domain)
    :width: 100%
    :align: center
 
