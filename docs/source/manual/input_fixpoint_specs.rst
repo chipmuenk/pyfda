@@ -35,7 +35,7 @@ limit cycles in recursive filters.
 
 .. _fig_input_fixpoint:
 
-.. figure:: ../img/pyfda_input_fixpoint.png
+.. figure:: ../img/manual/pyfda_input_fixpoint.png
    :alt: Fixpoint parameter entry widget
    :width: 50%
    :align: center
@@ -58,7 +58,7 @@ Fixpoint filters are inherently non-linear due to quantization and saturation ef
 that's why frequency characteristics can only be derived by running a transient
 simulation and calculating the Fourier response afterwards:
    
-.. _fig_pyfda_screenshot_hn_fix_t:
+.. _fig_pyfda_screenshot_hn_fix_f:
 
 .. figure:: ../img/pyfda_screenshot_hn_fix_f.png
    :alt: Screenshot of fixpoint simulation results (frequency domain)
