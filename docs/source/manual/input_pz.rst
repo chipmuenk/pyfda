@@ -14,13 +14,13 @@ Cartesian format
 .. _fig_input_pz_cartesian:
 
 .. figure:: ../img/manual/pyfda_input_pz_cartesian.png
-   :alt: Screenshot of the pole/zero tab for cartesian format
+   :alt: Screenshot of the pole/zero tab in cartesian format
    :align: center
    :width: 50%
 
-   Screenshot of the pole/zero tab for cartesian format
+   Screenshot of the pole/zero tab in cartesian format
 
-Poles and zeros are displayed in cartesian format (x and y) by default as shown
+Poles and zeros are displayed in cartesian format ($x$ and $y$) by default as shown
 in :numref:`fig_input_pz_cartesian`.
 
 Polar format
@@ -29,11 +29,11 @@ Polar format
 .. _fig_input_pz_polar:
 
 .. figure:: ../img/manual/pyfda_input_pz_polar.png
-   :alt: Screenshot of the pole/zero tab for polar format
+   :alt: Screenshot of the pole/zero tab in polar format
    :align: center
    :width: 50%
 
-   Screenshot of the pole/zero tab for polar format
+   Screenshot of the pole/zero tab in polar format
    
 Alternatively, poles and zeros can be displayed and edited in polar format
 (radius and angle) as shown in :numref:`fig_input_pz_polar`. Especially for zeros

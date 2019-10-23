@@ -13,16 +13,16 @@ filter designs can be saved and loaded.
 
    Screenshot of the files tab
 
-Additionally, you can view paths etc. in the **About** popup window:
+Additionally, you can view the python version, paths etc. in the **About** popup window:
 
 .. _fig_input_files_about:
 
 .. figure:: ../img/manual/pyfda_input_files_about.png
-   :alt: Screenshot of the about popup
+   :alt: Screenshot of the about pyfda popup window
    :align: center
-   :width: 50%
+   :width: 60%
 
-   Screenshot of the "About" popup window
+   Screenshot of the "About pyfda" popup window
    
 Development
 -----------
