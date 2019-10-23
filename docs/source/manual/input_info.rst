@@ -6,7 +6,7 @@ information on the current filter design and design algorithm is displayed.
 
 .. _fig_input_info:
 
-.. figure:: ../img/manual/pyfda_input_coeffs_float.png
+.. figure:: ../img/manual/pyfda_input_info.png
    :alt: Screenshot of the info tab
    :align: center
    :width: 50%
@@ -20,7 +20,8 @@ checkbox activates the display of specifications in the frequency domain and
 how well they are met. Failed specifications are highlighted in red.
 
 The **Doc$** checkbox selects whether docstring info from the corresponding python
-module is displayed. The **RTF** checkbox selects Rich Text Format for the  
+module is displayed. The **RTF** checkbox selects Rich Text Format for the
+documentation.
 
 The **FiltDict** and **FiltTree** checkboxes are for debugging purposes only.
 
