@@ -30,6 +30,12 @@ The invidual windows can be resized using the handles (red dots).
    input_info
    input_files
    input_fixpoint_specs
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Plotting Widgets
+
+   plot_hf
 
 .. _man_customization:
 
