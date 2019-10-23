@@ -13,7 +13,7 @@ group delay, here, an elliptical filter (IIR) is shown.
 
    Screenshot of the plot :math:`\tau_g(f)` tab
 
-There are not 
+There are no user servicable parts on this tab. 
 
    
 Development
