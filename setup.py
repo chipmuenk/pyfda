@@ -70,6 +70,7 @@ setup(
         'numpy',
         'scipy',
         'matplotlib',
+        'pyqt5',
         'docutils',
         'migen'
         ],
