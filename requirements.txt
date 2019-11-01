@@ -1,5 +1,8 @@
-# Requirements for Travis
-#------------------------
+# Requirements for Travis and ReadTheDocs.org
+#-----------------------------------------------
+# This file is specified in the project settings 
+# at ReadTheDocs.org and in .travis.yml
+#-----------------------------------------------
 numpy
 scipy
 matplotlib
