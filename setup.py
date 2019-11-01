@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 # To use a consistent encoding
-from codecs import open
+#from codecs import open not needed for py3?
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
-with open(path.join(here, 'README_PYPI.rst'), encoding='utf-8') as f:
+# see e.g. https://github.com/alttch/finac/blob/master/setup.py
+with open('README_PYPI.md', encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("pyfda/version.py") as fp:
+with open("pyfda/version.py", encoding='utf-8') as fp:
     exec(fp.read(), version_nr)
 
 setup(
     name = 'pyfda',
     version = version_nr['__version__'],
     description = 'pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
-    #long_description_content_type='text/markdown',
+    long_description_content_type='text/markdown',
+    #long_description_content_type='text/x-rst',
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
@@ -70,6 +72,7 @@ setup(
         'numpy',
         'scipy',
         'matplotlib',
+        'pyqt5',
         'docutils',
         'migen'
         ],
