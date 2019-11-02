@@ -71,7 +71,7 @@ or
 However, installing pyfda makes life easier by creating a run script in your path. This can be done in different ways:
 
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create my_new_environment`). 
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
 
 `PyQt5` is a requirement for pyfda but cannot easily / safely be installed via conda (if you know how to, please tell me). 
 It has to be installed manually *either* system wide via `pip install`**`pyqt5`** or sytem resp. environment wide via `conda install` **`pyqt`** . If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
