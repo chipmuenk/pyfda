@@ -12,8 +12,23 @@ with open('README_PYPI.md', encoding='utf-8') as f:
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("pyfda/version.py", encoding='utf-8') as fp:
-    exec(fp.read(), version_nr)
+with open("pyfda/version.py", encoding='utf-8') as f_v:
+    exec(f_v.read(), version_nr)
+
+requirements_list =  []    
+with open("requirements.txt", encoding='utf-8') as f_r:
+    exec(f_r.read(), requirements_list)
+
+try:
+    import PyQt5
+    requirements_list.remove('pyqt5')
+    print("PyQt5 {0} is already installed, skipping.\n{1}".format(PyQt5.QtCore.QT_VERSION_STR, requirements_list))
+    # try to prevent installing library twice under conda where lib is listed
+    # as "pyqt" for backward compatibility with PyQt4
+except ImportError:
+    print("PyQt5 will be installed.\n{1}".format(requirements_list))
+
+
 
 setup(
     name = 'pyfda',
@@ -28,6 +43,7 @@ setup(
     author_email = 'mail07@chipmuenk.de',
     license = 'MIT',
     platforms = ['any'],
+    install_requires = requirements_list,
 
      # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
