@@ -584,7 +584,8 @@ def import_data(parent, fkey, title="Import"):
     parent: handle to calling instance
 
     fkey: string
-        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file with 
+        multiple entries.
 
     title: str
         title string for the file dialog box (e.g. "filter coefficients ")
@@ -622,6 +623,7 @@ def import_data(parent, fkey, title="Import"):
         if file_type == '.csv':
             with io.open(file_name, 'r') as f:
                 data_arr = csv2array(f)
+                # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
         else:
             with io.open(file_name, 'rb') as f:
                 if file_type == '.mat':
