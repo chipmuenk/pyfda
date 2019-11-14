@@ -18,10 +18,13 @@ logger = logging.getLogger(__name__)
 import pyfda.pyfda_dirs as dirs # initial import constructs file paths
 
 import matplotlib
-matplotlib.use("Qt5Agg")
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
+matplotlib.use("Qt5Agg")
+# turn off matplotlib debug messages by elevating the level to "Warning"
+mpl_logger = logging.getLogger('matplotlib')
+mpl_logger.setLevel(logging.WARNING)
 
 from .compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
                      QMessageBox, QPlainTextEdit, QAction, QMenu, pyqtSignal)
