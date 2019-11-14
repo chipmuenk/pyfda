@@ -72,7 +72,8 @@ class Firwin(QWidget):
         
         self.rt_dict_add = {
             'COM':{'min':{'msg':('a',
-                                  r"<br /><b>Note:</b> This is only a rough approximation!")},
+                                  r"<br /><b>Note:</b> Filter order is only a rough approximation "
+                                  "and most likely far too low!")},
                    'man':{'msg':('a',
                                  r"Enter desired filter order <b><i>N</i></b> and " 
                                   "<b>-6 dB</b> pass band corner "

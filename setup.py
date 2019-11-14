@@ -12,8 +12,28 @@ with open('README_PYPI.md', encoding='utf-8') as f:
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("pyfda/version.py", encoding='utf-8') as fp:
-    exec(fp.read(), version_nr)
+with open("pyfda/version.py", encoding='utf-8') as f_v:
+    exec(f_v.read(), version_nr)
+
+# --- read requirements.txt, remove comments and unneeded modules   
+with open("requirements.txt", encoding='utf-8') as f_r:
+    requirements_list = f_r.read().strip().split("\n")
+
+for p in requirements_list[:]:
+    if p.startswith('#'):
+        requirements_list.remove(p)
+if 'nose' in requirements_list:
+    requirements_list.remove('nose')
+try:
+    from PyQt5.QtCore import QT_VERSION_STR
+    requirements_list.remove('pyqt5')
+    print("PyQt5 {0} is already installed, skipping it.".format(QT_VERSION_STR))
+    # try to prevent installing library twice under conda where lib is listed
+    # as "pyqt" for backward compatibility with PyQt4
+except ImportError:
+    pass
+
+print("Installing packages\n{0}\n".format(requirements_list))
 
 setup(
     name = 'pyfda',
@@ -28,6 +48,7 @@ setup(
     author_email = 'mail07@chipmuenk.de',
     license = 'MIT',
     platforms = ['any'],
+    install_requires = requirements_list,
 
      # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -68,14 +89,14 @@ setup(
     # include files that get installed OUTSIDE the package
     ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
     # Required modules
-    install_requires = [
-        'numpy',
-        'scipy',
-        'matplotlib',
-        'pyqt5',
-        'docutils',
-        'migen'
-        ],
+#    install_requires = [
+#        'numpy',
+#        'scipy',
+#        'matplotlib',
+#        'pyqt5',
+#        'docutils',
+#        'migen'
+#        ],
 
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
