@@ -174,6 +174,8 @@ class MplWidget(QWidget):
         """
         Get the full extent of axes system `ax`, including axes labels, tick labels
         and titles.
+        
+        Needed for inset plot in H(f)
         """
         #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
         # For text objects, we need to draw the figure first, otherwise the extents
@@ -413,7 +415,7 @@ class MplToolbar(NavigationToolbar):
                 ax.grid(False)
             else:
                 ax.grid(self.a_gr.isChecked())#(self.grid)
-        self.parent.pltCanv.draw() # don't use self.redraw()
+        self.parent.pltCanv.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
