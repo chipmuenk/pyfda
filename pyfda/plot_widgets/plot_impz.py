@@ -305,7 +305,7 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            logger.info("Calc impz started!")
+            logger.debug("Calc impz started!")
             self.calc_stimulus()
             if self.fx_sim:
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
@@ -319,7 +319,7 @@ class Plot_Impz(QWidget):
             self.needs_redraw = [True] * 2
 
         if self.needs_redraw[self.tabWidget.currentIndex()]:
-            logger.info("Redraw impz started!")
+            logger.debug("Redraw impz started!")
             self.draw()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
 
@@ -383,7 +383,7 @@ class Plot_Impz(QWidget):
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-                logger.info("fx stimulus sent")
+                logger.debug("fx stimulus sent")
                 return
             elif phase == 'set_results':
                 self.y = np.asarray(dict_sig['fx_results'])
@@ -771,7 +771,7 @@ class Plot_Impz(QWidget):
             if self.ui.chk_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
-            logger.info("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
+            logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
 

@@ -382,8 +382,8 @@ class Input_Fixpoint_Specs(QWidget):
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(class_name,e))
                     continue
-                except Exception as e:
-                    logger.warning(e)
+                except KeyError as e:
+                    logger.warning("No fixpoint filter for filter type {0} available.".format(e))
                     continue
 
            # restore last fxp widget if possible
@@ -698,7 +698,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            logger.info('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'
+            logger.debug('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'
                         '\n\tStimuli: Shape {2} of type "{3}"'
                         .format( 
                             dict_sig['sender'],
@@ -713,7 +713,7 @@ class Input_Fixpoint_Specs(QWidget):
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
-                logger.info("fx_results: {0}"\
+                logger.debug("fx_results: {0}"\
                             .format(pprint_log(self.fx_results, tab= " ")))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
