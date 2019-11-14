@@ -4,10 +4,9 @@ pyFDA
 
 [![PyPI version](https://badge.fury.io/py/pyfda.svg)](https://badge.fury.io/py/pyfda)
 [![Downloads/mo.](https://pepy.tech/badge/pyfda/month)](https://pepy.tech/project/pyfda)
-[![Anaconda-Server Badge](https://anaconda.org/chipmuenk/pyfda/badges/version.svg)](https://anaconda.org/chipmuenk/pyfda)
+[![Conda pyfda version](https://img.shields.io/conda/v/chipmuenk/pyfda.svg)](https://anaconda.org/chipmuenk/pyfda)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Google Group](https://img.shields.io/badge/Google%20Group-pyFDA-red.svg)](https://groups.google.com/forum/#!forum/pyfda)
 [![Travis-CI](https://travis-ci.org/chipmuenk/pyFDA.svg?branch=master)](https://travis-ci.org/chipmuenk/pyFDA)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 
@@ -72,7 +71,17 @@ or
 However, installing pyfda makes life easier by creating a run script in your path. This can be done in different ways:
 
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
+
+`PyQt5` is a requirement for pyfda but cannot easily / safely be installed via conda (if you know how to, please tell me). 
+It has to be installed manually *either* system wide via `pip install`**`pyqt5`** or sytem resp. environment wide via `conda install` **`pyqt`** . If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
+
+    > conda list qt
+
+    pyqt                      5.6.0                    py36_2
+    PyQt5                     5.8.2                     <pip>
+    
+and get a similar result as above, you probably have a corrupted system. When you have one of the two installed, you can proceed with
 
     > conda install -c Chipmuenk pyfda
 
@@ -81,7 +90,7 @@ resp.
     > conda update  -c Chipmuenk pyfda
 
 ### pip
-Otherwise, you can install from PyPI using
+Otherwise, you can install from PyPI (attention: pip **does** install PyQt5 when it is not present) using
 
     > pip install pyfda
 
@@ -93,14 +102,14 @@ or install locally (development mode) using
 
     > pip install -e <YOUR_PATH_TO_PYFDA>
 	
-where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git (see below).
+where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably obtained using git (see below).
 
 To select a specific version (by default, pip selects the latest stable version) use e.g.
 
     > pip install pyfda==0.2b3
 
 ### setup.py   
-You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
+You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
 
     > python setup.py install
 

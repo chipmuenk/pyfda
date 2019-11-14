@@ -66,7 +66,6 @@ input_files
 
 .. automodule:: pyfda.input_widgets.input_files
 	:members:
-	
 
 
 input_fixpoint_specs

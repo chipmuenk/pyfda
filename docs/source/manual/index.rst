@@ -14,8 +14,11 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 *	**Plotting widgets** can be selected on the right hand side of the application.
 
-The two parts can be resized using the handles (red dots).
+*   **Logger window** is in the lower part of the plotting window, it can be resized
+        or completely closed. The content of the logger window can be selected, copied
+        or cleared with a right mouse button context menu.
 
+The invidual windows can be resized using the handles (red dots).
 
 .. toctree::
    :maxdepth: 1
@@ -23,7 +26,21 @@ The two parts can be resized using the handles (red dots).
 
    input_specs
    input_coeffs
-   fixpoint_specs
+   input_pz
+   input_info
+   input_files
+   input_fixpoint_specs
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Plotting Widgets
+
+   plot_hf
+   plot_phi
+   plot_tau_g
+   plot_pz
+   plot_impz
+   plot_3d
 
 .. _man_customization:
 

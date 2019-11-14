@@ -330,7 +330,7 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            logger.info("Calc impz started!")
+            logger.debug("Calc impz started!")
             self.calc_stimulus()
             if self.fx_sim:
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
@@ -344,7 +344,7 @@ class Plot_Impz(QWidget):
             self.needs_redraw = [True] * 2
 
         if self.needs_redraw[self.tabWidget.currentIndex()]:
-            logger.info("Redraw impz started!")
+            logger.debug("Redraw impz started!")
             self.draw()
             self.needs_redraw[self.tabWidget.currentIndex()] = False
 
@@ -408,7 +408,7 @@ class Plot_Impz(QWidget):
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-                logger.info("fx stimulus sent")
+                logger.debug("fx stimulus sent")
                 return
             elif phase == 'set_results':
                 self.y = np.asarray(dict_sig['fx_results'])
@@ -436,6 +436,9 @@ class Plot_Impz(QWidget):
         phi2 = self.ui.phi2 / 180 * pi
 
         # calculate stimuli x[n] ==============================================
+        self.H_str = r'$y[n]$'
+        self.title_str = r'System Response '
+
         if self.ui.stim == "Pulse":
             self.x = np.zeros(self.ui.N_end)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
@@ -444,7 +447,7 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "None":
             self.x = np.zeros(self.ui.N_end)
-            self.title_str = r'System Response to Zero Input'
+            self.title_str = r'Zero Input System Response'
             self.H_str = r'$h_0[n]$' # default
 
         elif self.ui.stim == "Step":
@@ -460,46 +463,40 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str = r'System Response to Cosine Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Cosine Signal'
 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str = r'System Response to Sinusoidal Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Sinusoidal Signal '
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Bandlimited Triangular Signal'
+                self.title_str += r'to Bandlim. Triangular Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1, width=0.5)
-                self.title_str = r'System Response to Triangular Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Triangular Signal'
 
         elif self.ui.stim == "Saw":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Bandlimited Sawtooth Signal'
+                self.title_str += r'to Bandlim. Sawtooth Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str = r'System Response to Sawtooth Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Sawtooth Signal'
 
         elif self.ui.stim == "Rect":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str = r'System Response to Bandlimited Rect. Signal'
+                self.title_str += r'to Bandlimited Rect. Signal'
             else:
                 self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str = r'System Response to Rect. Signal'
-            self.H_str = r'$y[n]$'
+                self.title_str += r'to Rect. Signal'
 
         elif self.ui.stim == "Comb":
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str = r'System Response to Bandlimited Comb Signal'
-            self.H_str = r'$y[n]$'
+            self.title_str += r'to Bandlim. Comb Signal'
 
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
@@ -688,14 +685,15 @@ class Plot_Impz(QWidget):
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
         log = self.ui.chk_log_time.isChecked()
-        self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
-        self.ui.lbl_dB_time.setVisible(log)
+
         if log:
             self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
                                          self.ui.bottom_t, return_type='float', sign='neg')
             self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
+            self.ui.chk_log_time.setText("dB : min.")
         else:
+            self.ui.chk_log_time.setText("dB")
             self.ui.bottom_t = 0
 
         self.draw()
@@ -706,16 +704,16 @@ class Plot_Impz(QWidget):
         """
 
         log = self.ui.chk_log_freq.isChecked()
-        self.ui.lbl_log_bottom_freq.setVisible(log)
         self.ui.led_log_bottom_freq.setVisible(log)
-        self.ui.lbl_dB_freq.setVisible(log)
         if log:
             self.ui.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(),
                                          self.ui.bottom_f, return_type='float',
                                          sign='neg')
             self.ui.led_log_bottom_freq.setText(str(self.ui.bottom_f))
+            self.ui.chk_log_freq.setText("dB : min.")
         else:
             self.ui.bottom_f = 0
+            self.ui.chk_log_freq.setText("dB")
 
         self.draw()
 
@@ -799,7 +797,7 @@ class Plot_Impz(QWidget):
             if self.ui.chk_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
-            logger.info("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
+            logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
 
@@ -1168,4 +1166,3 @@ def main():
 if __name__ == "__main__":
     main()
     # module test using python -m pyfda.plot_widgets.plot_impz
-    

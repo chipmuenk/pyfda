@@ -26,10 +26,10 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: from connector widget plot_tab_widgets to self.process_sig_rx() 
+    # incoming: from connector widget plot_tab_widgets to self.process_sig_rx()
     sig_rx = pyqtSignal(object)
     # outgoing: from process_sig_rx() to PlotImpz
-    sig_tx = pyqtSignal(object) 
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         """
@@ -48,7 +48,7 @@ class PlotImpz_UI(QWidget):
         self.N_start = 0
         self.N_user = 0
         self.N = 0
-        
+
         self.bottom_t = -80
         self.f1 = 0.02
         self.f2 = 0.03
@@ -65,11 +65,11 @@ class PlotImpz_UI(QWidget):
         # initial settings for comboboxes
         self.plt_time_resp = "Stem"
         self.plt_time_stim = "None"
-        self.plt_time_stmq = "None"        
+        self.plt_time_stmq = "None"
 
         self.plt_freq_resp = "Line"
-        self.plt_freq_stim = "None"        
-        self.plt_freq_stmq = "None"        
+        self.plt_freq_stim = "None"
+        self.plt_freq_stmq = "None"
 
         self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
@@ -91,11 +91,11 @@ class PlotImpz_UI(QWidget):
         self.chk_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
         self.chk_auto_run.setChecked(True)
-        
+
         self.but_run = QPushButton("RUN", self)
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.chk_auto_run.isChecked())
-        
+
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
         qset_cmb_box(self.cmb_sim_select, "Float")
@@ -111,13 +111,13 @@ class PlotImpz_UI(QWidget):
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
-        self.led_N_start.setToolTip("<span>First point to plot.</span>")   
+        self.led_N_start.setToolTip("<span>First point to plot.</span>")
 
         self.chk_fx_scale = QCheckBox("Int. scale", self)
         self.chk_fx_scale.setObjectName("chk_fx_scale")
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
         self.chk_fx_scale.setChecked(False)
-        
+
         self.chk_stim_options = QCheckBox("Stim. Options", self)
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
@@ -128,15 +128,15 @@ class PlotImpz_UI(QWidget):
         #layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
         layH_ctrl_run.addWidget(self.chk_auto_run)
-        layH_ctrl_run.addStretch(1)        
+        layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
-        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.chk_fx_scale)
-        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.chk_stim_options)
         layH_ctrl_run.addStretch(10)
 
@@ -144,28 +144,29 @@ class PlotImpz_UI(QWidget):
 
         self.wdg_ctrl_run = QWidget(self)
         self.wdg_ctrl_run.setLayout(layH_ctrl_run)
-        # --- end of run control ----------------------------------------        
+        # --- end of run control ----------------------------------------
 
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
-        
-        self.lbl_plt_time_resp = QLabel("<b>View:</b> Response", self)
+
+        lbl_plt_time_title = QLabel("<b>View:</b>", self)
+        lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
-        self.cmb_plt_time_resp.addItems(plot_styles_list)       
+        self.cmb_plt_time_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
-        
+
         self.lbl_plt_time_stim = QLabel("Stimulus", self)
         self.cmb_plt_time_stim = QComboBox(self)
-        self.cmb_plt_time_stim.addItems(plot_styles_list)       
+        self.cmb_plt_time_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
-        
+
         self.lbl_plt_time_stmq = QLabel("Stim.<q>", self)
         self.cmb_plt_time_stmq = QComboBox(self)
-        self.cmb_plt_time_stmq.addItems(plot_styles_list)       
+        self.cmb_plt_time_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
 
@@ -174,12 +175,10 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom_time = QLabel("Min. = ", self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB_time = QLabel("dB", self)
-        
+
         self.chk_win_time = QCheckBox("FFT Window", self)
         self.chk_win_time.setObjectName("chk_win_time")
         self.chk_win_time.setToolTip("<span>Show FFT windowing function.</span>")
@@ -191,8 +190,10 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_limits.setChecked(False)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_resp)      
+        layH_ctrl_time.addWidget(lbl_plt_time_title)
+        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(lbl_plt_time_resp)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
@@ -201,18 +202,15 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_plt_time_stmq)
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_log_time)
-        layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
-        layH_ctrl_time.addWidget(self.lbl_dB_time)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.chk_win_time)        
-        layH_ctrl_time.addStretch(2)        
+        layH_ctrl_time.addWidget(self.chk_win_time)
+        layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
-        
+
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
-        
+
         self.wdg_ctrl_time = QWidget(self)
         self.wdg_ctrl_time.setLayout(layH_ctrl_time)
         # ---- end time domain ------------------
@@ -220,34 +218,33 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
+        lbl_plt_freq_title = QLabel("<b>View:</b>", self)
+        lbl_plt_freq_resp = QLabel("Response", self)
+        self.cmb_plt_freq_resp = QComboBox(self)
+        self.cmb_plt_freq_resp.addItems(plot_styles_list)
+        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
+        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
+
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
-        self.cmb_plt_freq_stim.addItems(plot_styles_list)       
+        self.cmb_plt_freq_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
         self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel("Stim.<q>", self)
         self.cmb_plt_freq_stmq = QComboBox(self)
-        self.cmb_plt_freq_stmq.addItems(plot_styles_list)       
+        self.cmb_plt_freq_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
-        
-        self.lbl_plt_freq_resp = QLabel("<b>View:</b> Response", self)
-        self.cmb_plt_freq_resp = QComboBox(self)
-        self.cmb_plt_freq_resp.addItems(plot_styles_list)       
-        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
-        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_log_freq = QCheckBox("dB", self)
+        self.chk_log_freq = QCheckBox("dB : Min.", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setChecked(True)
 
-        self.lbl_log_bottom_freq = QLabel("Min. = ", self)
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB_freq = QLabel("dB", self)
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
@@ -259,33 +256,32 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1 = QLineEdit(self)
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
-        
+
         self.chk_win_freq = QCheckBox("Show", self)
         self.chk_win_freq.setObjectName("chk_win_freq")
         self.chk_win_freq.setToolTip("<span>Show FFT windowing function.</span>")
         self.chk_win_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
-
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)      
+        layH_ctrl_freq.addWidget(lbl_plt_freq_title)
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(lbl_plt_freq_resp)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stmq)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stmq)
-        layH_ctrl_freq.addStretch(2)        
+        layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.chk_log_freq)
-        layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
-        layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
-        layH_ctrl_freq.addWidget(self.chk_win_freq)        
+        layH_ctrl_freq.addWidget(self.chk_win_freq)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
@@ -299,21 +295,21 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
-        
+
         self.lblStimulus = QLabel("Signal: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine",
                                    "Triang","Saw","Rect","Comb"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
-        
+
         self.chk_stim_bl = QCheckBox("BL", self)
         self.chk_stim_bl.setToolTip("<span>The signal is bandlimited to the Nyquist frequency "
                                     "to avoid aliasing. However, it is much slower to generate "
-                                    "than the regular version.</span>")        
+                                    "than the regular version.</span>")
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
-        
+
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
@@ -327,7 +323,7 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
-        
+
         #layVCmb.addWidget(self.cmbStimulus)
         layVCmb.addLayout(layHCmbStim)
         layVCmb.addWidget(self.cmbNoise)
@@ -351,7 +347,7 @@ class PlotImpz_UI(QWidget):
         layVledAmp = QVBoxLayout()
         layVledAmp.addWidget(self.ledAmp1)
         layVledAmp.addWidget(self.ledAmp2)
-        
+
         #----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&phi;_1", frmt='bi') + " =", self)
         self.ledPhi1 = QLineEdit(self)
@@ -374,7 +370,7 @@ class PlotImpz_UI(QWidget):
         layVledPhi = QVBoxLayout()
         layVledPhi.addWidget(self.ledPhi1)
         layVledPhi.addWidget(self.ledPhi2)
-        
+
         layVlblPhU = QVBoxLayout()
         layVlblPhU.addWidget(self.lblPhU1)
         layVlblPhU.addWidget(self.lblPhU2)
@@ -426,7 +422,7 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
 
-        #----------------------------------------------        
+        #----------------------------------------------
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
@@ -436,9 +432,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addLayout(layVlblAmp)
         layH_ctrl_stim.addLayout(layVledAmp)
         layH_ctrl_stim.addLayout(layVlblPhi)
-        layH_ctrl_stim.addLayout(layVledPhi)          
+        layH_ctrl_stim.addLayout(layVledPhi)
         layH_ctrl_stim.addLayout(layVlblPhU)
-        layH_ctrl_stim.addStretch(1)        
+        layH_ctrl_stim.addStretch(1)
         layH_ctrl_stim.addLayout(layVlblfreq)
         layH_ctrl_stim.addLayout(layVledfreq)
         layH_ctrl_stim.addLayout(layVlblfreqU)
@@ -446,7 +442,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addLayout(layVlblNoiDC)
         layH_ctrl_stim.addLayout(layVledNoiDC)
         layH_ctrl_stim.addStretch(10)
-        
+
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
         # --------- end stimuli ---------------------------------
@@ -469,10 +465,10 @@ class PlotImpz_UI(QWidget):
 
         # --- stimulus control ---
         self.chk_stim_options.clicked.connect(self._show_stim_options)
-        
+
         self.chk_stim_bl.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
-        
+
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
@@ -480,7 +476,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.ledDC.editingFinished.connect(self._update_DC)
-        
+
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
@@ -513,7 +509,7 @@ class PlotImpz_UI(QWidget):
                 self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
                 #self.impz()
 
-#        if isinstance(source, QLineEdit): 
+#        if isinstance(source, QLineEdit):
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
         if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
@@ -526,9 +522,9 @@ class PlotImpz_UI(QWidget):
                     _store_entry(source)
                 elif key == Qt.Key_Escape: # revert changes
                     self.spec_edited = False
-                    if source.objectName() == "stimFreq1":                    
+                    if source.objectName() == "stimFreq1":
                         source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
-                    elif source.objectName() == "stimFreq2":                    
+                    elif source.objectName() == "stimFreq2":
                         source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
             elif event.type() == QEvent.FocusOut:
@@ -537,7 +533,7 @@ class PlotImpz_UI(QWidget):
         # Call base class method to continue normal event processing:
         return super(PlotImpz_UI, self).eventFilter(source, event)
 
-#-------------------------------------------------------------        
+#-------------------------------------------------------------
     def _show_stim_options(self):
         """
         Hide / show panel with stimulus options
@@ -549,21 +545,21 @@ class PlotImpz_UI(QWidget):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
         f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang", "Comb"}
-        f2_en = self.stim in {"Cos", "Sine"}               
+        f2_en = self.stim in {"Cos", "Sine"}
         dc_en = self.stim not in {"Step", "StepErr"}
 
         self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
 
         self.lblAmp1.setVisible(self.stim != "None")
         self.ledAmp1.setVisible(self.stim != "None")
-        
+
         self.lblPhi1.setVisible(f1_en)
         self.ledPhi1.setVisible(f1_en)
         self.lblPhU1.setVisible(f1_en)
         self.lblFreq1.setVisible(f1_en)
         self.ledFreq1.setVisible(f1_en)
         self.lblFreqUnit1.setVisible(f1_en)
-        
+
         self.lblFreq2.setVisible(f2_en)
         self.ledFreq2.setVisible(f2_en)
         self.lblFreqUnit2.setVisible(f2_en)
@@ -572,18 +568,18 @@ class PlotImpz_UI(QWidget):
         self.lblPhi2.setVisible(f2_en)
         self.ledPhi2.setVisible(f2_en)
         self.lblPhU2.setVisible(f2_en)
-        
+
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
 
         self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
 
-#-------------------------------------------------------------        
+#-------------------------------------------------------------
     def load_fs(self):
         """
         Reload sampling frequency from filter dictionary and transform
         the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
@@ -789,11 +785,11 @@ def main():
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    
+
     mainw = PlotImpz_UI(None)
     layVMain = QVBoxLayout()
     layVMain.addWidget(mainw.wdg_ctrl_time)
-    layVMain.addWidget(mainw.wdg_ctrl_freq)    
+    layVMain.addWidget(mainw.wdg_ctrl_freq)
     layVMain.addWidget(mainw.wdg_ctrl_stim)
     layVMain.addWidget(mainw.wdg_ctrl_run)
     layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)

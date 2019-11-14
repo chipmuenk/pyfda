@@ -422,6 +422,7 @@ class Input_Files(QWidget):
 
         dir_string = ("<table><th style='font-size:large;'>Software Versions</th>")
         dir_string += pyfda_lib.mod_version()
+        dir_string += "</table>"
 
         dir_string += ("<table><th style='font-size:large;'>Directories</th>"
                         "<tr><td><b>Home:</b></td><td>{0}</td></tr>"

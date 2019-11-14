@@ -1,20 +1,16 @@
 {% set name = "pyfda" %}
-{% set version = "0.1" %}
-{% set file_ext = "tar.gz" %}
-{% set hash_type = "sha256" %}
-{% set hash_value = "c4b9f7f46e293f38f1116f8b163aaf69668e8b63114fb5892d6f2e3b23b198f6" %}
+{% set version = "0.2" %}
 
 package:
-  name: '{{ name|lower }}'
-  version: '{{ version }}'
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
 
 source:
-  fn: '{{ name }}-{{ version }}.{{ file_ext }}'
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.{{ file_ext }}
-  '{{ hash_type }}': '{{ hash_value }}'
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: "cb50c1f133d3626ac75e50bfa1e83b49bfc6ad8081e45c1671ee7f4ba407c9dc"
 
 build:
-  noarch_python: True
+  noarch: python
   number: 0
   entry_points:
     - pyfdax = pyfda.pyfdax:main
@@ -22,62 +18,53 @@ build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
-  build:
-    - python
-    - setuptools
-    - numpy
-    - scipy
-    - matplotlib
+  host:
     - docutils
+    - matplotlib
+    - migen
+    - numpy
+    - pip
+    - python
+    - scipy
+    - pyqt5
   run:
-    - python
-    - numpy
-    - scipy
-    - matplotlib
     - docutils
+    - matplotlib
+    - migen
+    - numpy
+    - python
+    - scipy
+    - pyqt5
 
 test:
   imports:
     - pyfda
-    - pyfda.filter_design
-    - pyfda.hdl_generation
+    - pyfda.filter_designs
+    - pyfda.fixpoint_widgets
     - pyfda.input_widgets
     - pyfda.plot_widgets
     - pyfda.tests
     - pyfda.tests.widgets
+    - pyfda.widget_templates
+    - pyfda.widget_templates.filter_designs
+    - pyfda.widget_templates.fixpoint_widgets
+    - pyfda.widget_templates.input_widgets
+    - pyfda.widget_templates.plot_widgets
   commands:
     - pyfdax --help
     - pyfdax_no_term --help
 
 about:
-  home: https://github.com/chipmuenk/pyFDA
-  license: MIT License
-  license_family: MIT
-  license_file: ''
-  summary: pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.
-  description: "pyFDA\n*****\n\nPython Filter Design Analysis Tool\n==================================\n\npyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The\
-    \ capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.\n\n.. image:: https://github.com/chipmuenk/pyFDA/raw/master/images/pyFDA_screenshot_3.PNG\n\
-    \    :width: 300px\n\nPrerequisites\n-------------\n\nBesides standard python libraries, the project requires the following libraries:\n\n* numpy\n* scipy\n* matplotlib\n* pyQt4 or pyQt5\n\n* Optional\
-    \ libraries:\n    * docutils for rendering info text as rich text\n    * xlwt and / or XlsxWriter for exporting filter coefficients as \\*.xls(x) files\n\n\n\nInstalling and starting pyFDA\n-----------------------------\n\
-    \n    ``>> pip install pyfda``\n\nor download the zip file and extract it to a directory of your choice. Install it either to your ``<python>/Lib/site-packages`` subdirectory using\n\n    ``>> python\
-    \ setup.py install``\n\nor run it where you have installed the python source files using (for testing / development)\n\n    ``>> python setup.py develop``\n\nIn both cases, start scripts ``pyfdax``\
-    \ and `pyfdax_no_term` are created (with / without terminal).\n\nFor development, you can also run pyFDA using::\n\n    In [1]: %run -m pyfda.pyfdax # IPython or\n    >> python -m pyfda.pyfdax    #\
-    \ plain python interpreter\n\n    \nor run individual files from pyFDA using e.g.::\n\n    In [2]: %run -m pyfda.input_widgets.input_pz  # IPython or\n    >> python -m pyfda.input_widgets.input_pz \
-    \    # plain python interpreter\n   \nCustomization\n-------------\n\nThe layout and some default paths can be customized using the file ``pyfda/pyfda_rc.py``.\n\nFeatures\n--------\n\n* **Filter design**\n\
-    \    * **Design methods** from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 \n    * **Remember all specifications** when changing filter design methods\n    *\
-    \ **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms\n    * **Compare filter designs** for a given set of specifications and different design methods\n\
-    \    * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized\n\n* **Clearly structured GUI**\n    * only widgets needed for the currently selected design method are visible\n\
-    \    * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)\n\n* **Common interface for all filter design methods:**\n    * specify frequencies as absolute values or normalized\
-    \ to sampling or Nyquist frequency\n    * specify ripple and attenuations in dB, as voltage or as power ratios\n    * enter expressions like exp(-pi/4 * 1j) with the help of the library ``simpleeval``\
-    \ (https://pypi.python.org/pypi/simpleeval) (included in source files)\n\n* **Graphical Analyses**\n    * Magnitude response (lin / power / log) with optional display of specification bands, phase and\
-    \ an inset plot\n    * Phase response (wrapped / unwrapped)\n    * Group delay\n    * Pole / Zero plot\n    * Impulse response and step response (lin / log)\n    * 3D-Plots (\\|H(f)\\|, mesh, surface,\
-    \ contour) with optional pole / zero display\n\n* **Modular architecture**, facilitating the implementation of new filter design and analysis methods\n    * Filter design files not only contain the\
-    \ actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. \n    * Special widgets needed by design methods (e.g. for choosing the window\
-    \ type in Firwin) are included in the filter design file, not in the main program\n    * Filter design files can be added and edited *without* changing or even restarting the program\n\n* **Saving and\
-    \ loading**\n    * Save and load filter designs in pickled and in numpy's NPZ-format\n    * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or\
-    \ in Matlab (R) workspace format\n\n* **Display help files** (own / Python docstrings) as rich text\n* **Runs under Python 2.7 and Python 3.3 ... 3.5**\n"
-  doc_url: ''
-  dev_url: ''
+  home: "https://github.com/chipmuenk/pyFDA"
+  license: "MIT"
+  license_family: "MIT"
+  license_file: "LICENSE"
+  summary: "pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters."
+  description: "See the package README.rst or pyfda.readthedocs.io for more information."
+  doc_url: "https://pyfda.readthedocs.io/"
+  dev_url: "https://github.com/chipmuenk/pyFDA"
+  doc_source_url: "https://github.com/chipmuenk/pyfda/blob/master/README.rst"
 
 extra:
-  recipe-maintainers: ''
+  recipe-maintainers:
+    - chipmuenk
