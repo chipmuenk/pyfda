@@ -122,6 +122,12 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
+        
+        self.but_fft_win = QPushButton("WIN FFT", self)
+        self.but_fft_win.setToolTip("Show FFT Window")
+        self.but_fft_win.setCheckable(True)
+        self.but_fft_win.toggle()
+        self.but_fft_win.setChecked(False)
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_run)
@@ -138,6 +144,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.chk_fx_scale)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.chk_stim_options)
+        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addWidget(self.but_fft_win)
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -257,11 +265,6 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
 
-        self.chk_win_freq = QCheckBox("Show", self)
-        self.chk_win_freq.setObjectName("chk_win_freq")
-        self.chk_win_freq.setToolTip("<span>Show FFT windowing function.</span>")
-        self.chk_win_freq.setChecked(False)
-
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
         layH_ctrl_freq.addStretch(1)
@@ -281,7 +284,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
-        layH_ctrl_freq.addWidget(self.chk_win_freq)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])

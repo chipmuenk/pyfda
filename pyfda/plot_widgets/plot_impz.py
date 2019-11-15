@@ -129,6 +129,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw)
+        self.ui.but_fft_win.clicked.connect(self.show_fft_win)
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -144,7 +145,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
-        self.ui.chk_win_freq.clicked.connect(self.draw)
+        #self.ui.chk_win_freq.clicked.connect(self.draw)
 
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
@@ -276,26 +277,27 @@ class Plot_Impz(QWidget):
             return
 
     #------------------------------------------------------------------------------
-    def show_FFT_win(self):
+    def show_fft_win(self):
         """
         Pop-up FFT window
         """
-        if self.fft_window is None:
-            if self.ui.chk_win_freq.isChecked():
+        if self.fft_window is None: # does a handle to the window exist?
+            if self.ui.but_fft_win.isChecked():
                 self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
                 self.ui.sig_tx.connect(self.fft_window.sig_rx)
-                self.fft_window.sig_tx.connect(self.close_FFT_win)
+                self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
         else:
-            if not self.ui.chk_win_freq.isChecked():
+            if not self.ui.but_fft_win.isChecked():
                 if self.fft_window is None:
                     logger.warning("FFT window is already closed!")
                 else:
                     self.fft_window.close()
 
-    def close_FFT_win(self):
+    def close_fft_win(self):
         self.fft_window = None
-        self.ui.chk_win_freq.setChecked(False)
+        #self.ui.chk_win_freq.setChecked(False)
+        self.ui.but_fft_win.setChecked(False)
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -614,8 +616,8 @@ class Plot_Impz(QWidget):
             self.Y = np.abs(np.fft.fft(y_win)) / (self.ui.N * sqrt(2))
             self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
-        if self.ui.chk_win_freq.isChecked():
-            self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
+#        if self.ui.chk_win_freq.isChecked():
+#            self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
 
         self.needs_redraw[1] = True   # redraw of frequency widget needed
 
@@ -678,7 +680,7 @@ class Plot_Impz(QWidget):
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
-        self.show_FFT_win()
+        self.show_fft_win()
 
     def _log_mode_time(self):
         """
@@ -1005,10 +1007,10 @@ class Plot_Impz(QWidget):
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Y[1:] = 2 * Y[1:]
 
-            if self.ui.chk_win_freq.isChecked():
-                Win = self.Win.copy()/np.sqrt(2)
-                if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                    Win[1:] = 2 * Win[1:]
+#            if self.ui.chk_win_freq.isChecked():
+#                Win = self.Win.copy()/np.sqrt(2)
+#                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+#                    Win[1:] = 2 * Win[1:]
 
         #-----------------------------------------------------------------
         # Calculate log FFT and power if selected, set units
@@ -1026,8 +1028,8 @@ class Plot_Impz(QWidget):
                 if plt_response:
                     Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
                     Py = 10*np.log10(Py)
-                if self.ui.chk_win_freq.isChecked():
-                    Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
+#                if self.ui.chk_win_freq.isChecked():
+#                    Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
             else:
                 unit = "Vrms"
                 unit_P = "W"
@@ -1046,8 +1048,8 @@ class Plot_Impz(QWidget):
                     X = np.fft.fftshift(X)
                 if plt_stimulus_q:
                     X_q = np.fft.fftshift(X_q)
-                if self.ui.chk_win_freq.isChecked():
-                    Win = np.fft.fftshift(Win)
+#                if self.ui.chk_win_freq.isChecked():
+#                    Win = np.fft.fftshift(Win)
                 F = np.fft.fftshift(F)
 
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
@@ -1058,8 +1060,8 @@ class Plot_Impz(QWidget):
                     X = X[0:self.ui.N//2]
                 if plt_stimulus_q:
                     X_q = X_q[0:self.ui.N//2]
-                if self.ui.chk_win_freq.isChecked():
-                    Win = Win[0:self.ui.N//2]
+#                if self.ui.chk_win_freq.isChecked():
+#                    Win = Win[0:self.ui.N//2]
                 F = F[0:self.ui.N//2]
 
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
@@ -1105,9 +1107,9 @@ class Plot_Impz(QWidget):
 
                 labels.append("$P_Y$ = {0:.3g} {1}".format(Py, unit_P))
 
-            if self.ui.chk_win_freq.isChecked():
-                self.ax_fft.plot(F, Win, c="gray", label="win")
-                labels.append("{0}".format(self.ui.window_type))
+#            if self.ui.chk_win_freq.isChecked():
+#                self.ax_fft.plot(F, Win, c="gray", label="win")
+#                labels.append("{0}".format(self.ui.window_type))
 
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))

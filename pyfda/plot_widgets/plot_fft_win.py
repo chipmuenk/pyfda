@@ -37,6 +37,8 @@ class Plot_FFT_win(QMainWindow):
 
     def __init__(self, parent):
         super(Plot_FFT_win, self).__init__(parent)
+        self.needs_calc = False
+        
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
@@ -145,10 +147,19 @@ class Plot_FFT_win(QMainWindow):
         """
         Initialize and clear the axes - this is only called once
         """
-        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
-            self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
+        window_name = "Kaiser"
+        self.fig = self.mplwidget.fig
+        self.fig.suptitle(r'{0} Window in Time and Spectrum'.format(window_name))
+        self.fig.subplots_adjust(top=0.88)
+
+        self.ax_t = self.fig.add_subplot(211)
+        self.ax_t.set_title("Time")
+        self.ax_f = self.fig.add_subplot(212)
+        self.ax_f.set_title("Frequency")
+        self.ax_t.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax_t.get_yaxis().tick_left() # remove axis ticks right
+        self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.fig.set_tight_layout(True)
 
 #------------------------------------------------------------------------------
     def calc_resp(self):
@@ -160,6 +171,30 @@ class Plot_FFT_win(QMainWindow):
         self.H_cmplx = np.random.randn(params['N_FFT'])
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
+        
+#------------------------------------------------------------------------------
+    def calc_win_freq(self):
+        """
+        Calculate frequency transform of window function
+        """
+        F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_S'])
+        self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
+        Win = self.Win.copy()/np.sqrt(2)
+        if fb.fil[0]['freqSpecsRangeType'] == 'half':
+            Win[1:] = 2 * Win[1:]
+        if self.ui.chk_log_freq.isChecked():
+            Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)  
+
+        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+        # shift X, Y and F by f_S/2
+            Win = np.fft.fftshift(Win)
+            F = np.fft.fftshift(F)
+        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+            Win = Win[0:self.ui.N//2]
+            F = F[0:self.ui.N//2]
+        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+            # plot for F = 0 ... 1
+            F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -215,14 +250,14 @@ class Plot_FFT_win(QMainWindow):
             phi_plt = np.unwrap(np.angle(H)) * scale
 
         #---------------------------------------------------------
-        self.ax.clear() # need to clear, doesn't overwrite
-        line_phi, = self.ax.plot(F, phi_plt)
+        #self.ax_t.clear() # need to clear, doesn't overwrite
+        #self.ax_f.clear() # need to clear, doesn't overwrite
+        line_phi, = self.ax_t.plot(F, phi_plt)
         #---------------------------------------------------------
-
-        self.ax.set_title(r'Phase Frequency Response')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
-        self.ax.set_ylabel(y_str)
-        self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
+        self.ax_t.set_ylabel(y_str)
+        
+        self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax_f.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.redraw()
 
