@@ -239,7 +239,11 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
                     + r'$\rightarrow $',
             'time_designed' : -1,
-            'wdg_dyn':{'win':'hann'}
+            'wdg_dyn':{'win':'hann'},
+            # Parameters for FFT Window function
+            'win_fnct':'hann', # function name or array with values
+            'win_params':'',
+            'win_len':1024
             }
 
 fil = [None] * 10 # create empty list with length 10 for multiple filter designs
