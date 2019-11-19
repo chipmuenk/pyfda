@@ -13,9 +13,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
+from numpy.fft import fft, fftshift, fftfreq
 import scipy.signal.windows as win
 
-#from pyfda.pyfda_lib import safe_eval
+from pyfda.pyfda_lib import safe_eval
 from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -37,9 +38,11 @@ class Plot_FFT_win(QMainWindow):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(Plot_FFT_win, self).__init__(parent)
+        super(Plot_FFT_win, self).__init__(parent, QtCore.Qt.WindowStaysOnTopHint)
         self.needs_calc = False
         self.bottom_f = -80 # min. value for dB display
+        self.bottom_t = -60
+        self.N = 128 # initial number of data points
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
@@ -87,30 +90,40 @@ class Plot_FFT_win(QMainWindow):
         - Frame with control elements
         """
 
-        self.cmbUnitsPhi = QComboBox(self)
-        units = ["rad", "rad/pi",  "deg"]
-        scales = [1.,   1./ np.pi, 180./np.pi]
-        for unit, scale in zip(units, scales):
-            self.cmbUnitsPhi.addItem(unit, scale)
-        self.cmbUnitsPhi.setObjectName("cmbUnitsA")
-        self.cmbUnitsPhi.setToolTip("Set unit for phase.")
-        self.cmbUnitsPhi.setCurrentIndex(0)
-        self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.chk_f_log = QCheckBox("Log", self)
-        self.chk_f_log.setChecked(False)
-        self.chk_f_log.setToolTip("Display in dB")
+        self.chk_auto_N = QCheckBox("N Auto", self)
+        self.chk_auto_N.setChecked(False)
+        self.chk_auto_N.setToolTip("Use number of points from calling routine.")
         
+        self.led_N = QLineEdit(self)
+        self.led_N.setText(str(self.N))    
+        self.led_N.setToolTip("<span>Number of window data points.</span>")
+        
+        self.chk_log_t = QCheckBox("Log", self)
+        self.chk_log_t.setChecked(False)
+        self.chk_log_t.setToolTip("Display in dB")
+        
+        self.led_log_bottom_t = QLineEdit(self)
+        self.led_log_bottom_t.setText(str(self.bottom_t))
+        self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
+
+        self.chk_log_f = QCheckBox("Log", self)
+        self.chk_log_f.setChecked(True)
+        self.chk_log_f.setToolTip("Display in dB")
+
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setText(str(self.bottom_f))
         self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
 
-
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.cmbUnitsPhi)
-        layHControls.addWidget(self.chk_f_log)
+        layHControls.addWidget(self.chk_auto_N)
+        layHControls.addWidget(self.led_N)  
+        layHControls.addStretch(1)         
+        layHControls.addWidget(self.chk_log_t)
+        layHControls.addWidget(self.led_log_bottom_t)
+        layHControls.addStretch(10)       
+        layHControls.addWidget(self.chk_log_f)
         layHControls.addWidget(self.led_log_bottom_f)
-        layHControls.addStretch(10)
+
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -134,7 +147,10 @@ class Plot_FFT_win(QMainWindow):
         
         self.setCentralWidget(self.mplwidget)
 
-        self.init_axes()
+        self.fig = self.mplwidget.fig
+        self.ax_t = self.fig.add_subplot(121)
+        self.ax_f = self.fig.add_subplot(122)
+
 
         self.draw() # initial drawing
 
@@ -146,8 +162,10 @@ class Plot_FFT_win(QMainWindow):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chk_f_log.clicked.connect(self.draw)
-        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+        self.chk_log_f.clicked.connect(self.update_view)
+        self.chk_log_t.clicked.connect(self.update_view)
+        self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
+        self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
@@ -155,55 +173,63 @@ class Plot_FFT_win(QMainWindow):
         """
         Initialize and clear the axes - this is only called once
         """
-        window_name = "Kaiser"
-        self.fig = self.mplwidget.fig
-        self.fig.suptitle(r'{0} Window in Time and Spectrum'.format(window_name))
-        self.fig.subplots_adjust(top=0.88)
+        window_name = fb.fil[0]['win_name']
+        self.fig.suptitle(r'{0} Window'.format(window_name))
+        
+        #self.fig.subplots_adjust(top=0.88)
 
-        self.ax_t = self.fig.add_subplot(211)
-        self.ax_t.set_title("Time")
-        self.ax_f = self.fig.add_subplot(212)
-        self.ax_f.set_title("Frequency")
-        self.ax_t.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax_t.get_yaxis().tick_left() # remove axis ticks right
-        self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
         self.fig.set_tight_layout(True)
+        
+#------------------------------------------------------------------------------
+    def update_bottom(self):
+        """
+        Update log bottom settings
+        """
+        self.bottom_t = safe_eval(self.led_log_bottom_t.text(), self.bottom_t, 
+                                  sign='neg', return_type='float')
+        self.led_log_bottom_t.setText(str(self.bottom_t))
+
 
 #------------------------------------------------------------------------------
     def calc_win(self):
         """
-        (Re-)Calculate the FFT window in the time domain, only dummy data at the moment
+        (Re-)Calculate the window and its FFT
         """
-        # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         self.N = fb.fil[0]['win_len']
         self.t = np.arange(self.N)
-        self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N)
-        # replace nan and inf by finite values, otherwise np.unwrap yields
-        # an array full of nans
+        params = fb.fil[0]['win_params'] # convert to iterable
+        if not params:
+            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N)
+        elif np.isscalar(params):
+            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N, params)
+        else:
+            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N, *params)
+            
+        self.F = fftshift(fftfreq(self.N * 8, d=1. / fb.fil[0]['f_S'])) # zero-padding 
+        self.Win = fftshift(np.abs(fft(self.win, self.N * 8))) / self.N
         
 #------------------------------------------------------------------------------
-    def calc_win_freq(self):
+    def calc_win_freq_x(self):
         """
         Calculate frequency transform of window function
         """
-        self.F = np.fft.fftfreq(self.N, d=1. / fb.fil[0]['f_S'])
-        self.Win = np.abs(np.fft.fft(self.win)) / self.N
+        self.F = fftshift(fftfreq(self.N * 8, d=1. / fb.fil[0]['f_S'])) # zero-padding 
+        self.Win = fftshift(np.abs(fft(self.win, self.N * 8))) / self.N
 
         if fb.fil[0]['freqSpecsRangeType'] == 'half':
             self.Win[1:] = 2 * self.Win[1:]
-        if self.chk_f_log.isChecked():
-            self.Win = np.maximum(20 * np.log10(self.Win), self.bottom_f)  
+  
 
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-        # shift X, Y and F by f_S/2
-            self.Win = np.fft.fftshift(self.Win)
-            self.F = np.fft.fftshift(self.F)
-        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            self.Win = self.Win[0:self.N//2]
-            self.F = self.F[0:self.N//2]
-        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
-            # plot for F = 0 ... 1
-            self.F = np.fft.fftshift(self.F) + fb.fil[0]['f_S']/2.
+#        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+#        # shift X, Y and F by f_S/2
+#            self.Win = np.fft.fftshift(self.Win)
+#            self.F = np.fft.fftshift(self.F)
+#        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+#            self.Win = self.Win[0:self.N//2]
+#            self.F = self.F[0:self.N//2]
+#        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+#            # plot for F = 0 ... 1
+#            self.F = np.fft.fftshift(self.F) + fb.fil[0]['f_S']/2.
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -211,8 +237,8 @@ class Plot_FFT_win(QMainWindow):
         Main entry point:
         Re-calculate \|H(f)\| and draw the figure
         """
+        self.init_axes()
         self.calc_win()
-        self.calc_win_freq()
         self.update_view()
 
 #------------------------------------------------------------------------------
@@ -220,24 +246,26 @@ class Plot_FFT_win(QMainWindow):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
-
-        self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
-
-        #========= select frequency range to be displayed =====================
-        #=== shift, scale and select: W -> F, H_cplx -> H_c
-
-        y_str = r'$t \rightarrow$'
-
-        #---------------------------------------------------------
-        #self.ax_t.clear() # need to clear, doesn't overwrite
-        #self.ax_f.clear() # need to clear, doesn't overwrite
-        line_win_t, = self.ax_t.plot(self.t, self.win)
-        line_win_t, = self.ax_f.plot(self.F, self.Win)
-        #---------------------------------------------------------
-        self.ax_t.set_ylabel(y_str)
+        self.ax_t.cla()
+        self.ax_f.cla()
+        
+        self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
+        self.ax_t.set_title("Time")
         
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
-        self.ax_f.set_xlim(fb.fil[0]['freqSpecsRange'])
+        self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
+        self.ax_f.set_title("Frequency")
+        
+        if self.chk_log_t.isChecked():
+            self.ax_t.plot(self.t, np.maximum(20 * np.log10(self.win), self.bottom_t))
+        else:
+            self.ax_t.plot(self.t, self.win)
+            
+        if self.chk_log_f.isChecked():
+            self.ax_f.plot(self.F, np.maximum(20 * np.log10(self.Win), self.bottom_f))
+        else:
+            self.ax_f.plot(self.F, self.Win)
 
         self.redraw()
 

@@ -60,7 +60,7 @@ class PlotImpz_UI(QWidget):
         self.DC = 0.0
 
         self.bottom_f = -120
-        self.param1 = None
+        self.param = None
 
         # initial settings for comboboxes
         self.plt_time_resp = "Stem"
@@ -689,17 +689,22 @@ class PlotImpz_UI(QWidget):
     def _update_win_fft(self, dict_sig=None):
         """ Update window type for FFT """
 
-        def _update_param1():
+        def _get_param(par_default=None):
             self.ledWinPar1.setToolTip(tooltip)
-            self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
+            self.lblWinPar1.setText(to_html(txt_par, frmt='bi'))
 
-            self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
-            self.ledWinPar1.setText(str(self.param1))
+            self.param = safe_eval(self.ledWinPar1.text(), self.param, return_type='float', sign='pos')
+            self.ledWinPar1.setText(str(self.param))
         #----------------------------------------------------------------------
+        
+        def _set_param(param):
+            self.ledWinPar1.setText(str(param))
+            self.param = param
+        #----------------------------------------------------------------------
+        
         self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
-#        self.param1 = None
-        has_par1 = False
-        txt_par1 = ""
+        N_par = 0
+        txt_par = ""
 
         if self.window_type in {"Bartlett", "Triangular"}:
             window_name = "bartlett"
@@ -711,28 +716,28 @@ class PlotImpz_UI(QWidget):
             window_name = "hann"
         elif self.window_type == "Rect":
             window_name = "boxcar"
+        #--------------------------------------
         elif self.window_type == "Kaiser":
             window_name = "kaiser"
-            has_par1 = True
-            txt_par1 = '&beta; ='
-
+            N_par = 1
+            txt_par = '&beta; ='
             tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
-                       "higher values reduce side lobe level, typ. value is 5.</span>")
-            _update_param1()
-            if not self.param1:
-                self.param1 = 5
-
+                       "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>")
+            _get_param()
+            #if not self.param:
+             #   _set_param(5)
+        #--------------------------------------
         elif self.window_type == "Chebwin":
             window_name = "chebwin"
-            has_par1 = True
-            txt_par1 = 'Attn ='
+            N_par = 1
+            txt_par = 'Attn ='
             tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
-            _update_param1()
-            if not self.param1:
-                self.param1 = 80
-            if self.param1 < 45:
+            _get_param()
+            if not self.param:
+                self.param = 80
+            if self.param < 45:
+                _set_param(45)
                 logger.warning("Attenuation needs to be larger than 45 dB!")
-
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
 
@@ -743,12 +748,19 @@ class PlotImpz_UI(QWidget):
             logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
                          .format(window_name))
             win_fnct = sig.windows.boxcar
-            self.param1 = None
+            self.param = None
+        fb.fil[0]['win_name'] = self.window_type
+        fb.fil[0]['win_fnct'] = window_name
+        if N_par == 1:
+            fb.fil[0]['win_params'] = self.param
+        else:
+            fb.fil[0]['win_params'] = ''
+        fb.fil[0]['win_len']  = self.N
 
-        self.lblWinPar1.setVisible(has_par1)
-        self.ledWinPar1.setVisible(has_par1)
-        if has_par1:
-            self.win = win_fnct(self.N, self.param1) # use additional parameter
+        self.lblWinPar1.setVisible(N_par > 0)
+        self.ledWinPar1.setVisible(N_par > 0)
+        if N_par == 1:
+            self.win = win_fnct(self.N, self.param) # use additional parameter
         else:
             self.win = win_fnct(self.N)
 
