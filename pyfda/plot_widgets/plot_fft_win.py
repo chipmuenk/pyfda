@@ -13,6 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
+import scipy.signal.windows as win
 
 #from pyfda.pyfda_lib import safe_eval
 from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
@@ -22,7 +23,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, QtCore, QFrame, QLabel, pyqtSignal,
-                     QCheckBox, QComboBox, QPushButton,
+                     QCheckBox, QComboBox, QPushButton, QLineEdit,
                      QHBoxLayout, QVBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
@@ -38,6 +39,7 @@ class Plot_FFT_win(QMainWindow):
     def __init__(self, parent):
         super(Plot_FFT_win, self).__init__(parent)
         self.needs_calc = False
+        self.bottom_f = -80 # min. value for dB display
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
@@ -95,13 +97,19 @@ class Plot_FFT_win(QMainWindow):
         self.cmbUnitsPhi.setCurrentIndex(0)
         self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkWrap = QCheckBox("Wrapped Phase", self)
-        self.chkWrap.setChecked(False)
-        self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
+        self.chk_f_log = QCheckBox("Log", self)
+        self.chk_f_log.setChecked(False)
+        self.chk_f_log.setToolTip("Display in dB")
+        
+        self.led_log_bottom_f = QLineEdit(self)
+        self.led_log_bottom_f.setText(str(self.bottom_f))
+        self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
+
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.cmbUnitsPhi)
-        layHControls.addWidget(self.chkWrap)
+        layHControls.addWidget(self.chk_f_log)
+        layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addStretch(10)
 
         #----------------------------------------------------------------------
@@ -138,7 +146,7 @@ class Plot_FFT_win(QMainWindow):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkWrap.clicked.connect(self.draw)
+        self.chk_f_log.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
@@ -162,13 +170,14 @@ class Plot_FFT_win(QMainWindow):
         self.fig.set_tight_layout(True)
 
 #------------------------------------------------------------------------------
-    def calc_resp(self):
+    def calc_win(self):
         """
-        (Re-)Calculate the FFT window, only dummy data at the moment
+        (Re-)Calculate the FFT window in the time domain, only dummy data at the moment
         """
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
-        self.W = np.arange(params['N_FFT'])
-        self.H_cmplx = np.random.randn(params['N_FFT'])
+        self.N = fb.fil[0]['win_len']
+        self.t = np.arange(self.N)
+        self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
         
@@ -177,24 +186,24 @@ class Plot_FFT_win(QMainWindow):
         """
         Calculate frequency transform of window function
         """
-        F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_S'])
-        self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
-        Win = self.Win.copy()/np.sqrt(2)
+        self.F = np.fft.fftfreq(self.N, d=1. / fb.fil[0]['f_S'])
+        self.Win = np.abs(np.fft.fft(self.win)) / self.N
+
         if fb.fil[0]['freqSpecsRangeType'] == 'half':
-            Win[1:] = 2 * Win[1:]
-        if self.ui.chk_log_freq.isChecked():
-            Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)  
+            self.Win[1:] = 2 * self.Win[1:]
+        if self.chk_f_log.isChecked():
+            self.Win = np.maximum(20 * np.log10(self.Win), self.bottom_f)  
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
         # shift X, Y and F by f_S/2
-            Win = np.fft.fftshift(Win)
-            F = np.fft.fftshift(F)
+            self.Win = np.fft.fftshift(self.Win)
+            self.F = np.fft.fftshift(self.F)
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            Win = Win[0:self.ui.N//2]
-            F = F[0:self.ui.N//2]
+            self.Win = self.Win[0:self.N//2]
+            self.F = self.F[0:self.N//2]
         else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
             # plot for F = 0 ... 1
-            F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+            self.F = np.fft.fftshift(self.F) + fb.fil[0]['f_S']/2.
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -202,7 +211,8 @@ class Plot_FFT_win(QMainWindow):
         Main entry point:
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.calc_resp()
+        self.calc_win()
+        self.calc_win_freq()
         self.update_view()
 
 #------------------------------------------------------------------------------
@@ -213,46 +223,16 @@ class Plot_FFT_win(QMainWindow):
 
         self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
 
-        f_S2 = fb.fil[0]['f_S'] / 2.
-
         #========= select frequency range to be displayed =====================
         #=== shift, scale and select: W -> F, H_cplx -> H_c
-        F = self.W * f_S2 / np.pi
 
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            # shift H and F by f_S/2
-            H = np.fft.fftshift(self.H_cmplx)
-            F -= f_S2
-        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            # only use the first half of H and F
-            H = self.H_cmplx[0:params['N_FFT']//2]
-            F = F[0:params['N_FFT']//2]
-        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
-            # use H and F as calculated
-            H = self.H_cmplx
-
-        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
-        if self.unitPhi == 'rad':
-            y_str += 'rad ' + r'$\rightarrow $'
-            scale = 1.
-        elif self.unitPhi == 'rad/pi':
-            y_str += 'rad' + r'$ / \pi \;\rightarrow $'
-            scale = 1./ np.pi
-        else:
-            y_str += 'deg ' + r'$\rightarrow $'
-            scale = 180./np.pi
-        fb.fil[0]['plt_phiLabel'] = y_str
-        fb.fil[0]['plt_phiUnit'] = self.unitPhi
-
-        if self.chkWrap.isChecked():
-            phi_plt = np.angle(H) * scale
-        else:
-            phi_plt = np.unwrap(np.angle(H)) * scale
+        y_str = r'$t \rightarrow$'
 
         #---------------------------------------------------------
         #self.ax_t.clear() # need to clear, doesn't overwrite
         #self.ax_f.clear() # need to clear, doesn't overwrite
-        line_phi, = self.ax_t.plot(F, phi_plt)
+        line_win_t, = self.ax_t.plot(self.t, self.win)
+        line_win_t, = self.ax_f.plot(self.F, self.Win)
         #---------------------------------------------------------
         self.ax_t.set_ylabel(y_str)
         
