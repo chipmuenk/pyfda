@@ -241,8 +241,9 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'time_designed' : -1,
             'wdg_dyn':{'win':'hann'},
             # Parameters for FFT Window function
+            'win_name':'Hann', # Window name
             'win_fnct':'hann', # function name or array with values
-            'win_params':'',
+            'win_params':{}, # set of keyword params
             'win_len':1024
             }
 
