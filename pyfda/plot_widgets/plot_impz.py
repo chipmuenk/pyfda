@@ -296,7 +296,6 @@ class Plot_Impz(QWidget):
 
     def close_fft_win(self):
         self.fft_window = None
-        #self.ui.chk_win_freq.setChecked(False)
         self.ui.but_fft_win.setChecked(False)
 
 # =============================================================================
