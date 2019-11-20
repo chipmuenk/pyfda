@@ -26,7 +26,7 @@ try:
 except ImportError:
     figureoptions = None
     
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot, HAS_QT5,
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
                       QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
@@ -479,11 +479,7 @@ class MplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            if HAS_QT5:
-                img = QImage(self.canvas.grab())
-                self.cb.setImage(img)
-            else:
-                pixmap = QPixmap.grabWidget(self.canvas)
-                self.cb.setPixmap(pixmap)
+            img = QImage(self.canvas.grab())
+            self.cb.setImage(img)
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
