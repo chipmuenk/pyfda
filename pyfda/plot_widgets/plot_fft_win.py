@@ -169,6 +169,10 @@ class Plot_FFT_win(QMainWindow):
         self.chk_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
+
+        self.chk_auto_N.clicked.connect(self.draw)
+        self.led_N.editingFinished.connect(self.draw)
+
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
@@ -192,13 +196,23 @@ class Plot_FFT_win(QMainWindow):
                                   sign='neg', return_type='float')
         self.led_log_bottom_t.setText(str(self.bottom_t))
 
+        self.bottom_f = safe_eval(self.led_log_bottom_f.text(), self.bottom_f, 
+                                  sign='neg', return_type='float')
+        self.led_log_bottom_f.setText(str(self.bottom_f))
 
+        self.update_view()
 #------------------------------------------------------------------------------
     def calc_win(self):
         """
         (Re-)Calculate the window and its FFT
         """
-        self.N = fb.fil[0]['win_len']
+        self.led_N.setEnabled(not self.chk_auto_N.isChecked())
+        if self.chk_auto_N.isChecked():
+            self.N = fb.fil[0]['win_len']
+            self.led_N.setText(str(self.N))
+        else:
+            self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
+
         self.t = np.arange(self.N)
         params = fb.fil[0]['win_params'] # convert to iterable
         if not params:
