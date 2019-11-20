@@ -23,7 +23,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from pyfda.compat import (QMainWindow, QtCore, QFrame, pyqtSignal,
+from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
                      QCheckBox, QLineEdit, QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
@@ -37,17 +37,24 @@ class Plot_FFT_win(QMainWindow):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(Plot_FFT_win, self).__init__(parent)#, QtCore.Qt.WindowStaysOnTopHint)
-        # On Windows (7) the new window stays on top anyway, providing the hint
+        super(Plot_FFT_win, self).__init__(parent)
+
+        # On Windows (7) the new window stays on top anyway, setting WindowStaysOnTopHint
         # blocks the message window when trying to close pyfda
         if dirs.OS != "Windows":
-            self.setWindowState(QtCore.Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(Qt.CustomizeWindowHint | Qt.Window |# always needed
+                                Qt.WindowStaysOnTopHint | # window should stay on top
+                                Qt.WindowTitleHint | # show title bar, make window movable
+                                Qt.WindowCloseButtonHint | # show close button
+                                Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
+                                Qt.WindowMinMaxButtonsHint # show min/max buttons
+                                )
         self.needs_calc = False
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 128 # initial number of data points
         
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
 
