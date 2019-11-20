@@ -30,6 +30,21 @@ from PyQt5.QtWidgets import (QAction, QMenu,
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
+#def windowStaysOnTopHint(self, b=True):
+#    try:
+#        import win32gui, win32con
+#        flag = win32con.HWND_TOPMOST if b else win32con.HWND_NOTOPMOST
+#        win32gui.SetWindowPos(self.winId(), flag, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+#    except ModuleNotFoundError:
+#        pass
+#    if b:
+#        flag = self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint
+#    else:
+#        flag = self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint
+#    self.setGeometry(self.geometry())  # `setWindowFlags` resets size if setGeometry is never called
+#    self.setWindowFlags(flag)
+#    self.show()
+
 #except ImportError:
 #    import PyQt4
 #
