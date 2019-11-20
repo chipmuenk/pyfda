@@ -105,7 +105,8 @@ class Plot_FFT_win(QMainWindow):
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
         
         self.led_N = QLineEdit(self)
-        self.led_N.setText(str(self.N))    
+        self.led_N.setText(str(self.N))
+        self.led_N.setMaximumWidth(70)
         self.led_N.setToolTip("<span>Number of window data points.</span>")
         
         self.chk_log_t = QCheckBox("Log", self)
@@ -114,6 +115,7 @@ class Plot_FFT_win(QMainWindow):
         
         self.led_log_bottom_t = QLineEdit(self)
         self.led_log_bottom_t.setText(str(self.bottom_t))
+        self.led_log_bottom_t.setMaximumWidth(50)
         self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
 
         self.chk_log_f = QCheckBox("Log", self)
@@ -122,6 +124,7 @@ class Plot_FFT_win(QMainWindow):
 
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setText(str(self.bottom_f))
+        self.led_log_bottom_f.setMaximumWidth(50)
         self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
 
         layHControls = QHBoxLayout()
