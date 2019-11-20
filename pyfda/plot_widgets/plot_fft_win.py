@@ -17,15 +17,14 @@ from numpy.fft import fft, fftshift, fftfreq
 import scipy.signal.windows as win
 
 from pyfda.pyfda_lib import safe_eval
-from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
+#from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from pyfda.compat import (QMainWindow, QtCore, QFrame, QLabel, pyqtSignal,
-                     QCheckBox, QComboBox, QPushButton, QLineEdit,
-                     QHBoxLayout, QVBoxLayout)
+from pyfda.compat import (QMainWindow, QtCore, QFrame, pyqtSignal,
+                     QCheckBox, QLineEdit, QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
