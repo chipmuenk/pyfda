@@ -20,7 +20,7 @@ from pyfda.pyfda_lib import safe_eval
 from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-#import pyfda.pyfda_dirs as dirs
+import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, QtCore, QFrame, QLabel, pyqtSignal,
@@ -38,7 +38,11 @@ class Plot_FFT_win(QMainWindow):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(Plot_FFT_win, self).__init__(parent, QtCore.Qt.WindowStaysOnTopHint)
+        super(Plot_FFT_win, self).__init__(parent)#, QtCore.Qt.WindowStaysOnTopHint)
+        # On Windows (7) the new window stays on top anyway, providing the hint
+        # blocks the message window when trying to close pyfda
+        if dirs.OS != "Windows":
+            self.setWindowState(QtCore.Qt.WindowStaysOnTopHint)
         self.needs_calc = False
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
