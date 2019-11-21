@@ -19,7 +19,8 @@ import scipy.signal.windows as win
 from pyfda.pyfda_lib import safe_eval
 #from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
-from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.plot_widgets.mpl_widget2 import MplWidget
+from matplotlib.gridspec import GridSpec
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
@@ -53,6 +54,8 @@ class Plot_FFT_win(QMainWindow):
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 128 # initial number of data points
+        
+        self.pad = 8 # amount of zero padding
         
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
@@ -144,11 +147,10 @@ class Plot_FFT_win(QMainWindow):
         layHControls.addStretch(10) 
         layHControls.addWidget(self.chk_norm_f)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chk_log_f)
-        layHControls.addStretch(1)
         layHControls.addWidget(self.chk_half_f)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chk_log_f)
         layHControls.addWidget(self.led_log_bottom_f)
-
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -171,11 +173,9 @@ class Plot_FFT_win(QMainWindow):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
         self.setCentralWidget(self.mplwidget)
-
-        self.fig = self.mplwidget.fig
-        self.ax_t = self.fig.add_subplot(121)
-        self.ax_f = self.fig.add_subplot(122)
-
+        gs = GridSpec(nrows=1, ncols=2, figure=self.mplwidget.fig, hspace=0.01)
+        self.ax_t = self.mplwidget.fig.add_subplot(gs[0,0])
+        self.ax_f = self.mplwidget.fig.add_subplot(gs[0,1])
 
         self.draw() # initial drawing
 
@@ -200,14 +200,7 @@ class Plot_FFT_win(QMainWindow):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
-#------------------------------------------------------------------------------
-    def init_axes(self):
-        """
-        Initialize and clear the axes - this is only called once
-        """
-        window_name = fb.fil[0]['win_name']
-        self.fig.suptitle(r'{0} Window'.format(window_name))
-        
+
 #------------------------------------------------------------------------------
     def update_bottom(self):
         """
@@ -249,17 +242,14 @@ class Plot_FFT_win(QMainWindow):
         if self.chk_norm_f.isChecked():
             self.win *= self.scale # correct gain for periodic signals (coherent gain)
             
-        self.F = fftshift(fftfreq(self.N * 8, d=1. / fb.fil[0]['f_S'])) # zero-padding 
-        self.Win = fftshift(np.abs(fft(self.win, self.N * 8))) / self.N
-        
-
+        self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
+        self.Win = np.abs(fft(self.win, self.N * self.pad)) / self.N
 #------------------------------------------------------------------------------
     def draw(self):
         """
         Main entry point:
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.init_axes()
         self.calc_win()
         self.update_view()
 
@@ -283,14 +273,21 @@ class Plot_FFT_win(QMainWindow):
             self.ax_t.plot(self.t, np.maximum(20 * np.log10(self.win), self.bottom_t))
         else:
             self.ax_t.plot(self.t, self.win)
+
+        if self.chk_half_f.isChecked():
+            F = self.F[:len(self.F)//2]
+            Win = self.Win[:len(self.F)//2]
+        else:
+            F = fftshift(self.F)
+            Win = fftshift(self.Win)
             
         if self.chk_log_f.isChecked():
-            self.ax_f.plot(self.F, np.maximum(20 * np.log10(self.Win), self.bottom_f))
+            self.ax_f.plot(F, np.maximum(20 * np.log10(Win), self.bottom_f))
         else:
-            self.ax_f.plot(self.F, self.Win)
-            
-        self.fig.subplots_adjust(top=0.88)
-        self.fig.set_tight_layout(True)
+            self.ax_f.plot(F, Win)
+        
+        window_name = fb.fil[0]['win_name']
+        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name))
 
         self.redraw()
 
