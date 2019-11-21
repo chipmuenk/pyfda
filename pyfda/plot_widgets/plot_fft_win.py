@@ -118,6 +118,14 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_t.setMaximumWidth(50)
         self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
 
+        self.chk_norm_f = QCheckBox("Norm", self)
+        self.chk_norm_f.setChecked(True)
+        self.chk_norm_f.setToolTip("Normalize window spectrum for a maximum of 1.")
+        
+        self.chk_half_f = QCheckBox("Half", self)
+        self.chk_half_f.setChecked(True)
+        self.chk_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
+
         self.chk_log_f = QCheckBox("Log", self)
         self.chk_log_f.setChecked(True)
         self.chk_log_f.setToolTip("Display in dB")
@@ -133,8 +141,12 @@ class Plot_FFT_win(QMainWindow):
         layHControls.addStretch(1)         
         layHControls.addWidget(self.chk_log_t)
         layHControls.addWidget(self.led_log_bottom_t)
-        layHControls.addStretch(10)       
+        layHControls.addStretch(10) 
+        layHControls.addWidget(self.chk_norm_f)
+        layHControls.addStretch(1)
         layHControls.addWidget(self.chk_log_f)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chk_half_f)
         layHControls.addWidget(self.led_log_bottom_f)
 
 
@@ -182,6 +194,9 @@ class Plot_FFT_win(QMainWindow):
 
         self.chk_auto_N.clicked.connect(self.draw)
         self.led_N.editingFinished.connect(self.draw)
+        
+        self.chk_norm_f.clicked.connect(self.draw)
+        self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
@@ -192,10 +207,6 @@ class Plot_FFT_win(QMainWindow):
         """
         window_name = fb.fil[0]['win_name']
         self.fig.suptitle(r'{0} Window'.format(window_name))
-        
-        #self.fig.subplots_adjust(top=0.88)
-
-        self.fig.set_tight_layout(True)
         
 #------------------------------------------------------------------------------
     def update_bottom(self):
@@ -232,31 +243,15 @@ class Plot_FFT_win(QMainWindow):
         else:
             self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N, *params)
             
+        self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
+        self.scale = self.N / np.sum(self.win)
+        
+        if self.chk_norm_f.isChecked():
+            self.win *= self.scale # correct gain for periodic signals (coherent gain)
+            
         self.F = fftshift(fftfreq(self.N * 8, d=1. / fb.fil[0]['f_S'])) # zero-padding 
         self.Win = fftshift(np.abs(fft(self.win, self.N * 8))) / self.N
         
-#------------------------------------------------------------------------------
-    def calc_win_freq_x(self):
-        """
-        Calculate frequency transform of window function
-        """
-        self.F = fftshift(fftfreq(self.N * 8, d=1. / fb.fil[0]['f_S'])) # zero-padding 
-        self.Win = fftshift(np.abs(fft(self.win, self.N * 8))) / self.N
-
-        if fb.fil[0]['freqSpecsRangeType'] == 'half':
-            self.Win[1:] = 2 * self.Win[1:]
-  
-
-#        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-#        # shift X, Y and F by f_S/2
-#            self.Win = np.fft.fftshift(self.Win)
-#            self.F = np.fft.fftshift(self.F)
-#        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-#            self.Win = self.Win[0:self.N//2]
-#            self.F = self.F[0:self.N//2]
-#        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
-#            # plot for F = 0 ... 1
-#            self.F = np.fft.fftshift(self.F) + fb.fil[0]['f_S']/2.
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -278,11 +273,11 @@ class Plot_FFT_win(QMainWindow):
         
         self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
         self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
-        self.ax_t.set_title("Time")
+        #self.ax_t.set_title("Time")
         
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
-        self.ax_f.set_title("Frequency")
+        #self.ax_f.set_title("Frequency")
         
         if self.chk_log_t.isChecked():
             self.ax_t.plot(self.t, np.maximum(20 * np.log10(self.win), self.bottom_t))
@@ -293,6 +288,9 @@ class Plot_FFT_win(QMainWindow):
             self.ax_f.plot(self.F, np.maximum(20 * np.log10(self.Win), self.bottom_f))
         else:
             self.ax_f.plot(self.F, self.Win)
+            
+        self.fig.subplots_adjust(top=0.88)
+        self.fig.set_tight_layout(True)
 
         self.redraw()
 
