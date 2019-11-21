@@ -126,7 +126,6 @@ class PlotImpz_UI(QWidget):
         self.but_fft_win = QPushButton("WIN FFT", self)
         self.but_fft_win.setToolTip("Show FFT Window")
         self.but_fft_win.setCheckable(True)
-        self.but_fft_win.toggle()
         self.but_fft_win.setChecked(False)
 
         layH_ctrl_run = QHBoxLayout()
