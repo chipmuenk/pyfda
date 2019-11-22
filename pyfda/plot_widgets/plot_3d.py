@@ -24,7 +24,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
-from pyfda.plot_widgets.mpl_widget2 import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from mpl_toolkits import mplot3d # import to register 3D projection
 from matplotlib import cm # Colormap
@@ -666,3 +666,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# module test using python -m pyfda.plot_widgets.plot_3d

@@ -13,25 +13,27 @@ toolbar.
 import logging
 logger = logging.getLogger(__name__)
 import sys
-import numpy as np
+#import numpy as np
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 #from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
+from matplotlib.gridspec import GridSpec
 from matplotlib import rcParams
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
-    
+
 from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
-                      QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import cmp_version
 from pyfda import qrc_resources # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
@@ -40,12 +42,12 @@ for key in pyfda_rc.mpl_rc:
 
 #------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, **kwargs):
-    """ 
+    """
     A faster replacement for stem plot using vlines (= LineCollection)
     LineCollection keywords are supported.
     """
     # pop the 'bottom' key-value pair from the dict, provide default value 0
-    bottom=kwargs.pop('bottom', 0) 
+    bottom=kwargs.pop('bottom', 0)
     ax.axhline(bottom, **kwargs)
     ax.vlines(x, y, bottom, label=label, **kwargs)
     # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
@@ -54,8 +56,8 @@ def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
     """
     Don't plot anything - needed for plot factory
     """
-    pass 
-    
+    pass
+
 #------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
@@ -68,7 +70,11 @@ class MplWidget(QWidget):
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure:
         self.plt_lim = [] # define variable for x,y plot limits
-        self.fig = Figure()
+
+        if cmp_version("matplotlib", "2.2.0") >= 0:
+            self.fig = Figure(constrained_layout=True)
+        else:
+            self.fig = Figure()
 
         self.pltCanv = FigureCanvas(self.fig)
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
@@ -139,11 +145,11 @@ class MplWidget(QWidget):
                 else:
                     self.limits = ax.axis() # save old limits
 
-            try:
-                # tight_layout() crashes with small figure sizes
-               self.fig.tight_layout(pad = 0.1)
-            except(ValueError, np.linalg.linalg.LinAlgError):
-                logger.debug("error in tight_layout")
+#            try:
+#                # tight_layout() crashes with small figure sizes
+#               self.fig.tight_layout(pad = 0.1)
+#            except(ValueError, np.linalg.linalg.LinAlgError):
+#                logger.debug("error in tight_layout")
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
@@ -174,7 +180,7 @@ class MplWidget(QWidget):
         """
         Get the full extent of axes system `ax`, including axes labels, tick labels
         and titles.
-        
+
         Needed for inset plot in H(f)
         """
         #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
@@ -196,7 +202,7 @@ class MplToolbar(NavigationToolbar):
     - new functions and icons for grid toggle, full view, screenshot
     - removed buttons for configuring subplots and editing curves
     - added an x,y location widget and icon
-    
+
     Signalling / communication works via the signal `sig_tx'
 
 
@@ -229,7 +235,7 @@ class MplToolbar(NavigationToolbar):
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
 
-    sig_tx = pyqtSignal(object) # general signal, containing a dict 
+    sig_tx = pyqtSignal(object) # general signal, containing a dict
 
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
@@ -397,7 +403,7 @@ class MplToolbar(NavigationToolbar):
 #                else:
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
-    
+
     def home(self):
         """
         Reset zoom to default settings (defined by plotting widget).
@@ -438,7 +444,7 @@ class MplToolbar(NavigationToolbar):
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
-            
+
         self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
@@ -456,7 +462,7 @@ class MplToolbar(NavigationToolbar):
 #             self.a_en.setIcon(QIcon(':/circle-x.svg'))
 #         else:
 #             self.a_en.setIcon(QIcon(':/circle-check.svg'))
-# 
+#
 #         self.a_ho.setEnabled(self.enabled)
 #         self.a_ba.setEnabled(self.enabled)
 #         self.a_fw.setEnabled(self.enabled)
@@ -469,9 +475,9 @@ class MplToolbar(NavigationToolbar):
 #         self.a_sv.setEnabled(self.enabled)
 #         self.a_cb.setEnabled(self.enabled)
 #         self.a_op.setEnabled(self.enabled)
-# 
+#
 #         self.sig_tx.emit({'sender':__name__, 'enabled':self.enabled})
-# 
+#
 # =============================================================================
 #------------------------------------------------------------------------------
     def mpl2Clip(self):

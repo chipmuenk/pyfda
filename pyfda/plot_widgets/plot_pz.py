@@ -21,7 +21,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import unique_roots
 
-from pyfda.plot_widgets.mpl_widget2 import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from  matplotlib import patches
 
