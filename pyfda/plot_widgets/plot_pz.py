@@ -21,7 +21,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import unique_roots
 
-from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.plot_widgets.mpl_widget2 import MplWidget
 
 from  matplotlib import patches
 
@@ -150,7 +150,7 @@ class Plot_PZ(QWidget):
         Initialize and clear the axes (this is only run once)
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
-            self.ax = self.mplwidget.fig.add_subplot(111)
+            self.ax = self.mplwidget.fig.subplots() #.add_subplot(111)
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
 

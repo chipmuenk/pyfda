@@ -173,9 +173,9 @@ class Plot_FFT_win(QMainWindow):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
         self.setCentralWidget(self.mplwidget)
-        gs = GridSpec(nrows=1, ncols=2, figure=self.mplwidget.fig, hspace=0.01)
-        self.ax_t = self.mplwidget.fig.add_subplot(gs[0,0])
-        self.ax_f = self.mplwidget.fig.add_subplot(gs[0,1])
+        self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
+        self.ax_t = self.ax[0]
+        self.ax_f = self.ax[1]
 
         self.draw() # initial drawing
 
@@ -243,7 +243,9 @@ class Plot_FFT_win(QMainWindow):
             self.win *= self.scale # correct gain for periodic signals (coherent gain)
             
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
-        self.Win = np.abs(fft(self.win, self.N * self.pad)) / self.N
+        self.Win = np.abs(fft(self.win, self.N * self.pad))
+        if self.chk_norm_f.isChecked():
+            self.Win /= self.scale # correct gain for periodic signals (coherent gain)
 #------------------------------------------------------------------------------
     def draw(self):
         """

@@ -24,9 +24,9 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
-from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.plot_widgets.mpl_widget2 import MplWidget
 
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+from mpl_toolkits import mplot3d # import to register 3D projection
 from matplotlib import cm # Colormap
 from matplotlib.colors import LightSource
 
@@ -41,6 +41,12 @@ if mod_version('mayavi'):
     MLAB = True
 else:
     MLAB = False
+
+if mod_version('vispy'):
+    from vispy import plot #(?)
+    HAS_VISPY = True
+else:
+    HAS_VISPY = False
 
 
 class Plot_3D(QWidget):
@@ -326,6 +332,7 @@ class Plot_3D(QWidget):
 
         self.mplwidget.fig.clf() # needed to get rid of colorbar
         self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+        #self.ax3d = self.mplwidget.fig.subplots(nrows=1, ncols=1, projection='3d')
 
         self._restore_axes()
 
