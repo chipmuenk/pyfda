@@ -765,18 +765,20 @@ class Plot_Impz(QWidget):
         if plt_time:
             num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
 
-            self.mplwidget_t.fig.subplots_adjust(hspace=0.5)
+            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1, 
+                                               sharex=True, squeeze = False)
 
-            self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 1)
-            self.ax_r.clear()
+            self.ax_r = ax[0][0]
+            self.ax_r.cla()
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
             if self.cmplx and self.plt_time_resp != "none":
-                self.ax_i = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 2, sharex=self.ax_r)
-                self.ax_i.clear()
+                self.ax_i = ax[1][0]   
+                self.ax_i.cla()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
+                self.mplwidget_t.fig.align_ylabels()
 
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
@@ -949,7 +951,7 @@ class Plot_Impz(QWidget):
             self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
 
         if len(self.mplwidget_f.fig.get_axes()) == 0: # empty figure, no axes
-            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)
+            self.ax_fft = self.mplwidget_f.fig.subplots()
             self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
             self.ax_fft.set_title("FFT of Transient Response")
