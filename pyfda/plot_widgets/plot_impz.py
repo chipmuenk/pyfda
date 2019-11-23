@@ -1120,6 +1120,7 @@ class Plot_Impz(QWidget):
             # collect all plot objects, hope that the order isn't messed up and add two dummy handles
             # for the NENBW and the CGAIN labels
             handles = self.ax_fft.get_lines()
+            # Create two empty patches for NENBW and CGAIN:
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
                                                  ec="white", lw=0, alpha=0))
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
