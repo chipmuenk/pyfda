@@ -242,6 +242,8 @@ class Plot_FFT_win(QMainWindow):
 
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
+        if self.chk_norm_f.isChecked():
+            self.Win /= (self.scale * self.N)# correct gain for periodic signals (coherent gain)
 #------------------------------------------------------------------------------
     def draw(self):
         """
@@ -273,14 +275,11 @@ class Plot_FFT_win(QMainWindow):
             self.ax_t.plot(self.t, self.win)
 
         if self.chk_half_f.isChecked():
-            F = self.F[:len(self.F)//2]
-            Win = self.Win[:len(self.F)//2]
+            F = self.F[:len(self.F*self.pad)//2]
+            Win = self.Win[:len(self.F*self.pad)//2]
         else:
             F = fftshift(self.F)
             Win = fftshift(self.Win)
-            
-        if self.chk_norm_f.isChecked():
-            Win /= (self.scale * self.N)# correct gain for periodic signals (coherent gain)
             
         if self.chk_log_f.isChecked():
             self.ax_f.plot(F, np.maximum(20 * np.log10(Win), self.bottom_f))
