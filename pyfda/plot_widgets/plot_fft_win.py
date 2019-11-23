@@ -26,7 +26,7 @@ import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
-                     QCheckBox, QLineEdit, QHBoxLayout)
+                     QCheckBox, QLineEdit, QToolButton, QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
@@ -40,18 +40,11 @@ class Plot_FFT_win(QMainWindow):
 
     def __init__(self, parent):
         super(Plot_FFT_win, self).__init__(parent)
+        
+        self.needs_calc = True
+        self.needs_draw = True  
 
-        # On Windows (7) the new window stays on top anyway, setting WindowStaysOnTopHint
-        # blocks the message window when trying to close pyfda
-        if dirs.OS != "Windows":
-            self.setWindowFlags(Qt.CustomizeWindowHint | Qt.Window |# always needed
-                                Qt.WindowStaysOnTopHint | # window should stay on top
-                                Qt.WindowTitleHint | # show title bar, make window movable
-                                Qt.WindowCloseButtonHint | # show close button
-                                Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
-                                Qt.WindowMinMaxButtonsHint # show min/max buttons
-                                )
-        self.needs_calc = False
+        self.flg_on_top = True # window stays on top (only non-MS Windows OS)
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 128 # initial number of data points
@@ -61,6 +54,9 @@ class Plot_FFT_win(QMainWindow):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
+        # On Windows (7) the new window stays on top anyway, setting WindowStaysOnTopHint
+        # blocks the message window when trying to close pyfda
+        self.window_stay_on_top()
 
     def closeEvent(self, event):
         """
@@ -69,15 +65,41 @@ class Plot_FFT_win(QMainWindow):
         closing the window.
         """
         self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
+        logger.warning("fft close event")
         event.accept()
+        
+    def window_stay_on_top(self):
+        """
+        Set flags for window such that it stays on top (True) or not
+        """
+        #logger.warning(state)
+    
+#        if state is not None: # initialization
+#            self.flg_on_top = state
+            
+        win_flags = (Qt.CustomizeWindowHint | Qt.Window |# always needed
+                    Qt.WindowTitleHint | # show title bar, make window movable
+                    Qt.WindowCloseButtonHint | # show close button
+                    Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
+                    Qt.WindowMinMaxButtonsHint) # show min/max buttons
+    
+        if True:
+            self.setWindowFlags(win_flags)
+            self.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
+            
+            #self.setWindowFlags(win_flags | 
+                    #Qt.WindowStaysOnTopHint) # window should stay on top
+#        else:
+#            self.setWindowFlags(win_flags)              
+
         
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_calc, self.isVisible()))
+        logger.debug("Processing {0} | visible = {1}"\
+                     .format(dict_sig, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
@@ -103,6 +125,13 @@ class Plot_FFT_win(QMainWindow):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
+        self.but_on_top = QToolButton(self)
+        #self.but_on_top.setIcon(QIcon(":/icon.png"))
+        self.but_on_top.setText("On Top")
+        self.but_on_top.setToolButtonStyle(Qt.ToolButtonTextOnly)#(Qt.ToolButtonIconOnly)#ToolButtonTextOnlyToolButtonTextBesideIcon);
+        self.but_on_top.setCheckable(True)
+        self.but_on_top.setVisible(dirs.OS != "Windows")
+        self.but_on_top.setChecked((dirs.OS != "Windows") & (self.flg_on_top))
 
         self.chk_auto_N = QCheckBox("N Auto", self)
         self.chk_auto_N.setChecked(False)
@@ -140,6 +169,7 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
 
         layHControls = QHBoxLayout()
+        layHControls.addWidget(self.but_on_top)
         layHControls.addWidget(self.chk_auto_N)
         layHControls.addWidget(self.led_N)  
         layHControls.addStretch(1)         
@@ -188,6 +218,7 @@ class Plot_FFT_win(QMainWindow):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.but_on_top.clicked.connect(self.window_stay_on_top)
         self.chk_log_f.clicked.connect(self.update_view)
         self.chk_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
