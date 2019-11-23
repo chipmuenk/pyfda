@@ -281,9 +281,13 @@ class Plot_Impz(QWidget):
         """
         Pop-up FFT window
         """
-        if self.fft_window is None: # does a handle to the window exist?
+        if self.ui.but_fft_win.isChecked():
+            qstyle_widget(self.ui.but_fft_win, "changed")
+        else:
+            qstyle_widget(self.ui.but_fft_win, "normal")
+            
+        if self.fft_window is None: # no handle to the window? Create a new instance
             if self.ui.but_fft_win.isChecked():
-                qstyle_widget(self.ui.but_fft_win, "changed")
                 self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
                 self.ui.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
@@ -294,11 +298,11 @@ class Plot_Impz(QWidget):
                     logger.warning("FFT window is already closed!")
                 else:
                     self.fft_window.close()
-                    qstyle_widget(self.ui.but_fft_win, "normal")
 
     def close_fft_win(self):
         self.fft_window = None
         self.ui.but_fft_win.setChecked(False)
+        qstyle_widget(self.ui.but_fft_win, "normal")
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
