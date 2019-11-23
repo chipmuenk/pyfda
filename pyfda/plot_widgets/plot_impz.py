@@ -12,7 +12,7 @@ Widget for plotting impulse and general transient responses
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QtCore, Qt
+from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
 from numpy import pi, sqrt
@@ -26,7 +26,7 @@ from pyfda.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
-#from mpl_toolkits.mplot3d.axes3d import Axes3D
+
 from .plot_impz_ui import PlotImpz_UI
 from .plot_fft_win import Plot_FFT_win
 
