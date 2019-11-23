@@ -15,12 +15,13 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 import scipy.signal.windows as win
+import matplotlib.patches as mpl_patches
 
 from pyfda.pyfda_lib import safe_eval
 #from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from matplotlib.gridspec import GridSpec
+
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
@@ -238,14 +239,9 @@ class Plot_FFT_win(QMainWindow):
             
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         self.scale = self.N / np.sum(self.win)
-        
-        if self.chk_norm_f.isChecked():
-            self.win *= self.scale # correct gain for periodic signals (coherent gain)
-            
+
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
-        if self.chk_norm_f.isChecked():
-            self.Win /= self.scale # correct gain for periodic signals (coherent gain)
 #------------------------------------------------------------------------------
     def draw(self):
         """
@@ -283,13 +279,29 @@ class Plot_FFT_win(QMainWindow):
             F = fftshift(self.F)
             Win = fftshift(self.Win)
             
+        if self.chk_norm_f.isChecked():
+            Win /= (self.scale * self.N)# correct gain for periodic signals (coherent gain)
+            
         if self.chk_log_f.isChecked():
             self.ax_f.plot(F, np.maximum(20 * np.log10(Win), self.bottom_f))
+            nenbw = 10 * np.log10(self.nenbw)
+            unit_nenbw = "dB"
         else:
             self.ax_f.plot(F, Win)
+            nenbw = self.nenbw
+            unit_nenbw = "bins"
         
         window_name = fb.fil[0]['win_name']
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name))
+
+        # create two empty patches
+        handles = [mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)] * 2
+
+        labels = []
+        labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
+        labels.append("$CGAIN$  = {0:.4g}".format(self.scale))
+        self.ax_f.legend(handles, labels, loc='best', fontsize='small',
+                               fancybox=True, framealpha=0.7)
 
         self.redraw()
 
