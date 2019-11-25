@@ -18,15 +18,14 @@ import scipy.signal.windows as win
 import matplotlib.patches as mpl_patches
 
 from pyfda.pyfda_lib import safe_eval
-#from pyfda.pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
+from pyfda.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
-import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
-                     QCheckBox, QLineEdit, QToolButton, QHBoxLayout)
+                     QCheckBox, QLineEdit, QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
@@ -54,10 +53,10 @@ class Plot_FFT_win(QMainWindow):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
-        # On Windows (7) the new window stays on top anyway, setting WindowStaysOnTopHint
-        # blocks the message window when trying to close pyfda
-        self.window_stay_on_top()
 
+        qwindow_stay_on_top(self, True)
+
+#------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
         Catch closeEvent (user has tried to close the window) and send a 
@@ -67,32 +66,7 @@ class Plot_FFT_win(QMainWindow):
         self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
         logger.warning("fft close event")
         event.accept()
-        
-    def window_stay_on_top(self):
-        """
-        Set flags for window such that it stays on top (True) or not
-        """
-        #logger.warning(state)
-    
-#        if state is not None: # initialization
-#            self.flg_on_top = state
-            
-        win_flags = (Qt.CustomizeWindowHint | Qt.Window |# always needed
-                    Qt.WindowTitleHint | # show title bar, make window movable
-                    Qt.WindowCloseButtonHint | # show close button
-                    Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
-                    Qt.WindowMinMaxButtonsHint) # show min/max buttons
-    
-        if True:
-            self.setWindowFlags(win_flags)
-            self.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
-            
-            #self.setWindowFlags(win_flags | 
-                    #Qt.WindowStaysOnTopHint) # window should stay on top
-#        else:
-#            self.setWindowFlags(win_flags)              
 
-        
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -125,14 +99,6 @@ class Plot_FFT_win(QMainWindow):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.but_on_top = QToolButton(self)
-        #self.but_on_top.setIcon(QIcon(":/icon.png"))
-        self.but_on_top.setText("On Top")
-        self.but_on_top.setToolButtonStyle(Qt.ToolButtonTextOnly)#(Qt.ToolButtonIconOnly)#ToolButtonTextOnlyToolButtonTextBesideIcon);
-        self.but_on_top.setCheckable(True)
-        self.but_on_top.setVisible(dirs.OS != "Windows")
-        self.but_on_top.setChecked((dirs.OS != "Windows") & (self.flg_on_top))
-
         self.chk_auto_N = QCheckBox("N Auto", self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
@@ -169,7 +135,6 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
 
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.but_on_top)
         layHControls.addWidget(self.chk_auto_N)
         layHControls.addWidget(self.led_N)  
         layHControls.addStretch(1)         
@@ -218,7 +183,6 @@ class Plot_FFT_win(QMainWindow):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.but_on_top.clicked.connect(self.window_stay_on_top)
         self.chk_log_f.clicked.connect(self.update_view)
         self.chk_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)

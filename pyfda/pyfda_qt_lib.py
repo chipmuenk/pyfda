@@ -16,6 +16,28 @@ logger = logging.getLogger(__name__)
 from .pyfda_lib import qstr
 
 from .compat import QFrame, QMessageBox, Qt
+from .pyfda_dirs import OS
+
+#------------------------------------------------------------------------------        
+def qwindow_stay_on_top(win, top):
+    """
+    Set flags for a window such that it stays on top (True) or not
+
+    On Windows (7) the new window stays on top anyway (check for Win10), 
+    Additionally setting WindowStaysOnTopHint blocks the message window when 
+    trying to close pyfda.
+    """
+
+    win_flags = (Qt.CustomizeWindowHint | Qt.Window |# always needed
+                Qt.WindowTitleHint | # show title bar, make window movable
+                Qt.WindowCloseButtonHint | # show close button
+                Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
+                Qt.WindowMinMaxButtonsHint) # show min/max buttons
+
+    if OS == "Windows" or not top:
+        win.setWindowFlags(win_flags)
+    else:
+        win.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
 
 #------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):
