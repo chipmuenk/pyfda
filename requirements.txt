@@ -1,11 +1,13 @@
-# Requirements for Travis and ReadTheDocs.org
-#-----------------------------------------------
+# Requirements for pip, Travis and ReadTheDocs.org
+#-------------------------------------------------
+# - pip reads this file via 'setup.py', filtering
+#   out comments and 'nose'
 # This file is specified in the project settings 
 # at ReadTheDocs.org and in .travis.yml
-#-----------------------------------------------
+#-------------------------------------------------
 numpy
 scipy
-matplotlib
+matplotlib >= 2.0, != 3.1.0
 pyqt5
 docutils
 nose
