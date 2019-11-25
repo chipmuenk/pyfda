@@ -409,7 +409,8 @@ qss_common = """
                 QPushButton
                 {
                 width: 20px;
-                height: 20px;
+                height: 15px;
+                /* border-radius: 1px; destroys button shape */
                 }
 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -429,6 +430,7 @@ qss_common = """
                                 color: white;}
                 *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
+                QPushButton:checked {background-color:lightblue; color:black;}
                 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */

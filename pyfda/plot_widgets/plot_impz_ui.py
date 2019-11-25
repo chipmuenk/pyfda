@@ -92,7 +92,8 @@ class PlotImpz_UI(QWidget):
                                      "parameters have been changed.</span>")
         self.chk_auto_run.setChecked(True)
 
-        self.but_run = QPushButton("RUN", self)
+        self.but_run = QPushButton(self)
+        self.but_run.setText("RUN")
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.chk_auto_run.isChecked())
 
@@ -123,8 +124,9 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
         
-        self.but_fft_win = QPushButton("WIN FFT", self)
-        self.but_fft_win.setToolTip("Show FFT Window")
+        self.but_fft_win = QPushButton(self)
+        self.but_fft_win.setText("WIN FFT")
+        self.but_fft_win.setToolTip("Show time and frequency response of FFT Window")
         self.but_fft_win.setCheckable(True)
         self.but_fft_win.setChecked(False)
 
