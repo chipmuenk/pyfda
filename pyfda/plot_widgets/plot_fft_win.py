@@ -237,8 +237,9 @@ class Plot_FFT_win(QMainWindow):
 
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
+
         if self.chk_norm_f.isChecked():
-            self.Win /= (self.scale * self.N)# correct gain for periodic signals (coherent gain)
+            self.Win /= (self.N / self.scale)# correct gain for periodic signals (coherent gain)
 #------------------------------------------------------------------------------
     def draw(self):
         """
