@@ -25,7 +25,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
-                     QCheckBox, QLineEdit, QHBoxLayout)
+                     QCheckBox, QLabel, QLineEdit, QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
@@ -37,7 +37,7 @@ class Plot_FFT_win(QMainWindow):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent):
+    def __init__(self, parent, win_dict="fb.fil[0]"):
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
@@ -49,6 +49,8 @@ class Plot_FFT_win(QMainWindow):
         self.N = 128 # initial number of data points
         
         self.pad = 8 # amount of zero padding
+        
+        self.win_dict = win_dict
         
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
