@@ -17,7 +17,7 @@ from numpy.fft import fft, fftshift, fftfreq
 import scipy.signal.windows as win
 import matplotlib.patches as mpl_patches
 
-from pyfda.pyfda_lib import safe_eval
+from pyfda.pyfda_lib import safe_eval, to_html
 from pyfda.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -43,7 +43,6 @@ class Plot_FFT_win(QMainWindow):
         self.needs_calc = True
         self.needs_draw = True  
 
-        self.flg_on_top = True # window stays on top (only non-MS Windows OS)
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 128 # initial number of data points
@@ -66,7 +65,6 @@ class Plot_FFT_win(QMainWindow):
         closing the window.
         """
         self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
-        logger.warning("fft close event")
         event.accept()
 
 #------------------------------------------------------------------------------
@@ -101,9 +99,11 @@ class Plot_FFT_win(QMainWindow):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.chk_auto_N = QCheckBox("N Auto", self)
+        self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
+        
+        self.lbl_auto_N = QLabel(to_html("N", frmt='i') + " Auto")
         
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N))
@@ -117,7 +117,11 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_t = QLineEdit(self)
         self.led_log_bottom_t.setText(str(self.bottom_t))
         self.led_log_bottom_t.setMaximumWidth(50)
+        self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
+        
+        self.lbl_log_bottom_t = QLabel("dB", self)
+        self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
 
         self.chk_norm_f = QCheckBox("Norm", self)
         self.chk_norm_f.setChecked(True)
@@ -134,14 +138,20 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setText(str(self.bottom_f))
         self.led_log_bottom_f.setMaximumWidth(50)
+        self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
+
+        self.lbl_log_bottom_f = QLabel("dB", self)
+        self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chk_auto_N)
+        layHControls.addWidget(self.lbl_auto_N)
         layHControls.addWidget(self.led_N)  
-        layHControls.addStretch(1)         
+        layHControls.addStretch(1)        
         layHControls.addWidget(self.chk_log_t)
         layHControls.addWidget(self.led_log_bottom_t)
+        layHControls.addWidget(self.lbl_log_bottom_t)
         layHControls.addStretch(10) 
         layHControls.addWidget(self.chk_norm_f)
         layHControls.addStretch(1)
@@ -149,6 +159,7 @@ class Plot_FFT_win(QMainWindow):
         layHControls.addStretch(1)
         layHControls.addWidget(self.chk_log_f)
         layHControls.addWidget(self.led_log_bottom_f)
+        layHControls.addWidget(self.lbl_log_bottom_f)
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -287,6 +298,11 @@ class Plot_FFT_win(QMainWindow):
             self.ax_f.plot(F, Win)
             nenbw = self.nenbw
             unit_nenbw = "bins"
+            
+        self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
+        self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
+        self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
+        self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         
         window_name = fb.fil[0]['win_name']
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name))
