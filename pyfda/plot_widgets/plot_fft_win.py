@@ -266,7 +266,7 @@ class Plot_FFT_win(QMainWindow):
         #self.ax_f.set_title("Frequency")
         
         if self.chk_log_t.isChecked():
-            self.ax_t.plot(self.t, np.maximum(20 * np.log10(self.win), self.bottom_t))
+            self.ax_t.plot(self.t, np.maximum(20 * np.log10(np.abs(self.win)), self.bottom_t))
         else:
             self.ax_t.plot(self.t, self.win)
 
@@ -278,7 +278,7 @@ class Plot_FFT_win(QMainWindow):
             Win = fftshift(self.Win)
             
         if self.chk_log_f.isChecked():
-            self.ax_f.plot(F, np.maximum(20 * np.log10(Win), self.bottom_f))
+            self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
             nenbw = 10 * np.log10(self.nenbw)
             unit_nenbw = "dB"
         else:
