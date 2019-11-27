@@ -115,9 +115,9 @@ def calc_window_function(win_dict, win_name):
         txt_par = 'Attn ='
         tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
         _get_param()
-        if not self.param:
-            self.param = 80
-        if self.param < 45:
+        if not param:
+            param = 80
+        if param < 45:
             _set_param(45)
             logger.warning("Attenuation needs to be larger than 45 dB!")
     else:
@@ -131,14 +131,14 @@ def calc_window_function(win_dict, win_name):
         logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
                      .format(win_fnct_name))
         win_fnct = sig.windows.boxcar
-        self.param = None
+        param = None
         
     win_dict['win_name'] = win_name
     win_dict['win_fnct'] = win_fnct_name
     if N_par == 1:
-        win_dict['win_params'] = self.param
+        win_dict['win_params'] = param
     else:
         win_dict['win_params'] = ''
-    win_dict['win_len']  = self.N
+    win_dict['win_len']  = N
     
-return win_fnct
+    return win_fnct
