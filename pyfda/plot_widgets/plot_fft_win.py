@@ -304,7 +304,7 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         
-        window_name = fb.fil[0]['win_name']
+        window_name = self.win_dict['win_name']
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name))
 
         # create two empty patches
