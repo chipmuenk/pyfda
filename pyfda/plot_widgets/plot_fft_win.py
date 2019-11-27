@@ -37,7 +37,7 @@ class Plot_FFT_win(QMainWindow):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict="fb.fil[0]"):
+    def __init__(self, parent, win_dict="win_spectral_analysis"):
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
@@ -49,7 +49,7 @@ class Plot_FFT_win(QMainWindow):
         
         self.pad = 8 # amount of zero padding
         
-        self.win_dict = win_dict
+        self.win_dict = fb.fil[0][win_dict]
         
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
@@ -103,7 +103,7 @@ class Plot_FFT_win(QMainWindow):
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
         
-        self.lbl_auto_N = QLabel(to_html("N", frmt='i') + " Auto")
+        self.lbl_auto_N = QLabel("Auto " + to_html("N", frmt='i'))
         
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N))
@@ -231,19 +231,19 @@ class Plot_FFT_win(QMainWindow):
         """
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
         if self.chk_auto_N.isChecked():
-            self.N = fb.fil[0]['win_len']
+            self.N = self.win_dict['win_len']
             self.led_N.setText(str(self.N))
         else:
             self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
 
         self.t = np.arange(self.N)
-        params = fb.fil[0]['win_params'] # convert to iterable
+        params = self.win_dict['win_params'] # convert to iterable
         if not params:
-            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N)
+            self.win = getattr(win, self.win_dict['win_fnct'])(self.N)
         elif np.isscalar(params):
-            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N, params)
+            self.win = getattr(win, self.win_dict['win_fnct'])(self.N, params)
         else:
-            self.win = getattr(win, fb.fil[0]['win_fnct'])(self.N, *params)
+            self.win = getattr(win, self.win_dict['win_fnct'])(self.N, *params)
             
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         self.scale = self.N / np.sum(self.win)

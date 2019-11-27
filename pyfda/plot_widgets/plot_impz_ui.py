@@ -750,13 +750,14 @@ class PlotImpz_UI(QWidget):
                          .format(window_name))
             win_fnct = sig.windows.boxcar
             self.param = None
-        fb.fil[0]['win_name'] = self.window_type
-        fb.fil[0]['win_fnct'] = window_name
+        win_dict = fb.fil[0]['win_spectral_analysis']
+        win_dict['win_name'] = self.window_type
+        win_dict['win_fnct'] = window_name
         if N_par == 1:
-            fb.fil[0]['win_params'] = self.param
+            win_dict['win_params'] = self.param
         else:
-            fb.fil[0]['win_params'] = ''
-        fb.fil[0]['win_len']  = self.N
+            win_dict['win_params'] = ''
+        win_dict['win_len']  = self.N
 
         self.lblWinPar1.setVisible(N_par > 0)
         self.ledWinPar1.setVisible(N_par > 0)

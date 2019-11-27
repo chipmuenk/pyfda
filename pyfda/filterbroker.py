@@ -240,11 +240,20 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
                     + r'$\rightarrow $',
             'time_designed' : -1,
             'wdg_dyn':{'win':'hann'},
-            # Parameters for FFT Window function
-            'win_name':'Hann', # Window name
-            'win_fnct':'hann', # function name or array with values
-            'win_params':{}, # set of keyword params
-            'win_len':1024
+            # Parameters for spectral analysis window function
+            'win_spectral_analysis':
+                {'win_name':'Hann', # Window name
+                 'win_fnct':'hann', # function name or array with values
+                 'win_params':{}, # set of keyword params
+                 'win_len':1024
+                 },
+            # Parameters for filter design window function
+            'win_fft_FIR_design':
+                {'win_name':'Hann', # Window name
+                 'win_fnct':'hann', # function name or array with values
+                 'win_params':{}, # set of keyword params
+                 'win_len':1024
+                 }
             }
 
 fil = [None] * 10 # create empty list with length 10 for multiple filter designs
