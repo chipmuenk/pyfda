@@ -20,8 +20,8 @@ import scipy.signal as sig
 windows =\
     {'Boxcar':
         {'fn_name':'boxcar', 
-         'tooltip':
-             ("<span>Rectangular window, well suited for coherent signals, i.e. "
+         'info':
+             ("<span>Rectangular (a.k.a. 'Boxcar') window, well suited for coherent signals, i.e. "
               " where the window length is an integer number of the signal's period.</span>"),
         'props':{
             'enbw':1,
@@ -31,7 +31,7 @@ windows =\
          },
     'Barthann':
         {'fn_name':'barthann',
-         'tooltip':
+         'info':
              ("<span>A modified Bartlett-Hann Window."
               "</span>")},
     'Bartlett':
@@ -40,7 +40,7 @@ windows =\
         {'fn_name':'blackman'},
     'Blackmanharris':
         {'fn_name':'blackmanharris',
-         'tooltip':
+         'info':
              ("<span>The minimum 4-term Blackman-Harris window with excellent side-"
               "lobe suppression.</span>")
              },
@@ -48,8 +48,8 @@ windows =\
         {'fn_name':'bohman'},
     'Chebwin':
         {'fn_name':'chebwin',
-         'par':[['Attn.'],[80], ["<span>Side lobe attenuation in dB (typ. 80 dB).</span>"]],
-         'tooltip':
+         'par':[['Attn.'],[45, 80, 300], ["<span>Side lobe attenuation in dB (typ. 80 dB).</span>"]],
+         'info':
              ("<span>This window optimizes for the narrowest main lobe width for "
               "a given order <i>M</i> and sidelobe equiripple attenuation <i>Attn.</i>, "
               "using Chebyshev polynomials.</span>"),
@@ -61,17 +61,17 @@ windows =\
     'Gaussian':{},
     'Hamming':
         {'fn_name':'hamming',
-         'tooltip':
+         'info':
          ("<span>This window is smooth at the edges and has a fall-off rate of "
           "18 dB/oct.</span>")
          },
     'Hann':{},
     'Kaiser':
         {'fn_name':'kaiser',
-         'par':[['beta'],[10],
+         'par':[['beta'],[0, 10, 30],
                 ["<span>Shape parameter; lower values reduce  main lobe width, "
                  "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
-         'tooltip':
+         'info':
              ("<span>The Kaiser window is a very good approximation to the "
               "Digital Prolate Spheroidal Sequence, or Slepian window, which is "
               "which maximizes the energy in the main lobe of the window relative "
@@ -80,40 +80,45 @@ windows =\
     'Nuttall':{},
     'Parzen':{},
     'Slepian':{},
-    'Triang':{}
+    'Triang':{},
     }
 
 def calc_window_function(win_dict, win_name):
     
+    if win_name not in windows:
+        logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
+        win_name = "Boxcar"
+    d = windows[win_name]
+    if 'fn_name' not in d:
+        fn_name = win_name.lower()
+    else:
+        fn_name = d['fn_name']
+    if 'par' not in d:
+        par = []
+    if 'info' not in d:
+        info = ""
+    else:
+        info = d['info']
+        
     N_par = 0
     txt_par = ""
 
-    if win_name in {"Bartlett", "Triangular"}:
-        win_fnct_name = "bartlett"
-    elif win_name == "Flattop":
-        win_fnct_name = "flattop"
-    elif win_name == "Hamming":
-        win_fnct_name = "hamming"
-    elif win_name == "Hann":
-        win_fnct_name = "hann"
-    elif win_name == "Rect":
-        win_fnct_name = "boxcar"
     #--------------------------------------
     elif win_name == "Kaiser":
-        win_fnct_name = "kaiser"
+        fn_name = "kaiser"
         N_par = 1
         txt_par = '&beta; ='
-        tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
+        info = ("<span>Shape parameter; lower values reduce  main lobe width, "
                    "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>")
         _get_param()
         #if not self.param:
          #   _set_param(5)
     #--------------------------------------
     elif win_name == "Chebwin":
-        win_fnct_name = "chebwin"
+        fn_name = "chebwin"
         N_par = 1
         txt_par = 'Attn ='
-        tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
+        info = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
         _get_param()
         if not param:
             param = 80
@@ -123,18 +128,18 @@ def calc_window_function(win_dict, win_name):
     else:
         logger.error("Unknown window type {0}".format(win_name))
 
-    # get attribute win_fnct_name from submodule sig.windows and
+    # get attribute fn_name from submodule sig.windows and
     # return the desired window function:
-    win_fnct = getattr(sig.windows, win_fnct_name, None)
+    win_fnct = getattr(sig.windows, fn_name, None)
     
     if not win_fnct:
         logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
-                     .format(win_fnct_name))
+                     .format(fn_name))
         win_fnct = sig.windows.boxcar
         param = None
         
     win_dict['win_name'] = win_name
-    win_dict['win_fnct'] = win_fnct_name
+    win_dict['win_fnct'] = fn_name
     if N_par == 1:
         win_dict['win_params'] = param
     else:
