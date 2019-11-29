@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
-import scipy.signal.windows as win
+import scipy.signal.windows
 import matplotlib.patches as mpl_patches
 
 from pyfda.pyfda_lib import safe_eval, to_html
@@ -230,6 +230,8 @@ class Plot_FFT_win(QMainWindow):
         """
         (Re-)Calculate the window and its FFT
         """
+        #logger.info(calc_window_function(self.win_dict, ))
+        
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
         if self.chk_auto_N.isChecked():
             self.N = self.win_dict['win_len']
@@ -240,11 +242,11 @@ class Plot_FFT_win(QMainWindow):
         self.t = np.arange(self.N)
         params = self.win_dict['win_params'] # convert to iterable
         if not params:
-            self.win = getattr(win, self.win_dict['win_fnct'])(self.N)
+            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N)
         elif np.isscalar(params):
-            self.win = getattr(win, self.win_dict['win_fnct'])(self.N, params)
+            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N, params)
         else:
-            self.win = getattr(win, self.win_dict['win_fnct'])(self.N, *params)
+            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N, *params)
             
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         self.scale = self.N / np.sum(self.win)
