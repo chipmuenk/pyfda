@@ -341,3 +341,4 @@ if __name__=='__main__':
 
     sys.exit(app.exec_())
 
+    # module test using python -m pyfda.plot_widgets.plot_fft_win 
