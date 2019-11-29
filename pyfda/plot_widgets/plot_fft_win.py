@@ -315,7 +315,8 @@ class Plot_FFT_win(QMainWindow):
         labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
         labels.append("$CGAIN$  = {0:.4g}".format(self.scale))
         self.ax_f.legend(handles, labels, loc='best', fontsize='small',
-                               fancybox=True, framealpha=0.7)
+                               fancybox=True, framealpha=0.7, 
+                               handlelength=0, handletextpad=0)
 
         self.redraw()
 
