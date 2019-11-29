@@ -20,6 +20,7 @@ import scipy.signal as sig
 from pyfda.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
+from pyfda.pyfda_fft_windows import get_window_names
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 class PlotImpz_UI(QWidget):
@@ -257,7 +258,8 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
+        self.cmb_win_fft.addItems(get_window_names())
+        #self.cmb_win_fft.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
         self.cmb_win_fft.setToolTip("FFT window type.")
         qset_cmb_box(self.cmb_win_fft, self.window)
 
@@ -706,6 +708,7 @@ class PlotImpz_UI(QWidget):
         self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
         N_par = 0
         txt_par = ""
+        window_name = "boxcar"
 
         if self.window_type in {"Bartlett", "Triangular"}:
             window_name = "bartlett"

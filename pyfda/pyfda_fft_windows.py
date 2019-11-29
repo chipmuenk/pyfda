@@ -82,6 +82,17 @@ windows =\
     'Slepian':{},
     'Triang':{},
     }
+def get_window_names():
+    """
+    Extract window names (= keys) from the windows dict and return and a list
+    with all the names (strings).
+    """
+    win_name_list = []
+    for d in windows:
+        win_name_list.append(d)
+    
+    return win_name_list
+        
 
 def calc_window_function(win_dict, win_name):
     
