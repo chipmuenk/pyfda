@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Library with classes and functions for file and text IO
+Create a popup window with FFT window information
 """
 import logging
 logger = logging.getLogger(__name__)
@@ -21,7 +21,6 @@ from pyfda.pyfda_lib import safe_eval, to_html
 from pyfda.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.pyfda_fft_windows import calc_window_function
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
