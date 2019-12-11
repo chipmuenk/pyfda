@@ -273,7 +273,7 @@ class Plot_FFT_win(QMainWindow):
         else:
             self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
 
-        self.t = np.arange(self.N)
+        self.n = np.arange(self.N)
         params = self.win_dict['win_params'] # convert to iterable
         if not params:
             self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N)
@@ -317,9 +317,9 @@ class Plot_FFT_win(QMainWindow):
         #self.ax_f.set_title("Frequency")
         
         if self.chk_log_t.isChecked():
-            self.ax_t.plot(self.t, np.maximum(20 * np.log10(np.abs(self.win)), self.bottom_t))
+            self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win)), self.bottom_t))
         else:
-            self.ax_t.plot(self.t, self.win)
+            self.ax_t.plot(self.n, self.win)
 
         if self.chk_half_f.isChecked():
             F = self.F[:len(self.F*self.pad)//2]
