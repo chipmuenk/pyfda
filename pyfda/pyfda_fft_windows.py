@@ -48,7 +48,11 @@ windows =\
         {'fn_name':'bohman'},
     'Chebwin':
         {'fn_name':'chebwin',
-         'par':[['Attn.'],[45, 80, 300], ["<span>Side lobe attenuation in dB (typ. 80 dB).</span>"]],
+         'par':[['Attn.'],
+                ['$a$'],
+                [80],
+                [[45, 300]], 
+                ["<span>Side lobe attenuation in dB (typ. 80 dB).</span>"]],
          'info':
              ("<span>This window optimizes for the narrowest main lobe width for "
               "a given order <i>M</i> and sidelobe equiripple attenuation <i>Attn.</i>, "
@@ -57,8 +61,32 @@ windows =\
     'Cosine':{},
     'Flattop':
          {'win_fn_name':'flattop'},
-    'General_Gaussian':{},
-    'Gaussian':{},
+    'General_Gaussian':
+        {'fn_name':'general_gaussian',
+         'par':[
+             ['p','&sigma;'],
+             ['$p$','$\sigma$'],
+             [1.5, 5],
+             [[0,20], [0,100]],
+             ["<span>Shape parameter p</span>",
+              "<span>Standard deviation &sigma;</span>"]],
+         'info':
+             ("<span>General Gaussian window, p = 1 yields a Gaussian window, "
+              "p = 0.5 yields the shape of a Laplace distribution."
+              "</span>")
+         },
+    'Gauss':
+        {'fn_name':'gaussian',
+         'par':[
+             ['&sigma;'],
+             [r'$\sigma$'],
+             [5],
+             [[0,100]],
+             ["<span>Standard deviation &sigma;</span>"]],
+         'info':
+             ("<span>Gaussian window "
+              "</span>")
+         },
     'Hamming':
         {'fn_name':'hamming',
          'info':
@@ -68,7 +96,10 @@ windows =\
     'Hann':{},
     'Kaiser':
         {'fn_name':'kaiser',
-         'par':[['beta'],[0, 10, 30],
+         'par':[['&beta;'],
+                [r'$\beta$'],
+                [10], 
+                [[0, 30]],
                 ["<span>Shape parameter; lower values reduce  main lobe width, "
                  "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
          'info':
@@ -79,7 +110,19 @@ windows =\
         },
     'Nuttall':{},
     'Parzen':{},
-    'Slepian':{},
+    'Slepian':
+        {'fn_name':'slepian',
+         'par':[
+             ['BW'],
+             ['$BW$'],
+             [0.3],
+             [[0,100]],
+             ["<span>Bandwidth</span>"]],
+         'info':
+             ("<span>Used to maximize the energy concentration in the main lobe. "
+              " Also called the digital prolate spheroidal sequence (DPSS)."
+              "</span>")
+         },
     'Triang':{},
     }
 def get_window_names():
@@ -94,7 +137,26 @@ def get_window_names():
     return win_name_list
         
 
-def calc_window_function(win_dict, win_name):
+def calc_window_function(win_dict, win_name, N=32, sym=True):
+    """
+    Generate a window function.
+
+    Parameters
+    ----------
+    win_dict : dict
+        The dict where the window functions are stored.
+    win_name : str
+        Name of the window, this will be looked for in scipy.signal.windows.
+    N : int, optional
+        Number of data points. The default is 32.
+    sym : bool, optional
+        When True (default), generates a symmetric window, for use in filter design. 
+        When False, generates a periodic window, for use in spectral analysis.
+    Returns
+    -------
+    win_fnct : ndarray
+        The window function 
+    """
     
     par = []
     info = ""
@@ -107,15 +169,18 @@ def calc_window_function(win_dict, win_name):
         fn_name = win_name.lower()
     else:
         fn_name = d['fn_name']
+
     if 'par' in d:
         par = d['par']
+        n_par = np.shape(par)[1]
+    else:
+        par = []
+        n_par = 0
+        
     if 'info' in d:
         info = d['info']
         
-    N_par = np.shape(par)[0]
-
     #--------------------------------------
-
     # get attribute fn_name from submodule sig.windows and
     # return the desired window function:
     win_fnct = getattr(sig.windows, fn_name, None)
@@ -123,13 +188,13 @@ def calc_window_function(win_dict, win_name):
     if not win_fnct:
         logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
                      .format(fn_name))
-        win_fnct = sig.windows.boxcar
+        fn_name = "boxcar"
+        win_fnct = getattr(sig.windows, fn_name, None)
         
-    win_dict.update({'win_name':win_name, 'win_fnct':fn_name, 'info':info})
+    win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info, 
+                     'par':par, 'n_par':n_par, 'win_len':N})
 
-    if N_par == 1:
-        win_dict['win_params'] = par
+    if n_par == 0:
+        return win_fnct(N,sym=sym)
     else:
-        win_dict['win_params'] = ''
-    
-    return win_fnct
+        return win_fnct(N, *par[2], sym=sym)

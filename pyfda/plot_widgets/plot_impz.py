@@ -288,7 +288,8 @@ class Plot_Impz(QWidget):
             
         if self.fft_window is None: # no handle to the window? Create a new instance
             if self.ui.but_fft_win.isChecked():
-                self.fft_window = Plot_FFT_win(self) # important: Handle must be class attribute
+                # important: Handle to window must be class attribute
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=False)
                 self.ui.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
@@ -877,7 +878,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
-            self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_type)
+            self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
 
         self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
 

@@ -16,7 +16,6 @@ from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushBut
                       QHBoxLayout, QVBoxLayout, pyqtSignal, QEvent, Qt)
 
 import numpy as np
-import scipy.signal as sig
 from pyfda.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
@@ -45,7 +44,7 @@ class PlotImpz_UI(QWidget):
         - two bottom rows with action buttons
         """
 
-        # initial settings for lineedit widgets
+        # initial settings
         self.N_start = 0
         self.N_user = 0
         self.N = 0
@@ -76,6 +75,9 @@ class PlotImpz_UI(QWidget):
         self.stim = "Pulse"
         self.noise = "None"
         self.window = "Rect"
+
+        # dictionary for fft window settings   
+        self.win_dict = fb.fil[0]['win_fft']
 
         self._construct_UI()
         self._enable_stim_widgets()
@@ -267,6 +269,11 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1 = QLineEdit(self)
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
+        
+        self.lblWinPar2 = QLabel("Param2")
+        self.ledWinPar2 = QLineEdit(self)
+        self.ledWinPar2.setText("2")
+        self.ledWinPar2.setObjectName("ledWinPar2")
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
@@ -287,6 +294,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
+        layH_ctrl_freq.addWidget(self.lblWinPar2)
+        layH_ctrl_freq.addWidget(self.ledWinPar2)        
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
@@ -466,7 +475,8 @@ class PlotImpz_UI(QWidget):
         # --- frequency control ---
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
-        self.ledWinPar1.editingFinished.connect(self._update_win_fft)
+        self.ledWinPar1.editingFinished.connect(self._update_param1)
+        self.ledWinPar2.editingFinished.connect(self._update_param2)        
 
         # --- stimulus control ---
         self.chk_stim_options.clicked.connect(self._show_stim_options)
@@ -668,7 +678,7 @@ class PlotImpz_UI(QWidget):
     # -------------------------------------------------------------------------
 
     def update_N(self, dict_sig=None):
-        # TODO: dict_Sig not needed here, call directly from impz, distinguish
+        # TODO: dict_sig not needed here, call directly from impz, distinguish
         # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
@@ -689,100 +699,59 @@ class PlotImpz_UI(QWidget):
 
         self._update_win_fft(dict_sig)
 
+
+    def _update_param1(self):
+        """Read out textbox when editing is finished and update dict and fft window"""
+        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][2][0], 
+                          return_type='float')
+        if param < self.win_dict['par'][3][0][0]:
+            param = self.win_dict['par'][3][0][0]
+        elif param > self.win_dict['par'][3][0][1]:
+            param = self.win_dict['par'][3][0][1]   
+        self.ledWinPar1.setText(str(param))     
+        self.win_dict['par'][2][0] = param
+        self._update_win_fft()
+        
+    def _update_param2(self):
+        """Read out textbox when editing is finished and update dict and fft window"""
+        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][2][1], 
+                          return_type='float')
+        if param < self.win_dict['par'][3][1][0]:
+            param = self.win_dict['par'][3][1][0]
+        elif param > self.win_dict['par'][3][1][1]:
+            param = self.win_dict['par'][3][1][1]   
+        self.ledWinPar2.setText(str(param))     
+        self.win_dict['par'][2][1] = param
+        self._update_win_fft()
+
     def _update_win_fft(self, dict_sig=None):
         """ Update window type for FFT """
 
-        def _get_param(par_default=None):
-            self.ledWinPar1.setToolTip(self.tooltip)
-            self.lblWinPar1.setText(to_html(self.txt_par, frmt='bi'))
-
-            self.param = safe_eval(self.ledWinPar1.text(), self.param, return_type='float', sign='pos')
-            self.ledWinPar1.setText(str(self.param))
-        #----------------------------------------------------------------------
-        
-        def _set_param(param):
-            self.ledWinPar1.setText(str(param))
-            self.param = param
-        #----------------------------------------------------------------------
-            
-        def calc_window_function_loc(win_dict, window_type):
-            N_par = 0
-            txt_par = ""
-            tooltip = ""
-            window_name = "boxcar"
-    
-            if window_type in {"Bartlett", "Triangular"}:
-                window_name = "bartlett"
-            elif window_type == "Flattop":
-                window_name = "flattop"
-            elif window_type == "Hamming":
-                window_name = "hamming"
-            elif window_type == "Hann":
-                window_name = "hann"
-            elif window_type == "Rect":
-                window_name = "boxcar"
-            #--------------------------------------
-            elif window_type == "Kaiser":
-                window_name = "kaiser"
-                N_par = 1
-                txt_par = '&beta; ='
-                tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
-                           "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>")
-                _get_param()
-                #if not self.param:
-                 #   _set_param(5)
-            #--------------------------------------
-            elif window_type == "Chebwin":
-                window_name = "chebwin"
-                N_par = 1
-                txt_par = 'Attn ='
-                tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
-                _get_param()
-                if not self.param:
-                    self.param = 80
-                if self.param < 45:
-                    _set_param(45)
-                    logger.warning("Attenuation needs to be larger than 45 dB!")
-            else:
-                logger.error("Unknown window type {0}".format(window_type))
-    
-            # get attribute window_name from submodule sig.windows and
-            # returning the desired window function:
-            win_fnct = getattr(sig.windows, window_name, None)
-            if not win_fnct:
-                logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
-                             .format(window_name))
-                win_fnct = sig.windows.boxcar
-                self.param = None
-
-            win_dict['win_name'] = window_type
-            win_dict['win_fnct'] = window_name
-            if N_par == 1:
-                win_dict['win_params'] = self.param
-            else:
-                win_dict['win_params'] = ''
-            win_dict['win_len']  = self.N
-            
-            # TODO: This should be in the dict resp. outside the function
-            self.tooltip  = tooltip
-            self.txt_par  = txt_par          
-    
-            self.lblWinPar1.setVisible(N_par > 0)
-            self.ledWinPar1.setVisible(N_par > 0)
-            ##########################################################
- 
-            if N_par == 1:
-                win = win_fnct(self.N, self.param) # use additional parameter
-            else:
-                win = win_fnct(self.N)
-
-            return win
+        def _update_param1():
+            self.lblWinPar1.setText(to_html(self.win_dict['par'][0][0] + " =", frmt='bi'))
+            self.ledWinPar1.setText(str(self.win_dict['par'][2][0]))
+            self.ledWinPar1.setToolTip(self.win_dict['par'][4][0])
+        def _update_param2():
+            self.lblWinPar2.setText(to_html(self.win_dict['par'][0][1] + " =", frmt='bi'))
+            self.ledWinPar2.setText(str(self.win_dict['par'][2][1]))
+            self.ledWinPar2.setToolTip(self.win_dict['par'][4][1])
 #------------------------------------------------------------------------------
             
-        self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
-        
-        self.win = calc_window_function_loc(fb.fil[0]['win_spectral_analysis'], self.window_type)
+        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.win = calc_window_function(self.win_dict, self.window_name,
+                                        N=self.N, sym=False)
+ 
+        n_par = self.win_dict['n_par']
 
+        self.lblWinPar1.setVisible(n_par > 0)
+        self.ledWinPar1.setVisible(n_par > 0)
+        self.lblWinPar2.setVisible(n_par > 1)
+        self.ledWinPar2.setVisible(n_par > 1)        
+
+        if n_par > 0:
+            _update_param1()
+        if n_par > 1:
+            _update_param2()
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 

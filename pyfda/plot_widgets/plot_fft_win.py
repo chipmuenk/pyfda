@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
-import scipy.signal.windows
 import matplotlib.patches as mpl_patches
 
 from pyfda.pyfda_lib import safe_eval, to_html
 from pyfda.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
+from pyfda.pyfda_fft_windows import calc_window_function
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -40,7 +40,7 @@ class Plot_FFT_win(QMainWindow):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict="win_spectral_analysis"):
+    def __init__(self, parent, win_dict_name="win_fft", sym=True):
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
@@ -52,7 +52,8 @@ class Plot_FFT_win(QMainWindow):
         
         self.pad = 8 # amount of zero padding
         
-        self.win_dict = fb.fil[0][win_dict]
+        self.win_dict = fb.fil[0][win_dict_name]
+        self.sym = sym
         
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
@@ -264,9 +265,7 @@ class Plot_FFT_win(QMainWindow):
     def calc_win(self):
         """
         (Re-)Calculate the window and its FFT
-        """
-        #logger.info(calc_window_function(self.win_dict, ))
-        
+        """    
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
         if self.chk_auto_N.isChecked():
             self.N = self.win_dict['win_len']
@@ -275,13 +274,9 @@ class Plot_FFT_win(QMainWindow):
             self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
 
         self.n = np.arange(self.N)
-        params = self.win_dict['win_params'] # convert to iterable
-        if not params:
-            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N)
-        elif np.isscalar(params):
-            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N, params)
-        else:
-            self.win = getattr(scipy.signal.windows, self.win_dict['win_fnct'])(self.N, *params)
+
+        self.win = calc_window_function(self.win_dict, self.win_dict['name'], self.N, sym=self.sym)
+
             
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         self.scale = self.N / np.sum(self.win)
@@ -311,11 +306,9 @@ class Plot_FFT_win(QMainWindow):
         
         self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
         self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
-        #self.ax_t.set_title("Time")
         
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
-        #self.ax_f.set_title("Frequency")
         
         if self.chk_log_t.isChecked():
             self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win)), self.bottom_t))
@@ -343,8 +336,14 @@ class Plot_FFT_win(QMainWindow):
         self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         
-        window_name = self.win_dict['win_name']
-        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name))
+        window_name = self.win_dict['name']
+        if self.win_dict['n_par'] == 1:
+            param_txt = " (" + self.win_dict['par'][1][0] + " = {0})".format(self.win_dict['par'][2][0])
+        else:
+            param_txt = ""
+
+        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) 
+                                    +param_txt)
 
         # create two empty patches
         handles = [mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)] * 2

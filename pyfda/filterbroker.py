@@ -241,17 +241,25 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'time_designed' : -1,
             'wdg_dyn':{'win':'hann'},
             # Parameters for spectral analysis window function
-            'win_spectral_analysis':
-                {'win_name':'Hann', # Window name
-                 'win_fnct':'hann', # function name or array with values
-                 'win_params':{}, # set of keyword params
-                 'win_len':1024
+            'win_fft':
+                {'name':'Hann', # Window name
+                 'fnct':'hann', # function name or array with values
+                 'par':[['beta'],
+                        [10],
+                        [[0, 30]],
+                        ["<span>Shape parameter; lower values reduce  main lobe width, "
+                         "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
+                 'n_par' : 1,   # number of window parameters
+                 'info':"",     # Docstring for the window
+                 'win_len':1024,
                  },
             # Parameters for filter design window function
-            'win_fft_FIR_design':
-                {'win_name':'Hann', # Window name
-                 'win_fnct':'hann', # function name or array with values
-                 'win_params':{}, # set of keyword params
+            'win_fir':
+                {'name':'Hann', # Window name
+                 'fnct':'hann', # function name or array with values
+                 'par':[],      # set of list of window parameters
+                 'n_par' : 0,   # number of window parameters                 
+                 'info':"",     # Docstring for the window
                  'win_len':1024
                  }
             }
