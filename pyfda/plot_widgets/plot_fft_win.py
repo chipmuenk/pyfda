@@ -361,7 +361,8 @@ class Plot_FFT_win(QMainWindow):
         """
         Update the text info box for the window
         """
-        pass
+        if 'info' in self.win_dict:
+            self.txtInfoBox.setText(self.win_dict['info'])
     
 #------------------------------------------------------------------------------
     def redraw(self):
