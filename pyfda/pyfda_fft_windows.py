@@ -73,8 +73,8 @@ windows =\
                  "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
          'info':
              ("<span>The Kaiser window is a very good approximation to the "
-              "Digital Prolate Spheroidal Sequence, or Slepian window, which is "
-              "which maximizes the energy in the main lobe of the window relative "
+              "Digital Prolate Spheroidal Sequence, or Slepian window, which "
+              "maximizes the energy in the main lobe of the window relative "
               "to the total energy.</span>")
         },
     'Nuttall':{},
