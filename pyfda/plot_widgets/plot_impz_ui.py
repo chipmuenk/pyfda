@@ -20,7 +20,7 @@ import scipy.signal as sig
 from pyfda.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
-from pyfda.pyfda_fft_windows import get_window_names
+from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 class PlotImpz_UI(QWidget):
@@ -693,8 +693,8 @@ class PlotImpz_UI(QWidget):
         """ Update window type for FFT """
 
         def _get_param(par_default=None):
-            self.ledWinPar1.setToolTip(tooltip)
-            self.lblWinPar1.setText(to_html(txt_par, frmt='bi'))
+            self.ledWinPar1.setToolTip(self.tooltip)
+            self.lblWinPar1.setText(to_html(self.txt_par, frmt='bi'))
 
             self.param = safe_eval(self.ledWinPar1.text(), self.param, return_type='float', sign='pos')
             self.ledWinPar1.setText(str(self.param))
@@ -704,70 +704,85 @@ class PlotImpz_UI(QWidget):
             self.ledWinPar1.setText(str(param))
             self.param = param
         #----------------------------------------------------------------------
-        
-        self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
-        N_par = 0
-        txt_par = ""
-        window_name = "boxcar"
-
-        if self.window_type in {"Bartlett", "Triangular"}:
-            window_name = "bartlett"
-        elif self.window_type == "Flattop":
-            window_name = "flattop"
-        elif self.window_type == "Hamming":
-            window_name = "hamming"
-        elif self.window_type == "Hann":
-            window_name = "hann"
-        elif self.window_type == "Rect":
+            
+        def calc_window_function_loc(win_dict, window_type):
+            N_par = 0
+            txt_par = ""
+            tooltip = ""
             window_name = "boxcar"
-        #--------------------------------------
-        elif self.window_type == "Kaiser":
-            window_name = "kaiser"
-            N_par = 1
-            txt_par = '&beta; ='
-            tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
-                       "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>")
-            _get_param()
-            #if not self.param:
-             #   _set_param(5)
-        #--------------------------------------
-        elif self.window_type == "Chebwin":
-            window_name = "chebwin"
-            N_par = 1
-            txt_par = 'Attn ='
-            tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
-            _get_param()
-            if not self.param:
-                self.param = 80
-            if self.param < 45:
-                _set_param(45)
-                logger.warning("Attenuation needs to be larger than 45 dB!")
-        else:
-            logger.error("Unknown window type {0}".format(self.window_type))
+    
+            if window_type in {"Bartlett", "Triangular"}:
+                window_name = "bartlett"
+            elif window_type == "Flattop":
+                window_name = "flattop"
+            elif window_type == "Hamming":
+                window_name = "hamming"
+            elif window_type == "Hann":
+                window_name = "hann"
+            elif window_type == "Rect":
+                window_name = "boxcar"
+            #--------------------------------------
+            elif window_type == "Kaiser":
+                window_name = "kaiser"
+                N_par = 1
+                txt_par = '&beta; ='
+                tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
+                           "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>")
+                _get_param()
+                #if not self.param:
+                 #   _set_param(5)
+            #--------------------------------------
+            elif window_type == "Chebwin":
+                window_name = "chebwin"
+                N_par = 1
+                txt_par = 'Attn ='
+                tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
+                _get_param()
+                if not self.param:
+                    self.param = 80
+                if self.param < 45:
+                    _set_param(45)
+                    logger.warning("Attenuation needs to be larger than 45 dB!")
+            else:
+                logger.error("Unknown window type {0}".format(window_type))
+    
+            # get attribute window_name from submodule sig.windows and
+            # returning the desired window function:
+            win_fnct = getattr(sig.windows, window_name, None)
+            if not win_fnct:
+                logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
+                             .format(window_name))
+                win_fnct = sig.windows.boxcar
+                self.param = None
 
-        # get attribute window_name from submodule sig.windows and
-        # returning the desired window function:
-        win_fnct = getattr(sig.windows, window_name, None)
-        if not win_fnct:
-            logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
-                         .format(window_name))
-            win_fnct = sig.windows.boxcar
-            self.param = None
-        win_dict = fb.fil[0]['win_spectral_analysis']
-        win_dict['win_name'] = self.window_type
-        win_dict['win_fnct'] = window_name
-        if N_par == 1:
-            win_dict['win_params'] = self.param
-        else:
-            win_dict['win_params'] = ''
-        win_dict['win_len']  = self.N
+            win_dict['win_name'] = window_type
+            win_dict['win_fnct'] = window_name
+            if N_par == 1:
+                win_dict['win_params'] = self.param
+            else:
+                win_dict['win_params'] = ''
+            win_dict['win_len']  = self.N
+            
+            # TODO: This should be in the dict resp. outside the function
+            self.tooltip  = tooltip
+            self.txt_par  = txt_par          
+    
+            self.lblWinPar1.setVisible(N_par > 0)
+            self.ledWinPar1.setVisible(N_par > 0)
+            ##########################################################
+ 
+            if N_par == 1:
+                win = win_fnct(self.N, self.param) # use additional parameter
+            else:
+                win = win_fnct(self.N)
 
-        self.lblWinPar1.setVisible(N_par > 0)
-        self.ledWinPar1.setVisible(N_par > 0)
-        if N_par == 1:
-            self.win = win_fnct(self.N, self.param) # use additional parameter
-        else:
-            self.win = win_fnct(self.N)
+            return win
+#------------------------------------------------------------------------------
+            
+        self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
+        
+        self.win = calc_window_function_loc(fb.fil[0]['win_spectral_analysis'], self.window_type)
+
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
