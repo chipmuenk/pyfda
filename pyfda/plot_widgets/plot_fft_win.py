@@ -32,6 +32,8 @@ class Plot_FFT_win(QMainWindow):
     """
     Create a pop-up widget for displaying time and frequency view of an FFT 
     window.
+    
+    Data is passed via the dictionary `win_dict` that is passed during construction.
     """
     # incoming
     sig_rx = pyqtSignal(object)
