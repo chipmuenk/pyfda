@@ -26,7 +26,8 @@ from pyfda.pyfda_fft_windows import calc_window_function
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
-                     QCheckBox, QLabel, QLineEdit, QHBoxLayout)
+                     QCheckBox, QLabel, QLineEdit, QTextBrowser, QSplitter,
+                     QHBoxLayout)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
@@ -161,6 +162,17 @@ class Plot_FFT_win(QMainWindow):
         layHControls.addWidget(self.chk_log_f)
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
+        
+#         self.tblFiltPerf = QTableWidget(self)
+#         self.tblFiltPerf.setAlternatingRowColors(True)
+# #        self.tblFiltPerf.verticalHeader().setVisible(False)
+#         self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
+#         self.tblFiltPerf.horizontalHeader().setFont(bfont)
+#         self.tblFiltPerf.verticalHeader().setHighlightSections(False)
+#         self.tblFiltPerf.verticalHeader().setFont(bfont)
+
+        self.txtInfoBox = QTextBrowser(self)
+
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -182,7 +194,30 @@ class Plot_FFT_win(QMainWindow):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
-        self.setCentralWidget(self.mplwidget)
+        
+        #----------------------------------------------------------------------
+        #               ### splitter ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
+
+        splitter = QSplitter(self)
+        splitter.setOrientation(Qt.Vertical)
+        splitter.addWidget(self.mplwidget)
+        splitter.addWidget(self.txtInfoBox)
+
+        # setSizes uses absolute pixel values, but can be "misused" by specifying values
+        # that are way too large: in this case, the space is distributed according
+        # to the _ratio_ of the values:
+        splitter.setSizes([3000,1000])
+
+        self.setCentralWidget(splitter)
+      
+        #self.setCentralWidget(self.mplwidget)
+        
+        #----------------------------------------------------------------------
+        #           Set subplots
+        #
         self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
@@ -209,7 +244,6 @@ class Plot_FFT_win(QMainWindow):
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-
 
 #------------------------------------------------------------------------------
     def update_bottom(self):
@@ -264,6 +298,7 @@ class Plot_FFT_win(QMainWindow):
         """
         self.calc_win()
         self.update_view()
+        self.update_info()
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -321,7 +356,13 @@ class Plot_FFT_win(QMainWindow):
                                handlelength=0, handletextpad=0)
 
         self.redraw()
-
+#------------------------------------------------------------------------------
+    def update_info(self):
+        """
+        Update the text info box for the window
+        """
+        pass
+    
 #------------------------------------------------------------------------------
     def redraw(self):
         """
