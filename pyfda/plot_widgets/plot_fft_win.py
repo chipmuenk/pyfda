@@ -337,10 +337,12 @@ class Plot_FFT_win(QMainWindow):
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         
         window_name = self.win_dict['name']
-        if self.win_dict['n_par'] == 1:
-            param_txt = " (" + self.win_dict['par'][1][0] + " = {0})".format(self.win_dict['par'][2][0])
-        else:
-            param_txt = ""
+        param_txt = ""
+        if self.win_dict['n_par'] > 0:
+            param_txt = " (" + self.win_dict['par'][1][0] + " = {0:.3g})".format(self.win_dict['par'][2][0])
+        if self.win_dict['n_par'] > 1:
+            param_txt = param_txt[:-1]\
+                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1][1], self.win_dict['par'][2][1])
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) 
                                     +param_txt)
