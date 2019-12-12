@@ -1,5 +1,7 @@
-include pyfda/fixpoint_widgets/*.png
-include pyfda/fixpoint_widgets/*.svg
-include pyfda/pyfda_log.conf
-include pyfda/pyfda.conf
-include README_PYPI.rst
+recursive-include pyfda *
+
+include AUTHORS.py
+include LICENSE
+include README*.*
+include index.html
+include requirements.txt
