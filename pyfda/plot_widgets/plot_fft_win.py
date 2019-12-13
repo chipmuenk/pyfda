@@ -348,12 +348,17 @@ class Plot_FFT_win(QMainWindow):
                                     +param_txt)
 
         # create two empty patches
-        handles = [mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)] * 2
+        patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)
 
-        labels = []
-        labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
-        labels.append("$CGAIN$  = {0:.4g}".format(self.scale))
-        self.ax_f.legend(handles, labels, loc='best', fontsize='small',
+        labels_t = []
+        labels_t.append("$N$ = {0:d}".format(self.N))
+        self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
+                              fancybox=True, framealpha=0.7, 
+                              handlelength=0, handletextpad=0)
+        labels_f = []
+        labels_f.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
+        labels_f.append("$CGAIN$  = {0:.4g}".format(self.scale))
+        self.ax_f.legend([patch] * 2, labels_f, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7, 
                                handlelength=0, handletextpad=0)
 
