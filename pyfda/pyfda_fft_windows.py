@@ -47,11 +47,10 @@ windows =\
         {'fn_name':'bohman'},
     'Chebwin':
         {'fn_name':'chebwin',
-         'par':[['Attn.'],
-                ['$a$'],
-                [80],
-                [[45, 300]], 
-                ["<span>Side lobe attenuation in dB (typ. 80 dB).</span>"]],
+         'par':[{
+            'name':'Attn.', 'name_tex':r'$a$',
+            'val':80, 'min':45, 'max':300, 
+            'tooltip':"<span>Side lobe attenuation in dB.</span>"}],
          'info':
              ("<span>This window optimizes for the narrowest main lobe width for "
               "a given order <i>M</i> and sidelobe equiripple attenuation <i>Attn.</i>, "
@@ -62,13 +61,20 @@ windows =\
          {'win_fn_name':'flattop'},
     'General Gaussian':
         {'fn_name':'general_gaussian',
-         'par':[
-             ['p','&sigma;'],
-             ['$p$','$\sigma$'],
-             [1.5, 5],
-             [[0,20], [0,100]],
-             ["<span>Shape parameter p</span>",
-              "<span>Standard deviation &sigma;</span>"]],
+         'par':[{
+            'name':'p','name_tex':r'$p$',
+            'val':1.5, 'min':0, 'max':20,
+             'tooltip':"<span>Shape parameter p</span>"
+             },
+             {
+            'name':'&sigma;','name_tex':r'$\sigma$',
+            'val':5, 'min':0, 'max':100,
+             'tooltip':"<span>Standard deviation &sigma;</span>"}
+             ],
+         'info':
+             ("<span>General Gaussian window, p = 1 yields a Gaussian window, "
+              "p = 0.5 yields the shape of a Laplace distribution."
+              "</span>"),
          'info':
              ("<span>General Gaussian window, p = 1 yields a Gaussian window, "
               "p = 0.5 yields the shape of a Laplace distribution."
@@ -76,12 +82,13 @@ windows =\
          },
     'Gauss':
         {'fn_name':'gaussian',
-         'par':[
-             ['&sigma;'],
-             [r'$\sigma$'],
-             [5],
-             [[0,100]],
-             ["<span>Standard deviation &sigma;</span>"]],
+         'par':[{
+             'name':'&sigma;', 'name_tex':r'$\sigma$',
+             'val':5,'min':0, 'max':100,
+             'tooltip':"<span>Standard deviation &sigma;</span>"}],
+         'info':
+             ("<span>Gaussian window "
+              "</span>"),
          'info':
              ("<span>Gaussian window "
               "</span>")
@@ -95,12 +102,13 @@ windows =\
     'Hann':{},
     'Kaiser':
         {'fn_name':'kaiser',
-         'par':[['&beta;'],
-                [r'$\beta$'],
-                [10], 
-                [[0, 30]],
-                ["<span>Shape parameter; lower values reduce  main lobe width, "
-                 "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
+         'par':[{
+                'name':'&beta;', 'name_tex':r'$\beta$',
+                'val':10, 'min':0, 'max':30,
+                'tooltip':
+                    ("<span>Shape parameter; lower values reduce  main lobe width, "
+                     "higher values reduce side lobe level, typ. in the range "
+                     "5 ... 20.</span>")}],
          'info':
              ("<span>The Kaiser window is a very good approximation to the "
               "Digital Prolate Spheroidal Sequence, or Slepian window, which "
@@ -111,12 +119,10 @@ windows =\
     'Parzen':{},
     'Slepian':
         {'fn_name':'slepian',
-         'par':[
-             ['BW'],
-             ['$BW$'],
-             [0.3],
-             [[0,100]],
-             ["<span>Bandwidth</span>"]],
+         'par':[{
+             'name':'BW', 'name_tex':r'$BW$',
+             'val':0.3, 'min':0, 'max':100,
+             'tooltip':"<span>Bandwidth</span>"}],
          'info':
              ("<span>Used to maximize the energy concentration in the main lobe. "
               " Also called the digital prolate spheroidal sequence (DPSS)."
@@ -171,7 +177,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
 
     if 'par' in d:
         par = d['par']
-        n_par = np.shape(par)[1]
+        n_par = len(par)
     else:
         par = []
         n_par = 0
@@ -195,5 +201,10 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
 
     if n_par == 0:
         return win_fnct(N,sym=sym)
+    elif n_par == 1:
+        return win_fnct(N, par[0]['val'], sym=sym)
+    elif n_par == 2:
+        return win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)        
     else:
-        return win_fnct(N, *par[2], sym=sym)
+        logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
+    #        return win_fnct(N, *par[2], sym=sym)

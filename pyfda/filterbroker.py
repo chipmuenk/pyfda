@@ -244,11 +244,15 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'win_fft':
                 {'name':'Kaiser', # Window name
                  'fnct':'kaiser', # function name or array with values
-                 'par':[['beta'],
-                        [10],
-                        [[0, 30]],
-                        ["<span>Shape parameter; lower values reduce  main lobe width, "
-                         "higher values reduce side lobe level, typ. in the range 5 ... 20.</span>"]],
+                 'par':[{'name':'&beta;',
+                          'name_tex':r'$\beta$',
+                          'val':10,
+                          'min':0,
+                          'max':30,
+                          'tooltip':
+                              ("<span>Shape parameter; lower values reduce main lobe width, "
+                              "higher values reduce side lobe level, typ. in the range "
+                              "5 ... 20.</span>")}],
                  'n_par' : 1,   # number of window parameters
                  'info':"",     # Docstring for the window
                  'win_len':1024,

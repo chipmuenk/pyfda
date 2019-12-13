@@ -702,39 +702,39 @@ class PlotImpz_UI(QWidget):
 
     def _update_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][2][0], 
+        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
                           return_type='float')
-        if param < self.win_dict['par'][3][0][0]:
-            param = self.win_dict['par'][3][0][0]
-        elif param > self.win_dict['par'][3][0][1]:
-            param = self.win_dict['par'][3][0][1]   
+        if param < self.win_dict['par'][0]['min']:
+            param = self.win_dict['par'][0]['min']
+        elif param > self.win_dict['par'][0]['max']:
+            param = self.win_dict['par'][0]['max']   
         self.ledWinPar1.setText(str(param))     
-        self.win_dict['par'][2][0] = param
+        self.win_dict['par'][0]['val'] = param
         self._update_win_fft()
         
     def _update_param2(self):
         """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][2][1], 
+        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'], 
                           return_type='float')
-        if param < self.win_dict['par'][3][1][0]:
-            param = self.win_dict['par'][3][1][0]
-        elif param > self.win_dict['par'][3][1][1]:
-            param = self.win_dict['par'][3][1][1]   
+        if param < self.win_dict['par'][1]['min']:
+            param = self.win_dict['par'][1]['min']
+        elif param > self.win_dict['par'][1]['max']:
+            param = self.win_dict['par'][1]['max']   
         self.ledWinPar2.setText(str(param))     
-        self.win_dict['par'][2][1] = param
+        self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
 
     def _update_win_fft(self, dict_sig=None):
         """ Update window type for FFT """
 
         def _update_param1():
-            self.lblWinPar1.setText(to_html(self.win_dict['par'][0][0] + " =", frmt='bi'))
-            self.ledWinPar1.setText(str(self.win_dict['par'][2][0]))
-            self.ledWinPar1.setToolTip(self.win_dict['par'][4][0])
+            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
         def _update_param2():
-            self.lblWinPar2.setText(to_html(self.win_dict['par'][0][1] + " =", frmt='bi'))
-            self.ledWinPar2.setText(str(self.win_dict['par'][2][1]))
-            self.ledWinPar2.setToolTip(self.win_dict['par'][4][1])
+            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 #------------------------------------------------------------------------------
             
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)

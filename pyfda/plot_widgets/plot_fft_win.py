@@ -50,7 +50,7 @@ class Plot_FFT_win(QMainWindow):
         self.bottom_t = -60
         self.N = 128 # initial number of data points
         
-        self.pad = 8 # amount of zero padding
+        self.pad = 16 # amount of zero padding
         
         self.win_dict = fb.fil[0][win_dict_name]
         self.sym = sym
@@ -339,10 +339,10 @@ class Plot_FFT_win(QMainWindow):
         window_name = self.win_dict['name']
         param_txt = ""
         if self.win_dict['n_par'] > 0:
-            param_txt = " (" + self.win_dict['par'][1][0] + " = {0:.3g})".format(self.win_dict['par'][2][0])
+            param_txt = " (" + self.win_dict['par'][0]['name_tex'] + " = {0:.3g})".format(self.win_dict['par'][0]['val'])
         if self.win_dict['n_par'] > 1:
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1][1], self.win_dict['par'][2][1])
+                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1]['name_tex'], self.win_dict['par'][1]['val'])
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) 
                                     +param_txt)
