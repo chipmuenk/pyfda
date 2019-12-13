@@ -242,8 +242,8 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'},
             # Parameters for spectral analysis window function
             'win_fft':
-                {'name':'Hann', # Window name
-                 'fnct':'hann', # function name or array with values
+                {'name':'Kaiser', # Window name
+                 'fnct':'kaiser', # function name or array with values
                  'par':[['beta'],
                         [10],
                         [[0, 30]],
