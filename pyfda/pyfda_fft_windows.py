@@ -13,7 +13,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from numpy import pi, sqrt
 import scipy.signal as sig
 
 
@@ -61,7 +60,7 @@ windows =\
     'Cosine':{},
     'Flattop':
          {'win_fn_name':'flattop'},
-    'General_Gaussian':
+    'General Gaussian':
         {'fn_name':'general_gaussian',
          'par':[
              ['p','&sigma;'],
