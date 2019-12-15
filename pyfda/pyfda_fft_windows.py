@@ -34,7 +34,10 @@ windows =\
              ("<span>A modified Bartlett-Hann Window."
               "</span>")},
     'Bartlett':
-        {'fn_name':'bartlett'},
+        {'fn_name':'bartlett',
+         'info':'<span>The Bartlett window is very similar to a triangular window, '
+             'except that the end points are at zero.'
+             '<br />Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
     'Blackman':
         {'fn_name':'blackman'},
     'Blackmanharris':
@@ -72,13 +75,9 @@ windows =\
              'tooltip':"<span>Standard deviation &sigma;</span>"}
              ],
          'info':
-             ("<span>General Gaussian window, p = 1 yields a Gaussian window, "
-              "p = 0.5 yields the shape of a Laplace distribution."
+             ("<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, "
+              "<i>p</i> = 0.5 yields the shape of a Laplace distribution."
               "</span>"),
-         'info':
-             ("<span>General Gaussian window, p = 1 yields a Gaussian window, "
-              "p = 0.5 yields the shape of a Laplace distribution."
-              "</span>")
          },
     'Gauss':
         {'fn_name':'gaussian',
@@ -88,18 +87,25 @@ windows =\
              'tooltip':"<span>Standard deviation &sigma;</span>"}],
          'info':
              ("<span>Gaussian window "
-              "</span>"),
-         'info':
-             ("<span>Gaussian window "
               "</span>")
          },
     'Hamming':
         {'fn_name':'hamming',
          'info':
-         ("<span>This window is smooth at the edges and has a fall-off rate of "
-          "18 dB/oct.</span>")
+             ("<span>The Hamming Window has been optimized for suppression of "
+              "the first side lobe. Compared to the Hann window, this comes at "
+              "the cost of a worse (constant) level of higher side lobes."
+              "<br />Mathematically, it is a two-term raised cosine window with "
+              "non-zero endpoints (DC-offset).</span>")
          },
-    'Hann':{},
+    'Hann':
+        {'fn_name':'hann',
+        'info':'<span>The Hann (or, falsely, "Hanning") window is smooth at the '
+          'edges, in the frequence domain side-lobe fall-off at a rate of 18 dB/oct '
+          'or 30 dB/dec. It is good compromise for many application, especially '
+          'when higher frequency components need to be suppressed.'
+          '<br />Mathematically, it is the most simple two-term raised cosine '
+          'window or squared sine window.</span>'},
     'Kaiser':
         {'fn_name':'kaiser',
          'par':[{
@@ -117,6 +123,7 @@ windows =\
         },
     'Nuttall':{},
     'Parzen':{},
+    'Rectangular':{'fn_name':'boxcar'},
     'Slepian':
         {'fn_name':'slepian',
          'par':[{
@@ -128,7 +135,7 @@ windows =\
               " Also called the digital prolate spheroidal sequence (DPSS)."
               "</span>")
          },
-    'Triang':{},
+    'Triangular':{'fn_name':'triang'},
     }
 def get_window_names():
     """
