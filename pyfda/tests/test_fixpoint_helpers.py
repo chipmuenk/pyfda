@@ -13,7 +13,7 @@ Test suite for fixpoint_helpers.py
 import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
-from pyfda import pyfda_fix_lib as fix_lib
+from pyfda.libs import pyfda_fix_lib as fx
 try:
     from migen import Cat, If, Replicate, Signal, Module, run_simulation
     from pyfda.fixpoint_widgets.fixpoint_helpers import rescale
@@ -34,7 +34,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # initialize a pyfda fixpoint quantizer
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
-        self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
+        self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
     def tb_dut(self, stimulus, inputs, outputs):

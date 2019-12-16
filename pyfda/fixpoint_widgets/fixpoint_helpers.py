@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 #import numpy as np
 import pyfda.filterbroker as fb
-import pyfda.pyfda_fix_lib as fix
+import pyfda.libs.pyfda_fix_lib as fx
 
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
                       QVBoxLayout, QHBoxLayout, QFrame,
@@ -323,7 +323,7 @@ class UI_W(QWidget):
         """
         # Create coefficient quantizer instances using the quantization parameters dict
         # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
-        Q_coeff = fix.Fixed(q_dict)
+        Q_coeff = fx.Fixed(q_dict)
         Q_coeff.frmt = 'dec' # always use decimal format for coefficients
 
         if coeffs is None:

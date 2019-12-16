@@ -23,7 +23,7 @@ import numpy as np
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import qstr, cmp_version, pprint_log
-import pyfda.pyfda_fix_lib as fx
+import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q

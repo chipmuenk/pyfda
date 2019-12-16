@@ -12,8 +12,8 @@ Test suite for the pyfda_fix_lib classes and methods
 
 import unittest
 import numpy as np
-from pyfda import pyfda_fix_lib as fix_lib
-from pyfda.pyfda_fix_lib import bin2hex, dec2csd, csd2dec
+from pyfda.libs import pyfda_fix_lib as fix_lib
+from pyfda.libs.pyfda_fix_lib import bin2hex, dec2csd, csd2dec
 # TODO: Add test case for complex numbers
 # TODO: test csd2dec, csd2dec_vec
 

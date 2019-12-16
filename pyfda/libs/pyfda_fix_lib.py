@@ -997,7 +997,7 @@ class Fixed(object):
 ########################################
 if __name__=='__main__':
     """
-    Run a simple test with python -m pyfda.pyfda_fix_lib
+    Run a simple test with python -m pyfda.libs.pyfda_fix_lib
     or a more elaborate one with
     python -m pyfda.tests.test_pyfda_fix_lib
     """

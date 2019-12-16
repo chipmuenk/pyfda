@@ -23,7 +23,7 @@ from scipy.io import loadmat, savemat
 
 from .pyfda_lib import safe_eval
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
-import pyfda.pyfda_fix_lib as fix_lib
+import pyfda.libs.pyfda_fix_lib as fx
 from .pyfda_rc import params
 import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -826,7 +826,7 @@ def export_coe_xilinx(f):
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
-    qc = fix_lib.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
     logger.warning("scale = {0}, WF = {1}".format(qc.scale, qc.WF))
     if qc.frmt == 'hex': # select hex format
         coe_radix = 16

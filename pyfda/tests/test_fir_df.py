@@ -12,7 +12,7 @@ Test suite for fir_df
 
 import unittest
 import numpy as np
-from pyfda import pyfda_fix_lib as fix_lib
+from pyfda.libs import pyfda_fix_lib as fx
 from pyfda.fixpoint_widgets.fir_df import FIR_DF_wdg
 
 
@@ -20,7 +20,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
-        self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
+        self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         self.y_list_cmplx = [-1.1j + 0.1, -1.0 - 0.3j, -0.5-0.5j, 0j, 0.5j, 0.9, 0.99+0.3j, 1j, 1.1]

@@ -25,7 +25,7 @@ from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_s
 from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
 
 from pyfda.pyfda_rc import params
-import pyfda.pyfda_fix_lib as fix
+import pyfda.libs.pyfda_fix_lib as fx
 
 from .input_coeffs_ui import Input_Coeffs_UI
 
@@ -333,7 +333,7 @@ class Input_Coeffs(QWidget):
 
         self.setLayout(layVMain)
 
-        self.myQ = fix.Fixed(fb.fil[0]['fxqc']['QCB']) # initialize fixpoint object
+        self.myQ = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # initialize fixpoint object
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()

@@ -20,7 +20,7 @@ import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_fix_lib as fx
+import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
         sawtooth_bl, triang_bl, comb_bl)
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget

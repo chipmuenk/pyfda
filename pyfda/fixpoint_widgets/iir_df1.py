@@ -18,7 +18,7 @@ import pyfda.filterbroker as fb
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
-import pyfda.pyfda_fix_lib as fx
+import pyfda.libs.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 
 import myhdl as hdl

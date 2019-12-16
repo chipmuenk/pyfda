@@ -20,7 +20,7 @@ from pyfda.pyfda_qt_lib import qget_cmb_box
 
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
-#import pyfda.pyfda_fix_lib as fx
+#import pyfda.libs.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_Q, rescale
 
 #####################
