@@ -12,8 +12,10 @@ Store the available fft windows and their properties
 import logging
 logger = logging.getLogger(__name__)
 
-import numpy as np
+import importlib
+#import numpy as np
 import scipy.signal as sig
+import scipy
 
 
 windows =\
@@ -29,7 +31,7 @@ windows =\
             }
          },
     'Barthann':
-        {'fn_name':'barthann',
+        {'fn_name':'scipy.signal.windows.barthann',
          'info':
              ("<span>A modified Bartlett-Hann Window."
               "</span>")},
@@ -188,13 +190,21 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     #--------------------------------------
     # get attribute fn_name from submodule sig.windows and
     # return the desired window function:
-    win_fnct = getattr(sig.windows, fn_name, None)
+    mod_fnct = fn_name.split('.') # try to split fully qualified name
+    fnct = mod_fnct[-1]
+    if len(mod_fnct) == 1: # only one element, no modules given
+        win_fnct = getattr(sig.windows, fnct, None)
+    else:
+        mod_name = fn_name[:fn_name.rfind(".")] # remove the leftmost part from the last '.'
+        mod = importlib.import_module(mod_name)  
+        win_fnct = getattr(mod, fnct, None)
     
     if not win_fnct:
         logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
                      .format(fn_name))
         fn_name = "boxcar"
-        win_fnct = getattr(sig.windows, fn_name, None)
+     #   win_fnct = getattr(sig.windows, fn_name, None)
+        win_fnct = getattr(scipy, fn_name, None)
         
     win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info, 
                      'par':par, 'n_par':n_par, 'win_len':N})
