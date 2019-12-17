@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import importlib
-#import numpy as np
+import numpy as np
 import scipy.signal as sig
 import scipy
 
@@ -48,6 +48,13 @@ windows =\
              ("<span>The minimum 4-term Blackman-Harris window with excellent side-"
               "lobe suppression.</span>")
              },
+    'Blackmanharris_7':
+        {'fn_name':'blackmanharris',
+         'info':
+             ("<span>The minimum 4-term Blackman-Harris window with excellent side-"
+              "lobe suppression.</span>")
+             },
+
     'Bohman':
         {'fn_name':'bohman'},
     'Chebwin':
@@ -225,3 +232,15 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     else:
         logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
     #        return win_fnct(N, *par[2], sym=sym)
+
+class UserWindows(object):
+    def __init__(self, parent):
+        super(UserWindows, self).__init__(parent)
+
+        self.tab_label = 'Fixpoint'
+ 
+    
+    def blackmanharris7(self, N, sym):
+        x = np.ones(N)
+        return np.cos(x/(2*np.pi))
+        
