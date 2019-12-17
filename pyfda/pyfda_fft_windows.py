@@ -45,8 +45,9 @@ windows =\
     'Blackmanharris':
         {'fn_name':'blackmanharris',
          'info':
-             ("<span>The minimum 4-term Blackman-Harris window with excellent side-"
-              "lobe suppression.</span>")
+             ("<span>The minimum 4-term Blackman-Harris window gives an excellent "
+              "constant side-lobe suppression of more than 90 dB while keeping a "
+              "reasonably narrow main lobe.</span>")
              },
     'Blackmanharris_7':
         {'fn_name':'blackmanharris',
@@ -60,13 +61,13 @@ windows =\
     'Chebwin':
         {'fn_name':'chebwin',
          'par':[{
-            'name':'Attn.', 'name_tex':r'$a$',
+            'name':'a', 'name_tex':r'$a$',
             'val':80, 'min':45, 'max':300, 
             'tooltip':"<span>Side lobe attenuation in dB.</span>"}],
          'info':
              ("<span>This window optimizes for the narrowest main lobe width for "
-              "a given order <i>M</i> and sidelobe equiripple attenuation <i>Attn.</i>, "
-              "using Chebyshev polynomials.</span>"),
+              "a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, "
+              "using Chebychev polynomials.</span>"),
         },
     'Cosine':{},
     'Flattop':
@@ -110,11 +111,12 @@ windows =\
     'Hann':
         {'fn_name':'hann',
         'info':'<span>The Hann (or, falsely, "Hanning") window is smooth at the '
-          'edges, in the frequence domain side-lobe fall-off at a rate of 18 dB/oct '
-          'or 30 dB/dec. It is good compromise for many application, especially '
+          'edges. In the frequency domain this corresponds to side-lobes falling '
+          'off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite '
+          'high (-32 dB). It is a good compromise for many applications, especially '
           'when higher frequency components need to be suppressed.'
           '<br />Mathematically, it is the most simple two-term raised cosine '
-          'window or squared sine window.</span>'},
+          'or squared sine window.</span>'},
     'Kaiser':
         {'fn_name':'kaiser',
          'par':[{
@@ -126,12 +128,15 @@ windows =\
                      "5 ... 20.</span>")}],
          'info':
              ("<span>The Kaiser window is a very good approximation to the "
-              "Digital Prolate Spheroidal Sequence, or Slepian window, which "
-              "maximizes the energy in the main lobe of the window relative "
+              "Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, "
+              "which maximizes the energy in the main lobe of the window relative "
               "to the total energy.</span>")
         },
     'Nuttall':{},
-    'Parzen':{},
+    'Parzen':{
+        'info':
+            ("<span>The Parzen window is a 4th order B-spline window whose side-"
+             "lobes fall off with -24 dB/oct.</span>")},
     'Rectangular':{'fn_name':'boxcar'},
     'Slepian':
         {'fn_name':'slepian',
@@ -142,6 +147,7 @@ windows =\
          'info':
              ("<span>Used to maximize the energy concentration in the main lobe. "
               " Also called the digital prolate spheroidal sequence (DPSS)."
+              " See also: Kaiser window."
               "</span>")
          },
     'Triangular':{'fn_name':'triang'},
@@ -202,22 +208,23 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         info = d['info']
         
     #--------------------------------------
-    # get attribute fn_name from submodule sig.windows and
+    # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
     mod_fnct = fn_name.split('.') # try to split fully qualified name
     fnct = mod_fnct[-1]
-    if len(mod_fnct) == 1: # only one element, no modules given
+    if len(mod_fnct) == 1: 
+        # only one element, no modules given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
     else:
-        mod_name = fn_name[:fn_name.rfind(".")] # remove the leftmost part from the last '.'
+        # remove the leftmost part starting with the last '.'
+        mod_name = fn_name[:fn_name.rfind(".")] 
         mod = importlib.import_module(mod_name)  
         win_fnct = getattr(mod, fnct, None)
     
     if not win_fnct:
         logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
                      .format(fn_name))
-        fn_name = "boxcar"
-     #   win_fnct = getattr(sig.windows, fn_name, None)
+        fn_name  = "boxcar"
         win_fnct = getattr(scipy, fn_name, None)
         
     win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info, 
@@ -231,7 +238,6 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         return win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)        
     else:
         logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
-    #        return win_fnct(N, *par[2], sym=sym)
 
 class UserWindows(object):
     def __init__(self, parent):
@@ -244,3 +250,6 @@ class UserWindows(object):
         x = np.ones(N)
         return np.cos(x/(2*np.pi))
         
+# =======
+# see https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
+
