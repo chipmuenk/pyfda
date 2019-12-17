@@ -50,12 +50,11 @@ windows =\
               "reasonably narrow main lobe.</span>")
              },
     'Blackmanharris_7':
-        {'fn_name':'blackmanharris',
+        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris7',
          'info':
-             ("<span>The minimum 4-term Blackman-Harris window with excellent side-"
+             ("<span>The 7-term Blackman-Harris window with excellent side-"
               "lobe suppression.</span>")
              },
-
     'Bohman':
         {'fn_name':'bohman'},
     'Chebwin':
@@ -239,16 +238,16 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     else:
         logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
 
+
+def blackmanharris7(N, sym):
+        x = np.arange(N)
+        # this is just a Hann window, coefficients need to be adapted
+        return 0.5 - 0.5 * np.cos(2 * np.pi * x / N)
+
 class UserWindows(object):
     def __init__(self, parent):
         super(UserWindows, self).__init__(parent)
-
-        self.tab_label = 'Fixpoint'
  
-    
-    def blackmanharris7(self, N, sym):
-        x = np.ones(N)
-        return np.cos(x/(2*np.pi))
         
 # =======
 # see https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
