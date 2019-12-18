@@ -38,8 +38,9 @@ windows =\
     'Bartlett':
         {'fn_name':'bartlett',
          'info':'<span>The Bartlett window is very similar to a triangular window, '
-             'except that the end points are at zero.'
-             '<br />Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
+             'except that the end points are at zero. Its side lobes fall off with '
+             '12 dB/oct., the side lobe suppression is xx dB.'
+             '<br /><br />Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
     'Blackman':
         {'fn_name':'blackman'},
     'Blackmanharris':
@@ -68,7 +69,11 @@ windows =\
               "a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, "
               "using Chebychev polynomials.</span>"),
         },
-    'Cosine':{},
+    'Cosine':
+        {'info':
+             ('<span>The window is half a cosine period, shifted by pi/2. '
+              'For that reason it is also known as "half-cosine" or "sine" window.</span>'),
+             },
     'Flattop':
          {'win_fn_name':'flattop'},
     'General Gaussian':
@@ -134,8 +139,13 @@ windows =\
     'Nuttall':{},
     'Parzen':{
         'info':
-            ("<span>The Parzen window is a 4th order B-spline window whose side-"
-             "lobes fall off with -24 dB/oct.</span>")},
+            ('<span>The Parzen window is a 4th order B-spline window whose side-'
+             'lobes fall off with -24 dB/oct.'
+             '<br/ >&nbsp;<br />'
+             'It can be constructed by convolving '
+             'a rectangular window four times (or multiplying its frequency response '
+             'four times).'
+             '<br />See also: Boxcar and Triangular / Bartlett windows.</span>')},
     'Rectangular':{'fn_name':'boxcar'},
     'Slepian':
         {'fn_name':'slepian',
@@ -146,7 +156,7 @@ windows =\
          'info':
              ("<span>Used to maximize the energy concentration in the main lobe. "
               " Also called the digital prolate spheroidal sequence (DPSS)."
-              " See also: Kaiser window."
+              "<br/ >See also: Kaiser window."
               "</span>")
          },
     'Triangular':{'fn_name':'triang'},
@@ -164,6 +174,7 @@ def get_window_names():
         
 
 def calc_window_function(win_dict, win_name, N=32, sym=True):
+    sym = True
     """
     Generate a window function.
 
@@ -240,9 +251,13 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
 
 
 def blackmanharris7(N, sym):
-        x = np.arange(N)
+        if sym:
+            L = N-1
+        else:
+            L = N  
+        x = np.arange(N) * 2 * np.pi / L
         # this is just a Hann window, coefficients need to be adapted
-        return 0.5 - 0.5 * np.cos(2 * np.pi * x / N)
+        return 0.5 - 0.5 * np.cos(x)
 
 class UserWindows(object):
     def __init__(self, parent):
@@ -250,5 +265,9 @@ class UserWindows(object):
  
         
 # =======
-# see https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
+# see also:
+# https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
+# https://github.com/capitanov/blackman_harris_win
+# https://en.m.wikipedia.org/wiki/Window_function
+
 
