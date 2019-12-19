@@ -34,7 +34,7 @@ API version info:
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, QPushButton,
                       QVBoxLayout, QGridLayout)
 import numpy as np
 import scipy.signal as sig
@@ -71,6 +71,7 @@ class Firwin(QWidget):
         QWidget.__init__(self)
 
         self.ft = 'FIR'
+        self.fft_window = None
                            
         c = Common()
         self.rt_dict = c.rt_base_iir
@@ -145,6 +146,12 @@ class Firwin(QWidget):
         # self.cmb_firwin_win.addItems(windows)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        self.but_fft_win = QPushButton(self)
+        self.but_fft_win.setText("WIN FFT")
+        self.but_fft_win.setToolTip("Show time and frequency response of FFT Window")
+        self.but_fft_win.setCheckable(True)
+        self.but_fft_win.setChecked(False)
 
         self.lbl_firwin_1 = QLabel("a", self)
         self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
@@ -164,7 +171,8 @@ class Firwin(QWidget):
 
         self.layGWin = QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
-        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,2)
+        self.layGWin.addWidget(self.cmb_firwin_win,0,0)#,1,2)
+        self.layGWin.addWidget(self.but_fft_win,0,1)
         self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
         self.layGWin.addWidget(self.lbl_firwin_1,1,0)
         self.layGWin.addWidget(self.led_firwin_1,1,1)
@@ -183,6 +191,8 @@ class Firwin(QWidget):
         self.led_firwin_1.editingFinished.connect(self._update_UI)
         self.led_firwin_2.editingFinished.connect(self._update_UI)
         self.cmb_firwin_alg.activated.connect(self._update_UI)
+        
+        self.but_fft_win.clicked.connect(self.show_fft_win)
         #----------------------------------------------------------------------
 
         self._load_dict() # get initial / last setting from dictionary
@@ -242,6 +252,9 @@ class Firwin(QWidget):
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
         
 #=============================================================================
+# Taken from impz()
+#==============================================================================
+
     def _update_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
         param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
@@ -266,7 +279,8 @@ class Firwin(QWidget):
         self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
 
-    def _update_win_fft(self, dict_sig=None):
+
+    def _update_win_fft(self):
         """ Update window type for FFT """
 
         def _update_param1():
@@ -300,9 +314,9 @@ class Firwin(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
-        if not dict_sig or type(dict_sig) != dict:
-            self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
 
+#=============================================================================
 #=============================================================================
             
     def _load_dict(self):
@@ -508,20 +522,20 @@ class Firwin(QWidget):
         """
         Pop-up FFT window
         """
-        if self.ui.but_fft_win.isChecked():
-            qstyle_widget(self.ui.but_fft_win, "changed")
+        if self.but_fft_win.isChecked():
+            qstyle_widget(self.but_fft_win, "changed")
         else:
-            qstyle_widget(self.ui.but_fft_win, "normal")
+            qstyle_widget(self.but_fft_win, "normal")
             
         if self.fft_window is None: # no handle to the window? Create a new instance
-            if self.ui.but_fft_win.isChecked():
+            if self.but_fft_win.isChecked():
                 # important: Handle to window must be class attribute
-                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=False)
-                self.ui.sig_tx.connect(self.fft_window.sig_rx)
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=True)
+                self.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
         else:
-            if not self.ui.but_fft_win.isChecked():
+            if not self.but_fft_win.isChecked():
                 if self.fft_window is None:
                     logger.warning("FFT window is already closed!")
                 else:
@@ -529,8 +543,8 @@ class Firwin(QWidget):
 
     def close_fft_win(self):
         self.fft_window = None
-        self.ui.but_fft_win.setChecked(False)
-        qstyle_widget(self.ui.but_fft_win, "normal")
+        self.but_fft_win.setChecked(False)
+        qstyle_widget(self.but_fft_win, "normal")
 
 #------------------------------------------------------------------------------
 
