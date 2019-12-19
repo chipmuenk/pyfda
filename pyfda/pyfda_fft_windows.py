@@ -251,22 +251,22 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
 
 
 def blackmanharris7(N, sym):
-    # a0 = 0.27105140069342
-    # a1 = −0.43329793923448
-    # a2 = 0.21812299954311
-    # a3 = −0.06592544638803
-    # a4 = 0.01081174209837
-    # a5 = −0.00077658482522
-    # a6 = 0.00001388721735
-        if sym:
-            L = N-1
-        else:
-            L = N  
-        x = np.arange(N) * 2 * np.pi / L
-        # this is just a Hann window, coefficients need to be adapted
-        return 0.5 - 0.5 * np.cos(x)
-    
-    
+    a = [0.27105140069342,
+         -0.43329793923448,
+         0.21812299954311,
+         -0.06592544638803,
+         0.01081174209837,
+         -0.00077658482522,
+         0.00001388721735]
+    if sym:
+        L = N-1
+    else:
+        L = N  
+    x = np.arange(N) * 2 * np.pi / L
+    blk = a[0]
+    for k in range(1,7):
+        blk += a[k] * np.cos(k*x)
+    return blk
 
 
 class UserWindows(object):
