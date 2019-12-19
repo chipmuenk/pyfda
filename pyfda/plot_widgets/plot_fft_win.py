@@ -44,7 +44,8 @@ class Plot_FFT_win(QMainWindow):
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
-        self.needs_draw = True  
+        self.needs_draw = True
+        self.needs_redraw = True
 
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
@@ -89,6 +90,7 @@ class Plot_FFT_win(QMainWindow):
             elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
                 or self.needs_redraw:
                 self.redraw()
+                self.needs_redraw = False
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
@@ -299,7 +301,8 @@ class Plot_FFT_win(QMainWindow):
 #------------------------------------------------------------------------------
     def update_view(self):
         """
-        Draw the figure with new limits, scale etc without recalculating H(f)
+        Draw the figure with new limits, scale etc without recalculating the
+        window.
         """
         self.ax_t.cla()
         self.ax_f.cla()
@@ -377,6 +380,7 @@ class Plot_FFT_win(QMainWindow):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
+        self.needs_redraw = False
 
 #==============================================================================
 
