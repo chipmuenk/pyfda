@@ -160,6 +160,7 @@ windows =\
               "</span>")
          },
     'Triangular':{'fn_name':'triang'},
+    'Ultraspherical':{'fn_name':'pyfda.pyfda_fft_windows.ultraspherical'}
     }
 def get_window_names():
     """
@@ -267,6 +268,23 @@ def blackmanharris7(N, sym):
     for k in range(1,7):
         blk += a[k] * np.cos(k*x)
     return blk
+
+def ultraspherical(N, sym):
+    alpha = 1
+    x_0 = 0
+    if sym:
+        L = N-1
+    else:
+        L = N  
+    x = np.arange(N) * 2 * np.pi / (N+1)
+    
+    geg = scipy.special.gegenbauer
+    rtn = geg(N-1, alpha, x_0)
+    
+    for k in range(1,N//2):
+        #rtn += geg(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(x*k)
+        rtn +=  np.cos(x*k)   
+    return (rtn / (N+1))
 
 
 class UserWindows(object):
