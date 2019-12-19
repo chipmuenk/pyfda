@@ -31,6 +31,9 @@ API version info:
     
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
 """
+import logging
+logger = logging.getLogger(__name__)
+
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
                       QVBoxLayout, QGridLayout)
 import numpy as np
@@ -39,8 +42,10 @@ from importlib import import_module
 import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, round_odd, safe_eval
-from pyfda.pyfda_qt_lib import qfilter_warning
+from pyfda.pyfda_lib import fil_save, round_odd, safe_eval, to_html
+from pyfda.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
+from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
+from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -123,20 +128,21 @@ class Firwin(QWidget):
 
         # Combobox for selecting the window used for filter design
         self.cmb_firwin_win = QComboBox(self)
+        self.cmb_firwin_win.addItems(get_window_names())
         self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
 
-        windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
-                   'Boxcar','Chebwin','Cosine','Flattop','General_Gaussian',
-                   'Gaussian','Hamming','Hann','Kaiser','Nuttall','Parzen',
-                   'Slepian','Triang']
-        #=== Windows with parameters =======
-        # kaiser - needs beta
-        # gaussian needs std
-        # general_gaussian - needs power, width
-        # slepian - needs width
-        # chebwin - needs attenuation
+        # windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
+        #            'Boxcar','Chebwin','Cosine','Flattop','General_Gaussian',
+        #            'Gaussian','Hamming','Hann','Kaiser','Nuttall','Parzen',
+        #            'Slepian','Triang']
+        # #=== Windows with parameters =======
+        # # kaiser - needs beta
+        # # gaussian needs std
+        # # general_gaussian - needs power, width
+        # # slepian - needs width
+        # # chebwin - needs attenuation
 
-        self.cmb_firwin_win.addItems(windows)
+        # self.cmb_firwin_win.addItems(windows)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -234,6 +240,70 @@ class Firwin(QWidget):
 
         # sig_tx -> select_filter -> filter_specs
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
+        
+#=============================================================================
+    def _update_param1(self):
+        """Read out textbox when editing is finished and update dict and fft window"""
+        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
+                          return_type='float')
+        if param < self.win_dict['par'][0]['min']:
+            param = self.win_dict['par'][0]['min']
+        elif param > self.win_dict['par'][0]['max']:
+            param = self.win_dict['par'][0]['max']   
+        self.ledWinPar1.setText(str(param))     
+        self.win_dict['par'][0]['val'] = param
+        self._update_win_fft()
+        
+    def _update_param2(self):
+        """Read out textbox when editing is finished and update dict and fft window"""
+        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'], 
+                          return_type='float')
+        if param < self.win_dict['par'][1]['min']:
+            param = self.win_dict['par'][1]['min']
+        elif param > self.win_dict['par'][1]['max']:
+            param = self.win_dict['par'][1]['max']   
+        self.ledWinPar2.setText(str(param))     
+        self.win_dict['par'][1]['val'] = param
+        self._update_win_fft()
+
+    def _update_win_fft(self, dict_sig=None):
+        """ Update window type for FFT """
+
+        def _update_param1():
+            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
+        def _update_param2():
+            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
+#------------------------------------------------------------------------------
+            
+        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.win = calc_window_function(self.win_dict, self.window_name,
+                                        N=self.N, sym=False)
+ 
+        n_par = self.win_dict['n_par']
+
+        self.lblWinPar1.setVisible(n_par > 0)
+        self.ledWinPar1.setVisible(n_par > 0)
+        self.lblWinPar2.setVisible(n_par > 1)
+        self.ledWinPar2.setVisible(n_par > 1)        
+
+        if n_par > 0:
+            _update_param1()
+        if n_par > 1:
+            _update_param2()
+
+        self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
+
+        self.scale = self.N / np.sum(self.win)
+        self.win *= self.scale # correct gain for periodic signals (coherent gain)
+
+        if not dict_sig or type(dict_sig) != dict:
+            self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+
+#=============================================================================
             
     def _load_dict(self):
         """
@@ -433,6 +503,34 @@ class Firwin(QWidget):
         self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
+    #------------------------------------------------------------------------------
+    def show_fft_win(self):
+        """
+        Pop-up FFT window
+        """
+        if self.ui.but_fft_win.isChecked():
+            qstyle_widget(self.ui.but_fft_win, "changed")
+        else:
+            qstyle_widget(self.ui.but_fft_win, "normal")
+            
+        if self.fft_window is None: # no handle to the window? Create a new instance
+            if self.ui.but_fft_win.isChecked():
+                # important: Handle to window must be class attribute
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=False)
+                self.ui.sig_tx.connect(self.fft_window.sig_rx)
+                self.fft_window.sig_tx.connect(self.close_fft_win)
+                self.fft_window.show() # modeless i.e. non-blocking popup window
+        else:
+            if not self.ui.but_fft_win.isChecked():
+                if self.fft_window is None:
+                    logger.warning("FFT window is already closed!")
+                else:
+                    self.fft_window.close()
+
+    def close_fft_win(self):
+        self.fft_window = None
+        self.ui.but_fft_win.setChecked(False)
+        qstyle_widget(self.ui.but_fft_win, "normal")
 
 #------------------------------------------------------------------------------
 
