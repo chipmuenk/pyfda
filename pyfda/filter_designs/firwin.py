@@ -153,31 +153,31 @@ class Firwin(QWidget):
         self.but_fft_win.setCheckable(True)
         self.but_fft_win.setChecked(False)
 
-        self.lbl_firwin_1 = QLabel("a", self)
-        self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
-        self.led_firwin_1 = QLineEdit(self)
-        self.led_firwin_1.setText("0.5")
-        self.led_firwin_1.setObjectName('wdg_led_firwin_1')
-        self.lbl_firwin_1.setVisible(False)
-        self.led_firwin_1.setVisible(False)
+        self.lblWinPar1 = QLabel("a", self)
+        self.lblWinPar1.setObjectName('wdg_lbl_firwin_1')
+        self.ledWinPar1 = QLineEdit(self)
+        self.ledWinPar1.setText("0.5")
+        self.ledWinPar1.setObjectName('wdg_led_firwin_1')
+        self.lblWinPar1.setVisible(False)
+        self.ledWinPar1.setVisible(False)
                
-        self.lbl_firwin_2 = QLabel("b", self)
-        self.lbl_firwin_2.setObjectName('wdg_lbl_firwin_2')
-        self.led_firwin_2 = QLineEdit(self)
-        self.led_firwin_2.setText("0.5")
-        self.led_firwin_2.setObjectName('wdg_led_firwin_2')
-        self.led_firwin_2.setVisible(False)
-        self.lbl_firwin_2.setVisible(False)
+        self.lblWinPar2 = QLabel("b", self)
+        self.lblWinPar2.setObjectName('wdg_lbl_firwin_2')
+        self.ledWinPar2 = QLineEdit(self)
+        self.ledWinPar2.setText("0.5")
+        self.ledWinPar2.setObjectName('wdg_led_firwin_2')
+        self.ledWinPar2.setVisible(False)
+        self.lblWinPar2.setVisible(False)
 
         self.layGWin = QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
         self.layGWin.addWidget(self.cmb_firwin_win,0,0)#,1,2)
         self.layGWin.addWidget(self.but_fft_win,0,1)
         self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
-        self.layGWin.addWidget(self.lbl_firwin_1,1,0)
-        self.layGWin.addWidget(self.led_firwin_1,1,1)
-        self.layGWin.addWidget(self.lbl_firwin_2,1,2)
-        self.layGWin.addWidget(self.led_firwin_2,1,3)
+        self.layGWin.addWidget(self.lblWinPar1,1,0)
+        self.layGWin.addWidget(self.ledWinPar1,1,1)
+        self.layGWin.addWidget(self.lblWinPar2,1,2)
+        self.layGWin.addWidget(self.ledWinPar2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
@@ -188,8 +188,8 @@ class Firwin(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmb_firwin_win.activated.connect(self._update_UI)
-        self.led_firwin_1.editingFinished.connect(self._update_UI)
-        self.led_firwin_2.editingFinished.connect(self._update_UI)
+        self.ledWinPar1.editingFinished.connect(self._update_UI)
+        self.ledWinPar2.editingFinished.connect(self._update_UI)
         self.cmb_firwin_alg.activated.connect(self._update_UI)
         
         self.but_fft_win.clicked.connect(self.show_fft_win)
@@ -208,7 +208,6 @@ class Firwin(QWidget):
         self.alg = str(self.cmb_firwin_alg.currentText())
 
         mod_ = import_module('scipy.signal.windows')
-#        mod = __import__('scipy.signal') # works, but not with the next line
         
          # construct window class, e.g. scipy.signal.boxcar :
         class_ = getattr(mod_, self.fir_window_name)
@@ -231,20 +230,20 @@ class Firwin(QWidget):
         # the window name and optionally one or two float parameters. 
         # If there are no additional parameters, just pass the window name string.
         N_args = len(self.winArgs)
-        self.lbl_firwin_1.setVisible(N_args > 0)
-        self.led_firwin_1.setVisible(N_args > 0)
-        self.lbl_firwin_2.setVisible(N_args > 1)
-        self.led_firwin_2.setVisible(N_args > 1)
+        self.lblWinPar1.setVisible(N_args > 0)
+        self.ledWinPar1.setVisible(N_args > 0)
+        self.lblWinPar2.setVisible(N_args > 1)
+        self.ledWinPar2.setVisible(N_args > 1)
             
         if N_args > 1 :
-            self.lbl_firwin_2.setText(self.winArgs[1] + ":")
+            self.lblWinPar2.setText(self.winArgs[1] + ":")
             self.firWindow = (self.fir_window_name,
-                                      safe_eval(self.led_firwin_1.text(), return_type='float'), 
-                                      safe_eval(self.led_firwin_2.text(), return_type='float'))
+                                      safe_eval(self.ledWinPar1.text(), return_type='float'), 
+                                      safe_eval(self.ledWinPar2.text(), return_type='float'))
         elif N_args > 0 :
-            self.lbl_firwin_1.setText(self.winArgs[0] + ":")
+            self.lblWinPar1.setText(self.winArgs[0] + ":")
             self.firWindow = (self.fir_window_name,
-                                      safe_eval(self.led_firwin_1.text(), return_type='float'))
+                                      safe_eval(self.ledWinPar1.text(), return_type='float'))
         else:
             self.firWindow = self.fir_window_name
 
@@ -335,9 +334,9 @@ class Firwin(QWidget):
                     window = wdg_fil_par['win']
                 else:
                     window = wdg_fil_par['win'][0]
-                    self.led_firwin_1.setText(str(wdg_fil_par['win'][1]))
+                    self.ledWinPar1.setText(str(wdg_fil_par['win'][1]))
                     if len(wdg_fil_par['win']) > 2:
-                        self.led_firwin_2.setText(str(wdg_fil_par['win'][2]))                       
+                        self.ledWinPar2.setText(str(wdg_fil_par['win'][2]))                       
 
                 # find index for window string
                 win_idx = self.cmb_firwin_win.findText(window, 
@@ -421,7 +420,7 @@ class Firwin(QWidget):
         delta_A = np.sqrt(A[0] * A[1])
         if self.fir_window_name == 'kaiser':
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
-            self.led_firwin_1.setText(str(beta))
+            self.ledWinPar1.setText(str(beta))
             fb.fil[0]['wdg_fil'][1] = beta
             self._update_UI()
             #self._load_dict()
