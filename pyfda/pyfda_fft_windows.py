@@ -160,7 +160,23 @@ windows =\
               "</span>")
          },
     'Triangular':{'fn_name':'triang'},
-    'Ultraspherical':{'fn_name':'pyfda.pyfda_fft_windows.ultraspherical'}
+    'Ultraspherical':
+        {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
+         'par':[{
+            'name':'&alpha;','name_tex':r'$\alpha$',
+            'val':0.5, 'min':-0.5, 'max':10,
+             'tooltip':"<span>Shape parameter &alpha; or &mu;</span>"
+             },
+             {
+            'name':'x0','name_tex':r'$x_0$',
+            'val':1, 'min':-10, 'max':10,
+             'tooltip':"<span>Amplitude</span>"}
+             ],
+         'info':
+             ("<span>Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian window, "
+              "<i>p</i> = 0.5 yields the shape of a Laplace distribution."
+              "</span>"),
+             }
     }
 def get_window_names():
     """
@@ -175,7 +191,6 @@ def get_window_names():
         
 
 def calc_window_function(win_dict, win_name, N=32, sym=True):
-    sym = True
     """
     Generate a window function.
 
@@ -269,22 +284,31 @@ def blackmanharris7(N, sym):
         blk += a[k] * np.cos(k*x)
     return blk
 
-def ultraspherical(N, sym):
-    alpha = 1
-    x_0 = 0
+def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
+
     if sym:
         L = N-1
     else:
         L = N  
-    x = np.arange(N) * 2 * np.pi / (N+1)
+    x = np.arange(N) * np.pi / (N)
     
-    geg = scipy.special.gegenbauer
-    rtn = geg(N-1, alpha, x_0)
+    geg_ev = scipy.special.eval_gegenbauer
+    # a = 2
+    # for n in range(5 + 1):
+    #     x = np.linspace(-1.1, 1.1, 5001)
+    #     y = eval_gegenbauer(n, a, x)
+    #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
+    #     plt.ylim((-10,10))
     
-    for k in range(1,N//2):
-        #rtn += geg(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(x*k)
-        rtn +=  np.cos(x*k)   
-    return (rtn / (N+1))
+    # for k in range(1,N//2):
+    #     #rtn += geg(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(x*k)
+    #     rtn +=  np.cos(x*k)
+    
+    w = geg_ev(N-1, alpha, x_0 * np.cos(x))
+    #logger.error(W[0].dtype, len(W))
+    #W = np.abs(fft.ifft(w))
+    #logger.error(type(w[0].dtype), len(w))
+    return w
 
 
 class UserWindows(object):
