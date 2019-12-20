@@ -645,7 +645,10 @@ class Firwin(QWidget):
         if self.fft_window is None: # no handle to the window? Create a new instance
             if self.but_fft_win.isChecked():
                 # important: Handle to window must be class attribute
-                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=True)
+                # pass the name of the dictionary where parameters are stored and 
+                # whether a symmetric window or one that can be continued periodically
+                # will be constructed
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fir",sym=True)
                 self.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
