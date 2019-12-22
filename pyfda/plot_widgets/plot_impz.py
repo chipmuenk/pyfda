@@ -289,7 +289,8 @@ class Plot_Impz(QWidget):
         if self.fft_window is None: # no handle to the window? Create a new instance
             if self.ui.but_fft_win.isChecked():
                 # important: Handle to window must be class attribute
-                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft",sym=False)
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft", sym=False,
+                                               title="pyFDA Spectral Window Viewer")
                 self.ui.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
@@ -922,8 +923,8 @@ class Plot_Impz(QWidget):
                                '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], y_i[self.ui.N_start:], 'o', markersize=8,
-                           markerfacecolor='none', label='$y[n]$')
+            self.ax3d.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], y_i[self.ui.N_start:],
+                            'o', markersize=8, markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')

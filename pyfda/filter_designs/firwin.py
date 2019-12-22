@@ -648,7 +648,8 @@ class Firwin(QWidget):
                 # pass the name of the dictionary where parameters are stored and 
                 # whether a symmetric window or one that can be continued periodically
                 # will be constructed
-                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fir",sym=True)
+                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fir",sym=True,
+                                               title="pyFDA FIR Window Viewer")
                 self.sig_tx.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
