@@ -313,7 +313,7 @@ class PlotImpz_UI(QWidget):
         self.lblStimulus = QLabel("Signal: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine",
-                                   "Triang","Saw","Rect","Comb"])
+                                   "Triang","Saw","Rect","Comb", "FM"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
@@ -559,8 +559,8 @@ class PlotImpz_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang", "Comb"}
-        f2_en = self.stim in {"Cos", "Sine"}
+        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang", "Comb", "FM"}
+        f2_en = self.stim in {"Cos", "Sine", "FM"}
         dc_en = self.stim not in {"Step", "StepErr"}
 
         self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
