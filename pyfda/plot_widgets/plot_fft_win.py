@@ -24,9 +24,9 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from pyfda.compat import (QMainWindow, Qt, QFrame, pyqtSignal,
-                     QCheckBox, QLabel, QLineEdit, QTextBrowser, QSplitter,
-                     QHBoxLayout)
+from pyfda.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
+                     QMainWindow, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
+                     QTextBrowser, QSplitter,QTableWidget, QTableWidgetItem)
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QMainWindow):
     """
@@ -55,7 +55,7 @@ class Plot_FFT_win(QMainWindow):
         
         self.win_dict = fb.fil[0][win_dict_name]
         self.sym = sym
-        
+
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle('pyFDA Window Viewer')
         self._construct_UI()
@@ -105,6 +105,9 @@ class Plot_FFT_win(QMainWindow):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
+        bfont = QFont()
+        bfont.setBold(True)
+
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
@@ -167,16 +170,21 @@ class Plot_FFT_win(QMainWindow):
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
         
-#         self.tblFiltPerf = QTableWidget(self)
-#         self.tblFiltPerf.setAlternatingRowColors(True)
-# #        self.tblFiltPerf.verticalHeader().setVisible(False)
-#         self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
-#         self.tblFiltPerf.horizontalHeader().setFont(bfont)
-#         self.tblFiltPerf.verticalHeader().setHighlightSections(False)
-#         self.tblFiltPerf.verticalHeader().setFont(bfont)
+        self.tblWinProperties = QTableWidget(self)
+        self.tblWinProperties.setRowCount(2)
+        self.tblWinProperties.setColumnCount(2)
+        self.tblWinProperties.setAlternatingRowColors(True)
+        #self.tblWinProperties.verticalHeader().setHighlightSections(False)
+        self.tblWinProperties.verticalHeader().setFont(bfont)
+        self.tblWinProperties.setVerticalHeaderLabels(["ENBW", "CGain"]) 
+        
+        self.tblWinProperties.horizontalHeader().setHighlightSections(False)
+        self.tblWinProperties.horizontalHeader().setVisible(False)
+        self.tblWinProperties.horizontalHeader().setFont(bfont)
+        self.tblWinProperties.setHorizontalHeaderLabels(["Param", "Value"])
+        #self.tblWinProperties.horizontalHeaderItem().setTextAlignment(Qt.AlignHCenter)
 
         self.txtInfoBox = QTextBrowser(self)
-
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -198,7 +206,20 @@ class Plot_FFT_win(QMainWindow):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
-        
+        #----------------------------------------------------------------------
+        #               ### frmInfo ###
+        #
+        # This widget encompasses the text info box and the table with window
+        # parameters.
+        #----------------------------------------------------------------------
+        layVInfo = QVBoxLayout(self)
+        layVInfo.addWidget(self.tblWinProperties)
+        layVInfo.addWidget(self.txtInfoBox)
+
+        self.frmInfo = QFrame(self)
+        self.frmInfo.setObjectName("frmInfo")
+        self.frmInfo.setLayout(layVInfo)
+
         #----------------------------------------------------------------------
         #               ### splitter ###
         #
@@ -208,7 +229,7 @@ class Plot_FFT_win(QMainWindow):
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.mplwidget)
-        splitter.addWidget(self.txtInfoBox)
+        splitter.addWidget(self.frmInfo)
 
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
@@ -248,7 +269,17 @@ class Plot_FFT_win(QMainWindow):
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-
+#------------------------------------------------------------------------------
+    def _set_table_item(self, row, col, val):
+        """
+        Set the table item with the index `row, col` and the value val
+        """
+        item = self.tblWinProperties.item(row, col)
+        if item: # does item exist?
+            item.setText(str(val))
+        else: # no, construct it:
+            self.tblWinProperties.setItem(row,col,QTableWidgetItem(str(val)))
+        self.tblWinProperties.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
 #------------------------------------------------------------------------------
     def update_bottom(self):
         """
@@ -327,12 +358,16 @@ class Plot_FFT_win(QMainWindow):
             
         if self.chk_log_f.isChecked():
             self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
-            nenbw = 10 * np.log10(self.nenbw)
-            unit_nenbw = "dB"
+            self.nenbw_disp = 10 * np.log10(self.nenbw)
+            self.scale_disp = 20 * np.log10(self.scale)
+            self.unit_nenbw = "dB"
+            self.unit_scale = "dB"            
         else:
             self.ax_f.plot(F, Win)
-            nenbw = self.nenbw
-            unit_nenbw = "bins"
+            self.nenbw_disp = self.nenbw
+            self.scale_disp = self.scale           
+            self.unit_nenbw = "bins"
+            self.unit_scale = ""
             
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
@@ -359,12 +394,12 @@ class Plot_FFT_win(QMainWindow):
                               fancybox=True, framealpha=0.7, 
                               handlelength=0, handletextpad=0)
         labels_f = []
-        labels_f.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
-        labels_f.append("$CGAIN$  = {0:.4g}".format(self.scale))
+        labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
+        labels_f.append("$CGAIN$  = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
         self.ax_f.legend([patch] * 2, labels_f, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7, 
                                handlelength=0, handletextpad=0)
-
+        self.update_info()
         self.redraw()
 #------------------------------------------------------------------------------
     def update_info(self):
@@ -373,7 +408,14 @@ class Plot_FFT_win(QMainWindow):
         """
         if 'info' in self.win_dict:
             self.txtInfoBox.setText(self.win_dict['info'])
-    
+
+        self._set_table_item(0,0, self.nenbw_disp)
+        self._set_table_item(0,1, self.unit_nenbw)
+        self._set_table_item(1,0, self.scale_disp)
+        self._set_table_item(1,1, self.unit_scale)
+
+        self.tblWinProperties.resizeColumnsToContents()
+        self.tblWinProperties.resizeRowsToContents()
 #------------------------------------------------------------------------------
     def redraw(self):
         """
