@@ -507,10 +507,10 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'to Bandlim. Comb Signal'
 
-        elif self.ui.stim == "FM":
+        elif self.ui.stim == "PM":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2))
-            self.title_str += r'to FM Signal $A_1 \sin(2 \pi f_1 n + \varphi_1 + A_2 \sin(2 \pi f_2 n + \varphi_2))$'
+            self.title_str += r'to PM Signal $A_1 \sin(2 \pi f_1 n + \varphi_1 + A_2 \sin(2 \pi f_2 n + \varphi_2))$'
 
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
