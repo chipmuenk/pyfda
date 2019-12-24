@@ -58,7 +58,7 @@ windows =\
              },
     'Bohman':
         {'fn_name':'bohman'},
-    'Chebwin':
+    'Dolph-Chebychev':
         {'fn_name':'chebwin',
          'par':[{
             'name':'a', 'name_tex':r'$a$',
@@ -187,7 +187,7 @@ def get_window_names():
     for d in windows:
         win_name_list.append(d)
     
-    return win_name_list
+    return sorted(win_name_list)
         
 
 def calc_window_function(win_dict, win_name, N=32, sym=True):
