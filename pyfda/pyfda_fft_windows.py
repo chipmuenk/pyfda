@@ -290,9 +290,11 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
         L = N-1
     else:
         L = N  
-    x = np.arange(N) * np.pi / (N)
+    #x = np.arange(N) * np.pi / (N)
     
     geg_ev = scipy.special.eval_gegenbauer
+    w0= geg_ev(N, alpha, x_0)
+    w=np.zeros(N)
     # a = 2
     # for n in range(5 + 1):
     #     x = np.linspace(-1.1, 1.1, 5001)
@@ -300,11 +302,13 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
     #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
     #     plt.ylim((-10,10))
     
-    # for k in range(1,N//2):
-    #     #rtn += geg(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(x*k)
+    for n in range(0,N):
+        w[n] = w0
+        for k in range(1,N//2+1):
+            w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(2*n*np.pi*k/(N+1))
     #     rtn +=  np.cos(x*k)
     
-    w = geg_ev(N-1, alpha, x_0 * np.cos(x))
+    #w = geg_ev(N-1, alpha, x_0 * np.cos(x))
     #logger.error(W[0].dtype, len(W))
     #W = np.abs(fft.ifft(w))
     #logger.error(type(w[0].dtype), len(w))
