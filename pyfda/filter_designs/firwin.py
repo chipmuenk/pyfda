@@ -216,7 +216,7 @@ class Firwin(QWidget):
         
         self.info_doc = []
         self.info_doc.append('firwin()\n========')
-        self.info_doc.append(sig.firwin.__doc__)
+        #self.info_doc.append(sig.firwin.__doc__)
         self.info_doc.append(self.fir_window_name + '()' +'\n' + 
                                         '=' * (len(self.fir_window_name) + 2))
         self.info_doc.append(win_doc)
@@ -415,13 +415,16 @@ class Firwin(QWidget):
 #        self._store_entries()
 
 #------------------------------------------------------------------------------
-    def firwin(numtaps, cutoff, window=None, pass_zero=True,
-               scale=True, nyq=1.0):
+    def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
+               scale=True, nyq=1.0, fs=None):
     
         """
         FIR filter design using the window method. This is more or less the 
-        same as `scipy.signal.firwin` with the exception that instead of the 
-        window name, an ndarray with the window values is passed.
+        same as `scipy.signal.firwin` with the exception that an ndarray with 
+        the window values can be passed as an alternative to the window name.
+        
+        The parameters "width" (specifying a Kaiser window) and "fs" have been
+        omitted, they are not needed here.
 
         This function computes the coefficients of a finite impulse response
         filter.  The filter will have linear phase; it will be Type I if
@@ -442,8 +445,11 @@ class Firwin(QWidget):
             latter case, the frequencies in `cutoff` should be positive and
             monotonically increasing between 0 and `nyq`.  The values 0 and
             `nyq` must not be included in `cutoff`.
-        window : ndarray
-            The window values - this is different from the original firwin routine.
+        window : ndarray or string
+            string: use the window with the passed name from scipy.signal.windows
+            
+            ndarray: The window values - this is an addition to the original 
+            firwin routine.
         pass_zero : bool, optional
             If True, the gain at the frequency 0 (i.e. the "DC gain") is 1.
             Otherwise the DC gain is 0.
@@ -474,7 +480,6 @@ class Firwin(QWidget):
         --------
         scipy.firwin
         """
-    
         cutoff = np.atleast_1d(cutoff) / float(nyq)
     
         # Check for invalid input.
@@ -484,8 +489,8 @@ class Firwin(QWidget):
         if cutoff.size == 0:
             raise ValueError("At least one cutoff frequency must be given.")
         if cutoff.min() <= 0 or cutoff.max() >= 1:
-            raise ValueError("Invalid cutoff frequency: frequencies must be "
-                             "greater than 0 and less than nyq.")
+            raise ValueError("Invalid cutoff frequency {0}: frequencies must be "
+                             "greater than 0 and less than nyq.".format(cutoff))
         if np.any(np.diff(cutoff) <= 0):
             raise ValueError("Invalid cutoff frequencies: the frequencies "
                              "must be strictly increasing.")
@@ -513,14 +518,14 @@ class Firwin(QWidget):
 
         if type(window) == str:   
             # Get and apply the window function.
-            from .signaltools import get_window
+            from scipy.signal.signaltools import get_window
             win = get_window(window, numtaps, fftbins=False)
         elif type(window) == np.ndarray:
             win = window
         else:
             logger.error("The 'window' was neither a string nor a numpy array, it could not be evaluated.")
             return None
-    
+        logger.info(win)
         # apply the window function.
         h *= win
     
@@ -574,14 +579,14 @@ class Firwin(QWidget):
         if not self._test_N():
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], 
                                        window = self.firWindow, nyq = 0.5))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'],
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
                                        window = self.firWindow, nyq = 0.5))
 
     def HPmin(self, fil_dict):
@@ -592,7 +597,7 @@ class Firwin(QWidget):
         if not self._test_N():
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def HPman(self, fil_dict):
@@ -600,7 +605,7 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], 
             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
 
@@ -613,14 +618,14 @@ class Firwin(QWidget):
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BSmin(self, fil_dict):
@@ -632,7 +637,7 @@ class Firwin(QWidget):
             return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     def BSman(self, fil_dict):
@@ -640,7 +645,7 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     #------------------------------------------------------------------------------
