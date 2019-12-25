@@ -35,7 +35,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, QPushButton,
-                      QVBoxLayout, QGridLayout)
+                      QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
 from scipy.special import sinc
@@ -50,8 +50,6 @@ from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
 # TODO: Hilbert, differentiator, multiband are missing
-# TODO: Use kaiserord, kaiser_beta & kaiser_atten to calculate params for 
-#       kaiser window
 # TODO: Improve calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
@@ -135,18 +133,6 @@ class Firwin(QWidget):
         self.cmb_firwin_win.addItems(get_window_names())
         self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
 
-        # windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
-        #            'Boxcar','Chebwin','Cosine','Flattop','General_Gaussian',
-        #            'Gaussian','Hamming','Hann','Kaiser','Nuttall','Parzen',
-        #            'Slepian','Triang']
-        # #=== Windows with parameters =======
-        # # kaiser - needs beta
-        # # gaussian needs std
-        # # general_gaussian - needs power, width
-        # # slepian - needs width
-        # # chebwin - needs attenuation
-
-        # self.cmb_firwin_win.addItems(windows)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         
@@ -172,20 +158,27 @@ class Firwin(QWidget):
         self.ledWinPar2.setVisible(False)
         self.lblWinPar2.setVisible(False)
 
-        self.layGWin = QGridLayout()
-        self.layGWin.setObjectName('wdg_layGWin')
-        self.layGWin.addWidget(self.cmb_firwin_win,0,0)#,1,2)
-        self.layGWin.addWidget(self.but_fft_win,0,1)
-        self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
-        self.layGWin.addWidget(self.lblWinPar1,1,0)
-        self.layGWin.addWidget(self.ledWinPar1,1,1)
-        self.layGWin.addWidget(self.lblWinPar2,1,2)
-        self.layGWin.addWidget(self.ledWinPar2,1,3)
-        self.layGWin.setContentsMargins(0,0,0,0)
+
+
+        self.layHWin1 = QHBoxLayout()
+        self.layHWin1.addWidget(self.cmb_firwin_win)
+        self.layHWin1.addWidget(self.but_fft_win)
+        self.layHWin1.addWidget(self.cmb_firwin_alg)
+        self.layHWin2 = QHBoxLayout()       
+        self.layHWin2.addWidget(self.lblWinPar1)
+        self.layHWin2.addWidget(self.ledWinPar1)
+        self.layHWin2.addWidget(self.lblWinPar2)
+        self.layHWin2.addWidget(self.ledWinPar2)
+        
+        self.layVWin = QVBoxLayout()
+        self.layVWin.addLayout(self.layHWin1)
+        self.layVWin.addLayout(self.layHWin2)        
+        self.layVWin.setContentsMargins(0,0,0,0)
+
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layGWin)
+        self.wdg_fil.setLayout(self.layVWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
