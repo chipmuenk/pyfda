@@ -414,6 +414,7 @@ class Firwin(QWidget):
             pass
 #        self._store_entries()
 
+#------------------------------------------------------------------------------
     def firwin(numtaps, cutoff, window=None, pass_zero=True,
                scale=True, nyq=1.0):
     
@@ -509,9 +510,19 @@ class Firwin(QWidget):
         for left, right in bands:
             h += right * sinc(right * m)
             h -= left * sinc(left * m)
+
+        if type(window) == str:   
+            # Get and apply the window function.
+            from .signaltools import get_window
+            win = get_window(window, numtaps, fftbins=False)
+        elif type(window) == np.ndarray:
+            win = window
+        else:
+            logger.error("The 'window' was neither a string nor a numpy array, it could not be evaluated.")
+            return None
     
         # apply the window function.
-        h *= window
+        h *= win
     
         # Now handle scaling if desired.
         if scale:
