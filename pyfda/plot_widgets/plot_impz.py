@@ -28,11 +28,9 @@ from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 
 from .plot_impz_ui import PlotImpz_UI
-from .plot_fft_win import Plot_FFT_win
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
 
 classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
 
@@ -50,7 +48,6 @@ class Plot_Impz(QWidget):
         super(Plot_Impz, self).__init__(parent)
 
         self.ACTIVE_3D = False
-        self.fft_window = None # handle for FFT window pop-up widget
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
 
         # initial settings
@@ -129,7 +126,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw)
-        self.ui.but_fft_win.clicked.connect(self.show_fft_win)
+        self.ui.but_fft_win.clicked.connect(self.ui.show_fft_win)
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -275,36 +272,6 @@ class Plot_Impz(QWidget):
             # from this one
             self.sig_tx.emit(dict_sig)
             return
-
-    #------------------------------------------------------------------------------
-    def show_fft_win(self):
-        """
-        Pop-up FFT window
-        """
-        if self.ui.but_fft_win.isChecked():
-            qstyle_widget(self.ui.but_fft_win, "changed")
-        else:
-            qstyle_widget(self.ui.but_fft_win, "normal")
-            
-        if self.fft_window is None: # no handle to the window? Create a new instance
-            if self.ui.but_fft_win.isChecked():
-                # important: Handle to window must be class attribute
-                self.fft_window = Plot_FFT_win(self, win_dict_name="win_fft", sym=False,
-                                               title="pyFDA Spectral Window Viewer")
-                self.ui.sig_tx.connect(self.fft_window.sig_rx)
-                self.fft_window.sig_tx.connect(self.close_fft_win)
-                self.fft_window.show() # modeless i.e. non-blocking popup window
-        else:
-            if not self.ui.but_fft_win.isChecked():
-                if self.fft_window is None:
-                    logger.warning("FFT window is already closed!")
-                else:
-                    self.fft_window.close()
-
-    def close_fft_win(self):
-        self.fft_window = None
-        self.ui.but_fft_win.setChecked(False)
-        qstyle_widget(self.ui.but_fft_win, "normal")
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -692,7 +659,7 @@ class Plot_Impz(QWidget):
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
-        self.show_fft_win()
+        self.ui.show_fft_win()
 
     def _log_mode_time(self):
         """

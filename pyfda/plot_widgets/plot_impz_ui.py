@@ -18,8 +18,9 @@ from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushBut
 import numpy as np
 from pyfda.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
-from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
+from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 class PlotImpz_UI(QWidget):
@@ -78,6 +79,7 @@ class PlotImpz_UI(QWidget):
 
         # dictionary for fft window settings   
         self.win_dict = fb.fil[0]['win_fft']
+        self.fft_window = None # handle for FFT window pop-up widget
 
         self._construct_UI()
         self._enable_stim_widgets()
@@ -757,6 +759,37 @@ class PlotImpz_UI(QWidget):
 
         if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+            
+    #------------------------------------------------------------------------------
+    def show_fft_win(self):
+        """
+        Pop-up FFT window
+        """
+        if self.but_fft_win.isChecked():
+            qstyle_widget(self.but_fft_win, "changed")
+        else:
+            qstyle_widget(self.but_fft_win, "normal")
+            
+        if self.fft_window is None: # no handle to the window? Create a new instance
+            if self.but_fft_win.isChecked():
+                # important: Handle to window must be class attribute
+                self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
+                                               title="pyFDA Spectral Window Viewer")
+                self.sig_tx.connect(self.fft_window.sig_rx)
+                self.fft_window.sig_tx.connect(self.close_fft_win)
+                self.fft_window.show() # modeless i.e. non-blocking popup window
+        else:
+            if not self.but_fft_win.isChecked():
+                if self.fft_window is None:
+                    logger.warning("FFT window is already closed!")
+                else:
+                    self.fft_window.close()
+
+    def close_fft_win(self):
+        self.fft_window = None
+        self.but_fft_win.setChecked(False)
+        qstyle_widget(self.but_fft_win, "normal")
+
 
 #------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
