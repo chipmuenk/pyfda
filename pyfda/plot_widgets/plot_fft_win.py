@@ -80,7 +80,8 @@ class Plot_FFT_win(QMainWindow):
         logger.debug("Processing {0} | visible = {1}"\
                      .format(dict_sig, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or 'home' in dict_sig\
+                or 'filt_changed' in dict_sig or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False               
@@ -92,7 +93,7 @@ class Plot_FFT_win(QMainWindow):
                 self.redraw()
                 self.needs_redraw = False
         else:
-            if 'data_changed' in dict_sig:
+            if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
                 self.needs_draw = True 
