@@ -475,8 +475,8 @@ class PlotImpz_UI(QWidget):
         # --- frequency control ---
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
-        self.ledWinPar1.editingFinished.connect(self._update_param1)
-        self.ledWinPar2.editingFinished.connect(self._update_param2)        
+        self.ledWinPar1.editingFinished.connect(self._read_param1)
+        self.ledWinPar2.editingFinished.connect(self._read_param2)        
 
         # --- stimulus control ---
         self.chk_stim_options.clicked.connect(self._show_stim_options)
@@ -700,7 +700,7 @@ class PlotImpz_UI(QWidget):
         self._update_win_fft(dict_sig)
 
 
-    def _update_param1(self):
+    def _read_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
         param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
                           return_type='float')
@@ -712,7 +712,7 @@ class PlotImpz_UI(QWidget):
         self.win_dict['par'][0]['val'] = param
         self._update_win_fft()
         
-    def _update_param2(self):
+    def _read_param2(self):
         """Read out textbox when editing is finished and update dict and fft window"""
         param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'], 
                           return_type='float')
@@ -724,19 +724,10 @@ class PlotImpz_UI(QWidget):
         self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
 
+#------------------------------------------------------------------------------
     def _update_win_fft(self, dict_sig=None):
         """ Update window type for FFT """
-
-        def _update_param1():
-            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
-            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
-        def _update_param2():
-            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
-            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
-#------------------------------------------------------------------------------
-            
+           
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict, self.window_name,
                                         N=self.N, sym=False)
@@ -749,9 +740,15 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar2.setVisible(n_par > 1)        
 
         if n_par > 0:
-            _update_param1()
+            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
+
         if n_par > 1:
-            _update_param2()
+            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
+
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
