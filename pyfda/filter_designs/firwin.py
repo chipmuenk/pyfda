@@ -293,8 +293,8 @@ class Firwin(QWidget):
             self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 #------------------------------------------------------------------------------
             
-        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win = calc_window_function(self.win_dict, self.window_name,
+        self.fir_window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
                                         N=self.N, sym=True)
  
         n_par = self.win_dict['n_par']
@@ -309,12 +309,12 @@ class Firwin(QWidget):
         if n_par > 1:
             _update_param2()
 
-        self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
+        #self.scale = self.N / np.sum(self.win)
+        #self.win *= self.scale # correct gain for periodic signals (coherent gain)
+        
+        self.firWindow = self.fir_window
 
-        self.scale = self.N / np.sum(self.win)
-        self.win *= self.scale # correct gain for periodic signals (coherent gain)
-
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
 
 #=============================================================================
 #=============================================================================
