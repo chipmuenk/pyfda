@@ -410,9 +410,9 @@ class Plot_FFT_win(QMainWindow):
         if 'info' in self.win_dict:
             self.txtInfoBox.setText(self.win_dict['info'])
 
-        self._set_table_item(0,0, self.nenbw_disp)
+        self._set_table_item(0,0, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0,1, self.unit_nenbw)
-        self._set_table_item(1,0, self.scale_disp)
+        self._set_table_item(1,0, "{0:.5g}".format(self.scale_disp))
         self._set_table_item(1,1, self.unit_scale)
 
         self.tblWinProperties.resizeColumnsToContents()
