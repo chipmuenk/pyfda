@@ -9,13 +9,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, Qt, QEvent, pyqtSignal, 
+from pyfda.libs.compat import (QtCore, Qt, QEvent, pyqtSignal, 
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval
-from pyfda.pyfda_qt_lib import qstyle_widget, qget_cmb_box
+from pyfda.libs.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 
@@ -292,7 +292,7 @@ class AmplitudeSpecs(QWidget):
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = AmplitudeSpecs(None)
 

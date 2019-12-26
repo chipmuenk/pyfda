@@ -15,7 +15,7 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
+from pyfda.libs.compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                       QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
 
@@ -25,7 +25,7 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import lin2unit, mod_version
+from pyfda.libs.pyfda_lib import lin2unit, mod_version
 from pyfda.pyfda_rc import params
 # TODO: Passband and stopband info should show min / max values for each band
 
@@ -430,7 +430,7 @@ class Input_Info(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = Input_Info(None)
 

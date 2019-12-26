@@ -16,18 +16,18 @@ import sys
 import re
 from pprint import pformat
 
-from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, pyqtSlot, QEvent, QIcon,
+from pyfda.libs.compat import (QtCore, QWidget, QLineEdit, pyqtSignal, pyqtSlot, QEvent, QIcon,
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
-from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.pyfda_io_lib import qtable2text, qtext2table
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 
 from pyfda.pyfda_rc import params
 

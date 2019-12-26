@@ -27,13 +27,13 @@ try:
 except ImportError:
     figureoptions = None
 
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
+from pyfda.libs.compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
                       QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import cmp_version
+from pyfda.libs.pyfda_lib import cmp_version
 from pyfda import qrc_resources # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib

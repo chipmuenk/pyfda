@@ -14,15 +14,15 @@ logger = logging.getLogger(__name__)
 
 import sys
 
-from ..compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
+from pyfda.libs.compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
                       QIcon, QSize, QTableWidget, QTableWidgetItem, QVBoxLayout,
                       pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
-from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
-from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
+from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
+from pyfda.libs.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
 
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_fix_lib as fx

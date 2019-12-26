@@ -26,11 +26,11 @@ API version info:
 import scipy.signal as sig
 from numpy import conj, sqrt, sum, zeros
 from scipy.signal import ellipord
-from pyfda.pyfda_lib import fil_save, lin2unit
-from pyfda.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_lib import fil_save, lin2unit
+from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
-from ..compat import (QWidget, QFrame, pyqtSignal,
+from pyfda.libs.compat import (QWidget, QFrame, pyqtSignal,
                       QCheckBox, QVBoxLayout, QHBoxLayout)
 
 import logging
@@ -435,7 +435,7 @@ to be complex (no real values).
 
 if __name__ == '__main__':
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 # importing filterbroker initializes all its globals
     import pyfda.filterbroker as fb
 

@@ -9,9 +9,9 @@ Created on Wed Jun 14 11:57:19 2017
 import sys
 import unittest
 import pytest
-from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 
-from ...compat import Qt, QtTest, QApplication, QTableWidgetItem
+from .pyfda.libs.compat import Qt, QtTest, QApplication, QTableWidgetItem
 
 from pyfda.input_widgets.input_coeffs import Input_Coeffs
 

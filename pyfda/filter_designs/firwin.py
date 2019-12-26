@@ -34,7 +34,7 @@ API version info:
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, QPushButton,
+from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, QPushButton,
                       QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
@@ -43,8 +43,8 @@ from importlib import import_module
 import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, round_odd, safe_eval, to_html
-from pyfda.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
+from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
+from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
 from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
@@ -672,7 +672,7 @@ class Firwin(QWidget):
 
 if __name__ == '__main__':
     import sys 
-    from ..compat import QApplication, QFrame
+    from pyfda.libs.compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
     

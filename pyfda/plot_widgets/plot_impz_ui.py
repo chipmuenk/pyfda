@@ -12,13 +12,13 @@ Create the UI for the PlotImz class
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
                       QHBoxLayout, QVBoxLayout, pyqtSignal, QEvent, Qt)
 
 import numpy as np
-from pyfda.pyfda_lib import to_html, safe_eval
+from pyfda.libs.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
-from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
 from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -815,7 +815,7 @@ class PlotImpz_UI(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
 

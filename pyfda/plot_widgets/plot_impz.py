@@ -12,7 +12,7 @@ Widget for plotting impulse and general transient responses
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
+from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
 from numpy import pi, sqrt
@@ -21,9 +21,9 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
+from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
         sawtooth_bl, triang_bl, comb_bl)
-from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 
@@ -1139,7 +1139,7 @@ class Plot_Impz(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     mainw = Plot_Impz(None)

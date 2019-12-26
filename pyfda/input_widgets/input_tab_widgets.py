@@ -14,13 +14,13 @@ import importlib
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
+from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 
 SCROLL = True
 
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_lib import pprint_log
 
 class InputTabWidgets(QWidget):
     """
@@ -155,7 +155,7 @@ class InputTabWidgets(QWidget):
 
 def main():
     from pyfda import pyfda_rc as rc
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.css_rc)
 

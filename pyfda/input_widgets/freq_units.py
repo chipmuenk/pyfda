@@ -13,15 +13,15 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore,
+from pyfda.libs.compat import (QtCore,
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QToolButton,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
                       pyqtSignal, QEvent)
 
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import to_html, safe_eval
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_lib import to_html, safe_eval
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 
@@ -282,7 +282,7 @@ class FreqUnits(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     form = FreqUnits(None)
 

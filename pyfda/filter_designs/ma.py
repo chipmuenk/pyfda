@@ -36,14 +36,14 @@ API version info:
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
+from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
                       QVBoxLayout, QHBoxLayout)
 
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
-from pyfda.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
+from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.2"
 
@@ -385,7 +385,7 @@ near ``f_S/2`` (highpass).
 
 if __name__ == '__main__':
     import sys
-    from ..compat import QApplication, QFrame
+    from pyfda.libs.compat import QApplication, QFrame
    
     app = QApplication(sys.argv)
     

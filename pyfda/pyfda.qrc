@@ -40,6 +40,6 @@
      QtPy5: pyrcc5 pyfda.qrc -o qrc_resources.py
 
      manual edit in qrc_resources.py : 
-        from PyQtX import QtCore -> from .compat import QtCore  
+        from PyQtX import QtCore -> from pyfda.libs.compat import QtCore  
 -->
 

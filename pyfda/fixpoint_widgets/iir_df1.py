@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 import math
 import pyfda.filterbroker as fb
 
-from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
+from pyfda.libs.compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
 import pyfda.libs.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
@@ -439,7 +439,7 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = IIR_DF1(None)
     mainw.show()

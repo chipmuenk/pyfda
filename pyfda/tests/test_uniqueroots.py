@@ -16,7 +16,7 @@ import numpy as np
 from numpy import ones, exp, pi
 
 import scipy.signal as sig
-from pyfda.pyfda_lib import unique_roots
+from pyfda.libs.pyfda_lib import unique_roots
 
 
 import unittest

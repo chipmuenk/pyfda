@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from pyfda.compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout, pyqtSlot, pyqtSignal)
 
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import unique_roots
+from pyfda.libs.pyfda_lib import unique_roots
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -35,7 +35,7 @@ class Myplot(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     import sys
     app = QApplication(sys.argv)
     mainw = Myplot(None)

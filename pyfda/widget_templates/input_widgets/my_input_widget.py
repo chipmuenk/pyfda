@@ -110,7 +110,7 @@ class My_Input_Widget(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = My_Input_Widget(None)
 

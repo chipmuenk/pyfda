@@ -33,14 +33,14 @@ API version info:
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
+from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 
 import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_qt_lib import qfilter_warning
-from pyfda.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
+from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord 
 
 __version__ = "2.2"
@@ -394,7 +394,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
 if __name__ == '__main__':
     import sys
-    from ..compat import QApplication, QFrame
+    from pyfda.libs.compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
     

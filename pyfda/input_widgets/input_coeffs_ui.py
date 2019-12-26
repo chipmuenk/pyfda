@@ -13,12 +13,12 @@ Create the UI for the FilterCoeffs class
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox,
+from pyfda.libs.compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
-from pyfda.pyfda_qt_lib import qset_cmb_box, QHLine
-from pyfda.pyfda_io_lib import CSV_option_box
+from pyfda.libs.pyfda_qt_lib import qset_cmb_box, QHLine
+from pyfda.libs.pyfda_io_lib import CSV_option_box
  
 from pyfda.pyfda_rc import params
 
@@ -438,7 +438,7 @@ class Input_Coeffs_UI(QWidget):
 if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.input_coeffs_ui """
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     mainw = Input_Coeffs_UI(None)

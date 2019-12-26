@@ -34,8 +34,8 @@ API version info:
 """
 import scipy.signal as sig
 from scipy.signal import ellipord
-from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
-from pyfda.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
 

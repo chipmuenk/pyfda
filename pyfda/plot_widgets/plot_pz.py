@@ -12,14 +12,14 @@ Widget for plotting poles and zeros
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout,
+from pyfda.libs.compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout,
                       pyqtSlot, pyqtSignal)
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import unique_roots
+from pyfda.libs.pyfda_lib import unique_roots
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -439,7 +439,7 @@ class Plot_PZ(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     mainw = Plot_PZ(None)

@@ -37,7 +37,7 @@ More info on data persistence and storing / accessing global variables:
 
 """
 from collections import OrderedDict
-from .frozendict import freeze_hierarchical
+from pyfda.libs.frozendict import freeze_hierarchical
 
 clipboard = None
 """ Handle to central clipboard instance """

@@ -16,15 +16,15 @@ import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 import matplotlib.patches as mpl_patches
 
-from pyfda.pyfda_lib import safe_eval, to_html
-from pyfda.pyfda_qt_lib import qwindow_stay_on_top
+from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_fft_windows import calc_window_function
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from pyfda.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
+from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
                      QMainWindow, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
                      QTextBrowser, QSplitter,QTableWidget, QTableWidgetItem)
 #------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-import pyfda.pyfda_dirs as dirs # initial import constructs file paths
+import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
@@ -26,10 +26,10 @@ matplotlib.use("Qt5Agg")
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
-from .compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
+from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
                      QMessageBox, QPlainTextEdit, QAction, QMenu, pyqtSignal)
 
-from pyfda.pyfda_lib import to_html
+from pyfda.libs.pyfda_lib import to_html
 
 #========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
@@ -102,8 +102,8 @@ from pyfda import qrc_resources # contains all icons
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
 #   or          pyrcc5 pyfda.qrc -o qrc_resources.py
 # and manually replace "from from PyQt4/5 import QtCore"
-#   by "from .compat import QtCore" in qrc_resources.py
-from pyfda.tree_builder import Tree_Builder
+#   by "from pyfda.libs.compat import QtCore" in qrc_resources.py
+from pyfda.libs.tree_builder import Tree_Builder
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 

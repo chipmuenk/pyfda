@@ -15,7 +15,7 @@ can be overlayed.
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, 
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, 
                       pyqtSlot, pyqtSignal)
 import numpy as np
 from matplotlib.patches import Rectangle
@@ -25,7 +25,7 @@ from matplotlib import rcParams
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.pyfda_lib import calc_Hcomplex, pprint_log
+from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
 
 classes = {'Plot_Hf':'|H(f)|'} #: Dict containing class name : display name
 
@@ -624,7 +624,7 @@ class Plot_Hf(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     
     app = QApplication(sys.argv)
     mainw = Plot_Hf(None)

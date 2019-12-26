@@ -13,15 +13,15 @@ import os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame,
+from pyfda.libs.compat import (QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame,
                       QVBoxLayout, QMessageBox, QPixmap, QIcon)
 
 import pyfda.version as version
-import pyfda.pyfda_lib as pyfda_lib
-import pyfda.pyfda_dirs as dirs
+import pyfda.libs.pyfda_lib as pyfda_lib
+import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_io_lib import extract_file_ext
+from pyfda.libs.pyfda_io_lib import extract_file_ext
 
 from pyfda import qrc_resources # contains all icons
 
@@ -467,7 +467,7 @@ class Input_Files(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     import sys
     app = QApplication(sys.argv)
     mainw = Input_Files(None)

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-import pyfda.pyfda_dirs as dirs
+import pyfda.libs.pyfda_dirs as dirs
 
 from .frozendict import freeze_hierarchical
 

@@ -41,7 +41,7 @@ API version info:
 """
 import scipy.signal as sig
 from scipy.signal import buttord
-from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.libs.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 import logging
 logger = logging.getLogger(__name__)
 

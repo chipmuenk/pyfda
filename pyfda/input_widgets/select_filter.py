@@ -16,14 +16,14 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
                       QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.pyfda_lib import safe_eval
+from pyfda.libs.pyfda_lib import safe_eval
 import pyfda.pyfda_rc as rc
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 
 class SelectFilter(QWidget):
@@ -458,7 +458,7 @@ class SelectFilter(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
 
     mainw = SelectFilter(None)

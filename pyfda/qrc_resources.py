@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from .compat import QtCore
+from pyfda.libs.compat import QtCore
 
 qt_resource_data = b"\
 \x00\x00\x01\x50\

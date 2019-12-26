@@ -24,8 +24,8 @@ from scipy.io import loadmat, savemat
 from .pyfda_lib import safe_eval
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 import pyfda.libs.pyfda_fix_lib as fx
-from .pyfda_rc import params
-import pyfda.pyfda_dirs as dirs
+from pyfda.pyfda_rc import params
+import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,

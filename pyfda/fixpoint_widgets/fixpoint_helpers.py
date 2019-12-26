@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
+from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
                       QVBoxLayout, QHBoxLayout, QFrame,
                       pyqtSignal)
 
 from migen import Cat, If, Replicate, Signal
 
-from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import qstr, safe_eval, to_html
+from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 
 
 def rescale(mod, sig_i, QI, QO):
@@ -525,7 +525,7 @@ class UI_Q(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = UI_W(None)
     mainw.show()

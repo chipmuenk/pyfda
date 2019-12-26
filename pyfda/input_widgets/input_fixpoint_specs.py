@@ -14,18 +14,18 @@ import sys, os, io, importlib
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel,
+from pyfda.libs.compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel,
                       QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
                       QEvent, QSizePolicy)
 
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda.pyfda_dirs as dirs
-from pyfda.pyfda_lib import qstr, cmp_version, pprint_log
+import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.pyfda_io_lib import extract_file_ext
-from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_io_lib import extract_file_ext
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
@@ -759,7 +759,7 @@ class Input_Fixpoint_Specs(QWidget):
 
 if __name__ == '__main__':
     from pyfda.tree_builder import Tree_Builder
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     logging.basicConfig() # setup a basic logger
     #fb.fixpoint_classes = {{'DF1':''}, {'DF2':''}}
     #fb.filter_classes = {'Bessel':{}, 'Equiripple':{'fix':'DF1'}}

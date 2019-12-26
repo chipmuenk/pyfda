@@ -12,14 +12,14 @@ Widget for plotting the group delay
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSignal, pyqtSlot
+from pyfda.libs.compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSignal, pyqtSlot
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from scipy.signal import group_delay
-#from pyfda.pyfda_lib import group_delay
+#from pyfda.libs.pyfda_lib import group_delay
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # TODO: Anticausal filter have no group delay. But is a filter with
@@ -201,7 +201,7 @@ class Plot_tau_g(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = Plot_tau_g(None)
     app.setActiveWindow(mainw)

@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import set_dict_defaults, pprint_log
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
-from ..compat import QWidget, QVBoxLayout, pyqtSignal
+from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 #import pyfda.libs.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_Q, rescale
@@ -333,7 +333,7 @@ class FIR(Module):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = FIR_DF_wdg(None)
     mainw.show()

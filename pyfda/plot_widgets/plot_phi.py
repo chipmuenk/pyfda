@@ -11,15 +11,15 @@ Widget for plotting phase frequency response phi(f)
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal
+from pyfda.libs.compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.pyfda_lib import calc_Hcomplex
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_lib import calc_Hcomplex
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 classes = {'Plot_Phi':'\u03C6(f)'} #: Dict containing class name : display name
 
@@ -222,7 +222,7 @@ class Plot_Phi(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     mainw = Plot_Phi(None)

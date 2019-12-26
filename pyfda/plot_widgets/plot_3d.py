@@ -12,7 +12,7 @@ Widget for plotting \|H(z)\| in 3D
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
                       QGridLayout, QFrame, pyqtSlot, pyqtSignal)
 
 import numpy as np
@@ -22,8 +22,8 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from mpl_toolkits import mplot3d # import to register 3D projection
@@ -657,7 +657,7 @@ class Plot_3D(QWidget):
 
 def main():
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = Plot_3D(None)
     app.setActiveWindow(mainw)

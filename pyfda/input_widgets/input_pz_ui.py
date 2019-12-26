@@ -13,12 +13,12 @@ Create the UI for the FilterPZ class
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
+from pyfda.libs.compat import (pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
                       QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.pyfda_qt_lib import qset_cmb_box
-from pyfda.pyfda_io_lib import CSV_option_box
-from pyfda.pyfda_lib import to_html
+from pyfda.libs.pyfda_qt_lib import qset_cmb_box
+from pyfda.libs.pyfda_io_lib import CSV_option_box
+from pyfda.libs.pyfda_lib import to_html
 from pyfda.pyfda_rc import params
 
 class Input_PZ_UI(QWidget):
@@ -280,7 +280,7 @@ class Input_PZ_UI(QWidget):
 if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.input_pz_ui """
     import sys
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     mainw = Input_PZ_UI(None)

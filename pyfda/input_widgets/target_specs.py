@@ -14,7 +14,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt,
+from pyfda.libs.compat import (QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt,
                       QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
@@ -145,7 +145,7 @@ class TargetSpecs(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
 
     # Read freq / amp / weight labels for current filter design

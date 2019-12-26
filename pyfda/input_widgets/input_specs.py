@@ -14,13 +14,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
+from pyfda.libs.compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
                       QVBoxLayout, QHBoxLayout)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.pyfda_lib import pprint_log
-from pyfda.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
@@ -368,7 +368,7 @@ class Input_Specs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = Input_Specs(None)
     app.setActiveWindow(mainw)

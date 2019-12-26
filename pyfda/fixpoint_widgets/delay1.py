@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 
-from ..compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
+from pyfda.libs.compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
 from .fixpoint_helpers import rescale
 
@@ -193,7 +193,7 @@ class Delay(Module):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = Delay_wdg(None)
     mainw.show()

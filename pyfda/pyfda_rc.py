@@ -21,7 +21,7 @@ from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
 
-from .pyfda_lib import cmp_version, CRLF
+from pyfda.libs.pyfda_lib import cmp_version, CRLF
 
 # #############################################################################
 # General layout settings

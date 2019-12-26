@@ -13,14 +13,14 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, Qt,
+from pyfda.libs.compat import (QtCore, Qt,
                       QWidget, QLabel, QLineEdit, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
                       pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import to_html, safe_eval, unique_roots
-from pyfda.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_lib import to_html, safe_eval, unique_roots
+from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 MIN_FREQ_STEP = 1e-4
@@ -352,7 +352,7 @@ class FreqSpecs(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
     mainw = FreqSpecs(None)
 

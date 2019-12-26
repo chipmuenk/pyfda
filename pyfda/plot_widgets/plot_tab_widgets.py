@@ -15,9 +15,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 import importlib
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
+from pyfda.libs.compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
-from pyfda.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
@@ -196,7 +196,7 @@ class PlotTabWidgets(QTabWidget):
 def main():
     import sys
     from pyfda import pyfda_rc as rc
-    from ..compat import QApplication
+    from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
