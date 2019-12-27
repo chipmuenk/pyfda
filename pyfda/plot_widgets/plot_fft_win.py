@@ -430,7 +430,8 @@ class Plot_FFT_win(QMainWindow):
 
 if __name__=='__main__':
     import sys
-    from pyfda.compat import QApplication
+    from pyfda.libs.compat import QApplication
+    #import pyfda.filterbroker as fb
     
     """ Test with python -m pyfda.plot_widgets.plot_fft_win"""
     app = QApplication(sys.argv)
