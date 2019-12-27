@@ -40,7 +40,8 @@ class Plot_FFT_win(QMainWindow):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict=None, sym=True, title='pyFDA Window Viewer'):
+    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True, title='pyFDA Window Viewer'):
+        #QMainWindow.__init__(self)
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
