@@ -50,11 +50,17 @@ windows =\
               "constant side-lobe suppression of more than 90 dB while keeping a "
               "reasonably narrow main lobe.</span>")
              },
+    'Blackmanharris_5':
+        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris5',
+         'info':
+             ("<span>The 5-term Blackman-Harris window with a side-"
+              "lobe suppression of up to 125 dB.</span>")
+             },
     'Blackmanharris_7':
         {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris7',
          'info':
-             ("<span>The 7-term Blackman-Harris window with excellent side-"
-              "lobe suppression.</span>")
+             ("<span>The 7-term Blackman-Harris window with a side-"
+              "lobe suppression of up to 180 dB.</span>")
              },
     'Bohman':
         {'fn_name':'bohman'},
@@ -265,24 +271,37 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     else:
         logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
 
+def blackmanharris5(N, sym):
+    """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
+    a = [3.232153788877343e-001,
+         -4.714921439576260e-001,
+         1.755341299601972e-001,
+         -2.849699010614994e-002,
+         1.261357088292677e-003]
+    return calc_cosine_window(N, sym, a)
 
 def blackmanharris7(N, sym):
-    a = [0.27105140069342,
-         -0.43329793923448,
-         0.21812299954311,
-         -0.06592544638803,
-         0.01081174209837,
-         -0.00077658482522,
-         0.00001388721735]
+    """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""    
+    a = [2.712203605850388e-001,
+         -4.334446123274422e-001,
+         2.180041228929303e-001,
+         -6.578534329560609e-002,
+         1.076186730534183e-002,
+         -7.700127105808265e-004,
+         1.368088305992921e-005]
+    return calc_cosine_window(N, sym, a)
+    
+    
+def calc_cosine_window(N, sym, a):   
     if sym:
         L = N-1
     else:
         L = N  
     x = np.arange(N) * 2 * np.pi / L
-    blk = a[0]
-    for k in range(1,7):
-        blk += a[k] * np.cos(k*x)
-    return blk
+    win = a[0]
+    for k in range(1,len(a)):
+        win += a[k] * np.cos(k*x)
+    return win
 
 def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
 
@@ -325,5 +344,13 @@ class UserWindows(object):
 # https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
 # https://github.com/capitanov/blackman_harris_win
 # https://en.m.wikipedia.org/wiki/Window_function
-
+# https://www.dsprelated.com/freebooks/sasp/Blackman_Harris_Window_Family.html
+# https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/46092/versions/3/previews/coswin.m/index.html
+#Ref:
+#   A Family of Cosine-Sum Windows for High-Resolution Measurements
+#    Hans-Helge Albrecht
+#    Physikalisch-Technische Bendesanstalt
+#   Acoustics, Speech, and Signal Processing, 2001. Proceedings. (ICASSP '01).
+#    2001 IEEE International Conference on   (Volume:5 )
+#    pgs. 3081-3084
 
