@@ -238,9 +238,9 @@ class Plot_FFT_win(QMainWindow):
         # to the _ratio_ of the values:
         splitter.setSizes([3000,1000])
 
-        #self.setCentralWidget(splitter)
+        self.setCentralWidget(splitter)
       
-        self.setCentralWidget(self.mplwidget)
+        #self.setCentralWidget(self.mplwidget)
         
         #----------------------------------------------------------------------
         #           Set subplots

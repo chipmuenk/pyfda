@@ -772,7 +772,8 @@ class PlotImpz_UI(QWidget):
             
         if self.fft_window is None: # no handle to the window? Create a new instance
             if self.but_fft_win.isChecked():
-                # important: Handle to window must be class attribute
+                # Important: Handle to window must be class attribute otherwise it
+                # (and the attached window) is deleted immediately when it goes out of scope
                 self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
                                                title="pyFDA Spectral Window Viewer")
                 self.sig_tx.connect(self.fft_window.sig_rx)
