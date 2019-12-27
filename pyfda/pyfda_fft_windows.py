@@ -62,6 +62,12 @@ windows =\
              ("<span>The 7-term Blackman-Harris window with a side-"
               "lobe suppression of up to 180 dB.</span>")
              },
+    'Blackmanharris_9':
+        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris9',
+         'info':
+             ("<span>The 9-term Blackman-Harris window with a side-"
+              "lobe suppression of up to 230 dB.</span>")
+             },
     'Bohman':
         {'fn_name':'bohman'},
     'Dolph-Chebychev':
@@ -290,7 +296,20 @@ def blackmanharris7(N, sym):
          -7.700127105808265e-004,
          1.368088305992921e-005]
     return calc_cosine_window(N, sym, a)
-    
+
+def blackmanharris9(N, sym):
+    """ 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain"""
+    a = [2.384331152777942e-001,
+         -4.005545348643820e-001,
+         2.358242530472107e-001,
+         -9.527918858383112e-002,
+         2.537395516617152e-002,
+         -4.152432907505835e-003,
+         3.685604163298180e-004,
+         -1.384355593917030e-005,
+         1.161808358932861e-007]
+     return calc_cosine_window(N, sym, a)
+   
     
 def calc_cosine_window(N, sym, a):   
     if sym:
@@ -346,11 +365,16 @@ class UserWindows(object):
 # https://en.m.wikipedia.org/wiki/Window_function
 # https://www.dsprelated.com/freebooks/sasp/Blackman_Harris_Window_Family.html
 # https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/46092/versions/3/previews/coswin.m/index.html
-#Ref:
-#   A Family of Cosine-Sum Windows for High-Resolution Measurements
+
+# Ref:
+#   "A Family of Cosine-Sum Windows for High-Resolution Measurements"
 #    Hans-Helge Albrecht
-#    Physikalisch-Technische Bendesanstalt
+#    Physikalisch-Technische Bundesanstalt
 #   Acoustics, Speech, and Signal Processing, 2001. Proceedings. (ICASSP '01).
 #    2001 IEEE International Conference on   (Volume:5 )
 #    pgs. 3081-3084
 
+# "Tailoring of Minimum Sidelobe Cosine-Sum Windows for High-Resolution Measurements"
+#   Hans-Helge Albrecht
+#   Physikalisch-Technische Bundesanstalt (PTB), Berlin, Germany        
+#   The Open Signal Processing Journal, 2010, 3, pp. 20-29 
