@@ -27,6 +27,7 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
                      QDialog, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
                      QTextBrowser, QSplitter,QTableWidget, QTableWidgetItem)
+
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QDialog):
     """
@@ -337,6 +338,10 @@ class Plot_FFT_win(QDialog):
         Draw the figure with new limits, scale etc without recalculating the
         window.
         """
+        # suppress "divide by zero in log10" warnings
+        old_settings_seterr = np.seterr()
+        np.seterr(divide='ignore')
+
         self.ax_t.cla()
         self.ax_f.cla()
         
@@ -345,7 +350,7 @@ class Plot_FFT_win(QDialog):
         
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
-        
+
         if self.chk_log_t.isChecked():
             self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win)), self.bottom_t))
         else:
@@ -401,8 +406,12 @@ class Plot_FFT_win(QDialog):
         self.ax_f.legend([patch] * 2, labels_f, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7, 
                                handlelength=0, handletextpad=0)
+
+        np.seterr(**old_settings_seterr)
+
         self.update_info()
         self.redraw()
+
 #------------------------------------------------------------------------------
     def update_info(self):
         """

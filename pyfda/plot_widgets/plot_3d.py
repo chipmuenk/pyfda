@@ -468,6 +468,10 @@ class Plot_3D(QWidget):
 
 
         if self.chkLog.isChecked(): # logarithmic scale
+            # suppress "divide by zero in log10" warnings
+            old_settings_seterr = np.seterr()
+            np.seterr(divide='ignore')
+
             bottom = np.floor(max(self.zmin_dB, 20*log10(H_min)) / 10) * 10
             top = self.zmax_dB
             top_bottom = top - bottom
@@ -480,6 +484,8 @@ class Plot_3D(QWidget):
             else:
                 plevel_top = top + top_bottom * (plevel_rel - 1)
                 plevel_btm = top
+
+            np.seterr(**old_settings_seterr)
 
         else: # linear scale
             bottom = max(self.zmin, H_min)  # min. display value

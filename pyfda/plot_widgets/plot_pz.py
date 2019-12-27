@@ -406,6 +406,10 @@ class Plot_PZ(QWidget):
         """
         Draw the magnitude frequency response around the UC
         """
+        # suppress "divide by zero in log10" warnings
+        old_settings_seterr = np.seterr()
+        np.seterr(divide='ignore')
+
         self.chkHfLog.setVisible(self.chkHf.isChecked())
         self.diaRad_Hf.setVisible(self.chkHf.isChecked())
         self.lblRad_Hf.setVisible(self.chkHf.isChecked())
@@ -435,6 +439,7 @@ class Plot_PZ(QWidget):
         self.ax.set_xlim((-xmax, xmax))
         self.ax.set_ylim((-ymax, ymax))
 
+        np.seterr(**old_settings_seterr)
 #------------------------------------------------------------------------------
 
 def main():

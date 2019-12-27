@@ -494,6 +494,10 @@ class Plot_Hf(QWidget):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
+        # suppress "divide by zero in log10" warnings
+        old_settings_seterr = np.seterr()
+        np.seterr(divide='ignore')
+
         # Get corners for spec display from the parameters of the target specs subwidget       
         try:
             param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
@@ -609,7 +613,9 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
-            self.ax.set_title(r'Magnitude Frequency Response')            
+            self.ax.set_title(r'Magnitude Frequency Response')   
+
+            np.seterr(**old_settings_seterr)
 
         self.redraw()
         
