@@ -25,10 +25,10 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
-                     QMainWindow, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
+                     QDialog, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
                      QTextBrowser, QSplitter,QTableWidget, QTableWidgetItem)
 #------------------------------------------------------------------------------
-class Plot_FFT_win(QMainWindow):
+class Plot_FFT_win(QDialog):
     """
     Create a pop-up widget for displaying time and frequency view of an FFT 
     window.
@@ -41,7 +41,6 @@ class Plot_FFT_win(QMainWindow):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True, title='pyFDA Window Viewer'):
-        #QMainWindow.__init__(self)
         super(Plot_FFT_win, self).__init__(parent)
         
         self.needs_calc = True
@@ -238,9 +237,10 @@ class Plot_FFT_win(QMainWindow):
         # to the _ratio_ of the values:
         splitter.setSizes([3000,1000])
 
-        self.setCentralWidget(splitter)
-      
-        #self.setCentralWidget(self.mplwidget)
+        layVMain = QVBoxLayout()
+        layVMain.addWidget(splitter)
+        self.setLayout(layVMain)
+        
         
         #----------------------------------------------------------------------
         #           Set subplots
@@ -431,7 +431,6 @@ class Plot_FFT_win(QMainWindow):
 if __name__=='__main__':
     import sys
     from pyfda.libs.compat import QApplication
-    #import pyfda.filterbroker as fb
     
     """ Test with python -m pyfda.plot_widgets.plot_fft_win"""
     app = QApplication(sys.argv)
