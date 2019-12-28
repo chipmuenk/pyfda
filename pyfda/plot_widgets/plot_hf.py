@@ -15,8 +15,8 @@ can be overlayed.
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, 
-                      pyqtSlot, pyqtSignal)
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
+                       QFrame, QHBoxLayout, pyqtSlot, pyqtSignal)
 import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
@@ -25,7 +25,7 @@ from matplotlib import rcParams
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
+from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval
 
 classes = {'Plot_Hf':'|H(f)|'} #: Dict containing class name : display name
 
@@ -43,6 +43,9 @@ class Plot_Hf(QWidget):
         self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Magnitude and phase frequency response"
         self.tab_label = "|H(f)|"
+
+        self.log_bottom = -80
+
         self._construct_ui()
 
 #------------------------------------------------------------------------------
@@ -98,6 +101,12 @@ class Plot_Hf(QWidget):
         self.cmbUnitsA.setToolTip("<span>Set unit for y-axis:\n"
         "dB is attenuation (positive values), V and W are gain (less than 1).</span>")
         self.cmbUnitsA.setCurrentIndex(0)
+        
+        self.lbl_log_bottom = QLabel("Bottom", self)
+        self.led_log_bottom = QLineEdit(self)
+        self.led_log_bottom.setText(str(self.log_bottom))
+        self.led_log_bottom.setToolTip("<span>Minimum display value for dB. scale.</span>")
+        self.lbl_log_unit = QLabel("dB", self)
 
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -131,6 +140,10 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.cmbShowH)
         layHControls.addWidget(self.lblIn)
         layHControls.addWidget(self.cmbUnitsA)
+        layHControls.addStretch(1)       
+        layHControls.addWidget(self.lbl_log_bottom)    
+        layHControls.addWidget(self.led_log_bottom)
+        layHControls.addWidget(self.lbl_log_unit)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chkZerophase)
         layHControls.addStretch(1)
@@ -168,6 +181,7 @@ class Plot_Hf(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.draw)
+        self.led_log_bottom.editingFinished.connect(self.update_view)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
         self.chkZerophase.clicked.connect(self.draw)
@@ -505,6 +519,7 @@ class Plot_Hf(QWidget):
         except KeyError:
             param_list = []
 
+
         SB = [l for l in param_list if 'A_SB' in l]
         PB = [l for l in param_list if 'A_PB' in l]
         
@@ -526,6 +541,11 @@ class Plot_Hf(QWidget):
         else:
             self.unitA = self.cmbUnitsA.currentText()
 
+        # only display log bottom widget for unit dB
+        self.lbl_log_bottom.setVisible(self.unitA == 'dB')
+        self.led_log_bottom.setVisible(self.unitA == 'dB')        
+        self.lbl_log_unit.setVisible(self.unitA == 'dB')
+        
         # Linphase settings only makes sense for amplitude plot and 
         # for plottin real/imag. part of H, not its magnitude
         self.chkZerophase.setCheckable(self.unitA == 'V')
@@ -579,8 +599,13 @@ class Plot_Hf(QWidget):
         if self.ax.get_navigate():
 
             if self.unitA == 'dB':
-                A_lim = [20*np.log10(A_min) -10, 20*np.log10(1+A_max) +1]
+                self.log_bottom = safe_eval(self.led_log_bottom.text(),
+                                         self.log_bottom, return_type='float',
+                                         sign='neg')
+                self.led_log_bottom.setText(str(self.log_bottom))
+
                 self.H_plt = 20*np.log10(abs(H))
+                A_lim = [self.log_bottom, np.max(self.H_plt) + 2]
                 H_str += ' in dB ' + r'$\rightarrow$'
             elif self.unitA == 'V': #  'lin'
                 self.H_plt = H
