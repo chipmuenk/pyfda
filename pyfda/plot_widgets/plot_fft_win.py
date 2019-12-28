@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
+from scipy.signal import argrelextrema
+
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html
@@ -335,6 +337,11 @@ class Plot_FFT_win(QDialog):
 
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
+        
+        Min = argrelextrema(self.Win[:], np.less)[0][0] #self.N//2*self.pad
+        #self.sidelobes = np.max(self.Win[Min:])
+        #logger.info(20*log10(self.sidelobes))
+        logger.info(Min)
 
         if self.chk_norm_f.isChecked():
             self.Win /= (self.N / self.scale)# correct gain for periodic signals (coherent gain)
