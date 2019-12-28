@@ -263,9 +263,12 @@ class PlotImpz_UI(QWidget):
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
-        #self.cmb_win_fft.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
         self.cmb_win_fft.setToolTip("FFT window type.")
         qset_cmb_box(self.cmb_win_fft, self.window)
+
+        self.cmb_win_fft_variant = QComboBox(self)
+        self.cmb_win_fft_variant.setToolTip("FFT window variant.")
+        self.cmb_win_fft_variant.setVisible(False)
 
         self.lblWinPar1 = QLabel("Param1")
         self.ledWinPar1 = QLineEdit(self)
@@ -294,6 +297,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
+        layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)        
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addWidget(self.lblWinPar2)
