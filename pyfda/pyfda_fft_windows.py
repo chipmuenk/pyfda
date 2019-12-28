@@ -308,7 +308,7 @@ def blackmanharris9(N, sym):
          3.685604163298180e-004,
          -1.384355593917030e-005,
          1.161808358932861e-007]
-     return calc_cosine_window(N, sym, a)
+    return calc_cosine_window(N, sym, a)
    
     
 def calc_cosine_window(N, sym, a):   
@@ -366,7 +366,7 @@ class UserWindows(object):
 # https://www.dsprelated.com/freebooks/sasp/Blackman_Harris_Window_Family.html
 # https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/46092/versions/3/previews/coswin.m/index.html
 
-# Ref:
+# Refs:
 #   "A Family of Cosine-Sum Windows for High-Resolution Measurements"
 #    Hans-Helge Albrecht
 #    Physikalisch-Technische Bundesanstalt
@@ -378,3 +378,9 @@ class UserWindows(object):
 #   Hans-Helge Albrecht
 #   Physikalisch-Technische Bundesanstalt (PTB), Berlin, Germany        
 #   The Open Signal Processing Journal, 2010, 3, pp. 20-29 
+
+# Heinzel G. et al., 
+# "Spectrum and spectral density estimation by the Discrete Fourier transform (DFT), 
+# including a comprehensive list of window functions and some new flat-top windows", 
+# February 15, 2002 
+# https://holometer.fnal.gov/GH_FFT.pdf
