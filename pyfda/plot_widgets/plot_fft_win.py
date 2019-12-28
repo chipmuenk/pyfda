@@ -107,8 +107,8 @@ class Plot_FFT_win(QDialog):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        bfont = QFont()
-        bfont.setBold(True)
+        self.bfont = QFont()
+        self.bfont.setBold(True)
 
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
@@ -172,19 +172,11 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
         
-        self.tblWinProperties = QTableWidget(self)
-        self.tblWinProperties.setRowCount(2)
-        self.tblWinProperties.setColumnCount(2)
+        self.tblWinProperties = QTableWidget(1,6,self)
         self.tblWinProperties.setAlternatingRowColors(True)
-        #self.tblWinProperties.verticalHeader().setHighlightSections(False)
-        self.tblWinProperties.verticalHeader().setFont(bfont)
-        self.tblWinProperties.setVerticalHeaderLabels(["ENBW", "CGain"]) 
-        
-        self.tblWinProperties.horizontalHeader().setHighlightSections(False)
+        self.tblWinProperties.verticalHeader().setVisible(False)
         self.tblWinProperties.horizontalHeader().setVisible(False)
-        self.tblWinProperties.horizontalHeader().setFont(bfont)
-        self.tblWinProperties.setHorizontalHeaderLabels(["Param", "Value"])
-        #self.tblWinProperties.horizontalHeaderItem().setTextAlignment(Qt.AlignHCenter)
+        self._init_table(1,6, " ")
 
         self.txtInfoBox = QTextBrowser(self)
 
@@ -272,17 +264,41 @@ class Plot_FFT_win(QDialog):
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.tblWinProperties.itemClicked.connect(self._handle_item_clicked)
 #------------------------------------------------------------------------------
-    def _set_table_item(self, row, col, val):
+    def _init_table(self, rows, cols, val):
+        for r in range(rows):
+            for c in range(cols):
+                item = QTableWidgetItem(val)
+                if c == 0 or c == 3:
+                    item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    item.setCheckState(Qt.Unchecked)  
+                self.tblWinProperties.setItem(r,c,item)
+ #   https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
+
+#------------------------------------------------------------------------------
+    def _set_table_item(self, row, col, val, font=None, sel=None):
         """
         Set the table item with the index `row, col` and the value val
         """
         item = self.tblWinProperties.item(row, col)
-        if item: # does item exist?
-            item.setText(str(val))
-        else: # no, construct it:
-            self.tblWinProperties.setItem(row,col,QTableWidgetItem(str(val)))
-        self.tblWinProperties.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
+        item.setText(str(val))
+
+        if font:
+            self.tblWinProperties.item(row,col).setFont(font)
+
+        if sel == True:
+            item.setCheckState(Qt.Checked)
+        if sel == False:
+            item.setCheckState(Qt.Unchecked)
+        # when sel is not used, don't change anything
+            
+#------------------------------------------------------------------------------
+    def _handle_item_clicked(self, item):
+        if item.checkState() == Qt.Checked:
+            logger.info('"{0}:{1}" Checked'.format(item.text(), item.row()))
+        else:
+            logger.info('"{0}" Clicked'.format(item.text()))
 #------------------------------------------------------------------------------
     def update_bottom(self):
         """
@@ -420,10 +436,12 @@ class Plot_FFT_win(QDialog):
         if 'info' in self.win_dict:
             self.txtInfoBox.setText(self.win_dict['info'])
 
-        self._set_table_item(0,0, "{0:.5g}".format(self.nenbw_disp))
-        self._set_table_item(0,1, self.unit_nenbw)
-        self._set_table_item(1,0, "{0:.5g}".format(self.scale_disp))
-        self._set_table_item(1,1, self.unit_scale)
+        self._set_table_item(0,0, "ENBW", font=self.bfont)#, sel=True)
+        self._set_table_item(0,1, "{0:.5g}".format(self.nenbw_disp))
+        self._set_table_item(0,2, self.unit_nenbw)
+        self._set_table_item(0,3, "Scale", font=self.bfont)#, sel=True)        
+        self._set_table_item(0,4, "{0:.5g}".format(self.scale_disp))
+        self._set_table_item(0,5, self.unit_scale)
 
         self.tblWinProperties.resizeColumnsToContents()
         self.tblWinProperties.resizeRowsToContents()
