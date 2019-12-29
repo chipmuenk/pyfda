@@ -323,9 +323,9 @@ class Plot_FFT_win(QDialog):
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
         if self.chk_auto_N.isChecked():
             self.N = self.win_dict['win_len']
-            self.led_N.setText(str(self.N))
         else:
             self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
+        self.led_N.setText(str(self.N))
 
         self.n = np.arange(self.N)
 

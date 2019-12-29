@@ -340,24 +340,28 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 else: # return_type == 'float' or 'int'
                     result = ex_num.real
 
-                if sign == 'pos':
+                if sign in {'pos', 'poszero'}:
                     result = np.abs(result)
-                elif sign == 'neg':
+                elif sign in {'neg', 'negzero'}:
                     result = -np.abs(result)
+                
+                if result == 0 and sign in {'pos', 'neg'}:
+                    logger.warning(fallback + 'Argument must not be zero.')
+                    result = None
 
-                if return_type == 'int':
+                if return_type == 'int' and result is not None:
                     result = int(ex_num) # convert to standard int type, not np.int64
 
             except SyntaxError:
-                logger.warning(fallback + ' Syntax error in expression "{0}".'.format(ex))
+                logger.warning(fallback + 'Syntax error in expression "{0}".'.format(ex))
             except ZeroDivisionError:
-                logger.warning(fallback + ' Division by 0 in expression "{0}".'.format(ex))
+                logger.warning(fallback + 'Division by 0 in expression "{0}".'.format(ex))
             except OverflowError:
-                logger.warning(fallback + ' Overflow in expression "{0}".'.format(ex))
+                logger.warning(fallback + 'Overflow in expression "{0}".'.format(ex))
             except KeyError:
-                logger.warning(fallback + ' Invalid expression "{0}".'.format(ex))
+                logger.warning(fallback + 'Invalid expression "{0}".'.format(ex))
             except TypeError as e:
-                logger.warning(fallback + ' Type error in "{0}", {1}.'.format(ex, e))
+                logger.warning(fallback + 'Type error in "{0}", {1}.'.format(ex, e))
 
             except (se.NameNotDefined, se.FunctionNotDefined) as e:
                 logger.warning(fallback + '{0}'.format(e))

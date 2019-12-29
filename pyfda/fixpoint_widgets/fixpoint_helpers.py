@@ -358,9 +358,9 @@ class UI_W(QWidget):
         Emit a signal with `{'ui':objectName of the sender}`.
         """
 
-        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos'))
+        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='poszero'))
         self.ledWI.setText(qstr(self.WI))
-        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))
+        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='poszero'))
         self.ledWF.setText(qstr(self.WF))
         self.W = int(self.WI + self.WF + 1)
 
@@ -384,13 +384,13 @@ class UI_W(QWidget):
             q_dict = self.q_dict
             
         if 'WI' in q_dict:
-            self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='pos')
+            self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
             self.ledWI.setText(qstr(self.WI))
         else:
             logger.warning("No key 'WI' in dict!")
 
         if 'WF' in q_dict:
-            self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='pos')
+            self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
             self.ledWF.setText(qstr(self.WF))
         else:
             logger.warning("No key 'WF' in dict!")

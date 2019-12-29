@@ -657,7 +657,7 @@ class PlotImpz_UI(QWidget):
         self.lblNoi.setVisible(self.noise!='none')
         self.ledNoi.setVisible(self.noise!='none')
         if self.noise!='none':
-            self.noi = safe_eval(self.ledNoi.text(), 0, return_type='float', sign='pos')
+            self.noi = safe_eval(self.ledNoi.text(), 0, return_type='float', sign='poszero')
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
                 self.lblNoi.setText(to_html("&sigma; =", frmt='bi'))
@@ -690,9 +690,9 @@ class PlotImpz_UI(QWidget):
         Update values for self.N and self.N_start from the QLineEditWidget,
         update the window and fire "data_changed"
         """
-        self.N_start = safe_eval(self.led_N_start.text(), self.N_start, return_type='int', sign='pos')
+        self.N_start = safe_eval(self.led_N_start.text(), self.N_start, return_type='int', sign='poszero')
         self.led_N_start.setText(str(self.N_start)) # update widget
-        self.N_user = safe_eval(self.led_N_points.text(), self.N_user, return_type='int', sign='pos')
+        self.N_user = safe_eval(self.led_N_points.text(), self.N_user, return_type='int', sign='poszero')
 
         if self.N_user == 0: # automatic calculation
             self.N = self.calc_n_points(self.N_user) # widget remains set to 0
