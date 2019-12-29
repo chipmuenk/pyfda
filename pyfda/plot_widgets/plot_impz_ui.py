@@ -75,11 +75,11 @@ class PlotImpz_UI(QWidget):
         self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
         self.noise = "None"
-        self.window = "Rect"
 
         # dictionary for fft window settings   
         self.win_dict = fb.fil[0]['win_fft']
         self.fft_window = None # handle for FFT window pop-up widget
+        self.window_name = "Rectangular"
 
         self._construct_UI()
         self._enable_stim_widgets()
@@ -264,7 +264,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.window)
+        qset_cmb_box(self.cmb_win_fft, self.window_name)
 
         self.cmb_win_fft_variant = QComboBox(self)
         self.cmb_win_fft_variant.setToolTip("FFT window variant.")
