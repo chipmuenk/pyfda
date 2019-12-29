@@ -206,7 +206,7 @@ windows =\
     #          ('<span>Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian window, '
     #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
     #           '</span>'),
-             }
+    #        }
     }
 def get_window_names():
     """
