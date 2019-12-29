@@ -340,14 +340,18 @@ class Plot_FFT_win(QDialog):
 
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
-        
-        Min = argrelextrema(self.Win[:], np.less)[0][0] #self.N//2*self.pad
-        #self.sidelobes = np.max(self.Win[Min:])
-        #logger.info(20*log10(self.sidelobes))
-        logger.info(Min)
-
         if self.chk_norm_f.isChecked():
             self.Win /= (self.N / self.scale)# correct gain for periodic signals (coherent gain)
+        
+        first_zero = argrelextrema(self.Win[:(self.N*self.pad)//2], np.less)
+        if np.shape(first_zero)[1] > 0:
+            first_zero = first_zero[0][0]
+            self.first_zero_f = self.F[first_zero]
+            self.sidelobe_level = np.max(self.Win[first_zero:(self.N*self.pad)//2])
+        else:
+            self.first_zero_f = np.nan
+            self.sidelobe_level = 0
+       
 #------------------------------------------------------------------------------
     def draw(self):
         """
@@ -393,12 +397,14 @@ class Plot_FFT_win(QDialog):
             self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.scale_disp = 20 * np.log10(self.scale)
+            self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
             self.unit_nenbw = "dB"
             self.unit_scale = "dB"            
         else:
             self.ax_f.plot(F, Win)
             self.nenbw_disp = self.nenbw
-            self.scale_disp = self.scale           
+            self.scale_disp = self.scale
+            self.sidelobe_level_disp = self.sidelobe_level
             self.unit_nenbw = "bins"
             self.unit_scale = ""
             
@@ -452,6 +458,14 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(0,3, "Scale", font=self.bfont)#, sel=True)        
         self._set_table_item(0,4, "{0:.5g}".format(self.scale_disp))
         self._set_table_item(0,5, self.unit_scale)
+        
+        self._set_table_item(1,0, "First Zero", font=self.bfont)#, sel=True)
+        self._set_table_item(1,1, "{0:.5g}".format(self.first_zero_f))
+        self._set_table_item(1,2, "f_S")
+
+        self._set_table_item(1,3, "Sidelobes", font=self.bfont)#, sel=True)        
+        self._set_table_item(1,4, "{0:.5g}".format(self.sidelobe_level_disp))
+        self._set_table_item(1,5, self.unit_nenbw)
 
         self.tblWinProperties.resizeColumnsToContents()
         self.tblWinProperties.resizeRowsToContents()
