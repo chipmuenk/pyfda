@@ -58,6 +58,9 @@ class Plot_FFT_win(QDialog):
         
         self.win_dict = win_dict
         self.sym = sym
+        
+        self.tbl_rows = 2
+        self.tbl_cols = 6
 
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(title)
@@ -174,11 +177,11 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
         
-        self.tblWinProperties = QTableWidget(1,6,self)
+        self.tblWinProperties = QTableWidget(self.tbl_rows, self.tbl_cols, self)
         self.tblWinProperties.setAlternatingRowColors(True)
         self.tblWinProperties.verticalHeader().setVisible(False)
         self.tblWinProperties.horizontalHeader().setVisible(False)
-        self._init_table(1,6, " ")
+        self._init_table(self.tbl_rows, self.tbl_cols, " ")
 
         self.txtInfoBox = QTextBrowser(self)
 
