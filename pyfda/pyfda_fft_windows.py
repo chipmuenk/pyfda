@@ -22,51 +22,66 @@ windows =\
     {'Boxcar':
         {'fn_name':'boxcar', 
          'info':
-             ("<span>Rectangular (a.k.a. 'Boxcar') window, well suited for coherent signals, i.e. "
-              " where the window length is an integer number of the signal's period.</span>"),
+             ('<span>Rectangular (a.k.a. "Boxcar") window, best suited for coherent signals, i.e. '
+              'where the window length is an integer number of the signal period. '
+              'It also works great when the signal length is shorter than the window '
+              'length (e.g. for the impulse response of a FIR filter). For other signals, '
+              'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
+              'This window also has the best SNR of all windows.</span>'),
         'props':{
             'enbw':1,
             'cgain':1,
             'bw':1
             }
          },
+    'Rectangular':
+        {'fn_name':'boxcar',
+         'info':
+             ('<span>Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals, i.e. '
+              'where the window length is an integer number of the signal period. '
+              'It also works great when the signal length is shorter than the window '
+              'length (e.g. for the impulse response of a FIR filter). For other signals, '
+              'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
+              'This window also has the best SNR of all windows.</span>')
+        },
     'Barthann':
         {'fn_name':'scipy.signal.windows.barthann',
          'info':
-             ("<span>A modified Bartlett-Hann Window."
-              "</span>")},
+             ('<span>A modified Bartlett-Hann Window.'
+              '</span>')},
     'Bartlett':
         {'fn_name':'bartlett',
          'info':'<span>The Bartlett window is very similar to a triangular window, '
              'except that the end points are at zero. Its side lobes fall off with '
              '12 dB/oct., the side lobe suppression is xx dB.'
-             '<br /><br />Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
+             '<br />&nbsp;<br />'
+             'Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
     'Blackman':
         {'fn_name':'blackman'},
     'Blackmanharris':
         {'fn_name':'blackmanharris',
          'info':
-             ("<span>The minimum 4-term Blackman-Harris window gives an excellent "
-              "constant side-lobe suppression of more than 90 dB while keeping a "
-              "reasonably narrow main lobe.</span>")
+             ('<span>The minimum 4-term Blackman-Harris window gives an excellent '
+              'constant side-lobe suppression of more than 90 dB while keeping a '
+              'reasonably narrow main lobe.</span>')
              },
     'Blackmanharris_5':
         {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris5',
          'info':
-             ("<span>The 5-term Blackman-Harris window with a side-"
-              "lobe suppression of up to 125 dB.</span>")
+             ('<span>The 5-term Blackman-Harris window with a side-'
+              'lobe suppression of up to 125 dB.</span>')
              },
     'Blackmanharris_7':
         {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris7',
          'info':
-             ("<span>The 7-term Blackman-Harris window with a side-"
-              "lobe suppression of up to 180 dB.</span>")
+             ('<span>The 7-term Blackman-Harris window with a side-'
+              'lobe suppression of up to 180 dB.</span>')
              },
     'Blackmanharris_9':
         {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris9',
          'info':
-             ("<span>The 9-term Blackman-Harris window with a side-"
-              "lobe suppression of up to 230 dB.</span>")
+             ('<span>The 9-term Blackman-Harris window with a side-'
+              'lobe suppression of up to 230 dB.</span>')
              },
     'Bohman':
         {'fn_name':'bohman'},
@@ -75,11 +90,11 @@ windows =\
          'par':[{
             'name':'a', 'name_tex':r'$a$',
             'val':80, 'min':45, 'max':300, 
-            'tooltip':"<span>Side lobe attenuation in dB.</span>"}],
+            'tooltip':'<span>Side lobe attenuation in dB.</span>'}],
          'info':
-             ("<span>This window optimizes for the narrowest main lobe width for "
-              "a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, "
-              "using Chebychev polynomials.</span>"),
+             ('<span>This window optimizes for the narrowest main lobe width for '
+              'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
+              'using Chebychev polynomials.</span>'),
         },
     'Cosine':
         {'info':
@@ -93,101 +108,104 @@ windows =\
          'par':[{
             'name':'p','name_tex':r'$p$',
             'val':1.5, 'min':0, 'max':20,
-             'tooltip':"<span>Shape parameter p</span>"
+             'tooltip':'<span>Shape parameter p</span>'
              },
              {
             'name':'&sigma;','name_tex':r'$\sigma$',
             'val':5, 'min':0, 'max':100,
-             'tooltip':"<span>Standard deviation &sigma;</span>"}
+             'tooltip':'<span>Standard deviation &sigma;</span>'}
              ],
          'info':
-             ("<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, "
-              "<i>p</i> = 0.5 yields the shape of a Laplace distribution."
-              "</span>"),
+             ('<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, '
+              '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
+              '</span>'),
          },
     'Gauss':
         {'fn_name':'gaussian',
          'par':[{
              'name':'&sigma;', 'name_tex':r'$\sigma$',
              'val':5,'min':0, 'max':100,
-             'tooltip':"<span>Standard deviation &sigma;</span>"}],
+             'tooltip':'<span>Standard deviation &sigma;</span>'}],
          'info':
-             ("<span>Gaussian window "
-              "</span>")
+             ('<span>Gaussian window '
+              '</span>')
          },
     'Hamming':
         {'fn_name':'hamming',
          'info':
-             ("<span>The Hamming Window has been optimized for suppression of "
-              "the first side lobe. Compared to the Hann window, this comes at "
-              "the cost of a worse (constant) level of higher side lobes."
-              "<br />Mathematically, it is a two-term raised cosine window with "
-              "non-zero endpoints (DC-offset).</span>")
+             ('<span>The Hamming Window has been optimized for suppression of '
+              'the first side lobe. Compared to the Hann window, this comes at '
+              'the cost of a worse (constant) level of higher side lobes.'
+              '<br />&nbsp;<br />Mathematically, it is a two-term raised cosine window with '
+              'non-zero endpoints (DC-offset).</span>')
          },
     'Hann':
         {'fn_name':'hann',
-        'info':'<span>The Hann (or, falsely, "Hanning") window is smooth at the '
-          'edges. In the frequency domain this corresponds to side-lobes falling '
-          'off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite '
-          'high (-32 dB). It is a good compromise for many applications, especially '
-          'when higher frequency components need to be suppressed.'
-          '<br />Mathematically, it is the most simple two-term raised cosine '
-          'or squared sine window.</span>'},
+        'info':
+            '<span>The Hann (or, falsely, "Hanning") window is smooth at the '
+            'edges. In the frequency domain this corresponds to side-lobes falling '
+            'off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite '
+            'high (-32 dB). It is a good compromise for many applications, especially '
+            'when higher frequency components need to be suppressed.'
+            '<br />&nbsp;<br />'
+            'Mathematically, it is the most simple two-term raised cosine '
+            'or squared sine window.</span>'},
     'Kaiser':
         {'fn_name':'kaiser',
          'par':[{
                 'name':'&beta;', 'name_tex':r'$\beta$',
                 'val':10, 'min':0, 'max':30,
                 'tooltip':
-                    ("<span>Shape parameter; lower values reduce  main lobe width, "
-                     "higher values reduce side lobe level, typ. in the range "
-                     "5 ... 20.</span>")}],
+                    ('<span>Shape parameter; lower values reduce  main lobe width, '
+                     'higher values reduce side lobe level, typ. in the range '
+                     '5 ... 20.</span>')}],
          'info':
-             ("<span>The Kaiser window is a very good approximation to the "
-              "Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, "
-              "which maximizes the energy in the main lobe of the window relative "
-              "to the total energy.</span>")
+             '<span>The Kaiser window is a very good approximation to the '
+             'Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, '
+             'which maximizes the energy in the main lobe of the window relative '
+             'to the total energy.</span>'
         },
     'Nuttall':{},
     'Parzen':{
         'info':
-            ('<span>The Parzen window is a 4th order B-spline window whose side-'
-             'lobes fall off with -24 dB/oct.'
-             '<br/ >&nbsp;<br />'
-             'It can be constructed by convolving '
-             'a rectangular window four times (or multiplying its frequency response '
-             'four times).'
-             '<br />See also: Boxcar and Triangular / Bartlett windows.</span>')},
-    'Rectangular':{'fn_name':'boxcar'},
+            '<span>The Parzen window is a 4th order B-spline window whose side-'
+            'lobes fall off with -24 dB/oct.'
+            '<br/ >&nbsp;<br />'
+            'It can be constructed by convolving '
+            'a rectangular window four times (or multiplying its frequency response '
+            'four times).'
+            '<br />&nbsp;<br />'
+            'See also: Boxcar and Triangular / Bartlett windows.</span>'},
     'Slepian':
         {'fn_name':'slepian',
          'par':[{
              'name':'BW', 'name_tex':r'$BW$',
              'val':0.3, 'min':0, 'max':100,
-             'tooltip':"<span>Bandwidth</span>"}],
+             'tooltip':'<span>Bandwidth</span>'}],
          'info':
-             ("<span>Used to maximize the energy concentration in the main lobe. "
-              " Also called the digital prolate spheroidal sequence (DPSS)."
-              "<br/ >See also: Kaiser window."
-              "</span>")
+             '<span>Used to maximize the energy concentration in the main lobe. '
+             ' Also called the digital prolate spheroidal sequence (DPSS).'
+             '<br />&nbsp;<br />'
+             'See also: Kaiser window.'
+             '</span>'
          },
     'Triangular':{'fn_name':'triang'},
-    'Ultraspherical':
-        {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
-         'par':[{
-            'name':'&alpha;','name_tex':r'$\alpha$',
-            'val':0.5, 'min':-0.5, 'max':10,
-             'tooltip':"<span>Shape parameter &alpha; or &mu;</span>"
-             },
-             {
-            'name':'x0','name_tex':r'$x_0$',
-            'val':1, 'min':-10, 'max':10,
-             'tooltip':"<span>Amplitude</span>"}
-             ],
-         'info':
-             ("<span>Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian window, "
-              "<i>p</i> = 0.5 yields the shape of a Laplace distribution."
-              "</span>"),
+    # 'Ultraspherical':
+    #     {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
+    #      'par':[{
+    #         'name':'&alpha;','name_tex':r'$\alpha$',
+    #         'val':0.5, 'min':-0.5, 'max':10,
+    #          'tooltip':'<span>Shape parameter &alpha; or &mu;</span>'
+    #          },
+    #          {
+    #         'name':'x0','name_tex':r'$x_0$',
+    #         'val':1, 'min':-10, 'max':10,
+    #          'tooltip':'<span>Amplitude</span>'}
+    #          ],
+    #      'info':
+    #          ('<span>Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian window, '
+    #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
+    #           '</span>'),
              }
     }
 def get_window_names():
