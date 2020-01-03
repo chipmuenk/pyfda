@@ -145,7 +145,7 @@ if not os.path.isfile(USER_CONF_DIR_FILE):
     # Copy default configuration file to user directory if it doesn't exist
     # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(INSTALL_DIR, CONF_FILE), USER_CONF_DIR_FILE)
+        shutil.copyfile(os.path.join(INSTALL_DIR, 'pyfda_template.conf'), USER_CONF_DIR_FILE)
         print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
     except IOError as e:
         print(e)
@@ -154,7 +154,7 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
     # Copy default logging configuration file to user directory if it doesn't exist
     # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(INSTALL_DIR, LOG_CONF_FILE), USER_LOG_CONF_DIR_FILE)
+        shutil.copyfile(os.path.join(INSTALL_DIR, 'pyfda_log_template.conf'), USER_LOG_CONF_DIR_FILE)
         print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
     except IOError as e:
         print(e)
