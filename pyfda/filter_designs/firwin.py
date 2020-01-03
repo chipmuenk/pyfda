@@ -45,7 +45,7 @@ import inspect
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
-from pyfda.pyfda_fft_windows import get_window_names, calc_window_function
+from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
@@ -158,8 +158,6 @@ class Firwin(QWidget):
         self.ledWinPar2.setVisible(False)
         self.lblWinPar2.setVisible(False)
 
-
-
         self.layHWin1 = QHBoxLayout()
         self.layHWin1.addWidget(self.cmb_firwin_win)
         self.layHWin1.addWidget(self.but_fft_win)
@@ -193,57 +191,6 @@ class Firwin(QWidget):
 
         self._load_dict() # get initial / last setting from dictionary
         self._update_win_fft()
-
-    def _update_UI_bak(self):
-        """
-        Update UI and info_doc when one of the comboboxes or line edits is 
-        changed.
-        """
-        self.fir_window_name = str(self.cmb_firwin_win.currentText()).lower()
-        self.alg = str(self.cmb_firwin_alg.currentText())
-
-        mod_ = import_module('scipy.signal.windows')
-        
-         # construct window class, e.g. scipy.signal.boxcar :
-        class_ = getattr(mod_, self.fir_window_name)
-        win_doc = getattr(class_, '__doc__') # read docstring attribute from window class
-        
-        self.info_doc = []
-        self.info_doc.append('firwin()\n========')
-        #self.info_doc.append(sig.firwin.__doc__)
-        self.info_doc.append(self.fir_window_name + '()' +'\n' + 
-                                        '=' * (len(self.fir_window_name) + 2))
-        self.info_doc.append(win_doc)
-        
-        self.winArgs = inspect.getargspec(class_)[0] # return args of window
-        # and remove common args for all window types ('sym' and 'M'):
-        self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
-
-        
-        # make edit boxes and labels for additional parameters visible if needed
-        # and construct self.firWindow as a tuple consisting of a string with 
-        # the window name and optionally one or two float parameters. 
-        # If there are no additional parameters, just pass the window name string.
-        N_args = len(self.winArgs)
-        self.lblWinPar1.setVisible(N_args > 0)
-        self.ledWinPar1.setVisible(N_args > 0)
-        self.lblWinPar2.setVisible(N_args > 1)
-        self.ledWinPar2.setVisible(N_args > 1)
-            
-        if N_args > 1 :
-            self.lblWinPar2.setText(self.winArgs[1] + ":")
-            self.firWindow = (self.fir_window_name,
-                                      safe_eval(self.ledWinPar1.text(), return_type='float'), 
-                                      safe_eval(self.ledWinPar2.text(), return_type='float'))
-        elif N_args > 0 :
-            self.lblWinPar1.setText(self.winArgs[0] + ":")
-            self.firWindow = (self.fir_window_name,
-                                      safe_eval(self.ledWinPar1.text(), return_type='float'))
-        else:
-            self.firWindow = self.fir_window_name
-
-        # sig_tx -> select_filter -> filter_specs
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
         
 #=============================================================================
 # Taken from impz()
@@ -272,7 +219,6 @@ class Firwin(QWidget):
         self.ledWinPar2.setText(str(param))     
         self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
-
 
     def _update_win_fft(self):
         """ Update window type for FirWin """          
