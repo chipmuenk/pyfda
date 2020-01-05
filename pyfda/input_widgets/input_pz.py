@@ -31,7 +31,7 @@ from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 
 from pyfda.pyfda_rc import params
 
-from .input_pz_ui import Input_PZ_UI
+from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 
 classes = {'Input_PZ':'P/Z'} #: Dict containing class name : display name
 
