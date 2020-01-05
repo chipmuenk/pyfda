@@ -13,10 +13,6 @@ a shallow copy. Used by filterbroker.py and filter_tree_builder.py
 
 Taken from http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
-if 3 / 2 == 1:
-    version = 2
-else:
-    version = 3
 
 def col(i):
     ''' For binding named attributes to spots inside subclasses of tuple.'''
@@ -194,51 +190,3 @@ class FrozenDict(frozenset):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-
-
-if version == 2:
-    #Here are the Python2 modifications
-    class Python2(FrozenDict):
-        def __iter__(self):
-            items = frozenset.__iter__(self)
-            for i in items:
-                yield i.key
-
-        def iterkeys(self):
-            items = frozenset.__iter__(self)
-            for i in items:
-                yield i.key
-
-        def itervalues(self):
-            items = frozenset.__iter__(self)
-            for i in items:
-                yield i.value
-
-        def iteritems(self):
-            items = frozenset.__iter__(self)
-            for i in items:
-                yield (i.key, i.value)
-
-        def has_key(self, key):
-            return key in self
-
-        def viewkeys(self):
-            return dict(self).viewkeys()
-
-        def viewvalues(self):
-            return dict(self).viewvalues()
-
-        def viewitems(self):
-            return dict(self).viewitems()
-
-    #If this is Python2, rebuild the class
-    #from scratch rather than use a subclass
-    py3 = FrozenDict.__dict__
-    py3 = {k: py3[k] for k in py3}
-    py2 = {}
-    py2.update(py3)
-    dct = Python2.__dict__
-    py2.update({k: dct[k] for k in dct})
-
-    FrozenDict = type('FrozenDict', (frozenset,), py2)
