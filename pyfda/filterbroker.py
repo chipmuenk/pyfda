@@ -221,7 +221,7 @@ fil_tree = freeze_hierarchical({
 # auxiliary information, the initial definition here is overwritten by
 # input widgets and design routines:
 #------------------------------------------------------------------------------
-fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
+fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
