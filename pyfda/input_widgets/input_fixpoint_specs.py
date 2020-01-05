@@ -761,8 +761,7 @@ if __name__ == '__main__':
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
     logging.basicConfig() # setup a basic logger
-    #fb.fixpoint_classes = {{'DF1':''}, {'DF2':''}}
-    #fb.filter_classes = {'Bessel':{}, 'Equiripple':{'fix':'DF1'}}
+
     app = QApplication(sys.argv)
     _ = Tree_Builder() # TODO_ couldn't this be a function?
     mainw = Input_Fixpoint_Specs(None)
