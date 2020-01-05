@@ -758,7 +758,7 @@ class Input_Fixpoint_Specs(QWidget):
 ###############################################################################
 
 if __name__ == '__main__':
-    from pyfda.tree_builder import Tree_Builder
+    from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
     logging.basicConfig() # setup a basic logger
     #fb.fixpoint_classes = {{'DF1':''}, {'DF2':''}}
