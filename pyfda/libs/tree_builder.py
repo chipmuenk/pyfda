@@ -532,6 +532,7 @@ class Tree_Builder(object):
         else:
             logger.info("Imported {0:d} filter classes:\n{1:s}"\
                     .format(num_imports, imported_classes))
+        logger.debug(classes_dict)
         return classes_dict
 
 #==============================================================================
