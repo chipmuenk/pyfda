@@ -157,7 +157,7 @@ def main():
     from pyfda import pyfda_rc as rc
     from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.css_rc)
+    app.setStyleSheet(rc.qss_rc)
 
     mainw = InputTabWidgets(None)
     app.setActiveWindow(mainw)
