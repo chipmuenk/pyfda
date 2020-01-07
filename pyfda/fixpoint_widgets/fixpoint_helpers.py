@@ -372,7 +372,7 @@ class UI_W(QWidget):
             dict_sig = {'sender':__name__, 'ui':name}
             self.sig_tx.emit(dict_sig)
         elif s=='init':
-            logger.warning("called by __init__")
+            logger.debug("called by __init__")
         else:
             logger.error("sender without name!")
             
