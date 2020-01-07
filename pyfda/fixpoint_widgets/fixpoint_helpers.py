@@ -199,7 +199,7 @@ class UI_W(QWidget):
         self.q_dict = q_dict # pass a dict with initial settings for construction
         #logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
-        self.ui2dict() # initialize the class attributes
+        self.ui2dict(s='init') # initialize the class attributes
 
     def _construct_UI(self, **kwargs):
         """ 
@@ -350,7 +350,7 @@ class UI_W(QWidget):
         self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
-    def ui2dict(self):
+    def ui2dict(self, s=None):
         """ 
         Update the attributes `self.WI`, `self.WF` and `self.W` and `self.q_dict`
         when one of the QLineEdit widgets has been edited.
@@ -371,8 +371,11 @@ class UI_W(QWidget):
             logger.debug("sender: {0}".format(name))
             dict_sig = {'sender':__name__, 'ui':name}
             self.sig_tx.emit(dict_sig)
+        elif s=='init':
+            logger.warning("called by __init__")
         else:
-            logger.error("sender without name, shouldn't happen!")
+            logger.error("sender without name!")
+            
         
     #--------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
