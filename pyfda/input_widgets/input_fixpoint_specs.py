@@ -418,7 +418,7 @@ class Input_Fixpoint_Specs(QWidget):
             par_w, par_h = self.parent.width(), self.parent.height()
         else:
             par_w, par_h = 300, 700
-        lbl_w, lbl_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height()
+        #lbl_w, lbl_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height()
         img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
 
         if img_w > 10:        
@@ -760,9 +760,12 @@ class Input_Fixpoint_Specs(QWidget):
 if __name__ == '__main__':
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
     logging.basicConfig() # setup a basic logger
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+
     _ = Tree_Builder() # TODO_ couldn't this be a function?
     mainw = Input_Fixpoint_Specs(None)
     mainw.show()

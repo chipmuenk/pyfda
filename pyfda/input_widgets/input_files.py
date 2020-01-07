@@ -466,10 +466,12 @@ class Input_Files(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
+    """ Test with python -m pyfda.input_widgets.input_files """
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
     import sys
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     mainw = Input_Files(None)
 
     app.setActiveWindow(mainw)

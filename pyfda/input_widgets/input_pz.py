@@ -839,7 +839,10 @@ class Input_PZ(QWidget):
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.input_pz"""
+    from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+    
     mainw = Input_PZ(None)
 
     app.setActiveWindow(mainw)

@@ -429,9 +429,12 @@ class Input_Info(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
+    """ Test with python -m pyfda.input_widgets.input_info"""
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     mainw = Input_Info(None)
 
     app.setActiveWindow(mainw) 
