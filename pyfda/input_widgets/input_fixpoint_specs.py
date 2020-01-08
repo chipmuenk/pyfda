@@ -66,6 +66,14 @@ class Input_Fixpoint_Specs(QWidget):
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                 " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
+        self.fx_path = os.path.realpath(os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
+        self.no_fx_filter_img = os.path.join(self.fx_path, "no_fx_filter.png")
+        if not os.path.isfile(self.no_fx_filter_img):
+            logger.error("Image {0:s} not found!".format(self.no_fx_filter_img))
+            
+        self.default_fx_img = os.path.join(self.fx_path, "default_fx_img.png")
+        if not os.path.isfile(self.default_fx_img):
+            logger.error("Image {0:s} not found!".format(self.default_fx_img))
         
         if HAS_MIGEN:
             self._construct_UI()
@@ -269,12 +277,10 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------        
 #       Dynamically updated image of filter topology
 #------------------------------------------------------------------------------        
-        self.lbl_img_fixp = QLabel("a", self)
+        self.lbl_img_fixp = QLabel("img not set", self)
         #self.lbl_img_fixp.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-        self.img_dir = os.path.dirname(os.path.realpath(__file__))  
-        self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
-        self.img_fixp = QPixmap(self.img_file)
+        self.img_fixp = QPixmap(self.no_fx_filter_img)
 
         layHImg = QHBoxLayout()
         layHImg.setContentsMargins(0,0,0,0)
@@ -315,6 +321,7 @@ class Input_Fixpoint_Specs(QWidget):
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(frmHDL_wdg)
         splitter.addWidget(frmQoWdg)
+        #splitter.addWidget(self.lbl_img_fixp)
         splitter.addWidget(self.frmImg)
 
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
@@ -417,21 +424,21 @@ class Input_Fixpoint_Specs(QWidget):
         if hasattr(self.parent, "width"): # needed for module test
             par_w, par_h = self.parent.width(), self.parent.height()
         else:
-            par_w, par_h = 300, 700
-        #lbl_w, lbl_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height()
+            par_w, par_h = 300, 700 # fixed size for module test
+        lbl_w, lbl_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height()
         img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
 
         if img_w > 10:        
             max_h = int(max(np.floor(img_h * par_w/img_w) - 15, 20))
         else:
             max_h = 200
-        logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
+        logger.warning("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
         #return
-        #img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         #img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
-        img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
+        #img_scaled = self.img_fixp.scaledToHeight(max_h)
 
-        self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
+        self.lbl_img_fixp.setPixmap(img_scaled)
 
 #------------------------------------------------------------------------------
     def _update_fixp_widget(self):
@@ -465,7 +472,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.butSimFxPy.setVisible(False)
             self.butSimHDL.setEnabled(False)
             self.butExportHDL.setEnabled(False)
-            self.img_fixp = QPixmap("no_fx_filter.png")
+            self.img_fixp = QPixmap(self.no_fx_filter_img)
             self.resize_img()
             self.lblTitle.setText("")
 
@@ -507,12 +514,14 @@ class Input_Fixpoint_Specs(QWidget):
 
             #---- instantiate and scale graphic of filter topology ----        
             if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
-                self.fx_wdg_inst.img_name = "no_img.png"
-                # check whether file exists
-            file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
-            img_file = os.path.join(file_path, self.fx_wdg_inst.img_name) # construct full image name from it
-            # _, file_extension = os.path.splitext(self.fx_wdg_inst.img_name)
-            if os.path.exists(img_file):
+                img_file = self.default_fx_img
+            else:
+                file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
+                img_file = os.path.join(file_path, self.fx_wdg_inst.img_name) # construct full image name from it
+
+            # check whether file exists
+            if os.path.isfile(img_file):
+                # _, file_extension = os.path.splitext(self.fx_wdg_inst.img_name)
                 self.img_fixp = QPixmap(img_file)
 #                if file_extension == '.png':
 #                    self.img_fixp = QPixmap(img_file)
@@ -520,8 +529,7 @@ class Input_Fixpoint_Specs(QWidget):
 #                    self.img_fixp = QtSvg.QSvgWidget(img_file)
             else:
                 logger.warning("Image file {0} doesn't exist.".format(img_file))
-                img_file = os.path.join(file_path, "no_img.png")                
-                self.img_fixp = QPixmap(img_file)
+                self.img_fixp = QPixmap(self.default_fx_img)
                 #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
             self.resize_img()
 

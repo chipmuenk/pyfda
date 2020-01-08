@@ -119,7 +119,8 @@ OS_VER = platform.release()
 CONF_FILE = 'pyfda.conf'            #: name for general configuration file
 LOG_CONF_FILE = 'pyfda_log.conf'    #: name for logging configuration file
 
-INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
+THIS_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
+INSTALL_DIR = os.path.join(THIS_DIR, '..')
 
 TEMP_DIR = tempfile.gettempdir() #: Temp directory for constructing logging dir
 USER_DIRS = [] #: Placeholder for user widgets directory list, set by treebuilder
@@ -145,7 +146,7 @@ if not os.path.isfile(USER_CONF_DIR_FILE):
     # Copy default configuration file to user directory if it doesn't exist
     # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(INSTALL_DIR, 'pyfda_template.conf'), USER_CONF_DIR_FILE)
+        shutil.copyfile(os.path.join(THIS_DIR, 'pyfda_template.conf'), USER_CONF_DIR_FILE)
         print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
     except IOError as e:
         print(e)
@@ -154,7 +155,7 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
     # Copy default logging configuration file to user directory if it doesn't exist
     # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(INSTALL_DIR, 'pyfda_log_template.conf'), USER_LOG_CONF_DIR_FILE)
+        shutil.copyfile(os.path.join(THIS_DIR, 'pyfda_log_template.conf'), USER_LOG_CONF_DIR_FILE)
         print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
     except IOError as e:
         print(e)
