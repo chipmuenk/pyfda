@@ -33,9 +33,9 @@ from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
 #------------------------------------------------------------------------------
 class Plot_FFT_win(QDialog):
     """
-    Create a pop-up widget for displaying time and frequency view of an FFT 
+    Create a pop-up widget for displaying time and frequency view of an FFT
     window.
-    
+
     Data is passed via the dictionary `win_dict` that is passed during construction.
     """
     # incoming
@@ -45,7 +45,7 @@ class Plot_FFT_win(QDialog):
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True, title='pyFDA Window Viewer'):
         super(Plot_FFT_win, self).__init__(parent)
-        
+
         self.needs_calc = True
         self.needs_draw = True
         self.needs_redraw = True
@@ -53,12 +53,12 @@ class Plot_FFT_win(QDialog):
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 32 # initial number of data points
-        
+
         self.pad = 16 # amount of zero padding
-        
+
         self.win_dict = win_dict
         self.sym = sym
-        
+
         self.tbl_rows = 2
         self.tbl_cols = 6
         # initial settings for checkboxes
@@ -73,7 +73,7 @@ class Plot_FFT_win(QDialog):
 #------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
-        Catch closeEvent (user has tried to close the window) and send a 
+        Catch closeEvent (user has tried to close the window) and send a
         signal to parent where window closing is registered before actually
         closing the window.
         """
@@ -92,10 +92,10 @@ class Plot_FFT_win(QDialog):
                 or 'filt_changed' in dict_sig or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
-                self.needs_draw = False               
+                self.needs_draw = False
             elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
-                self.needs_draw = False                
+                self.needs_draw = False
             elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
                 or self.needs_redraw:
                 self.redraw()
@@ -104,7 +104,7 @@ class Plot_FFT_win(QDialog):
             if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
-                self.needs_draw = True 
+                self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
 
@@ -120,31 +120,31 @@ class Plot_FFT_win(QDialog):
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("Use number of points from calling routine.")
-        
+
         self.lbl_auto_N = QLabel("Auto " + to_html("N", frmt='i'))
-        
+
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N))
         self.led_N.setMaximumWidth(70)
         self.led_N.setToolTip("<span>Number of window data points.</span>")
-        
+
         self.chk_log_t = QCheckBox("Log", self)
         self.chk_log_t.setChecked(False)
         self.chk_log_t.setToolTip("Display in dB")
-        
+
         self.led_log_bottom_t = QLineEdit(self)
         self.led_log_bottom_t.setText(str(self.bottom_t))
         self.led_log_bottom_t.setMaximumWidth(50)
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
-        
+
         self.lbl_log_bottom_t = QLabel("dB", self)
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
 
         self.chk_norm_f = QCheckBox("Norm", self)
         self.chk_norm_f.setChecked(True)
         self.chk_norm_f.setToolTip("Normalize window spectrum for a maximum of 1.")
-        
+
         self.chk_half_f = QCheckBox("Half", self)
         self.chk_half_f.setChecked(True)
         self.chk_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
@@ -165,12 +165,12 @@ class Plot_FFT_win(QDialog):
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chk_auto_N)
         layHControls.addWidget(self.lbl_auto_N)
-        layHControls.addWidget(self.led_N)  
-        layHControls.addStretch(1)        
+        layHControls.addWidget(self.led_N)
+        layHControls.addStretch(1)
         layHControls.addWidget(self.chk_log_t)
         layHControls.addWidget(self.led_log_bottom_t)
         layHControls.addWidget(self.lbl_log_bottom_t)
-        layHControls.addStretch(10) 
+        layHControls.addStretch(10)
         layHControls.addWidget(self.chk_norm_f)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chk_half_f)
@@ -178,7 +178,7 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.chk_log_f)
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
-        
+
         self.tblWinProperties = QTableWidget(self.tbl_rows, self.tbl_cols, self)
         self.tblWinProperties.setAlternatingRowColors(True)
         self.tblWinProperties.verticalHeader().setVisible(False)
@@ -206,7 +206,7 @@ class Plot_FFT_win(QDialog):
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-        
+
         #----------------------------------------------------------------------
         #               ### frmInfo ###
         #
@@ -240,8 +240,8 @@ class Plot_FFT_win(QDialog):
         layVMain = QVBoxLayout()
         layVMain.addWidget(splitter)
         self.setLayout(layVMain)
-        
-        
+
+
         #----------------------------------------------------------------------
         #           Set subplots
         #
@@ -266,7 +266,7 @@ class Plot_FFT_win(QDialog):
 
         self.chk_auto_N.clicked.connect(self.draw)
         self.led_N.editingFinished.connect(self.draw)
-        
+
         self.chk_norm_f.clicked.connect(self.draw)
         self.chk_half_f.clicked.connect(self.update_view)
 
@@ -302,7 +302,7 @@ class Plot_FFT_win(QDialog):
         if sel == False:
             item.setCheckState(Qt.Unchecked)
         # when sel is not specified, don't change anything
-            
+
 #------------------------------------------------------------------------------
     def _handle_item_clicked(self, item):
         if item.column() % 3 == 0: # clicked on checkbox
@@ -313,11 +313,11 @@ class Plot_FFT_win(QDialog):
             else:
                 self.tbl_sel[num] = False
                 logger.debug('"{0}:{1}" Unchecked'.format(item.text(), num))
-                
+
         elif item.column() % 3 == 1: # clicked on value field
             logger.info("{0:s} copied to clipboard.".format(item.text()))
             fb.clipboard.setText(item.text())
-        
+
         self.update_view()
 
 #------------------------------------------------------------------------------
@@ -325,11 +325,11 @@ class Plot_FFT_win(QDialog):
         """
         Update log bottom settings
         """
-        self.bottom_t = safe_eval(self.led_log_bottom_t.text(), self.bottom_t, 
+        self.bottom_t = safe_eval(self.led_log_bottom_t.text(), self.bottom_t,
                                   sign='neg', return_type='float')
         self.led_log_bottom_t.setText(str(self.bottom_t))
 
-        self.bottom_f = safe_eval(self.led_log_bottom_f.text(), self.bottom_f, 
+        self.bottom_f = safe_eval(self.led_log_bottom_f.text(), self.bottom_f,
                                   sign='neg', return_type='float')
         self.led_log_bottom_f.setText(str(self.bottom_f))
 
@@ -338,7 +338,7 @@ class Plot_FFT_win(QDialog):
     def calc_win(self):
         """
         (Re-)Calculate the window and its FFT
-        """    
+        """
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
         if self.chk_auto_N.isChecked():
             self.N = self.win_dict['win_len']
@@ -350,7 +350,7 @@ class Plot_FFT_win(QDialog):
 
         self.win = calc_window_function(self.win_dict, self.win_dict['name'], self.N, sym=self.sym)
 
-            
+
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         self.scale = self.N / np.sum(self.win)
 
@@ -358,7 +358,7 @@ class Plot_FFT_win(QDialog):
         self.Win = np.abs(fft(self.win, self.N * self.pad))
         if self.chk_norm_f.isChecked():
             self.Win /= (self.N / self.scale)# correct gain for periodic signals (coherent gain)
-        
+
         first_zero = argrelextrema(self.Win[:(self.N*self.pad)//2], np.less)
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
@@ -367,7 +367,7 @@ class Plot_FFT_win(QDialog):
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
-       
+
 #------------------------------------------------------------------------------
     def draw(self):
         """
@@ -390,10 +390,10 @@ class Plot_FFT_win(QDialog):
 
         self.ax_t.cla()
         self.ax_f.cla()
-        
+
         self.ax_t.set_xlabel(fb.fil[0]['plt_tLabel'])
         self.ax_t.set_ylabel(r'$w[n] \; \rightarrow$')
-        
+
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
@@ -408,14 +408,14 @@ class Plot_FFT_win(QDialog):
         else:
             F = fftshift(self.F)
             Win = fftshift(self.Win)
-            
+
         if self.chk_log_f.isChecked():
             self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.scale_disp = 20 * np.log10(self.scale)
             self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
             self.unit_nenbw = "dB"
-            self.unit_scale = "dB"            
+            self.unit_scale = "dB"
         else:
             self.ax_f.plot(F, Win)
             self.nenbw_disp = self.nenbw
@@ -423,12 +423,12 @@ class Plot_FFT_win(QDialog):
             self.sidelobe_level_disp = self.sidelobe_level
             self.unit_nenbw = "bins"
             self.unit_scale = ""
-            
+
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
-        
+
         window_name = self.win_dict['name']
         param_txt = ""
         if self.win_dict['n_par'] > 0:
@@ -437,7 +437,7 @@ class Plot_FFT_win(QDialog):
             param_txt = param_txt[:-1]\
                 + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1]['name_tex'], self.win_dict['par'][1]['val'])
 
-        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) 
+        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name)
                                     +param_txt)
 
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)
@@ -446,7 +446,7 @@ class Plot_FFT_win(QDialog):
         labels_t.append("$N$ = {0:d}".format(self.N))
 
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
-                              fancybox=True, framealpha=0.7, 
+                              fancybox=True, framealpha=0.7,
                               handlelength=0, handletextpad=0)
 
         # Info legend for frequency domain window
@@ -460,7 +460,7 @@ class Plot_FFT_win(QDialog):
             N_patches += 1
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
-                                   fancybox=True, framealpha=0.7, 
+                                   fancybox=True, framealpha=0.7,
                                    handlelength=0, handletextpad=0)
 
         np.seterr(**old_settings_seterr)
@@ -479,15 +479,15 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(0,0, "ENBW", font=self.bfont)#, sel=True)
         self._set_table_item(0,1, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0,2, self.unit_nenbw)
-        self._set_table_item(0,3, "Scale", font=self.bfont)#, sel=True)        
+        self._set_table_item(0,3, "Scale", font=self.bfont)#, sel=True)
         self._set_table_item(0,4, "{0:.5g}".format(self.scale_disp))
         self._set_table_item(0,5, self.unit_scale)
-        
+
         self._set_table_item(1,0, "First Zero", font=self.bfont)#, sel=True)
         self._set_table_item(1,1, "{0:.5g}".format(self.first_zero_f))
         self._set_table_item(1,2, "f_S")
 
-        self._set_table_item(1,3, "Sidelobes", font=self.bfont)#, sel=True)        
+        self._set_table_item(1,3, "Sidelobes", font=self.bfont)#, sel=True)
         self._set_table_item(1,4, "{0:.5g}".format(self.sidelobe_level_disp))
         self._set_table_item(1,5, self.unit_nenbw)
 
@@ -506,7 +506,7 @@ class Plot_FFT_win(QDialog):
 if __name__=='__main__':
     import sys
     from pyfda.libs.compat import QApplication
-    
+
     """ Test with python -m pyfda.plot_widgets.plot_fft_win"""
     app = QApplication(sys.argv)
     mainw = Plot_FFT_win(None)
@@ -516,4 +516,4 @@ if __name__=='__main__':
 
     sys.exit(app.exec_())
 
-    # module test using python -m pyfda.plot_widgets.plot_fft_win 
+    # module test using python -m pyfda.plot_widgets.plot_fft_win
