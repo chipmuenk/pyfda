@@ -52,7 +52,7 @@ class Plot_FFT_win(QDialog):
 
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
-        self.N = 128 # initial number of data points
+        self.N = 32 # initial number of data points
         
         self.pad = 16 # amount of zero padding
         
@@ -61,6 +61,8 @@ class Plot_FFT_win(QDialog):
         
         self.tbl_rows = 2
         self.tbl_cols = 6
+        # initial settings for checkboxes
+        self.tbl_sel = [True, True, False, False]
 
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(title)
@@ -275,9 +277,12 @@ class Plot_FFT_win(QDialog):
         for r in range(rows):
             for c in range(cols):
                 item = QTableWidgetItem(val)
-                if c == 0 or c == 3:
+                if c % 3 == 0:
                     item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-                    item.setCheckState(Qt.Unchecked)  
+                    if self.tbl_sel[r * 2 + c % 3]:
+                        item.setCheckState(Qt.Checked)
+                    else:
+                        item.setCheckState(Qt.Unchecked)
                 self.tblWinProperties.setItem(r,c,item)
  #   https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
@@ -296,14 +301,25 @@ class Plot_FFT_win(QDialog):
             item.setCheckState(Qt.Checked)
         if sel == False:
             item.setCheckState(Qt.Unchecked)
-        # when sel is not used, don't change anything
+        # when sel is not specified, don't change anything
             
 #------------------------------------------------------------------------------
     def _handle_item_clicked(self, item):
-        if item.checkState() == Qt.Checked:
-            logger.info('"{0}:{1}" Checked'.format(item.text(), item.row()))
-        else:
-            logger.info('"{0}" Clicked'.format(item.text()))
+        if item.column() % 3 == 0: # clicked on checkbox
+            num = item.row() * 2 + item.column() // 3
+            if item.checkState() == Qt.Checked:
+                self.tbl_sel[num] = True
+                logger.debug('"{0}:{1}" Checked'.format(item.text(), num))
+            else:
+                self.tbl_sel[num] = False
+                logger.debug('"{0}:{1}" Unchecked'.format(item.text(), num))
+                
+        elif item.column() % 3 == 1: # clicked on value field
+            logger.info("{0:s} copied to clipboard.".format(item.text()))
+            fb.clipboard.setText(item.text())
+        
+        self.update_view()
+
 #------------------------------------------------------------------------------
     def update_bottom(self):
         """
@@ -424,20 +440,28 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) 
                                     +param_txt)
 
-        # create two empty patches
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)
-
+        # Info legend for time domain window
         labels_t = []
         labels_t.append("$N$ = {0:d}".format(self.N))
+
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
                               fancybox=True, framealpha=0.7, 
                               handlelength=0, handletextpad=0)
+
+        # Info legend for frequency domain window
         labels_f = []
-        labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
-        labels_f.append("$CGAIN$  = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
-        self.ax_f.legend([patch] * 2, labels_f, loc='best', fontsize='small',
-                               fancybox=True, framealpha=0.7, 
-                               handlelength=0, handletextpad=0)
+        N_patches = 0
+        if self.tbl_sel[0]:
+            labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
+            N_patches += 1
+        if self.tbl_sel[1]:
+            labels_f.append("$CGAIN$  = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
+            N_patches += 1
+        if N_patches > 0:
+            self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
+                                   fancybox=True, framealpha=0.7, 
+                                   handlelength=0, handletextpad=0)
 
         np.seterr(**old_settings_seterr)
 
