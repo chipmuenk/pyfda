@@ -449,6 +449,10 @@ class Plot_FFT_win(QDialog):
                               fancybox=True, framealpha=0.7,
                               handlelength=0, handletextpad=0)
 
+        # plot a line at the max. sidelobe level
+        if self.tbl_sel[3]:
+            self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
+
         # Info legend for frequency domain window
         labels_f = []
         N_patches = 0
@@ -462,7 +466,6 @@ class Plot_FFT_win(QDialog):
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
                                    fancybox=True, framealpha=0.7,
                                    handlelength=0, handletextpad=0)
-
         np.seterr(**old_settings_seterr)
 
         self.update_info()
