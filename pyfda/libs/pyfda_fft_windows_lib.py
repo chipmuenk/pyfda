@@ -45,7 +45,7 @@ windows =\
               'This window also has the best SNR of all windows.</span>')
         },
     'Barthann':
-        {'fn_name':'scipy.signal.windows.barthann',
+        {'fn_name':'barthann',
          'info':
              ('<span>A modified Bartlett-Hann Window.'
               '</span>')},
@@ -66,19 +66,19 @@ windows =\
               'reasonably narrow main lobe.</span>')
              },
     'Blackmanharris_5':
-        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris5',
+        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
          'info':
              ('<span>The 5-term Blackman-Harris window with a side-'
               'lobe suppression of up to 125 dB.</span>')
              },
     'Blackmanharris_7':
-        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris7',
+        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
          'info':
              ('<span>The 7-term Blackman-Harris window with a side-'
               'lobe suppression of up to 180 dB.</span>')
              },
     'Blackmanharris_9':
-        {'fn_name':'pyfda.pyfda_fft_windows.blackmanharris9',
+        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
          'info':
              ('<span>The 9-term Blackman-Harris window with a side-'
               'lobe suppression of up to 230 dB.</span>')
