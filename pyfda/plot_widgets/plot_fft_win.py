@@ -353,6 +353,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setText(str(self.bottom_f))
 
         self.update_view()
+
 #------------------------------------------------------------------------------
     def calc_N(self):
         """
@@ -491,10 +492,10 @@ class Plot_FFT_win(QDialog):
             labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
             N_patches += 1
         if self.tbl_sel[1]:
-            labels_f.append("$CGAIN$  = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
+            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
             N_patches += 1
         if self.tbl_sel[2]:
-            labels_f.append("$1st Zero$  = {0:.4g}".format(self.first_zero_f))
+            labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))
             N_patches += 1
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
