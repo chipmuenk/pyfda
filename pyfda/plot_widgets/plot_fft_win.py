@@ -462,6 +462,9 @@ class Plot_FFT_win(QDialog):
         if self.tbl_sel[1]:
             labels_f.append("$CGAIN$  = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
             N_patches += 1
+        if self.tbl_sel[2]:
+            labels_f.append("$1st Zero$  = {0:.4g}".format(self.first_zero_f))
+            N_patches += 1
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
                                    fancybox=True, framealpha=0.7,
@@ -486,7 +489,7 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(0,4, "{0:.5g}".format(self.scale_disp))
         self._set_table_item(0,5, self.unit_scale)
 
-        self._set_table_item(1,0, "First Zero", font=self.bfont)#, sel=True)
+        self._set_table_item(1,0, "1st Zero", font=self.bfont)#, sel=True)
         self._set_table_item(1,1, "{0:.5g}".format(self.first_zero_f))
         self._set_table_item(1,2, "f_S")
 
