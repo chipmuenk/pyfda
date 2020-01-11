@@ -440,18 +440,17 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name)
                                     +param_txt)
 
+        # plot a line at the max. sidelobe level
+        if self.tbl_sel[3]:
+            self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
+
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)
         # Info legend for time domain window
         labels_t = []
         labels_t.append("$N$ = {0:d}".format(self.N))
-
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
                               fancybox=True, framealpha=0.7,
                               handlelength=0, handletextpad=0)
-
-        # plot a line at the max. sidelobe level
-        if self.tbl_sel[3]:
-            self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
 
         # Info legend for frequency domain window
         labels_f = []
