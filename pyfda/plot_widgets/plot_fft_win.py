@@ -495,7 +495,7 @@ class Plot_FFT_win(QDialog):
 
         self._set_table_item(1,3, "Sidelobes", font=self.bfont)#, sel=True)
         self._set_table_item(1,4, "{0:.5g}".format(self.sidelobe_level_disp))
-        self._set_table_item(1,5, self.unit_nenbw)
+        self._set_table_item(1,5, self.unit_scale)
 
         self.tblWinProperties.resizeColumnsToContents()
         self.tblWinProperties.resizeRowsToContents()
