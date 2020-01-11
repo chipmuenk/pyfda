@@ -85,7 +85,7 @@ class Plot_FFT_win(QDialog):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | visible = {1}"\
+        logger.info("Processing {0} | visible = {1}"\
                      .format(dict_sig, self.isVisible()))
         if ('data_changed' in dict_sig and dict_sig['data_changed'] == 'win')\
             or self.needs_calc:
