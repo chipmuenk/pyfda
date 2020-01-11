@@ -53,6 +53,7 @@ class Plot_FFT_win(QDialog):
         self.bottom_f = -80 # min. value for dB display
         self.bottom_t = -60
         self.N = 32 # initial number of data points
+        self.N_auto = win_dict['win_len']
 
         self.pad = 16 # amount of zero padding
 
