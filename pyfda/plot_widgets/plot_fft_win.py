@@ -376,7 +376,6 @@ class Plot_FFT_win(QDialog):
         """
         self.calc_win()
         self.update_view()
-        self.update_info()
 
 #------------------------------------------------------------------------------
     def update_view(self):
