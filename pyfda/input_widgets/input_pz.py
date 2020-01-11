@@ -232,9 +232,6 @@ class Input_PZ(QWidget):
         """
         Intitialize the widget
         """
-        # instantiate central clipboard
-        self.clipboard = fb.clipboard
-
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors)

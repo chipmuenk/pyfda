@@ -366,10 +366,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
             text.rstrip(cr)
 
     if params['CSV']['clipboard']:
-        if hasattr(parent, 'clipboard'):
-            parent.clipboard.setText(text)
-        else:
-            logger.error("No clipboard instance defined!")
+        fb.clipboard.setText(text)
     else:
         export_data(parent, text, fkey, title=title)
 
@@ -441,14 +438,10 @@ def qtext2table(parent, fkey, title = "Import"):
     """
 
     if params['CSV']['clipboard']: # data from clipboard
-        if not hasattr(parent, 'clipboard'):
-            logger.error("No clipboard instance defined!")
-            data_arr = None
-        else:
-            text = parent.clipboard.text()
-            logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
-            # pass handle to text and convert to numpy array:
-            data_arr = csv2array(io.StringIO(text))
+        text = fb.clipboard.text()
+        logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
+        # pass handle to text and convert to numpy array:
+        data_arr = csv2array(io.StringIO(text))
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array

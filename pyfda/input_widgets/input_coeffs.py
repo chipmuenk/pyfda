@@ -306,10 +306,6 @@ class Input_Coeffs(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-
-        # handle to central clipboard instance
-        self.clipboard = fb.clipboard
-
         # ---------------------------------------------------------------------
         #   Coefficient table widget
         # ---------------------------------------------------------------------
