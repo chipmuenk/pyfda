@@ -87,26 +87,45 @@ class Plot_FFT_win(QDialog):
         """
         logger.debug("Processing {0} | visible = {1}"\
                      .format(dict_sig, self.isVisible()))
-        if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig\
-                or 'filt_changed' in dict_sig or self.needs_calc:
+        if ('data_changed' in dict_sig and dict_sig['data_changed'] == 'win')\
+            or self.needs_calc:
+            logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto, self.win_dict['win_len']))
+            self.N_auto = self.win_dict['win_len']
+            self.calc_N()
+            
+            if self.isVisible():
                 self.draw()
                 self.needs_calc = False
-                self.needs_draw = False
-            elif 'view_changed' in dict_sig or self.needs_draw:
-                self.update_view()
-                self.needs_draw = False
-            elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
-                or self.needs_redraw:
-                self.redraw()
-                self.needs_redraw = False
-        else:
-            if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
+            else:
                 self.needs_calc = True
-            elif 'view_changed' in dict_sig:
-                self.needs_draw = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
+
+        elif 'home' in dict_sig:
+            self.update_view()
+
+        else:
+            logger.error("Unknown content of dict_sig: {0}".format(dict_sig))
+                
+            
+        # if self.isVisible():
+        #     if 'data_changed' in dict_sig or 'home' in dict_sig\
+        #         or 'filt_changed' in dict_sig or self.needs_calc:
+        #         self.draw()
+        #         self.needs_calc = False
+        #         self.needs_draw = False
+        #     elif 'view_changed' in dict_sig or self.needs_draw:
+        #         self.update_view()
+        #         self.needs_draw = False
+        #     elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
+        #         or self.needs_redraw:
+        #         self.redraw()
+        #         self.needs_redraw = False
+        # else:
+        #     if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
+        #         self.needs_calc = True
+        #     elif 'view_changed' in dict_sig:
+        #         self.needs_draw = True
+        #     elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+        #         self.needs_redraw = True
 
     def _construct_UI(self):
         """
@@ -264,7 +283,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.chk_auto_N.clicked.connect(self.draw)
+        self.chk_auto_N.clicked.connect(self.calc_N)
         self.led_N.editingFinished.connect(self.draw)
 
         self.chk_norm_f.clicked.connect(self.draw)
@@ -335,15 +354,29 @@ class Plot_FFT_win(QDialog):
 
         self.update_view()
 #------------------------------------------------------------------------------
+    def calc_N(self):
+        """
+        (Re-)Calculate the number of data points when Auto N chkbox has been
+        clicked or when the number of data points has been updated outside this
+        class
+        """
+        if self.chk_auto_N.isChecked():
+            self.N = self.N_auto
+
+        self.draw()
+
+#------------------------------------------------------------------------------
     def calc_win(self):
         """
         (Re-)Calculate the window and its FFT
         """
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
-        if self.chk_auto_N.isChecked():
-            self.N = self.win_dict['win_len']
-        else:
+
+        if not self.chk_auto_N.isChecked():
             self.N = safe_eval(self.led_N.text(), self.N, sign='pos', return_type='int')
+       # else:
+            #self.N = self.win_dict['win_len']
+
         self.led_N.setText(str(self.N))
 
         self.n = np.arange(self.N)
