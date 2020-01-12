@@ -27,7 +27,8 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: not implemented at the moment
+    # incoming: not implemented at the moment, update_N is triggered directly
+    # by plot_impz
     # sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('data_changed':'xxx')
     sig_tx = pyqtSignal(object)
