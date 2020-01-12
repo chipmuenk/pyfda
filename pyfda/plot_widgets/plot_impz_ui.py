@@ -27,10 +27,13 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: from connector widget plot_tab_widgets to self.process_sig_rx()
-    sig_rx = pyqtSignal(object)
-    # outgoing: from process_sig_rx() to PlotImpz
+    # incoming: not implemented at the moment
+    # sig_rx = pyqtSignal(object)
+    # outgoing: from various UI elements to PlotImpz ('data_changed':'xxx')
     sig_tx = pyqtSignal(object)
+    # outgoing to local fft window
+    sig_tx_fft = pyqtSignal(object)
+
 
     def __init__(self, parent):
         """
@@ -761,8 +764,11 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
+        # only emit a signal when window has been changed here to prevent infinite loop
         if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+        # ... but always notify the FFT widget
+        self.sig_tx_fft.emit({'sender':__name__, 'data_changed':'win'})
             
     #------------------------------------------------------------------------------
     def show_fft_win(self):
@@ -780,7 +786,7 @@ class PlotImpz_UI(QWidget):
                 # (and the attached window) is deleted immediately when it goes out of scope
                 self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=True,
                                                title="pyFDA Spectral Window Viewer")
-                self.sig_tx.connect(self.fft_window.sig_rx)
+                self.sig_tx_fft.connect(self.fft_window.sig_rx)
                 self.fft_window.sig_tx.connect(self.close_fft_win)
                 self.fft_window.show() # modeless i.e. non-blocking popup window
         else:
