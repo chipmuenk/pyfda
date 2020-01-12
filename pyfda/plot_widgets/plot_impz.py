@@ -151,7 +151,8 @@ class Plot_Impz(QWidget):
         self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
 
         self.sig_rx.connect(self.process_sig_rx)
-        self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
+        # connect UI to widgets and signals upstream:
+        self.ui.sig_tx.connect(self.process_sig_rx) 
 #------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig=None):
         """
