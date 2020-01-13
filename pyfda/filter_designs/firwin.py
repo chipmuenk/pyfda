@@ -39,8 +39,6 @@ from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComb
 import numpy as np
 import scipy.signal as sig
 from scipy.special import sinc
-from importlib import import_module
-import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
