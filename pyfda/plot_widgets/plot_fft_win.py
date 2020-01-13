@@ -89,6 +89,7 @@ class Plot_FFT_win(QDialog):
         logger.info("Processing {0} | visible = {1}"\
                      .format(dict_sig, self.isVisible()))
         if ('data_changed' in dict_sig and dict_sig['data_changed'] == 'win')\
+            or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
             logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto, self.win_dict['win_len']))
             self.N_auto = self.win_dict['win_len']
