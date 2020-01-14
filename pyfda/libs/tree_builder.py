@@ -255,8 +255,12 @@ class Tree_Builder(object):
             # Allow interpolation across sections, ${Dirs:dir1}
             self.conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
             self.conf.read(dirs.USER_CONF_DIR_FILE)
-            logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
-                        .format(dirs.USER_CONF_DIR_FILE, str(self.conf.sections())))
+            sect = ""
+            for s in self.conf.sections():
+                sect += "\t\t[" + str(s) + "]\n"
+            logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
+                        .format(dirs.USER_CONF_DIR_FILE, sect))
+
 
             # -----------------------------------------------------------------
             # Parsing [Common]
@@ -284,7 +288,7 @@ class Tree_Builder(object):
             if dirs.USER_DIRS: 
                 logger.info("User directory(s):\n\t{0}\n".format(dirs.USER_DIRS))
             else:
-                logger.warning('No valid user directory found in "{0}\n.'
+                logger.warning("No valid user directory found in\n\t'{0}'"
                             .format(dirs.USER_CONF_DIR_FILE))
 
             # -----------------------------------------------------------------
@@ -388,7 +392,7 @@ class Tree_Builder(object):
 
                     section_conf_dict.update({i[0]:val})
 
-                logger.info('Found {0:2d} entries in [{1:s}].'
+                logger.debug('Found {0:2d} entries in [{1:s}].'
                         .format(len(section_conf_dict), section))
             else:
                 logger.warning('Empty section [{0:s}].'.format(section))
@@ -501,7 +505,7 @@ class Tree_Builder(object):
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:
                 if not hasattr(mod, c): # class c doesn't exist in module
-                    logger.warning("Skipping filter class '{0}', it doesn't exist in module '{1}'."\
+                    logger.warning("Skipping class '{0}', it doesn't exist in module '{1}'."\
                                    .format(c, mod_fq_name))
                     continue # continue with next entry in classes_dict
                 else:
@@ -525,12 +529,12 @@ class Tree_Builder(object):
 
                 # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
-                imported_classes += "\t" + mod_name + "."+ c + "\n"
+                imported_classes += "\t" + mod_fq_name + "."+ c + "\n"
 
         if num_imports < 1:
             logger.warning("No class could be imported.")
         else:
-            logger.info("Using {0:2d} classes of [{1:s}]:\n{2:s}"\
+            logger.info("Found {0:d} classes in [{1:s}]:\n{2:s}"\
                     .format(num_imports, section, imported_classes))
         logger.debug(classes_dict)
         return classes_dict
