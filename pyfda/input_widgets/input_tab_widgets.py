@@ -99,7 +99,7 @@ class InputTabWidgets(QWidget):
             logger.critical("No input widgets found!")
             sys.exit()
         else:
-            logger.info("Imported {0:d} input classes:\n{1}"
+            logger.debug("Imported {0:d} input classes:\n{1}"
                         .format(n_wdg, inst_wdg_str))
 
         #

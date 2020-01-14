@@ -92,7 +92,7 @@ class PlotTabWidgets(QTabWidget):
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
+            logger.debug("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)

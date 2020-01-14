@@ -299,7 +299,7 @@ class Input_Specs(QWidget):
         """
 
         try:
-            logger.info("Start filter design using method '{0}.{1}{2}'"\
+            logger.info("Start filter design using method\n\t'{0}.{1}{2}'"\
                 .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
 
             #----------------------------------------------------------------------
