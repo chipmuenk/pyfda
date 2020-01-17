@@ -3,6 +3,10 @@
 # https://realpython.com/pyinstaller-python/
 # https://techxmag.com/questions/how-to-add-dynamic-python-modules-to-pyinstallers-specs/
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 block_cipher = None
 
@@ -11,7 +15,7 @@ from PyInstaller.utils.hooks import collect_data_files
 
 hiddenimports = collect_submodules('scipy.signal')
 datas = collect_data_files('scipy.signal')
-datas += 
+
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
     'pyfda.plot_widgets.plot_pz','pyfda.plot_widgets.plot_impz','pyfda.plot_widgets.plot_3d']
@@ -32,9 +36,9 @@ excludes += collect_submodules('colorama')
 excludes += collect_submodules('tkinter') 
 excludes += collect_submodules('docutils')
 
-a = Analysis(['pyfda\\pyfdax.py'],
-             pathex=['D:\\Daten\\design\\python\\git\\pyfda'],
-             binaries=[],
+a = Analysis(['pyfda/pyfdax.py'],
+             pathex=['.'],
+             binaries=[('/home/cmuenker/anaconda3/lib/libiomp5.so','.')],
              datas=datas,
              hiddenimports=hiddenimports,
              hookspath=[],
@@ -59,4 +63,5 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True )
+          console=True,
+ 	  icon='images/icon/pyfda_logo.png')
