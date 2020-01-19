@@ -853,7 +853,7 @@ def export_coe_microsemi(f):
     For (anti)aymmetric filter only one half of the coefficients must be
     specified?
     """
-    qc = fix_lib.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
     qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
     # Quantize coefficients to decimal integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -870,7 +870,7 @@ def export_coe_vhdl_package(f):
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
-    qc = fix_lib.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
     WO = fb.fil[0]['fxqc']['QO']['W']
 
     if qc.frmt == 'hex':
