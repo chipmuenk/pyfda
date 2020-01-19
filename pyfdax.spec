@@ -1,8 +1,23 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 # https://realpython.com/pyinstaller-python/
+# Pyinstaller cannot understand dynamic imports (hard enough for me ...) so all
+# modules that are imported dynamically need to be added manually via "hiddenimports"
 # https://techxmag.com/questions/how-to-add-dynamic-python-modules-to-pyinstallers-specs/
+
+# How to choose between OpenBLAS and MKL optimized numpy / scipy: The MKL libraries increase
+# size of the exe from ~80 MB to 350 MB under linux (and I haven't seen a speed gain)
 # https://docs.anaconda.com/mkl-optimizations/
+# This only works under Linux and OS X, under Windows there seems to be no feasible
+# alternative to scipy built with mkl
+
+# Under windows, Qt library become installed twice, bloating the resulting exe
+# This might be caused by pywin32 (Anaconda) and pypiwin32 both installed (or a similar
+# issue related to Qt5)
+# https://github.com/pyinstaller/pyinstaller/issues/1488
+
+# Including an icon seems to be problem under windows. Some hints at
+# https://stackoverflow.com/questions/45628653/add-ico-file-to-executable-in-pyinstaller
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -19,8 +34,10 @@ from PyInstaller.utils.hooks import collect_data_files
 hiddenimports = []
 datas = []
 #hiddenimports = collect_submodules('scipy.signal')
-#datas = collect_data_files('scipy.signal')
-datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets') ]
+#datas += collect_data_files('scipy.signal')
+datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
+
+datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets')]
 
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
@@ -44,10 +61,10 @@ excludes += collect_submodules('jedi')
 excludes += collect_submodules('PIL')
 excludes += collect_submodules('nbconvert')
 excludes += collect_submodules('nbformat')
-#excludes += collect_submodules('scipy.optimize')
-#excludes += collect_submodules('scipy.sparse')
-#excludes += collect_submodules('scipy.ndimage')
-#jupyter,scipy.spatial, scipy.stats, scipy.fftpack, scipy.integrate, scipy.interpolate
+#excludes += collect_submodules('scipy.optimize') # needed
+#excludes += collect_submodules('scipy.sparse') # needed
+#excludes += collect_submodules('scipy.ndimage') # needed
+#jupyter,scipy.spatial, scipy.stats, scipy.integrate, scipy.interpolate
 
 # For MKL, set  binaries=[('/home/cmuenker/anaconda3/lib/libiomp5.so','.')],
 a = Analysis(['pyfda/pyfdax.py'],
@@ -73,13 +90,17 @@ a.binaries = a.binaries - TOC([
  ('tcl85.dll', None, None),
  ('tk85.dll', None, None),
  ('_sqlite3', None, None),
- ('_tkinter', None, None)])
- #('_ssl', None, None),
+ ('_tkinter', None, None),
+ ('Qt5Qml.dll', None, None)])
+ #('_ssl', None, None), # needed
+
 
 # Delete data ...
 a.datas = [x for x in a.datas if 
-	(not x[0].startswith('tk') and not x[0].startswith('IPython')
-	 and not x[0].startswith('scipy/fftpack') and not x[0].startswith('lib')
+	(not x[0].startswith('tk')
+	 and not x[0].startswith('IPython')
+	 # and not x[0].startswith('scipy/fftpack') # needed for windows
+	 and not x[0].startswith('lib')
 	 and not x[0].startswith('notebook'))]
 
 pyz = PYZ(a.pure, a.zipped_data,
@@ -98,7 +119,8 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True,
- 	  icon='./pyfda/images/icons/pyfda_logo.png')
+     	  icon=None)
+    # icon is set in main program via qrc resources, no import needed
 
 coll = COLLECT(exe,
                a.binaries,
