@@ -333,7 +333,7 @@ class Input_Files(QWidget):
         """
         Save filter as zipped binary numpy array or pickle object
         """
-        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;Text file pole/residue (*.txt)")
+        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;Text file pole/residue (*.txt_rpk)")
         dlg = QFD(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileName_(
@@ -355,7 +355,7 @@ class Input_Files(QWidget):
 
             file_type_err = False
             try:
-                if file_type == '.txt':
+                if file_type == '.txt_rpk':
                     # save as a custom residue/pole text output for apply with custom tool
                     # make sure we have the residues
                     if 'rpk' in fb.fil[0]:
@@ -363,7 +363,7 @@ class Input_Files(QWidget):
                             self.file_dump(f)
                     else:
                         file_type_err = True
-                        logger.error('filter has no residues/poles, cannot save txt file')
+                        logger.error('filter has no residues/poles, cannot save as *.txt_rpk file')
                 else:
                     with io.open(file_name, 'wb') as f:
                         if file_type == '.npz':
