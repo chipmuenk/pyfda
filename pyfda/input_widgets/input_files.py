@@ -369,8 +369,8 @@ class Input_Files(QWidget):
                         if file_type == '.npz':
                             np.savez(f, **fb.fil[0])
                         elif file_type == '.pkl':
-                            # save as a pickle version compatible with Python 2.x
-                            pickle.dump(fb.fil[0], f, protocol = 2)
+                            # save in default pickle version, only compatible with Python 3.x
+                            pickle.dump(fb.fil[0], f, protocol = 3)
                         else:
                             file_type_err = True
                             logger.error('Unknown file type "{0}"'.format(file_type))
