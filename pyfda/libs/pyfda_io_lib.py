@@ -588,7 +588,9 @@ def import_data(parent, fkey, title="Import"):
     numpy array
 
     """
-    file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat);;"
+    file_filters = ("Comma / Tab Separated Values (*.csv);;"
+                    "Comma / Tab Separated Values (*.txt);;"
+                    "Matlab-Workspace (*.mat);;"
     "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
     dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
@@ -613,7 +615,7 @@ def import_data(parent, fkey, title="Import"):
 
     file_type_err = False
     try:
-        if file_type == '.csv':
+        if file_type in {'.csv','txt'}:
             with io.open(file_name, 'r') as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
@@ -671,8 +673,10 @@ def export_data(parent, data, fkey, title="Export"):
     logger.debug("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
-    file_filters = ("Comma / Tab Separated Values (*.csv);;Matlab-Workspace (*.mat)"
-        ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
+    file_filters = ("Comma / Tab Separated Values (*.csv);;"
+                    "Comma / Tab Separated Values (*.txt);;"
+                    "Matlab-Workspace (*.mat);;"
+        "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
     if fb.fil[0]['ft'] == 'FIR':
         file_filters += (";;Xilinx FIR coefficient format (*.coe)"
@@ -709,7 +713,7 @@ def export_data(parent, data, fkey, title="Export"):
     file_type_err = False
 
     try:
-        if file_type == '.csv':
+        if file_type in {'.csv'}:
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
         elif file_type in {'.coe', '.txt', '.vhd'}: # text / string format
