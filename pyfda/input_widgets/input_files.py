@@ -174,7 +174,7 @@ class Input_Files(QWidget):
                              # Bytes need to be decoded for py3 to be used as keys later on
                             if type(fb.fil[0][k]) == bytes:
                                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-                            if fb.fil[0][k] == None:
+                            if fb.fil[0][k] is None:
                                 logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
 
                         logger.info('Loaded filter "{0}"'.format(file_name))
