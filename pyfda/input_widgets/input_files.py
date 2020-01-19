@@ -150,7 +150,7 @@ class Input_Files(QWidget):
                         # needed for loading py2 generated pickled files on py3.
                         # fix_imports will try to map old py2 names to new py3
                         # names when unpickling.
-                        a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
+                        a = np.load(f, fix_imports=True, encoding='bytes', allow_pickle = True) # array containing dict, dtype 'object'
                         
                         logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
                         for key in sorted(a):
