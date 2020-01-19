@@ -402,6 +402,8 @@ class Input_Fixpoint_Specs(QWidget):
             idx = self.cmb_wdg_fixp.findText(last_fx_wdg)
             # set to idx 0 if not found (returned -1)
             self.cmb_wdg_fixp.setCurrentIndex(max(idx,0))
+        else: # no fixpoint widget
+            self.embed_fixp_img(self.no_fx_filter_img)
         return inst_wdg_str
         
 #------------------------------------------------------------------------------
