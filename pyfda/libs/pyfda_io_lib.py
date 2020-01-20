@@ -589,7 +589,6 @@ def import_data(parent, fkey, title="Import"):
 
     """
     file_filters = ("Comma / Tab Separated Values (*.csv);;"
-                    "Comma / Tab Separated Values (*.txt);;"
                     "Matlab-Workspace (*.mat);;"
     "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
     dlg = QFileDialog(parent) # create instance for QFileDialog
@@ -615,7 +614,7 @@ def import_data(parent, fkey, title="Import"):
 
     file_type_err = False
     try:
-        if file_type in {'.csv','txt'}:
+        if file_type in {'.csv'}:
             with io.open(file_name, 'r') as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
@@ -639,7 +638,7 @@ def import_data(parent, fkey, title="Import"):
                     file_type_err = True
 
         if not file_type_err:
-            logger.info('Successfully loaded \n"{0}"'.format(file_name))
+            logger.info('Successfully loaded \n\t"{0}"'.format(file_name))
             dirs.save_dir = os.path.dirname(file_name)
             dirs.save_filt = sel_filt
             return data_arr # returns numpy array
@@ -674,7 +673,6 @@ def export_data(parent, data, fkey, title="Export"):
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
     file_filters = ("Comma / Tab Separated Values (*.csv);;"
-                    "Comma / Tab Separated Values (*.txt);;"
                     "Matlab-Workspace (*.mat);;"
         "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
@@ -784,7 +782,7 @@ def export_data(parent, data, fkey, title="Export"):
                     file_type_err = True
 
         if not file_type_err:
-            logger.info('Filter saved as "{0}"'.format(file_name))
+            logger.info('Filter saved as\n\t"{0}"'.format(file_name))
             dirs.save_dir = os.path.dirname(file_name) # save new dir
             dirs.save_filt = sel_filt # save new filter selection
 
