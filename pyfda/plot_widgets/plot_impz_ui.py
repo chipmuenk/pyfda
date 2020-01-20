@@ -54,7 +54,7 @@ class PlotImpz_UI(QWidget):
         self.N_user = 0
         self.N = 0
 
-        self.bottom_t = -80
+        self.bottom_t = -80 # initial value for log. scale
         self.f1 = 0.02
         self.f2 = 0.03
         self.A1 = 1.0
@@ -64,7 +64,7 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
 
-        self.bottom_f = -120
+        self.bottom_f = -120 # initial value for log. scale
         self.param = None
 
         # initial settings for comboboxes
@@ -76,7 +76,6 @@ class PlotImpz_UI(QWidget):
         self.plt_freq_stim = "None"
         self.plt_freq_stmq = "None"
 
-        self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
         self.noise = "None"
 
@@ -192,13 +191,15 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
-        if not self.chk_log_time.isChecked():
-            self.chk_log_time.setText("dB")
 
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_time.setVisible(self.chk_log_time.isChecked())
+        
+        if not self.chk_log_time.isChecked():
+            self.chk_log_time.setText("dB")
+            self.bottom_t = 0
 
         self.chk_win_time = QCheckBox("FFT Window", self)
         self.chk_win_time.setObjectName("chk_win_time")
@@ -262,13 +263,16 @@ class PlotImpz_UI(QWidget):
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setChecked(True)
-        if not self.chk_log_freq.isChecked():
-            self.chk_log_freq.setText("dB")
 
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
+
+        if not self.chk_log_freq.isChecked():
+            self.chk_log_freq.setText("dB")
+            self.bottom_f = 0
+
 
 
         self.lbl_win_fft = QLabel("Window: ", self)
