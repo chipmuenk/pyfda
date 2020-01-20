@@ -94,12 +94,13 @@ a.binaries = a.binaries - TOC([
  ('Qt5Qml.dll', None, None),
  ('libQt5Qml.so.5', None, None),
  ('libQt5Quick.so.5', None, None),
-# ('libQt5Svg.so.5', None, None),
  ('libstdc++.so.6', None, None),
  ('libzmq.so.5', None, None),
  ('libsqlite3.so.0', None, None)
     ])
- #('_ssl', None, None), # needed
+ # ('_ssl', None, None), # needed for?
+ # libicudata.so.58' # central Qt library 
+ # libQt5Svg.so.5' # needed for icons
 
 
 # Delete data ...
