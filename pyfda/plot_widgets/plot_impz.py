@@ -75,11 +75,8 @@ class Plot_Impz(QWidget):
 
         #--------------------------------------------
         # initialize routines and settings
-        self._log_mode_time()
-        self._log_mode_freq()
         self.fx_select()    # initialize fixpoint or float simulation
         self.impz() # initial calculation of stimulus and response and drawing
-
 
     def _construct_UI(self):
         """

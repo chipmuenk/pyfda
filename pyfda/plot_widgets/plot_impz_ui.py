@@ -188,14 +188,17 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
 
-        self.chk_log_time = QCheckBox("dB", self)
+        self.chk_log_time = QCheckBox("dB : min.", self)
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
+        if not self.chk_log_time.isChecked():
+            self.chk_log_time.setText("dB")
 
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.led_log_bottom_time.setVisible(self.chk_log_time.isChecked())
 
         self.chk_win_time = QCheckBox("FFT Window", self)
         self.chk_win_time.setObjectName("chk_win_time")
@@ -255,14 +258,18 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
 
-        self.chk_log_freq = QCheckBox("dB : Min.", self)
+        self.chk_log_freq = QCheckBox("dB : min.", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setChecked(True)
+        if not self.chk_log_freq.isChecked():
+            self.chk_log_freq.setText("dB")
 
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
+
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
