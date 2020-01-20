@@ -177,7 +177,7 @@ class Input_Files(QWidget):
                             if fb.fil[0][k] is None:
                                 logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
 
-                        logger.info('Loaded filter "{0}"'.format(file_name))
+                        logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                          # emit signal -> InputTabWidgets.load_all:
                         self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
                         dirs.save_dir = os.path.dirname(file_name) # update working dir
@@ -363,7 +363,7 @@ class Input_Files(QWidget):
                             self.file_dump(f)
                     else:
                         file_type_err = True
-                        logger.error('filter has no residues/poles, cannot save as *.txt_rpk file')
+                        logger.error('Filter has no residues/poles, cannot save as *.txt_rpk file')
                 else:
                     with io.open(file_name, 'wb') as f:
                         if file_type == '.npz':
@@ -376,7 +376,7 @@ class Input_Files(QWidget):
                             logger.error('Unknown file type "{0}"'.format(file_type))
 
                 if not file_type_err:
-                    logger.info('Filter saved as "{0}"'.format(file_name))
+                    logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
                     dirs.save_dir = os.path.dirname(file_name) # save new dir
 
             except IOError as e:
@@ -407,7 +407,7 @@ class Input_Files(QWidget):
                 user_dirs_str += d + '<br />'
 
         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-        "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
+        "Version {0} (c) 2013 - 2020 Christian Münker</b><br />"
         "Design, analyze and synthesize digital filters. Docs @ "
         "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
         " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
