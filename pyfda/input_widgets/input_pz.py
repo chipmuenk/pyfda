@@ -211,13 +211,13 @@ class Input_PZ(QWidget):
                      .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite loop detected (and interrupted)!")
+            logger.warning("Infinite loop detected (and interrupted)!")
             return
         if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
                 self.load_dict()
                 self.data_changed = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv' or self.ui_changed:
+            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv' or self.ui_changed:
                 self.ui._set_load_save_icons()
                 self.ui_changed = False
         else:
