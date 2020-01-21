@@ -37,7 +37,9 @@ datas = []
 #datas += collect_data_files('scipy.signal')
 datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
 
-datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets')]
+# add images and configuration files
+datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
+            ('pyfda/libs/*.conf', 'pyfda/libs')]
 
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
