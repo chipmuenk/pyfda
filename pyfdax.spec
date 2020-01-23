@@ -96,7 +96,7 @@ a.binaries = a.binaries - TOC([
  ('Qt5Qml.dll', None, None),
  ('libQt5Qml.so.5', None, None),
  ('libQt5Quick.so.5', None, None),
- ('libstdc++.so.6', None, None),
+ #('libstdc++.so.6', None, None),
  ('libzmq.so.5', None, None),
  ('libsqlite3.so.0', None, None)
     ])
