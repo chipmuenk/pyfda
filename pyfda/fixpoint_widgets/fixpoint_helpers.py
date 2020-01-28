@@ -176,6 +176,10 @@ class UI_W(QWidget):
 
     'id'            : 'ui_w'                    # widget id
     'label'         : 'WI.WF'                   # widget text label
+    'visible'       : True                      # Is widget visible?
+    'enabled'       : True                      # Is widget enabled?
+
+    'fractional'    : True                      # Display WF, otherwise WF=0
     'lbl_sep'       : '.'                       # label between WI and WF field
     'max_led_width' : 30                        # max. length of lineedit field
     'WI'            : 0                         # number of frac. *bits*                
@@ -184,11 +188,14 @@ class UI_W(QWidget):
     'WF'            : 15                        # number of frac. *bits*
     'WF_len'        : 2                         # max. number of frac. *digits*
     'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
-    'enabled'       : True                      # Is widget enabled?
-    'visible'       : True                      # Is widget visible?
-    'fractional'    : True                      # Display WF, otherwise WF=0
+
+    
     'lock_visible'  : False                     # Pushbutton for locking visible
     'tip_lock'      : 'Lock input/output quant.'# Tooltip for  lock push button
+    
+    'combo_visible' : False                     # Enable integrated combo widget
+    'combo_items'   : ['auto', 'full', 'man']   # Combo selection
+    'tip_combo'     : 'Calculate Acc. width.'   # tooltip for combo
     """
     # incoming, 
     #sig_rx = pyqtSignal(object)
