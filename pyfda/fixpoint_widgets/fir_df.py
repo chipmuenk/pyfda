@@ -75,7 +75,6 @@ class FIR_DF_wdg(QWidget):
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]['fxqc']['QCB']['WI'],
                                         WF = fb.fil[0]['fxqc']['QCB']['WF'])
-        self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
 
         
 #        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
@@ -117,7 +116,7 @@ class FIR_DF_wdg(QWidget):
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         if 'ui' in dict_sig:
