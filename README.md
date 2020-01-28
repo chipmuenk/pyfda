@@ -39,10 +39,25 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 * Python versions: **3.3 ... 3.7**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
-  * **(Py)Qt5**
+  * **PyQt5**
   * **numpy**
   * **scipy**
   * **matplotlib**: **2.0** or higher
+  
+All required libraries are installed automatically by conda or pip if they are missing except for `PyQt5`: I have not included it in the installation scripts for `pyfda` to prevent installing it twice accidentally. `PyQt5` has to be installed manually *either* 
+
+- system wide via `pip install` **`pyqt5`** 
+
+- or sytem resp. environment wide via `conda install` **`pyqt`** . 
+
+If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
+
+    > conda list qt
+
+    pyqt                      5.6.0                    py36_2
+    PyQt5                     5.8.2                     <pip>
+    
+and get a similar result as above, you probably have a corrupted system. 
 
 ### Optional libraries:
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
@@ -60,7 +75,7 @@ or
     
     In [1]: %run -m pyfda.pyfdax # IPython
     
-Most individual files from pyFDA can be run using e.g.
+For testing purposes, most individual files from pyFDA can be run using e.g.
 
     > python -m pyfda.input_widgets.input_pz       # Plain python interpreter
 
@@ -73,15 +88,7 @@ However, installing pyfda makes life easier by creating a run script in your pat
 ### conda
 If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
 
-`PyQt5` is a requirement for pyfda but cannot easily / safely be installed via conda (if you know how to, please tell me). 
-It has to be installed manually *either* system wide via `pip install`**`pyqt5`** or sytem resp. environment wide via `conda install` **`pyqt`** . If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
-
-    > conda list qt
-
-    pyqt                      5.6.0                    py36_2
-    PyQt5                     5.8.2                     <pip>
-    
-and get a similar result as above, you probably have a corrupted system. When you have one of the two installed, you can proceed with
+When you have one of the two installed, you can proceed with
 
     > conda install -c Chipmuenk pyfda
 
