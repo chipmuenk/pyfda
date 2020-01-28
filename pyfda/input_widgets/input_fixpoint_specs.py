@@ -194,7 +194,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Intitialize the main GUI, consisting of:
             
-        - A combo box to select the filter topology with an image of the filter topology
+        - A combo box to select the filter topology and an image of the topology
         
         - The input quantizer
         
@@ -323,7 +323,6 @@ class Input_Fixpoint_Specs(QWidget):
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(frmHDL_wdg)
         splitter.addWidget(frmQoWdg)
-        #splitter.addWidget(self.lbl_fixp_img)
         splitter.addWidget(self.frmImg)
 
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
@@ -644,18 +643,7 @@ class Input_Fixpoint_Specs(QWidget):
             hdl_file_name = os.path.join(hdl_dir_name, 
                                 os.path.splitext(os.path.basename(hdl_file))[0]+ ".v")
 
-# =============================================================================
-#             # remove the suffix from the filename:
-# 
-#             if hdl_type == '.vhd':
-#                 hdl = 'VHDL'
-#             elif hdl_type == '.v':
-#                 hdl = 'Verilog'
-#             else:
-#                 logger.error('Unknown file extension "{0}", cancelling.'.format(hdl_type))
-#                 return
-# 
-# =============================================================================
+
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name)))
             try:
