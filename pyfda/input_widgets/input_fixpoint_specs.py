@@ -237,8 +237,7 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
-                                label='',
-                                lock_visible=True)
+                                id='w_input', label='', lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
         
         cmb_q = ['round','floor','fix']
