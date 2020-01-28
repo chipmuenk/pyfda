@@ -131,7 +131,7 @@ class FIR_DF_wdg(QWidget):
                 else:
                     return
 
-            dict_sig.update({'sender':__name__})
+            dict_sig.update({'sender':__name__}) # currently only local
 
         self.sig_tx.emit(dict_sig)
 
@@ -198,14 +198,14 @@ class FIR_DF_wdg(QWidget):
         fxqc_dict = fb.fil[0]['fxqc']
         if not 'QA' in fxqc_dict:
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
-            logger.warning("empty QA")
-            
+            logger.warning("QA key missing")
+
         if not 'QCB' in fxqc_dict:
             fxqc_dict.update({'QCB':{}}) # no coefficient settings in dict yet 
+            logger.warning("QCB key missing")
             
         self.wdg_w_coeffs.dict2ui(fxqc_dict['QCB']) # update coefficient wordlength
-
-        self.update_accu_settings()        
+        self.update_accu_settings()                 # update accumulator settings
 #------------------------------------------------------------------------------
     def ui2dict(self):
         """
