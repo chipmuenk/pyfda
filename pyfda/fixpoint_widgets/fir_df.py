@@ -76,7 +76,7 @@ class FIR_DF_wdg(QWidget):
                                         WI = fb.fil[0]['fxqc']['QCB']['WI'],
                                         WF = fb.fil[0]['fxqc']['QCB']['WF'])
         self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
-#        self.wdg_w_coeffs.setEnabled(False)
+
         
 #        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
 #                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'], 
@@ -86,15 +86,21 @@ class FIR_DF_wdg(QWidget):
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
                                label='', id='w_accu',
                                fractional=True, combo_visible=True)
-        self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
 
         self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], id='q_accu',
                                label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
-        self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
-        # initial setting for accumulator
+
+        # initial setting for accumulator        
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)        
         self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
         self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
+
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs & EVENTFILTERS
+        #----------------------------------------------------------------------      
+        self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
+        self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
+        self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
