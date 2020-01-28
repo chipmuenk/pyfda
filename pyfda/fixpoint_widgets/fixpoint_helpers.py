@@ -174,7 +174,8 @@ class UI_W(QWidget):
     The constructor accepts a dictionary for initial widget settings.
     The following keys are defined; default values are used for missing keys:
 
-    'label'         : 'WI.WF'                   # widget label
+    'id'            : 'ui_w'                    # widget id
+    'label'         : 'WI.WF'                   # widget text label
     'lbl_sep'       : '.'                       # label between WI and WF field
     'max_led_width' : 30                        # max. length of lineedit field
     'WI'            : 0                         # number of frac. *bits*                
@@ -207,7 +208,7 @@ class UI_W(QWidget):
         the default dict below """
 
         # default settings
-        dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
+        dict_ui = {'id':'ui_w', 'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True,
@@ -224,6 +225,8 @@ class UI_W(QWidget):
                 logger.warning("Unknown key {0}".format(k))
             else:
                 dict_ui.update({k:v})
+
+        self.id = dict_ui['id']
 
         if not dict_ui['fractional']:
             dict_ui['WF'] = 0
@@ -346,7 +349,7 @@ class UI_W(QWidget):
         q_icon_size = self.butLock.iconSize() # <- uncomment this for manual sizing
         self.butLock.setIconSize(q_icon_size)
 
-        dict_sig = {'sender':__name__, 'ui':'butLock'}
+        dict_sig = {'sender':__name__, 'id':self.id, 'ui':'butLock'}
         self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
@@ -369,7 +372,7 @@ class UI_W(QWidget):
         if self.sender():
             name = self.sender().objectName()
             logger.debug("sender: {0}".format(name))
-            dict_sig = {'sender':__name__, 'ui':name}
+            dict_sig = {'sender':__name__, 'id':self.id, 'ui':name}
             self.sig_tx.emit(dict_sig)
         elif s=='init':
             logger.debug("called by __init__")
@@ -413,10 +416,21 @@ class UI_Q(QWidget):
     
     The following keys are defined; default values are used for missing keys:
 
-    'label_q'  : 'Quant.'                           # widget label
-    'tip_q'    : 'Select the kind of quantization.' # Mouse-over tooltip
-    'enabled'  : True                               # Is widget enabled?
-    'visible'  : True                               # Is widget visible?
+    'id'        : 'ui_q'                            # widget id
+    'label'     : ''                                # widget text label
+    
+    'label_q'   : 'Quant.'                          # subwidget text label
+    'tip_q'     : 'Select kind of quantization.'    # Mouse-over tooltip
+    'cmb_q'     : [round', 'fix', 'floor']          # combo-box choices
+    'cur_q'     : 'round'                           # initial / current setting
+ 
+    'label_ov'  : 'Ovfl.'                           # subwidget text label
+    'tip_ov'    : 'Select overflow behaviour.'      # Mouse-over tooltip
+    'cmb_ov'    : ['wrap', 'sat']                   # combo-box choices
+    'cur_ov'    : 'wrap'                            # initial / current setting
+
+    'enabled'   : True                              # Is widget enabled?
+    'visible'   : True                              # Is widget visible?
     """
     # incoming, 
     #sig_rx = pyqtSignal(object)
@@ -431,7 +445,7 @@ class UI_Q(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
 
-        dict_ui = {'label':'',
+        dict_ui = {'id':'ui_q', 'label':'',
                    'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
@@ -447,7 +461,9 @@ class UI_Q(QWidget):
         for key, val in kwargs.items():
             dict_ui.update({key:val})
         # dict_ui.update(map(kwargs)) # same as above?
-
+            
+        self.id = dict_ui['id']
+        
         lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
         self.cmbQuant.addItems(dict_ui['cmb_q'])
@@ -516,7 +532,7 @@ class UI_Q(QWidget):
         
         if self.sender():
             name = self.sender().objectName()
-            dict_sig = {'sender':__name__, 'ui':name}
+            dict_sig = {'sender':__name__, 'id':self.id, 'ui':name}
             self.sig_tx.emit(dict_sig)
 
     #--------------------------------------------------------------------------
