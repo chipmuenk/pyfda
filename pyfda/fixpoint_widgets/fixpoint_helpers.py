@@ -301,11 +301,11 @@ class UI_W(QWidget):
         #----------------------------------------------------------------------
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
-        self.butLock.clicked.connect(self.but_clicked)
+        self.butLock.clicked.connect(self.butLock_clicked)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
         # initialize button icon        
-        self.but_clicked(self.butLock.isChecked())
+        self.butLock_clicked(self.butLock.isChecked())
 
     def quant_coeffs(self, q_dict, coeffs):
         """
@@ -337,7 +337,7 @@ class UI_W(QWidget):
         return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
 
     #--------------------------------------------------------------------------
-    def but_clicked(self, clicked):
+    def butLock_clicked(self, clicked):
         """ 
         Update the icon of the push button depending on its state
         """
