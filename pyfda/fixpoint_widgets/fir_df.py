@@ -119,8 +119,19 @@ class FIR_DF_wdg(QWidget):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
+        # if not, just pass the dict 
         if 'ui' in dict_sig:
-            if dict_sig['ui'] == 'cmbW':
+            if dict_sig['id'] == 'w_coeff': # coefficient format updated
+                """
+                Update coefficient quantization settings and coefficients.
+        
+                The new values are written to the fixpoint coefficient dict as
+                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
+                """  
+
+                fb.fil[0]['fxqc'].update(self.ui2dict())
+                
+            elif dict_sig['ui'] == 'cmbW':
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
