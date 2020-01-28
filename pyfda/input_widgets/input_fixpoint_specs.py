@@ -202,22 +202,22 @@ class Input_Fixpoint_Specs(QWidget):
         
         - Simulation and export buttons
         """
-        self.cmb_wdg_fixp = QComboBox(self)
-        self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-                
 #------------------------------------------------------------------------------        
         # Define frame and layout for the dynamically updated filter widget
         # The actual filter widget is instantiated in self.set_fixp_widget() later on
        
-        self.layHWdg = QHBoxLayout()
-        #self.layHWdg.setContentsMargins(*params['wdg_margins'])
+        self.layH_fx_wdg = QHBoxLayout()
+        #self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
         frmHDL_wdg = QFrame(self)
-        frmHDL_wdg.setLayout(self.layHWdg)
+        frmHDL_wdg.setLayout(self.layH_fx_wdg)
         #frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 #------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
 #------------------------------------------------------------------------------
+        self.cmb_wdg_fixp = QComboBox(self)
+        self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
         self.lblTitle = QLabel("not set", self)
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -258,13 +258,13 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
         # Layout and frame for input quantization 
-        layVQioWdg = QVBoxLayout()
-        layVQioWdg.addWidget(self.wdg_q_input)
-        layVQioWdg.addWidget(self.wdg_w_input)
-        frmQioWdg = QFrame(self)
+        layVQiWdg = QVBoxLayout()
+        layVQiWdg.addWidget(self.wdg_q_input)
+        layVQiWdg.addWidget(self.wdg_w_input)
+        frmQiWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQioWdg.setLayout(layVQioWdg)
-        frmQioWdg.setContentsMargins(*params['wdg_margins'])
+        frmQiWdg.setLayout(layVQiWdg)
+        frmQiWdg.setContentsMargins(*params['wdg_margins'])
         
         # Layout and frame for output quantization
         layVQoWdg = QVBoxLayout()        
@@ -333,7 +333,7 @@ class Input_Fixpoint_Specs(QWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)        
-        layVMain.addWidget(frmQioWdg)
+        layVMain.addWidget(frmQiWdg)
         layVMain.addWidget(splitter)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
@@ -497,7 +497,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None: # is a fixpoint widget loaded?
                 try:
-                    self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
+                    self.layH_fx_wdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
                     self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
                 except AttributeError as e:
                     logger.error("Destructing UI failed!\n{0}".format(e))
@@ -506,6 +506,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.butSimFxPy.setVisible(False)
             self.butSimHDL.setEnabled(False)
             self.butExportHDL.setEnabled(False)
+            #self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.lblTitle.setText("")
 
@@ -525,12 +526,12 @@ class Input_Fixpoint_Specs(QWidget):
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the fixpoint widget
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
-
+            self.layH_fx_wdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+            self.fx_wdg_inst.setVisible(True)
 # Doesn't work at the moment, combo box becomes inaccessible        
 #            try:
 #                self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
-#                self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+#                self.layH_fx_wdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
 #            except KeyError as e:
 #                logger.warning('Key Error {0} in fixpoint filter \n{1}'\
 #                               .format(e, fx_mod_name + "." + cmb_wdg_fx_cur))
