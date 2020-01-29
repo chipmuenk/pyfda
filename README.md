@@ -48,7 +48,7 @@ All required libraries are installed automatically by conda or pip if they are m
 
 - system wide via `pip install` **`pyqt5`** 
 
-- or sytem resp. environment wide via `conda install` **`pyqt`** . 
+- sytem wide / in an environment via `conda install` **`pyqt`** . 
 
 If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
 
@@ -92,7 +92,7 @@ When you have one of the two installed, you can proceed with
 
     > conda install -c Chipmuenk pyfda
 
-resp.
+or
     
     > conda update  -c Chipmuenk pyfda
 
