@@ -458,6 +458,7 @@ class Input_Coeffs(QWidget):
         #------------------------------------------------------------------------------
     def _set_scale(self):
         """
+        Triggered by `ui.ledScale`
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
@@ -652,6 +653,8 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def _set_number_format(self):
         """
+        Triggered by `contruct_UI()`, `qdict2ui()`and by `ui.cmbQFrmt.currentIndexChanged()`
+        
         Set one of three number formats: Integer, fractional, normalized fractional
         (triggered by self.ui.cmbQFrmt combobox)
         """
@@ -692,6 +695,9 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def qdict2ui(self):
         """
+        Triggered by:
+        - process_sig_rx()  if self.fx_specs_changed or dict_sig['fx_sim'] == 'specs_changed'
+        - 
         Set the UI from the quantization dict and update the fixpoint object.
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
@@ -714,6 +720,12 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def ui2qdict(self):
         """
+        Triggered by modifying 
+        `ui.cmbFormat`, `ui.cmbQOvfl`, `ui.cmbQuant`, `ui.ledWF`, `ui.ledWI`
+        or `ui.ledW` (via `_W_changed()`)
+        or `ui.cmbQFrmt` (via `_set_number_format()`)
+        or `ui.ledScale()` (via `_set_scale()`)
+        
         Read out the settings of the quantization comboboxes.
 
         - Store them in the filter dict `fb.fil[0]['fxqc']['QCB']` and as class
