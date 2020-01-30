@@ -311,6 +311,7 @@ class Input_Coeffs(QWidget):
                 self.ui_changed = False 
             if self.fx_specs_changed or ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
                 self.qdict2ui()
+                self.fx_specs_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view 
             if 'data_changed' in dict_sig:
