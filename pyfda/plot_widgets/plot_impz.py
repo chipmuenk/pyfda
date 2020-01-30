@@ -169,7 +169,7 @@ class Plot_Impz(QWidget):
         All signals terminate here unless the flag `propagate=True`.
         """
 
-        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
+        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:

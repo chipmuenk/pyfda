@@ -128,10 +128,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.debug("SIG_RX - vis: {0} | prop: {1}\n{2}"\
+        logger.info("process_sig_rx(): vis={0} | prop={1}\n{2}"\
                     .format(self.isVisible(), propagate, pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite loop detected")
+            logger.warning("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
         elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here

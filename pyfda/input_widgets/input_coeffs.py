@@ -56,6 +56,11 @@ class ItemDelegate(QStyledItemDelegate):
     - `setEditorData()` pass data with full precision and in selected format to editor
 
     - `setModelData()` pass edited data back to model (`self.ba`)
+    
+    Editing the table triggers `setModelData()` but does not emit a signal outside
+    this class, only the `ui.butSave` button is highlighted. When it is pressed, 
+    a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
+    Additionally, a signal is emitted with `'view_changed':'q_coeff'` by `ui2qdict()`?!
 
 
     """
@@ -291,10 +296,11 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("process_sig_rx(): vis={0}\n{1}"\
+                    .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite Loop!")
+            logger.warning("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
         if self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:
