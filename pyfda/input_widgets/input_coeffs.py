@@ -725,7 +725,7 @@ class Input_Coeffs(QWidget):
         """
         fb.fil[0]['fxqc']['QCB'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
-                'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
+                'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='poszero'),
                 'W':safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos'),
                 'quant':qstr(self.ui.cmbQuant.currentText()),
                 'ovfl':qstr(self.ui.cmbQOvfl.currentText()),
