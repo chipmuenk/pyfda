@@ -154,13 +154,15 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None, propagate=False):
         """
-        Process signals coming from the navigation toolbar, local widgets and
-        collected from input_tab_widgets
+        Process signals coming from 
+        - the navigation toolbars (time and freq.)
+        - local widgets (impz_ui) and
+        - plot_tab_widgets() (global signals)
 
         All signals terminate here unless the flag `propagate=True`.
         """
 
-        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
+        logger.info("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
@@ -171,6 +173,7 @@ class Plot_Impz(QWidget):
         
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
+            return # probably not needed
 
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
@@ -197,7 +200,7 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
-                    self.fx_run(phase='set_stimuli')
+                    self.fx_run(phase='set_stimulus')
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -274,15 +277,18 @@ class Plot_Impz(QWidget):
 
     def impz(self, arg=None):
         """
-        Calculate response and redraw it automatically if checkbox "Auto Run"
-        is selected or if called directly by pressing the "Run" button. In the
-        latter case, the signal-slot connection passes the state of button (?)
-        as a boolean.
-
+        Triggered by:
+            - construct_UI()  [Initialization]
+            - Pressing "Run" button, passing button state as a boolean
+            - Activating "Autorun" via `self.calc_auto()`
+            - 'fx_sim' : 'specs_changed' 
+            - 
+        Calculate response and redraw it.
+        
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
-        if type(arg) == bool:
+        if type(arg) == bool: # but_run has been pressed
             self.needs_calc = True # force recalculation when but_run is pressed
         elif not self.ui.chk_auto_run.isChecked():
             return
@@ -316,8 +322,7 @@ class Plot_Impz(QWidget):
     def fx_select(self, fx=None):
         """
         Select between fixpoint and floating point simulation.
-
-        parameter `fx` can be:
+        Parameter `fx` can be:
 
         - str "Fixpoint" or "Float" when called directly
 
@@ -327,6 +332,11 @@ class Plot_Impz(QWidget):
         In both cases, the index of the combobox is updated according to the
         passed argument. If the index has been changed since last time,
         `self.needs_calc` is set to True and the run button is set to "changed".
+        
+        When fixpoint simulation is selected, all corresponding widgets are made
+        visible. `self.fx_sim` is set to True.
+        
+        If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
         logger.debug("start fx_select")
 
@@ -363,7 +373,10 @@ class Plot_Impz(QWidget):
         """
         if self.needs_calc:
             self.needs_redraw = [True] * 2
-            if phase == 'set_stimuli':
+            if phase == 'set_stimulus':
+                # calculate stimuli, quantize them according to the settings of
+                # the input quantization widget, scale them as integer attach them 
+                # to dict_sig and emit 'set_stimulus'
                 self.calc_stimulus()
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
@@ -380,7 +393,7 @@ class Plot_Impz(QWidget):
 
                     self.draw()
                     qstyle_widget(self.ui.but_run, "normal")
-                    logger.error("send FINISH (fx_run")
+                    logger.error("send FINISH (fx_run)")
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
             else:
                 logger.error("Unknown argument {0} for fx_run phase".format(phase))
