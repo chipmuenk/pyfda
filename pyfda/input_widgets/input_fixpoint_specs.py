@@ -81,39 +81,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.state = "deactivated" # "invisible", "disabled"
 
 #------------------------------------------------------------------------------
-    def process_sig_rx_w_i(self, dict_sig=None):
-        """
-        Input fixpoint format has been changed. When I/O lock is active, copy
-        input fixpoint word format to output word format.
-        
-        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
-        for signal propagation.
-        """
-        if self.wdg_w_input.butLock.isChecked():
-            fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
-            fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
-            fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
-
-        self.process_sig_rx(dict_sig, propagate=True)
-
-#------------------------------------------------------------------------------
-    def process_sig_rx_w_o(self, dict_sig=None):
-        """
-        Output fixpoint format has been changed. When I/O lock is active, copy
-        output fixpoint word format to input word format.
-        
-        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
-        for signal propagation.
-        """
-        if self.wdg_w_input.butLock.isChecked():
-            fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
-            fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
-            fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
-
-        self.process_sig_rx(dict_sig, propagate=True)
-
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None, propagate=False):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
 		
@@ -128,19 +96,19 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.info("process_sig_rx(): vis={0} | prop={1}\n{2}"\
-                    .format(self.isVisible(), propagate, pprint_log(dict_sig)))
+        logger.info("process_sig_rx(): vis={0}\n{1}"\
+                    .format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
         elif 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
+            return
         elif 'data_changed' in dict_sig or\
             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
-            # been changed. Also set RUN button to "changed" in wdg_dict2ui() and 
-            # enable propagate so that 
+            # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
             #self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
         elif 'fx_sim' in dict_sig:
@@ -165,27 +133,48 @@ class Input_Fixpoint_Specs(QWidget):
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
         # ---- Process local widget signals 
         elif 'ui' in dict_sig:
-            if dict_sig['ui'] == 'butLock':
-                if self.wdg_w_input.butLock.isChecked():
+            if 'id' in dict_sig and dict_sig['id'] == 'w_input':
+                """
+                Input fixpoint format has been changed or butLock has been clicked.
+                When I/O lock is active, copy input fixpoint word format to output 
+                word format.
+                """
+                if dict_sig['ui'] == 'butLock' and not self.wdg_w_input.butLock.isChecked():
+                     # butLock was deactivitated, don't do anything
+                    return 
+                elif self.wdg_w_input.butLock.isChecked():
+                    # but lock was activated or wordlength setting have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
-                else:
-                    return
-            elif dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW'}:
-                pass
+                     
+            elif 'id' in dict_sig and dict_sig['id'] == 'w_output':
+                """
+                Output fixpoint format has been changed. When I/O lock is active, copy
+                output fixpoint word format to input word format.
+                
+                Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
+                for signal propagation.
+                """
+                if self.wdg_w_input.butLock.isChecked():
+                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
+                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                    fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
+ 
+            elif 'id' in dict_sig and dict_sig['id'] == 'w_coeff':
+                pass # nothing to do for now
+
             else:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-            self.wdg_dict2ui()
+                if not "id" in dict_sig:
+                    logger.warning("No id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
+                else:
+                    logger.warning("Unknown id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
+                    
+            if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+               logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+            self.wdg_dict2ui() # update wordlengths in UI and set RUN button to 'changed'
             self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
 
-        if propagate:
-            # signals of local subwidgets are propagated,
-            # global signals terminate here.
-            # The next event in the queue is only handled when control returns
-            # from this one
-            #dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
             return
 
 #------------------------------------------------------------------------------
@@ -238,13 +227,14 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 id='w_input', label='', lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
+        self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
         
         cmb_q = ['round','floor','fix']
 
         self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'], id='w_output', 
                                  label='')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
+        self.wdg_w_output.sig_tx.connect(self.process_sig_rx)
+
         self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'], id='q_output',
                                  label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
                                  cmb_q=cmb_q, cmb_ov=['wrap','sat'])
