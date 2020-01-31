@@ -152,9 +152,6 @@ class Input_Fixpoint_Specs(QWidget):
                 """
                 Output fixpoint format has been changed. When I/O lock is active, copy
                 output fixpoint word format to input word format.
-                
-                Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
-                for signal propagation.
                 """
                 if self.wdg_w_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
