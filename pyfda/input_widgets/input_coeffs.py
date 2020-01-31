@@ -300,7 +300,7 @@ class Input_Coeffs(QWidget):
                     .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
         if self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:

@@ -173,7 +173,7 @@ class Plot_Impz(QWidget):
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         self.error = False
@@ -324,6 +324,7 @@ class Plot_Impz(QWidget):
 
         qstyle_widget(self.ui.but_run, "normal")
         if self.fx_sim:
+            logger.error("send FINISH (impz)")
             self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 # =============================================================================
@@ -395,6 +396,7 @@ class Plot_Impz(QWidget):
 
                     self.draw()
                     qstyle_widget(self.ui.but_run, "normal")
+                    logger.error("send FINISH (fx_run")
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
             else:
                 logger.error("Unknown argument {0} for fx_run phase".format(phase))
