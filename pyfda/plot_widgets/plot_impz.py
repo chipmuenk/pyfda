@@ -223,7 +223,7 @@ class Plot_Impz(QWidget):
 
         elif self.isVisible(): # all signals except 'fx_sim'
             if 'view_changed' in dict_sig:
-                self.impz()
+                self.draw()
 
             elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
 
