@@ -188,12 +188,9 @@ class Plot_Impz(QWidget):
                 """
                 - Select Fixpoint mode
 
-                - Start fixpoint simulation using `self.fx_run()` where the stimulus
-                  is calculated, quantized and passed to dict_sig with `'fx_sim':'set_stimulus'`
-                  and `'fx_stimulus':<quantized stimulus>`. Stimuli are scaled with the input
+                - Calculate stimuli, quantize and pass to dict_sig with `'fx_sim':'send_stimulus'`
+                  and `'fx_stimulus':<quantized stimulus array>`. Stimuli are scaled with the input
                   fractional word length, i.e. with 2**WF (input) to obtain integer values
-
-                # TODO: correct?
                   """
                 self.needs_calc = True # always require recalculation when triggered externally
                 self.error = False
@@ -217,10 +214,10 @@ class Plot_Impz(QWidget):
                 return
 
             elif not dict_sig['fx_sim']:
-                logger.error('Missing option for "fx_sim".')
+                logger.error('Missing value for key "fx_sim".')
 
             else:
-                logger.error('Unknown "fx_sim" command option "{0}"\n'\
+                logger.error('Unknown value "{0}" for "fx_sim" key\n'\
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
                                                dict_sig['sender']))
 

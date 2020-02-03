@@ -725,6 +725,7 @@ class Input_Coeffs(QWidget):
         or `ui.ledW` (via `_W_changed()`)
         or `ui.cmbQFrmt` (via `_set_number_format()`)
         or `ui.ledScale()` (via `_set_scale()`)
+        or 'qdict2ui()' via `_set_number_format()`
         
         Read out the settings of the quantization comboboxes.
 

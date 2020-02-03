@@ -89,7 +89,7 @@ class Input_Fixpoint_Specs(QWidget):
         
 		2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
-		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
+		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'send_stimulus'
 			and pass it to HDL object for simulation
 		   
 		4. Send back HDL response to widget via 'fx_sim':'set_response'
@@ -691,7 +691,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.sig_tx.emit(dict_sig)
                         
         except  ValueError as e: # exception
-            logger.error('Fixpoint stimulus generation failed for dict\n{0}'
+            logger.error('Fixpoint stimulus generation failed during "init" for dict\n{0}'
                            '\nwith "{1} "'.format(pprint_log(dict_sig), e))
         return
 
@@ -715,7 +715,7 @@ class Input_Fixpoint_Specs(QWidget):
                             ))
 
             # Run fixpoint simulation and return the results as integer values:
-            self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])         # Run the simulation
+            self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])  # Run the simulation
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
