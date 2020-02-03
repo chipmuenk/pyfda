@@ -96,7 +96,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         """
 		
-        logger.info("process_sig_rx(): vis={0}\n{1}"\
+        logger.debug("process_sig_rx(): vis={0}\n{1}"\
                     .format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
             logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
@@ -778,9 +778,6 @@ class Input_Fixpoint_Specs(QWidget):
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
         qstyle_widget(self.butSimHDL, "normal")
-        
-        logger.debug("Fixpoint plotting finished")        
-            
         return
 
 ###############################################################################
