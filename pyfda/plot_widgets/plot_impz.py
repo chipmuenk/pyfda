@@ -193,11 +193,12 @@ class Plot_Impz(QWidget):
                   fractional word length, i.e. with 2**WF (input) to obtain integer values
                   """
                 self.needs_calc = True # always require recalculation when triggered externally
+                self.needs_redraw = [True] * 2
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
-                    self.fx_run(phase='set_stimulus')
+                    self.calc_stimulus()
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -205,7 +206,7 @@ class Plot_Impz(QWidget):
                   routine
                 """
                 logger.info("Received fixpoint results.")
-                self.fx_run('set_results', dict_sig=dict_sig)
+                self.impz_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -292,11 +293,12 @@ class Plot_Impz(QWidget):
 
         if self.needs_calc:
             logger.debug("Calc impz started!")
-            self.calc_stimulus()
             if self.fx_sim:
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
-            else:
-                self.calc_response()
+                return
+
+            self.calc_stimulus()
+            self.calc_response()
 
             if self.error:
                 return
@@ -364,36 +366,24 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
 
-    def fx_run(self, phase, dict_sig=None):
+    def impz_fx(self, dict_sig=None):
         """
         Run the fixpoint simulation
         """
         if self.needs_calc:
             self.needs_redraw = [True] * 2
-            if phase == 'set_stimulus':
-                # calculate stimuli, quantize them according to the settings of
-                # the input quantization widget, scale them as integer attach them 
-                # to dict_sig and emit 'set_stimulus'
-                self.calc_stimulus()
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
-                    'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-                logger.debug("fx stimulus sent")
-                return
-            elif phase == 'set_results':
-                self.y = np.asarray(dict_sig['fx_results'])
-                if self.y is None:
-                    qstyle_widget(self.ui.but_run, "error")
-                    self.needs_calc = True
-                else:
-                    self.calc_response()
-                    self.needs_calc = False
-
-                    self.draw()
-                    qstyle_widget(self.ui.but_run, "normal")
-                    logger.error("send FINISH (fx_run)")
-                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
+            self.y = np.asarray(dict_sig['fx_results'])
+            if self.y is None:
+                qstyle_widget(self.ui.but_run, "error")
+                self.needs_calc = True
             else:
-                logger.error("Unknown argument {0} for fx_run phase".format(phase))
+                self.calc_response()
+                self.needs_calc = False
+
+                self.draw()
+                qstyle_widget(self.ui.but_run, "normal")
+                logger.error("send FINISH (impz_fx)")
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
