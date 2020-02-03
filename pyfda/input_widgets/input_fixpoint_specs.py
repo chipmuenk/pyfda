@@ -120,7 +120,7 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimHDL, "error")  
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
                     
-            elif dict_sig['fx_sim'] == 'set_stimulus':
+            elif dict_sig['fx_sim'] == 'send_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui

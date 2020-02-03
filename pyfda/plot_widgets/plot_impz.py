@@ -507,6 +507,10 @@ class Plot_Impz(QWidget):
             self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
             self.x_q = self.q_i.fixp(self.x)
 
+            self.sig_tx.emit({'sender':__name__, 'fx_sim':'send_stimulus',
+                    'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+            logger.debug("fx stimulus sent")
+
         self.needs_redraw[:] = [True] * 2
 
 #------------------------------------------------------------------------------
