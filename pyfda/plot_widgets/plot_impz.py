@@ -293,7 +293,7 @@ class Plot_Impz(QWidget):
 
         if self.needs_calc:
             logger.debug("Calc impz started!")
-            if self.fx_sim:
+            if self.fx_sim: # start a fixpoint simulation
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
                 return
 
@@ -312,9 +312,6 @@ class Plot_Impz(QWidget):
             self.needs_redraw[self.tabWidget.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
-        if self.fx_sim:
-            logger.error("send FINISH (impz)")
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 # =============================================================================
 
