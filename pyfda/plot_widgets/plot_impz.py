@@ -205,8 +205,8 @@ class Plot_Impz(QWidget):
                 - Convert simulation results to integer and transfer them to the plotting
                   routine
                 """
-                logger.info("Received fixpoint results.")
-                self.calc_response_fx(dict_sig=dict_sig)
+                logger.debug("Received fixpoint results.")
+                self.draw_response_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -524,7 +524,7 @@ class Plot_Impz(QWidget):
             self.y_i = None
 
 #------------------------------------------------------------------------------            
-    def calc_response_fx(self, dict_sig=None):
+    def draw_response_fx(self, dict_sig=None):
         """
         Get Fixpoint results and plot them
         """
