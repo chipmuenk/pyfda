@@ -720,8 +720,18 @@ class Input_Fixpoint_Specs(QWidget):
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
-                logger.debug("fx_results: {0}"\
-                            .format(pprint_log(self.fx_results, tab= " ")))
+                #logger.debug("fx_results: {0}"\
+                #            .format(pprint_log(self.fx_results, tab= " ")))
+                logger.debug('Fixpoint simulation successful for dict\n{0}'
+                         '\tStimuli: Shape {1} of type "{2}"'
+                         '\n\tResponse: Shape {3} of type "{4}"'\
+                           .format(pprint_log(dict_sig),
+                                   np.shape(dict_sig['fx_stimulus']),
+                                   dict_sig['fx_stimulus'].dtype,
+                                   np.shape(self.fx_results),
+                                   type(self.fx_results)
+                                    ))
+
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
