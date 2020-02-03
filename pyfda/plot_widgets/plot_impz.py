@@ -206,7 +206,7 @@ class Plot_Impz(QWidget):
                   routine
                 """
                 logger.info("Received fixpoint results.")
-                self.impz_fx(dict_sig=dict_sig)
+                self.calc_response_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -227,9 +227,7 @@ class Plot_Impz(QWidget):
                 self.draw()
 
             elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
-
                 self.ui.update_N(dict_sig)
-
                 self.needs_calc = True
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz()
@@ -362,26 +360,6 @@ class Plot_Impz(QWidget):
 
         self.fx_sim_old = self.fx_sim
 
-
-    def impz_fx(self, dict_sig=None):
-        """
-        Run the fixpoint simulation
-        """
-        if self.needs_calc:
-            self.needs_redraw = [True] * 2
-            self.y = np.asarray(dict_sig['fx_results'])
-            if self.y is None:
-                qstyle_widget(self.ui.but_run, "error")
-                self.needs_calc = True
-            else:
-                self.calc_response()
-                self.needs_calc = False
-
-                self.draw()
-                qstyle_widget(self.ui.but_run, "normal")
-                logger.error("send FINISH (impz_fx)")
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
-
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
@@ -503,41 +481,36 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_response(self):
         """
-        (Re-)calculate filter response `self.y` from stimulus `self.x`.
-        
-        When "fixpoint" is selected, results from fixpoint simulation have been
-        stored in `self.y` already and are used instead.
-        .
+        (Re-)calculate float filter response `self.y` from stimulus `self.x`.
 
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        if not self.fx_sim:
-            # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
-            self.bb = np.asarray(fb.fil[0]['ba'][0])
-            self.aa = np.asarray(fb.fil[0]['ba'][1])
-            if min(len(self.aa), len(self.bb)) < 2:
-                logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-                return
+        # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
+        self.bb = np.asarray(fb.fil[0]['ba'][0])
+        self.aa = np.asarray(fb.fil[0]['ba'][1])
+        if min(len(self.aa), len(self.bb)) < 2:
+            logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+            return
 
-            logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
+        logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
 
-            sos = np.asarray(fb.fil[0]['sos'])
-            antiCausal = 'zpkA' in fb.fil[0]
-            causal     = not antiCausal
+        sos = np.asarray(fb.fil[0]['sos'])
+        antiCausal = 'zpkA' in fb.fil[0]
+        causal     = not antiCausal
 
-            if len(sos) > 0 and causal: # has second order sections and is causal
-                y = sig.sosfilt(sos, self.x)
-            elif antiCausal:
-                y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
-            else: # no second order sections or antiCausals for current filter
-                y = sig.lfilter(self.bb, self.aa, self.x)
+        if len(sos) > 0 and causal: # has second order sections and is causal
+            y = sig.sosfilt(sos, self.x)
+        elif antiCausal:
+            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
+        else: # no second order sections or antiCausals for current filter
+            y = sig.lfilter(self.bb, self.aa, self.x)
 
-            if self.ui.stim == "StepErr":
-                dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
-                y = y - abs(dc[1]) # subtract DC (final) value from response
+        if self.ui.stim == "StepErr":
+            dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
+            y = y - abs(dc[1]) # subtract DC (final) value from response
 
-            self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
+        self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 
         self.needs_redraw[:] = [True] * 2
 
@@ -549,6 +522,28 @@ class Plot_Impz(QWidget):
         else:
             self.y_r = self.y
             self.y_i = None
+
+#------------------------------------------------------------------------------            
+    def calc_response_fx(self, dict_sig=None):
+        """
+        Get Fixpoint results and plot them
+        """
+        if self.needs_calc:
+            self.needs_redraw = [True] * 2
+            self.y = np.asarray(dict_sig['fx_results'])
+            if self.y is None:
+                qstyle_widget(self.ui.but_run, "error")
+                self.needs_calc = True
+            else:
+                self.needs_calc = False
+                self.y_r = self.y
+                self.y_i = None
+                self.cmplx = False
+
+                self.draw()
+                qstyle_widget(self.ui.but_run, "normal")
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
+
 
 #------------------------------------------------------------------------------
     def calc_fft(self):
