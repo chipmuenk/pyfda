@@ -10,7 +10,7 @@
 Widget for simulating fixpoint filters and generating Verilog Code
 
 """
-import sys, os, io, importlib
+import sys, os, io, importlib, time
 import logging
 logger = logging.getLogger(__name__)
 
@@ -127,7 +127,9 @@ class Input_Fixpoint_Specs(QWidget):
                 # and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
-                qstyle_widget(self.butSimHDL, "normal") 
+                qstyle_widget(self.butSimHDL, "normal")
+                logger.info('Fixpoint simulation [{0:5.3g} ms]: Plotting finished'\
+                            .format((time.process_time() - self.t_resp)*1000))
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
@@ -685,7 +687,8 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         try:
-            logger.info("Started HDL fixpoint simulation")
+            logger.info("Fixpoint simulation started")
+            self.t_start = time.process_time()
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
 
@@ -715,9 +718,13 @@ class Input_Fixpoint_Specs(QWidget):
                             np.shape(dict_sig['fx_stimulus']),
                             dict_sig['fx_stimulus'].dtype,
                             ))
+            self.t_stim = time.process_time()
+            logger.info("Fixpoint simulation [{0:5.3g} ms]: Stimuli generated"\
+                        .format((self.t_stim-self.t_start)*1000))
 
             # Run fixpoint simulation and return the results as integer values:
             self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])  # Run the simulation
+            self.t_resp = time.process_time()
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
@@ -733,6 +740,8 @@ class Input_Fixpoint_Specs(QWidget):
                                    np.shape(self.fx_results),
                                    type(self.fx_results)
                                     ))
+                logger.info('Fixpoint simulation [{0:5.3g} ms]: Response calculated'\
+                            .format((self.t_resp - self.t_stim)*1000))
 
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation

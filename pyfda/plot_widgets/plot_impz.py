@@ -12,6 +12,7 @@ Widget for plotting impulse and general transient responses
 import logging
 logger = logging.getLogger(__name__)
 
+import time
 from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
@@ -530,6 +531,7 @@ class Plot_Impz(QWidget):
         """
         if self.needs_calc:
             self.needs_redraw = [True] * 2
+            t_draw_start = time.process_time()
             self.y = np.asarray(dict_sig['fx_results'])
             if self.y is None:
                 qstyle_widget(self.ui.but_run, "error")
@@ -542,6 +544,7 @@ class Plot_Impz(QWidget):
 
                 self.draw()
                 qstyle_widget(self.ui.but_run, "normal")
+                
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 
