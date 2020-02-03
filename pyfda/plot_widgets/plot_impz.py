@@ -501,15 +501,17 @@ class Plot_Impz(QWidget):
         self.needs_redraw[:] = [True] * 2
 
 #------------------------------------------------------------------------------
-    def calc_response(self, y_fx=None):
+    def calc_response(self):
         """
-        (Re-)calculate filter response `self.y` from either stimulus `self.x`
-        or from the passed array (e.g. fixpoint response).
+        (Re-)calculate filter response `self.y` from stimulus `self.x`.
+        
+        When "fixpoint" is selected, results from fixpoint simulation have been
+        stored in `self.y` already and are used instead.
+        .
 
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        # for fixpoint simulations, results from fixpoint simulation are used instead:
         if not self.fx_sim:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
             self.bb = np.asarray(fb.fil[0]['ba'][0])
