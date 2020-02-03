@@ -158,14 +158,16 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
                     fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
  
-            elif 'id' in dict_sig and dict_sig['id'] == 'w_coeff':
+            elif 'id' in dict_sig and dict_sig['id'] in \
+                {'w_coeff', 'q_input', 'q_output', 'w_accu', 'q_accu'}:
                 pass # nothing to do for now
 
             else:
                 if not "id" in dict_sig:
                     logger.warning("No id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
                 else:
-                    logger.warning("Unknown id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
+                    logger.warning('Unknown id "{0}" in dict_sig:\n{1}'\
+                                   .format(dict_sig['id'], pprint_log(dict_sig)))
                     
             if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
