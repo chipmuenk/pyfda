@@ -106,29 +106,8 @@ class Plot_FFT_win(QDialog):
 
         else:
             logger.error("Unknown content of dict_sig: {0}".format(dict_sig))
-                
-            
-        # if self.isVisible():
-        #     if 'data_changed' in dict_sig or 'home' in dict_sig\
-        #         or 'filt_changed' in dict_sig or self.needs_calc:
-        #         self.draw()
-        #         self.needs_calc = False
-        #         self.needs_draw = False
-        #     elif 'view_changed' in dict_sig or self.needs_draw:
-        #         self.update_view()
-        #         self.needs_draw = False
-        #     elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
-        #         or self.needs_redraw:
-        #         self.redraw()
-        #         self.needs_redraw = False
-        # else:
-        #     if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
-        #         self.needs_calc = True
-        #     elif 'view_changed' in dict_sig:
-        #         self.needs_draw = True
-        #     elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-        #         self.needs_redraw = True
 
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
