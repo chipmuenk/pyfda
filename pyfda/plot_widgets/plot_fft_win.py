@@ -18,7 +18,7 @@ from scipy.signal import argrelextrema
 
 import matplotlib.patches as mpl_patches
 
-from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import calc_window_function
@@ -86,8 +86,8 @@ class Plot_FFT_win(QDialog):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.info("Processing {0} | visible = {1}"\
-                     .format(dict_sig, self.isVisible()))
+        logger.info("PROCESS_SIG_RX - vis: {0}\n{1}"\
+                     .format(self.isVisible(), pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
