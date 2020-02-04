@@ -227,6 +227,17 @@ class Plot_Impz(QWidget):
             if 'view_changed' in dict_sig:
                 self.draw()
 
+            if 'ui_changed' in dict_sig:
+                # exclude those ui elements  / events that don't require a recalculation
+                if dict_sig['ui_changed'] in {'win', 'resized'}:
+                    self.draw()                    
+                elif dict_sig['ui_changed'] in {'resized'}:
+                    pass
+                else:
+                    self.needs_calc = True
+                    qstyle_widget(self.ui.but_run, "changed")
+                    self.impz()
+
             elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
                 self.ui.update_N(dict_sig) # needed when e.g. FIR filter order has changed
                 self.needs_calc = True
@@ -238,11 +249,6 @@ class Plot_Impz(QWidget):
                 # self.tabWidget.currentWidget().redraw()
                 # redraw method of current mplwidget, always redraws tab 0
                 self.needs_redraw[self.tabWidget.currentIndex()] = False
-
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw[self.tabWidget.currentIndex()]:
-                self.needs_redraw[:] = [True] * 2
-                self.redraw() # redraw current widget
 
         else: # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:

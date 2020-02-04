@@ -30,7 +30,7 @@ class PlotImpz_UI(QWidget):
     # incoming: not implemented at the moment, update_N is triggered directly
     # by plot_impz
     # sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('data_changed':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing to local fft window
     sig_tx_fft = pyqtSignal(object)
@@ -542,7 +542,7 @@ class PlotImpz_UI(QWidget):
                    source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
                 self.spec_edited = False # reset flag
-                self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
+                self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
                 #self.impz()
 
 #        if isinstance(source, QLineEdit):
@@ -608,7 +608,7 @@ class PlotImpz_UI(QWidget):
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
 #-------------------------------------------------------------
     def load_fs(self):
@@ -645,25 +645,25 @@ class PlotImpz_UI(QWidget):
         """ Update value for self.A1 from QLineEditWidget"""
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
         self.ledAmp1.setText(str(self.A1))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'a1'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'a1'})
 
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'a2'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'a2'})
 
     def _update_phi1(self):
         """ Update value for self.phi1 from QLineEditWidget"""
         self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'phi1'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi1'})
 
     def _update_phi2(self):
         """ Update value for self.phi2 from the QLineEditWidget"""
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'phi2'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi2'})
 
 
     def _update_noi(self):
@@ -689,13 +689,13 @@ class PlotImpz_UI(QWidget):
                 self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
                                        "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'noi'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'noi'})
 
     def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
     # -------------------------------------------------------------------------
 
     def update_N(self, dict_sig=None):
@@ -779,7 +779,7 @@ class PlotImpz_UI(QWidget):
 
         # only emit a signal when window has been changed here to prevent infinite loop
         if not dict_sig or type(dict_sig) != dict:
-            self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+            self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
         # ... but always notify the FFT widget via sig_tx_fft
         self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
             
