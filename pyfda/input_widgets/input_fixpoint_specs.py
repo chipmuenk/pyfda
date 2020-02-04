@@ -624,7 +624,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         if hdl_file != "": # "operation cancelled" returns an empty string
             # return '.v' or '.vhd' depending on filetype selection:
-            hdl_type = extract_file_ext(qstr(hdl_filter))[0]
+            # hdl_type = extract_file_ext(qstr(hdl_filter))[0]
             # sanitized dir + filename + suffix. The filename suffix is replaced
             # by `v` later.
             hdl_file = os.path.normpath(hdl_file)
