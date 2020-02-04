@@ -777,7 +777,9 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
-        # only emit a signal when window has been changed here to prevent infinite loop
+        # only emit a signal for local triggers to prevent infinite loop:
+        # - signal-slot connection passes a bool or an integer
+        # - local function calls don't pass anything
         if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
         # ... but always notify the FFT widget via sig_tx_fft
