@@ -103,10 +103,10 @@ class Plot_3D(QWidget):
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
 
-        self.chkPolar = QCheckBox("Polar", self)
-        self.chkPolar.setObjectName("chkPolar")
-        self.chkPolar.setToolTip("Polar coordinate range")
-        self.chkPolar.setChecked(False)
+        self.chk_plot_in_UC = QCheckBox("|z| < 1", self)
+        self.chk_plot_in_UC.setObjectName("chk_plot_in_UC")
+        self.chk_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
+        self.chk_plot_in_UC.setChecked(False)
 
         self.lblBottom = QLabel("Bottom:", self)
         self.ledBottom = QLineEdit(self)
@@ -196,7 +196,7 @@ class Plot_3D(QWidget):
 
         layGControls = QGridLayout()
         layGControls.addWidget(self.chkLog, 0, 0)
-        layGControls.addWidget(self.chkPolar, 1, 0)
+        layGControls.addWidget(self.chk_plot_in_UC, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
         layGControls.addWidget(self.ledTop, 0, 4)
         layGControls.addWidget(self.lblTopdB, 0, 5)        
@@ -250,7 +250,7 @@ class Plot_3D(QWidget):
         self.ledBottom.editingFinished.connect(self._log_clicked)
         self.ledTop.editingFinished.connect(self._log_clicked)
 
-        self.chkPolar.clicked.connect(self._init_grid)
+        self.chk_plot_in_UC.clicked.connect(self._init_grid)
         self.chkUC.clicked.connect(self.draw)
         self.chkHf.clicked.connect(self.draw)
         self.chkPZ.clicked.connect(self.draw)
@@ -299,14 +299,14 @@ class Plot_3D(QWidget):
         self.xmin = -1.5; self.xmax = 1.5  # cartesian range limits
         self.ymin = -1.5; self.ymax = 1.5
 
-        rmin = 0;    rmax = self.xmin  # polar range limits
+        rmin = 0;    rmax = 1  # polar range limits
 
         # Calculate grids for 3D-Plots
         dr = rmax / steps * 2 # grid size for polar range
         dx = (self.xmax - self.xmin) / steps
         dy = (self.ymax - self.ymin) / steps # grid size cartesian range
 
-        if self.chkPolar.isChecked(): # # Plot circular range in 3D-Plot
+        if self.chk_plot_in_UC.isChecked(): # # Plot circular range in 3D-Plot
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
                             np.linspace(0, 2 * pi, steps, endpoint=True))
             self.x = r * cos(phi)
@@ -523,9 +523,9 @@ class Plot_3D(QWidget):
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.5)
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.5, lw=3)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=3)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_UC[::stride])):
