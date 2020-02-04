@@ -228,7 +228,7 @@ class Plot_Impz(QWidget):
                 self.draw()
 
             elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
-                self.ui.update_N(dict_sig)
+                self.ui.update_N(dict_sig) # needed when e.g. FIR filter order has changed
                 self.needs_calc = True
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz()

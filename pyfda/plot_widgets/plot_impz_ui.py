@@ -718,6 +718,7 @@ class PlotImpz_UI(QWidget):
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 
+        # FFT window needs to be updated due to changed number of data points
         self._update_win_fft(dict_sig)
 
 
