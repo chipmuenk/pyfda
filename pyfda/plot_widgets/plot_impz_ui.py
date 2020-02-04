@@ -779,8 +779,8 @@ class PlotImpz_UI(QWidget):
         # only emit a signal when window has been changed here to prevent infinite loop
         if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
-        # ... but always notify the FFT widget
-        self.sig_tx_fft.emit({'sender':__name__, 'data_changed':'win'})
+        # ... but always notify the FFT widget via sig_tx_fft
+        self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
             
     #------------------------------------------------------------------------------
     def show_fft_win(self):
