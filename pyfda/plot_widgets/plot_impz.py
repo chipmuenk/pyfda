@@ -228,10 +228,12 @@ class Plot_Impz(QWidget):
 
             if 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
-                if dict_sig['ui_changed'] in {'win', 'resized'}:
+                if dict_sig['ui_changed'] in {'win'}:
                     self.draw()                    
-                elif dict_sig['ui_changed'] in {'resized'}:
-                    pass
+                elif dict_sig['ui_changed'] in {'resized','tab'}:
+                    if self.needs_calc:
+                        qstyle_widget(self.ui.but_run, "changed")
+                        self.impz()                        
                 else:
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
