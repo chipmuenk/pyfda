@@ -698,7 +698,7 @@ class PlotImpz_UI(QWidget):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
     # -------------------------------------------------------------------------
 
-    def update_N(self, dict_sig=None):
+    def update_N(self, dict_sig={'dummy':None}):
         # TODO: dict_sig not needed here, call directly from impz, distinguish
         # between local triggering and updates upstream
         """
