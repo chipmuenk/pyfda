@@ -116,7 +116,7 @@ class FIR_DF_wdg(QWidget):
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         # if not, just pass the dict 
