@@ -252,8 +252,6 @@ class Plot_Impz(QWidget):
         else: # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw[:] = [True] * 2
 
 #            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
 #                    self.needs_calc = True # always require recalculation when triggered externally
