@@ -180,7 +180,6 @@ class Plot_Impz(QWidget):
             if dict_sig['fx_sim'] == 'specs_changed':
                 self.needs_calc = True
                 self.error = False
-                self.ui.update_N(dict_sig) # needed?
                 qstyle_widget(self.ui.but_run, "changed")
                 if self.isVisible():
                     self.impz()
