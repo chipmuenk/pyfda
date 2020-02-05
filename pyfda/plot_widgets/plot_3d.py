@@ -75,7 +75,7 @@ class Plot_3D(QWidget):
         self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from ``sig_rx``
         """
@@ -86,15 +86,15 @@ class Plot_3D(QWidget):
                 self.draw()
                 self.data_changed = False
                 self.size_changed = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.size_changed:
-                self.redraw()
-                self.size_changed = False                
+            # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+            #         or self.size_changed:
+            #     self.redraw()
+            #     self.size_changed = False                
         else:
             if 'data_changed' in dict_sig:
                 self.data_changed = True
-            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.size_changed = True
+            #if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+            #    self.size_changed = True
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -152,7 +152,7 @@ class Plot_3D(QWidget):
         self.chkColormap_r.setChecked(True)
 
         self.cmbColormap = QComboBox(self)
-        self._init_cmb_colormap()
+        self._init_cmb_colormap(cmap=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
         self.chkColBar = QCheckBox("Colorbar", self)
@@ -242,7 +242,7 @@ class Plot_3D(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -265,28 +265,44 @@ class Plot_3D(QWidget):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         #self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
 #------------------------------------------------------------------------------
-    def _init_cmb_colormap(self):
-        """ (Re-)Load combobox with available colormaps"""
-        if self.chkColormap_r.isChecked():
-            cmap_list = [m for m in cm.datad if m.endswith("_r")]
-        else:
-            cmap_list = [m for m in cm.datad if not m.endswith("_r")]
-        # *_r colormaps reverse the color order
-        cmap_list.sort()
+    def _init_cmb_colormap(self, cmap=None):
+        """
+        (Re-)Load combobox with available colormaps, either with "normal" or with
+        "reversed" color intensities.
+        
+        When `cmap` is a string, normal and reverse lists are initialized and 
+        used to populate a combobox (either the "reverse" or the "normal") list,
+        depending on the setting of the `self.chkColormap_r` checkbox. It is tried
+        to set the combobox to the passed string.
+        
+        Signal-slot connection passes the state of the clicked `self.chkColormap_r`
+        widget as a bool.
+        """
+        if isinstance(cmap, str): # initialize colormap lists
+            cmap_new = cmap
+            self.cmap_list = sorted([m for m in cm.datad if not m.endswith("_r")])
+            self.cmap_list_r = sorted([m for m in cm.datad if m.endswith("_r")])
+        elif cmap is True: # chkbox clicked
+            cmap_new = self.cmbColormap.currentText() + "_r"           
+        elif cmap is False: # chkbox unclicked
+            cmap_new = self.cmbColormap.currentText().rstrip('_r')
+
         self.cmbColormap.blockSignals(True) # don't send signal "indexChanged"
         self.cmbColormap.clear()
-        self.cmbColormap.addItems(cmap_list)
+        if self.chkColormap_r.isChecked():
+            self.cmbColormap.addItems(self.cmap_list_r)
+        else:
+            self.cmbColormap.addItems(self.cmap_list)            
         self.cmbColormap.blockSignals(False)
 
-        idx = self.cmbColormap.findText(self.cmap_default)
+        idx = self.cmbColormap.findText(cmap_new)
         if idx == -1:
             idx = 0
         self.cmbColormap.setCurrentIndex(idx)
-
 
 #------------------------------------------------------------------------------
     def _init_grid(self):
@@ -523,9 +539,9 @@ class Plot_3D(QWidget):
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.5, lw=3)
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.8, lw=4)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=3)
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=4)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_UC[::stride])):
