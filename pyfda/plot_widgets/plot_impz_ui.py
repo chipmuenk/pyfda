@@ -719,7 +719,8 @@ class PlotImpz_UI(QWidget):
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 
         # FFT window needs to be updated due to changed number of data points
-        self._update_win_fft(dict_sig)
+        self._update_win_fft(dict_sig) # don't emit anything here
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'N'})
 
 
     def _read_param1(self):
@@ -748,7 +749,15 @@ class PlotImpz_UI(QWidget):
 
 #------------------------------------------------------------------------------
     def _update_win_fft(self, dict_sig=None):
-        """ Update window type for FFT """
+        """
+        Update window type for FFT  with different arguments:
+        
+        - signal-slot connection to combo-box -> index (int)
+        - called by _read_param() -> empty
+        - called by update_N() -> dict
+        
+        
+        """
            
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict, self.window_name,
