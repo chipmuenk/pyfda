@@ -178,7 +178,6 @@ class Plot_Impz(QWidget):
         # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
-                logger.error("fx specs changed:\n{0}".format(pprint_log(dict_sig)))
                 self.needs_calc = True
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")

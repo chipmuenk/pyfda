@@ -207,12 +207,14 @@ class Input_PZ(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
-                     .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected (and interrupted)!")
+            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
+        else:
+            logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
+                     .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
+        
         if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
                 self.load_dict()
