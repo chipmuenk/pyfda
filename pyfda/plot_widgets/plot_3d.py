@@ -68,7 +68,6 @@ class Plot_3D(QWidget):
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
         self.data_changed = True # flag whether data has changed
-        self.size_changed = True # flag whether widget has been resized
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
 
@@ -85,16 +84,9 @@ class Plot_3D(QWidget):
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
                 self.draw()
                 self.data_changed = False
-                self.size_changed = False
-            # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-            #         or self.size_changed:
-            #     self.redraw()
-            #     self.size_changed = False                
         else:
             if 'data_changed' in dict_sig:
                 self.data_changed = True
-            #if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-            #    self.size_changed = True
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
