@@ -101,8 +101,8 @@ class Input_Fixpoint_Specs(QWidget):
         if dict_sig['sender'] == __name__:
             logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
-        elif 'filt_changed' in dict_sig:
-            # update list of available filter topologies here
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
+            # New filter has been designed, update list of available filter topologies here
             self._update_filter_cmb()
             return
         elif 'data_changed' in dict_sig or\
