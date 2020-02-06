@@ -86,7 +86,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self.update_N() # also updates window function
+        self.update_N(emit=False) # also updates window function
         self._update_noi()
 
 
@@ -698,13 +698,15 @@ class PlotImpz_UI(QWidget):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
     # -------------------------------------------------------------------------
 
-    def update_N(self, dict_sig={'dummy':None}):
+    def update_N(self, emit=True):
         # TODO: dict_sig not needed here, call directly from impz, distinguish
         # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
         update the window and fire "data_changed"
         """
+        if not isinstance(emit, bool):
+            logger.error("update N: emit={0}".format(emit))
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start, return_type='int', sign='poszero')
         self.led_N_start.setText(str(self.N_start)) # update widget
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user, return_type='int', sign='poszero')
@@ -719,8 +721,9 @@ class PlotImpz_UI(QWidget):
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 
         # FFT window needs to be updated due to changed number of data points
-        self._update_win_fft(dict_sig) # don't emit anything here
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'N'})
+        self._update_win_fft(emit=False) # don't emit anything here
+        if emit:
+            self.sig_tx.emit({'sender':__name__, 'ui_changed':'N'})
 
 
     def _read_param1(self):
@@ -748,17 +751,18 @@ class PlotImpz_UI(QWidget):
         self._update_win_fft()
 
 #------------------------------------------------------------------------------
-    def _update_win_fft(self, dict_sig=None):
+    def _update_win_fft(self, arg=None, emit=True):
         """
         Update window type for FFT  with different arguments:
         
-        - signal-slot connection to combo-box -> index (int)
-        - called by _read_param() -> empty
-        - called by update_N() -> dict
-        
+        - signal-slot connection to combo-box -> index (int), absorbed by `arg`
+                                                 emit is not set -> emit=True   
+        - called by _read_param() -> empty -> emit=True
+        - called by update_N(emit=False)
         
         """
-           
+        if not isinstance(emit, bool):
+            logger.error("update win: emit={0}".format(emit))
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict, self.window_name,
                                         N=self.N, sym=False)
@@ -789,7 +793,7 @@ class PlotImpz_UI(QWidget):
         # only emit a signal for local triggers to prevent infinite loop:
         # - signal-slot connection passes a bool or an integer
         # - local function calls don't pass anything
-        if not dict_sig or type(dict_sig) != dict:
+        if emit is True:
             self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
         # ... but always notify the FFT widget via sig_tx_fft
         self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})

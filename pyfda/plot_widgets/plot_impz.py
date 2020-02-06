@@ -175,9 +175,10 @@ class Plot_Impz(QWidget):
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
             return # probably not needed
-
+        # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
+                logger.error("fx specs changed:\n{0}".format(pprint_log(dict_sig)))
                 self.needs_calc = True
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
@@ -222,30 +223,30 @@ class Plot_Impz(QWidget):
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
                                                dict_sig['sender']))
 
+        # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible(): # all signals except 'fx_sim'
-            if 'view_changed' in dict_sig:
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
+                # update number of data points in impz_ui and FFT window
+                # needed when e.g. FIR filter order has changed. Don't emit a signal.
+                self.ui.update_N(emit=False)
+                self.needs_calc = True
+                qstyle_widget(self.ui.but_run, "changed")
+                self.impz()
+
+            elif 'view_changed' in dict_sig:
                 self.draw()
 
-            if 'ui_changed' in dict_sig:
+            elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
                 if dict_sig['ui_changed'] in {'win'}:
                     self.draw()                    
                 elif dict_sig['ui_changed'] in {'resized','tab'}:
-                    if self.needs_calc:
-                        qstyle_widget(self.ui.but_run, "changed")
-                        self.impz()                        
-                else:
+                    pass
+                       
+                else: # all the other ui elements are treated here
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
                     self.impz()
-
-            elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
-                # update number of data points in impz_ui and FFT window
-                # needed when e.g. FIR filter order has changed. Don't emit a signal.
-                self.ui.update_N(dict_sig)
-                self.needs_calc = True
-                qstyle_widget(self.ui.but_run, "changed")
-                self.impz()
 
             elif 'home' in dict_sig:
                 self.redraw()
