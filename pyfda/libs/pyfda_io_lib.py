@@ -443,7 +443,7 @@ def qtext2table(parent, fkey, title = "Import"):
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
         if isinstance(data_arr, str): # returned an error message instead of numpy data
-            logger.error(data_arr)
+            logger.error("Error importing clipboard data:\n{0}".format(data_arr))
             return None   
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
@@ -630,7 +630,7 @@ def import_data(parent, fkey, title="Import"):
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str): # returned an error message instead of numpy data
-                    logger.error(data_arr)
+                    logger.error("Error loading file '{0}':\n{1}".format(file_name, data_arr))
                     return None
         else:
             with io.open(file_name, 'rb') as f:
@@ -652,7 +652,7 @@ def import_data(parent, fkey, title="Import"):
                     file_type_err = True
 
         if not file_type_err:
-            logger.info('Successfully loaded \n\t"{0}"'.format(file_name))
+            logger.info('Successfully imported \n\t"{0}"'.format(file_name))
             dirs.save_dir = os.path.dirname(file_name)
             dirs.save_filt = sel_filt
             return data_arr # returns numpy array
@@ -741,7 +741,7 @@ def export_data(parent, data, fkey, title="Export"):
             # convert csv data to numpy array
             np_data = csv2array(io.StringIO(data))
             if isinstance(np_data, str): # returned an error message instead of numpy data
-                logger.error(np_data)
+                logger.error("Error converting coefficient data:\n{0}".format(np_data))
                 return None
 
             with io.open(file_name, 'wb') as f:
