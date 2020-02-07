@@ -53,10 +53,11 @@ class CSV_option_box(QDialog):
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
 
         lblTerminator = QLabel("Line Terminator:", self)
-        terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
+        terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
         self.cmbLineTerminator = QComboBox(self)
         self.cmbLineTerminator.setToolTip("<span>Terminator at the end of a data row."
-                " (depending on the operating system).")
+                " (depending on the operating system). 'None' can be used for a single "
+                "row of data with added line breaks.")
         for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
 
@@ -448,7 +449,7 @@ def qtext2table(parent, fkey, title = "Import"):
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array
-        logger.debug("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
+        logger.debug("Imported data from file. shape = {0} | {1}\n{2}".format(np.shape(data_arr), np.ndim(data_arr), data_arr))
         if type(data_arr) == int and data_arr == -1: # file operation cancelled
             data_arr = None
     return data_arr
@@ -524,8 +525,8 @@ def csv2array(f):
             f.seek(0)
 
     except csv.Error as e:
-        logger.warning("Error during CSV analysis:\n{0}\n"
-                       "continueing with format 'excel-tab'".format(e))
+        logger.warning("Error during CSV analysis:\n{0},\n"
+                       "continuing with format 'excel-tab'".format(e))
         dialect = csv.get_dialect('excel-tab') # fall back
         use_header = False
 
@@ -545,14 +546,31 @@ def csv2array(f):
     if cr != 'auto':
         lineterminator = str(cr)
 
-    logger.info("using delimiter {0}, terminator {1} and quotechar {2}"\
-                .format(repr(delimiter), repr(lineterminator), repr(quotechar)))
-    logger.info("using header '{0}'".format(use_header))
-    logger.info("Type of passed text is '{0}'".format(f.__class__.__name__))
+    logger.info("Parsing CSV data with header = '{0}'\n"
+                "\tDelimiter = {1} | Lineterm. = {2} | quotechar = ' {3} '\n"
+                "\tType of passed text: '{4}'"
+                .format(use_header, repr(delimiter), repr(lineterminator), 
+                        quotechar,f.__class__.__name__))
     #------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
     #------------------------------------------------
+# =============================================================================
+#     with open('/your/path/file') as f:
+#         for line in f:
+#             process(line)
+# 
+#     Where you define your process function any way you want. For example:
+# 
+#         def process(line):
+#             if 'save the world' in line.lower():
+#                 superman.save_the_world()
+# 
+#     This will work nicely for any file size and you go through your file in just 1 pass. 
+#     This is typically how generic parsers will work.
+#     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)  
+# =============================================================================
+
     if use_header:
         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
 
