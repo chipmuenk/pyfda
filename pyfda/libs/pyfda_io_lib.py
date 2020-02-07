@@ -442,6 +442,9 @@ def qtext2table(parent, fkey, title = "Import"):
         logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
+        if isinstance(data_arr, str): # returned an error message instead of numpy data
+            logger.error(data_arr)
+            return None   
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array
@@ -470,11 +473,16 @@ def csv2array(f):
     -------
 
     ndarray
-        numpy array containing table data from file or text
+        numpy array containing table data from file or text when import was 
+        successful     
+        
+    io_error: str
+        String with the error message when import was unsuccessful
     """
     #------------------------------------------------------------------------------
     # Get CSV parameter settings
     #------------------------------------------------------------------------------
+    io_error = "" # initialize string for I/O error messages
     CSV_dict = params['CSV']
     try:
         header = CSV_dict['header'].lower()
@@ -482,7 +490,7 @@ def csv2array(f):
             pass
         else:
             header = 'auto'
-            logger.error("Unknown key '{0}' for CSV_dict['header'], using {1} instead."
+            logger.warning("Unknown key '{0}' for CSV_dict['header'], using {1} instead."
                                             .format(CSV_dict['header']), header)
 
         orientation_horiz = CSV_dict['orientation'].lower()
@@ -490,14 +498,15 @@ def csv2array(f):
             pass
         else:
             orientation_horiz = 'vert'
-            logger.error("Unknown key '{0}' for CSV_dict['orientation'], using {1} instead."
+            logger.warning("Unknown key '{0}' for CSV_dict['orientation'], using {1} instead."
                                         .format(CSV_dict['orientation']), orientation_horiz)
 
         tab = CSV_dict['delimiter'].lower()
         cr = CSV_dict['lineterminator'].lower()
 
     except KeyError as e:
-        logger.error(e)
+        io_error = "Dict 'params':\n{0}".format(e)
+        return io_error
 
     try:
         #------------------------------------------------------------------------------
@@ -515,7 +524,8 @@ def csv2array(f):
             f.seek(0)
 
     except csv.Error as e:
-        logger.error("Error during CSV analysis:\n{0}".format(e))
+        logger.warning("Error during CSV analysis:\n{0}\n"
+                       "continueing with format 'excel-tab'".format(e))
         dialect = csv.get_dialect('excel-tab') # fall back
         use_header = False
 
@@ -552,7 +562,8 @@ def csv2array(f):
             logger.debug("{0}".format(row))
             data_list.append(row)
     except csv.Error as e:
-        logger.error("Error during CSV reading:\n{0}".format(e))
+        io_error = "Error during CSV reading:\n{0}".format(e)
+        return io_error
 
     try:
         data_arr = np.array(data_list)
@@ -564,8 +575,8 @@ def csv2array(f):
             return data_arr
 
     except (TypeError, ValueError) as e:
-        logger.error("{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list))
-        return None
+        io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
+        return io_error
 
 #------------------------------------------------------------------------------
 def import_data(parent, fkey, title="Import"):
@@ -576,7 +587,7 @@ def import_data(parent, fkey, title="Import"):
     ----------
     parent: handle to calling instance
 
-    fkey: string
+    fkey: str
         Key for accessing data in *.npz or Matlab workspace (*.mat) file with 
         multiple entries.
 
@@ -585,8 +596,8 @@ def import_data(parent, fkey, title="Import"):
 
     Returns
     -------
-    numpy array
-
+    ndarray
+        Data from the file
     """
     file_filters = ("Comma / Tab Separated Values (*.csv);;"
                     "Matlab-Workspace (*.mat);;"
@@ -618,6 +629,9 @@ def import_data(parent, fkey, title="Import"):
             with io.open(file_name, 'r') as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
+                if isinstance(data_arr, str): # returned an error message instead of numpy data
+                    logger.error(data_arr)
+                    return None
         else:
             with io.open(file_name, 'rb') as f:
                 if file_type == '.mat':
@@ -724,7 +738,11 @@ def export_data(parent, data, fkey, title="Export"):
                     export_coe_vhdl_package(f)
 
         else: # binary format
+            # convert csv data to numpy array
             np_data = csv2array(io.StringIO(data))
+            if isinstance(np_data, str): # returned an error message instead of numpy data
+                logger.error(np_data)
+                return None
 
             with io.open(file_name, 'wb') as f:
                 if file_type == '.mat':
