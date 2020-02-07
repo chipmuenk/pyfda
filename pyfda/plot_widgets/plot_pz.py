@@ -33,8 +33,9 @@ class Plot_PZ(QWidget):
 
     def __init__(self, parent):
         super(Plot_PZ, self).__init__(parent)
-        self.data_changed = True   # flag whether filter data has been changed
-        self.size_changed = True # flag whether plot has been resized
+        self.needs_calc = True    # flag whether filter data has been changed
+        self.needs_draw = False   # flag whether whether figure needs to be drawn
+                                    # with new limits etc. (not implemented yet)
         self.tool_tip = "Pole / zero plan"
         self.tab_label = "P / Z"
 
@@ -46,28 +47,20 @@ class Plot_PZ(QWidget):
         Process signals coming from the navigation toolbar and from sig_rx
         """
         logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.data_changed, self.isVisible()))
+                     .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
-                self.data_changed = False
-                self.size_changed = False
-                self.view_changed = False
-            if 'view_changed' in dict_sig or self.view_changed:
+                self.needs_calc = False
+                self.needs_draw = False
+            if 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
-                self.view_changed = False
-                self.size_changed = False
-            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.size_changed:
-                self.redraw()
-                self.size_changed = False
+                self.needs_draw = False
         else:
             if 'data_changed' in dict_sig:
-                self.data_changed = True
+                self.needs_calc = True
             if 'view_changed' in dict_sig:
-                self.view_changed = True
-            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.size_changed = True
+                self.needs_draw = True
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):

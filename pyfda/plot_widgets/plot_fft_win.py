@@ -18,7 +18,7 @@ from scipy.signal import argrelextrema
 
 import matplotlib.patches as mpl_patches
 
-from pyfda.libs.pyfda_lib import safe_eval, to_html
+from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import calc_window_function
@@ -86,12 +86,12 @@ class Plot_FFT_win(QDialog):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.info("Processing {0} | visible = {1}"\
-                     .format(dict_sig, self.isVisible()))
-        if ('data_changed' in dict_sig and dict_sig['data_changed'] == 'win')\
+        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"\
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
-            logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto, self.win_dict['win_len']))
+            # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto, self.win_dict['win_len']))
             self.N_auto = self.win_dict['win_len']
             self.calc_N()
             
@@ -106,29 +106,8 @@ class Plot_FFT_win(QDialog):
 
         else:
             logger.error("Unknown content of dict_sig: {0}".format(dict_sig))
-                
-            
-        # if self.isVisible():
-        #     if 'data_changed' in dict_sig or 'home' in dict_sig\
-        #         or 'filt_changed' in dict_sig or self.needs_calc:
-        #         self.draw()
-        #         self.needs_calc = False
-        #         self.needs_draw = False
-        #     elif 'view_changed' in dict_sig or self.needs_draw:
-        #         self.update_view()
-        #         self.needs_draw = False
-        #     elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
-        #         or self.needs_redraw:
-        #         self.redraw()
-        #         self.needs_redraw = False
-        # else:
-        #     if 'data_changed' in dict_sig or 'filt_changed' in dict_sig:
-        #         self.needs_calc = True
-        #     elif 'view_changed' in dict_sig:
-        #         self.needs_draw = True
-        #     elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-        #         self.needs_redraw = True
 
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:

@@ -31,7 +31,6 @@ class Plot_Phi(QWidget):
         super(Plot_Phi, self).__init__(parent)
         self.needs_calc = True # recalculation of filter function necessary
         self.needs_draw = True # plotting neccessary (e.g. log instead of  lin)
-        self.needs_redraw = True # redraw (e.g. because size has changed) neccessary
         self.tool_tip = "Phase frequency response"
         self.tab_label = "\u03C6(f)" # phi(f)
         self._construct_UI()
@@ -51,16 +50,16 @@ class Plot_Phi(QWidget):
             elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False                
-            elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
-                or self.needs_redraw:
-                self.redraw()
+            # elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
+            #     or self.needs_redraw:
+            #     self.redraw()
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
                 self.needs_draw = True 
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
+            # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+            #     self.needs_redraw = True
 
 
     def _construct_UI(self):

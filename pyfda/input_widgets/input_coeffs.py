@@ -56,6 +56,11 @@ class ItemDelegate(QStyledItemDelegate):
     - `setEditorData()` pass data with full precision and in selected format to editor
 
     - `setModelData()` pass edited data back to model (`self.ba`)
+    
+    Editing the table triggers `setModelData()` but does not emit a signal outside
+    this class, only the `ui.butSave` button is highlighted. When it is pressed, 
+    a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
+    Additionally, a signal is emitted with `'view_changed':'q_coeff'` by `ui2qdict()`?!
 
 
     """
@@ -291,10 +296,11 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("process_sig_rx(): vis={0}\n{1}"\
+                    .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite Loop!")
+            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
         if self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:
@@ -305,6 +311,7 @@ class Input_Coeffs(QWidget):
                 self.ui_changed = False 
             if self.fx_specs_changed or ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
                 self.qdict2ui()
+                self.fx_specs_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view 
             if 'data_changed' in dict_sig:
@@ -451,6 +458,7 @@ class Input_Coeffs(QWidget):
         #------------------------------------------------------------------------------
     def _set_scale(self):
         """
+        Triggered by `ui.ledScale`
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
@@ -645,6 +653,8 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def _set_number_format(self):
         """
+        Triggered by `contruct_UI()`, `qdict2ui()`and by `ui.cmbQFrmt.currentIndexChanged()`
+        
         Set one of three number formats: Integer, fractional, normalized fractional
         (triggered by self.ui.cmbQFrmt combobox)
         """
@@ -685,6 +695,9 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def qdict2ui(self):
         """
+        Triggered by:
+        - process_sig_rx()  if self.fx_specs_changed or dict_sig['fx_sim'] == 'specs_changed'
+        - 
         Set the UI from the quantization dict and update the fixpoint object.
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
@@ -707,6 +720,13 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def ui2qdict(self):
         """
+        Triggered by modifying 
+        `ui.cmbFormat`, `ui.cmbQOvfl`, `ui.cmbQuant`, `ui.ledWF`, `ui.ledWI`
+        or `ui.ledW` (via `_W_changed()`)
+        or `ui.cmbQFrmt` (via `_set_number_format()`)
+        or `ui.ledScale()` (via `_set_scale()`)
+        or 'qdict2ui()' via `_set_number_format()`
+        
         Read out the settings of the quantization comboboxes.
 
         - Store them in the filter dict `fb.fil[0]['fxqc']['QCB']` and as class
@@ -718,7 +738,7 @@ class Input_Coeffs(QWidget):
         """
         fb.fil[0]['fxqc']['QCB'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
-                'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
+                'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='poszero'),
                 'W':safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos'),
                 'quant':qstr(self.ui.cmbQuant.currentText()),
                 'ovfl':qstr(self.ui.cmbQOvfl.currentText()),

@@ -205,7 +205,6 @@ class UI_W(QWidget):
     def __init__(self, parent, q_dict, **kwargs):
         super(UI_W, self).__init__(parent)
         self.q_dict = q_dict # pass a dict with initial settings for construction
-        #logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
         self.ui2dict(s='init') # initialize the class attributes
 

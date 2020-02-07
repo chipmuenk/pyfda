@@ -40,7 +40,6 @@ class Plot_tau_g(QWidget):
         super(Plot_tau_g, self).__init__(parent)
         self.verbose = True # suppress warnings
         self.needs_calc = True   # flag whether plot needs to be recalculated
-        self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Group delay"
         self.tab_label = "\U0001D70F(f)"#"tau_g" \u03C4
         self._construct_UI()
@@ -83,14 +82,14 @@ class Plot_tau_g(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
@@ -100,18 +99,11 @@ class Plot_tau_g(QWidget):
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
-                self.needs_redraw = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw:
-                self.redraw()
-                self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_calc = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
 
 #------------------------------------------------------------------------------
     def init_axes(self):

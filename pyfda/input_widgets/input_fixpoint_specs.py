@@ -10,7 +10,7 @@
 Widget for simulating fixpoint filters and generating Verilog Code
 
 """
-import sys, os, io, importlib
+import sys, os, io, importlib, time
 import logging
 logger = logging.getLogger(__name__)
 
@@ -81,39 +81,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.state = "deactivated" # "invisible", "disabled"
 
 #------------------------------------------------------------------------------
-    def process_sig_rx_w_i(self, dict_sig=None):
-        """
-        Input fixpoint format has been changed. When I/O lock is active, copy
-        input fixpoint word format to output word format.
-        
-        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
-        for signal propagation.
-        """
-        if self.wdg_w_input.butLock.isChecked():
-            fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
-            fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
-            fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
-
-        self.process_sig_rx(dict_sig, propagate=True)
-
-#------------------------------------------------------------------------------
-    def process_sig_rx_w_o(self, dict_sig=None):
-        """
-        Output fixpoint format has been changed. When I/O lock is active, copy
-        output fixpoint word format to input word format.
-        
-        Flag with `propagate=True` before proceeding in `process_sig_rx` to allow
-        for signal propagation.
-        """
-        if self.wdg_w_input.butLock.isChecked():
-            fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
-            fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
-            fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
-
-        self.process_sig_rx(dict_sig, propagate=True)
-
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None, propagate=False):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
 		
@@ -121,26 +89,26 @@ class Input_Fixpoint_Specs(QWidget):
         
 		2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
-		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
+		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'send_stimulus'
 			and pass it to HDL object for simulation
 		   
 		4. Send back HDL response to widget via 'fx_sim':'set_response'
 
         """
 		
-        logger.debug("SIG_RX - vis: {0} | prop: {1}\n{2}"\
-                    .format(self.isVisible(), propagate, pprint_log(dict_sig)))
+        logger.debug("process_sig_rx(): vis={0}\n{1}"\
+                    .format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
-            logger.debug("Infinite loop detected")
+            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
-        elif 'filt_changed' in dict_sig:
-            # update list of available filter topologies here
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
+            # New filter has been designed, update list of available filter topologies here
             self._update_filter_cmb()
+            return
         elif 'data_changed' in dict_sig or\
             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
-            # been changed. Also set RUN button to "changed" in wdg_dict2ui() and 
-            # enable propagate so that 
+            # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
             #self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
         elif 'fx_sim' in dict_sig:
@@ -152,40 +120,62 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimHDL, "error")  
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
                     
-            elif dict_sig['fx_sim'] == 'set_stimulus':
+            elif dict_sig['fx_sim'] == 'send_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui
                 # and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
-                qstyle_widget(self.butSimHDL, "normal") 
+                qstyle_widget(self.butSimHDL, "normal")
+                logger.info('Fixpoint simulation [{0:5.3g} ms]: Plotting finished'\
+                            .format((time.process_time() - self.t_resp)*1000))
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
         # ---- Process local widget signals 
         elif 'ui' in dict_sig:
-            if dict_sig['ui'] == 'butLock':
-                if self.wdg_w_input.butLock.isChecked():
+            if 'id' in dict_sig and dict_sig['id'] == 'w_input':
+                """
+                Input fixpoint format has been changed or butLock has been clicked.
+                When I/O lock is active, copy input fixpoint word format to output 
+                word format.
+                """
+                if dict_sig['ui'] == 'butLock' and not self.wdg_w_input.butLock.isChecked():
+                     # butLock was deactivitated, don't do anything
+                    return 
+                elif self.wdg_w_input.butLock.isChecked():
+                    # but lock was activated or wordlength setting have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
-                else:
-                    return
-            elif dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW'}:
-                pass
+                     
+            elif 'id' in dict_sig and dict_sig['id'] == 'w_output':
+                """
+                Output fixpoint format has been changed. When I/O lock is active, copy
+                output fixpoint word format to input word format.
+                """
+                if self.wdg_w_input.butLock.isChecked():
+                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
+                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                    fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
+ 
+            elif 'id' in dict_sig and dict_sig['id'] in \
+                {'w_coeff', 'q_input', 'q_output', 'w_accu', 'q_accu'}:
+                pass # nothing to do for now
+
             else:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-            self.wdg_dict2ui()
+                if not "id" in dict_sig:
+                    logger.warning("No id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
+                else:
+                    logger.warning('Unknown id "{0}" in dict_sig:\n{1}'\
+                                   .format(dict_sig['id'], pprint_log(dict_sig)))
+                    
+            if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+               logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+            self.wdg_dict2ui() # update wordlengths in UI and set RUN button to 'changed'
             self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
 
-        if propagate:
-            # signals of local subwidgets are propagated,
-            # global signals terminate here.
-            # The next event in the queue is only handled when control returns
-            # from this one
-            #dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
             return
 
 #------------------------------------------------------------------------------
@@ -238,13 +228,14 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
                                 id='w_input', label='', lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_w_i)
+        self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
         
         cmb_q = ['round','floor','fix']
 
         self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'], id='w_output', 
                                  label='')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_w_o)
+        self.wdg_w_output.sig_tx.connect(self.process_sig_rx)
+
         self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'], id='q_output',
                                  label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
                                  cmb_q=cmb_q, cmb_ov=['wrap','sat'])
@@ -633,7 +624,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         if hdl_file != "": # "operation cancelled" returns an empty string
             # return '.v' or '.vhd' depending on filetype selection:
-            hdl_type = extract_file_ext(qstr(hdl_filter))[0]
+            # hdl_type = extract_file_ext(qstr(hdl_filter))[0]
             # sanitized dir + filename + suffix. The filename suffix is replaced
             # by `v` later.
             hdl_file = os.path.normpath(hdl_file)
@@ -696,7 +687,8 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         try:
-            logger.info("Started HDL fixpoint simulation")
+            logger.info("Fixpoint simulation started")
+            self.t_start = time.process_time()
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
 
@@ -704,7 +696,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.sig_tx.emit(dict_sig)
                         
         except  ValueError as e: # exception
-            logger.error('Fixpoint stimulus generation failed for dict\n{0}'
+            logger.error('Fixpoint stimulus generation failed during "init" for dict\n{0}'
                            '\nwith "{1} "'.format(pprint_log(dict_sig), e))
         return
 
@@ -726,15 +718,31 @@ class Input_Fixpoint_Specs(QWidget):
                             np.shape(dict_sig['fx_stimulus']),
                             dict_sig['fx_stimulus'].dtype,
                             ))
+            self.t_stim = time.process_time()
+            logger.info("Fixpoint simulation [{0:5.3g} ms]: Stimuli generated"\
+                        .format((self.t_stim-self.t_start)*1000))
 
             # Run fixpoint simulation and return the results as integer values:
-            self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])         # Run the simulation
+            self.fx_results=self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])  # Run the simulation
+            self.t_resp = time.process_time()
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
-                logger.debug("fx_results: {0}"\
-                            .format(pprint_log(self.fx_results, tab= " ")))
+                #logger.debug("fx_results: {0}"\
+                #            .format(pprint_log(self.fx_results, tab= " ")))
+                logger.debug('Fixpoint simulation successful for dict\n{0}'
+                         '\tStimuli: Shape {1} of type "{2}"'
+                         '\n\tResponse: Shape {3} of type "{4}"'\
+                           .format(pprint_log(dict_sig),
+                                   np.shape(dict_sig['fx_stimulus']),
+                                   dict_sig['fx_stimulus'].dtype,
+                                   np.shape(self.fx_results),
+                                   type(self.fx_results)
+                                    ))
+                logger.info('Fixpoint simulation [{0:5.3g} ms]: Response calculated'\
+                            .format((self.t_resp - self.t_stim)*1000))
+
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
@@ -770,9 +778,6 @@ class Input_Fixpoint_Specs(QWidget):
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
         qstyle_widget(self.butSimHDL, "normal")
-        
-        logger.debug("Fixpoint plotting finished")        
-            
         return
 
 ###############################################################################

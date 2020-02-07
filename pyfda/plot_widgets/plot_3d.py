@@ -68,14 +68,13 @@ class Plot_3D(QWidget):
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
         self.data_changed = True # flag whether data has changed
-        self.size_changed = True # flag whether widget has been resized
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
 
         self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from ``sig_rx``
         """
@@ -85,16 +84,9 @@ class Plot_3D(QWidget):
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
                 self.draw()
                 self.data_changed = False
-                self.size_changed = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.size_changed:
-                self.redraw()
-                self.size_changed = False                
         else:
             if 'data_changed' in dict_sig:
                 self.data_changed = True
-            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.size_changed = True
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -103,10 +95,10 @@ class Plot_3D(QWidget):
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
 
-        self.chkPolar = QCheckBox("Polar", self)
-        self.chkPolar.setObjectName("chkPolar")
-        self.chkPolar.setToolTip("Polar coordinate range")
-        self.chkPolar.setChecked(False)
+        self.chk_plot_in_UC = QCheckBox("|z| < 1", self)
+        self.chk_plot_in_UC.setObjectName("chk_plot_in_UC")
+        self.chk_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
+        self.chk_plot_in_UC.setChecked(False)
 
         self.lblBottom = QLabel("Bottom:", self)
         self.ledBottom = QLineEdit(self)
@@ -152,7 +144,7 @@ class Plot_3D(QWidget):
         self.chkColormap_r.setChecked(True)
 
         self.cmbColormap = QComboBox(self)
-        self._init_cmb_colormap()
+        self._init_cmb_colormap(cmap=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
         self.chkColBar = QCheckBox("Colorbar", self)
@@ -196,7 +188,7 @@ class Plot_3D(QWidget):
 
         layGControls = QGridLayout()
         layGControls.addWidget(self.chkLog, 0, 0)
-        layGControls.addWidget(self.chkPolar, 1, 0)
+        layGControls.addWidget(self.chk_plot_in_UC, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
         layGControls.addWidget(self.ledTop, 0, 4)
         layGControls.addWidget(self.lblTopdB, 0, 5)        
@@ -242,7 +234,7 @@ class Plot_3D(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -250,7 +242,7 @@ class Plot_3D(QWidget):
         self.ledBottom.editingFinished.connect(self._log_clicked)
         self.ledTop.editingFinished.connect(self._log_clicked)
 
-        self.chkPolar.clicked.connect(self._init_grid)
+        self.chk_plot_in_UC.clicked.connect(self._init_grid)
         self.chkUC.clicked.connect(self.draw)
         self.chkHf.clicked.connect(self.draw)
         self.chkPZ.clicked.connect(self.draw)
@@ -265,28 +257,44 @@ class Plot_3D(QWidget):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         #self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
 #------------------------------------------------------------------------------
-    def _init_cmb_colormap(self):
-        """ (Re-)Load combobox with available colormaps"""
-        if self.chkColormap_r.isChecked():
-            cmap_list = [m for m in cm.datad if m.endswith("_r")]
-        else:
-            cmap_list = [m for m in cm.datad if not m.endswith("_r")]
-        # *_r colormaps reverse the color order
-        cmap_list.sort()
+    def _init_cmb_colormap(self, cmap=None):
+        """
+        (Re-)Load combobox with available colormaps, either with "normal" or with
+        "reversed" color intensities.
+        
+        When `cmap` is a string, normal and reverse lists are initialized and 
+        used to populate a combobox (either the "reverse" or the "normal") list,
+        depending on the setting of the `self.chkColormap_r` checkbox. It is tried
+        to set the combobox to the passed string.
+        
+        Signal-slot connection passes the state of the clicked `self.chkColormap_r`
+        widget as a bool.
+        """
+        if isinstance(cmap, str): # initialize colormap lists
+            cmap_new = cmap
+            self.cmap_list = sorted([m for m in cm.datad if not m.endswith("_r")])
+            self.cmap_list_r = sorted([m for m in cm.datad if m.endswith("_r")])
+        elif cmap is True: # chkbox clicked
+            cmap_new = self.cmbColormap.currentText() + "_r"           
+        elif cmap is False: # chkbox unclicked
+            cmap_new = self.cmbColormap.currentText().rstrip('_r')
+
         self.cmbColormap.blockSignals(True) # don't send signal "indexChanged"
         self.cmbColormap.clear()
-        self.cmbColormap.addItems(cmap_list)
+        if self.chkColormap_r.isChecked():
+            self.cmbColormap.addItems(self.cmap_list_r)
+        else:
+            self.cmbColormap.addItems(self.cmap_list)            
         self.cmbColormap.blockSignals(False)
 
-        idx = self.cmbColormap.findText(self.cmap_default)
+        idx = self.cmbColormap.findText(cmap_new)
         if idx == -1:
             idx = 0
         self.cmbColormap.setCurrentIndex(idx)
-
 
 #------------------------------------------------------------------------------
     def _init_grid(self):
@@ -299,14 +307,14 @@ class Plot_3D(QWidget):
         self.xmin = -1.5; self.xmax = 1.5  # cartesian range limits
         self.ymin = -1.5; self.ymax = 1.5
 
-        rmin = 0;    rmax = self.xmin  # polar range limits
+        rmin = 0;    rmax = 1  # polar range limits
 
         # Calculate grids for 3D-Plots
         dr = rmax / steps * 2 # grid size for polar range
         dx = (self.xmax - self.xmin) / steps
         dy = (self.ymax - self.ymin) / steps # grid size cartesian range
 
-        if self.chkPolar.isChecked(): # # Plot circular range in 3D-Plot
+        if self.chk_plot_in_UC.isChecked(): # # Plot circular range in 3D-Plot
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
                             np.linspace(0, 2 * pi, steps, endpoint=True))
             self.x = r * cos(phi)
@@ -523,9 +531,9 @@ class Plot_3D(QWidget):
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.5)
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.8, lw=4)
             # draw once more as dashed white line to improve visibility
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=4)
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_UC[::stride])):

@@ -12,6 +12,7 @@ Widget for plotting impulse and general transient responses
 import logging
 logger = logging.getLogger(__name__)
 
+import time
 from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
@@ -150,42 +151,35 @@ class Plot_Impz(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx) 
-#------------------------------------------------------------------------------
-    def process_sig_rx_local(self, dict_sig=None):
-        """
-        Flag signals coming in from local subwidgets with `propagate=True` before
-        proceeding with processing in `process_sig_rx`.
-
-        TODO: not used at the moment
-        """
-        self.process_sig_rx(dict_sig, propagate=True)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None, propagate=False):
         """
-        Process signals coming from the navigation toolbar, local widgets and
-        collected from input_tab_widgets
+        Process signals coming from 
+        - the navigation toolbars (time and freq.)
+        - local widgets (impz_ui) and
+        - plot_tab_widgets() (global signals)
 
         All signals terminate here unless the flag `propagate=True`.
         """
 
-        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
+        logger.debug("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         self.error = False
         
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
-
+            return # probably not needed
+        # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
                 self.needs_calc = True
                 self.error = False
-                self.ui.update_N(dict_sig) # needed?
                 qstyle_widget(self.ui.but_run, "changed")
                 if self.isVisible():
                     self.impz()
@@ -194,27 +188,25 @@ class Plot_Impz(QWidget):
                 """
                 - Select Fixpoint mode
 
-                - Start fixpoint simulation using `self.fx_run()` where the stimulus
-                  is calculated, quantized and passed to dict_sig with `'fx_sim':'set_stimulus'`
-                  and `'fx_stimulus':<quantized stimulus>`. Stimuli are scaled with the input
+                - Calculate stimuli, quantize and pass to dict_sig with `'fx_sim':'send_stimulus'`
+                  and `'fx_stimulus':<quantized stimulus array>`. Stimuli are scaled with the input
                   fractional word length, i.e. with 2**WF (input) to obtain integer values
-
-                # TODO: correct?
                   """
                 self.needs_calc = True # always require recalculation when triggered externally
+                self.needs_redraw = [True] * 2
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
-                    self.fx_run(phase='set_stimuli')
+                    self.calc_stimulus()
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
                 - Convert simulation results to integer and transfer them to the plotting
                   routine
                 """
-                logger.info("Received fixpoint results.")
-                self.fx_run('set_results', dict_sig=dict_sig)
+                logger.debug("Received fixpoint results.")
+                self.draw_response_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -223,24 +215,37 @@ class Plot_Impz(QWidget):
                 return
 
             elif not dict_sig['fx_sim']:
-                logger.error('Missing option for "fx_sim".')
+                logger.error('Missing value for key "fx_sim".')
 
             else:
-                logger.error('Unknown "fx_sim" command option "{0}"\n'\
+                logger.error('Unknown value "{0}" for "fx_sim" key\n'\
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
                                                dict_sig['sender']))
 
+        # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible(): # all signals except 'fx_sim'
-            if 'view_changed' in dict_sig:
-                self.impz()
-
-            elif 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
-
-                self.ui.update_N(dict_sig)
-
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
+                # update number of data points in impz_ui and FFT window
+                # needed when e.g. FIR filter order has changed. Don't emit a signal.
+                self.ui.update_N(emit=False)
                 self.needs_calc = True
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz()
+
+            elif 'view_changed' in dict_sig:
+                self.draw()
+
+            elif 'ui_changed' in dict_sig:
+                # exclude those ui elements  / events that don't require a recalculation
+                if dict_sig['ui_changed'] in {'win'}:
+                    self.draw()                    
+                elif dict_sig['ui_changed'] in {'resized','tab'}:
+                    pass
+                       
+                else: # all the other ui elements are treated here
+                    self.needs_calc = True
+                    qstyle_widget(self.ui.but_run, "changed")
+                    self.impz()
 
             elif 'home' in dict_sig:
                 self.redraw()
@@ -248,28 +253,14 @@ class Plot_Impz(QWidget):
                 # redraw method of current mplwidget, always redraws tab 0
                 self.needs_redraw[self.tabWidget.currentIndex()] = False
 
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw[self.tabWidget.currentIndex()]:
-                self.needs_redraw[:] = [True] * 2
-                self.redraw() # redraw current widget
-
         else: # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw[:] = [True] * 2
 
 #            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
 #                    self.needs_calc = True # always require recalculation when triggered externally
 #                    qstyle_widget(self.ui.but_run, "changed")
 #                    self.fx_select("Fixpoint")
-
-        if propagate:
-            # signals of local subwidgets are propagated, global signals terminate here.
-            # The next event in the queue is only handled when control returns
-            # from this one
-            self.sig_tx.emit(dict_sig)
-            return
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -290,26 +281,30 @@ class Plot_Impz(QWidget):
 
     def impz(self, arg=None):
         """
-        Calculate response and redraw it automatically if checkbox "Auto Run"
-        is selected or if called directly by pressing the "Run" button. In the
-        latter case, the signal-slot connection passes the state of button (?)
-        as a boolean.
-
+        Triggered by:
+            - construct_UI()  [Initialization]
+            - Pressing "Run" button, passing button state as a boolean
+            - Activating "Autorun" via `self.calc_auto()`
+            - 'fx_sim' : 'specs_changed' 
+            - 
+        Calculate response and redraw it.
+        
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
-        if type(arg) == bool:
+        if type(arg) == bool: # but_run has been pressed
             self.needs_calc = True # force recalculation when but_run is pressed
         elif not self.ui.chk_auto_run.isChecked():
             return
 
         if self.needs_calc:
             logger.debug("Calc impz started!")
-            self.calc_stimulus()
-            if self.fx_sim:
+            if self.fx_sim: # start a fixpoint simulation
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
-            else:
-                self.calc_response()
+                return
+
+            self.calc_stimulus()
+            self.calc_response()
 
             if self.error:
                 return
@@ -323,16 +318,13 @@ class Plot_Impz(QWidget):
             self.needs_redraw[self.tabWidget.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
-        if self.fx_sim:
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 # =============================================================================
 
     def fx_select(self, fx=None):
         """
         Select between fixpoint and floating point simulation.
-
-        parameter `fx` can be:
+        Parameter `fx` can be:
 
         - str "Fixpoint" or "Float" when called directly
 
@@ -342,6 +334,11 @@ class Plot_Impz(QWidget):
         In both cases, the index of the combobox is updated according to the
         passed argument. If the index has been changed since last time,
         `self.needs_calc` is set to True and the run button is set to "changed".
+        
+        When fixpoint simulation is selected, all corresponding widgets are made
+        visible. `self.fx_sim` is set to True.
+        
+        If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
         logger.debug("start fx_select")
 
@@ -370,34 +367,6 @@ class Plot_Impz(QWidget):
             self.needs_calc = True
 
         self.fx_sim_old = self.fx_sim
-
-
-    def fx_run(self, phase, dict_sig=None):
-        """
-        Run the fixpoint simulation
-        """
-        if self.needs_calc:
-            self.needs_redraw = [True] * 2
-            if phase == 'set_stimuli':
-                self.calc_stimulus()
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
-                    'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-                logger.debug("fx stimulus sent")
-                return
-            elif phase == 'set_results':
-                self.y = np.asarray(dict_sig['fx_results'])
-                if self.y is None:
-                    qstyle_widget(self.ui.but_run, "error")
-                    self.needs_calc = True
-                else:
-                    self.calc_response()
-                    self.needs_calc = False
-
-                    self.draw()
-                    qstyle_widget(self.ui.but_run, "normal")
-                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
-            else:
-                logger.error("Unknown argument {0} for fx_run phase".format(phase))
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -511,44 +480,45 @@ class Plot_Impz(QWidget):
             self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
             self.x_q = self.q_i.fixp(self.x)
 
+            self.sig_tx.emit({'sender':__name__, 'fx_sim':'send_stimulus',
+                    'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+            logger.debug("fx stimulus sent")
+
         self.needs_redraw[:] = [True] * 2
 
 #------------------------------------------------------------------------------
-    def calc_response(self, y_fx=None):
+    def calc_response(self):
         """
-        (Re-)calculate filter response `self.y` from either stimulus `self.x`
-        or from the passed array (e.g. fixpoint response).
+        (Re-)calculate float filter response `self.y` from stimulus `self.x`.
 
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        # for fixpoint simulations, results from fixpoint simulation are used instead:
-        if not self.fx_sim:
-            # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
-            self.bb = np.asarray(fb.fil[0]['ba'][0])
-            self.aa = np.asarray(fb.fil[0]['ba'][1])
-            if min(len(self.aa), len(self.bb)) < 2:
-                logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-                return
+        # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
+        self.bb = np.asarray(fb.fil[0]['ba'][0])
+        self.aa = np.asarray(fb.fil[0]['ba'][1])
+        if min(len(self.aa), len(self.bb)) < 2:
+            logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+            return
 
-            logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
+        logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
 
-            sos = np.asarray(fb.fil[0]['sos'])
-            antiCausal = 'zpkA' in fb.fil[0]
-            causal     = not antiCausal
+        sos = np.asarray(fb.fil[0]['sos'])
+        antiCausal = 'zpkA' in fb.fil[0]
+        causal     = not antiCausal
 
-            if len(sos) > 0 and causal: # has second order sections and is causal
-                y = sig.sosfilt(sos, self.x)
-            elif antiCausal:
-                y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
-            else: # no second order sections or antiCausals for current filter
-                y = sig.lfilter(self.bb, self.aa, self.x)
+        if len(sos) > 0 and causal: # has second order sections and is causal
+            y = sig.sosfilt(sos, self.x)
+        elif antiCausal:
+            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
+        else: # no second order sections or antiCausals for current filter
+            y = sig.lfilter(self.bb, self.aa, self.x)
 
-            if self.ui.stim == "StepErr":
-                dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
-                y = y - abs(dc[1]) # subtract DC (final) value from response
+        if self.ui.stim == "StepErr":
+            dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
+            y = y - abs(dc[1]) # subtract DC (final) value from response
 
-            self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
+        self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 
         self.needs_redraw[:] = [True] * 2
 
@@ -560,6 +530,30 @@ class Plot_Impz(QWidget):
         else:
             self.y_r = self.y
             self.y_i = None
+
+#------------------------------------------------------------------------------            
+    def draw_response_fx(self, dict_sig=None):
+        """
+        Get Fixpoint results and plot them
+        """
+        if self.needs_calc:
+            self.needs_redraw = [True] * 2
+            t_draw_start = time.process_time()
+            self.y = np.asarray(dict_sig['fx_results'])
+            if self.y is None:
+                qstyle_widget(self.ui.but_run, "error")
+                self.needs_calc = True
+            else:
+                self.needs_calc = False
+                self.y_r = self.y
+                self.y_i = None
+                self.cmplx = False
+
+                self.draw()
+                qstyle_widget(self.ui.but_run, "normal")
+                
+                self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
+
 
 #------------------------------------------------------------------------------
     def calc_fft(self):
