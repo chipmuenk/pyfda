@@ -285,7 +285,6 @@ class Input_Coeffs(QWidget):
         self.tab_label = "b,a"
         
         self.data_changed = True # initialize flag: filter data has been changed
-        self.ui_changed = True # initialize flag: ui for csv options has been changed
         self.fx_specs_changed = True # fixpoint specs have been changed outside
 
         self.ui = Input_Coeffs_UI(self) # create the UI part with buttons etc.
@@ -302,13 +301,14 @@ class Input_Coeffs(QWidget):
         if dict_sig['sender'] == __name__:
             logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
             return
-        if self.isVisible():
+
+        if  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            self.ui._set_load_save_icons()
+
+        elif self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:
                 self.load_dict()
                 self.data_changed = False
-            if  self.ui_changed or ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv'):
-                self.ui._set_load_save_icons()
-                self.ui_changed = False 
             if self.fx_specs_changed or ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
                 self.qdict2ui()
                 self.fx_specs_changed = False
@@ -316,8 +316,6 @@ class Input_Coeffs(QWidget):
             # TODO: draw wouldn't be necessary for 'view_changed', only update view 
             if 'data_changed' in dict_sig:
                 self.data_changed = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
-                self.ui_changed = True
             elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
                 self.fx_specs_changed = True
 

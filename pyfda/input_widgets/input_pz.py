@@ -185,7 +185,6 @@ class Input_PZ(QWidget):
         super(Input_PZ, self).__init__(parent)
         
         self.data_changed = True # initialize flag: filter data has been changed
-        self.ui_changed = True # initialize flag: ui for csv options has been changed
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.angle_char = "\u2220"
@@ -215,19 +214,18 @@ class Input_PZ(QWidget):
             logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
                      .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
         
-        if self.isVisible():
+        if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            self.ui._set_load_save_icons()
+            #self.sig_tx.emit(dict_sig)
+
+        elif self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
                 self.load_dict()
                 self.data_changed = False
-            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv' or self.ui_changed:
-                self.ui._set_load_save_icons()
-                self.ui_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view 
             if 'data_changed' in dict_sig:
                 self.data_changed = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
-                self.ui_changed = True
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
