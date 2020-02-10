@@ -35,16 +35,16 @@ from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
 class CSV_option_box(QDialog):
     """
     Create a pop-up widget for setting CSV options. This is needed when storing /
-    reading Comma-Separated Value (CSV) files containing coefficients or poles 
+    reading Comma-Separated Value (CSV) files containing coefficients or poles
     and zeros.
     """
     sig_tx = pyqtSignal(dict) # outgoing
-    
+
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
         self._construct_UI()
         qwindow_stay_on_top(self, True)
-        
+
 #------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
@@ -147,7 +147,7 @@ class CSV_option_box(QDialog):
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
-            
+
             self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
 
         except KeyError as e:
@@ -460,7 +460,7 @@ def qtext2table(parent, fkey, title = "Import"):
         data_arr = csv2array(io.StringIO(text))
         if isinstance(data_arr, str): # returned an error message instead of numpy data
             logger.error("Error importing clipboard data:\n{0}".format(data_arr))
-            return None   
+            return None
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array
@@ -489,9 +489,9 @@ def csv2array(f):
     -------
 
     ndarray
-        numpy array containing table data from file or text when import was 
-        successful     
-        
+        numpy array containing table data from file or text when import was
+        successful
+
     io_error: str
         String with the error message when import was unsuccessful
     """
@@ -564,7 +564,7 @@ def csv2array(f):
     logger.info("Parsing CSV data with header = '{0}'\n"
                 "\tDelimiter = {1} | Lineterm. = {2} | quotechar = ' {3} '\n"
                 "\tType of passed text: '{4}'"
-                .format(use_header, repr(delimiter), repr(lineterminator), 
+                .format(use_header, repr(delimiter), repr(lineterminator),
                         quotechar,f.__class__.__name__))
     #------------------------------------------------
     # finally, create iterator from csv data
@@ -574,16 +574,16 @@ def csv2array(f):
 #     with open('/your/path/file') as f:
 #         for line in f:
 #             process(line)
-# 
+#
 #     Where you define your process function any way you want. For example:
-# 
+#
 #         def process(line):
 #             if 'save the world' in line.lower():
 #                 superman.save_the_world()
-# 
-#     This will work nicely for any file size and you go through your file in just 1 pass. 
+#
+#     This will work nicely for any file size and you go through your file in just 1 pass.
 #     This is typically how generic parsers will work.
-#     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)  
+#     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
 # =============================================================================
 
     if use_header:
@@ -621,7 +621,7 @@ def import_data(parent, fkey, title="Import"):
     parent: handle to calling instance
 
     fkey: str
-        Key for accessing data in *.npz or Matlab workspace (*.mat) file with 
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file with
         multiple entries.
 
     title: str
@@ -715,7 +715,7 @@ def export_data(parent, data, fkey, title="Export"):
         title string for the file dialog box (e.g. "filter coefficients ")
 
     """
-    
+
     logger.debug("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
@@ -857,10 +857,10 @@ def generate_header(title):
     unit = fb.fil[0]['amp_specs_unit']
     unit = 'dB' # fix this for the moment
     # construct pairs of corner frequency and corresponding amplitude
-    # labels in ascending frequency for each response type        
+    # labels in ascending frequency for each response type
     if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
         if fb.fil[0]['rt'] == 'LP':
-            f_lbls = ['F_PB', 'F_SB'] 
+            f_lbls = ['F_PB', 'F_SB']
             a_lbls = ['A_PB', 'A_SB']
         elif fb.fil[0]['rt'] == 'HP':
             f_lbls = ['F_SB', 'F_PB']
@@ -878,9 +878,9 @@ def generate_header(title):
 
     # Try to get lists of frequency / amplitude specs from the filter dict
     # that correspond to the f_lbls / a_lbls pairs defined above
-    # When one of the labels doesn't exist in the filter dict, delete 
+    # When one of the labels doesn't exist in the filter dict, delete
     # all corresponding amplitude and frequency entries.
-        err = [False] * len(f_lbls) # initialize error list  
+        err = [False] * len(f_lbls) # initialize error list
         f_vals = []
         a_targs = []
         for i in range(len(f_lbls)):
@@ -908,7 +908,7 @@ def generate_header(title):
                 del f_vals[i]
                 del a_lbls[i]
                 del a_targs[i]
-                del a_targs_dB[i]    
+                del a_targs_dB[i]
 
     date_frmt = "%d-%B-%Y %H:%M:%S" # select date format
     unit = fb.fil[0]['plt_fUnit']
