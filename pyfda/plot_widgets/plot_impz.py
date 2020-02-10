@@ -153,14 +153,12 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx) 
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None, propagate=False):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from 
         - the navigation toolbars (time and freq.)
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
-
-        All signals terminate here unless the flag `propagate=True`.
         """
 
         logger.debug("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"\
