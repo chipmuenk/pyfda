@@ -37,10 +37,21 @@ class CSV_option_box(QDialog):
     reading Comma-Separated Value (CSV) files containing coefficients or poles 
     and zeros.
     """
+    sig_tx = pyqtSignal(dict) # outgoing
+    
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
         self._init_UI()
+#------------------------------------------------------------------------------
+    def closeEvent(self, event):
+        """
+        Override closeEvent (user has tried to close the window) and send a
+        signal to parent where window closing is registered before actually
+        closing the window.
+        """
+        self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
+        event.accept()
 
     def _init_UI(self):
         """ initialize the User Interface """
@@ -134,6 +145,8 @@ class CSV_option_box(QDialog):
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
+            
+            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
 
         except KeyError as e:
             logger.error(e)
