@@ -20,6 +20,7 @@ from pyfda.libs.compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit
 from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine
 from pyfda.libs.pyfda_io_lib import CSV_option_box
 from pyfda.libs.pyfda_lib import pprint_log
+import pyfda.libs.pyfda_dirs as dirs
  
 from pyfda.pyfda_rc import params
 
@@ -33,7 +34,6 @@ class Input_Coeffs_UI(QWidget):
     def __init__(self, parent):
         super(Input_Coeffs_UI, self).__init__(parent)
         self.eps = 1.e-6 # initialize tolerance value
-        self.csv_options_window = None # handle to csv_options pop-up
         self._construct_UI()
 
 #------------------------------------------------------------------------------
@@ -42,10 +42,11 @@ class Input_Coeffs_UI(QWidget):
         Process signals coming from the CSV pop-up window
         """
 
-        logger.debug("PROCESS_SIG_RX\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
         
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
+            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})            
             return # probably not needed
         elif 'ui_changed' in dict_sig:
             self._set_load_save_icons() # update icons file <-> clipboard
@@ -194,7 +195,6 @@ class Input_Coeffs_UI(QWidget):
 
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
-        self._set_load_save_icons()
 
         self.but_csv_options = QPushButton(self)
         self.but_csv_options.setIcon(QIcon(':/settings.svg'))
@@ -203,6 +203,8 @@ class Input_Coeffs_UI(QWidget):
                                 "to copy to/from clipboard or file.</span>")
         self.but_csv_options.setCheckable(True)
         self.but_csv_options.setChecked(False)
+        
+        self._set_load_save_icons() # initialize icon / button settings
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
@@ -430,22 +432,26 @@ class Input_Coeffs_UI(QWidget):
         else:
             qstyle_widget(self.but_csv_options, "normal")
 
-        if self.csv_options_window is None: # no handle to the window? Create a new instance
+        if dirs.csv_options_handle is None: # no handle to the window? Create a new instance
             if self.but_csv_options.isChecked():
                 # Important: Handle to window must be class attribute otherwise it
                 # (and the attached window) is deleted immediately when it goes out of scope
-                self.csv_options_window = CSV_option_box(self)
-                self.csv_options_window.sig_tx.connect(self.process_sig_rx)
-                self.csv_options_window.show() # modeless i.e. non-blocking popup window
+                dirs.csv_options_handle = CSV_option_box(self)
+                dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
+                dirs.csv_options_handle.show() # modeless i.e. non-blocking popup window
         else:
             if not self.but_csv_options.isChecked(): # this should not happen
-                if self.csv_options_window is None:
+                if dirs.csv_options_handle is None:
                     logger.warning("CSV options window is already closed!")
                 else:
-                    self.csv_options_window.close()
+                    dirs.csv_options_handle.close()
+
+        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+
+    #------------------------------------------------------------------------------
 
     def _close_csv_win(self):
-        self.csv_options_window = None
+        dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
         qstyle_widget(self.but_csv_options, "normal")
 
@@ -474,6 +480,13 @@ class Input_Coeffs_UI(QWidget):
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
             self.butToTable.setToolTip("<span>Load table from file.</span>")
+
+        if dirs.csv_options_handle is None:
+            qstyle_widget(self.but_csv_options, "normal")
+            self.but_csv_options.setChecked(False)
+        else:
+            qstyle_widget(self.but_csv_options, "changed")
+            self.but_csv_options.setChecked(True)            
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
