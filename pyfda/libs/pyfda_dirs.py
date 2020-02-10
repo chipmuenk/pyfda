@@ -165,3 +165,5 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
 save_dir = HOME_DIR
 """ Place holder for default file filter in file dialog"""
 save_filt = ''
+""" Global handle to pop-up window for CSV options """
+csv_options_handle = None
