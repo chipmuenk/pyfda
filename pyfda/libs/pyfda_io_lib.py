@@ -43,6 +43,8 @@ class CSV_option_box(QDialog):
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
         self._init_UI()
+        qwindow_stay_on_top(self, True)
+        
 #------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
