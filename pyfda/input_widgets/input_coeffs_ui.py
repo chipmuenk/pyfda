@@ -17,8 +17,9 @@ from pyfda.libs.compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit
                       QPushButton, QFrame, QSpinBox, QFont, QIcon,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
-from pyfda.libs.pyfda_qt_lib import qset_cmb_box, QHLine
+from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine
 from pyfda.libs.pyfda_io_lib import CSV_option_box
+from pyfda.libs.pyfda_lib import pprint_log
  
 from pyfda.pyfda_rc import params
 
@@ -32,6 +33,28 @@ class Input_Coeffs_UI(QWidget):
     def __init__(self, parent):
         super(Input_Coeffs_UI, self).__init__(parent)
         self.eps = 1.e-6 # initialize tolerance value
+        self.csv_options_window = None # handle to csv_options pop-up
+        self._construct_UI()
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from the CSV pop-up window
+        """
+
+        logger.debug("PROCESS_SIG_RX\n{0}".format(pprint_log(dict_sig)))
+        
+        if 'closeEvent' in dict_sig:
+            self._close_csv_win()
+            return # probably not needed
+        elif 'ui_changed' in dict_sig:
+            self._set_load_save_icons() # update icons file <-> clipboard
+            # inform e.g. the p/z input widget about changes in CSV options 
+            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+
+#------------------------------------------------------------------------------
+    def _construct_UI(self):
+
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -173,11 +196,13 @@ class Input_Coeffs_UI(QWidget):
         self.butToTable.setIconSize(q_icon_size)
         self._set_load_save_icons()
 
-        butSettingsClipboard = QPushButton(self)
-        butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
-        butSettingsClipboard.setIconSize(q_icon_size)
-        butSettingsClipboard.setToolTip("<span>Select CSV format and whether "
+        self.but_csv_options = QPushButton(self)
+        self.but_csv_options.setIcon(QIcon(':/settings.svg'))
+        self.but_csv_options.setIconSize(q_icon_size)
+        self.but_csv_options.setToolTip("<span>Select CSV format and whether "
                                 "to copy to/from clipboard or file.</span>")
+        self.but_csv_options.setCheckable(True)
+        self.but_csv_options.setChecked(False)
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
@@ -188,7 +213,7 @@ class Input_Coeffs_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butLoad)
         layHButtonsCoeffs1.addWidget(self.butFromTable)
         layHButtonsCoeffs1.addWidget(self.butToTable)
-        layHButtonsCoeffs1.addWidget(butSettingsClipboard)
+        layHButtonsCoeffs1.addWidget(self.but_csv_options)
         layHButtonsCoeffs1.addStretch()
 
         #----------------------------------------------------------------------
@@ -393,21 +418,37 @@ class Input_Coeffs_UI(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------                
-        butSettingsClipboard.clicked.connect(self._copy_options)
-        self.sig_rx.connect(self._set_load_save_icons)
-        
+        self.but_csv_options.clicked.connect(self._open_csv_win)
+ 
     #------------------------------------------------------------------------------
-    def _copy_options(self):
+    def _open_csv_win(self):
         """
-        Set options for copying to/from clipboard or file, storing the selections
-        in `params`
-        """
-        self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
-        #self.opt_widget.show() # modeless dialog, i.e. non-blocking
-        self.opt_widget.exec_() # modal dialog (blocking)
+        Pop-up window for CSV options
+        """        
+        if self.but_csv_options.isChecked():
+            qstyle_widget(self.but_csv_options, "changed")
+        else:
+            qstyle_widget(self.but_csv_options, "normal")
 
-        self._set_load_save_icons()
-        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+        if self.csv_options_window is None: # no handle to the window? Create a new instance
+            if self.but_csv_options.isChecked():
+                # Important: Handle to window must be class attribute otherwise it
+                # (and the attached window) is deleted immediately when it goes out of scope
+                self.csv_options_window = CSV_option_box(self)
+                self.csv_options_window.sig_tx.connect(self.process_sig_rx)
+                self.csv_options_window.show() # modeless i.e. non-blocking popup window
+        else:
+            if not self.but_csv_options.isChecked(): # this should not happen
+                if self.csv_options_window is None:
+                    logger.warning("CSV options window is already closed!")
+                else:
+                    self.csv_options_window.close()
+
+    def _close_csv_win(self):
+        self.csv_options_window = None
+        self.but_csv_options.setChecked(False)
+        qstyle_widget(self.but_csv_options, "normal")
+
 
     #------------------------------------------------------------------------------
     def _set_load_save_icons(self):
