@@ -22,14 +22,15 @@ import numpy as np
 from scipy.io import loadmat, savemat
 
 from .pyfda_lib import safe_eval, lin2unit
-from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
+from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
+
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
-                     QFileDialog, QHBoxLayout, QVBoxLayout)
+                     QFileDialog, QHBoxLayout, QVBoxLayout, pyqtSignal)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
     """
@@ -39,10 +40,9 @@ class CSV_option_box(QDialog):
     """
     sig_tx = pyqtSignal(dict) # outgoing
     
-
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
-        self._init_UI()
+        self._construct_UI()
         qwindow_stay_on_top(self, True)
         
 #------------------------------------------------------------------------------
@@ -55,7 +55,8 @@ class CSV_option_box(QDialog):
         self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
         event.accept()
 
-    def _init_UI(self):
+#------------------------------------------------------------------------------
+    def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
         lblDelimiter = QLabel("CSV-Delimiter:", self)
@@ -134,7 +135,6 @@ class CSV_option_box(QDialog):
         self.cmbHeader.currentIndexChanged.connect(self._store_settings)
         self.radClipboard.clicked.connect(self._store_settings)
         self.radFile.clicked.connect(self._store_settings)
-
 
     def _store_settings(self):
         """
