@@ -482,7 +482,7 @@ def csv2array(f):
     f: handle to file or file-like object
         e.g.
 
-        >>> f = io.open(file_name, 'r') # or
+        >>> f = open(file_name, 'r') # or
         >>> f = io.StringIO(text)
 
     Returns
@@ -659,14 +659,14 @@ def import_data(parent, fkey, title="Import"):
     file_type_err = False
     try:
         if file_type in {'.csv'}:
-            with io.open(file_name, 'r') as f:
+            with open(file_name, 'r') as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str): # returned an error message instead of numpy data
                     logger.error("Error loading file '{0}':\n{1}".format(file_name, data_arr))
                     return None
         else:
-            with io.open(file_name, 'rb') as f:
+            with open(file_name, 'rb') as f:
                 if file_type == '.mat':
                     data_arr = loadmat(f)[fkey]
                 elif file_type == '.npy':
@@ -762,7 +762,7 @@ def export_data(parent, data, fkey, title="Export"):
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
         elif file_type in {'.coe', '.txt', '.vhd'}: # text / string format
-            with io.open(file_name, 'w', encoding="utf8") as f:
+            with open(file_name, 'w', encoding="utf8") as f:
                 if file_type == '.coe':
                     export_coe_xilinx(f)
                 elif file_type == '.txt':
@@ -777,7 +777,7 @@ def export_data(parent, data, fkey, title="Export"):
                 logger.error("Error converting coefficient data:\n{0}".format(np_data))
                 return None
 
-            with io.open(file_name, 'wb') as f:
+            with open(file_name, 'wb') as f:
                 if file_type == '.mat':
                     savemat(f, mdict={fkey:np_data})
                     # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
