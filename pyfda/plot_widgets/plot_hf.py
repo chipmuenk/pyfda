@@ -44,6 +44,7 @@ class Plot_Hf(QWidget):
         self.tab_label = "|H(f)|"
 
         self.log_bottom = -80
+        self.lin_neg_bottom = -10
 
         self._construct_ui()
 
@@ -595,13 +596,13 @@ class Plot_Hf(QWidget):
                                          sign='neg')
                 self.led_log_bottom.setText(str(self.log_bottom))
 
-                self.H_plt = 20*np.log10(abs(H))
-                A_lim = [self.log_bottom, np.max(self.H_plt) + 2]
+                self.H_plt = np.maximum(20*np.log10(abs(H)), self.log_bottom)
+                A_lim = [self.log_bottom, 2]
                 H_str += ' in dB ' + r'$\rightarrow$'
             elif self.unitA == 'V': #  'lin'
                 self.H_plt = H
                 if self.cmbShowH.currentIndex() != 0: # H can be less than zero
-                    A_min = np.min(self.H_plt)
+                    A_min = max(self.lin_neg_bottom, np.min(self.H_plt))
                 else:
                     A_min = 0
                 A_lim = [A_min, (1.05 + A_max)]
@@ -611,6 +612,8 @@ class Plot_Hf(QWidget):
                 A_lim = [0, (1.03 + A_max)**2.]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
+                
+            #logger.debug("lim: {0}, min: {1}, max: {2} - {3}".format(A_lim, A_min, A_max, self.H_plt[0]))
 
             #-----------------------------------------------------------
             self.ax.clear()
