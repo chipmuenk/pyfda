@@ -830,7 +830,7 @@ def import_data(parent, fkey, title="Import"):
     file_type_err = False
     try:
         if file_type in {'.csv'}:
-            with open(file_name, 'r') as f:
+            with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str): # returned an error message instead of numpy data
