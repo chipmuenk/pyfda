@@ -21,7 +21,7 @@ import datetime
 import numpy as np
 from scipy.io import loadmat, savemat
 
-from .pyfda_lib import safe_eval, lin2unit
+from .pyfda_lib import safe_eval, lin2unit, pprint_log
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
 
 import pyfda.libs.pyfda_fix_lib as fx
@@ -600,18 +600,45 @@ def csv2array(f):
         return io_error
 
     try:
+        if data_list is None:
+            return "Imported data is None."           
         data_arr = np.array(data_list)
-        cols, rows = np.shape(data_arr)
-        logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
-        if params['CSV']['orientation'] == 'vert':
-            return data_arr.T
-        else:
+        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
+            return "Imported data is a scalar: '0'".format(data_arr)
+        elif np.ndim(data_arr) == 1:
             return data_arr
+        elif np.ndim(data_arr) == 2:
+            cols, rows = np.shape(data_arr)
+            logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
+            if cols > 2 and rows > 2:
+                return "Unsuitable data shape {0}".format(np.shape(data_arr))
+            elif cols > rows:
+                return data_arr.T
+            else:
+                return data_arr
+        else:
+            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
+                .format(np.ndim(data_arr), np.shape(data_arr))
 
     except (TypeError, ValueError) as e:
         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
         return io_error
 
+# =============================================================================
+#     try:
+#         data_arr = np.array(data_list)
+#         cols, rows = np.shape(data_arr)
+#         logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
+#         if params['CSV']['orientation'] == 'vert':
+#             return data_arr.T
+#         else:
+#             return data_arr
+# 
+#     except (TypeError, ValueError) as e:
+#         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
+#         return io_error
+# 
+# =============================================================================
 #------------------------------------------------------------------------------
 def csv2array_new(f):
     """
@@ -711,7 +738,7 @@ def csv2array_new(f):
                         quotechar,f.__class__.__name__))
     #------------------------------------------------
     # finally, create iterator from csv data
-    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
+    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator)
     #------------------------------------------------
 # =============================================================================
     """ 
@@ -738,15 +765,19 @@ def csv2array_new(f):
       https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
      """
 
-
+    data_list = []
+    
     def process(line):
-        if 'save the world' in line.lower():
-            superman.save_the_world()
+        data_list.append(line.split(lineterminator)) # split into lines (if not split yet)
 
 
     #with open(fo) as f:
     for line in f:
         process(line)
+        
+    for e in data_list:
+        pass
+        
 
     # Where you define your process function any way you want. For example:
 
@@ -756,26 +787,39 @@ def csv2array_new(f):
     # (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
 # =============================================================================
 
-    if use_header:
-        logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
+# =============================================================================
+#     if use_header:
+#         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
+# 
+#     try:
+#         for row in data_iter:
+#             logger.debug("{0}".format(row))
+#             data_list.append(row)
+#     except csv.Error as e:
+#         io_error = "Error during CSV reading:\n{0}".format(e)
+#         return io_error
+# =============================================================================
 
-    data_list = []
     try:
-        for row in data_iter:
-            logger.debug("{0}".format(row))
-            data_list.append(row)
-    except csv.Error as e:
-        io_error = "Error during CSV reading:\n{0}".format(e)
-        return io_error
-
-    try:
+        if data_list is None:
+            return "Imported data is None."           
         data_arr = np.array(data_list)
-        cols, rows = np.shape(data_arr)
-        logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
-        if params['CSV']['orientation'] == 'vert':
-            return data_arr.T
-        else:
+        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
+            return "Imported data is a scalar: '0'".format(data_arr)
+        elif np.ndim(data_arr) == 1:
             return data_arr
+        elif np.ndim(data_arr) == 2:
+            cols, rows = np.shape(data_arr)
+            logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
+            if cols > 2 and rows > 2:
+                return "Unsuitable data shape {0}".format(np.shape(data_arr))
+            elif cols > rows:
+                return data_arr.T
+            else:
+                return data_arr
+        else:
+            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
+                .format(np.ndim(data_arr), np.shape(data_arr))
 
     except (TypeError, ValueError) as e:
         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
@@ -857,6 +901,7 @@ def import_data(parent, fkey, title="Import"):
 
         if not file_type_err:
             logger.info('Successfully imported \n\t"{0}"'.format(file_name))
+            logger.info("data_arr: \n{0}".format(pprint_log(data_arr,N=3)))
             dirs.save_dir = os.path.dirname(file_name)
             dirs.save_filt = sel_filt
             return data_arr # returns numpy array
