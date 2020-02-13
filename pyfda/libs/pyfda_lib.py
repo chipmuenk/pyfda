@@ -280,7 +280,23 @@ def pprint_log(d, N=10, tab="\t"):
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
     elif type(d) in {list, np.ndarray}:
-        s += str(d[: min(N-1, len(d))]) + ' ...'
+        if type(d) == np.ndarray:
+            d = d.tolist()
+        if np.ndim(d) == 1:
+            s += 'shape =  ({0} x 1)\n'.format(len(d))
+            s += str(d[: min(N-1, len(d))])
+            if len(d) > N-1:
+                s += ' ...'
+        elif np.ndim(d) == 2:
+            cols, rows = np.shape(d)
+            s += 'shape =  ({0} x {1})\n'.format(rows, cols)
+            for c in range(min(N-1, cols)):
+                s += str(d[: min(N-1, rows)][c])
+                if rows > N-1:
+                    s += ' ...'+ '\n'
+                else:
+                    s += '\n'
+                
     else:
         s = d
 
