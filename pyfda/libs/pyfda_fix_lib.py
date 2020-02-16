@@ -415,7 +415,7 @@ class Fixed(object):
 
     def __init__(self, q_obj):
         """
-        Initialize fixed object with dict q_obj
+        Initialize Fixed object with dict q_obj
         """
         # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
