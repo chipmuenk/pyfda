@@ -980,11 +980,11 @@ def export_data(parent, data, fkey, title="Export"):
         elif file_type in {'.coe', '.txt', '.vhd'}: # text / string format
             with open(file_name, 'w', encoding="utf8") as f:
                 if file_type == '.coe':
-                    export_coe_xilinx(f)
+                    err = export_coe_xilinx(f)
                 elif file_type == '.txt':
-                    export_coe_microsemi(f)
+                    err = export_coe_microsemi(f)
                 else: #file_type == '.vhd':
-                    export_coe_vhdl_package(f)
+                    err = export_coe_vhdl_package(f)
 
         else: # binary format
             # convert csv data to numpy array
@@ -1155,11 +1155,20 @@ def export_coe_xilinx(f):
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
     logger.debug("scale = {0}, WF = {1}".format(qc.scale, qc.WF))
+
+    if qc.WF != 0: # Set the fixpoint format to integer (WF=0) with the original wordlength
+        qc.setQobj({'W':qc.W, 'scale':1 << qc.W-1})# Set the fixpoint format to integer (WF=0) with the original wordlength
+        logger.warning("Fractional formats are not supported, using integer format.")
+
     if qc.frmt == 'hex': # select hex format
         coe_radix = 16
+    if qc.frmt == 'bin': # select binary format
+        coe_radix = 2        
     else:
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
         coe_radix = 10
+        logger.warning('Coefficients are in "{0}" format are not supported in COE format,'
+                       'using decimal format.')
 
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -1184,7 +1193,16 @@ def export_coe_microsemi(f):
     specified?
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
-    qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
+
+    if qc.WF != 0: # Set the fixpoint format to integer (WF=0) with the original wordlength:
+        qc.setQobj({'W':qc.W, 'scale':1 << qc.W-1})
+        logger.warning("Fractional formats are not supported, using integer format.")
+
+    if qc.frmt != 'dec':
+        qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
+        logger.warning('Only coefficients in "dec" format are supported,'
+                       'using decimal format.')
+
     # Quantize coefficients to decimal integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
@@ -1193,6 +1211,8 @@ def export_coe_microsemi(f):
         coeff_str += str(b) + "\n"
 
     f.write(coeff_str)
+    
+    return None
 
 #------------------------------------------------------------------------------
 def export_coe_vhdl_package(f):
@@ -1201,6 +1221,11 @@ def export_coe_vhdl_package(f):
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
+    if not qc.frmt == 'float' and qc.WF != 0: 
+        # Set the fixpoint format to integer (WF=0) with the original wordlength
+        qc.setQobj({'W':qc.W, 'scale':1 << qc.W-1})
+        logger.warning("Fractional formats are not supported, using integer format.")
+
     WO = fb.fil[0]['fxqc']['QO']['W']
 
     if qc.frmt == 'hex':
@@ -1209,22 +1234,30 @@ def export_coe_vhdl_package(f):
     elif qc.frmt =='bin':
         pre = "#2#"
         post = "#"
-    else:
+    elif qc.frmt in {'dec', 'float'}:
         pre = ""
-        post = ""
+        post = ""    
+    else:
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
-
-    # Quantize coefficients to decimal / hex integer format, returning an array of strings
+        logger.warning('Coefficients in "{0}" format are currently not supported,'
+                       'using decimal format.')
+        
+    # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
     exp_str = "-- " + generate_header("VHDL FIR filter coefficient package file").replace("\n","\n-- ")
 
-    exp_str += "\nLIBRARY ieee;\n"
-    exp_str += "USE ieee.std_logic_1164.all;\n\n"
+    exp_str += "\nlibrary IEEE;\n"
+    if qc.frmt == 'float':
+        exp_str += "use IEEE.math_real.all;\n"
+    exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    exp_str += "type coeff_type is array(0 to n_taps) of integer "
-    exp_str += "range {0} to {1};\n\n".format(-1 << WO, (1 << WO) - 1)
+    if qc.frmt == 'float':
+        exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
+    else:
+        exp_str += "type coeff_type is array(0 to n_taps) of integer "        
+        exp_str += "range {0} to {1};\n\n".format(-1 << WO-1, (1 << WO-1) - 1)
     exp_str += "constant coeff : coeff_type := "
 
     coeff_str = "(\n"
@@ -1235,6 +1268,8 @@ def export_coe_vhdl_package(f):
     exp_str += "end coeff_package;"
 
     f.write(exp_str)
+    
+    return None
 
 #------------------------------------------------------------------------------
 def export_coe_TI(f):
