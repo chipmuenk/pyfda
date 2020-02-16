@@ -271,6 +271,7 @@ def pprint_log(d, N=10, tab="\t"):
     """
 
     s = tab
+    logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
     if type(d) == dict:
         for k in d:
             if type(d[k]) in {list, np.ndarray}:
@@ -280,23 +281,25 @@ def pprint_log(d, N=10, tab="\t"):
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
     elif type(d) in {list, np.ndarray}:
-        if type(d) == np.ndarray:
-            d = d.tolist()
+        #if type(d) == np.ndarray:
+        #    d = d.tolist()
         if np.ndim(d) == 1:
-            s += 'shape =  ({0} x 1)\n'.format(len(d))
+            s += ('Type: {1}, Shape =  ({0} x 1)\n' + tab).format(len(d), type(d[0]))
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)
-            s += 'shape =  ({0} x {1})\n'.format(rows, cols)
+            s += ('Type: {1}, Shape =  ({0} x {1})\n' + tab).format(rows, cols, type(d[0][0]))
             for c in range(min(N-1, cols)):
+                logger.warning(type(d[0][0]))
+                logger.warning(d)
+                logger.warning('rows={0},min={1}\nd={2}'.format(N, rows, min(N-1, rows), d[:min(N-1, rows)][c]))
                 s += str(d[: min(N-1, rows)][c])
                 if rows > N-1:
-                    s += ' ...'+ '\n'
+                    s += ' ...'+ '\n' + tab
                 else:
-                    s += '\n'
-                
+                    s += '\n' + tab
     else:
         s = d
 
