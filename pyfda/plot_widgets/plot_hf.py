@@ -602,7 +602,7 @@ class Plot_Hf(QWidget):
             elif self.unitA == 'V': #  'lin'
                 self.H_plt = H
                 if self.cmbShowH.currentIndex() != 0: # H can be less than zero
-                    A_min = max(self.lin_neg_bottom, np.min(self.H_plt))
+                    A_min = max(self.lin_neg_bottom, np.nanmin(self.H_plt[np.isfinite(self.H_plt)]))
                 else:
                     A_min = 0
                 A_lim = [A_min, (1.05 + A_max)]
