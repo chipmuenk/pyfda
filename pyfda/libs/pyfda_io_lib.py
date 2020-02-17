@@ -1165,10 +1165,10 @@ def export_coe_xilinx(f):
     if qc.frmt == 'bin': # select binary format
         coe_radix = 2        
     else:
+        logger.warning('Coefficients in "{0}" format are not supported in COE files, '
+                       'using decimal format.')
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
         coe_radix = 10
-        logger.warning('Coefficients are in "{0}" format are not supported in COE format,'
-                       'using decimal format.')
 
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -1239,8 +1239,10 @@ def export_coe_vhdl_package(f):
         post = ""    
     else:
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
-        logger.warning('Coefficients in "{0}" format are currently not supported,'
-                       'using decimal format.')
+        pre = ""
+        post = ""    
+        logger.warning('Coefficients in "{0}" format are currently not supported, '
+                       'using decimal format.'.format(qc.frmt))
         
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
