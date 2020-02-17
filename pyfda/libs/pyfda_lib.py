@@ -271,7 +271,7 @@ def pprint_log(d, N=10, tab="\t"):
     """
 
     s = tab
-    logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
+    #logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
     if type(d) == dict:
         for k in d:
             if type(d[k]) in {list, np.ndarray}:
