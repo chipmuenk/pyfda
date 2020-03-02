@@ -20,7 +20,7 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
 import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
-#import matplotlib.ticker
+import matplotlib.ticker as ticker
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
@@ -193,6 +193,40 @@ class Plot_Hf(QWidget):
             self.ax = self.mplwidget.fig.subplots()
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
+
+#------------------------------------------------------------------------------
+    def align_y_axes(self, ax1, ax2):
+        """ Sets tick marks of twinx axes to line up with total number of 
+            ax1 tick marks
+    
+        ax1 and ax2 are matplotlib axes
+        Spacing between tick marks will be a factor of minresax1 and minresax2"""
+        ax1_ylims = ax1.get_ybound()
+        # collect only visible ticks
+        ax1_yticks = [t for t in ax1.get_yticks() if t >= ax1_ylims[0] and t <= ax1_ylims[1]]
+        ax1_nticks = len(ax1_yticks)
+        ax1_ydelta_lim = ax1_ylims[1] - ax1_ylims[0]
+        ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0]
+        ax1_yoffset = ax1_yticks[0]-ax1_ylims[0]
+
+        # scale Delta Limits / Delta Ticks
+        ax1_scale = ax1_ydelta_lim / ax1_ydelta_vis
+
+        ax2_ylims = ax2.get_ybound()
+        ax2_yticks = ax2.get_yticks()
+        ax2_nticks = len(ax2_yticks)
+        #ax2_ydelta_lim = ax2_ylims[1] - ax2_ylims[0]
+        ax2_ydelta_vis = ax2_yticks[-1] - ax2_yticks[0]
+        ax2_ydelta_lim = ax2_ydelta_vis * ax1_scale
+        ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
+        ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
+        logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
+
+        ax2.set_yticks(np.linspace(ax2_yticks[0], 
+                                   (ax2_yticks[1]-ax2_yticks[0]), 
+                                   ax1_nticks))
+        ax2_lim0 = ax2_yticks[0] - ax2_yoffset
+        ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
 #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
@@ -443,7 +477,28 @@ class Plot_Hf(QWidget):
                                'g-.', label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
-            nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
+            
+            #nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
+            # Align gridlines between H(f) and phi nicely
+            
+# =============================================================================
+#             # https://stackoverflow.com/questions/26752464/how-do-i-align-gridlines-for-two-y-axis-scales-using-matplotlib
+#             # works, but both axes have ugly numbers
+#             nticks = 11
+#             ax.yaxis.set_major_locator(ticker.LinearLocator(nticks))
+#             self.ax_p.yaxis.set_major_locator(ticker.LinearLocator(nticks))
+# # =============================================================================
+# =============================================================================
+#             # https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
+#             # works, but second axis has ugly numbering
+#             l_H = ax.get_ylim()
+#             l_p = self.ax_p.get_ylim()
+#             f = lambda x : l_p[0]+(x-l_H[0])/(l_H[1]-l_H[0])*(l_p[1]-l_p[0])
+#             ticks = f(ax.get_yticks())
+#             self.ax_p.yaxis.set_major_locator(ticker.FixedLocator(ticks))
+# 
+# =============================================================================
+            
             # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
             # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
             # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
@@ -629,6 +684,7 @@ class Plot_Hf(QWidget):
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(A_lim)
+            logger.warning("set limits")
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
@@ -643,7 +699,10 @@ class Plot_Hf(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
+        if hasattr(self, 'ax_p'):
+            self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()
+        logger.warning("redraw")
 
 #------------------------------------------------------------------------------
 
