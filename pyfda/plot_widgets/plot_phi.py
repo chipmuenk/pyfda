@@ -18,7 +18,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.libs.pyfda_lib import calc_Hcomplex
+from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 classes = {'Plot_Phi':'\u03C6(f)'} #: Dict containing class name : display name
@@ -26,6 +26,9 @@ classes = {'Plot_Phi':'\u03C6(f)'} #: Dict containing class name : display name
 class Plot_Phi(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
+    # outgoing, distributed via plot_tab_widget
+    sig_tx = pyqtSignal(object)
+
 
     def __init__(self, parent):
         super(Plot_Phi, self).__init__(parent)
@@ -42,6 +45,10 @@ class Plot_Phi(QWidget):
         """
         logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"\
                      .format(dict_sig, self.needs_calc, self.isVisible()))
+        if dict_sig['sender'] == __name__:
+            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+            return
+
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
@@ -61,7 +68,7 @@ class Plot_Phi(QWidget):
             # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
             #     self.needs_redraw = True
 
-
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -120,7 +127,7 @@ class Plot_Phi(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkWrap.clicked.connect(self.draw)
-        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+        self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
@@ -129,10 +136,18 @@ class Plot_Phi(QWidget):
         Initialize and clear the axes - this is only called once
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
-            #self.ax = self.mplwidget.fig.add_subplot(111)
             self.ax = self.mplwidget.fig.subplots()
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
+        
+#------------------------------------------------------------------------------
+    def unit_changed(self):
+        """
+        Unit for phase display has been changed, emit a 'view_changed' signal
+        and continue with drawing.
+        """
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'plot_phi'})
+        self.draw()
 
 #------------------------------------------------------------------------------
     def calc_resp(self):
