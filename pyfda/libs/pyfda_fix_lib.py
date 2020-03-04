@@ -775,6 +775,11 @@ class Fixed(object):
         if y == "":
             return 0
 
+        if isinstance(y, np.str_):
+            logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
+            y = str(y)
+            #return None
+
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
@@ -782,7 +787,9 @@ class Fixed(object):
 
         if frmt == 'float32':
             float_frmt = np.float32
+            # TODO: not implemented yet
         elif frmt == 'float16':
+            # TODO: not implemented yet
             float_frmt = np.float16
 
         if frmt == 'float':
@@ -794,6 +801,7 @@ class Fixed(object):
                     y_float = np.complex(y).real
                 except Exception as e:
                     y_float = None
+                    logger.warning("'y': type {0}, len {1}".format(type(y), len(y)))
                     logger.warning("Can't convert {0}: {1}".format(y,e))
             return y_float
 

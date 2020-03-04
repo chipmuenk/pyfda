@@ -284,17 +284,17 @@ def pprint_log(d, N=10, tab="\t"):
         #if type(d) == np.ndarray:
         #    d = d.tolist()
         if np.ndim(d) == 1:
-            s += ('Type: {1}, Shape =  ({0} x 1)\n' + tab).format(len(d), type(d[0]))
+            s += ('Type: {0} -> {1}, Shape =  ({2} x 1)\n' + tab).format(type(d), type(d[0]), len(d))
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)
-            s += ('Type: {1}, Shape =  ({0} x {1})\n' + tab).format(rows, cols, type(d[0][0]))
+            s += ('Type: {0} -> {1}, Shape =  ({2} x {3})\n' + tab).format(type(d), type(d[0][0]), rows, cols)
             for c in range(min(N-1, cols)):
                 logger.warning(type(d[0][0]))
                 logger.warning(d)
-                logger.warning('rows={0},min={1}\nd={2}'.format(N, rows, min(N-1, rows), d[:min(N-1, rows)][c]))
+                logger.warning('rows={0},min={1}\nd={2}'.format(rows, min(N-1, rows), d[:min(N-1, rows)][c]))
                 s += str(d[: min(N-1, rows)][c])
                 if rows > N-1:
                     s += ' ...'+ '\n' + tab

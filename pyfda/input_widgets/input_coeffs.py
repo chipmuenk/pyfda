@@ -602,6 +602,7 @@ class Input_Coeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")
+        logger.error(type(data_str))
         if data_str is None: # file operation has been aborted or some other error
             return
 
