@@ -66,7 +66,7 @@ class Plot_3D(QWidget):
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80
-        self.cmap_default = 'RdYlBu_r'
+        self.cmap_default = 'RdYlBu'
         self.data_changed = True # flag whether data has changed
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
@@ -250,7 +250,7 @@ class Plot_3D(QWidget):
         self.chkColBar.clicked.connect(self.draw)
 
         self.cmbColormap.currentIndexChanged.connect(self.draw)
-        self.chkColormap_r.clicked.connect(self._init_cmb_colormap)
+        self.chkColormap_r.clicked.connect(self.draw)
 
         self.chkLighting.clicked.connect(self.draw)
         self.diaAlpha.valueChanged.connect(self.draw)
@@ -261,37 +261,17 @@ class Plot_3D(QWidget):
         #self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
 #------------------------------------------------------------------------------
-    def _init_cmb_colormap(self, cmap=None):
+    def _init_cmb_colormap(self, cmap_init):
         """
-        (Re-)Load combobox with available colormaps, either with "normal" or with
-        "reversed" color intensities.
+        Initialize combobox with available colormaps and try to set it to `cmap_init`
         
-        When `cmap` is a string, normal and reverse lists are initialized and 
-        used to populate a combobox (either the "reverse" or the "normal") list,
-        depending on the setting of the `self.chkColormap_r` checkbox. It is tried
-        to set the combobox to the passed string.
-        
-        Signal-slot connection passes the state of the clicked `self.chkColormap_r`
-        widget as a bool.
+        Since matplotlib 3.2 the reversed "*_r" colormaps are no longer contained
+        in cm.datad. They are now obtained by using the reversed() function (much simpler!)
         """
-        if isinstance(cmap, str): # initialize colormap lists
-            cmap_new = cmap
-            self.cmap_list = sorted([m for m in cm.datad if not m.endswith("_r")])
-            self.cmap_list_r = sorted([m for m in cm.datad if m.endswith("_r")])
-        elif cmap is True: # chkbox clicked
-            cmap_new = self.cmbColormap.currentText() + "_r"           
-        elif cmap is False: # chkbox unclicked
-            cmap_new = self.cmbColormap.currentText().rstrip('_r')
-
-        self.cmbColormap.blockSignals(True) # don't send signal "indexChanged"
-        self.cmbColormap.clear()
-        if self.chkColormap_r.isChecked():
-            self.cmbColormap.addItems(self.cmap_list_r)
-        else:
-            self.cmbColormap.addItems(self.cmap_list)            
-        self.cmbColormap.blockSignals(False)
-
-        idx = self.cmbColormap.findText(cmap_new)
+        self.cmap_list = sorted([m for m in cm.datad if not m.endswith("_r")])
+        self.cmbColormap.addItems(self.cmap_list)
+        
+        idx = self.cmbColormap.findText(cmap_init)
         if idx == -1:
             idx = 0
         self.cmbColormap.setCurrentIndex(idx)
@@ -441,9 +421,12 @@ class Plot_3D(QWidget):
         N_FFT = params['N_FFT']
 
         alpha = self.diaAlpha.value()/10.
-        cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
-        # Number of Lines /step size for H(f) stride, mesh, contour3d:
 
+        cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
+        if self.chkColormap_r.isChecked():
+            cmap = cmap.reversed() # use reversed colormap
+
+        # Number of Lines /step size for H(f) stride, mesh, contour3d:
         stride = 10 - self.diaHatch.value()
         NL = 3 * self.diaHatch.value() + 5
 
