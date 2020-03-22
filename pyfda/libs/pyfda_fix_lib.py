@@ -776,9 +776,8 @@ class Fixed(object):
             return 0
 
         if isinstance(y, np.str_):
-            logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
+            #logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
             y = str(y)
-            #return None
 
         if frmt is None:
             frmt = self.frmt
