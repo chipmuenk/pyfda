@@ -144,7 +144,7 @@ class Plot_3D(QWidget):
         self.chkColormap_r.setChecked(True)
 
         self.cmbColormap = QComboBox(self)
-        self._init_cmb_colormap(cmap=self.cmap_default)
+        self._init_cmb_colormap(cmap_init=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
         self.chkColBar = QCheckBox("Colorbar", self)
