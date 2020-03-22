@@ -269,7 +269,6 @@ def pprint_log(d, N=10, tab="\t"):
     If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
     truncate it to `N` items.
     """
-
     s = tab
     #logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
     if type(d) == dict:
@@ -289,13 +288,14 @@ def pprint_log(d, N=10, tab="\t"):
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
-            cols, rows = np.shape(d)
-            s += ('Type: {0} -> {1}, Shape =  ({2} x {3})\n' + tab).format(type(d), type(d[0][0]), rows, cols)
+            cols, rows = np.shape(d) #(outer, inner), inner (rows)is 1 or 2
+            s += ('Type: {0} of {1}({2}),Shape = ({3} x {4})\n' + tab)\
+                .format(type(d).__name__, type(d[0][0]).__name__, d[0][0].dtype, rows, cols)
+            logger.info(s)
             for c in range(min(N-1, cols)):
-                logger.warning(type(d[0][0]))
-                logger.warning(d)
-                logger.warning('rows={0},min={1}\nd={2}'.format(rows, min(N-1, rows), d[:min(N-1, rows)][c]))
-                s += str(d[: min(N-1, rows)][c])
+                logger.warning('rows={0}; min(N-1, rows)={1}\nd={2}'\
+                               .format(rows, min(N, rows), d[c][:min(N, rows)])) #d[:min(N-1, rows)][c]))
+                s += str(d[c][: min(N-1, rows)])
                 if rows > N-1:
                     s += ' ...'+ '\n' + tab
                 else:
