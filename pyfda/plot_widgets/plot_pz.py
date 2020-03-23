@@ -339,8 +339,8 @@ class Plot_PZ(QWidget):
                                 color='grey', ls='solid', zorder=1)
             ax.add_patch(uc)
             if style == 'square':
-                r = 1.1
-                ax.axis([-r, r, -r, r], 'equal')
+                #r = 1.1
+                #ax.axis([-r, r, -r, r]) # overridden by next option
                 ax.axis('equal')
         #    ax.spines['left'].set_position('center')
         #    ax.spines['bottom'].set_position('center')
