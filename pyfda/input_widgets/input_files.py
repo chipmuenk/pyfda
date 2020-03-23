@@ -392,10 +392,11 @@ class Input_Files(QWidget):
             Copy version info to clipboard
             """
             mapping = [('<br>','\n'),('<br />','\n'),  ('</tr>','\n'),
-                       ('</th>','\n'), ('</table>','\n'),
+                       ('</th>','\n==============\n'), ('</table>','\n'),
                        ('<hr>','\n---------\n'),
                        ('<b>',''),('</b>',''),('<tr>',''), ('<td>',''),('</td>','\t'),
-                       ('<th>',''), ('&emsp;',' '), ('<table>','')
+                       ('<th>',''), ('&emsp;',' '), ('<table>',''),# ('</a>',''),
+                       ("<th style='font-size:large;'>","\n")
                        ]
             for k, v in mapping:
                 my_string = my_string.replace(k, v)
