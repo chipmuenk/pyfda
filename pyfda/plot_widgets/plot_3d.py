@@ -28,6 +28,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from mpl_toolkits import mplot3d # import to register 3D projection
 from matplotlib import cm # Colormap
+from matplotlib.pyplot import colormaps
 from matplotlib.colors import LightSource
 
 classes = {'Plot_3D':'3D'} #: Dict containing class name : display name
@@ -265,11 +266,13 @@ class Plot_3D(QWidget):
         """
         Initialize combobox with available colormaps and try to set it to `cmap_init`
         
-        Since matplotlib 3.2 the reversed "*_r" colormaps are no longer contained
-        in cm.datad. They are now obtained by using the reversed() function (much simpler!)
+        Since matplotlib 3.2 the reversed "*_r" colormaps are no longer contained in
+        `cm.datad`. They are now obtained by using the `reversed()` method (much simpler!)
+        
+        `cm.datad` doesn't return the "new" colormaps like viridis, instead the 
+        `colormaps()` method is used.
         """
-        self.cmap_list = sorted([m for m in cm.datad if not m.endswith("_r")])
-        self.cmbColormap.addItems(self.cmap_list)
+        self.cmbColormap.addItems([m for m in colormaps() if not m.endswith("_r")])
         
         idx = self.cmbColormap.findText(cmap_init)
         if idx == -1:
