@@ -500,7 +500,6 @@ def csv2array(f):
     #------------------------------------------------------------------------------
     io_error = "" # initialize string for I/O error messages
     CSV_dict = params['CSV']
-    logger.warning("Fileobject format: {0}".format(type(f).__name__))
     try:
         header = CSV_dict['header'].lower()
         if header in {'auto', 'on', 'off'}:
@@ -562,11 +561,11 @@ def csv2array(f):
     if cr != 'auto':
         lineterminator = str(cr)
 
-    logger.info("Parsing CSV data with header = '{0}'\n"
-                "\tDelimiter = {1} | Lineterm. = {2} | quotechar = ' {3} '\n"
-                "\tType of passed text: '{4}'"
+    logger.info("Parsing CSV data with \n"
+                "\tHeader = '{0}' | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3}"
+                #"\n\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar,f.__class__.__name__))
+                        quotechar))#,f.__class__.__name__))
     #------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
@@ -870,6 +869,7 @@ def import_data(parent, fkey, title="Import"):
 
     # strip extension from returned file name (if any) + append file type:
     file_name = os.path.splitext(file_name)[0] + file_type
+    logger.info('Try to import file \n\t"{0}"'.format(file_name))
 
     file_type_err = False
     try:
@@ -900,8 +900,7 @@ def import_data(parent, fkey, title="Import"):
                     file_type_err = True
 
         if not file_type_err:
-            logger.info('Successfully imported \n\t"{0}"'.format(file_name))
-            logger.info("data_arr: \n{0}".format(pprint_log(data_arr,N=3)))
+            logger.info("Success! Parsed data format:\n{0}".format(pprint_log(data_arr,N=3)))
             dirs.save_dir = os.path.dirname(file_name)
             dirs.save_filt = sel_filt
             return data_arr # returns numpy array

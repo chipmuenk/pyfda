@@ -291,11 +291,11 @@ def pprint_log(d, N=10, tab="\t"):
             cols, rows = np.shape(d) #(outer, inner), inner (rows)is 1 or 2
             s += ('Type: {0} of {1}({2}),Shape = ({3} x {4})\n' + tab)\
                 .format(type(d).__name__, type(d[0][0]).__name__, d[0][0].dtype, rows, cols)
-            logger.info(s)
+            logger.debug(s)
             for c in range(min(N-1, cols)):
-                logger.warning('rows={0}; min(N-1, rows)={1}\nd={2}'\
-                               .format(rows, min(N, rows), d[c][:min(N, rows)])) #d[:min(N-1, rows)][c]))
-                s += str(d[c][: min(N-1, rows)])
+                logger.debug('rows={0}; min(N-1, rows)={1}\nd={2}'\
+                               .format(rows, min(N, rows), d[c][:min(N, rows)]))
+                s += str(d[c][: min(N, rows)])
                 if rows > N-1:
                     s += ' ...'+ '\n' + tab
                 else:
