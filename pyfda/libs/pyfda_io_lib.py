@@ -839,7 +839,7 @@ def import_data(parent, fkey, title="Import"):
     ndarray
         Data from the file
     """
-    file_filters = ("Comma / Tab Separated Values (*.csv);;"
+    file_filters = ("Comma / Tab Separated Values (*.csv *.txt);;"
                     "Matlab-Workspace (*.mat);;"
     "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
     dlg = QFileDialog(parent) # create instance for QFileDialog
@@ -852,21 +852,20 @@ def import_data(parent, fkey, title="Import"):
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0] # pick only first selected file
-        sel_filt = dlg.selectedNameFilter()
+        file_type = os.path.splitext(file_name)[1]
+        sel_filt = '*' + file_type
+        #sel_filt = dlg.selectedNameFilter()
     else:
         return -1  # operation cancelled
 
-    for t in extract_file_ext(file_filters): # extract the list of file extensions
-        if t in str(sel_filt):
-            file_type = t
-
     # strip extension from returned file name (if any) + append file type:
-    file_name = os.path.splitext(file_name)[0] + file_type
+    #file_name = os.path.splitext(file_name)[0] + file_type
+    
     logger.info('Try to import file \n\t"{0}"'.format(file_name))
 
     file_type_err = False
     try:
-        if file_type in {'.csv'}:
+        if file_type in {'.csv', '.txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
