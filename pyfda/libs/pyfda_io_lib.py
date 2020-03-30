@@ -30,7 +30,7 @@ import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
-                     QFileDialog, QHBoxLayout, QVBoxLayout, pyqtSignal)
+                     QFileDialog, QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
     """
@@ -77,13 +77,6 @@ class CSV_option_box(QDialog):
 
         butClose = QPushButton(self)
         butClose.setText("Close")
-        layHDelimiter = QHBoxLayout()
-        layHDelimiter.addWidget(lblDelimiter)
-        layHDelimiter.addWidget(self.cmbDelimiter)
-
-        layHLineTerminator = QHBoxLayout()
-        layHLineTerminator.addWidget(lblTerminator)
-        layHLineTerminator.addWidget(self.cmbLineTerminator)
 
         lblOrientation = QLabel("Table orientation", self)
         orientation = [('Auto/Vert.', 'auto'), ('Vertical', 'vert'), ('Horizontal', 'horiz')]
@@ -92,37 +85,37 @@ class CSV_option_box(QDialog):
         for o in orientation:
             self.cmbOrientation.addItem(o[0], o[1])
 
-        layHOrientation = QHBoxLayout()
-        layHOrientation.addWidget(lblOrientation)
-        layHOrientation.addWidget(self.cmbOrientation)
-
         lblHeader = QLabel("Enable header", self)
         header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
         self.cmbHeader = QComboBox(self)
         self.cmbHeader.setToolTip("First row is a header.")
         for h in header:
             self.cmbHeader.addItem(h[0], h[1])
-        layHHeader = QHBoxLayout()
-        layHHeader.addWidget(lblHeader)
-        layHHeader.addWidget(self.cmbHeader)
 
         self.radClipboard = QRadioButton("Clipboard", self)
+        self.radClipboard.setChecked(False)
         self.radFile = QRadioButton("File", self)
-        self.radClipboard.setChecked(True)
-        layHClipFile = QHBoxLayout()
-        layHClipFile.addWidget(self.radClipboard)
-        layHClipFile.addWidget(self.radFile)
+        self.radFile.setChecked(True)
 
+
+        lay_grid = QGridLayout()
+        lay_grid.addWidget(lblDelimiter, 1, 1)
+        lay_grid.addWidget(self.cmbDelimiter, 1, 2)
+        lay_grid.addWidget(lblTerminator, 2, 1)
+        lay_grid.addWidget(self.cmbLineTerminator, 2, 2)
+        lay_grid.addWidget(lblOrientation, 3, 1)
+        lay_grid.addWidget(self.cmbOrientation, 3, 2)
+        lay_grid.addWidget(lblHeader, 4, 1)
+        lay_grid.addWidget(self.cmbHeader, 4, 2)
+        lay_grid.addWidget(self.radClipboard, 5, 1)
+        lay_grid.addWidget(self.radFile, 5, 2)
+
+        
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
-        layVMain.addLayout(layHDelimiter)
-        layVMain.addLayout(layHLineTerminator)
-        layVMain.addLayout(layHOrientation)
-        layVMain.addLayout(layHHeader)
-        layVMain.addLayout(layHClipFile)
+        layVMain.addLayout(lay_grid)
         layVMain.addWidget(butClose)
         layVMain.setContentsMargins(*params['wdg_margins'])
-#        layVMain.addStretch(1)
         self.setLayout(layVMain)
 
         self._load_settings()
