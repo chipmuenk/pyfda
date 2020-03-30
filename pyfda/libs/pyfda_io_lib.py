@@ -452,7 +452,7 @@ def qtext2table(parent, fkey, title = "Import"):
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
         if isinstance(data_arr, str): # returned an error message instead of numpy data
-            logger.error("Error importing clipboard data:\n{0}".format(data_arr))
+            logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else: # data from file
         data_arr = import_data(parent, fkey, title=title)
@@ -555,7 +555,7 @@ def csv2array(f):
         lineterminator = str(cr)
 
     logger.info("Parsing CSV data with \n"
-                "\tHeader = '{0}' | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3}"
+                "\tHeader = {0} | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3} '"
                 #"\n\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
                         quotechar))#,f.__class__.__name__))
@@ -949,7 +949,7 @@ def export_data(parent, data, fkey, title="Export"):
     dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
     # dlg.setDefaultSuffix('csv') # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
+    dlg.selectNameFilter(dirs.save_filt) # default file type selected in file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0] # pick only first selected file
