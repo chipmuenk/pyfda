@@ -95,8 +95,7 @@ class CSV_option_box(QDialog):
         self.radClipboard = QRadioButton("Clipboard", self)
         self.radClipboard.setChecked(False)
         self.radFile = QRadioButton("File", self)
-        self.radFile.setChecked(True)
-
+        self.radFile.setChecked(True) # setting is read later on from params['CSV']['clipboard']
 
         lay_grid = QGridLayout()
         lay_grid.addWidget(lblDelimiter, 1, 1)
@@ -110,7 +109,6 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.radClipboard, 5, 1)
         lay_grid.addWidget(self.radFile, 5, 2)
 
-        
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(lay_grid)
