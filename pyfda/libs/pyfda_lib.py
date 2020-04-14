@@ -1657,7 +1657,7 @@ def to_html(text, frmt=None):
 
 #------------------------------------------------------------------------------
 
-def calc_Hcomplex(fil_dict, param, wholeF):
+def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
     """
     A wrapper around `signal.freqz()` for calculating the complex frequency 
     response H(f) for antiCausal systems as well. The filter coefficients are
@@ -1699,7 +1699,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
     ac  = fil_dict['ba'][1]
 
     # standard call to signal freqz
-    W, H = sig.freqz(bc, ac, worN = param, whole = wholeF)
+    W, H = sig.freqz(bc, ac, worN = worN, whole = wholeF, fs=fs)
 
     # test for NonCausal filter
     if ('rpk' in fil_dict):
@@ -1715,7 +1715,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
        # This is done by conjugating a and b prior to the call, and conjugating
        # h after the call.
 
-       wa, ha = sig.freqz(ba, aa, worN = param, whole=True)
+       wa, ha = sig.freqz(ba, aa, worN = worN, whole=True, fs=fs)
        ha = ha.conjugate()
 
        # Total transfer function is the product of causal response and antiCausal response
