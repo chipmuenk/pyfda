@@ -273,8 +273,6 @@ class PlotImpz_UI(QWidget):
             self.chk_log_freq.setText("dB")
             self.bottom_f = 0
 
-
-
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
@@ -294,6 +292,12 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar2 = QLineEdit(self)
         self.ledWinPar2.setText("2")
         self.ledWinPar2.setObjectName("ledWinPar2")
+        
+        self.chk_Hf = QCheckBox("|H(f)|", self)
+        self.chk_Hf.setObjectName("chk_Hf")
+        self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
+                               "from the filter coefficients.</span>")
+        self.chk_Hf.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
@@ -316,7 +320,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addWidget(self.lblWinPar2)
-        layH_ctrl_freq.addWidget(self.ledWinPar2)        
+        layH_ctrl_freq.addWidget(self.ledWinPar2)  
+        layH_ctrl_freq.addStretch(2)
+        layH_ctrl_freq.addWidget(self.chk_Hf)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
