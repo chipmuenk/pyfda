@@ -363,7 +363,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = np.abs(result)
                 elif sign in {'neg', 'negzero'}:
                     result = -np.abs(result)
-                
+
                 if result == 0 and sign in {'pos', 'neg'}:
                     logger.warning(fallback + 'Argument must not be zero.')
                     result = None
@@ -1659,10 +1659,10 @@ def to_html(text, frmt=None):
 
 def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
     """
-    A wrapper around `signal.freqz()` for calculating the complex frequency 
+    A wrapper around `signal.freqz()` for calculating the complex frequency
     response H(f) for antiCausal systems as well. The filter coefficients are
     are extracted from the filter dictionary.
-    
+
     Parameters
     ----------
 
@@ -1671,11 +1671,11 @@ def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
 
     worN: {None, int or array-like}
         number of points or frequencies where the frequency response is calculated
-        
+
     wholeF: bool
         when True, calculate frequency response from 0 ... f_S, otherwise
         calculate between 0 ... f_S/2
-        
+
     fs: float
         sampling frequency, used for calculation of the frequency vector.
         The default is 2*pi

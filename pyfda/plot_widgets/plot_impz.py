@@ -151,12 +151,12 @@ class Plot_Impz(QWidget):
 
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
-        self.ui.sig_tx.connect(self.process_sig_rx) 
+        self.ui.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        Process signals coming from 
+        Process signals coming from
         - the navigation toolbars (time and freq.)
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
@@ -170,7 +170,7 @@ class Plot_Impz(QWidget):
             return
 
         self.error = False
-        
+
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
             return # probably not needed
@@ -237,10 +237,10 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
                 if dict_sig['ui_changed'] in {'win'}:
-                    self.draw()                    
+                    self.draw()
                 elif dict_sig['ui_changed'] in {'resized','tab'}:
                     pass
-                       
+
                 else: # all the other ui elements are treated here
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
@@ -284,10 +284,10 @@ class Plot_Impz(QWidget):
             - construct_UI()  [Initialization]
             - Pressing "Run" button, passing button state as a boolean
             - Activating "Autorun" via `self.calc_auto()`
-            - 'fx_sim' : 'specs_changed' 
-            - 
+            - 'fx_sim' : 'specs_changed'
+            -
         Calculate response and redraw it.
-        
+
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
@@ -333,10 +333,10 @@ class Plot_Impz(QWidget):
         In both cases, the index of the combobox is updated according to the
         passed argument. If the index has been changed since last time,
         `self.needs_calc` is set to True and the run button is set to "changed".
-        
+
         When fixpoint simulation is selected, all corresponding widgets are made
         visible. `self.fx_sim` is set to True.
-        
+
         If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
         logger.debug("start fx_select")
@@ -530,7 +530,7 @@ class Plot_Impz(QWidget):
             self.y_r = self.y
             self.y_i = None
 
-#------------------------------------------------------------------------------            
+#------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
         Get Fixpoint results and plot them
@@ -550,7 +550,7 @@ class Plot_Impz(QWidget):
 
                 self.draw()
                 qstyle_widget(self.ui.but_run, "normal")
-                
+
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 
@@ -741,7 +741,7 @@ class Plot_Impz(QWidget):
         if plt_time:
             num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
 
-            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1, 
+            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
                                                sharex=True, squeeze = False)
 
             self.ax_r = ax[0][0]
@@ -750,7 +750,7 @@ class Plot_Impz(QWidget):
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
             if self.cmplx and self.plt_time_resp != "none":
-                self.ax_i = ax[1][0]   
+                self.ax_i = ax[1][0]
                 self.ax_i.cla()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
@@ -1056,7 +1056,7 @@ class Plot_Impz(QWidget):
 
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
-                F    = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.             
+                F    = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
             # --------------- Plot stimulus and response ----------------------
             labels = []
@@ -1096,7 +1096,7 @@ class Plot_Impz(QWidget):
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
 
                 labels.append("$P_Y$ = {0:.3g} {1}".format(Py, unit_P))
-                
+
             if self.ui.chk_Hf.isChecked():
                 self.ax_fft.plot(F_id, H_id, c="gray",)
                 labels.append("$|H_{id}(f)|$")
