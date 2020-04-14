@@ -1659,9 +1659,39 @@ def to_html(text, frmt=None):
 
 def calc_Hcomplex(fil_dict, param, wholeF):
     """
-    Calculate the complex frequency response H(f), consider antiCausal poles/zeros
-    return the H function and also the W function
-    Use fil_dict to gather poles/zeros, frequency ranges
+    A wrapper around `signal.freqz()` for calculating the complex frequency 
+    response H(f) for antiCausal systems as well. The filter coefficients are
+    are extracted from the filter dictionary.
+    
+    Parameters
+    ----------
+
+    fil_dict: dict
+        dictionary with filter data (coefficients etc.)
+
+    worN: {None, int or array-like}
+        number of points or frequencies where the frequency response is calculated
+        
+    wholeF: bool
+        when True, calculate frequency response from 0 ... f_S, otherwise
+        calculate between 0 ... f_S/2
+        
+    fs: float
+        sampling frequency, used for calculation of the frequency vector.
+        The default is 2*pi
+
+    Returns
+    -------
+
+    w: ndarray
+        The frequencies at which h was computed, in the same units as fs. By default, w is normalized to the range [0, pi) (radians/sample).
+
+    h: ndarray
+        The frequency response, as complex numbers.
+
+    Examples
+    --------
+
     """
 
     # causal poles/zeros
