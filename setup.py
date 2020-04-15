@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-# To use a consistent encoding
-#from codecs import open not needed for py3?
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 # see e.g. https://github.com/alttch/finac/blob/master/setup.py
-with open('README_PYPI.md', encoding='utf-8') as f:
+with open(path.join(here, 'README_PYPI.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("pyfda/version.py", encoding='utf-8') as f_v:
+with open(path.join(here, 'pyfda/version.py'), encoding='utf-8') as f_v:
     exec(f_v.read(), version_nr)
 
 # --- read requirements.txt, remove comments and unneeded modules   
-with open("requirements.txt", encoding='utf-8') as f_r:
+with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f_r:
     requirements_list = f_r.read().strip().split("\n")
 
 for p in requirements_list[:]:
