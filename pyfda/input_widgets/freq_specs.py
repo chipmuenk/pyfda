@@ -243,7 +243,7 @@ class FreqSpecs(QWidget):
         load_dict is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
-        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
+        It should be called when `specs_changed` or `data_changed` is emitted
         at another place, indicating that a reload is required.
         """
 
@@ -312,7 +312,8 @@ class FreqSpecs(QWidget):
         - Update the visible QLineEdit frequency widgets
 
         The method is called when:
-        - update_UI has been called after changing the filter design algorithm                                # that the response type has been changed 
+        - update_UI has been called after changing the filter design algorithm                                
+          that the response type has been changed 
           eg. from LP -> HP, requiring a different order of frequency entries
         - a frequency spec field has been edited
         - the sort button has been clicked (from filter_specs.py)

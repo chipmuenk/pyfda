@@ -265,7 +265,6 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         if str(fil_dict['fo']) == 'min': 
@@ -386,6 +385,12 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         if not self._test_N():
             return -1
         self.N = ceil_even(self.N) # enforce even order
+        if self.F_PB < 0.1:
+            logger.warning("Bandwidth for pass band ({0}) is too narrow, inreasing to 0.1".format(self.F_PB))
+            self.F_PB = 0.1
+            fil_dict['F_PB'] = self.F_PB
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'equiripple'})
+
         self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 Hz = 1, type = 'differentiator', grid_density = self.grid_density))
 

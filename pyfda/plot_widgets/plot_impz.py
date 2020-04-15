@@ -23,7 +23,7 @@ import matplotlib.patches as mpl_patches
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
-        sawtooth_bl, triang_bl, comb_bl)
+        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -138,6 +138,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
+        self.ui.chk_Hf.clicked.connect(self.draw)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
         #self.ui.chk_win_freq.clicked.connect(self.draw)
@@ -150,12 +151,12 @@ class Plot_Impz(QWidget):
 
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
-        self.ui.sig_tx.connect(self.process_sig_rx) 
+        self.ui.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        Process signals coming from 
+        Process signals coming from
         - the navigation toolbars (time and freq.)
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
@@ -169,7 +170,7 @@ class Plot_Impz(QWidget):
             return
 
         self.error = False
-        
+
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
             return # probably not needed
@@ -236,10 +237,10 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
                 if dict_sig['ui_changed'] in {'win'}:
-                    self.draw()                    
+                    self.draw()
                 elif dict_sig['ui_changed'] in {'resized','tab'}:
                     pass
-                       
+
                 else: # all the other ui elements are treated here
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
@@ -283,10 +284,10 @@ class Plot_Impz(QWidget):
             - construct_UI()  [Initialization]
             - Pressing "Run" button, passing button state as a boolean
             - Activating "Autorun" via `self.calc_auto()`
-            - 'fx_sim' : 'specs_changed' 
-            - 
+            - 'fx_sim' : 'specs_changed'
+            -
         Calculate response and redraw it.
-        
+
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         self.fx_select() # check for fixpoint setting and update if needed
@@ -332,10 +333,10 @@ class Plot_Impz(QWidget):
         In both cases, the index of the combobox is updated according to the
         passed argument. If the index has been changed since last time,
         `self.needs_calc` is set to True and the run button is set to "changed".
-        
+
         When fixpoint simulation is selected, all corresponding widgets are made
         visible. `self.fx_sim` is set to True.
-        
+
         If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
         logger.debug("start fx_select")
@@ -529,7 +530,7 @@ class Plot_Impz(QWidget):
             self.y_r = self.y
             self.y_i = None
 
-#------------------------------------------------------------------------------            
+#------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
         Get Fixpoint results and plot them
@@ -549,7 +550,7 @@ class Plot_Impz(QWidget):
 
                 self.draw()
                 qstyle_widget(self.ui.but_run, "normal")
-                
+
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
 
@@ -740,7 +741,7 @@ class Plot_Impz(QWidget):
         if plt_time:
             num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
 
-            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1, 
+            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
                                                sharex=True, squeeze = False)
 
             self.ax_r = ax[0][0]
@@ -749,7 +750,7 @@ class Plot_Impz(QWidget):
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
             if self.cmplx and self.plt_time_resp != "none":
-                self.ax_i = ax[1][0]   
+                self.ax_i = ax[1][0]
                 self.ax_i.cla()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
@@ -950,6 +951,9 @@ class Plot_Impz(QWidget):
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
 
+        # freqz-based ideal frequency response
+        F_id, H_id = np.abs(calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=fb.fil[0]['f_S']))
+
         if not self.plt_freq_disabled:
             if plt_response and not plt_stimulus:
                 XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
@@ -957,6 +961,7 @@ class Plot_Impz(QWidget):
                 XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
             else:
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            # frequency vector for FFT-based frequency plots
             F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_S'])
 
         #-----------------------------------------------------------------
@@ -997,6 +1002,7 @@ class Plot_Impz(QWidget):
                 unit = unit_P = "dBW"
                 unit_nenbw = "dB"
                 nenbw = 10 * np.log10(self.ui.nenbw)
+                H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
                     Px = 10*np.log10(Px)
@@ -1028,7 +1034,11 @@ class Plot_Impz(QWidget):
                     X_q = np.fft.fftshift(X_q)
 #                if self.ui.chk_win_freq.isChecked():
 #                    Win = np.fft.fftshift(Win)
-                F = np.fft.fftshift(F)
+
+                F    = np.fft.fftshift(F)
+                # shift H_id and F_id by f_S/2
+                H_id = np.fft.fftshift(H_id)
+                F_id -= fb.fil[0]['f_S']/2.
 
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
                 # only use the first half of X, Y and F
@@ -1040,11 +1050,13 @@ class Plot_Impz(QWidget):
                     X_q = X_q[0:self.ui.N//2]
 #                if self.ui.chk_win_freq.isChecked():
 #                    Win = Win[0:self.ui.N//2]
-                F = F[0:self.ui.N//2]
+                F    = F[0:self.ui.N//2]
+                F_id = F_id[0:params['N_FFT']//2]
+                H_id = H_id[0:params['N_FFT']//2]
 
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
-                F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+                F    = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
             # --------------- Plot stimulus and response ----------------------
             labels = []
@@ -1084,6 +1096,10 @@ class Plot_Impz(QWidget):
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
 
                 labels.append("$P_Y$ = {0:.3g} {1}".format(Py, unit_P))
+
+            if self.ui.chk_Hf.isChecked():
+                self.ax_fft.plot(F_id, H_id, c="gray",)
+                labels.append("$|H_{id}(f)|$")
 
 #            if self.ui.chk_win_freq.isChecked():
 #                self.ax_fft.plot(F, Win, c="gray", label="win")

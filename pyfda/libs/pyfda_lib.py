@@ -364,7 +364,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = np.abs(result)
                 elif sign in {'neg', 'negzero'}:
                     result = -np.abs(result)
-                
+
                 if result == 0 and sign in {'pos', 'neg'}:
                     logger.warning(fallback + 'Argument must not be zero.')
                     result = None
@@ -1658,11 +1658,41 @@ def to_html(text, frmt=None):
 
 #------------------------------------------------------------------------------
 
-def calc_Hcomplex(fil_dict, param, wholeF):
+def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
     """
-    Calculate the complex frequency response H(f), consider antiCausal poles/zeros
-    return the H function and also the W function
-    Use fil_dict to gather poles/zeros, frequency ranges
+    A wrapper around `signal.freqz()` for calculating the complex frequency
+    response H(f) for antiCausal systems as well. The filter coefficients are
+    are extracted from the filter dictionary.
+
+    Parameters
+    ----------
+
+    fil_dict: dict
+        dictionary with filter data (coefficients etc.)
+
+    worN: {None, int or array-like}
+        number of points or frequencies where the frequency response is calculated
+
+    wholeF: bool
+        when True, calculate frequency response from 0 ... f_S, otherwise
+        calculate between 0 ... f_S/2
+
+    fs: float
+        sampling frequency, used for calculation of the frequency vector.
+        The default is 2*pi
+
+    Returns
+    -------
+
+    w: ndarray
+        The frequencies at which h was computed, in the same units as fs. By default, w is normalized to the range [0, pi) (radians/sample).
+
+    h: ndarray
+        The frequency response, as complex numbers.
+
+    Examples
+    --------
+
     """
 
     # causal poles/zeros
@@ -1670,7 +1700,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
     ac  = fil_dict['ba'][1]
 
     # standard call to signal freqz
-    W, H = sig.freqz(bc, ac, worN = param, whole = wholeF)
+    W, H = sig.freqz(bc, ac, worN = worN, whole = wholeF, fs=fs)
 
     # test for NonCausal filter
     if ('rpk' in fil_dict):
@@ -1686,7 +1716,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
        # This is done by conjugating a and b prior to the call, and conjugating
        # h after the call.
 
-       wa, ha = sig.freqz(ba, aa, worN = param, whole=True)
+       wa, ha = sig.freqz(ba, aa, worN = worN, whole=True, fs=fs)
        ha = ha.conjugate()
 
        # Total transfer function is the product of causal response and antiCausal response

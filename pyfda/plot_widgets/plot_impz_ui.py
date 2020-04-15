@@ -79,7 +79,7 @@ class PlotImpz_UI(QWidget):
         self.stim = "Pulse"
         self.noise = "None"
 
-        # dictionary for fft window settings   
+        # dictionary for fft window settings
         self.win_dict = fb.fil[0]['win_fft']
         self.fft_window = None # handle for FFT window pop-up widget
         self.window_name = "Rectangular"
@@ -131,7 +131,7 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
-        
+
         self.but_fft_win = QPushButton(self)
         self.but_fft_win.setText("WIN FFT")
         self.but_fft_win.setToolTip("Show time and frequency response of FFT Window")
@@ -153,7 +153,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.chk_fx_scale)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.chk_stim_options)
-        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.but_fft_win)
         layH_ctrl_run.addStretch(10)
 
@@ -196,7 +196,7 @@ class PlotImpz_UI(QWidget):
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_time.setVisible(self.chk_log_time.isChecked())
-        
+
         if not self.chk_log_time.isChecked():
             self.chk_log_time.setText("dB")
             self.bottom_t = 0
@@ -273,8 +273,6 @@ class PlotImpz_UI(QWidget):
             self.chk_log_freq.setText("dB")
             self.bottom_f = 0
 
-
-
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
@@ -289,11 +287,17 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1 = QLineEdit(self)
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
-        
+
         self.lblWinPar2 = QLabel("Param2")
         self.ledWinPar2 = QLineEdit(self)
         self.ledWinPar2.setText("2")
         self.ledWinPar2.setObjectName("ledWinPar2")
+
+        self.chk_Hf = QCheckBox("|H(f)|", self)
+        self.chk_Hf.setObjectName("chk_Hf")
+        self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
+                               "from the filter coefficients.</span>")
+        self.chk_Hf.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
@@ -312,11 +316,13 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
-        layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)        
+        layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addWidget(self.lblWinPar2)
-        layH_ctrl_freq.addWidget(self.ledWinPar2)        
+        layH_ctrl_freq.addWidget(self.ledWinPar2)
+        layH_ctrl_freq.addStretch(2)
+        layH_ctrl_freq.addWidget(self.chk_Hf)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
@@ -497,7 +503,7 @@ class PlotImpz_UI(QWidget):
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._read_param1)
-        self.ledWinPar2.editingFinished.connect(self._read_param2)        
+        self.ledWinPar2.editingFinished.connect(self._read_param2)
 
         # --- stimulus control ---
         self.chk_stim_options.clicked.connect(self._show_stim_options)
@@ -728,25 +734,25 @@ class PlotImpz_UI(QWidget):
 
     def _read_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
+        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
                           return_type='float')
         if param < self.win_dict['par'][0]['min']:
             param = self.win_dict['par'][0]['min']
         elif param > self.win_dict['par'][0]['max']:
-            param = self.win_dict['par'][0]['max']   
-        self.ledWinPar1.setText(str(param))     
+            param = self.win_dict['par'][0]['max']
+        self.ledWinPar1.setText(str(param))
         self.win_dict['par'][0]['val'] = param
         self._update_win_fft()
-        
+
     def _read_param2(self):
         """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'], 
+        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
                           return_type='float')
         if param < self.win_dict['par'][1]['min']:
             param = self.win_dict['par'][1]['min']
         elif param > self.win_dict['par'][1]['max']:
-            param = self.win_dict['par'][1]['max']   
-        self.ledWinPar2.setText(str(param))     
+            param = self.win_dict['par'][1]['max']
+        self.ledWinPar2.setText(str(param))
         self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
 
@@ -754,25 +760,25 @@ class PlotImpz_UI(QWidget):
     def _update_win_fft(self, arg=None, emit=True):
         """
         Update window type for FFT  with different arguments:
-        
+
         - signal-slot connection to combo-box -> index (int), absorbed by `arg`
-                                                 emit is not set -> emit=True   
+                                                 emit is not set -> emit=True
         - called by _read_param() -> empty -> emit=True
         - called by update_N(emit=False)
-        
+
         """
         if not isinstance(emit, bool):
             logger.error("update win: emit={0}".format(emit))
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict, self.window_name,
                                         N=self.N, sym=False)
- 
+
         n_par = self.win_dict['n_par']
 
         self.lblWinPar1.setVisible(n_par > 0)
         self.ledWinPar1.setVisible(n_par > 0)
         self.lblWinPar2.setVisible(n_par > 1)
-        self.ledWinPar2.setVisible(n_par > 1)        
+        self.ledWinPar2.setVisible(n_par > 1)
 
         if n_par > 0:
             self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
@@ -797,7 +803,7 @@ class PlotImpz_UI(QWidget):
             self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
         # ... but always notify the FFT widget via sig_tx_fft
         self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
-            
+
     #------------------------------------------------------------------------------
     def show_fft_win(self):
         """
@@ -807,7 +813,7 @@ class PlotImpz_UI(QWidget):
             qstyle_widget(self.but_fft_win, "changed")
         else:
             qstyle_widget(self.but_fft_win, "normal")
-            
+
         if self.fft_window is None: # no handle to the window? Create a new instance
             if self.but_fft_win.isChecked():
                 # Important: Handle to window must be class attribute otherwise it
