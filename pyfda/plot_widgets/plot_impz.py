@@ -121,6 +121,7 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
+        self.ui.chk_scale_impz_f.clicked.connect(self.draw)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw)
@@ -290,6 +291,9 @@ class Plot_Impz(QWidget):
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
+        self.ui.chk_scale_impz_f.setEnabled((self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')\
+                                            and self.ui.DC == 0)
+
         self.fx_select() # check for fixpoint setting and update if needed
         if type(arg) == bool: # but_run has been pressed
             self.needs_calc = True # force recalculation when but_run is pressed
@@ -969,22 +973,30 @@ class Plot_Impz(QWidget):
         # - Correct RMS conversion at DC by multiplying with sqrt(2)
         # - Calculate total power P from
         # - Correct scale for single-sided spectrum (except at DC)
+        # - Scale impulse response with N_FFT if requested
+            if self.ui.chk_scale_impz_f.isVisible() and self.ui.chk_scale_impz_f.isEnabled()\
+                and self.ui.chk_scale_impz_f.isChecked():
+            
+                scale_impz = self.ui.N
+            else:
+                scale_impz = 1.
+                
             if plt_stimulus:
-                X = self.X.copy() * self.scale_i
+                X = self.X.copy() * self.scale_i * scale_impz
                 Px = 2*np.sum(np.square(X[1:])) + np.square(X[0])
                 Px /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X[1:] = 2 * X[1:]
 
             if plt_stimulus_q:
-                X_q = self.X_q.copy() * self.scale_i
+                X_q = self.X_q.copy() * self.scale_i * scale_impz
                 Pxq = 2 * np.sum(np.square(X_q[1:])) + np.square(X_q[0])
                 Pxq /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
-                Y = self.Y.copy() * self.scale_o
+                Y = self.Y.copy() * self.scale_o * scale_impz
                 Py = np.sum(np.square(Y[1:])) + np.square(Y[0])
                 Py /= self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':

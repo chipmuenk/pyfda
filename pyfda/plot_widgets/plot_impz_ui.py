@@ -350,6 +350,14 @@ class PlotImpz_UI(QWidget):
                                     "than the regular version.</span>")
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
+        
+        self.chk_scale_impz_f = QCheckBox("Scale", self)
+        self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response with <i>N<sub>FFT</sub></i> "
+                                    "so that it has the same magnitude as |H(f)|. DC and Noise need to be "
+                                    "turned off.</span>")
+        self.chk_scale_impz_f.setChecked(True)
+        self.chk_scale_impz_f.setObjectName("scale_impz_f")
+
 
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
@@ -364,10 +372,12 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
+        layHCmbStim.addWidget(self.chk_scale_impz_f)
 
         #layVCmb.addWidget(self.cmbStimulus)
         layVCmb.addLayout(layHCmbStim)
         layVCmb.addWidget(self.cmbNoise)
+        
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -384,10 +394,12 @@ class PlotImpz_UI(QWidget):
         layVlblAmp = QVBoxLayout()
         layVlblAmp.addWidget(self.lblAmp1)
         layVlblAmp.addWidget(self.lblAmp2)
+        #layVlblAmp.setAlignment(Qt.AlignTop) # labels are aligned incorrectly
 
         layVledAmp = QVBoxLayout()
         layVledAmp.addWidget(self.ledAmp1)
         layVledAmp.addWidget(self.ledAmp2)
+        #layVledAmp.setAlignment(Qt.AlignTop)
 
         #----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&phi;_1", frmt='bi') + " =", self)
@@ -464,6 +476,7 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
 
         #----------------------------------------------
+        #layG_ctrl_stim = QGridLayout()
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
@@ -594,6 +607,9 @@ class PlotImpz_UI(QWidget):
 
         self.lblAmp1.setVisible(self.stim != "None")
         self.ledAmp1.setVisible(self.stim != "None")
+        self.chk_scale_impz_f.setVisible(self.stim == 'Pulse')
+        self.chk_scale_impz_f.setEnabled((self.noi == 0 or self.cmbNoise.currentText() == 'None')\
+                                         and self.DC == 0)
 
         self.lblPhi1.setVisible(f1_en)
         self.ledPhi1.setVisible(f1_en)
