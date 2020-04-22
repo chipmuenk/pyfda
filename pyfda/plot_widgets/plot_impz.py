@@ -291,6 +291,7 @@ class Plot_Impz(QWidget):
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
+        # allow scaling the frequency response from pure impulse (no DC, no noise)
         self.ui.chk_scale_impz_f.setEnabled((self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')\
                                             and self.ui.DC == 0)
 
@@ -575,15 +576,15 @@ class Plot_Impz(QWidget):
         else:
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-            # calculate absolute value, scale by N_FFT and convert to RMS
-            self.X = np.abs(np.fft.fft(x_win)) / (self.ui.N * sqrt(2))
-            self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
+            # calculate absolute value and scale by N_FFT
+            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+            #self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
-                self.X_q = np.abs(np.fft.fft(x_q_win)) / (self.ui.N * sqrt(2))
-                self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
+                self.X_q = np.abs(np.fft.fft(x_q_win)) / self.ui.N
+                #self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.N_end:
             self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
@@ -594,8 +595,8 @@ class Plot_Impz(QWidget):
                                .format(len(self.y), self.ui.N_end))
         else:
             y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.Y = np.abs(np.fft.fft(y_win)) / (self.ui.N * sqrt(2))
-            self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
+            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+            #self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
 #        if self.ui.chk_win_freq.isChecked():
 #            self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
@@ -969,37 +970,40 @@ class Plot_Impz(QWidget):
             F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_S'])
 
         #-----------------------------------------------------------------
-        # - Enforce deep copy, scale and convert to RMS by dividing by sqrt(2)
-        # - Correct RMS conversion at DC by multiplying with sqrt(2)
-        # - Calculate total power P from
-        # - Correct scale for single-sided spectrum (except at DC)
-        # - Scale impulse response with N_FFT if requested
+        # Scale frequency response and calculate power
+        #-----------------------------------------------------------------
+        # - Enforce deep copy, scale
+        # - Calculate total power P from FFT, corrected by window equivalent noise
+        #   bandwidth and fixpoint scaling (scale_i / scale_o)
+        # - Correct scale for single-sided spectrum
+        # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.chk_scale_impz_f.isVisible() and self.ui.chk_scale_impz_f.isEnabled()\
                 and self.ui.chk_scale_impz_f.isChecked():
-            
+                freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
             else:
+                freq_resp = False
                 scale_impz = 1.
                 
             if plt_stimulus:
-                X = self.X.copy() * self.scale_i * scale_impz
-                Px = 2*np.sum(np.square(X[1:])) + np.square(X[0])
-                Px /= self.ui.nenbw
-                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                X = self.X.copy() * self.scale_i
+                Px = np.sum(np.square(X)) * scale_impz / self.ui.nenbw
+                X *= scale_impz # scale display of frequency response
+                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     X[1:] = 2 * X[1:]
 
             if plt_stimulus_q:
-                X_q = self.X_q.copy() * self.scale_i * scale_impz
-                Pxq = 2 * np.sum(np.square(X_q[1:])) + np.square(X_q[0])
-                Pxq /= self.ui.nenbw
-                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                X_q = self.X_q.copy() * self.scale_i
+                Pxq = np.sum(np.square(X_q)) * scale_impz / self.ui.nenbw
+                X_q *= scale_impz
+                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     X_q[1:] = 2 * X_q[1:]
 
             if plt_response:
-                Y = self.Y.copy() * self.scale_o * scale_impz
-                Py = np.sum(np.square(Y[1:])) + np.square(Y[0])
-                Py /= self.ui.nenbw
-                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                Y = self.Y.copy() * self.scale_o
+                Py = np.sum(np.square(Y)) * scale_impz / self.ui.nenbw
+                Y *= scale_impz # scale display of frequency response
+                if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     Y[1:] = 2 * Y[1:]
 
 #            if self.ui.chk_win_freq.isChecked():
@@ -1007,35 +1011,10 @@ class Plot_Impz(QWidget):
 #                if fb.fil[0]['freqSpecsRangeType'] == 'half':
 #                    Win[1:] = 2 * Win[1:]
 
-        #-----------------------------------------------------------------
-        # Calculate log FFT and power if selected, set units
-
-            if self.ui.chk_log_freq.isChecked():
-                unit = unit_P = "dBW"
-                unit_nenbw = "dB"
-                nenbw = 10 * np.log10(self.ui.nenbw)
-                H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
-                if plt_stimulus:
-                    X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
-                    Px = 10*np.log10(Px)
-                if plt_stimulus_q:
-                    X_q = np.maximum(20 * np.log10(X_q), self.ui.bottom_f)
-                    Pxq = 10*np.log10(Pxq)
-                if plt_response:
-                    Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
-                    Py = 10*np.log10(Py)
-#                if self.ui.chk_win_freq.isChecked():
-#                    Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
-            else:
-                unit = "Vrms"
-                unit_P = "W"
-                unit_nenbw = "bins"
-                nenbw = self.ui.nenbw
-
-            XY_str = XY_str + ' in ' + unit
 
         #-----------------------------------------------------------------
         # Set frequency range
+        #-----------------------------------------------------------------
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
                 if plt_response:
@@ -1050,6 +1029,8 @@ class Plot_Impz(QWidget):
                 F    = np.fft.fftshift(F)
                 # shift H_id and F_id by f_S/2
                 H_id = np.fft.fftshift(H_id)
+                if not freq_resp:
+                    H_id /= 2
                 F_id -= fb.fil[0]['f_S']/2.
 
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
@@ -1069,6 +1050,37 @@ class Plot_Impz(QWidget):
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
                 F    = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+                if not freq_resp:
+                    H_id /= 2
+
+        #-----------------------------------------------------------------
+        # Calculate log FFT and power if selected, set units
+        #-----------------------------------------------------------------
+            if self.ui.chk_log_freq.isChecked():
+                unit = "dBV"
+                unit_P = "dBW"
+                unit_nenbw = "dB"
+                nenbw = 10 * np.log10(self.ui.nenbw)
+                H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
+                if plt_stimulus:
+                    X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
+                    Px = 10*np.log10(Px)
+                if plt_stimulus_q:
+                    X_q = np.maximum(20 * np.log10(X_q), self.ui.bottom_f)
+                    Pxq = 10*np.log10(Pxq)
+                if plt_response:
+                    Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
+                    Py = 10*np.log10(Py)
+#                if self.ui.chk_win_freq.isChecked():
+#                    Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
+            else:
+                unit = "V"
+                unit_P = "W"
+                unit_nenbw = "bins"
+                nenbw = self.ui.nenbw
+
+            XY_str = XY_str + ' in ' + unit
+
 
             # --------------- Plot stimulus and response ----------------------
             labels = []
