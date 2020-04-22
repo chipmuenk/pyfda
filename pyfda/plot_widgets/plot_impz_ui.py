@@ -337,7 +337,7 @@ class PlotImpz_UI(QWidget):
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
 
-        self.lblStimulus = QLabel("Signal: ", self)
+        self.lblStimulus = QLabel(to_html("Shape ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine",
                                    "Triang","Saw","Rect","Comb", "AM", "FM", "PM"])
@@ -357,26 +357,26 @@ class PlotImpz_UI(QWidget):
                                     "turned off.</span>")
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
+        
+        self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
+        self.ledDC = QLineEdit(self)
+        self.ledDC.setText(str(self.DC))
+        self.ledDC.setToolTip("DC Level")
+        self.ledDC.setObjectName("stimDC")
 
-
-        self.lblNoise = QLabel("Noise: ", self)
-        self.cmbNoise = QComboBox(self)
-        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
-        self.cmbNoise.setToolTip("Type of additive noise.")
-        qset_cmb_box(self.cmbNoise, self.noise)
-
-        layVlblCmb = QVBoxLayout()
-        layVlblCmb.addWidget(self.lblStimulus)
-        layVlblCmb.addWidget(self.lblNoise)
-        layVCmb = QVBoxLayout()
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
-        layHCmbStim.addWidget(self.chk_scale_impz_f)
+        layHCmbStim.addWidget(self.chk_scale_impz_f)        
 
-        #layVCmb.addWidget(self.cmbStimulus)
-        layVCmb.addLayout(layHCmbStim)
-        layVCmb.addWidget(self.cmbNoise)
+        layVlblCmbDC = QVBoxLayout()
+        layVlblCmbDC.addWidget(self.lblStimulus)
+        layVlblCmbDC.addWidget(self.lblDC)
+        #layVlblAmp.setAlignment(Qt.AlignTop)
+
+        layVCmbDC = QVBoxLayout()
+        layVCmbDC.addLayout(layHCmbStim)
+        layVCmbDC.addWidget(self.ledDC)
         
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
@@ -456,32 +456,34 @@ class PlotImpz_UI(QWidget):
         layVlblfreqU.addWidget(self.lblFreqUnit2)
 
         #----------------------------------------------
+ 
+        self.lblNoise = QLabel(to_html("Noise: ", frmt='bi'), self)
+        self.cmbNoise = QComboBox(self)
+        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
+        self.cmbNoise.setToolTip("Type of additive noise.")
+        qset_cmb_box(self.cmbNoise, self.noise)
+        
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
 
-        self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
-        self.ledDC = QLineEdit(self)
-        self.ledDC.setText(str(self.DC))
-        self.ledDC.setToolTip("DC Level")
-        self.ledDC.setObjectName("stimDC")
+        layVlblNoi = QVBoxLayout()
+        layVlblNoi.addWidget(self.lblNoise)
+        layVlblNoi.addWidget(self.lblNoi)
 
-        layVlblNoiDC = QVBoxLayout()
-        layVlblNoiDC.addWidget(self.lblNoi)
-        layVlblNoiDC.addWidget(self.lblDC)
-        layVledNoiDC = QVBoxLayout()
-        layVledNoiDC.addWidget(self.ledNoi)
-        layVledNoiDC.addWidget(self.ledDC)
+        layVcmbledNoi = QVBoxLayout()
+        layVcmbledNoi.addWidget(self.cmbNoise)        
+        layVcmbledNoi.addWidget(self.ledNoi)
 
         #----------------------------------------------
         #layG_ctrl_stim = QGridLayout()
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblCmb)
-        layH_ctrl_stim.addLayout(layVCmb)
+        layH_ctrl_stim.addLayout(layVlblCmbDC)
+        layH_ctrl_stim.addLayout(layVCmbDC)
         layH_ctrl_stim.addStretch(1)
         layH_ctrl_stim.addLayout(layVlblAmp)
         layH_ctrl_stim.addLayout(layVledAmp)
@@ -493,8 +495,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addLayout(layVledfreq)
         layH_ctrl_stim.addLayout(layVlblfreqU)
         layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblNoiDC)
-        layH_ctrl_stim.addLayout(layVledNoiDC)
+        layH_ctrl_stim.addLayout(layVlblNoi)
+        layH_ctrl_stim.addLayout(layVcmbledNoi)
         layH_ctrl_stim.addStretch(10)
 
         self.wdg_ctrl_stim = QWidget(self)
