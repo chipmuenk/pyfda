@@ -1471,12 +1471,16 @@ def fil_convert(fil_dict, format_in):
 
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
-        try:
-            zpk = sig.tf2zpk(b,a)
-            zpk = np.nan_to_num(zpk)
-            fil_dict['zpk'] = [zpk[0].astype(np.complex), zpk[1].astype(np.complex), zpk[2]]
-        except Exception as e:
-            raise ValueError(e)
+        if np.all(np.isfinite([b,a])):
+            #try:
+                zpk = sig.tf2zpk(b,a)
+                zpk = np.nan_to_num(zpk)
+                fil_dict['zpk'] = [zpk[0].astype(np.complex), zpk[1].astype(np.complex), zpk[2]]
+            #except Exception as e:
+                #raise ValueError(e)
+        else:
+            raise ValueError("\tCoefficients contain NaNs or Inf element, cannot convert!")
+            zpk = None
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
