@@ -1405,6 +1405,15 @@ def fil_convert(fil_dict, format_in):
              from this format quite accurately
          :'ba': [b, a] where b and a are the polynomial coefficients - finding
                    the roots of the a and b polynomes may fail for higher orders
+
+    Returns
+    -------
+    None
+    
+    Exceptions
+    ----------
+    ValueError for Nan / Inf elements or other unsuitable parameters
+
     """
 
     if 'sos' in format_in:
