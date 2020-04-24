@@ -1327,7 +1327,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             format_error = True
 
         if format_error:
-            raise ValueError("Unknown 'zpk' format {0}".format(arg))
+            raise ValueError("\tUnknown 'zpk' format {0}".format(arg))
 
 
     elif format_in == 'ba':
@@ -1369,7 +1369,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         fil_dict['ba'] = [np.array(b, dtype=np.complex), np.array(a, dtype=np.complex)]
 
     else:
-        raise ValueError("Unknown input format {0:s}".format(format_in))
+        raise ValueError("\tUnknown input format {0:s}".format(format_in))
 
     fil_dict['creator'] = (format_in, sender)
     fil_dict['timestamp'] = time.time()
@@ -1419,7 +1419,7 @@ def fil_convert(fil_dict, format_in):
                 b1 = chk[section, :3]
                 a1 = chk[section, 3:]
                 if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
-                    raise ValueError('Bad coefficients, Order N is too high')
+                    raise ValueError('\tBad coefficients, Order N is too high')
 
         if 'zpk' not in format_in:
             try:
@@ -1477,7 +1477,7 @@ def fil_convert(fil_dict, format_in):
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
-        raise ValueError("Unknown input format {0:s}".format(format_in))
+        raise ValueError("\tUnknown input format {0:s}".format(format_in))
 
     # eliminate complex coefficients created by numerical inaccuracies
     fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100) # tol specified in multiples of machine eps
