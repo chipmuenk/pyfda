@@ -770,7 +770,12 @@ class Input_Coeffs(QWidget):
             fb.fil[0]['fc'] = 'Manual_FIR'
 
         # save, check and convert coeffs, check filter type
-        fil_save(fb.fil[0], self.ba, 'ba', __name__)
+        try:
+            fil_save(fb.fil[0], self.ba, 'ba', __name__)
+        except Exception as e:
+            # catch exception due to malformatted coefficients:
+            logger.error("While saving the filter coefficients, "
+                         "the following error occurred:\n{0}".format(e))
 
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
