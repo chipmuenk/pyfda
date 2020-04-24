@@ -172,11 +172,15 @@ class FIR_DF_wdg(QWidget):
         
         The new values are written to the fixpoint coefficient dict 
         `fb.fil[0]['fxqc']['QA']`.
-        """        
-        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
-            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
-        elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        """
+        try:
+            if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
+                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
+            elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        except Exception as e:
+            logger.error(e)
+            return
 
         if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full" or\
             qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
