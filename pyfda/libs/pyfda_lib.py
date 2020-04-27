@@ -1479,7 +1479,7 @@ def fil_convert(fil_dict, format_in):
             #except Exception as e:
                 #raise ValueError(e)
         else:
-            raise ValueError("\tCoefficients contain NaNs or Inf element, cannot convert!")
+            raise ValueError("\tCannot convert coefficients with NaN or Inf elements to zpk format!")
             zpk = None
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
