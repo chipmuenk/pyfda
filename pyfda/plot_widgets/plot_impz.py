@@ -1083,63 +1083,59 @@ class Plot_Impz(QWidget):
 
 
             # --------------- Plot stimulus and response ----------------------
-            labels = []
-
             if plt_stimulus:
                 plot_stim_dict = self.fmt_plot_stim.copy()
                 plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft,
                                               plot_stim_dict, self.ui.bottom_f)
 
-                plot_stim_fnc(F, X, label='$Stim.$', **plot_stim_dict)
+                label_P = "$P$ = {0:.3g} {1}".format(Px, unit_P)
+                plot_stim_fnc(F, X, label='$X(f)$:  ' + label_P, **plot_stim_dict)
 
                 if self.plt_freq_stim_mkr:
                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
-
-                labels.append("$P_X$ = {0:.3g} {1}".format(Px, unit_P))
 
             if plt_stimulus_q:
                 plot_stmq_dict = self.fmt_plot_stmq.copy()
                 plot_stmq_fnc = self.plot_fnc(self.plt_freq_stmq, self.ax_fft,
                                               plot_stmq_dict, self.ui.bottom_f)
 
-                plot_stmq_fnc(F, X_q, label='$Stim<q>.$', **plot_stmq_dict)
+                label_P = "$P$ = {0:.3g} {1}".format(Pxq, unit_P)
+                plot_stmq_fnc(F, X_q, label='$X_q(f)$: ' + label_P, **plot_stmq_dict)
 
                 if self.plt_freq_stmq_mkr:
                     self.ax_fft.scatter(F, X_q, **self.fmt_mkr_stmq)
-
-                labels.append("$P_{{Xq}}$ = {0:.3g} {1}".format(Pxq, unit_P))
 
             if plt_response:
                 plot_resp_dict = self.fmt_plot_resp.copy()
                 plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft,
                                               plot_resp_dict, self.ui.bottom_f)
 
-                plot_resp_fnc(F, Y, label='$Resp.$', **plot_resp_dict)
+                label_P = "$P$ = {0:.3g} {1}".format(Py, unit_P)
+                plot_resp_fnc(F, Y, label='$Y(f)$:   ' + label_P, **plot_resp_dict)
 
                 if self.plt_freq_resp_mkr:
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
 
-                labels.append("$P_Y$ = {0:.3g} {1}".format(Py, unit_P))
-
             if self.ui.chk_Hf.isChecked():
-                self.ax_fft.plot(F_id, H_id, c="gray",)
-                labels.append("$|H_{id}(f)|$")
+                self.ax_fft.plot(F_id, H_id, c="gray",label="$|H_{id}(f)|$")
 
 #            if self.ui.chk_win_freq.isChecked():
 #                self.ax_fft.plot(F, Win, c="gray", label="win")
 #                labels.append("{0}".format(self.ui.window_type))
 
+            # get handles and labels for all plots so far
+            handles, labels = self.ax_fft.get_legend_handles_labels()
+            # get a tuple with pairs of (label, handle), sorted for the label
+            sorted_pairs = sorted(zip(labels, handles))
+            # convert back to two lists
+            labels, handles = [ list(tuple) for tuple in  zip(*sorted_pairs)]
+            
+            # Create two empty patches for NENBW and CGAIN and extend handles list with them
+            handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
+                                                 ec="white", lw=0, alpha=0)] * 2)
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
-
-            # collect all plot objects, hope that the order isn't messed up and add two dummy handles
-            # for the NENBW and the CGAIN labels
-            handles = self.ax_fft.get_lines()
-            # Create two empty patches for NENBW and CGAIN:
-            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
-                                                 ec="white", lw=0, alpha=0))
-            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
-                                                 ec="white", lw=0, alpha=0))
+            
             self.ax_fft.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
 
