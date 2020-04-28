@@ -72,7 +72,7 @@ now: https://github.com/scipy/scipy/issues/1002
 https://github.com/thorstenkranz/eegpy/blob/master/eegpy/filter/remezord.py
 """
 
-def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
+def remezord(freqs,amps,rips,fs=1,alg='ichige'):
     """
     Filter parameter selection for the Remez exchange algorithm.
 
@@ -86,7 +86,7 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
     freqs : list
         A monotonic sequence of band edges specified in Hertz. All elements
         must be non-negative and less than 1/2 the sampling frequency as
-        given by the Hz parameter. The band edges "0" and "f_S / 2" do not
+        given by the `fs` parameter. The band edges "0" and "f_S / 2" do not
         have to be specified, hence  2 * number(amps) - 2 freqs are needed.
 
     amps : list
@@ -98,7 +98,7 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
         A list with the peak ripples (linear, not in dB!) for each band. For
         the stop band this is equivalent to the minimum attenuation.
 
-    Hz : float
+    fs : float
         Sampling frequency
 
     alg : string
@@ -117,7 +117,7 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
         sampling frequency of 200 Hz, a passband peak ripple of 10%
         and a stop band ripple of 0.01 or 40 dB.
 
-        >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], Hz = 200)
+        >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], fs = 200)
 
     """
 
@@ -130,7 +130,7 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
     rips /= (amps+(amps==0.0))
 
     # Normalize input frequencies with respect to sampling frequency:
-    freqs /= Hz
+    freqs /= fs
 
     # Select filter length approximation algorithm:
     if alg == 'herrmann':
