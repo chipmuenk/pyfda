@@ -811,8 +811,8 @@ class PlotImpz_UI(QWidget):
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
-        self.scale = self.N / np.sum(self.win)
-        self.win *= self.scale # correct gain for periodic signals (coherent gain)
+        self.cgain = np.sum(self.win) / self.N # coherent gain
+        self.win /= self.cgain # correct gain for periodic signals
 
         # only emit a signal for local triggers to prevent infinite loop:
         # - signal-slot connection passes a bool or an integer

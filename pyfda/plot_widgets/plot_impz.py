@@ -1062,7 +1062,7 @@ class Plot_Impz(QWidget):
                 unit_nenbw = "dB"
                 unit_cgain = "dB"
                 nenbw = 10 * np.log10(self.ui.nenbw)
-                cgain = 20 * np.log10(self.ui.scale)
+                cgain = 20 * np.log10(self.ui.cgain)
                 H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
@@ -1081,7 +1081,7 @@ class Plot_Impz(QWidget):
                 unit_nenbw = "bins"
                 unit_cgain = ""
                 nenbw = self.ui.nenbw
-                cgain = self.ui.scale
+                cgain = self.ui.cgain
 
             XY_str = XY_str + ' in ' + unit
 
