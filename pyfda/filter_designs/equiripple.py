@@ -265,7 +265,13 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        fil_save(fil_dict, arg, self.FRMT, __name__)
+        try:
+            fil_save(fil_dict, arg, self.FRMT, __name__)
+        except Exception as e:
+            # catch exception due to malformatted coefficients:
+            logger.error("While saving the equiripple filter design, "
+                         "the following error occurred:\n{0}".format(e))
+            return -1
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
