@@ -1327,7 +1327,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             format_error = True
 
         if format_error:
-            raise ValueError("\tUnknown 'zpk' format {0}".format(arg))
+            raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
 
 
     elif format_in == 'ba':
@@ -1369,7 +1369,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         fil_dict['ba'] = [np.array(b, dtype=np.complex), np.array(a, dtype=np.complex)]
 
     else:
-        raise ValueError("\tUnknown input format {0:s}".format(format_in))
+        raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
 
     fil_dict['creator'] = (format_in, sender)
     fil_dict['timestamp'] = time.time()
@@ -1428,7 +1428,7 @@ def fil_convert(fil_dict, format_in):
                 b1 = chk[section, :3]
                 a1 = chk[section, 3:]
                 if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
-                    raise ValueError('\tBad coefficients, Order N is too high')
+                    raise ValueError("\t'fil_convert()': Bad coefficients, Order N is too high!")
 
         if 'zpk' not in format_in:
             try:
@@ -1479,7 +1479,7 @@ def fil_convert(fil_dict, format_in):
             #except Exception as e:
                 #raise ValueError(e)
         else:
-            raise ValueError("\tCannot convert coefficients with NaN or Inf elements to zpk format!")
+            raise ValueError("\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements to zpk format!")
             zpk = None
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
@@ -1490,7 +1490,7 @@ def fil_convert(fil_dict, format_in):
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
-        raise ValueError("\tUnknown input format {0:s}".format(format_in))
+        raise ValueError("\t'fil_convert()': Unknown input format {0:s}".format(format_in))
 
     # eliminate complex coefficients created by numerical inaccuracies
     fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100) # tol specified in multiples of machine eps
