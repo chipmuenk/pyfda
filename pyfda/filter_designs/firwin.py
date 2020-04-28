@@ -223,7 +223,7 @@ class Firwin(QWidget):
         self.alg = str(self.cmb_firwin_alg.currentText())
         self.fir_window_name = qget_cmb_box(self.cmb_firwin_win, data=False)
         self.win = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=False) 
+                                        N=self.N, sym=True) 
         n_par = self.win_dict['n_par']
 
         self.lblWinPar1.setVisible(n_par > 0)
