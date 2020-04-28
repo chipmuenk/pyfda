@@ -273,6 +273,14 @@ class FIR_DF_wdg(QWidget):
         Construct an instance of the fixpoint filter object using the settings from
         the 'fxqc' quantizer dict
         """
+        p = fb.fil[0]['fxqc']
+        if not all(np.isfinite(p['b'])):
+            logger.error("Coefficients contain non-finite values!")
+            return
+        if any(np.iscomplex(p['b'])):
+            logger.error("Coefficients contain complex values!")
+            return
+
         self.fixp_filter = FIR()
 #------------------------------------------------------------------------------
     def to_verilog(self):
