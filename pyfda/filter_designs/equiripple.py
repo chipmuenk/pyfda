@@ -283,18 +283,18 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
             return -1
         self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
-                        weight = [fil_dict['W_PB'],fil_dict['W_SB']], Hz = 1,
+                        weight = [fil_dict['W_PB'],fil_dict['W_SB']], fs = 1,
                         grid_density = self.grid_density))
 
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
+            [self.A_PB, self.A_SB], fs = 1, alg = self.alg)
         if not self._test_N():
             return -1
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
-        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, fs = 1,
                         grid_density = self.grid_density))
 
 
@@ -305,28 +305,28 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
             self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
-                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
+                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else: # odd order, 
             self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
-                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
+                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
+            [self.A_SB, self.A_PB], fs = 1, alg = self.alg)
         if not self._test_N():
             return -1
 #        self.N = ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1, 
                         type = 'hilbert', grid_density = self.grid_density))
         else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1, 
                         type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
@@ -338,19 +338,19 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                  sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
-                Hz = 1, grid_density = self.grid_density))
+                fs = 1, grid_density = self.grid_density))
 
     def BPmin(self, fil_dict):
         self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
-            [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
+            [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)
         if not self._test_N():
             return -1
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
         fil_dict['W_SB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def BSman(self, fil_dict):
@@ -361,20 +361,20 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
-            Hz = 1, grid_density = self.grid_density))
+            fs = 1, grid_density = self.grid_density))
 
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
         (N, F, A, W) = remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
-            [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
+            [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
-        self._save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, fs = 1,
                                       grid_density = self.grid_density))
 
     def HILman(self, fil_dict):
@@ -384,21 +384,21 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
-                Hz = 1, type = 'hilbert', grid_density = self.grid_density))
+                fs = 1, type = 'hilbert', grid_density = self.grid_density))
 
     def DIFFman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
         self.N = ceil_even(self.N) # enforce even order
-        if self.F_PB < 0.1:
+        if self.F_PB < 0.01:
             logger.warning("Bandwidth for pass band ({0}) is too narrow, inreasing to 0.1".format(self.F_PB))
             self.F_PB = 0.1
             fil_dict['F_PB'] = self.F_PB
             self.sig_tx.emit({'sender':__name__, 'specs_changed':'equiripple'})
 
         self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
-                Hz = 1, type = 'differentiator', grid_density = self.grid_density))
+                fs = 1, type = 'differentiator', grid_density = self.grid_density))
 
 
 #------------------------------------------------------------------------------
