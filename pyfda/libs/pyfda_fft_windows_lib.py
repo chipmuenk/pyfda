@@ -41,7 +41,7 @@ windows =\
               'where the window length is an integer number of the signal period. '
               'It also works great when the signal length is shorter than the window '
               'length (e.g. for the impulse response of a FIR filter). For other signals, '
-              'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
+              'it has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />'
               'This window also has the best SNR of all windows.</span>')
         },
     'Barthann':
@@ -52,10 +52,12 @@ windows =\
     'Bartlett':
         {'fn_name':'bartlett',
          'info':'<span>The Bartlett window is very similar to a triangular window, '
-             'except that the end points are at zero. Its side lobes fall off with '
-             '12 dB/oct., the side lobe suppression is xx dB.'
+             'except that the end point(s) are at zero. Its side lobes fall off with '
+             '12 dB/oct., the side lobe suppression is 26 dB.'
              '<br />&nbsp;<br />'
-             'Its Fourier transform is the product of two (periodic) sinc functions.<span>'},
+             'It can be constructed as the convolution of two rectangular windows, '
+             'hence, its Fourier transform is the product of two (periodic) sinc '
+             'functions.<span>'},
     'Blackman':
         {'fn_name':'blackman'},
     'Blackmanharris':
