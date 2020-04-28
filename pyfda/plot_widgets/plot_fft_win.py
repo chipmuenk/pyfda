@@ -473,7 +473,7 @@ class Plot_FFT_win(QDialog):
             labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
             N_patches += 1
         if self.tbl_sel[1]:
-            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.scale_disp, self.unit_nenbw))
+            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.scale_disp, self.unit_scale))
             N_patches += 1
         if self.tbl_sel[2]:
             labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))

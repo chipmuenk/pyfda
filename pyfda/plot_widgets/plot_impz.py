@@ -1060,7 +1060,9 @@ class Plot_Impz(QWidget):
                 unit = "dBV"
                 unit_P = "dBW"
                 unit_nenbw = "dB"
+                unit_cgain = "dB"
                 nenbw = 10 * np.log10(self.ui.nenbw)
+                cgain = 20 * np.log10(self.ui.scale)
                 H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
@@ -1077,7 +1079,9 @@ class Plot_Impz(QWidget):
                 unit = "V"
                 unit_P = "W"
                 unit_nenbw = "bins"
+                unit_cgain = ""
                 nenbw = self.ui.nenbw
+                cgain = self.ui.scale
 
             XY_str = XY_str + ' in ' + unit
 
@@ -1134,7 +1138,7 @@ class Plot_Impz(QWidget):
             handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
                                                  ec="white", lw=0, alpha=0)] * 2)
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
-            labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
+            labels.append("$CGAIN$  = {0:.4g} {1}".format(cgain, unit_cgain))
             
             self.ax_fft.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
