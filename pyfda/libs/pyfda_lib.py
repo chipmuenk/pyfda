@@ -72,6 +72,12 @@ except (ImportError,SyntaxError):
 VERSION.update({'migen': VERSION_MIGEN})
 
 try:
+    from nmigen import __version__ as VERSION_NMIGEN
+    VERSION.update({'nMigen': VERSION_NMIGEN})
+except ImportError:
+    pass
+
+try:
     from docutils import __version__ as VERSION_DOCUTILS
     VERSION.update({'docutils': VERSION_DOCUTILS})
 except ImportError:
