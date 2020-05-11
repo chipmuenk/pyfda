@@ -290,13 +290,12 @@ class FIR_DF_wdg(QWidget):
         return verilog.convert(self.fixp_filter,
                                ios={self.fixp_filter.i, self.fixp_filter.o}) 
 #------------------------------------------------------------------------------
-    def tb_wdg_stim(self, stimulus, inputs, outputs):
+    def tb_wdg_stim(self, stimulus, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
             yield self.fixp_filter.i.eq(int(x)) # pass one stimulus value to filter
-            inputs.append(x) # and append it to input list
             outputs.append((yield self.fixp_filter.o)) # append filter output to output list
-            yield # ??
+            yield # next x
 
 
 #------------------------------------------------------------------------------           
@@ -307,11 +306,8 @@ class FIR_DF_wdg(QWidget):
         https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
         """
     
-        inputs = []
         response = []
-        
-        testbench = self.tb_wdg_stim(stimulus, inputs, response) 
-            
+        testbench = self.tb_wdg_stim(stimulus,response) 
         run_simulation(self.fixp_filter, testbench)
         
         return response
