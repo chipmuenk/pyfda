@@ -52,7 +52,16 @@ def rescale(mod, sig_i, QI, QO):
         Quantization dict for output word format; the keys 'WI' and 'WF' for 
         integer and fractional wordlength are evaluated as well as the keys 'quant'
         and 'ovfl' describing requantization and overflow behaviour.
-    
+
+    Returns
+    -------
+
+    sig_o: Signal (migen)
+        Requantized signal
+
+    Documentation
+    -------------
+
     **Input and output word are aligned at their binary points.**
     
     The following shows an example of rescaling an input word from Q2.4 to Q0.3
@@ -93,40 +102,43 @@ def rescale(mod, sig_i, QI, QO):
       bits with the sign bit.
     
     """
-    WI_I = QI['WI']
-    WI_F = QI['WF']
-    WI   = WI_I + WI_F + 1
+    WI_I = QI['WI']         # number of integer bits (input signal)
+    WI_F = QI['WF']         # number of integer bits (output signal)
+    WI   = WI_I + WI_F + 1  # total word length (input signal)
 
-    WO_I = QO['WI']
-    WO_F = QO['WF']
-    WO   = WO_I + WO_F + 1
+    WO_I = QO['WI']         # number of integer bits (input signal)
+    WO_F = QO['WF']         # number of integer bits (output signal)
+    WO   = WO_I + WO_F + 1  # total word length (input signal)
 
-    dWF = WI_F - WO_F # difference of fractional lengths
-    dWI = WI_I - WO_I # difference of integer lengths
+    dWF = WI_F - WO_F       # difference of fractional lengths
+    dWI = WI_I - WO_I       # difference of integer lengths
+
     # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
 
-    sig_i_q = Signal((max(WI,WO), True))
+    sig_i_q = Signal((max(WI,WO), True)) # intermediate signal with requantized fractional part
     sig_o = Signal((WO, True))
 
     logger.debug("rescale: dWI={0}, dWF={1}, QU:{2}, OV:{3}".format(dWI, dWF, QO['quant'], QO['ovfl'] ))
-    if dWF <= 0: # extend fractional word length of output word
-        mod.comb += sig_i_q.eq(sig_i << -dWF) # shift input right by -dWF   
-    else: # dWF > 0, fractional output word length needs to be shortened
+    if dWF <= 0: # Extend fractional word length of output word by multiplying with 2^dWF 
+        mod.comb += sig_i_q.eq(sig_i << -dWF) #  shift input left by -dWF   
+    else: # dWF > 0, reduce fractional word length by dividing by 2^dWF (shift right by dWF)
         if QO['quant'] == 'round':
-            # add half an LSB (1 << (dWF - 1)) and divide by 2^dWF (shift left by dWF)
+            # add half an LSB (1 << (dWF - 1)) before right shift 
             mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
-        elif QO['quant'] == 'floor': # just divide by 2^dWF (shift left by dWF)
+        elif QO['quant'] == 'floor': # just shift right
             mod.comb += sig_i_q.eq(sig_i >> dWF)
         elif QO['quant'] == 'fix':
-            # add sign bit as LSB (1 << dWF) and divide by 2^dWF (shift left by dWF)
+            # add sign bit (sig_i[-1]) as LSB (1 << dWF) before right shift
             mod.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
         else:
             raise Exception(u'Unknown quantization method "%s"!'%(QI['quant']))
  
-    if dWI < 0: # WI_I < WO_I, sign extend integer part
-        #mod.comb += sig_o.eq(sig_i_q >> -dWI)
+    # -----------------------------------------------------------------------
+    # Requantize integer part 
+    # -----------------------------------------------------------------------
+    if dWI < 0: # WI_I < WO_I, sign extend integer part (prepend copies of sign bit)
         mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(sig_i_q[-1], -dWI)))
     elif dWI == 0: # WI = WO, don't change integer part
         mod.comb += sig_o.eq(sig_i_q)
@@ -134,18 +146,15 @@ def rescale(mod, sig_i, QI, QO):
         mod.comb += \
             If(sig_i_q[-1] == 1,
                If(sig_i_q < MIN_o,
-               #If(sig_i_q[-dWI-1:-1] != Replicate(sig_i_q[-1], dWI),
                     sig_o.eq(MIN_o)
-                ).Else(sig_o.eq(sig_i_q))#[:-dWI-1]))# >> dWI
+                ).Else(sig_o.eq(sig_i_q))
             ).Elif(sig_i_q > MAX_o,
-            #).Elif(sig_i_q[WO-1:] == 0b01,
                 sig_o.eq(MAX_o)
-            ).Else(sig_o.eq(sig_i_q)#[:-dWI-1])# >> dWI)
+            ).Else(sig_o.eq(sig_i_q)
             )
     elif QO['ovfl'] == 'wrap': # wrap around (shift left)
-        mod.comb += sig_o.eq(sig_i_q)# >> dWI)
-        #mod.comb += sig_o.eq(Replicate(sig_i_q[-1], abs(dWI)))
-        #mod.comb += sig_o.eq(sig_i_q[-dWI-1:-1])
+        mod.comb += sig_o.eq(sig_i_q)
+
 # =============================================================================
 #             If(sig_i_q[-1] == 1,
 #                If(sig_i_q[-1:-dWI-1] != Replicate(sig_i_q[-1], dWI),
