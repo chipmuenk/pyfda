@@ -483,7 +483,7 @@ class Firwin(QWidget):
             fb.fil[0]['wdg_fil'][1] = beta
             self._update_UI()
         else:
-            N = remezord(F, W, A, Hz = 1, alg = alg)[0]
+            N = remezord(F, W, A, fs = 1, alg = alg)[0]
 
         return N
 
@@ -535,7 +535,7 @@ class Firwin(QWidget):
     def BPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
-            [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)[0]
+            [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)[0]
         if not self._test_N():
             return -1
         self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
@@ -558,7 +558,7 @@ class Firwin(QWidget):
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
-            [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)[0]
+            [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
