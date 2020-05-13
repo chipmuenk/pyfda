@@ -17,7 +17,7 @@ import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
-from .fixpoint_helpers import rescale
+from .fixpoint_helpers import requant
 
 from math import cos, pi
 
@@ -155,39 +155,7 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        self.comb += self.o.eq(rescale(self, src, p['QI'], p['QO']))
-
-#    def rescale(self, sig_i, WO, quant=None, ovfl=None):
-#        """
-#        Change word length of input signal `sig_in` to `WO` bits, using the 
-#        rounding and saturation methods specified by `quant` and `ovfl`.
-#        """
-#        WI = sig_i.nbits
-#        dW = WI - WO
-#        # max. resp. min, output values
-#        MIN_o = - 1 << (WO - 1)
-#        MAX_o = -MIN_o - 1
-#
-#        sig_i_q = Signal((WI, True))
-#        sig_o = Signal((WO, True))
-#        if quant == 'round' and dW > 0:
-#            self.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
-#        else:
-#            self.comb += sig_i_q.eq(sig_i)        
-#        if ovfl == 'wrap':
-#            if dW >= 0: # WI >= WO, shift left
-#                self.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
-#            else:
-#                self.comb += sig_o.eq(sig_i_q << -dW)
-#        else:
-#            self.comb += \
-#                If(sig_o[self.WO-2:] == 0b10,
-#                    sig_o.eq(MIN_o)
-#                ).Elif(sig_o[WO-2:] == 0b01,
-#                    sig_o.eq(MAX_o)
-#                ).Else(sig_o.eq(sig_i_q >> (dW))
-#                )
-#        return sig_o
+        self.comb += self.o.eq(requant(self, src, p['QI'], p['QO']))
 
 #------------------------------------------------------------------------------
 
@@ -200,4 +168,4 @@ if __name__ == '__main__':
 
     app.exec_()
     
-    # test using "python -m pyfda.fixpoint_filters.delay1"
+    # test using "python -m pyfda.fixpoint_widgets.fx_delay"

@@ -27,7 +27,7 @@ from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 
 
-def rescale(mod, sig_i, QI, QO):
+def requant(mod, sig_i, QI, QO):
     """
     Change word length of input signal `sig_i` to `WO` bits, using the 
     quantization and saturation methods specified by ``QO['quant']`` and 
@@ -84,7 +84,8 @@ def rescale(mod, sig_i, QI, QO):
     to be right-aligned. Changes in the number of integer bits `dWI` and fractional
     bits `dWF` are handled separately.
     
-    Fractional Bits:
+    Fractional Bits
+    ---------------
     
     - For reducing the number of fractional bits by `dWF`, simply right-shift the
       integer number by `dWF`. For rounding, add '1' to the bit below the truncation
@@ -93,7 +94,8 @@ def rescale(mod, sig_i, QI, QO):
     - Extend the number of fractional bits by left-shifting the integer by `dWF`,
       LSB's are filled with zeros.
       
-    Integer Bits:
+    Integer Bits
+    ------------
     
     - For reducing the number of integer bits by `dWI`, simply right-shift the
       integer by `dWI`.

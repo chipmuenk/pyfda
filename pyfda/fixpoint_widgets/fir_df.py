@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 #import pyfda.libs.pyfda_fix_lib as fx
-from .fixpoint_helpers import UI_W, UI_Q, rescale
+from .fixpoint_helpers import UI_W, UI_Q, requant
 
 #####################
 from functools import reduce
@@ -295,7 +295,7 @@ class FIR_DF_wdg(QWidget):
         for x in stimulus:
             yield self.fixp_filter.i.eq(int(x)) # pass one stimulus value to filter
             outputs.append((yield self.fixp_filter.o)) # append filter output to output list
-            yield # next x
+            yield # next x until stimulus is used up
 
 
 #------------------------------------------------------------------------------           
@@ -307,7 +307,7 @@ class FIR_DF_wdg(QWidget):
         """
     
         response = []
-        testbench = self.tb_wdg_stim(stimulus,response) 
+        testbench = self.tb_wdg_stim(stimulus, response) 
         run_simulation(self.fixp_filter, testbench)
         
         return response
@@ -346,10 +346,10 @@ class FIR(Module):
 
         # rescale from full product format to accumulator format 
         sum_accu = Signal((p['QA']['W'], True))
-        self.comb += sum_accu.eq(rescale(self, sum_full, QP, p['QA']))
+        self.comb += sum_accu.eq(requant(self, sum_full, QP, p['QA']))
 
         # rescale from accumulator format to output width
-        self.comb += self.o.eq(rescale(self, sum_accu, p['QA'], p['QO']))
+        self.comb += self.o.eq(requant(self, sum_accu, p['QA'], p['QO']))
 
 #------------------------------------------------------------------------------
 
