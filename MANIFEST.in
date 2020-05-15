@@ -1,8 +1,6 @@
 include pyfda/fixpoint_widgets/*.png
-include pyfda/fixpoint_widgets/*.svg
-include pyfda/libs/pyfda_log_template.conf
-include pyfda/libs/pyfda_template.conf
-include README_PYPI.md
-include README.md
+include pyfda/libs/pyfda_*.conf
+include README*.md
 include AUTHORS.md
 include LICENSE
+include requirements.txt
