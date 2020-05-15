@@ -976,8 +976,8 @@ class Plot_Impz(QWidget):
         # - Calculate total power P from FFT, corrected by window equivalent noise
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
-        # - Scale impulse response with N_FFT to calculate frequency response if requested
-            if self.ui.chk_scale_impz_f.isVisible() and self.ui.chk_scale_impz_f.isEnabled()\
+        # - Scale impulse response with N_FFT to calculate frequency response if requested      
+            if self.ui.chk_scale_impz_f.isEnabled() and self.ui.stim == "Pulse"\
                 and self.ui.chk_scale_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
