@@ -1121,7 +1121,7 @@ class Plot_Impz(QWidget):
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
 
             if self.ui.chk_Hf.isChecked():
-                self.ax_fft.plot(F_id, H_id, c="gray",label="$|H_{id}(f)|$")
+                self.ax_fft.plot(F_id, H_id, c="gray",label="$H_{id}(f)$")
 
 #            if self.ui.chk_win_freq.isChecked():
 #                self.ax_fft.plot(F, Win, c="gray", label="win")

@@ -169,23 +169,23 @@ class PlotImpz_UI(QWidget):
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
 
         lbl_plt_time_title = QLabel("<b>View:</b>", self)
-        lbl_plt_time_resp = QLabel("Response", self)
+        lbl_plt_time_resp = QLabel("Response " + to_html("y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_time_stim = QLabel("Stimulus", self)
+        self.lbl_plt_time_stim = QLabel("Stimulus " + to_html("x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_time_stmq = QLabel("Stim.<q>", self)
+        self.lbl_plt_time_stmq = QLabel("Fixp. Stim. " + to_html("x_Q", frmt='bi'), self)
         self.cmb_plt_time_stmq = QComboBox(self)
         self.cmb_plt_time_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
-        self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
+        self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
         self.chk_log_time = QCheckBox("dB : min.", self)
         self.chk_log_time.setObjectName("chk_log_time")
@@ -241,23 +241,23 @@ class PlotImpz_UI(QWidget):
         # Controls for frequency domain
         # ---------------------------------------------------------------
         lbl_plt_freq_title = QLabel("<b>View:</b>", self)
-        lbl_plt_freq_resp = QLabel("Response", self)
+        lbl_plt_freq_resp = QLabel("Response " + to_html("Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_freq_stim = QLabel("Stimulus", self)
+        self.lbl_plt_freq_stim = QLabel("Stimulus " + to_html("X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
         self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_freq_stmq = QLabel("Stim.<q>", self)
+        self.lbl_plt_freq_stmq = QLabel("Fixp. Stim. " + to_html("X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
         self.cmb_plt_freq_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
-        self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>quantized</em> stimulus.</span>")
+        self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
         self.chk_log_freq = QCheckBox("dB : min.", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
@@ -293,11 +293,12 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar2.setText("2")
         self.ledWinPar2.setObjectName("ledWinPar2")
 
-        self.chk_Hf = QCheckBox("|H(f)|", self)
+        self.chk_Hf = QCheckBox(self)
         self.chk_Hf.setObjectName("chk_Hf")
         self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
         self.chk_Hf.setChecked(False)
+        self.chk_Hf_lbl = QLabel(to_html("H_id (f)", frmt="bi"), self)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
@@ -323,6 +324,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.ledWinPar2)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.chk_Hf)
+        layH_ctrl_freq.addWidget(self.chk_Hf_lbl)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
