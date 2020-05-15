@@ -86,7 +86,9 @@ or
 However, installing pyfda makes life easier by creating a run script in your path. This can be done in different ways:
 
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). However, I'm not updating the files on my channel anymore, I find the process of generating conda packages too cumbersome (and there are few downloads via conda anyway). pip (see below) should play nice with Anaconda as well.
+
+Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
 
 When you have one of the two installed, you can proceed with
 
