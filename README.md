@@ -12,15 +12,15 @@ pyFDA
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. When the migen module is installed, fixpoint implementations (for some filter types) can be simulated and exported as synthesizable Verilog netlists.
 
-![Screenshot](img/pyFDA_screenshot_3.png)
+![Screenshot](img/pyfda_screenshot_3.png)
 
 **More screenshots from the current version:**
 
 <table>
     <tr>
-        <td><img src = "img/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "img/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "img/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_3d_4.png" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_hn.png" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_scr_shot_baq_impz.png" alt="Screenshot" width=300px></td>
    </tr>
     <tr>
         <td><img src = "img/pyfda_screenshot_3d_3.png" alt="Screenshot" width=300px></td>
