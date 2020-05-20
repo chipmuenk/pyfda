@@ -10,6 +10,7 @@
 # https://docs.anaconda.com/mkl-optimizations/
 # This only works under Linux and OS X, under Windows there seems to be no feasible
 # alternative to scipy built with mkl
+# see:  https://stackoverflow.com/questions/46656367/how-to-create-an-environment-in-anaconda-with-numpy-nomkl
 
 # Under windows, Qt library become installed twice, bloating the resulting exe
 # This might be caused by pywin32 (Anaconda) and pypiwin32 both installed (or a similar
