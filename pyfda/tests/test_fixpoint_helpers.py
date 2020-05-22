@@ -16,7 +16,7 @@ from numpy.testing import assert_array_equal
 from pyfda.libs import pyfda_fix_lib as fx
 try:
     from migen import Cat, If, Replicate, Signal, Module, run_simulation
-    from pyfda.fixpoint_widgets.fixpoint_helpers import rescale
+    from pyfda.fixpoint_widgets.fixpoint_helpers import requant
     HAS_MIGEN = True
 except ImportError:
     HAS_MIGEN = False
@@ -92,12 +92,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
 
     #==========================================================================
-    # Test rescale routine, this needs a migen class (DUT)
+    # Test requant routine, this needs a migen class (DUT)
     #--------------------------------------------------------------------------
     # - The input to the run_sim method needs to be an iterable of integers, 
     #    the output is a list of integers
     # - migen moduls only use integer arithmetics, fractional arithmetics is 
-    #    only provided by the rescale method. It accepts quantization dicts in
+    #    only provided by the requant method. It accepts quantization dicts in
     #    the same format as the pyfda quantization library
     # - Due to latency of one, strip last element of input and first of output
     # 
@@ -159,7 +159,7 @@ class TestSequenceFunctions(unittest.TestCase):
         
 
 ###############################################################################
-# migen class for testing rescale operation
+# migen class for testing requant operation
 class DUT(Module):
     def __init__(self, par_in, par_out):
 
@@ -167,10 +167,10 @@ class DUT(Module):
         self.i = Signal((par_in['W'], True)) # input signal
         self.o = Signal((par_out['W'], True)) # output signal
         ###
-        # rescale from input format to output format
-        self.comb += self.o.eq(rescale(self, self.i, par_in, par_out))
+        # requantize from input format to output format
+        self.comb += self.o.eq(requant(self, self.i, par_in, par_out))
 
 if __name__=='__main__':
     unittest.main()
 
-# run tests with python -m pyfda.tests.test_pyfda_fixpoint_helpers
+# run tests with python -m pyfda.tests.test_fixpoint_helpers
