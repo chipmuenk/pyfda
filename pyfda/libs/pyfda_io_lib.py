@@ -79,7 +79,7 @@ class CSV_option_box(QDialog):
         butClose.setText("Close")
 
         lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Vert.', 'auto'), ('Vertical', 'vert'), ('Horizontal', 'horiz')]
+        orientation = [('Auto/Horz.', 'auto'), ('Vertical', 'vert'), ('Horizontal', 'horiz')]
         self.cmbOrientation = QComboBox(self)
         self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
         for o in orientation:
@@ -241,7 +241,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 
     The following keys from the global dict dict ``params['CSV']`` are evaluated:
 
-    :'delimiter': str (default: "<tab>"),
+    :'delimiter': str (default: ","),
           character for separating columns
 
     :'lineterminator': str (default: As used by the operating system),
@@ -255,10 +255,12 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
             - \*nix   : Line feed
 
     :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
-            orientation the table is read.
+            orientation the table is written. 'vert' means a line break after 
+            each entry or pair of entries which usually is not what you want.
+            'auto' doesn't make much sense when writing, 'horiz' is used in this case.
 
     :'header': str (default: 'auto').
-            When ``header='on'``, treat first row as a header that will be discarded.
+            When ``header='on'``, write the first row with 'b, a'.
 
     :'clipboard': bool (default: True),
             when ``clipboard = True``, copy data to clipboard, else use a file.
@@ -278,15 +280,15 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
         logger.error("Unknown key '{0}' for params['CSV']['header']"
                                         .format(params['CSV']['header']))
 
-    if params['CSV']['orientation'] in {'auto', 'vert'}:
-        orientation_horiz = False
-    elif params['CSV']['orientation'] == 'horiz':
+    if params['CSV']['orientation'] in {'horiz', 'auto'}:
         orientation_horiz = True
+    elif params['CSV']['orientation'] == 'vert':
+        orientation_horiz = False
     else:
         logger.error("Unknown key '{0}' for params['CSV']['orientation']"
                                         .format(params['CSV']['orientation']))
 
-    delim = params['CSV']['delimiter']
+    delim = params['CSV']['delimiter'].lower()
     if delim == 'auto': # 'auto' doesn't make sense when exporting
         delim = ","
     cr = params['CSV']['lineterminator']
