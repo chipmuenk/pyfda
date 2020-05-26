@@ -2,5 +2,5 @@ include pyfda/fixpoint_widgets/*.png
 include pyfda/libs/pyfda_*.conf
 include README*.md
 include AUTHORS.md
-include LICENSE
+include LICENSE.txt
 include requirements.txt
