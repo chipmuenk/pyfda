@@ -34,6 +34,12 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
   <tr>
 </table>
 
+## Binaries
+
+Currently, binaries are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed.
+
+The binaries have been created using [pyInstaller](https://www.pyinstaller.org/), a `pyfdax.spec`, making it easy to create and distribute binaries for your system by running ``pyinstaller pyfdax.spec``. 
+
 ## Prerequisites
 
 * Python versions: **3.3 ... 3.7**
@@ -41,31 +47,16 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 * Libraries:
   * **PyQt5**
   * **numpy**
-  * **scipy**
+  * **scipy**: **1.2.0** or higher
   * **matplotlib**: **2.0** or higher
   
-All required libraries are installed automatically by conda or pip if they are missing except for `PyQt5`: I have not included it in the installation scripts for `pyfda` to prevent installing it twice accidentally. `PyQt5` has to be installed manually *either* 
-
-- system wide via `pip install` **`pyqt5`** 
-
-- sytem wide / in an environment via `conda install` **`pyqt`** . 
-
-If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
-
-    > conda list qt
-
-    pyqt                      5.6.0                    py36_2
-    PyQt5                     5.8.2                     <pip>
-    
-and get a similar result as above, you probably have a corrupted system. 
-
 ### Optional libraries:
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
 * **docutils** for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
-## Installing and Starting pyFDA
-You need to have a working Python installation on your computer, preferrably including the libraries listed above. I plan to provide binaries / flatpacks but haven't found the time yet. 
+## Installing pyFDA
+You need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: You can simply download and unpack the zip file from here and start the program from the top project directory using `pyfda/pyfdax.py` with
 
@@ -85,8 +76,51 @@ or
     
 However, installing pyfda makes life easier by creating a run script in your path. This can be done in different ways:
 
+### pip
+Installation from PyPI works the usual way, required libraries are installed automatically if missing:
+
+    > pip3 install pyfda
+
+or upgrade using
+
+    > pip3 install pyfda -U
+	
+or install locally (development mode) using
+
+    > pip3 install -e <YOUR_PATH_TO_PYFDA>
+	
+where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably obtained using git (see below).
+
+To select a specific version (by default, pip selects the latest stable version) use e.g.
+
+    > pip3 install pyfda==0.2b3
+
+### setup.py   
+You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
+
+    > python setup.py install
+
+or just create a link to where you have copied the python source files (for testing / development) using
+
+    > python setup.py develop
+
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). However, I'm not updating the files on my channel anymore, I find the process of generating conda packages too cumbersome (and there are few downloads via conda anyway). pip (see below) should play nice with Anaconda as well.
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda). However, I'm not updating the files on my channel anymore, I find the process of generating conda packages too cumbersome (and there are few downloads via conda anyway). pip (see above) should play nice with Anaconda as well.
+
+All required libraries are installed automatically if they are missing except for `PyQt5`: I have not included it in the installation scripts for `pyfda` to prevent installing it twice accidentally. `PyQt5` has to be installed manually *either* 
+
+- system wide via `pip install` **`pyqt5`** *or*
+
+- sytem wide / in an environment via `conda install` **`pyqt`** . 
+
+If you have *both* installed, you're in [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
+
+    > conda list qt
+
+    pyqt                      5.6.0                    py36_2
+    PyQt5                     5.8.2                     <pip>
+    
+and get a similar result as above, you probably have a corrupted system. 
 
 Don't use the `base` environment  for installing pyfda (you shouldn't do this for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) or create a new one (`conda create --name my_new_environment`). 
 
@@ -98,34 +132,6 @@ or
     
     > conda update  -c Chipmuenk pyfda
 
-### pip
-Otherwise, you can install from PyPI (attention: pip **does** install PyQt5 when it is not present) using
-
-    > pip install pyfda
-
-or upgrade using
-
-    > pip install pyfda -U
-	
-or install locally (development mode) using
-
-    > pip install -e <YOUR_PATH_TO_PYFDA>
-	
-where the specified path points to `pyfda/setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably obtained using git (see below).
-
-To select a specific version (by default, pip selects the latest stable version) use e.g.
-
-    > pip install pyfda==0.2b3
-
-### setup.py   
-You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
-
-    > python setup.py install
-
-or just create a link to where you have copied the python source files (for testing / development) using
-
-    > python setup.py develop
-
 ### git
 For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
 
@@ -136,7 +142,7 @@ This command creates a new folder "pyfda" at your current directory level and co
 The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point. As described above, pyfda can be 
 installed locally using either 
 
-    > pip install -e <YOUR_PATH_TO_PYFDA>
+    > pip3 install -e <YOUR_PATH_TO_PYFDA>
     
  or
  
@@ -144,7 +150,7 @@ installed locally using either
 
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
-### Starting pyFDA
+## Starting pyFDA
 In any case, a start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
@@ -223,6 +229,8 @@ Initial release
   * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
 * **Documentation using Sphinx / ReadTheDocs**
   Could be more and better ... but hey, it's a start!
+
+### Release 0.3.1 (May 2019)
 
 ### Release 1.0 (planned for some time in the not so near future)
 
