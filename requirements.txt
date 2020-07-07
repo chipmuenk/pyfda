@@ -6,7 +6,7 @@
 # at ReadTheDocs.org and in .travis.yml
 #-------------------------------------------------
 numpy
-scipy
+scipy >= 1.2.0
 matplotlib >= 2.0, != 3.1.0
 pyqt5
 docutils
