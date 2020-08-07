@@ -29,7 +29,7 @@ except ImportError:
 
 from pyfda.libs.compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
                       QSizePolicy, QIcon, QImage, QVBoxLayout,
-                      QInputDialog, FigureCanvas, NavigationToolbar)
+                      QInputDialog, FigureCanvas, NavigationToolbar, MplToolbar)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
