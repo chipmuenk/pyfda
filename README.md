@@ -38,7 +38,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 
 Currently, binaries are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed.
 
-The binaries have been created using [pyInstaller](https://www.pyinstaller.org/), a `pyfdax.spec`, making it easy to create and distribute binaries for your system by running ``pyinstaller pyfdax.spec``. 
+The binaries have been created using [pyInstaller](https://www.pyinstaller.org/). A `pyfdax.spec` is provided, making it easy to create and distribute binaries for your system by running ``pyinstaller pyfdax.spec``. 
 
 ## Prerequisites
 
@@ -48,7 +48,7 @@ The binaries have been created using [pyInstaller](https://www.pyinstaller.org/)
   * **PyQt5**
   * **numpy**
   * **scipy**: **1.2.0** or higher
-  * **matplotlib**: **2.0** or higher
+  * **matplotlib**: **2.0** or higher (**3.3 not supported yet**) 
   
 ### Optional libraries:
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
@@ -56,7 +56,7 @@ The binaries have been created using [pyInstaller](https://www.pyinstaller.org/)
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ## Installing pyFDA
-You need to have a working Python installation on your computer, preferrably including the libraries listed above. 
+Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: You can simply download and unpack the zip file from here and start the program from the top project directory using `pyfda/pyfdax.py` with
 
