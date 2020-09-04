@@ -237,11 +237,12 @@ class MplToolbar(NavigationToolbar):
 
     sig_tx = pyqtSignal(object) # general signal, containing a dict
 
+    def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
+
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
 
 #------------------------------------------------------------------------------
-    def _init_toolbar(self):
 
         #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
