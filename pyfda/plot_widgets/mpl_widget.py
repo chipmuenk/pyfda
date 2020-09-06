@@ -427,7 +427,7 @@ class MplToolbar(NavigationToolbar):
                 ax.grid(False)
             else:
                 ax.grid(self.a_gr.isChecked())#(self.grid)
-        self.parent.pltCanv.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
+        self.canvas.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
