@@ -256,7 +256,7 @@ class MplToolbar(NavigationToolbar):
 #        self.a_en.setChecked(True)
 ##        self.a.setEnabled(False)
 
-        self.addSeparator() #---------------------------------------------
+ #       self.addSeparator() #---------------------------------------------
 
         # HOME:
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
