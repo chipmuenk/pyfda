@@ -377,15 +377,17 @@ class Plot_PZ(QWidget):
                     ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
                                     va = 'bottom', color=mpc)
 
-            # increase distance between ticks and labels
-            # to give some room for poles and zeros
-        for tick in ax.get_xaxis().get_major_ticks():
-            tick.set_pad(12.)
-            tick.label1 = tick._get_text1()
-        for tick in ax.get_yaxis().get_major_ticks():
-            tick.set_pad(12.)
-            tick.label1 = tick._get_text1()
-
+# =============================================================================
+#            # increase distance between ticks and labels
+#            # to give some room for poles and zeros
+#         for tick in ax.get_xaxis().get_major_ticks():
+#             tick.set_pad(12.)
+#             tick.label1 = tick._get_text1()
+#         for tick in ax.get_yaxis().get_major_ticks():
+#             tick.set_pad(12.)
+#             tick.label1 = tick._get_text1()
+# 
+# =============================================================================
         xl = ax.get_xlim(); Dx = max(abs(xl[1]-xl[0]), 0.05)
         yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)
         ax.set_xlim((xl[0]-Dx*0.05, max(xl[1]+Dx*0.05,0)))
