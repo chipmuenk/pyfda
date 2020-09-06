@@ -218,6 +218,11 @@ class MplToolbar(NavigationToolbar):
     Changing the info:
     http://stackoverflow.com/questions/15876011/add-information-to-matplotlib-navigation-toolbar-status-bar
     https://stackoverflow.com/questions/53099295/matplotlib-navigationtoolbar-advanced-figure-options
+
+    Using Tool Manager
+    https://matplotlib.org/3.1.1/gallery/user_interfaces/toolmanager_sgskip.html
+    https://stackoverflow.com/questions/52971285/add-toolbar-button-icon-matplotlib
+
     """
 
     toolitems = () # remove original icons and actions
