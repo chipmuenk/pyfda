@@ -239,8 +239,10 @@ class MplToolbar(NavigationToolbar):
 
     def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
 
-    def __init__(self, *args, **kwargs):
-        NavigationToolbar.__init__(self, *args, **kwargs)
+    def __init__(self, canvas, parent, *args, **kwargs):
+        NavigationToolbar.__init__(self, canvas, parent, *args, **kwargs)
+ 
+        self.canvas = canvas
 
 #------------------------------------------------------------------------------
 
