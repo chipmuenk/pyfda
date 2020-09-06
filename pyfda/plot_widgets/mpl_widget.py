@@ -250,6 +250,7 @@ class MplToolbar(NavigationToolbar):
  
         self.canvas = canvas
         self.my_parent = parent
+        print("\n", self.my_parent.__class__.__name__, "\n")
         self.canvas.setParent(parent) # needed for matplotlib 3.3
 
 #------------------------------------------------------------------------------
