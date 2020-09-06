@@ -220,6 +220,7 @@ class MplToolbar(NavigationToolbar):
     https://stackoverflow.com/questions/53099295/matplotlib-navigationtoolbar-advanced-figure-options
     """
 
+    toolitems = () # remove original icons and actions
 #    toolitems = (
 #        ('Home', 'Reset original view', 'home', 'home'),
 #        ('Back', 'Back to  previous view', 'action-undo', 'back'),
