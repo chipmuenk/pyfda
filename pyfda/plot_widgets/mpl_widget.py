@@ -243,6 +243,8 @@ class MplToolbar(NavigationToolbar):
         NavigationToolbar.__init__(self, canvas, parent, *args, **kwargs)
  
         self.canvas = canvas
+        self.my_parent = parent
+        self.canvas.setParent(parent) # needed for matplotlib 3.3
 
 #------------------------------------------------------------------------------
 
@@ -284,7 +286,7 @@ class MplToolbar(NavigationToolbar):
 
         # FULL VIEW:
         self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
-            'Zoom full extent', self.parent.plt_full_view)
+            'Zoom full extent', self.my_parent.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK ZOOM:
@@ -305,7 +307,7 @@ class MplToolbar(NavigationToolbar):
         self.a_gr.setChecked(True)
 
         # REDRAW:
-        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
+        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.my_parent.redraw)
         #self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
@@ -414,12 +416,12 @@ class MplToolbar(NavigationToolbar):
         """
         self.push_current()
         self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
-        self.parent.redraw()
+        self.my_parent.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
-        for ax in self.parent.fig.axes:
+        for ax in self.my_parent.fig.axes:
             if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
                 ax.grid(False)
             else:
@@ -433,7 +435,7 @@ class MplToolbar(NavigationToolbar):
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.parent.save_limits() # save limits in any case:
+        self.my_parent.save_limits() # save limits in any case:
         self.lock_zoom = not self.lock_zoom
         if self.lock_zoom:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
