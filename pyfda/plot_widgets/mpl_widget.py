@@ -61,7 +61,7 @@ def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
 #------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
-    Construct a subwidget, instantiating a Matplotlib canvas and a modified
+    Construct a subwidget consisting of a Matplotlib canvas and a subclassed
     NavigationToolbar.
     """
 
