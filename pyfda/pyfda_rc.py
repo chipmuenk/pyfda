@@ -112,7 +112,8 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'font.family'               : 'sans-serif',#'serif',
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',#'stix',
-          'mathtext.fallback_to_cm'   : True,
+          #'mathtext.fallback'         : 'cm', # new since mpl 3.3
+          #'mathtext.fallback_to_cm'   : True, # deprecated since mpl 3.3
           'mathtext.default'          : 'it',
           'font.size'                 : 12, 
           'legend.fontsize'           : 12, 
