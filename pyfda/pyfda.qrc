@@ -21,6 +21,7 @@
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
     <file alias="move.svg">images/icons/dark/move.svg</file>
+    <file alias="map-marker.svg">images/icons/dark/map-marker.svg</file>    
     <file alias="quantize.svg">images/icons/dark/quantize.svg</file>
     <file alias="row_delete.svg">images/icons/dark/appbar.list.delete.svg</file>
     <file alias="row_insert_above.svg">images/icons/dark/appbar.list.add.above.svg</file>
