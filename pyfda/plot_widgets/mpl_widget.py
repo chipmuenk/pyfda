@@ -451,7 +451,12 @@ class MplToolbar(NavigationToolbar):
         self.zoom_locked = not self.zoom_locked
         if self.zoom_locked:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
+            if self.a_zo.isChecked():
+                self.a_zo.trigger()  # toggle off programmatically
             self.a_zo.setEnabled(False)
+
+            if self.a_pa.isChecked():
+                self.a_pa.trigger() # toggle off programmatically
             self.a_pa.setEnabled(False)
             self.a_fv.setEnabled(False)
             self.a_ho.setEnabled(False)
