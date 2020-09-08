@@ -98,7 +98,7 @@ class MplWidget(QWidget):
         # initialize toolbar settings
         #
         self.mplToolbar = MplToolbar(self.canvas, self)
-        self.mplToolbar.lock_zoom = False
+        self.mplToolbar.zoom_locked = False
         #self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
 
@@ -127,7 +127,7 @@ class MplWidget(QWidget):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
-        if not self.mplToolbar.lock_zoom:
+        if not self.mplToolbar.zoom_locked:
             for ax in self.fig.axes:
                 self.limits = ax.axis() # save old limits
 
@@ -144,7 +144,7 @@ class MplWidget(QWidget):
                 else:
                     ax.grid(self.mplToolbar.a_gr.isChecked())  # collect axes objects and apply grid settings
 
-                if self.mplToolbar.lock_zoom:
+                if self.mplToolbar.zoom_locked:
                     ax.axis(self.limits) # restore old limits
                 else:
                     self.limits = ax.axis() # save old limits
@@ -447,8 +447,8 @@ class MplToolbar(NavigationToolbar):
             when previously locked, current settings can be saved without effect
         """
         self.my_parent.save_limits() # save limits in any case:
-        self.lock_zoom = not self.lock_zoom
-        if self.lock_zoom:
+        self.zoom_locked = not self.zoom_locked
+        if self.zoom_locked:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
             self.a_zo.setEnabled(False)
             self.a_pa.setEnabled(False)
@@ -461,7 +461,9 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
 
-        self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.lock_zoom})
+        self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.zoom_locked})
+        
+
 
 #------------------------------------------------------------------------------
 # =============================================================================
