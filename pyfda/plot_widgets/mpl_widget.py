@@ -391,7 +391,7 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # --------------------------------------
-        # SETTINGS
+        # SETTINGS:
         # --------------------------------------
         if figureoptions is not None:
             self.a_op = self.addAction(QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
@@ -399,6 +399,8 @@ class MplToolbar(NavigationToolbar):
 
 #        self.buttons = {}
 
+        # --------------------------------------
+        # PRINT COORDINATES (only when mplcursors is not available):
         # --------------------------------------
         # Add the x,y location widget at the right side of the toolbar
         # The stretch factor is 1 which means any resizing of the toolbar
@@ -448,38 +450,7 @@ class MplToolbar(NavigationToolbar):
 
             figureoptions.figure_edit(axes, self)
 
-#    def mouse_move(self, event):
-#        if not event.inaxes or not self._active:
-#            if self._lastCursor != mplCursors.POINTER:
-#                self.set_cursor(mplCursors.POINTER)
-#                self._lastCursor = mplCursors.POINTER
-#        else:
-#            if self._active == 'ZOOM':
-#                if self._lastCursor != mplCursors.SELECT_REGION:
-#                    self.set_cursor(mplCursors.SELECT_REGION)
-#                    self._lastCursor = mplCursors.SELECT_REGION
-#                if self._xypress:
-#                    x, y = event.x, event.y
-#                    lastx, lasty, _, _, _, _ = self._xypress[0]
-#                    self.draw_rubberband(event, x, y, lastx, lasty)
-#            elif (self._active == 'PAN' and
-#                  self._lastCursor != mplCursors.MOVE):
-#                self.set_cursor(mplCursors.MOVE)
-#
-#                self._lastCursor = mplCursors.MOVE
-#
-#        if event.inaxes and event.inaxes.get_navigate():
-#
-#            try: s = event.inaxes.format_coord(event.xdata, event.ydata)
-#            except ValueError: pass
-#            except OverflowError: pass
-#            else:
-#                if len(self.mode):
-#                    self.set_message('%s : %s' % (self.mode, s))
-#                else:
-#                    self.set_message(s)
-#        else: self.set_message(self.mode)
-
+#------------------------------------------------------------------------------
     def home(self):
         """
         Reset zoom to default settings (defined by plotting widget).
