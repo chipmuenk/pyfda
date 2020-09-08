@@ -13,12 +13,21 @@ toolbar.
 import logging
 logger = logging.getLogger(__name__)
 import sys
+from pyfda.libs.pyfda_lib import cmp_version
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib import rcParams
 
+try:
+    MPL_CURS = True
+    import mplcursors
+    if cmp_version('matplotlib', '3.1') < 0:
+       MPL_CURS = False 
+except ImportError:
+    MPL_CURS = False
+    print(MPL_CURS)
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
@@ -30,7 +39,6 @@ from pyfda.libs.compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import cmp_version
 from pyfda import qrc_resources # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
