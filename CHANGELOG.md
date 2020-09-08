@@ -10,6 +10,6 @@
 
 - pan and zoom now is safely disabled when zoom is locked
 
-- Tracking cursor / annotations in plots [\#112]
+- Tracking cursor / annotations in plots [\#112](https://github.com/chipmuenk/pull/112) ([chipmuenk](https://github.com/chipmuenk))
 
-  mplcursors module is used for tracking cursor when available (only for matplotlib >= 3.1)
+  When available, use mplcursors module (only for matplotlib >= 3.1)
