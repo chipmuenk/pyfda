@@ -24,7 +24,7 @@ try:
     MPL_CURS = True
     import mplcursors
     if cmp_version('matplotlib', '3.1') < 0:
-       MPL_CURS = False 
+       MPL_CURS = False
 except ImportError:
     MPL_CURS = False
     print(MPL_CURS)
@@ -210,7 +210,7 @@ class MplWidget(QWidget):
             if self.mplToolbar.cursor_enabled:
                 if hasattr(self, "cursors"): # dangling references to old cursors?
                     for i in range(len(self.cursors)):
-                        self.cursors[i].remove()         # yes, remove them!            
+                        self.cursors[i].remove()         # yes, remove them!
                 self.cursors = []
                 for ax in self.fig.axes:
                     if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot"}:
@@ -273,16 +273,17 @@ class MplToolbar(NavigationToolbar):
     sig_tx = pyqtSignal(object) # general signal, containing a dict
 
     def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
-    
+
     # disable coordinate display when mplcursors is available
     if MPL_CURS:
-        def set_message(self, msg): pass 
+        def set_message(self, msg): pass
 
     def __init__(self, canv, mpl_widget, *args, **kwargs):
         NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
- 
+
         #self.canvas = canv
         self.mpl_widget = mpl_widget
+
 
 #------------------------------------------------------------------------------
 
@@ -421,6 +422,7 @@ class MplToolbar(NavigationToolbar):
             labelAction = self.addWidget(self.locLabel)
             labelAction.setVisible(True)
 
+#------------------------------------------------------------------------------
     if figureoptions is not None:
         def edit_parameters(self):
             allaxes = self.canvas.figure.get_axes()
@@ -464,7 +466,7 @@ class MplToolbar(NavigationToolbar):
         self.push_current()
         self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
         self.mpl_widget.redraw()
-        
+
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
