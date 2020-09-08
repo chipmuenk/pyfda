@@ -267,38 +267,54 @@ class MplToolbar(NavigationToolbar):
 
  #       self.addSeparator() #---------------------------------------------
 
+
+        #---------------------------------------------
         # HOME:
+        #---------------------------------------------
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
         self.a_ho.setToolTip('Reset zoom')
         # BACK:
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous zoom')
+
+        #---------------------------------------------
         # FORWARD:
+        #---------------------------------------------
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
         self.a_fw.setToolTip('Forward to next zoom')
 
-        self.addSeparator() #---------------------------------------------
+        #---------------------------------------------
+        self.addSeparator()
+        #---------------------------------------------
 
+        #---------------------------------------------
         # PAN:
+        #---------------------------------------------
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
         "pressing x / y / CTRL keys constrains to horizontal / vertical / diagonal movements.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
+        #---------------------------------------------
         # ZOOM RECTANGLE:
+        #---------------------------------------------
         self.a_zo = self.addAction(QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
         self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
         "pressing x / y keys constrains zoom to horizontal / vertical direction.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
+        #---------------------------------------------
         # FULL VIEW:
+        #---------------------------------------------
         self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
             'Zoom full extent', self.mpl_widget.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
+        #---------------------------------------------
         # LOCK ZOOM:
+        #---------------------------------------------
         self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'), \
                                    'Lock zoom', self.toggle_lock_zoom)
         self.a_lk.setCheckable(True)
@@ -309,7 +325,9 @@ class MplToolbar(NavigationToolbar):
         self.addSeparator()
         # --------------------------------------
 
+        #---------------------------------------------
         # GRID:
+        #---------------------------------------------
         self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
@@ -321,7 +339,9 @@ class MplToolbar(NavigationToolbar):
         #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.mpl_widget.redraw)
         #self.a_rd.setToolTip('Redraw Plot')
 
+        # --------------------------------------
         # SAVE:
+        # --------------------------------------
         self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
 
@@ -335,15 +355,20 @@ class MplToolbar(NavigationToolbar):
         self.addSeparator()
         # --------------------------------------
 
+        # --------------------------------------
+        # SETTINGS
+        # --------------------------------------
         if figureoptions is not None:
             self.a_op = self.addAction(QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
 #        self.buttons = {}
 
+        # --------------------------------------
         # Add the x,y location widget at the right side of the toolbar
         # The stretch factor is 1 which means any resizing of the toolbar
         # will resize this label instead of the buttons.
+        # --------------------------------------
         if self.coordinates:
             self.locLabel = QLabel("", self)
             self.locLabel.setAlignment(
