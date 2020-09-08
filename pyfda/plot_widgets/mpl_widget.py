@@ -99,6 +99,7 @@ class MplWidget(QWidget):
         #
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.zoom_locked = False
+        self.mplToolbar.cursor_enabled = False
         #self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
         layHToolbar = QHBoxLayout()
@@ -198,6 +199,27 @@ class MplWidget(QWidget):
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
         bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
+
+#------------------------------------------------------------------------------
+    def toggle_cursor(self):
+        """
+        Toggle the tracking cursor
+        """
+        if MPL_CURS:
+            self.mplToolbar.cursor_enabled = not self.mplToolbar.cursor_enabled
+            if self.mplToolbar.cursor_enabled:
+                if hasattr(self, "cursors"): # dangling references to old cursors?
+                    for i in range(len(self.cursors)):
+                        self.cursors[i].remove()         # yes, remove them!            
+                self.cursors = []
+                for ax in self.fig.axes:
+                    if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot"}:
+                        self.cursors.append(mplcursors.cursor(ax, hover=True))
+            else:
+                for i in range(len(self.cursors)):
+                    self.cursors[i].remove()
+
+        # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
 
 ###############################################################################
 
@@ -323,6 +345,16 @@ class MplToolbar(NavigationToolbar):
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
         self.a_lk.setToolTip('Lock / unlock current zoom setting')
+
+        #---------------------------------------------
+        # TRACKING CURSOR:
+        #---------------------------------------------
+        if MPL_CURS:
+            self.a_cr = self.addAction(QIcon(':/map-marker.svg'), \
+                                       'Cursor', self.mpl_widget.toggle_cursor)
+            self.a_cr.setCheckable(True)
+            self.a_cr.setChecked(False)
+            self.a_cr.setToolTip('Tracking Cursor')
 
         # --------------------------------------
         self.addSeparator()
@@ -486,6 +518,7 @@ class MplToolbar(NavigationToolbar):
             if self.a_pa.isChecked():
                 self.a_pa.trigger() # toggle off programmatically
             self.a_pa.setEnabled(False)
+
             self.a_fv.setEnabled(False)
             self.a_ho.setEnabled(False)
         else:
@@ -496,8 +529,6 @@ class MplToolbar(NavigationToolbar):
             self.a_ho.setEnabled(True)
 
         self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.zoom_locked})
-        
-
 
 #------------------------------------------------------------------------------
 # =============================================================================
@@ -541,3 +572,5 @@ class MplToolbar(NavigationToolbar):
             self.cb.setImage(img)
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
+
+
