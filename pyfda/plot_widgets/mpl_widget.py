@@ -273,6 +273,10 @@ class MplToolbar(NavigationToolbar):
     sig_tx = pyqtSignal(object) # general signal, containing a dict
 
     def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
+    
+    # disable coordinate display when mplcursors is available
+    if MPL_CURS:
+        def set_message(self, msg): pass 
 
     def __init__(self, canv, mpl_widget, *args, **kwargs):
         NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
@@ -406,7 +410,8 @@ class MplToolbar(NavigationToolbar):
         # The stretch factor is 1 which means any resizing of the toolbar
         # will resize this label instead of the buttons.
         # --------------------------------------
-        if self.coordinates:
+        if not MPL_CURS and self.coordinates:
+            self.addSeparator()
             self.locLabel = QLabel("", self)
             self.locLabel.setAlignment(
                     QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
