@@ -13,13 +13,10 @@ toolbar.
 import logging
 logger = logging.getLogger(__name__)
 import sys
-#import numpy as np
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
-#from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
-from matplotlib.gridspec import GridSpec
 from matplotlib import rcParams
 
 try:
