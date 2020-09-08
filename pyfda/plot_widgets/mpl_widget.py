@@ -34,7 +34,7 @@ except ImportError:
     figureoptions = None
 
 from pyfda.libs.compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout, QHBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
@@ -101,12 +101,15 @@ class MplWidget(QWidget):
         self.mplToolbar.zoom_locked = False
         #self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
+        layHToolbar = QHBoxLayout()
+        layHToolbar.addWidget(self.mplToolbar, 1, QtCore.Qt.AlignLeft)
+        layHToolbar.addStretch(1)
 
         #=============================================
         # Main plot widget layout
         #=============================================
         self.layVMainMpl = QVBoxLayout()
-        self.layVMainMpl.addWidget(self.mplToolbar)
+        self.layVMainMpl.addLayout(layHToolbar)
         self.layVMainMpl.addWidget(self.canvas)
 
         self.setLayout(self.layVMainMpl)
