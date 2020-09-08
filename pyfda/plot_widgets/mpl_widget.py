@@ -81,24 +81,23 @@ class MplWidget(QWidget):
         else:
             self.fig = Figure()
 
-        self.pltCanv = FigureCanvas(self.fig)
-        self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
+        self.canvas = FigureCanvas(self.fig)
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
 
         # Needed for mouse modifiers (x,y, <CTRL>, ...):
         #    Key press events in general are not processed unless you
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
-        self.pltCanv.setFocusPolicy( QtCore.Qt.ClickFocus )
-        self.pltCanv.setFocus()
+        self.canvas.setFocusPolicy( QtCore.Qt.ClickFocus )
+        self.canvas.setFocus()
 
-        self.pltCanv.updateGeometry()
+        self.canvas.updateGeometry()
 
         # Create a custom navigation toolbar, tied to the canvas and
         # initialize toolbar settings
         #
-        #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
+        self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.lock_zoom = False
         #self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
@@ -108,7 +107,7 @@ class MplWidget(QWidget):
         #=============================================
         self.layVMainMpl = QVBoxLayout()
         self.layVMainMpl.addWidget(self.mplToolbar)
-        self.layVMainMpl.addWidget(self.pltCanv)
+        self.layVMainMpl.addWidget(self.canvas)
 
         self.setLayout(self.layVMainMpl)
 
@@ -155,7 +154,7 @@ class MplWidget(QWidget):
 #               self.fig.tight_layout(pad = 0.1)
 #            except(ValueError, np.linalg.linalg.LinAlgError):
 #                logger.debug("error in tight_layout")
-        self.pltCanv.draw() # now (re-)draw the figure
+        self.canvas.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
 #    def clear_disabled_figure(self, enabled):
@@ -191,7 +190,7 @@ class MplWidget(QWidget):
         #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
         # For text objects, we need to draw the figure first, otherwise the extents
         # are undefined.
-        self.pltCanv.draw()
+        self.canvas.draw()
         items = ax.get_xticklabels() + ax.get_yticklabels()
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
         bbox = Bbox.union([item.get_window_extent() for item in items])
