@@ -66,8 +66,8 @@ class PlotTabWidgets(QTabWidget):
         for plot_class in fb.plot_classes:
             try:
                 mod_fq_name = fb.plot_classes[plot_class]['mod'] # fully qualified module name
-                mod = importlib.import_module(mod_fq_name)
-                wdg_class = getattr(mod, plot_class)
+                mod = importlib.import_module(mod_fq_name) # import plot widget module
+                wdg_class = getattr(mod, plot_class) # get plot widget class ...
                 # and instantiate it
                 inst = wdg_class(self)
             except ImportError as e:
