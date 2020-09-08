@@ -249,11 +249,11 @@ class MplToolbar(NavigationToolbar):
 
     def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
 
-    def __init__(self, canvas, parent, *args, **kwargs):
-        NavigationToolbar.__init__(self, canvas, parent, *args, **kwargs)
+    def __init__(self, canv, mpl_widget, *args, **kwargs):
+        NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
  
-        self.canvas = canvas
-        self.my_parent = parent
+        #self.canvas = canv
+        self.mpl_widget = mpl_widget
 
 #------------------------------------------------------------------------------
 
@@ -295,7 +295,7 @@ class MplToolbar(NavigationToolbar):
 
         # FULL VIEW:
         self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
-            'Zoom full extent', self.my_parent.plt_full_view)
+            'Zoom full extent', self.mpl_widget.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK ZOOM:
@@ -315,8 +315,10 @@ class MplToolbar(NavigationToolbar):
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
 
+        #---------------------------------------------
         # REDRAW:
-        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.my_parent.redraw)
+        #---------------------------------------------
+        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.mpl_widget.redraw)
         #self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
@@ -425,12 +427,13 @@ class MplToolbar(NavigationToolbar):
         """
         self.push_current()
         self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
-        self.my_parent.redraw()
+        self.mpl_widget.redraw()
+        
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
-        for ax in self.my_parent.fig.axes:
+        for ax in self.mpl_widget.fig.axes:
             if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
                 ax.grid(False)
             else:
@@ -444,7 +447,7 @@ class MplToolbar(NavigationToolbar):
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.my_parent.save_limits() # save limits in any case:
+        self.mpl_widget.save_limits() # save limits in any case:
         self.zoom_locked = not self.zoom_locked
         if self.zoom_locked:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
