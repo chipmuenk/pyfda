@@ -11,4 +11,9 @@
 
 - [PR \#333:](https://github.com/chipmuenk/pull/333) Add cursor / annotations in plots [(Issue \#112)](https://github.com/chipmuenk/issues/112) ([chipmuenk](https://github.com/chipmuenk))
 
-  Only available when (mplcursors)[https://mplcursors.readthedocs.io/] module is installed and for matplotlib >= 3.1. 
+  Only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1. 
+
+- Add CHANGELOG (this file)
+
+- Move attributions to AUTHORS.md
+
