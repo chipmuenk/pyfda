@@ -40,40 +40,5 @@ pyfda/images/icons/pyfda_icon.odt
 pyfda/images/icons/pyfda_icon.png
 pyfda/images/icons/pyfda_icon.svg
 
-[2] MIT License
-    ("Open Iconic" Icons at  https://useiconic.com/open/)
-
-pyfda/images/icons/action-undo.svg
-pyfda/images/icons/arrow-left.svg
-pyfda/images/icons/arrow-right.svg
-pyfda/images/icons/audio-spectrum.svg
-pyfda/images/icons/audio.svg
-pyfda/images/icons/bookmark.svg
-pyfda/images/icons/brush.svg
-pyfda/images/icons/camera-slr.svg
-pyfda/images/icons/check.svg
-pyfda/images/icons/circle-check.svg
-pyfda/images/icons/cog.svg
-pyfda/images/icons/file.svg
-pyfda/images/icons/folder.svg
-pyfda/images/icons/fullscreen-enter.svg
-pyfda/images/icons/fullscreen-exit.svg
-pyfda/images/icons/graph.svg
-pyfda/images/icons/grid-four-up.svg
-pyfda/images/icons/headphones.svg
-pyfda/images/icons/home.svg
-pyfda/images/icons/lock-locked.svg
-pyfda/images/icons/lock-unlocked.svg
-pyfda/images/icons/magnifying-glass.svg
-pyfda/images/icons/microphone.svg
-pyfda/images/icons/minus.svg
-pyfda/images/icons/move.svg
-pyfda/images/icons/plus.svg
-pyfda/images/icons/reload.svg
-pyfda/images/icons/resize-both.svg
-pyfda/images/icons/resize-height.svg
-pyfda/images/icons/resize-width.svg
-pyfda/images/icons/star.svg
-pyfda/images/icons/wrench.svg
 
 
