@@ -833,9 +833,10 @@ class Input_Coeffs(QWidget):
         """
         sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
 
-        if not np.any(sel) and len(self.ba[0]) > 0:
-            self.ba[0] = np.delete(self.ba[0], -1)
-            self.ba[1] = np.delete(self.ba[1], -1)
+        if not any(sel) and len(self.ba[0]) > 0: # delete last row
+            self.ba = np.delete(self.ba, -1, axis=1)
+        elif np.all(sel[0] == sel[1]): # only complete rows selected
+           self.ba = np.delete(self.ba, sel[0], axis=1)
         else:
             self.ba[0] = np.delete(self.ba[0], sel[0])
             self.ba[1] = np.delete(self.ba[1], sel[1])
