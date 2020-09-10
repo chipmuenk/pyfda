@@ -835,12 +835,14 @@ class Input_Coeffs(QWidget):
 
         if not any(sel) and len(self.ba[0]) > 0: # delete last row
             self.ba = np.delete(self.ba, -1, axis=1)
-        elif np.all(sel[0] == sel[1]): # only complete rows selected
-           self.ba = np.delete(self.ba, sel[0], axis=1)
+        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
+            # only complete rows selected or FIR -> delete row
+            self.ba = np.delete(self.ba, sel[0], axis=1)
         else:
-            self.ba[0] = np.delete(self.ba[0], sel[0])
-            self.ba[1] = np.delete(self.ba[1], sel[1])
-
+            self.ba[0][sel[0]] = 0
+            self.ba[1][sel[1]] = 0
+            #self.ba[0] = np.delete(self.ba[0], sel[0])
+            #self.ba[1] = np.delete(self.ba[1], sel[1])    
         # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
         # if length is less than 2, clear the table: this ain't no filter!
@@ -860,19 +862,22 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not np.any(sel): # nothing selected, append one row of zeros to table
+        if not any(sel): # nothing selected, append one row of zeros to table
             self.ba = np.hstack((self.ba,[[0],[0]]))
+        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR': # only complete rows selected
+            self.ba = np.insert(self.ba, sel[0], 0, axis=1)
         else:
-            self.ba[0] = np.insert(self.ba[0], sel[0], 0)
-            self.ba[1] = np.insert(self.ba[1], sel[1], 0)
-
+            logger.warning("Cannot insert single values")
+            #self.ba[0] = np.insert(self.ba[0], sel[0], 0)
+            #self.ba[1] = np.insert(self.ba[1], sel[1], 0)
+            return
         # insert 'sel' contiguous rows  before 'row':
         # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
 
         self._equalize_ba_length()
         self._refresh_table()
         # don't tag as 'changed' when only zeros have been added at the end
-        if np.any(sel):
+        if any(sel):
             qstyle_widget(self.ui.butSave, 'changed')
 
 #------------------------------------------------------------------------------
