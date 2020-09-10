@@ -423,8 +423,8 @@ class Input_Coeffs(QWidget):
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
 
-        if not ftype:
-            self._refresh_table()
+        self._equalize_ba_length()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _W_changed(self):
