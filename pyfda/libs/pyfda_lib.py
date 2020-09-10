@@ -1419,11 +1419,8 @@ def fil_convert(fil_dict, format_in):
     Exceptions
     ----------
     ValueError for Nan / Inf elements or other unsuitable parameters
-
     """
-
     if 'sos' in format_in:
-
         # check for bad coeffs before converting IIR filt
         # this is the same defn used by scipy (tolerance of 1e-14)
         if (fil_dict['ft'] == 'IIR'):
@@ -1478,12 +1475,11 @@ def fil_convert(fil_dict, format_in):
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite([b,a])):
-            #try:
-                zpk = sig.tf2zpk(b,a)
-                zpk = np.nan_to_num(zpk)
-                fil_dict['zpk'] = [zpk[0].astype(np.complex), zpk[1].astype(np.complex), zpk[2]]
-            #except Exception as e:
-                #raise ValueError(e)
+            zpk = sig.tf2zpk(b,a)
+            fil_dict['zpk'] = [np.nan_to_num(zpk[0]).astype(np.complex),
+                               np.nan_to_num(zpk[1]).astype(np.complex),
+                               np.nan_to_num(zpk[2])
+                               ]
         else:
             raise ValueError("\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements to zpk format!")
             zpk = None
