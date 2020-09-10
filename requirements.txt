@@ -12,6 +12,7 @@ pyqt5
 docutils
 nose
 migen
+mplcursors
 # pytest
 # coverage
 # coveralls
