@@ -860,9 +860,8 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not np.any(sel): # nothing selected, append zeros to table
-            self.ba[0] = np.append(self.ba[0], 0)
-            self.ba[1] = np.append(self.ba[1], 0)
+        if not np.any(sel): # nothing selected, append one row of zeros to table
+            self.ba = np.hstack((self.ba,[[0],[0]]))
         else:
             self.ba[0] = np.insert(self.ba[0], sel[0], 0)
             self.ba[1] = np.insert(self.ba[1], sel[1], 0)
