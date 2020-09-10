@@ -472,14 +472,18 @@ class Input_PZ(QWidget):
         Load all entries from filter dict fb.fil[0]['zpk'] into the Zero/Pole/Gain list
         self.zpk and update the display via `self._refresh_table()`.
         The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
-        otherwise the filter dict would be modified inadvertedly.
+        otherwise the filter dict would be modified inadvertedly. `dtype=object`
+        needs to be specified to create a numpy array from the nested lists with
+        differing lengths without creating the deprecation warning
 
-        The filter dict is a "normal" numpy float array for z / p / k values
-        The ZPK register `self.zpk` should be a list of float ndarrays to allow
-        for different lengths of z / p / k subarrays while adding / deleting items.?
+        "Creating an ndarray from ragged nested sequences (which is a list-or-tuple of
+        lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated."
+
+        The filter dict fb.fil[0]['zpk'] is a list of numpy float ndarrays for z / p / k values
+        `self.zpk` is an array of float ndarrays with different lengths of z / p / k subarrays 
+        to allow adding / deleting items.
         """
-        # TODO: check the above       
-        self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
+        self.zpk = np.array(fb.fil[0]['zpk'], dtype=object)# this enforces a deep copy
         qstyle_widget(self.ui.butSave, 'normal')
         self._refresh_table()
 
@@ -524,7 +528,7 @@ class Input_PZ(QWidget):
         Clear & initialize table and zpk for two poles and zeros @ origin,
         P = Z = [0; 0], k = 1
         """
-        self.zpk = np.array([[0, 0], [0, 0], 1])
+        self.zpk = np.array([[0, 0], [0, 0], 1], dtype=object)
         self.Hmax_last = 1.0
         self.anti = False
 
