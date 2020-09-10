@@ -351,6 +351,7 @@ class Input_PZ(QWidget):
         """
         if self.spec_edited:
             self.zpk[2] = safe_eval(source.text(), alt_expr = str(self.zpk[2]))
+            qstyle_widget(self.ui.butSave, 'changed')
             self.spec_edited = False # reset flag
 
 #------------------------------------------------------------------------------
