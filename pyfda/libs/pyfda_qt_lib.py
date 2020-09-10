@@ -173,7 +173,7 @@ def qget_selected(table, select_all=False, reverse=True):
     
     'idx': indices of selected cells as an unsorted list of tuples
     
-    'sel': list of selected cells per column, by default sorted in reverse
+    'sel': list of lists of selected cells per column, by default sorted in reverse
     
     'cur':  current cell selection as a tuple
 
@@ -193,7 +193,7 @@ def qget_selected(table, select_all=False, reverse=True):
     for _ in table.selectedItems():
         idx.append([_.column(), _.row(), ])
 
-    sel = [0, 0]
+    sel = [[], []]
     sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = reverse)
     sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = reverse)
 
