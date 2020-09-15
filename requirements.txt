@@ -14,7 +14,7 @@ nose
 migen
 mplcursors
 numexpr
-pyfixp
+# pyfixp # no PyPI package yet ...
 # pytest
 # coverage
 # coveralls
