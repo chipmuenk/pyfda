@@ -329,7 +329,7 @@ def pprint_log(d, N=10, tab="\t"):
 
 def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
-    Try ... except wrapper around simple_eval to catch various errors
+    Try ... except wrapper around numexpr to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
     return 0 to avoid errors further downstream.
 
