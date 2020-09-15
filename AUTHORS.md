@@ -36,7 +36,7 @@ Please send me message if I've '
 | [numpy](https://numpy.org/) | BSD | Base package for fast array numerics|
 | [scipy](https://www.scipy.org/)  | BSD | | Library for scientific computing |
 | [numexpr](https://github.com/pydata/numexpr) | MIT | Fast numerical array expression|
-| matplotlib | PSF-based | Plotting library |
+| [matplotlib](https://matplotlib.org/) | PSF-based | Plotting library |
 | Qt5    | LPGL | Widget library (UI etc.) |
 | PyQt | GPL | Python wrapper for Qt5 |
 | docutils | |
