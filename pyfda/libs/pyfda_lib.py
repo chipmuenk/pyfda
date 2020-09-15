@@ -10,9 +10,10 @@
 Library with various general functions and variables needed by the pyfda routines
 """
 
-import os, re
+import os, re, io
 import sys, time
 import struct
+from contextlib import redirect_stdout
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
@@ -30,7 +31,15 @@ import pyfda.simpleeval as se
 # ==
 # == When one of the following imports fails, terminate the program
 from numpy import __version__ as V_NP
-from numexpr import __version__ as V_NX
+from numpy import show_config
+# redirect stdio output of show_config to string
+f = io.StringIO()
+with redirect_stdout(f):
+    show_config()
+INFO_NP = f.getvalue()
+
+logger.warning(INFO_NP)
+
 from scipy import __version__ as V_SCI
 from matplotlib import __version__ as V_MPL
 from .compat import QT_VERSION_STR as V_QT # imports pyQt
@@ -52,7 +61,7 @@ MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
 MODULES.update({'matplotlib': V_MPL})
 MODULES.update({'pyqt': V_QT})
 MODULES.update({'numpy': V_NP})
-MODULES.update({'numexpr': V_NX})
+MODULES.update({'numexpr': numexpr.__version__})
 MODULES.update({'scipy': V_SCI})
 
 # ================ Optional Modules ============================
