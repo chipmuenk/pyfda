@@ -17,6 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, sin, cos
+import numexpr
 
 import scipy.signal as sig
 
@@ -28,10 +29,11 @@ import pyfda.simpleeval as se
 # ================ Required Modules ============================
 # ==
 # == When one of the following imports fails, terminate the program
-from numpy import __version__ as VERSION_NP
-from scipy import __version__ as VERSION_SCI
-from matplotlib import __version__ as VERSION_MPL
-from .compat import QT_VERSION_STR # imports pyQt
+from numpy import __version__ as V_NP
+from numexpr import __version__ as V_NX
+from scipy import __version__ as V_SCI
+from matplotlib import __version__ as V_MPL
+from .compat import QT_VERSION_STR as V_QT # imports pyQt
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
@@ -43,55 +45,51 @@ __all__ = ['cmp_version', 'mod_version',
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
-VERSION = {}
-# VERSION.update({'python_long': sys.version})
-VERSION.update({'python': ".".join(map(str, sys.version_info[:3]))
+MODULES = {}
+MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
                             + " (" + str(PY32_64) + " Bit)"})
-VERSION.update({'matplotlib': VERSION_MPL})
-VERSION.update({'pyqt': QT_VERSION_STR})
-VERSION.update({'numpy': VERSION_NP})
-VERSION.update({'scipy': VERSION_SCI})
+#MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
+MODULES.update({'matplotlib': V_MPL})
+MODULES.update({'pyqt': V_QT})
+MODULES.update({'numpy': V_NP})
+MODULES.update({'numexpr': V_NX})
+MODULES.update({'scipy': V_SCI})
 
 # ================ Optional Modules ============================
-try:
-    from cycler import __version__ as VERSION_CYCLER
-    VERSION.update({'cycler': VERSION_CYCLER})
-except ImportError:
-    VERSION.update({'cycler': None})
-try:
-    from mayavi import __version__ as VERSION_MAYAVI
-    VERSION.update({'mayavi': VERSION_MAYAVI})
-except ImportError:
-    pass
 
+try:
+    from pyfixp import __version__ as v
+    MODULES.update('pyfixp', v)
+except ImportError:
+    MODULES.update({'pyfixp': None})
+    
 try:
     import migen
-    VERSION_MIGEN = "installed"
+    MODULES.update({'migen': 'installed'})
 except (ImportError,SyntaxError):
-    VERSION_MIGEN = None
-VERSION.update({'migen': VERSION_MIGEN})
+    MODULES.update({'migen': None})
 
 try:
-    from nmigen import __version__ as VERSION_NMIGEN
-    VERSION.update({'nMigen': VERSION_NMIGEN})
+    from nmigen import __version__ as v
+    MODULES.update({'nMigen': v})
 except ImportError:
     pass
 
 try:
-    from docutils import __version__ as VERSION_DOCUTILS
-    VERSION.update({'docutils': VERSION_DOCUTILS})
+    from docutils import __version__ as v
+    MODULES.update({'docutils': v})
 except ImportError:
     pass
 
 try:
-    from xlwt import __version__ as VERSION_XLWT
-    VERSION.update({'xlwt': VERSION_XLWT})
+    from xlwt import __version__ as v
+    MODULES.update({'xlwt': v})
 except ImportError:
     pass
 
 try:
-    from xlsxwriter import __version__ as VERSION_XLSX
-    VERSION.update({'xlsx': VERSION_XLSX})
+    from xlsxwriter import __version__ as v
+    MODULES.update({'xlsx': v})
 except ImportError:
     pass
 
@@ -128,11 +126,11 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in VERSION or not VERSION[mod]:
+        if mod not in MODULES or not MODULES[mod]:
             return -2
-        elif LooseVersion(VERSION[mod]) > LooseVersion(version):
+        elif LooseVersion(MODULES[mod]) > LooseVersion(version):
             return 1
-        elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
+        elif  LooseVersion(MODULES[mod]) == LooseVersion(version):
             return 0
         else:
             return -1
@@ -148,18 +146,24 @@ def mod_version(mod = None):
     their versions sorted alphabetically.
     """
     if mod:
-        if mod in VERSION:
-            return LooseVersion(VERSION[mod])
+        if mod in MODULES:
+            return LooseVersion(MODULES[mod])
         else:
             return None
     else:
         v = ""
-        keys = sorted(list(VERSION.keys()))
+        keys = sorted(list(MODULES.keys()))
         for k in keys:
-            if VERSION[k]:
-                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td></tr>".format(k, LooseVersion(VERSION[k]))
+            try:
+                mod = '<a href="{0}"><{1}>'.format(MODULES[k]['url'], k)
+            except (KeyError, TypeError):
+                mod =  k
+                
+            if MODULES[k]:
+                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, LooseVersion(MODULES[k]))
             else:
-                v += "<tr><td>{0}</td><td>missing</td></tr>".format(k)
+                v += "<tr><td>{0}</td><td>missing</td>".format(mod)
+            v += "</tr>"
         return v
 
 #------------------------------------------------------------------------------
