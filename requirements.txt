@@ -13,6 +13,8 @@ docutils
 nose
 migen
 mplcursors
+numexpr
+pyfixp
 # pytest
 # coverage
 # coveralls
