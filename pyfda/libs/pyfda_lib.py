@@ -396,6 +396,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 logger.warning(fallback + 'Syntax error in expression "{0}".'.format(ex))
             except AttributeError:
                 logger.warning(fallback + 'Attribute error in expression "{0}".'.format(ex))
+            except ValueError:
+                logger.warning(fallback + 'Value error in expression "{0}".'.format(ex))
             except ZeroDivisionError:
                 logger.warning(fallback + 'Division by 0 in expression "{0}".'.format(ex))
             except OverflowError:

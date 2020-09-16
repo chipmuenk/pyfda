@@ -404,6 +404,8 @@ class Plot_Impz(QWidget):
                 logger.warning("Type error\n{0}".format(e))
             except AttributeError as e:
                 logger.warning("Attribute error:\n{0}".format(e))
+            except ValueError as e:
+                logger.warning("Value error:\n{0}".format(e))
             except ZeroDivisionError:
                 logger.warning("Zero division error in formula.")           
             #logger.warning("x: {0} : {1}".format(np.shape(np_expr), np_expr))
