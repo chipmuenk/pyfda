@@ -63,6 +63,7 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
+        self.stim_manual = "A1 * sin(2 * pi * f1 * t)"
 
         self.bottom_f = -120 # initial value for log. scale
         self.param = None
@@ -341,8 +342,8 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel(to_html("Shape ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine",
-                                   "Triang","Saw","Rect","Comb", "AM", "FM", "PM"])
+        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Triang",
+                                   "Saw","Rect","Comb","AM","FM","PM","Manual"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
@@ -430,7 +431,6 @@ class PlotImpz_UI(QWidget):
         layVlblPhU.addWidget(self.lblPhU1)
         layVlblPhU.addWidget(self.lblPhU2)
 
-
         #----------------------------------------------
         self.lblFreq1 = QLabel(to_html("f_1", frmt='bi') + " =", self)
         self.ledFreq1 = QLineEdit(self)
@@ -478,28 +478,50 @@ class PlotImpz_UI(QWidget):
         layVcmbledNoi = QVBoxLayout()
         layVcmbledNoi.addWidget(self.cmbNoise)        
         layVcmbledNoi.addWidget(self.ledNoi)
+        
+        #----------------------------------------------
+        self.lblStimManual = QLabel(to_html("x =", frmt='bi'), self)
+        self.ledStimManual = QLineEdit(self)
+        self.ledStimManual.setText(str(self.stim_manual))
+        self.ledStimManual.setToolTip("<span>Enter formula for stimulus in numexpr syntax"
+                                  "</span>")
+        self.ledStimManual.setObjectName("stimManual")
+
+        layH_ctrl_stim_man = QHBoxLayout()
+        layH_ctrl_stim_man.addWidget(self.lblStimManual)
+        layH_ctrl_stim_man.addWidget(self.ledStimManual,10)
 
         #----------------------------------------------
         #layG_ctrl_stim = QGridLayout()
+        layH_ctrl_stim_par = QHBoxLayout()
+        
+        layH_ctrl_stim_par.addLayout(layVlblCmbDC)
+        layH_ctrl_stim_par.addLayout(layVCmbDC)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblAmp)
+        layH_ctrl_stim_par.addLayout(layVledAmp)
+        layH_ctrl_stim_par.addLayout(layVlblPhi)
+        layH_ctrl_stim_par.addLayout(layVledPhi)
+        layH_ctrl_stim_par.addLayout(layVlblPhU)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblfreq)
+        layH_ctrl_stim_par.addLayout(layVledfreq)
+        layH_ctrl_stim_par.addLayout(layVlblfreqU)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblNoi)
+        layH_ctrl_stim_par.addLayout(layVcmbledNoi)
+        layH_ctrl_stim_par.addStretch(10)
+        
+        layV_ctrl_stim = QVBoxLayout()
+        layV_ctrl_stim.addLayout(layH_ctrl_stim_par)
+        layV_ctrl_stim.addLayout(layH_ctrl_stim_man)
+
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblCmbDC)
-        layH_ctrl_stim.addLayout(layVCmbDC)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblAmp)
-        layH_ctrl_stim.addLayout(layVledAmp)
-        layH_ctrl_stim.addLayout(layVlblPhi)
-        layH_ctrl_stim.addLayout(layVledPhi)
-        layH_ctrl_stim.addLayout(layVlblPhU)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblfreq)
-        layH_ctrl_stim.addLayout(layVledfreq)
-        layH_ctrl_stim.addLayout(layVlblfreqU)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblNoi)
-        layH_ctrl_stim.addLayout(layVcmbledNoi)
+        layH_ctrl_stim.addLayout(layV_ctrl_stim)
         layH_ctrl_stim.addStretch(10)
+
 
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
@@ -535,6 +557,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.ledDC.editingFinished.connect(self._update_DC)
+        self.ledStimManual.editingFinished.connect(self._update_stim_manual)
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -603,8 +626,8 @@ class PlotImpz_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang", "Comb", "PM", "FM", "AM"}
-        f2_en = self.stim in {"Cos", "Sine", "PM", "FM", "AM"}
+        f1_en = self.stim in {"Cos","Sine","PM","FM","AM","Manual","Rect","Saw","Triang","Comb"}
+        f2_en = self.stim in {"Cos","Sine","PM","FM","AM","Manual"}
         dc_en = self.stim not in {"Step", "StepErr"}
 
         self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
@@ -633,6 +656,9 @@ class PlotImpz_UI(QWidget):
 
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
+        
+        self.lblStimManual.setVisible(self.stim == "Manual")
+        self.ledStimManual.setVisible(self.stim == "Manual")
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -722,6 +748,13 @@ class PlotImpz_UI(QWidget):
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
+        
+    def _update_stim_manual(self):
+        """Update string with formula to be evaluated by numexpr"""
+        self.stim_manual = self.ledStimManual.text()
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_manual'})
+        
+        
     # -------------------------------------------------------------------------
 
     def update_N(self, emit=True):

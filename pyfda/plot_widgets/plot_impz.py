@@ -17,6 +17,7 @@ from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
 from numpy import pi, sqrt
+import numexpr
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
@@ -385,6 +386,37 @@ class Plot_Impz(QWidget):
         # calculate stimuli x[n] ==============================================
         self.H_str = r'$y[n]$'
         self.title_str = r'System Response '
+        
+        def eval_func_str(stim_manual):
+            """ Try to evaluate the passed string with numexpr """
+            param_dict ={"A1":self.ui.A1, "A2":self.ui.A2,
+                         "f1":self.ui.f1, "f2":self.ui.f2,
+                         "phi1":self.ui.phi1, "phi2":self.ui.phi2,
+                         "t":self.t, "n":self.n}
+            np_expr = np.zeros(self.ui.N_end) # default return value
+            try:
+                np_expr = numexpr.evaluate(self.ui.stim_manual, local_dict=param_dict)
+            except KeyError as e:
+                logger.warning("Unknown variable {0}".format(e))
+            except SyntaxError as e:
+                logger.warning("Syntax error:\n{0}".format(e))
+            except TypeError as e:
+                logger.warning("Type error\n{0}".format(e))
+            except AttributeError as e:
+                logger.warning("Attribute error:\n{0}".format(e))
+            except ZeroDivisionError:
+                logger.warning("Zero division error in formula.")           
+            #logger.warning("x: {0} : {1}".format(np.shape(np_expr), np_expr))
+            
+            if np.ndim(np_expr) == 0:
+                np_expr = np.ones(self.ui.N_end) * np_expr
+            elif np.ndim(np_expr) > 1:
+                logger.warning("Expression has unsuitable dimension {0}!".format(np.ndim(np_expr)))
+                np_expr = np.zeros(self.ui.N_end)
+            elif np.shape(np_expr)[0] != self.ui.N_end:
+                logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+                np_expr = np.zeros(self.ui.N_end)
+            return np_expr
 
         if self.ui.stim == "Pulse":
             self.x = np.zeros(self.ui.N_end)
@@ -457,6 +489,8 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(phi1 + 2*pi * self.n\
                         * (self.ui.f1 + self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)))
             self.title_str += r'to FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
+        elif self.ui.stim == "Manual":
+            self.x = eval_func_str(self.ui.stim_manual)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
