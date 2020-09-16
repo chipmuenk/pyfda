@@ -24,7 +24,7 @@ import scipy.signal as sig
 
 from distutils.version import LooseVersion
 
-import pyfda.simpleeval as se
+#import pyfda.simpleeval as se
 
 ####### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
@@ -394,6 +394,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
             except SyntaxError:
                 logger.warning(fallback + 'Syntax error in expression "{0}".'.format(ex))
+            except AttributeError:
+                logger.warning(fallback + 'Attribute error in expression "{0}".'.format(ex))
             except ZeroDivisionError:
                 logger.warning(fallback + 'Division by 0 in expression "{0}".'.format(ex))
             except OverflowError:
@@ -403,11 +405,13 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
             except TypeError as e:
                 logger.warning(fallback + 'Type error in "{0}", {1}.'.format(ex, e))
 
-            except (se.NameNotDefined, se.FunctionNotDefined) as e:
-                logger.warning(fallback + '{0}'.format(e))
-            except (se.InvalidExpression, IndexError) as e:
-                    logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
-
+# =============================================================================
+#             except (se.NameNotDefined, se.FunctionNotDefined) as e:
+#                 logger.warning(fallback + '{0}'.format(e))
+#             except (se.InvalidExpression, IndexError) as e:
+#                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
+# 
+# =============================================================================
         if result is not None:
             break # break out of for loop when evaluation has succeeded
         fallback = "Fallback: "
