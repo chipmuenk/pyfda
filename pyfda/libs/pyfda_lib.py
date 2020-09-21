@@ -208,7 +208,8 @@ def clean_ascii(arg):
 
     Returns
     -------
-    A string, cleaned from Non-ASCII characters
+    arg: str
+         Input string, cleaned from non-ASCII characters
 
     """
     if isinstance(arg, str):
@@ -466,13 +467,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
             except TypeError as e:
                 logger.warning(fallback + 'Type error in "{0}", {1}.'.format(ex, e))
 
-# =============================================================================
-#             except (se.NameNotDefined, se.FunctionNotDefined) as e:
-#                 logger.warning(fallback + '{0}'.format(e))
-#             except (se.InvalidExpression, IndexError) as e:
-#                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
-# 
-# =============================================================================
         if result is not None:
             break # break out of for loop when evaluation has succeeded
         fallback = "Fallback: "
