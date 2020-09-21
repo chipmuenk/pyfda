@@ -437,7 +437,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 elif return_type == '' or return_type =='auto':
                     result = np.real_if_close(ex_num).item()
                 else: # return_type == 'float' or 'int'
-                    result = ex_num.real
+                    result = np.abs(ex_num)
 
                 if sign in {'pos', 'poszero'}:
                     result = np.abs(result)
