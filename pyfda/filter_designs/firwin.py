@@ -197,7 +197,7 @@ class Firwin(QWidget):
     def _read_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
         param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'], 
-                          return_type='float')
+                          sign='pos', return_type='float')
         if param < self.win_dict['par'][0]['min']:
             param = self.win_dict['par'][0]['min']
         elif param > self.win_dict['par'][0]['max']:

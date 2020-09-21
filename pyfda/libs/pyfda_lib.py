@@ -10,28 +10,37 @@
 Library with various general functions and variables needed by the pyfda routines
 """
 
-import os, re
+import os, re, io
 import sys, time
 import struct
+from contextlib import redirect_stdout
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, sin, cos
+import numexpr
 
 import scipy.signal as sig
 
 from distutils.version import LooseVersion
 
-import pyfda.simpleeval as se
-
 ####### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
 # ==
 # == When one of the following imports fails, terminate the program
-from numpy import __version__ as VERSION_NP
-from scipy import __version__ as VERSION_SCI
-from matplotlib import __version__ as VERSION_MPL
-from .compat import QT_VERSION_STR # imports pyQt
+from numpy import __version__ as V_NP
+from numpy import show_config
+# redirect stdio output of show_config to string
+f = io.StringIO()
+with redirect_stdout(f):
+    show_config()
+INFO_NP = f.getvalue()
+
+logger.warning(INFO_NP)
+
+from scipy import __version__ as V_SCI
+from matplotlib import __version__ as V_MPL
+from .compat import QT_VERSION_STR as V_QT # imports pyQt
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
@@ -43,55 +52,51 @@ __all__ = ['cmp_version', 'mod_version',
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
-VERSION = {}
-# VERSION.update({'python_long': sys.version})
-VERSION.update({'python': ".".join(map(str, sys.version_info[:3]))
+MODULES = {}
+MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
                             + " (" + str(PY32_64) + " Bit)"})
-VERSION.update({'matplotlib': VERSION_MPL})
-VERSION.update({'pyqt': QT_VERSION_STR})
-VERSION.update({'numpy': VERSION_NP})
-VERSION.update({'scipy': VERSION_SCI})
+#MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
+MODULES.update({'matplotlib': V_MPL})
+MODULES.update({'pyqt': V_QT})
+MODULES.update({'numpy': V_NP})
+MODULES.update({'numexpr': numexpr.__version__})
+MODULES.update({'scipy': V_SCI})
 
 # ================ Optional Modules ============================
-try:
-    from cycler import __version__ as VERSION_CYCLER
-    VERSION.update({'cycler': VERSION_CYCLER})
-except ImportError:
-    VERSION.update({'cycler': None})
-try:
-    from mayavi import __version__ as VERSION_MAYAVI
-    VERSION.update({'mayavi': VERSION_MAYAVI})
-except ImportError:
-    pass
 
+try:
+    from pyfixp import __version__ as v
+    MODULES.update('pyfixp', v)
+except ImportError:
+    MODULES.update({'pyfixp': None})
+    
 try:
     import migen
-    VERSION_MIGEN = "installed"
+    MODULES.update({'migen': 'installed'})
 except (ImportError,SyntaxError):
-    VERSION_MIGEN = None
-VERSION.update({'migen': VERSION_MIGEN})
+    MODULES.update({'migen': None})
 
 try:
-    from nmigen import __version__ as VERSION_NMIGEN
-    VERSION.update({'nMigen': VERSION_NMIGEN})
+    from nmigen import __version__ as v
+    MODULES.update({'nMigen': v})
 except ImportError:
     pass
 
 try:
-    from docutils import __version__ as VERSION_DOCUTILS
-    VERSION.update({'docutils': VERSION_DOCUTILS})
+    from docutils import __version__ as v
+    MODULES.update({'docutils': v})
 except ImportError:
     pass
 
 try:
-    from xlwt import __version__ as VERSION_XLWT
-    VERSION.update({'xlwt': VERSION_XLWT})
+    from xlwt import __version__ as v
+    MODULES.update({'xlwt': v})
 except ImportError:
     pass
 
 try:
-    from xlsxwriter import __version__ as VERSION_XLSX
-    VERSION.update({'xlsx': VERSION_XLSX})
+    from xlsxwriter import __version__ as v
+    MODULES.update({'xlsx': v})
 except ImportError:
     pass
 
@@ -128,11 +133,11 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in VERSION or not VERSION[mod]:
+        if mod not in MODULES or not MODULES[mod]:
             return -2
-        elif LooseVersion(VERSION[mod]) > LooseVersion(version):
+        elif LooseVersion(MODULES[mod]) > LooseVersion(version):
             return 1
-        elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
+        elif  LooseVersion(MODULES[mod]) == LooseVersion(version):
             return 0
         else:
             return -1
@@ -148,18 +153,24 @@ def mod_version(mod = None):
     their versions sorted alphabetically.
     """
     if mod:
-        if mod in VERSION:
-            return LooseVersion(VERSION[mod])
+        if mod in MODULES:
+            return LooseVersion(MODULES[mod])
         else:
             return None
     else:
         v = ""
-        keys = sorted(list(VERSION.keys()))
+        keys = sorted(list(MODULES.keys()))
         for k in keys:
-            if VERSION[k]:
-                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td></tr>".format(k, LooseVersion(VERSION[k]))
+            try:
+                mod = '<a href="{0}"><{1}>'.format(MODULES[k]['url'], k)
+            except (KeyError, TypeError):
+                mod =  k
+                
+            if MODULES[k]:
+                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, LooseVersion(MODULES[k]))
             else:
-                v += "<tr><td>{0}</td><td>missing</td></tr>".format(k)
+                v += "<tr><td>{0}</td><td>missing</td>".format(mod)
+            v += "</tr>"
         return v
 
 #------------------------------------------------------------------------------
@@ -195,7 +206,8 @@ def clean_ascii(arg):
 
     Returns
     -------
-    A string, cleaned from Non-ASCII characters
+    arg: str
+         Input string, cleaned from non-ASCII characters
 
     """
     if isinstance(arg, str):
@@ -313,26 +325,89 @@ def pprint_log(d, N=10, tab="\t"):
     return s
 
 #------------------------------------------------------------------------------
+def safe_numexpr_eval(expr, fallback=None, local_dict={}):
+    """
+    Evaluate `numexpr.evaluate(expr)` and catch various errors.
+
+    Parameters
+    ----------
+    expr : str
+        String to be evaluated and converted to a numpy array
+    fallback : array-like or tuple
+        numpy array or scalar as a fallback when errors occur during evaluation,
+        this also defines the expected shape of the returned numpy expression
+
+        When fallback is a tuple (e.g. '(11,)'), provide an array of zeros with the passed shape.
+    local_dict : dict
+        dict with variables passed to `numexpr.evaluate`
+
+    Returns
+    -------
+    np_expr : array-like
+        `expr` converted to a numpy array or scalar
+
+    """
+    if type(fallback) == tuple:
+        np_expr = np.zeros(fallback) # fallback defines the shape
+        fallback_shape = fallback
+    else:
+        np_expr = fallback # fallback is the default numpy return value or None
+        fallback_shape = np.shape(fallback)
+
+    try:
+        np_expr = numexpr.evaluate(expr, local_dict=local_dict)
+    except SyntaxError as e:
+        logger.warning("Syntax error:\n\t{0}".format(e))
+    except KeyError as e:
+        logger.warning("Unknown variable {0}".format(e))
+    except TypeError as e:
+        logger.warning("Type error\n\t{0}".format(e))
+    except AttributeError as e:
+        logger.warning("Attribute error:\n\t{0}".format(e))
+    except ValueError as e:
+        logger.warning("Value error:\n\t{0}".format(e))
+    except ZeroDivisionError:
+        logger.warning("Zero division error in formula.")
+
+    if np_expr is None:
+        return None # no fallback, no error checking!
+    # check if dimensions of converted string agree with expected dimensions
+    elif np.ndim(np_expr) != np.ndim(fallback):
+        if np.ndim(np_expr) == 0:
+        # np_expr is scalar, return array with shape of fallback of constant values
+            np_expr = np.ones(fallback_shape) * np_expr
+        else:
+        # return array of zeros in the shape of the fallback
+            logger.warning("Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
+            np_expr = np.zeros(fallback_shape)
+
+    if np.shape(np_expr) != fallback_shape:
+            logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+            np_expr = np.zeros(fallback_shape)
+    return np_expr
+
 
 def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
-    Try ... except wrapper around simple_eval to catch various errors
+    Try ... except wrapper around numexpr to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
     return 0 to avoid errors further downstream.
 
     Parameters
     ----------
-    expr: str
-        String to be evaluated
+    expr: str or scalar
+       Expression to be evaluated, is cast to a string
 
-    alt_expr: str
-        String to be evaluated when evaluation of first string fails.
+    alt_expr: str or scalar
+        Expression to be evaluated when evaluation of first string fails, is 
+        cast to a string.
 
     return_type: str
         Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
     sign: str
-        enforce positive / negative sign of result ['pos' / None (default) / 'neg']
+        enforce positive / negative sign of result ['pos', 'poszero' / None (default) 
+                                                    'negzero' / 'neg']
 
     Returns
     -------
@@ -344,6 +419,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
     # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
     expr = clean_ascii(qstr(expr))
+    alt_expr = clean_ascii(qstr(alt_expr))
 
     result = None
     fallback = ""
@@ -356,8 +432,9 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         else:
             if not return_type in {'float', 'int', 'cmplx', 'auto', ''}:
                 logger.error('Unknown return type "{0}", setting result to 0.'.format(return_type))
-            try:
-                ex_num = se.simple_eval(ex)
+
+            ex_num = safe_numexpr_eval(ex)
+            if ex_num is not None:
 
                 if return_type == 'cmplx':
                     result = ex_num
@@ -376,23 +453,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = None
 
                 if return_type == 'int' and result is not None:
-                    result = int(ex_num) # convert to standard int type, not np.int64
-
-            except SyntaxError:
-                logger.warning(fallback + 'Syntax error in expression "{0}".'.format(ex))
-            except ZeroDivisionError:
-                logger.warning(fallback + 'Division by 0 in expression "{0}".'.format(ex))
-            except OverflowError:
-                logger.warning(fallback + 'Overflow in expression "{0}".'.format(ex))
-            except KeyError:
-                logger.warning(fallback + 'Invalid expression "{0}".'.format(ex))
-            except TypeError as e:
-                logger.warning(fallback + 'Type error in "{0}", {1}.'.format(ex, e))
-
-            except (se.NameNotDefined, se.FunctionNotDefined) as e:
-                logger.warning(fallback + '{0}'.format(e))
-            except (se.InvalidExpression, IndexError) as e:
-                    logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
+                    result = int(result.real) # convert to standard int type, not np.int64
 
         if result is not None:
             break # break out of for loop when evaluation has succeeded

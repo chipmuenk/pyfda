@@ -13,6 +13,8 @@ docutils
 nose
 migen
 mplcursors
+numexpr
+# pyfixp # no PyPI package yet ...
 # pytest
 # coverage
 # coveralls

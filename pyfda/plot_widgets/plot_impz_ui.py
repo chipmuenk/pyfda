@@ -63,6 +63,7 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
+        self.stim_formula = "A1 * abs(sin(2 * pi * f1 * t))"
 
         self.bottom_f = -120 # initial value for log. scale
         self.param = None
@@ -77,6 +78,7 @@ class PlotImpz_UI(QWidget):
         self.plt_freq_stmq = "None"
 
         self.stim = "Pulse"
+        self.chirp_method = 'Linear'
         self.noise = "None"
 
         # dictionary for fft window settings
@@ -169,13 +171,13 @@ class PlotImpz_UI(QWidget):
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
 
         lbl_plt_time_title = QLabel("<b>View:</b>", self)
-        lbl_plt_time_resp = QLabel("Response " + to_html("y", frmt='bi'), self)
+        lbl_plt_time_resp = QLabel(to_html("Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_time_stim = QLabel("Stimulus " + to_html("x", frmt='bi'), self)
+        self.lbl_plt_time_stim = QLabel(to_html("Stimulus x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
@@ -202,6 +204,7 @@ class PlotImpz_UI(QWidget):
             self.bottom_t = 0
 
         self.chk_win_time = QCheckBox("FFT Window", self)
+        #to_html("FFT Window", frmt='bi'
         self.chk_win_time.setObjectName("chk_win_time")
         self.chk_win_time.setToolTip("<span>Show FFT windowing function.</span>")
         self.chk_win_time.setChecked(False)
@@ -241,13 +244,13 @@ class PlotImpz_UI(QWidget):
         # Controls for frequency domain
         # ---------------------------------------------------------------
         lbl_plt_freq_title = QLabel("<b>View:</b>", self)
-        lbl_plt_freq_resp = QLabel("Response " + to_html("Y", frmt='bi'), self)
+        lbl_plt_freq_resp = QLabel(to_html("Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_freq_stim = QLabel("Stimulus " + to_html("X", frmt='bi'), self)
+        self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
@@ -341,8 +344,8 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel(to_html("Shape ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine",
-                                   "Triang","Saw","Rect","Comb", "AM", "FM", "PM"])
+        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine", "Chirp",
+                                   "Triang","Saw","Rect","Comb","AM","FM","PM","Formula"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
@@ -353,6 +356,11 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
         
+        self.cmbChirpMethod = QComboBox(self)
+        for t in [("Lin","Linear"),("Square","Quadratic"),("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
+            self.cmbChirpMethod.addItem(*t)
+        qset_cmb_box(self.cmbChirpMethod, self.chirp_method, data=False)
+
         self.chk_scale_impz_f = QCheckBox("Scale", self)
         self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response with <i>N<sub>FFT</sub></i> "
                                     "so that it has the same magnitude as |H(f)|. DC and Noise need to be "
@@ -369,7 +377,8 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
-        layHCmbStim.addWidget(self.chk_scale_impz_f)        
+        layHCmbStim.addWidget(self.chk_scale_impz_f)   
+        layHCmbStim.addWidget(self.cmbChirpMethod)
 
         layVlblCmbDC = QVBoxLayout()
         layVlblCmbDC.addWidget(self.lblStimulus)
@@ -430,7 +439,6 @@ class PlotImpz_UI(QWidget):
         layVlblPhU.addWidget(self.lblPhU1)
         layVlblPhU.addWidget(self.lblPhU2)
 
-
         #----------------------------------------------
         self.lblFreq1 = QLabel(to_html("f_1", frmt='bi') + " =", self)
         self.ledFreq1 = QLineEdit(self)
@@ -478,28 +486,50 @@ class PlotImpz_UI(QWidget):
         layVcmbledNoi = QVBoxLayout()
         layVcmbledNoi.addWidget(self.cmbNoise)        
         layVcmbledNoi.addWidget(self.ledNoi)
+        
+        #----------------------------------------------
+        self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
+        self.ledStimFormula = QLineEdit(self)
+        self.ledStimFormula.setText(str(self.stim_formula))
+        self.ledStimFormula.setToolTip("<span>Enter formula for stimulus in numexpr syntax"
+                                  "</span>")
+        self.ledStimFormula.setObjectName("stimFormula")
+
+        layH_ctrl_stim_formula = QHBoxLayout()
+        layH_ctrl_stim_formula.addWidget(self.lblStimFormula)
+        layH_ctrl_stim_formula.addWidget(self.ledStimFormula,10)
 
         #----------------------------------------------
         #layG_ctrl_stim = QGridLayout()
+        layH_ctrl_stim_par = QHBoxLayout()
+        
+        layH_ctrl_stim_par.addLayout(layVlblCmbDC)
+        layH_ctrl_stim_par.addLayout(layVCmbDC)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblAmp)
+        layH_ctrl_stim_par.addLayout(layVledAmp)
+        layH_ctrl_stim_par.addLayout(layVlblPhi)
+        layH_ctrl_stim_par.addLayout(layVledPhi)
+        layH_ctrl_stim_par.addLayout(layVlblPhU)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblfreq)
+        layH_ctrl_stim_par.addLayout(layVledfreq)
+        layH_ctrl_stim_par.addLayout(layVlblfreqU)
+        layH_ctrl_stim_par.addStretch(1)
+        layH_ctrl_stim_par.addLayout(layVlblNoi)
+        layH_ctrl_stim_par.addLayout(layVcmbledNoi)
+        layH_ctrl_stim_par.addStretch(10)
+        
+        layV_ctrl_stim = QVBoxLayout()
+        layV_ctrl_stim.addLayout(layH_ctrl_stim_par)
+        layV_ctrl_stim.addLayout(layH_ctrl_stim_formula)
+
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
         layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblCmbDC)
-        layH_ctrl_stim.addLayout(layVCmbDC)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblAmp)
-        layH_ctrl_stim.addLayout(layVledAmp)
-        layH_ctrl_stim.addLayout(layVlblPhi)
-        layH_ctrl_stim.addLayout(layVledPhi)
-        layH_ctrl_stim.addLayout(layVlblPhU)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblfreq)
-        layH_ctrl_stim.addLayout(layVledfreq)
-        layH_ctrl_stim.addLayout(layVlblfreqU)
-        layH_ctrl_stim.addStretch(1)
-        layH_ctrl_stim.addLayout(layVlblNoi)
-        layH_ctrl_stim.addLayout(layVcmbledNoi)
+        layH_ctrl_stim.addLayout(layV_ctrl_stim)
         layH_ctrl_stim.addStretch(10)
+
 
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
@@ -534,7 +564,9 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
+        self.cmbChirpMethod.currentIndexChanged.connect(self._update_chirp_method)
         self.ledDC.editingFinished.connect(self._update_DC)
+        self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -566,7 +598,6 @@ class PlotImpz_UI(QWidget):
 
                 self.spec_edited = False # reset flag
                 self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
-                #self.impz()
 
 #        if isinstance(source, QLineEdit):
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
@@ -603,8 +634,8 @@ class PlotImpz_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw", "Triang", "Comb", "PM", "FM", "AM"}
-        f2_en = self.stim in {"Cos", "Sine", "PM", "FM", "AM"}
+        f1_en = self.stim in {"Cos","Sine","Chirp","PM","FM","AM","Formula","Rect","Saw","Triang","Comb"}
+        f2_en = self.stim in {"Cos","Sine","Chirp","PM","FM","AM","Formula"}
         dc_en = self.stim not in {"Step", "StepErr"}
 
         self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
@@ -614,6 +645,8 @@ class PlotImpz_UI(QWidget):
         self.chk_scale_impz_f.setVisible(self.stim == 'Pulse')
         self.chk_scale_impz_f.setEnabled((self.noi == 0 or self.cmbNoise.currentText() == 'None')\
                                          and self.DC == 0)
+
+        self.cmbChirpMethod.setVisible(self.stim == 'Chirp')
 
         self.lblPhi1.setVisible(f1_en)
         self.ledPhi1.setVisible(f1_en)
@@ -625,14 +658,17 @@ class PlotImpz_UI(QWidget):
         self.lblFreq2.setVisible(f2_en)
         self.ledFreq2.setVisible(f2_en)
         self.lblFreqUnit2.setVisible(f2_en)
-        self.lblAmp2.setVisible(f2_en)
-        self.ledAmp2.setVisible(f2_en)
-        self.lblPhi2.setVisible(f2_en)
-        self.ledPhi2.setVisible(f2_en)
-        self.lblPhU2.setVisible(f2_en)
+        self.lblAmp2.setVisible(f2_en and self.stim != "Chirp")
+        self.ledAmp2.setVisible(f2_en and self.stim != "Chirp")
+        self.lblPhi2.setVisible(f2_en and self.stim != "Chirp")
+        self.ledPhi2.setVisible(f2_en and self.stim != "Chirp")
+        self.lblPhU2.setVisible(f2_en and self.stim != "Chirp")
 
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
+        
+        self.lblStimFormula.setVisible(self.stim == "Formula")
+        self.ledStimFormula.setVisible(self.stim == "Formula")
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -690,6 +726,11 @@ class PlotImpz_UI(QWidget):
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi2'})
+        
+    def _update_chirp_method(self):
+        """ Update value for self.chirp_method from the QLineEditWidget"""
+        self.chirp_method = qget_cmb_box(self.cmbChirpMethod) # read current data string
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_method'})
 
 
     def _update_noi(self):
@@ -722,6 +763,13 @@ class PlotImpz_UI(QWidget):
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
+        
+    def _update_stim_formula(self):
+        """Update string with formula to be evaluated by numexpr"""
+        self.stim_formula = self.ledStimFormula.text()
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
+        
+        
     # -------------------------------------------------------------------------
 
     def update_N(self, emit=True):

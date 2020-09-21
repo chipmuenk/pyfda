@@ -16,14 +16,14 @@ import time
 from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi, sqrt
+from numpy import pi
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
-        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex)
+        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -416,6 +416,11 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'to Sinusoidal Signal '
+            
+        elif self.ui.stim == "Chirp":
+            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,  
+                                            method=self.ui.chirp_method.lower(), phi=phi1)
+            self.title_str += r'to ' + self.ui.chirp_method + 'Chirp Signal '
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
@@ -457,6 +462,13 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(phi1 + 2*pi * self.n\
                         * (self.ui.f1 + self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)))
             self.title_str += r'to FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
+        elif self.ui.stim == "Formula":
+            param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
+                          "f1":self.ui.f1, "f2":self.ui.f2,
+                          "phi1":self.ui.phi1, "phi2":self.ui.phi2,
+                          "t":self.t, "n":self.n}
+
+            self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return

@@ -181,7 +181,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 * **Common interface for all filter design methods:**
     * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
     * specify ripple and attenuations in dB, as voltage or as power ratios
-    * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
+    * enter expressions like exp(-pi/4 * 1j) and create your own stimuli with the help of the [numexpr](https://github.com/pydata/numexpr) module
 * **Graphical Analyses**
     * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
     * Phase response (wrapped / unwrapped)
