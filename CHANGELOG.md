@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.3.2](https://github.com/chipmuenk/pyfda/tree/v0.3.2) (2020-09-xx)
+## [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.3.2) (2020-09-xx)
 
 **Bug Fixes**
 - Make compatible to matplotlib 3.3 by cleaning up hierarchy for NavigationToolbar in mpl_widgets.py
