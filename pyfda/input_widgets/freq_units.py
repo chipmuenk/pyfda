@@ -200,7 +200,7 @@ class FreqUnits(QWidget):
             again.
             """
             if self.spec_edited:
-                fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'])})
+                fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')})
                 # TODO: ?!
                 self._freq_range(emit_sig_range = False) # update plotting range 
                 self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})

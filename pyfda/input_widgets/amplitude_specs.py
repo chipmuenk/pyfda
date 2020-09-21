@@ -241,7 +241,7 @@ class AmplitudeSpecs(QWidget):
             unit = str(self.cmbUnitsA.currentText())
             filt_type = fb.fil[0]['ft']
             amp_label = str(source.objectName())
-            amp_value = safe_eval(source.text(), fb.data_old)
+            amp_value = safe_eval(source.text(), fb.data_old, sign='pos')
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sig_tx.emit({'sender':__name__, 'specs_changed':'a_specs'})
             self.spec_edited = False # reset flag
