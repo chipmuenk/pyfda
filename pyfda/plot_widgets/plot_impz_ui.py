@@ -171,13 +171,13 @@ class PlotImpz_UI(QWidget):
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
 
         lbl_plt_time_title = QLabel("<b>View:</b>", self)
-        lbl_plt_time_resp = QLabel("Response " + to_html("y", frmt='bi'), self)
+        lbl_plt_time_resp = QLabel(to_html("Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_time_stim = QLabel("Stimulus " + to_html("x", frmt='bi'), self)
+        self.lbl_plt_time_stim = QLabel(to_html("Stimulus x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
@@ -204,6 +204,7 @@ class PlotImpz_UI(QWidget):
             self.bottom_t = 0
 
         self.chk_win_time = QCheckBox("FFT Window", self)
+        #to_html("FFT Window", frmt='bi'
         self.chk_win_time.setObjectName("chk_win_time")
         self.chk_win_time.setToolTip("<span>Show FFT windowing function.</span>")
         self.chk_win_time.setChecked(False)
@@ -243,13 +244,13 @@ class PlotImpz_UI(QWidget):
         # Controls for frequency domain
         # ---------------------------------------------------------------
         lbl_plt_freq_title = QLabel("<b>View:</b>", self)
-        lbl_plt_freq_resp = QLabel("Response " + to_html("Y", frmt='bi'), self)
+        lbl_plt_freq_resp = QLabel(to_html("Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.lbl_plt_freq_stim = QLabel("Stimulus " + to_html("X", frmt='bi'), self)
+        self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         self.cmb_plt_freq_stim.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
