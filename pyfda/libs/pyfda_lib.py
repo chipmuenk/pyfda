@@ -419,6 +419,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
     # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
     expr = clean_ascii(qstr(expr))
+    alt_expr = clean_ascii(qstr(alt_expr))
 
     result = None
     fallback = ""
