@@ -432,8 +432,9 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         else:
             if not return_type in {'float', 'int', 'cmplx', 'auto', ''}:
                 logger.error('Unknown return type "{0}", setting result to 0.'.format(return_type))
-            try:
-                ex_num = numexpr.evaluate(ex)
+
+            ex_num = safe_numexpr_eval(ex)
+            if ex_num is not None:
 
                 if return_type == 'cmplx':
                     result = ex_num
