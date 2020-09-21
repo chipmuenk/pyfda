@@ -14,11 +14,17 @@
 
 - Fix several small bugs and deprecation warnings in the Coeff input widget
 
+- Enforce correct sign for various input fields
+
 **Enhancements**
 
 - Add cursor / annotations in plots [(Issue \#112)](https://github.com/chipmuenk/issues/112)
 
-  Only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1. 
+  (only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.)
+  
+- [PR \#xxx:](https://github.com/chipmuenk/pull/xxx) Replace simpleeval library by numexpr. This enables the creation of formula based stimuli 
+
+- Add chirp stimulus 
 
 - Add CHANGELOG.md (this file)
 
