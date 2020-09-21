@@ -416,6 +416,11 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'to Sinusoidal Signal '
+            
+        elif self.ui.stim == "Chirp":
+            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,  
+                                            method=self.ui.chirp_method.lower(), phi=phi1)
+            self.title_str += r'to ' + self.ui.chirp_method + 'Chirp Signal '
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
