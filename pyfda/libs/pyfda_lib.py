@@ -325,7 +325,7 @@ def pprint_log(d, N=10, tab="\t"):
     return s
 
 #------------------------------------------------------------------------------
-def safe_numexpr_eval(expr, fallback=0, local_dict={}):
+def safe_numexpr_eval(expr, fallback=None, local_dict={}):
     """
     Evaluate `numexpr.evaluate(expr)` and catch various errors.
 
@@ -351,7 +351,7 @@ def safe_numexpr_eval(expr, fallback=0, local_dict={}):
         np_expr = np.zeros(fallback) # fallback defines the shape
         fallback_shape = fallback
     else:
-        np_expr = fallback # fallback is the default numpy return value
+        np_expr = fallback # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
 
     try:
@@ -369,8 +369,10 @@ def safe_numexpr_eval(expr, fallback=0, local_dict={}):
     except ZeroDivisionError:
         logger.warning("Zero division error in formula.")
 
+    if np_expr is None:
+        return None # no fallback, no error checking!
     # check if dimensions of converted string agree with expected dimensions
-    if np.ndim(np_expr) != np.ndim(fallback):
+    elif np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
         # np_expr is scalar, return array with shape of fallback of constant values
             np_expr = np.ones(fallback_shape) * np_expr
