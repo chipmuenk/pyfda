@@ -22,7 +22,7 @@
 
   (only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.)
   
-- [PR \#xxx:](https://github.com/chipmuenk/pull/xxx) Replace simpleeval library by numexpr. This enables the creation of formula based stimuli 
+- [PR \#183:](https://github.com/chipmuenk/pull/183) Replace simpleeval library by numexpr. This enables the creation of formula based stimuli 
 
 - Add chirp stimulus 
 
