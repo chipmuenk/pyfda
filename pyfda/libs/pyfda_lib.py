@@ -326,6 +326,65 @@ def pprint_log(d, N=10, tab="\t"):
     return s
 
 #------------------------------------------------------------------------------
+def safe_numexpr_eval(expr, fallback=0, local_dict={}):
+    """
+    Evaluate `numexpr.evaluate(expr)` and catch various errors.
+
+    Parameters
+    ----------
+    expr : str
+        String to be evaluated and converted to a numpy array
+    fallback : array-like or tuple
+        numpy array or scalar as a fallback when errors occur during evaluation,
+        this also defines the expected shape of the returned numpy expression
+
+        When fallback is a tuple (e.g. '(11,)'), provide an array of zeros with the passed shape.
+    local_dict : dict
+        dict with variables passed to `numexpr.evaluate`
+
+    Returns
+    -------
+    np_expr : array-like
+        `expr` converted to a numpy array or scalar
+
+    """
+    if type(fallback) == tuple:
+        np_expr = np.zeros(fallback) # fallback defines the shape
+        fallback_shape = fallback
+    else:
+        np_expr = fallback # fallback is the default numpy return value
+        fallback_shape = np.shape(fallback)
+
+    try:
+        np_expr = numexpr.evaluate(expr, local_dict=local_dict)
+    except SyntaxError as e:
+        logger.warning("Syntax error:\n\t{0}".format(e))
+    except KeyError as e:
+        logger.warning("Unknown variable {0}".format(e))
+    except TypeError as e:
+        logger.warning("Type error\n\t{0}".format(e))
+    except AttributeError as e:
+        logger.warning("Attribute error:\n\t{0}".format(e))
+    except ValueError as e:
+        logger.warning("Value error:\n\t{0}".format(e))
+    except ZeroDivisionError:
+        logger.warning("Zero division error in formula.")
+
+    # check if dimensions of converted string agree with expected dimensions
+    if np.ndim(np_expr) != np.ndim(fallback):
+        if np.ndim(np_expr) == 0:
+        # np_expr is scalar, return array with shape of fallback of constant values
+            np_expr = np.ones(fallback_shape) * np_expr
+        else:
+        # return array of zeros in the shape of the fallback
+            logger.warning("Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
+            np_expr = np.zeros(fallback_shape)
+
+    if np.shape(np_expr) != fallback_shape:
+            logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+            np_expr = np.zeros(fallback_shape)
+    return np_expr
+
 
 def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """

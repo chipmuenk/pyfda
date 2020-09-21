@@ -24,7 +24,7 @@ import matplotlib.patches as mpl_patches
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
-        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex)
+        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -386,39 +386,6 @@ class Plot_Impz(QWidget):
         # calculate stimuli x[n] ==============================================
         self.H_str = r'$y[n]$'
         self.title_str = r'System Response '
-        
-        def eval_func_str(stim_manual):
-            """ Try to evaluate the passed string with numexpr """
-            param_dict ={"A1":self.ui.A1, "A2":self.ui.A2,
-                         "f1":self.ui.f1, "f2":self.ui.f2,
-                         "phi1":self.ui.phi1, "phi2":self.ui.phi2,
-                         "t":self.t, "n":self.n}
-            np_expr = np.zeros(self.ui.N_end) # default return value
-            try:
-                np_expr = numexpr.evaluate(self.ui.stim_manual, local_dict=param_dict)
-            except KeyError as e:
-                logger.warning("Unknown variable {0}".format(e))
-            except SyntaxError as e:
-                logger.warning("Syntax error:\n{0}".format(e))
-            except TypeError as e:
-                logger.warning("Type error\n{0}".format(e))
-            except AttributeError as e:
-                logger.warning("Attribute error:\n{0}".format(e))
-            except ValueError as e:
-                logger.warning("Value error:\n{0}".format(e))
-            except ZeroDivisionError:
-                logger.warning("Zero division error in formula.")           
-            #logger.warning("x: {0} : {1}".format(np.shape(np_expr), np_expr))
-            
-            if np.ndim(np_expr) == 0:
-                np_expr = np.ones(self.ui.N_end) * np_expr
-            elif np.ndim(np_expr) > 1:
-                logger.warning("Expression has unsuitable dimension {0}!".format(np.ndim(np_expr)))
-                np_expr = np.zeros(self.ui.N_end)
-            elif np.shape(np_expr)[0] != self.ui.N_end:
-                logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
-                np_expr = np.zeros(self.ui.N_end)
-            return np_expr
 
         if self.ui.stim == "Pulse":
             self.x = np.zeros(self.ui.N_end)
@@ -497,6 +464,7 @@ class Plot_Impz(QWidget):
                           "phi1":self.ui.phi1, "phi2":self.ui.phi2,
                           "t":self.t, "n":self.n}
 
+            self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
