@@ -63,7 +63,7 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
-        self.stim_manual = "A1 * sin(2 * pi * f1 * t)"
+        self.stim_formula = "A1 * abs(sin(2 * pi * f1 * t))"
 
         self.bottom_f = -120 # initial value for log. scale
         self.param = None
@@ -343,7 +343,7 @@ class PlotImpz_UI(QWidget):
         self.lblStimulus = QLabel(to_html("Shape ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Triang",
-                                   "Saw","Rect","Comb","AM","FM","PM","Manual"])
+                                   "Saw","Rect","Comb","AM","FM","PM","Formula"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
@@ -480,16 +480,16 @@ class PlotImpz_UI(QWidget):
         layVcmbledNoi.addWidget(self.ledNoi)
         
         #----------------------------------------------
-        self.lblStimManual = QLabel(to_html("x =", frmt='bi'), self)
-        self.ledStimManual = QLineEdit(self)
-        self.ledStimManual.setText(str(self.stim_manual))
-        self.ledStimManual.setToolTip("<span>Enter formula for stimulus in numexpr syntax"
+        self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
+        self.ledStimFormula = QLineEdit(self)
+        self.ledStimFormula.setText(str(self.stim_formula))
+        self.ledStimFormula.setToolTip("<span>Enter formula for stimulus in numexpr syntax"
                                   "</span>")
-        self.ledStimManual.setObjectName("stimManual")
+        self.ledStimFormula.setObjectName("stimFormula")
 
-        layH_ctrl_stim_man = QHBoxLayout()
-        layH_ctrl_stim_man.addWidget(self.lblStimManual)
-        layH_ctrl_stim_man.addWidget(self.ledStimManual,10)
+        layH_ctrl_stim_formula = QHBoxLayout()
+        layH_ctrl_stim_formula.addWidget(self.lblStimFormula)
+        layH_ctrl_stim_formula.addWidget(self.ledStimFormula,10)
 
         #----------------------------------------------
         #layG_ctrl_stim = QGridLayout()
@@ -514,7 +514,7 @@ class PlotImpz_UI(QWidget):
         
         layV_ctrl_stim = QVBoxLayout()
         layV_ctrl_stim.addLayout(layH_ctrl_stim_par)
-        layV_ctrl_stim.addLayout(layH_ctrl_stim_man)
+        layV_ctrl_stim.addLayout(layH_ctrl_stim_formula)
 
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addWidget(lbl_title_stim)
@@ -557,7 +557,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.ledDC.editingFinished.connect(self._update_DC)
-        self.ledStimManual.editingFinished.connect(self._update_stim_manual)
+        self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -589,7 +589,6 @@ class PlotImpz_UI(QWidget):
 
                 self.spec_edited = False # reset flag
                 self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
-                #self.impz()
 
 #        if isinstance(source, QLineEdit):
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
@@ -626,8 +625,8 @@ class PlotImpz_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos","Sine","PM","FM","AM","Manual","Rect","Saw","Triang","Comb"}
-        f2_en = self.stim in {"Cos","Sine","PM","FM","AM","Manual"}
+        f1_en = self.stim in {"Cos","Sine","PM","FM","AM","Formula","Rect","Saw","Triang","Comb"}
+        f2_en = self.stim in {"Cos","Sine","PM","FM","AM","Formula"}
         dc_en = self.stim not in {"Step", "StepErr"}
 
         self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
@@ -657,8 +656,8 @@ class PlotImpz_UI(QWidget):
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
         
-        self.lblStimManual.setVisible(self.stim == "Manual")
-        self.ledStimManual.setVisible(self.stim == "Manual")
+        self.lblStimFormula.setVisible(self.stim == "Formula")
+        self.ledStimFormula.setVisible(self.stim == "Formula")
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -749,10 +748,10 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
         
-    def _update_stim_manual(self):
+    def _update_stim_formula(self):
         """Update string with formula to be evaluated by numexpr"""
-        self.stim_manual = self.ledStimManual.text()
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_manual'})
+        self.stim_formula = self.ledStimFormula.text()
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
         
         
     # -------------------------------------------------------------------------

@@ -491,8 +491,12 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(phi1 + 2*pi * self.n\
                         * (self.ui.f1 + self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)))
             self.title_str += r'to FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
-        elif self.ui.stim == "Manual":
-            self.x = eval_func_str(self.ui.stim_manual)
+        elif self.ui.stim == "Formula":
+            param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
+                          "f1":self.ui.f1, "f2":self.ui.f2,
+                          "phi1":self.ui.phi1, "phi2":self.ui.phi2,
+                          "t":self.t, "n":self.n}
+
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
