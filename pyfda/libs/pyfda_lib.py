@@ -395,17 +395,19 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     Parameters
     ----------
-    expr: str
-        String to be evaluated
+    expr: str or scalar
+       Expression to be evaluated, is cast to a string
 
-    alt_expr: str
-        String to be evaluated when evaluation of first string fails.
+    alt_expr: str or scalar
+        Expression to be evaluated when evaluation of first string fails, is 
+        cast to a string.
 
     return_type: str
         Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
     sign: str
-        enforce positive / negative sign of result ['pos' / None (default) / 'neg']
+        enforce positive / negative sign of result ['pos', 'poszero' / None (default) 
+                                                    'negzero' / 'neg']
 
     Returns
     -------
