@@ -452,22 +452,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = None
 
                 if return_type == 'int' and result is not None:
-                    result = int(ex_num) # convert to standard int type, not np.int64
-
-            except SyntaxError:
-                logger.warning(fallback + 'Syntax error in expression "{0}".'.format(ex))
-            except AttributeError:
-                logger.warning(fallback + 'Attribute error in expression "{0}".'.format(ex))
-            except ValueError:
-                logger.warning(fallback + 'Value error in expression "{0}".'.format(ex))
-            except ZeroDivisionError:
-                logger.warning(fallback + 'Division by 0 in expression "{0}".'.format(ex))
-            except OverflowError:
-                logger.warning(fallback + 'Overflow in expression "{0}".'.format(ex))
-            except KeyError:
-                logger.warning(fallback + 'Invalid expression "{0}".'.format(ex))
-            except TypeError as e:
-                logger.warning(fallback + 'Type error in "{0}", {1}.'.format(ex, e))
+                    result = int(result.real) # convert to standard int type, not np.int64
 
         if result is not None:
             break # break out of for loop when evaluation has succeeded
