@@ -16,8 +16,7 @@ import time
 from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
-from numpy import pi, sqrt
-import numexpr
+from numpy import pi
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
 
