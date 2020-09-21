@@ -127,7 +127,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         dictionary
         """
         self.N = safe_eval(self.led_delay.text(), self.N, 
-                                      return_type='int')
+                                      sign="poszero", return_type='int')
         self.led_delay.setText(str(self.N))
 
         if not 'wdg_fil' in fb.fil[0]:
