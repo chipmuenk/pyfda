@@ -79,12 +79,13 @@ class Delay_wdg(QWidget):
         """
         self.fixp_filter = Delay() # construct HDL filter instance
 #------------------------------------------------------------------------------
-    def to_verilog(self):
+    def to_verilog(self, **kwargs):
         """
         Convert the HDL description to Verilog
         """
         return verilog.convert(self.fixp_filter,
-                               ios={self.fixp_filter.i, self.fixp_filter.o}) 
+                               ios={self.fixp_filter.i, self.fixp_filter.o},
+                               **kwargs) 
 #------------------------------------------------------------------------------
 
     def tb_wdg_stim(self, stimulus, inputs, outputs):

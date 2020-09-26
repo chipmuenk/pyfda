@@ -10,7 +10,10 @@
 Widget for simulating fixpoint filters and generating Verilog Code
 
 """
-import sys, os, io, importlib, time
+import sys, os, io
+import re
+import importlib
+import time
 import logging
 logger = logging.getLogger(__name__)
 
@@ -616,36 +619,46 @@ class Input_Fixpoint_Specs(QWidget):
         dlg = QFD(self) # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
+        dlg.setDefaultSuffix('v') # needed for overwrite confirmation when name is entered without suffix
+        dlg.setWindowTitle('Export Vlog')
+        dlg.setNameFilter(file_types)
+        dlg.setDirectory(dirs.save_dir)
+        dlg.setAcceptMode(QFD.AcceptSave)
+        #dlg.setOption(DontConfirmOverwrite, !*enabled*)
+        if dlg.exec_() == QFD.Accepted:
+            hdl_file = qstr(dlg.selectedFiles()[0])
+            
+# =============================================================================
+#       # static method getSaveFileName_() is simple but unflexible
+#         hdl_file, hdl_filter = dlg.getSaveFileName_(
+#                 caption="Save Verilog netlist as (this also defines the module name)", 
+#                 directory=dirs.save_dir, filter=file_types)
+#         hdl_file = qstr(hdl_file)
+# =============================================================================
 
-        hdl_file, hdl_filter = dlg.getSaveFileName_(
-                caption="Save HDL as", directory=dirs.save_dir,
-                filter=file_types)
-        hdl_file = qstr(hdl_file)
-
-        if hdl_file != "": # "operation cancelled" returns an empty string
+#        if hdl_file != "": # "operation cancelled" returns an empty string
             # return '.v' or '.vhd' depending on filetype selection:
             # hdl_type = extract_file_ext(qstr(hdl_filter))[0]
             # sanitized dir + filename + suffix. The filename suffix is replaced
             # by `v` later.
-            hdl_file = os.path.normpath(hdl_file)
+            hdl_file = os.path.normpath(hdl_file) # complete path + file name without suffix
+            logger.warning(hdl_file)
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
             dirs.save_dir = hdl_dir_name # make this directory the new default / base dir
-            hdl_file_name = os.path.join(hdl_dir_name, 
-                                os.path.splitext(os.path.basename(hdl_file))[0]+ ".v")
+            hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
+            hdl_full_name = os.path.join(hdl_dir_name, hdl_file_name  + ".v")
+            vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower() # remove all non-alphanumeric chars
 
-
-            logger.info('Creating hdl_file "{0}"'.format(
-                        os.path.join(hdl_dir_name, hdl_file_name)))
+            logger.info('Creating hdl_file "{0}"\n\twith top level module "{1}"'
+                        .format(hdl_full_name, vlog_mod_name))
             try:
                 self.update_fxqc_dict()
                 self.fx_wdg_inst.construct_fixp_filter()
-                code = self.fx_wdg_inst.to_verilog()
-                
-                logger.info(str(code))
-                
-                with io.open(hdl_file_name, 'w', encoding="utf8") as f:
+                code = self.fx_wdg_inst.to_verilog(name=vlog_mod_name)
+                #logger.info(str(code)) # print verilog code to console
+                with io.open(hdl_full_name, 'w', encoding="utf8") as f:
                     f.write(str(code))
 
                 logger.info("HDL conversion finished!")

@@ -283,12 +283,13 @@ class FIR_DF_wdg(QWidget):
 
         self.fixp_filter = FIR()
 #------------------------------------------------------------------------------
-    def to_verilog(self):
+    def to_verilog(self, **kwargs):
         """
         Convert the migen description to Verilog
         """
         return verilog.convert(self.fixp_filter,
-                               ios={self.fixp_filter.i, self.fixp_filter.o}) 
+                               ios={self.fixp_filter.i, self.fixp_filter.o},
+                               **kwargs) 
 #------------------------------------------------------------------------------
     def tb_wdg_stim(self, stimulus, outputs):
         """ use stimulus list from widget as input to filter """
