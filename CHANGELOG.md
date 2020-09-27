@@ -24,7 +24,11 @@
   
 - [PR \#183:](https://github.com/chipmuenk/pull/183) Replace simpleeval library by numexpr. This enables the creation of formula based stimuli 
 
-- Add chirp stimulus 
+- Add chirp stimulus
+
+- The top level module name for generated Verilog netlists (Fixpoint tab) is now derived from the
+  specified file name. The module name is converted to lower cased and sanitized so that is only 
+  contains alpha-numeric characters and '_'.
 
 - Add CHANGELOG.md (this file)
 
