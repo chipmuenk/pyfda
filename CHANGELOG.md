@@ -28,7 +28,8 @@
 
 - The top level module name for generated Verilog netlists (Fixpoint tab) is now derived from the
   specified file name. The module name is converted to lower cased and sanitized so that is only 
-  contains alpha-numeric characters and '_'.
+  contains alpha-numeric characters and '_'.  ([(Issue \#176)](https://github.com/chipmuenk/pyfda/issues/176), 
+  "allow different module names for verilog export").
 
 - Add CHANGELOG.md (this file)
 
