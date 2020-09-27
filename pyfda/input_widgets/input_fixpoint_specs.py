@@ -623,8 +623,8 @@ class Input_Fixpoint_Specs(QWidget):
         dlg.setWindowTitle('Export Vlog')
         dlg.setNameFilter(file_types)
         dlg.setDirectory(dirs.save_dir)
-        dlg.setAcceptMode(QFD.AcceptSave)
-        #dlg.setOption(DontConfirmOverwrite, !*enabled*)
+        dlg.setAcceptMode(QFD.AcceptSave)# set mode "save file" instead "open file"
+        dlg.setOption(QFD.DontConfirmOverwrite, False)
         if dlg.exec_() == QFD.Accepted:
             hdl_file = qstr(dlg.selectedFiles()[0])
             # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))[0]
