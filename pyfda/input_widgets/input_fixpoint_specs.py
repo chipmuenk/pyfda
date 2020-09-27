@@ -627,6 +627,7 @@ class Input_Fixpoint_Specs(QWidget):
         #dlg.setOption(DontConfirmOverwrite, !*enabled*)
         if dlg.exec_() == QFD.Accepted:
             hdl_file = qstr(dlg.selectedFiles()[0])
+            # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))[0]
             
 # =============================================================================
 #       # static method getSaveFileName_() is simple but unflexible
@@ -634,15 +635,13 @@ class Input_Fixpoint_Specs(QWidget):
 #                 caption="Save Verilog netlist as (this also defines the module name)", 
 #                 directory=dirs.save_dir, filter=file_types)
 #         hdl_file = qstr(hdl_file)
+#         if hdl_file != "": # "operation cancelled" returns an empty string
+#             # return '.v' or '.vhd' depending on filetype selection:
+#             # hdl_type = extract_file_ext(qstr(hdl_filter))[0]
+#             # sanitized dir + filename + suffix. The filename suffix is replaced
+#             # by `v` later.
+#             hdl_file = os.path.normpath(hdl_file) # complete path + file name
 # =============================================================================
-
-#        if hdl_file != "": # "operation cancelled" returns an empty string
-            # return '.v' or '.vhd' depending on filetype selection:
-            # hdl_type = extract_file_ext(qstr(hdl_filter))[0]
-            # sanitized dir + filename + suffix. The filename suffix is replaced
-            # by `v` later.
-            hdl_file = os.path.normpath(hdl_file) # complete path + file name without suffix
-            logger.warning(hdl_file)
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
