@@ -10,13 +10,12 @@
   by declaring explicitly np.array(some_ragged_list , dtype=object) or by handling the elements of ragged list indidually
   ([chipmuenk](https://github.com/chipmuenk))
   
-- [Issue \#184](https://github.com/chipmuenk/pyfda/issues/184) "Filter type "Delay" can crash pyfda", 
+- [PR \#186](https://github.com/chipmuenk/pyfda/pull/186), fixing [Issue \#184](https://github.com/chipmuenk/pyfda/issues/184) "Filter type "Delay" can crash pyfda", 
   syntax errors in the UI description have been fixed. As the filter class does not produce a proper 
   delay, it is commented out in the configuratiion file for the time being 
   (see [Issue \#184](https://github.com/chipmuenk/pyfda/issues/185))
-
   
-- When the gain k has been changed in the P/Z input widget, highlight the save button.
+- When the gain *k* has been changed in the P/Z input widget, highlight the save button.
 
 - Fix several small bugs and deprecation warnings in the Coeff input widget
 
@@ -24,14 +23,12 @@
 
 **Enhancements**
 
-- Add cursor / annotations in plots [(Issue \#112)](https://github.com/chipmuenk/issues/112)
-
-  (only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.)
+- Add cursor / annotations in plots [(Issue \#112)](https://github.com/chipmuenk/issues/112) This is only available when [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.
   
 - [PR \#183:](https://github.com/chipmuenk/pull/183) Replace simpleeval library by numexpr. 
   This enables the creation of formula based stimuli, closing [Issue \#162](https://github.com/chipmuenk/issues/162)
 
-- Add chirp stimulus
+- Add chirp stimulus in Impulse Response tab.
 
 - The top level module name for generated Verilog netlists (Fixpoint tab) is now derived from the
   specified file name. The module name is converted to lower cased and sanitized so that is only 
