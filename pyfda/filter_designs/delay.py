@@ -61,27 +61,11 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         self.rt_dict = {
             'COM': {'man': {'fo':('a', 'N'),
                             'msg':('a', 
-                                "<span>Enter desired filter order <b><i>N</i></b>, corner "
-                                "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
-                                "&nbsp; and <b><i>F<sub>SB</sub></i></b>&nbsp;, and relative weight "
-                                "values <b><i>W&nbsp; </i></b> (1 ... 10<sup>6</sup>) to specify how well "
-                                "the bands are approximated.</span>")
+                                "<span>Enter desired number of delays <b><i>N</i></b>.</span>")
                             },
                 },
-            'LP': {'man':{'wspecs': ('u','W_PB','W_SB'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB'), 
-                                           'amp':('u','A_PB','A_SB')})
-                          },
-                },
-            'HP': {'man':{'wspecs': ('u','W_SB','W_PB')},
-                    },
-            'BP': {
-                    },
-            'BS': {'man':{'wspecs': ('u','W_PB','W_SB','W_PB2'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
-                          }
-                }
+            'AP': {'man':{}
+                    }
             }
 
         self.info_doc = []
@@ -179,32 +163,15 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         """
         if arg is None:
             arg = np.zeros(self.N)
+            #arg =[[0], np.zeros(self.N), 1] # crashes coeff tab
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
-    def LPman(self, fil_dict):
+    def APman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
         self._save(fil_dict)
 
-
-    def HPman(self, fil_dict):
-        self._get_params(fil_dict)
-        if not self._test_N():
-            return -1
-        self._save(fil_dict)
-        
-    def BPman(self, fil_dict):
-        self._get_params(fil_dict)
-        if not self._test_N():
-            return -1
-        self._save(fil_dict)
-
-    def BSman(self, fil_dict):
-        self._get_params(fil_dict)
-        if not self._test_N():
-            return -1
-        self._save(fil_dict)
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
