@@ -90,7 +90,7 @@ mpl_params_light = {
 
 # Dictionary with translations between short method names and long names for
 # response types - the long name can be changed as you like, but don't change 
-# change the short name - it is used to construct the filter design method names
+# the short name - it is used to construct the filter design method names
 rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
             "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
             "HIL":"Hilbert", "DIFF":"Differentiator"}
