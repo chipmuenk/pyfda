@@ -77,51 +77,56 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-        self.lbl_delay = QLabel("Delays", self)
-        self.lbl_delay.setObjectName('wdg_lbl_delays')
-        self.led_delay = QLineEdit(self)
-        self.led_delay.setText(str(self.N))
-        self.led_delay.setObjectName('wdg_led_delay')
-        self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
-
-        self.layHWin = QHBoxLayout()
-        self.layHWin.setObjectName('wdg_layGWin')
-        self.layHWin.addWidget(self.lbl_delay)
-        self.layHWin.addWidget(self.led_delay)
-        self.layHWin.setContentsMargins(0,0,0,0)
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QWidget(self)
-        self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layHWin)
-
-        #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        self.led_delay.editingFinished.connect(self._update_UI)
-        # fires when edited line looses focus or when RETURN is pressed
-        #----------------------------------------------------------------------
-
-        self._load_dict() # get initial / last setting from dictionary
-        self._update_UI()
+        pass
+# =============================================================================
+#         self.lbl_delay = QLabel("Delays", self)
+#         self.lbl_delay.setObjectName('wdg_lbl_delays')
+#         self.led_delay = QLineEdit(self)
+#         self.led_delay.setText(str(self.N))
+#         self.led_delay.setObjectName('wdg_led_delay')
+#         self.led_delay.setToolTip("Number of delays, N > 0 produces poles, N < 0 zeros.")
+# 
+#         self.layHWin = QHBoxLayout()
+#         self.layHWin.setObjectName('wdg_layGWin')
+#         self.layHWin.addWidget(self.lbl_delay)
+#         self.layHWin.addWidget(self.led_delay)
+#         self.layHWin.setContentsMargins(0,0,0,0)
+#         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+#         self.wdg_fil = QWidget(self)
+#         self.wdg_fil.setObjectName('wdg_fil')
+#         self.wdg_fil.setLayout(self.layHWin)
+# 
+#         #----------------------------------------------------------------------
+#         # SIGNALS & SLOTs
+#         #----------------------------------------------------------------------
+#         self.led_delay.editingFinished.connect(self._update_UI)
+#         # fires when edited line looses focus or when RETURN is pressed
+#         #----------------------------------------------------------------------
+# 
+#         self._load_dict() # get initial / last setting from dictionary
+#         self._update_UI()
+# =============================================================================
         
-    def _update_UI(self):
-        """
-        Update UI when line edit field is changed (here, only the text is read
-        and converted to integer) and store parameter settings in filter 
-        dictionary
-        """
-        self.N = safe_eval(self.led_delay.text(), self.N, 
-                                      sign="poszero", return_type='int')
-        self.led_delay.setText(str(self.N))
-
-        if not 'wdg_fil' in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil':{}})
-        fb.fil[0]['wdg_fil'].update({'delay':
-                                        {'N':self.N}
-                                    })
-        
-        # sig_tx -> select_filter -> filter_specs   
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'delay'})
+# =============================================================================
+#     def _update_UI(self):
+#         """
+#         Update UI when line edit field is changed (here, only the text is read
+#         and converted to integer) and store parameter settings in filter 
+#         dictionary
+#         """
+#         self.N = safe_eval(self.led_delay.text(), self.N, 
+#                                       sign="poszero", return_type='int')
+#         self.led_delay.setText(str(self.N))
+# 
+#         if not 'wdg_fil' in fb.fil[0]:
+#             fb.fil[0].update({'wdg_fil':{}})
+#         fb.fil[0]['wdg_fil'].update({'delay':
+#                                         {'N':self.N}
+#                                     })
+#         
+#         # sig_tx -> select_filter -> filter_specs   
+#         self.sig_tx.emit({'sender':__name__, 'filt_changed':'delay'})
+# =============================================================================
 
 
     def _load_dict(self):
