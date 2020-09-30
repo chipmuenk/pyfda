@@ -15,7 +15,7 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QtGui, QWidget, QFont, QCheckBox, QFrame, QPushButton, QToolButton,
+from pyfda.libs.compat import (QtGui, QWidget, QFont, QFrame, QPushButton,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                       QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
 
@@ -73,44 +73,44 @@ class Input_Info(QWidget):
         
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-#        self.chkFiltPerf = QToolButton("H(f)", self)
-        self.chkFiltPerf = QPushButton(self)
-        self.chkFiltPerf.setText("H(f)")
-        self.chkFiltPerf.setCheckable(True)
-        self.chkFiltPerf.setChecked(True)
-        self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
+#        self.butFiltPerf = QToolButton("H(f)", self)
+        self.butFiltPerf = QPushButton(self)
+        self.butFiltPerf.setText("H(f)")
+        self.butFiltPerf.setCheckable(True)
+        self.butFiltPerf.setChecked(True)
+        self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.chkDocstring = QPushButton("Doc$", self)
-        self.chkDocstring.setCheckable(True)
-        self.chkDocstring.setChecked(False)
-        self.chkDocstring.setToolTip("Display docstring from python filter method.")
+        self.butDocstring = QPushButton("Doc$", self)
+        self.butDocstring.setCheckable(True)
+        self.butDocstring.setChecked(False)
+        self.butDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.chkRichText = QPushButton("RTF", self)
-        self.chkRichText.setCheckable(HAS_DOCUTILS)
-        self.chkRichText.setChecked(HAS_DOCUTILS)
-        self.chkRichText.setEnabled(HAS_DOCUTILS)
-        self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
+        self.butRichText = QPushButton("RTF", self)
+        self.butRichText.setCheckable(HAS_DOCUTILS)
+        self.butRichText.setChecked(HAS_DOCUTILS)
+        self.butRichText.setEnabled(HAS_DOCUTILS)
+        self.butRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.chkFiltDict = QPushButton("FiltDict", self)
-        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
-        self.chkFiltDict.setCheckable(True)
-        self.chkFiltDict.setChecked(False)
+        self.butFiltDict = QPushButton("FiltDict", self)
+        self.butFiltDict.setToolTip("Show filter dictionary for debugging.")
+        self.butFiltDict.setCheckable(True)
+        self.butFiltDict.setChecked(False)
 
-        self.chkFiltTree = QPushButton("FiltTree", self)
-        self.chkFiltTree.setToolTip("Show filter tree for debugging.")
-        self.chkFiltTree.setCheckable(True)
-        self.chkFiltTree.setChecked(False)
+        self.butFiltTree = QPushButton("FiltTree", self)
+        self.butFiltTree.setToolTip("Show filter tree for debugging.")
+        self.butFiltTree.setCheckable(True)
+        self.butFiltTree.setChecked(False)
 
         layHControls1 = QHBoxLayout()
-        layHControls1.addWidget(self.chkFiltPerf)
+        layHControls1.addWidget(self.butFiltPerf)
         layHControls1.addStretch(1)
-        layHControls1.addWidget(self.chkDocstring)
+        layHControls1.addWidget(self.butDocstring)
         layHControls1.addStretch(1)
-        layHControls1.addWidget(self.chkRichText)
+        layHControls1.addWidget(self.butRichText)
         layHControls1.addStretch(1)
-        layHControls1.addWidget(self.chkFiltDict)
+        layHControls1.addWidget(self.butFiltDict)
         layHControls1.addStretch(1)
-        layHControls1.addWidget(self.chkFiltTree)
+        layHControls1.addWidget(self.butFiltTree)
 
         self.butVer = QPushButton("Versions", self)  # pop-up "About" window
         self.butLic = QPushButton("License", self) # pop-up Licensing info
@@ -164,11 +164,11 @@ class Input_Info(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkFiltPerf.clicked.connect(self._show_filt_perf)
-        self.chkFiltDict.clicked.connect(self._show_filt_dict)
-        self.chkFiltTree.clicked.connect(self._show_filt_tree)
-        self.chkDocstring.clicked.connect(self._show_doc)
-        self.chkRichText.clicked.connect(self._show_doc)
+        self.butFiltPerf.clicked.connect(self._show_filt_perf)
+        self.butFiltDict.clicked.connect(self._show_filt_dict)
+        self.butFiltTree.clicked.connect(self._show_filt_tree)
+        self.butDocstring.clicked.connect(self._show_doc)
+        self.butRichText.clicked.connect(self._show_doc)
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -186,7 +186,7 @@ class Input_Info(QWidget):
         Display info from filter design file and docstring
         """
         if hasattr(ff.fil_inst,'info'):
-            if self.chkRichText.isChecked():
+            if self.butRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -195,8 +195,8 @@ class Input_Info(QWidget):
         else:
             self.txtFiltInfoBox.setText("")
 
-        if self.chkDocstring.isChecked() and hasattr(ff.fil_inst,'info_doc'):
-            if self.chkRichText.isChecked():
+        if self.butDocstring.isChecked() and hasattr(ff.fil_inst,'info_doc'):
+            if self.butRichText.isChecked():
                 self.txtFiltInfoBox.append(
                 '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
@@ -263,8 +263,8 @@ class Input_Info(QWidget):
             return F_min, H_min, F_max, H_max
         #------------------------------------------------------------------
 
-        self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
-        if self.chkFiltPerf.isChecked():
+        self.tblFiltPerf.setVisible(self.butFiltPerf.isChecked())
+        if self.butFiltPerf.isChecked():
 
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
@@ -425,7 +425,7 @@ class Input_Info(QWidget):
         """
         Print filter dict for debugging
         """
-        self.txtFiltDict.setVisible(self.chkFiltDict.isChecked())
+        self.txtFiltDict.setVisible(self.butFiltDict.isChecked())
 
         fb_sorted = [str(key) +' : '+ str(fb.fil[0][key]) for key in sorted(fb.fil[0].keys())]
         dictstr = pprint.pformat(fb_sorted)
@@ -437,7 +437,7 @@ class Input_Info(QWidget):
         """
         Print filter tree for debugging
         """
-        self.txtFiltTree.setVisible(self.chkFiltTree.isChecked())
+        self.txtFiltTree.setVisible(self.butFiltTree.isChecked())
 
         ftree_sorted = ['<b>' + str(key) +' : '+ '</b>' + str(fb.fil_tree[key]) for key in sorted(fb.fil_tree.keys())]
         dictstr = pprint.pformat(ftree_sorted, indent = 4)
