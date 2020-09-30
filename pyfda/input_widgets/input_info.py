@@ -15,7 +15,7 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
+from pyfda.libs.compat import (QtGui, QWidget, QFont, QCheckBox, QFrame, QPushButton, QToolButton,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                       QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
 
@@ -73,39 +73,58 @@ class Input_Info(QWidget):
         
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
-        self.chkFiltPerf = QCheckBox("H(f)", self)
+#        self.chkFiltPerf = QToolButton("H(f)", self)
+        self.chkFiltPerf = QPushButton(self)
+        self.chkFiltPerf.setText("H(f)")
+        self.chkFiltPerf.setCheckable(True)
         self.chkFiltPerf.setChecked(True)
         self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.chkDocstring = QCheckBox("Doc$", self)
+        self.chkDocstring = QPushButton("Doc$", self)
+        self.chkDocstring.setCheckable(True)
         self.chkDocstring.setChecked(False)
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.chkRichText = QCheckBox("RTF", self)
+        self.chkRichText = QPushButton("RTF", self)
+        self.chkRichText.setCheckable(HAS_DOCUTILS)
         self.chkRichText.setChecked(HAS_DOCUTILS)
         self.chkRichText.setEnabled(HAS_DOCUTILS)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
-                                                  
-        self.chkFiltDict = QCheckBox("FiltDict", self)
-        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")   
 
-        self.chkFiltTree = QCheckBox("FiltTree", self)
+        self.chkFiltDict = QPushButton("FiltDict", self)
+        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
+        self.chkFiltDict.setCheckable(True)
+        self.chkFiltDict.setChecked(False)
+
+        self.chkFiltTree = QPushButton("FiltTree", self)
         self.chkFiltTree.setToolTip("Show filter tree for debugging.")
+        self.chkFiltTree.setCheckable(True)
+        self.chkFiltTree.setChecked(False)
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addWidget(self.chkFiltPerf)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkDocstring)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkRichText)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkFiltDict)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkFiltTree)
+        layHControls1 = QHBoxLayout()
+        layHControls1.addWidget(self.chkFiltPerf)
+        layHControls1.addStretch(1)
+        layHControls1.addWidget(self.chkDocstring)
+        layHControls1.addStretch(1)
+        layHControls1.addWidget(self.chkRichText)
+        layHControls1.addStretch(1)
+        layHControls1.addWidget(self.chkFiltDict)
+        layHControls1.addStretch(1)
+        layHControls1.addWidget(self.chkFiltTree)
+
+        self.butVer = QPushButton("Versions", self)  # pop-up "About" window
+        self.butLic = QPushButton("License", self) # pop-up Licensing info
+        layHControls2 = QHBoxLayout()
+        layHControls2.addWidget(self.butVer)
+        layHControls2.addWidget(self.butLic)
+
+        layVControls = QVBoxLayout()
+        layVControls.addLayout(layHControls1)
+        layVControls.addLayout(layHControls2)
+
         self.frmMain = QFrame(self)
-        self.frmMain.setLayout(self.layHChkBoxes)
+        self.frmMain.setLayout(layVControls)
 
-        
         self.tblFiltPerf = QTableWidget(self)
         self.tblFiltPerf.setAlternatingRowColors(True)
 #        self.tblFiltPerf.verticalHeader().setVisible(False)
@@ -121,7 +140,7 @@ class Input_Info(QWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmMain)
 
-#        layVMain.addLayout(self.layHChkBoxes)
+#        layVMain.addLayout(self.layHControls)
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.tblFiltPerf)
