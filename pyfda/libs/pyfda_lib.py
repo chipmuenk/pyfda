@@ -19,10 +19,12 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, sin, cos
 import numexpr
+import markdown
 
 import scipy.signal as sig
 
 from distutils.version import LooseVersion
+import pyfda.libs.pyfda_dirs as dirs
 
 ####### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
@@ -34,6 +36,7 @@ from scipy import __version__ as V_SCI
 from matplotlib import __version__ as V_MPL
 from .compat import QT_VERSION_STR as V_QT
 from .compat import PYQT_VERSION_STR as V_PYQT
+from markdown import __version__ as V_MD
 
 # redirect stdio output of show_config to string
 f = io.StringIO()
@@ -42,6 +45,8 @@ with redirect_stdout(f):
 INFO_NP = f.getvalue()
 
 logger.warning(INFO_NP)
+
+
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
@@ -53,15 +58,16 @@ __all__ = ['cmp_version', 'mod_version',
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
+V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
 MODULES = {}
-MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
-                            + " (" + str(PY32_64) + " Bit)"})
+MODULES.update({'python': V_PY})
 MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
 MODULES.update({'Qt5': {'v':V_QT,'lic':'LPGL','url':'https://qt.io/', 'p':'Widget library (UI etc.)'}})
 MODULES.update({'pyqt': V_PYQT})
 MODULES.update({'numpy': {'v':V_NP, 'lic':'BSD', 'url':'https://numpy.org/'}})
 MODULES.update({'numexpr': {'v':V_NUM, 'lic':'MIT', 'url':'https://github.com/pydata/numexpr'}})
 MODULES.update({'scipy': {'v':V_SCI, 'lic':'BSD', 'url':'https://scipy.org/'}})
+MODULES.update({'markdown':{'v':V_MD}})
 
 # ================ Optional Modules ============================
 
@@ -165,38 +171,58 @@ def mod_version(mod = None):
         else:
             return None
     else:
-        v = ""
-        keys = sorted(list(MODULES.keys()))
-        for k in keys:
-            try:
-                mod = '<a href="{0}">{1}</a>'.format(MODULES[k]['url'], k)
-            except (KeyError, TypeError):
-                mod =  k
-                
-            try:
-                lic = '<td>{0}</td>'.format(MODULES[k]['lic'])
-            except (KeyError, TypeError):
-                lic ='<td></td>'
-                
-            if 'v' in MODULES[k]:
-                ver = MODULES[k]['v']
-            else:
-                ver = MODULES[k]
-                
-            if ver:
-                ver = LooseVersion(ver)
-            else:
-                ver = 'missing'
-                                   
-            v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, ver)
-            v += lic + "</tr>"
-        return v
+ 
+        v_md = ""                             
+        with open(os.path.join(dirs.INSTALL_DIR, "libs","libraries_template.md"), 'r') as f:
+            v = f.read()
+
+        # convert Markdown File to HTML
+        v_html = markdown.markdown(v, output_format='html5', extensions=['tables'])
+        v_l = v_html.splitlines() # split at linebreaks
+
+        # Replace variables e.g. {V_MPL} in the HTML file by the corresponding version numbers
+        # by evaluating strings like "f' ... {V_MPL} ...". This is taken from
+        # https://stackoverflow.com/questions/42497625/how-to-postpone-defer-the-evaluation-of-f-strings
+        for l in v_l:
+            v_md += eval(f"f'{l}'")
+
+        return v_md
+
+#        
+# =============================================================================
+#         v = ""
+#         keys = sorted(list(MODULES.keys()))
+#         for k in keys:
+#             try:
+#                 mod = '<a href="{0}">{1}</a>'.format(MODULES[k]['url'], k)
+#             except (KeyError, TypeError):
+#                 mod =  k
+#                 
+#             try:
+#                 lic = '<td>{0}</td>'.format(MODULES[k]['lic'])
+#             except (KeyError, TypeError):
+#                 lic ='<td></td>'
+#                 
+#             if 'v' in MODULES[k]:
+#                 ver = MODULES[k]['v']
+#             else:
+#                 ver = MODULES[k]
+#                 
+#             if ver:
+#                 ver = LooseVersion(ver)
+#             else:
+#                 ver = 'missing'
+#                                    
+#             v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, ver)
+#             v += lic + "</tr>"
+#         return v
+# =============================================================================
 
 #------------------------------------------------------------------------------
+logger.info(mod_version())
+#logger.info("Found the following modules:" + "\n" + mod_version())
 
-logger.info("Found the following modules:" + "\n" + mod_version())
-
-SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
+SOS_AVAIL = True # TODO: remove from software?
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
