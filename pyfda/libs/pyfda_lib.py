@@ -56,48 +56,54 @@ PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit 
 MODULES = {}
 MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
                             + " (" + str(PY32_64) + " Bit)"})
-#MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
-MODULES.update({'matplotlib': V_MPL})
-MODULES.update({'pyqt': V_QT})
-MODULES.update({'numpy': V_NP})
-MODULES.update({'numexpr': numexpr.__version__})
-MODULES.update({'scipy': V_SCI})
+MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
+MODULES.update({'Qt5': {'v':V_QT,'lic':'LPGL','url':'https://qt.io/', 'p':'Widget library (UI etc.)'}})
+MODULES.update({'pyqt': V_PYQT})
+MODULES.update({'numpy': {'v':V_NP, 'lic':'BSD', 'url':'https://numpy.org/'}})
+MODULES.update({'numexpr': {'v':V_NUM, 'lic':'MIT', 'url':'https://github.com/pydata/numexpr'}})
+MODULES.update({'scipy': {'v':V_SCI, 'lic':'BSD', 'url':'https://scipy.org/'}})
 
 # ================ Optional Modules ============================
 
 try:
-    from pyfixp import __version__ as v
-    MODULES.update('pyfixp', v)
+    from pyfixp import __version__ as V_FX
+    MODULES.update('pyfixp', {'v':V_FX})
 except ImportError:
-    MODULES.update({'pyfixp': None})
+    MODULES.update({'pyfixp': {'v':None}})
     
 try:
     import migen
-    MODULES.update({'migen': 'installed'})
+    MODULES.update({'migen': {'v':'installed'}})
 except (ImportError,SyntaxError):
-    MODULES.update({'migen': None})
+    MODULES.update({'migen':{'v':None}})
 
 try:
-    from nmigen import __version__ as v
-    MODULES.update({'nMigen': v})
+    from nmigen import __version__ as V_NMG
+    MODULES.update({'nMigen': {'v':V_NMG}})
 except ImportError:
     pass
 
 try:
-    from docutils import __version__ as v
-    MODULES.update({'docutils': v})
+    from docutils import __version__ as V_DOC
+    MODULES.update({'docutils': {'v':V_DOC}})
+except ImportError:
+    pass
+
+try:
+    from mplcursors import __version__ as V_CUR
+    MODULES.update({'mplcursors': {'v':V_CUR}})
 except ImportError:
     pass
 
 try:
     from xlwt import __version__ as v
-    MODULES.update({'xlwt': v})
+    MODULES.update({'xlwt': {'v':v}})
 except ImportError:
     pass
 
 try:
     from xlsxwriter import __version__ as v
-    MODULES.update({'xlsx': v})
+    MODULES.update({'xlsx': {'v':v}})
 except ImportError:
     pass
 
@@ -134,11 +140,11 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in MODULES or not MODULES[mod]:
+        if mod not in MODULES or not MODULES[mod]['v']:
             return -2
-        elif LooseVersion(MODULES[mod]) > LooseVersion(version):
+        elif LooseVersion(MODULES[mod]['v']) > LooseVersion(version):
             return 1
-        elif  LooseVersion(MODULES[mod]) == LooseVersion(version):
+        elif  LooseVersion(MODULES[mod]['v']) == LooseVersion(version):
             return 0
         else:
             return -1
@@ -155,7 +161,7 @@ def mod_version(mod = None):
     """
     if mod:
         if mod in MODULES:
-            return LooseVersion(MODULES[mod])
+            return LooseVersion(MODULES[mod]['v'])
         else:
             return None
     else:
@@ -163,15 +169,27 @@ def mod_version(mod = None):
         keys = sorted(list(MODULES.keys()))
         for k in keys:
             try:
-                mod = '<a href="{0}"><{1}>'.format(MODULES[k]['url'], k)
+                mod = '<a href="{0}">{1}</a>'.format(MODULES[k]['url'], k)
             except (KeyError, TypeError):
                 mod =  k
                 
-            if MODULES[k]:
-                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, LooseVersion(MODULES[k]))
+            try:
+                lic = '<td>{0}</td>'.format(MODULES[k]['lic'])
+            except (KeyError, TypeError):
+                lic ='<td></td>'
+                
+            if 'v' in MODULES[k]:
+                ver = MODULES[k]['v']
             else:
-                v += "<tr><td>{0}</td><td>missing</td>".format(mod)
-            v += "</tr>"
+                ver = MODULES[k]
+                
+            if ver:
+                ver = LooseVersion(ver)
+            else:
+                ver = 'missing'
+                                   
+            v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, ver)
+            v += lic + "</tr>"
         return v
 
 #------------------------------------------------------------------------------
