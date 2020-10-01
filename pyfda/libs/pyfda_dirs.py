@@ -120,7 +120,7 @@ CONF_FILE = 'pyfda.conf'            #: name for general configuration file
 LOG_CONF_FILE = 'pyfda_log.conf'    #: name for logging configuration file
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
-INSTALL_DIR = os.path.join(THIS_DIR, '..')
+INSTALL_DIR = os.path.normpath(os.path.join(THIS_DIR, '..'))
 
 TEMP_DIR = tempfile.gettempdir() #: Temp directory for constructing logging dir
 USER_DIRS = [] #: Placeholder for user widgets directory list, set by treebuilder
