@@ -26,7 +26,7 @@ The binary distribution comes bundled with several external libraries and icons.
 
 Most included software has BSD-style licenses, i.e. MIT or PSF (Python Software Foundation)
 with the notable exception of the Qt5 and PyQt libraries and the pyInstaller itself.
-The (L)GPL licenses of these components require that the binary is released under
+The (L)GPL licenses of these components require that the pyFDA binary is released under
 GPL license.
 
 
