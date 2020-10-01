@@ -22,28 +22,31 @@ External modules and libraries
 pyFDA itself is licensed under the permissive MIT license. The source code is
 released at the Github repository [chipmuenk/pyfda](https://github.com/chipmuenk/pyfda).
 
-However, when using
-binary distribution, several external libraries and icons come bundled with the binary.
+The binary distribution comes bundled with several external libraries and icons.
 
 Most included software has BSD-style licenses, i.e. MIT or PSF (Python Software Foundation)
-with the notable exception of the Qt5 and PyQt libraries.
-Please send me message if I've '
+with the notable exception of the Qt5 and PyQt libraries and the pyInstaller itself.
+The (L)GPL licenses of these components require that the binary is released under
+GPL license.
 
 
-| Module | Licence | Purpose |
-==============================
+| Module | Version | Licence | Purpose |
+========================================
 | Python | PSF     |
 | [numpy](https://numpy.org/) | BSD | Base package for fast array numerics|
-| [scipy](https://www.scipy.org/)  | BSD | | Library for scientific computing |
+| [scipy](https://scipy.org/)  | BSD | | Library for scientific computing |
 | [numexpr](https://github.com/pydata/numexpr) | MIT | Fast numerical array expression|
 | [matplotlib](https://matplotlib.org/) | PSF-based | Plotting library |
-| Qt5    | LPGL | Widget library (UI etc.) |
-| PyQt | GPL | Python wrapper for Qt5 |
+| [Qt5](https://qt.io/)  | LPGLv3 | Widget library (UI etc.) |
+| [PyQt](https://www.riverbankcomputing.com/software/pyqt/) | GPLv3 | Python bindings for Qt5 |
+| [Markdown](https://github.com/Python-Markdown/markdown)| | BSD | Python implementation of Markdown|
 | docutils | |
 | migen |  | Fixpoint simulation and synthesis |
 | nMigen |  | Fixpoint simulation and synthesis |
 | mplcursors | | Interactive cursors |
 | pyInstaller | GPL 2.0  |Packager for distributing the binary |
+
+https://stackoverflow.com/questions/59914573/how-to-pass-on-python-variables-to-markdown-table
 
 https://velovix.github.io/post/lgpl-gpl-license-compliance-with-pyinstaller/
 
