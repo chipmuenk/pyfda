@@ -28,19 +28,20 @@ from distutils.version import LooseVersion
 # ================ Required Modules ============================
 # ==
 # == When one of the following imports fails, terminate the program
-from numpy import __version__ as V_NP
-from numpy import show_config
+V_NP = np.__version__
+V_NUM = numexpr.__version__
+from scipy import __version__ as V_SCI
+from matplotlib import __version__ as V_MPL
+from .compat import QT_VERSION_STR as V_QT
+from .compat import PYQT_VERSION_STR as V_PYQT
+
 # redirect stdio output of show_config to string
 f = io.StringIO()
 with redirect_stdout(f):
-    show_config()
+    np.show_config()
 INFO_NP = f.getvalue()
 
 logger.warning(INFO_NP)
-
-from scipy import __version__ as V_SCI
-from matplotlib import __version__ as V_MPL
-from .compat import QT_VERSION_STR as V_QT # imports pyQt
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
