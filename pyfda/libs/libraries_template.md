@@ -24,12 +24,14 @@ Most of them have permissive BSDD-style licenses, i.e. MIT or PSF (Python Softwa
 with the notable exception of the Qt5 and PyQt libraries and the pyInstaller itself. 
 The (L)GPL licenses of these components require an 
 [(L)GPL compliant license](https://velovix.github.io/post/lgpl-gpl-license-compliance-with-pyinstaller/), 
-hence, the pyFDA binary is distributed with a GPL license.
+hence, the pyFDA binary is distributed with a GPL license. 
+
+See also [wikipedia](https://en.wikipedia.org/wiki/License_compatibility) on license compatibility.
 
 
 | Module | Version | Licence | Purpose |
 | :------ | :------- | :------- | :------- |
-| [Python](https://www.python.org/) | {V_PY}   | PSF | | 
+| [Python](https://www.python.org/) | {V_PY}&emsp;  | PSF | | 
 | [numpy](https://numpy.org/) | {V_NP} | BSD | Base package for fast array numerics |
 | [scipy](https://scipy.org/) | {V_SCI} | BSD | Library for scientific computing |
 | [numexpr](https://github.com/pydata/numexpr) | {V_NUM} | MIT | Fast numerical array expression|
@@ -39,11 +41,11 @@ hence, the pyFDA binary is distributed with a GPL license.
 | [Markdown](https://github.com/Python-Markdown/markdown) |  {V_MD} | BSD | Python implementation of Markdown|
 | [docutils](https://docutils.sourceforge.io) | {V_DOC} | GPLv3 a.o. | Convert plain text to markup formats |
 | migen | | | Fixpoint simulation and synthesis |
-| nMigen | {V_NMG} | | Fixpoint simulation and synthesis |
-| [mplcursors](https://github.com/anntzer/mplcursors)&emsp: | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
+| [nMigen](https://github.com/nmigen/nmigen) | {V_NMG} |  BSD-2 | Fixpoint simulation and synthesis |
+| [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
 | pyInstaller | | GPL 2.0  |Packager for distributing the binary |
 
 
-Icons (except the pyFDA icon) are taken from the ["Open Iconic"](https://useiconic.com/open/)Icons collection 
+Icons (except the pyFDA icon itself) are taken from the ["Open Iconic"](https://useiconic.com/open/) collection 
 under MIT license.
 
