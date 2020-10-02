@@ -184,8 +184,10 @@ def mod_version(mod = None):
         # by evaluating strings like "f' ... {V_MPL} ...". This is taken from
         # https://stackoverflow.com/questions/42497625/how-to-postpone-defer-the-evaluation-of-f-strings
         for l in v_l:
-            v_md += eval(f"f'{l}'")
-
+            try:
+                v_md += eval(f"f'{l}'")
+            except NameError: # encountered undefined {V_...}
+                pass # simply drop the line
         return v_md
 
 #        
