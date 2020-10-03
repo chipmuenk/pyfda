@@ -44,6 +44,12 @@ with redirect_stdout(f):
     np.show_config()
 INFO_NP = f.getvalue()
 
+if 'mkl_info' in INFO_NP:
+    MKL = " (mkl)"
+else:
+    MKL = ""
+    
+
 logger.warning(INFO_NP)
 
 
@@ -59,59 +65,67 @@ __all__ = ['cmp_version', 'mod_version',
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
 V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
-MODULES = {}
-MODULES.update({'python': V_PY})
-MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
-MODULES.update({'Qt5': {'v':V_QT,'lic':'LPGL','url':'https://qt.io/', 'p':'Widget library (UI etc.)'}})
-MODULES.update({'pyqt': V_PYQT})
-MODULES.update({'numpy': {'v':V_NP, 'lic':'BSD', 'url':'https://numpy.org/'}})
-MODULES.update({'numexpr': {'v':V_NUM, 'lic':'MIT', 'url':'https://github.com/pydata/numexpr'}})
-MODULES.update({'scipy': {'v':V_SCI, 'lic':'BSD', 'url':'https://scipy.org/'}})
-MODULES.update({'markdown':{'v':V_MD}})
+
+# ================ Required Modules ============================
+MODULES = {'python':       {'V_PY':V_PY},
+           'matplotlib':   {'V_MPL':V_MPL},
+           'Qt5':          {'V_QT':V_QT},
+           'pyqt':         {'V_PYQT':V_PYQT},
+           'numpy':        {'V_NP':V_NP},
+           'numexpr':      {'V_NUM':V_NUM},
+           'scipy':        {'V_SCI':V_SCI + MKL},
+           'markdown':     {'V_MD':V_MD}
+           }
 
 # ================ Optional Modules ============================
 
 try:
     from pyfixp import __version__ as V_FX
-    MODULES.update('pyfixp', {'v':V_FX})
+    MODULES.update({'pyfixp' : {'V_FX':V_FX}})
 except ImportError:
-    MODULES.update({'pyfixp': {'v':None}})
+    MODULES.update({'pyfixp': {'V_FX':None}})
     
 try:
     import migen
-    MODULES.update({'migen': {'v':'installed'}})
+    MODULES.update({'migen': {'V_MG':'installed'}})
 except (ImportError,SyntaxError):
-    MODULES.update({'migen':{'v':None}})
+    MODULES.update({'migen':{'V_MG':None}})
 
 try:
     from nmigen import __version__ as V_NMG
-    MODULES.update({'nMigen': {'v':V_NMG}})
+    MODULES.update({'nMigen': {'V_NMG':V_NMG}})
 except ImportError:
     pass
 
 try:
     from docutils import __version__ as V_DOC
-    MODULES.update({'docutils': {'v':V_DOC}})
+    MODULES.update({'docutils': {'V_DOC':V_DOC}})
 except ImportError:
     pass
 
 try:
     from mplcursors import __version__ as V_CUR
-    MODULES.update({'mplcursors': {'v':V_CUR}})
+    MODULES.update({'mplcursors': {'V_CUR':V_CUR}})
 except ImportError:
     pass
 
 try:
-    from xlwt import __version__ as v
-    MODULES.update({'xlwt': {'v':v}})
+    from xlwt import __version__ as V_XLWT
+    MODULES.update({'xlwt': {'V_XLWT':V_XLWT}})
 except ImportError:
     pass
 
 try:
-    from xlsxwriter import __version__ as v
-    MODULES.update({'xlsx': {'v':v}})
+    from xlsxwriter import __version__ as V_XLSX
+    MODULES.update({'xlsx': {'V_XLSX':V_XLSX}})
 except ImportError:
     pass
+
+# Remove module names as keys and return a dict with items like
+#  {'V_MPL':'3.3.1', ...}
+MOD_VERSIONS = {}
+for k in MODULES.keys():
+    MOD_VERSIONS.update(MODULES[k])
 
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
@@ -146,16 +160,20 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in MODULES or not MODULES[mod]['v']:
+        if mod not in MODULES or not MODULES[mod].values(): 
             return -2
-        elif LooseVersion(MODULES[mod]['v']) > LooseVersion(version):
+        else:
+            inst_ver = list(MODULES[mod].values())[0] # get dict value without knowing the key
+
+        if LooseVersion(inst_ver) > LooseVersion(version):
             return 1
-        elif  LooseVersion(MODULES[mod]['v']) == LooseVersion(version):
+        elif  LooseVersion(inst_ver) == LooseVersion(version):
             return 0
         else:
             return -1
-    except TypeError:
-        logger.warning("Version number of {0} could not be determined.".format(mod))
+    except (TypeError, KeyError) as e:
+        logger.warning("Version number of {0} could not be determined.\n"
+                       "({1})".format(mod,e))
         return -1
 
 
@@ -167,58 +185,23 @@ def mod_version(mod = None):
     """
     if mod:
         if mod in MODULES:
-            return LooseVersion(MODULES[mod]['v'])
+            return LooseVersion(list(MODULES[mod].values())[0])
         else:
             return None
     else:
- 
         v_md = ""                             
         with open(os.path.join(dirs.INSTALL_DIR, "libs","libraries_template.md"), 'r') as f:
-            v = f.read()
-
-        # convert Markdown File to HTML
-        v_html = markdown.markdown(v, output_format='html5', extensions=['tables'])
-        v_l = v_html.splitlines() # split at linebreaks
-
-        # Replace variables e.g. {V_MPL} in the HTML file by the corresponding version numbers
-        # by evaluating strings like "f' ... {V_MPL} ...". This is taken from
-        # https://stackoverflow.com/questions/42497625/how-to-postpone-defer-the-evaluation-of-f-strings
-        for l in v_l:
+            # return a list, split at linebreaks while keeping linebreaks    
+            v = f.read().splitlines(True) 
+        
+        for l in v:
             try:
-                v_md += eval(f"f'{l}'")
-            except NameError: # encountered undefined {V_...}
-                pass # simply drop the line
-        return v_md
+                v_md += l.format(**MOD_VERSIONS) # evaluate {V_...} from MOD_VERSIONS entries
+            except (KeyError) as e: # encountered undefined {V_...}
+                logger.warning("KeyError: {0}".format(e)) # simply drop the line
 
-#        
-# =============================================================================
-#         v = ""
-#         keys = sorted(list(MODULES.keys()))
-#         for k in keys:
-#             try:
-#                 mod = '<a href="{0}">{1}</a>'.format(MODULES[k]['url'], k)
-#             except (KeyError, TypeError):
-#                 mod =  k
-#                 
-#             try:
-#                 lic = '<td>{0}</td>'.format(MODULES[k]['lic'])
-#             except (KeyError, TypeError):
-#                 lic ='<td></td>'
-#                 
-#             if 'v' in MODULES[k]:
-#                 ver = MODULES[k]['v']
-#             else:
-#                 ver = MODULES[k]
-#                 
-#             if ver:
-#                 ver = LooseVersion(ver)
-#             else:
-#                 ver = 'missing'
-#                                    
-#             v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, ver)
-#             v += lic + "</tr>"
-#         return v
-# =============================================================================
+        v_html = markdown.markdown(v_md, output_format='html5', extensions=['tables'])
+        return v_html
 
 #------------------------------------------------------------------------------
 logger.info(mod_version())
