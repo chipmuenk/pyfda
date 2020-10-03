@@ -71,15 +71,8 @@ def about_window(self):
     versions_string =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}<br>"
                 .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
 
-#         dir_string = ("<table><th style='font-size:large;'>Imported Modules</th>"
-#                           "<tr><td>&nbsp;&emsp;{0}</td></tr>"\
-#                           .format( pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
 
-    dir_string = ("<table><th style='font-size:large;'>Software Versions</th>")
-    dir_string += pyfda_lib.mod_version()
-    dir_string += "</table>"
-
-    dir_string += ("<table><th style='font-size:large;'>Directories</th>"
+    dir_string =    ("<h3>Directories</h3><table>"
                     "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
                     "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
                      "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
@@ -93,7 +86,7 @@ def about_window(self):
                     "</table>"\
                    .format(dirs.USER_LOG_CONF_DIR_FILE, dirs.LOG_DIR_FILE))
 
-    about_string = info_string + versions_string + dir_string
+    about_string = info_string + versions_string + dir_string + pyfda_lib.mod_version()
 
     #msg = QMessageBox.about(self, "About pyFDA", info_string)
     butClipboard = QPushButton(self)
