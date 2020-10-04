@@ -21,6 +21,7 @@ import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_io_lib import load_filter, save_filter
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
@@ -195,6 +196,8 @@ class Input_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx_local.connect(self.process_sig_rx_local)
+        self.butLoadFilt.clicked.connect(lambda: load_filter(self))
+        self.butSaveFilt.clicked.connect(lambda: save_filter(self))        
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
@@ -374,6 +377,8 @@ class Input_Specs(QWidget):
         When <QUIT> button is pressed, send 'quit_program'
         """
         self.sig_tx.emit({'sender':__name__, 'quit_program':''})
+        
+
 
 #------------------------------------------------------------------------------
 
