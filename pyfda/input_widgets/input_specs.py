@@ -101,6 +101,24 @@ class Input_Specs(QWidget):
         """
         Construct User Interface from all input subwidgets
         """
+        self.butLoadFilt = QPushButton("LOAD FILTER", self)
+        self.butLoadFilt.setToolTip("Load filter from disk")
+        self.butSaveFilt = QPushButton("SAVE FILTER", self)
+        self.butSaveFilt.setToolTip("Save filter todisk")
+        layHButtons1 = QHBoxLayout()
+        layHButtons1.addWidget(self.butLoadFilt)  # <Load Filter> button
+        layHButtons1.addWidget(self.butSaveFilt)  # <Save Filter> button
+        layHButtons1.setContentsMargins(*params['wdg_margins'])
+        
+        self.butDesignFilt = QPushButton("DESIGN FILTER", self)
+        self.butDesignFilt.setToolTip("Design filter with chosen specs")
+        self.butQuit = QPushButton("Quit", self)
+        self.butQuit.setToolTip("Exit pyfda tool")
+        layHButtons2 = QHBoxLayout()
+        layHButtons2.addWidget(self.butDesignFilt)  # <Design Filter> button
+        layHButtons2.addWidget(self.butQuit)        # <Quit> button
+        layHButtons2.setContentsMargins(*params['wdg_margins'])
+
         # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
@@ -149,21 +167,13 @@ class Input_Specs(QWidget):
         layVFrm.addWidget(self.frmMsg)
         layVFrm.setContentsMargins(*params['wdg_margins'])
 
-        self.butDesignFilt = QPushButton("DESIGN FILTER", self)
-        self.butDesignFilt.setToolTip("Design filter with chosen specs")
-        self.butQuit = QPushButton("Quit", self)
-        self.butQuit.setToolTip("Exit pyfda tool")
-        layHButtons = QHBoxLayout()
-        layHButtons.addWidget(self.butDesignFilt)  # <Design Filter> button
-        layHButtons.addWidget(self.butQuit)        # <Quit> button
-        layHButtons.setContentsMargins(*params['wdg_margins'])
-
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout(self)
+        layVMain.addLayout(layHButtons1)  # <Load> & <Save> buttons        
         layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)         
-        layVMain.addLayout(layHButtons)   # <Design> & <Quit> buttons
+        layVMain.addLayout(layHButtons2)  # <Design> & <Quit> buttons
         layVMain.addWidget(self.f_units)  # Frequency units
         layVMain.addWidget(self.t_specs)  # Target specs
         layVMain.addWidget(self.f_specs)  # Freq. specifications
