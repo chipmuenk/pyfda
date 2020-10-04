@@ -47,7 +47,7 @@ class Input_Specs(QWidget):
 
     def process_sig_rx_local(self, dict_sig=None):
         """
-        Flag signals coming in from local subwidgets with `propagate=True` before 
+        Flag signals coming in from local subwidgets with `propagate=True` before
         proceeding with processing in `process_sig_rx`.
         """
         self.process_sig_rx(dict_sig, propagate=True)
@@ -55,9 +55,9 @@ class Input_Specs(QWidget):
     def process_sig_rx(self, dict_sig=None, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
-        
+
         All signals terminate here unless the flag `propagate=True`.
-        
+
         The sender name of signals coming in from local subwidgets is changed to
         its parent widget (`input_specs`) to prevent infinite loops.
 
@@ -88,14 +88,14 @@ class Input_Specs(QWidget):
                 """
                 self.sel_fil.load_dict() # update select_filter widget
             # Pass new filter data from the global filter dict & set button = "ok"
-            self.load_dict() 
+            self.load_dict()
 
         if propagate:
             # local signals are propagated with the name of this widget,
             # global signals terminate here
             dict_sig.update({'sender':__name__})
             self.sig_tx.emit(dict_sig)
-        
+
 
     def _construct_UI(self):
         """
@@ -109,7 +109,7 @@ class Input_Specs(QWidget):
         layHButtons1.addWidget(self.butLoadFilt)  # <Load Filter> button
         layHButtons1.addWidget(self.butSaveFilt)  # <Save Filter> button
         layHButtons1.setContentsMargins(*params['wdg_margins'])
-        
+
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butDesignFilt.setToolTip("Design filter with chosen specs")
         self.butQuit = QPushButton("Quit", self)
@@ -124,12 +124,12 @@ class Input_Specs(QWidget):
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
         self.sel_fil.sig_tx.connect(self.sig_rx_local)
-        
+
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
         self.f_units.sig_tx.connect(self.sig_rx_local)
-        
+
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
         # Activating the "Sort" button emits 'view_changed'?specs_changed'?, requiring
@@ -171,8 +171,8 @@ class Input_Specs(QWidget):
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout(self)
-        layVMain.addLayout(layHButtons1)  # <Load> & <Save> buttons        
-        layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)         
+        layVMain.addLayout(layHButtons1)  # <Load> & <Save> buttons
+        layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
         layVMain.addLayout(layHButtons2)  # <Design> & <Quit> buttons
         layVMain.addWidget(self.f_units)  # Frequency units
         layVMain.addWidget(self.t_specs)  # Target specs
@@ -193,8 +193,8 @@ class Input_Specs(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------        
-        self.sig_rx_local.connect(self.process_sig_rx_local)  
+        #----------------------------------------------------------------------
+        self.sig_rx_local.connect(self.process_sig_rx_local)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
@@ -291,15 +291,15 @@ class Input_Specs(QWidget):
         self.a_specs.load_dict() # magnitude specs with unit
         self.w_specs.load_dict() # weight specification
         self.t_specs.load_dict() # target specs
-        
-        fb.design_filt_state = "ok"            
+
+        fb.design_filt_state = "ok"
         qstyle_widget(self.butDesignFilt, "ok")
 
 #------------------------------------------------------------------------------
     def start_design_filt(self):
         """
         Start the actual filter design process:
-            
+
         - store the entries of all input widgets in the global filter dict.
         - call the design method, passing the whole dictionary as the
           argument: let the design method pick the needed specs
@@ -354,7 +354,7 @@ class Input_Specs(QWidget):
 #                     str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
 #                     str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
 #                     pformat(fb.fil[0]['zpk']))
-# 
+#
 # =============================================================================
         except Exception as e:
             if ('__doc__' in str(e)):
