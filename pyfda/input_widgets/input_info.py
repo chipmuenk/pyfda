@@ -80,6 +80,23 @@ class Input_Info(QWidget):
         self.butFiltPerf.setCheckable(True)
         self.butFiltPerf.setChecked(True)
         self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
+        
+        self.butDebug = QPushButton(self)
+        self.butDebug.setText("Debug")
+        self.butDebug.setCheckable(True)
+        self.butDebug.setChecked(False)
+        self.butDebug.setToolTip("Show debugging options.")
+
+        self.butVer = QPushButton("Versions", self)  # pop-up "About" window
+        self.butLic = QPushButton("License", self) # pop-up Licensing info
+        layHControls1 = QHBoxLayout()
+        layHControls1.addWidget(self.butFiltPerf)
+        #layHControls1.addStretch(1)
+        layHControls1.addWidget(self.butVer)
+        #layHControls1.addStretch(1)
+        layHControls1.addWidget(self.butLic)
+        #layHControls1.addStretch(1)
+        layHControls1.addWidget(self.butDebug)
 
         self.butDocstring = QPushButton("Doc$", self)
         self.butDocstring.setCheckable(True)
@@ -102,26 +119,24 @@ class Input_Info(QWidget):
         self.butFiltTree.setCheckable(True)
         self.butFiltTree.setChecked(False)
 
-        layHControls1 = QHBoxLayout()
-        layHControls1.addWidget(self.butFiltPerf)
-        layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butDocstring)
-        layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butRichText)
-        layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butFiltDict)
-        layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butFiltTree)
-
-        self.butVer = QPushButton("Versions", self)  # pop-up "About" window
-        self.butLic = QPushButton("License", self) # pop-up Licensing info
         layHControls2 = QHBoxLayout()
-        layHControls2.addWidget(self.butVer)
-        layHControls2.addWidget(self.butLic)
+        layHControls2.addWidget(self.butDocstring)
+        #layHControls2.addStretch(1)
+        layHControls2.addWidget(self.butRichText)
+        #layHControls2.addStretch(1)
+        layHControls2.addWidget(self.butFiltDict)
+        #layHControls2.addStretch(1)
+        layHControls2.addWidget(self.butFiltTree)
+        
+        self.frmControls2 = QFrame(self)
+        self.frmControls2.setLayout(layHControls2)
+        self.frmControls2.setVisible(self.butDebug.isChecked())
+        self.frmControls2.setContentsMargins(0,0,0,0)
+        #self.frmControls2.set
 
         layVControls = QVBoxLayout()
         layVControls.addLayout(layHControls1)
-        layVControls.addLayout(layHControls2)
+        layVControls.addWidget(self.frmControls2)
 
         self.frmMain = QFrame(self)
         self.frmMain.setLayout(layVControls)
@@ -166,12 +181,21 @@ class Input_Info(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.butFiltPerf.clicked.connect(self._show_filt_perf)
+        self.butVer.clicked.connect(lambda: about_window(self))
+        self.butDebug.clicked.connect(self._show_debug)
+        
         self.butFiltDict.clicked.connect(self._show_filt_dict)
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
 
-        self.butVer.clicked.connect(lambda: about_window(self))
+#------------------------------------------------------------------------------
+    def _show_debug(self):
+        """
+        Show / hide debug options depending on the state of the debug button
+        """
+        self.frmControls2.setVisible(self.butDebug.isChecked())
+
 
 #------------------------------------------------------------------------------
     def load_dict(self):
