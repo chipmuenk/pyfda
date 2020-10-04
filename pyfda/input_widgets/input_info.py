@@ -35,7 +35,7 @@ if mod_version('docutils') is not None:
     HAS_DOCUTILS = True
 else:
     HAS_DOCUTILS = False
-    
+
 classes = {'Input_Info':'Info'} #: Dict containing class name : display name
 
 class Input_Info(QWidget):
@@ -46,11 +46,11 @@ class Input_Info(QWidget):
 
     def __init__(self, parent):
         super(Input_Info, self).__init__(parent)
-        
+
         self.tab_label = 'Info'
         self.tool_tip = ("<span>Display the achieved filter specifications"
-                " and more info about the filter design algorithm.</span>")       
-        
+                " and more info about the filter design algorithm.</span>")
+
         self._construct_UI()
         self.load_dict()
 
@@ -71,7 +71,7 @@ class Input_Info(QWidget):
         """
         bfont = QFont()
         bfont.setBold(True)
-        
+
         # ============== UI Layout =====================================
         # widget / subwindow for filter infos
 #        self.butFiltPerf = QToolButton("H(f)", self)
@@ -80,7 +80,7 @@ class Input_Info(QWidget):
         self.butFiltPerf.setCheckable(True)
         self.butFiltPerf.setChecked(True)
         self.butFiltPerf.setToolTip("Display frequency response at test frequencies.")
-        
+
         self.butDebug = QPushButton(self)
         self.butDebug.setText("Debug")
         self.butDebug.setCheckable(True)
@@ -127,7 +127,7 @@ class Input_Info(QWidget):
         layHControls2.addWidget(self.butFiltDict)
         #layHControls2.addStretch(1)
         layHControls2.addWidget(self.butFiltTree)
-        
+
         self.frmControls2 = QFrame(self)
         self.frmControls2.setLayout(layHControls2)
         self.frmControls2.setVisible(self.butDebug.isChecked())
@@ -183,7 +183,7 @@ class Input_Info(QWidget):
         self.butFiltPerf.clicked.connect(self._show_filt_perf)
         self.butVer.clicked.connect(lambda: about_window(self))
         self.butDebug.clicked.connect(self._show_debug)
-        
+
         self.butFiltDict.clicked.connect(self._show_filt_dict)
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
@@ -254,7 +254,7 @@ class Input_Info(QWidget):
         Print filter properties in a table at frequencies of interest. When
         specs are violated, colour the table entry in red.
         """
-        
+
         antiC = False
 
         def _find_min_max(self, f_start, f_stop, unit = 'dB'):
@@ -282,7 +282,7 @@ class Input_Info(QWidget):
             H_abs = abs(H)
             H_max = max(H_abs)
             H_min = min(H_abs)
-            F_max = f[np.argmax(H_abs)] # find the frequency where H_abs 
+            F_max = f[np.argmax(H_abs)] # find the frequency where H_abs
             F_min = f[np.argmin(H_abs)] # becomes max resp. min
             if unit == 'dB':
                 H_max = 20*log10(H_max)
@@ -305,7 +305,7 @@ class Input_Info(QWidget):
                 aaA = aaA.conjugate()
 
             f_S  = fb.fil[0]['f_S']
-    
+
             f_lbls = []
             f_vals = []
             a_lbls = []
@@ -316,10 +316,10 @@ class Input_Info(QWidget):
             unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # fix this for the moment
             # construct pairs of corner frequency and corresponding amplitude
-            # labels in ascending frequency for each response type        
+            # labels in ascending frequency for each response type
             if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
                 if fb.fil[0]['rt'] == 'LP':
-                    f_lbls = ['F_PB', 'F_SB'] 
+                    f_lbls = ['F_PB', 'F_SB']
                     a_lbls = ['A_PB', 'A_SB']
                 elif fb.fil[0]['rt'] == 'HP':
                     f_lbls = ['F_SB', 'F_PB']
@@ -337,9 +337,9 @@ class Input_Info(QWidget):
 
             # Try to get lists of frequency / amplitude specs from the filter dict
             # that correspond to the f_lbls / a_lbls pairs defined above
-            # When one of the labels doesn't exist in the filter dict, delete 
+            # When one of the labels doesn't exist in the filter dict, delete
             # all corresponding amplitude and frequency entries.
-                err = [False] * len(f_lbls) # initialize error list  
+                err = [False] * len(f_lbls) # initialize error list
                 f_vals = []
                 a_targs = []
                 for i in range(len(f_lbls)):
@@ -368,11 +368,11 @@ class Input_Info(QWidget):
                         del a_lbls[i]
                         del a_targs[i]
                         del a_targs_dB[i]
-    
+
                 f_vals = np.asarray(f_vals) # convert to numpy array
-    
+
                 logger.debug("F_test_labels = %s" %f_lbls)
-                               
+
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
                 # add antiCausals if we have them
@@ -382,10 +382,10 @@ class Input_Info(QWidget):
                    a_test = a_test*ha
 
 
-            (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')    
-            # append frequencies and values for min. and max. filter reponse to 
+            (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')
+            # append frequencies and values for min. and max. filter reponse to
             # test vector
-            
+
             f_lbls += ['Min.','Max.']
             # QTableView does not support direct formatting, use QLabel
 
@@ -395,11 +395,11 @@ class Input_Info(QWidget):
             a_test = np.append(a_test, [H_min, H_max])
             # calculate response of test frequencies in dB
             a_test_dB = -20*log10(abs(a_test))
-            
+
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR') for dB <-> lin conversion
 #            unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # make this fixed for the moment
-    
+
             # build a list with the corresponding target specs:
             a_targs_pass = []
             eps = 1e-3
@@ -408,22 +408,22 @@ class Input_Info(QWidget):
                     a_targs_pass.append((a_test_dB[i] - a_targs_dB[i])< eps)
                     a_test[i] = 1 - abs(a_test[i])
                 elif 'SB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i]) 
+                    a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i])
                 else:
                     a_targs_pass.append(True)
-    
+
             self.targs_spec_passed = np.all(a_targs_pass)
-            
-            logger.debug("H_targ = {0}\n" 
+
+            logger.debug("H_targ = {0}\n"
                 "H_test = {1}\n"
                 "H_test_dB = {2}\n"
-                "F_test = {3}\n" 
-                "H_targ_pass = {4}\n" 
-                "passed: {5}\n".format(a_targs,  a_test,  a_test_dB, f_vals, a_targs_pass,self.targs_spec_passed)) 
-    
+                "F_test = {3}\n"
+                "H_targ_pass = {4}\n"
+                "passed: {5}\n".format(a_targs,  a_test,  a_test_dB, f_vals, a_targs_pass,self.targs_spec_passed))
+
             self.tblFiltPerf.setRowCount(len(a_test)) # number of table rows
             self.tblFiltPerf.setColumnCount(5) # number of table columns
-    
+
             self.tblFiltPerf.setHorizontalHeaderLabels([
             'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'Spec\n(dB)', '|H(f)|\n(dB)', 'Spec', '|H(f)|'] )
             self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
@@ -435,15 +435,15 @@ class Input_Info(QWidget):
                     self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%.3e'%(a_targs[row]))))
                 else:
                     self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.4f'%(a_targs[row]))))
-                if a_test[row] < 0.01:    
+                if a_test[row] < 0.01:
                     self.tblFiltPerf.setItem(row,4,QTableWidgetItem(str('%.3e'%(abs(a_test[row])))))
                 else:
                     self.tblFiltPerf.setItem(row,4,QTableWidgetItem(str('%.4f'%(abs(a_test[row])))))
-                    
+
                 if not a_targs_pass[row]:
                     self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
                     self.tblFiltPerf.item(row,3).setBackground(QtGui.QColor('red'))
-    
+
             self.tblFiltPerf.resizeColumnsToContents()
             self.tblFiltPerf.resizeRowsToContents()
 
@@ -470,7 +470,7 @@ class Input_Info(QWidget):
         dictstr = pprint.pformat(ftree_sorted, indent = 4)
 #        dictstr = pprint.pformat(fb.fil[0])
         self.txtFiltTree.setText(dictstr)
-        
+
 
 #------------------------------------------------------------------------------
 
@@ -483,7 +483,7 @@ if __name__ == '__main__':
     app.setStyleSheet(rc.qss_rc)
     mainw = Input_Info(None)
 
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())
