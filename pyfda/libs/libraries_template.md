@@ -28,8 +28,9 @@ See also [wikipedia](https://en.wikipedia.org/wiki/License_compatibility) on lic
 | [migen](https://github.com/m-labs/migen) | {V_MG} | BSD-2 | Fixpoint simulation and synthesis |
 | [nMigen](https://github.com/nmigen/nmigen) | {V_NMG} |  BSD-2 | Fixpoint simulation and synthesis |
 | [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
-| [pyInstaller](https://www.pyinstaller.org/) | 4.0 | GPL 2.0  | Packager for creating the binary (not part of the binary)|
+| [pyInstaller](https://www.pyinstaller.org/) | 4.0 | GPL 2.0  | Packager for creating the binary*  |
 
+* The pyFDA binary only contains the bootloader which has a permissive license.
 
 
 
