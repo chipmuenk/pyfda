@@ -26,7 +26,7 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import lin2unit, mod_version
-from pyfda.input_widgets.input_info_about import about_window
+from pyfda.input_widgets.input_info_about import AboutWindow#about_window
 from pyfda.pyfda_rc import params
 # TODO: Passband and stopband info should show min / max values for each band
 
@@ -181,13 +181,19 @@ class Input_Info(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.butFiltPerf.clicked.connect(self._show_filt_perf)
-        self.butVer.clicked.connect(lambda: about_window(self))
+#        self.butVer.clicked.connect(lambda: about_window(self))
+        self.butVer.clicked.connect(self._about_window)
         self.butDebug.clicked.connect(self._show_debug)
 
         self.butFiltDict.clicked.connect(self._show_filt_dict)
         self.butFiltTree.clicked.connect(self._show_filt_tree)
         self.butDocstring.clicked.connect(self._show_doc)
         self.butRichText.clicked.connect(self._show_doc)
+
+    def _about_window(self):
+        self.about_widget = AboutWindow(self) # important: Handle must be class attribute
+        #self.opt_widget.show() # modeless dialog, i.e. non-blocking
+        self.about_widget.exec_() # modal dialog (blocking)
 
 #------------------------------------------------------------------------------
     def _show_debug(self):
