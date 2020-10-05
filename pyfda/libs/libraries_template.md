@@ -1,15 +1,18 @@
-###External modules and libraries
-
+### Licenses
 pyFDA source code is published at the Github repository [chipmuenk/pyfda](https://github.com/chipmuenk/pyfda), 
 it is licensed under the permissive MIT license.
 
-The pyFDA binary is distributed with a GPL license as it bundles some components with (L)GPL licenses (e.g. Qt5 and PyQt libraries), 
+Icons (except the pyFDA icon itself) are taken from the ["Open Iconic"](https://useiconic.com/open/) collection 
+under MIT license.
+
+The pyFDA binary is published under a GPL license as it bundles some components with (L)GPL licenses (e.g. Qt5 and PyQt libraries), 
 requiring an 
 [(L)GPL compliant license](https://velovix.github.io/post/lgpl-gpl-license-compliance-with-pyinstaller/), 
 
 
 See also [wikipedia](https://en.wikipedia.org/wiki/License_compatibility) on license compatibility.
 
+### External modules and libraries
 
 | Module | Version | Licence | Purpose |
 | :------ | :------- | :------- | :------- |
@@ -25,9 +28,8 @@ See also [wikipedia](https://en.wikipedia.org/wiki/License_compatibility) on lic
 | [migen](https://github.com/m-labs/migen) | {V_MG} | BSD-2 | Fixpoint simulation and synthesis |
 | [nMigen](https://github.com/nmigen/nmigen) | {V_NMG} |  BSD-2 | Fixpoint simulation and synthesis |
 | [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
-| [pyInstaller](https://www.pyinstaller.org/) | 4.0 | GPL 2.0  |Packager for distributing the binary |
+| [pyInstaller](https://www.pyinstaller.org/) | 4.0 | GPL 2.0  | Packager for creating the binary (not part of the binary)|
 
 
-Icons (except the pyFDA icon itself) are taken from the ["Open Iconic"](https://useiconic.com/open/) collection 
-under MIT license.
+
 
