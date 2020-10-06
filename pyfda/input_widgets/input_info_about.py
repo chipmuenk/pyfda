@@ -142,6 +142,17 @@ class AboutWindow(QDialog):
         butClose.setToolTip("Close Window.")
         layHButtons = QHBoxLayout()
         #layHButtons.addWidget(pixIcon)
+        
+        butLicMIT = QPushButton(self)
+        butLicMIT.setText("MIT License")        
+        butLicMIT.setToolTip("MIT License for pyFDA source code")
+        
+        butLicGPLv3 = QPushButton(self)
+        butLicGPLv3.setText("GPLv3 License")        
+        butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
+
+        layHButtons.addWidget(butLicMIT)
+        layHButtons.addWidget(butLicGPLv3)
         layHButtons.addStretch(5)
         layHButtons.addWidget(butClipboard)
         layHButtons.addWidget(butClose)
