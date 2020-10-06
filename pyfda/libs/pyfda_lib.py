@@ -190,7 +190,7 @@ def mod_version(mod = None):
             return None
     else:
         v_md = ""                             
-        with open(os.path.join(dirs.INSTALL_DIR, "libs","libraries_template.md"), 'r') as f:
+        with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
             # return a list, split at linebreaks while keeping linebreaks    
             v = f.read().splitlines(True) 
         

@@ -87,14 +87,14 @@ class Input_Info(QWidget):
         self.butDebug.setChecked(False)
         self.butDebug.setToolTip("Show debugging options.")
 
-        self.butVer = QPushButton("Versions", self)  # pop-up "About" window
-        self.butLic = QPushButton("License", self) # pop-up Licensing info
+        self.butAbout = QPushButton("About", self)  # pop-up "About" window
+        #self.butLic = QPushButton("License", self) # pop-up Licensing info
         layHControls1 = QHBoxLayout()
         layHControls1.addWidget(self.butFiltPerf)
         #layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butVer)
+        layHControls1.addWidget(self.butAbout)
         #layHControls1.addStretch(1)
-        layHControls1.addWidget(self.butLic)
+        #layHControls1.addWidget(self.butLic)
         #layHControls1.addStretch(1)
         layHControls1.addWidget(self.butDebug)
 
@@ -181,8 +181,7 @@ class Input_Info(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.butFiltPerf.clicked.connect(self._show_filt_perf)
-#        self.butVer.clicked.connect(lambda: about_window(self))
-        self.butVer.clicked.connect(self._about_window)
+        self.butAbout.clicked.connect(self._about_window)
         self.butDebug.clicked.connect(self._show_debug)
 
         self.butFiltDict.clicked.connect(self._show_filt_dict)

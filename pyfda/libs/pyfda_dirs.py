@@ -12,7 +12,7 @@ Upon import, all the variables are set.
 This is imported first by pyfdax.
 """
 
-import os
+import os, sys
 import shutil
 import platform
 import tempfile
@@ -132,6 +132,8 @@ def create_conf_files():
             print(e)
 
 #==============================================================================
+# is the software running in a bundled PyInstaller environment?
+PYINSTALLER = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
 OS     = platform.system()
 OS_VER = platform.release()

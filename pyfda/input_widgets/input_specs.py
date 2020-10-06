@@ -109,7 +109,7 @@ class Input_Specs(QWidget):
         layHButtons1 = QHBoxLayout()
         layHButtons1.addWidget(self.butLoadFilt)  # <Load Filter> button
         layHButtons1.addWidget(self.butSaveFilt)  # <Save Filter> button
-        layHButtons1.setContentsMargins(*params['wdg_margins'])
+        layHButtons1.setContentsMargins(*params['wdg_margins_spc'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butDesignFilt.setToolTip("Design filter with chosen specs")
