@@ -175,8 +175,12 @@ class AboutWindow(QDialog):
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layGButtons)
         layVMain.addWidget(self.txtAboutBrowser)
+
         layVMain.setContentsMargins(*params['wdg_margins_spc'])
         self.setLayout(layVMain)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.resize(0,0)
+        self.adjustSize()
     
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.collect_about_string()))
         butClose.clicked.connect(self.close)
