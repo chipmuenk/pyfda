@@ -254,20 +254,23 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
     import sys
 
-    class Test_button(QWidget):
-        """Create a widget with a button"""
-        def __init__(self, parent):
-            super(Test_button, self).__init__(parent)
-            self.butAbout = QPushButton("About", self)
-            layVIO = QVBoxLayout()
-            layVIO.addWidget(self.butAbout) # pop-up "About" window
-            self.setLayout(layVIO)
-
-            self.butAbout.clicked.connect(lambda: about_window(self))
-
+# =============================================================================
+#     class Test_button(QWidget):
+#         """Create a widget with a button"""
+#         def __init__(self, parent):
+#             super(Test_button, self).__init__(parent)
+#             
+#             self.butAbout = QPushButton("About", self)
+#             layVIO = QVBoxLayout()
+#             layVIO.addWidget(self.butAbout) # pop-up "About" window
+#             self.setLayout(layVIO)
+# 
+#             self.butAbout.clicked.connect(lambda: about_window(self))
+# 
+# =============================================================================
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = Test_button(None)
+    mainw = AboutWindow(None) # Test_button
 
     app.setActiveWindow(mainw)
     mainw.show()
