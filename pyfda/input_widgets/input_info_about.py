@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 import markdown
 
 from pyfda.libs.compat import (Qt, QWidget, QPushButton, QFont, QFrame, QDialog,
-                      QVBoxLayout, QHBoxLayout, QMessageBox, QIcon, QPixmap, QTextBrowser)
+                      QVBoxLayout, QHBoxLayout, QMessageBox, QIcon, QPixmap, 
+                      QSizePolicy, QTextBrowser, QGridLayout)
 
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 import pyfda.version as version
@@ -140,8 +141,6 @@ class AboutWindow(QDialog):
         butClose = QPushButton(self)
         butClose.setText("Close")
         butClose.setToolTip("Close Window.")
-        layHButtons = QHBoxLayout()
-        #layHButtons.addWidget(pixIcon)
         
         butLicMIT = QPushButton(self)
         butLicMIT.setText("MIT License")        
@@ -151,12 +150,22 @@ class AboutWindow(QDialog):
         butLicGPLv3.setText("GPLv3 License")        
         butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
 
-        layHButtons.addWidget(butLicMIT)
-        layHButtons.addWidget(butLicGPLv3)
-        layHButtons.addStretch(5)
-        layHButtons.addWidget(butClipboard)
-        layHButtons.addWidget(butClose)
-        
+
+        layGButtons = QGridLayout()
+        layGButtons.addWidget(butLicMIT, 0,0)
+        layGButtons.addWidget(butLicGPLv3,0,1)
+        layGButtons.addWidget(butClipboard,0,2)
+        layGButtons.addWidget(butClose,0,3)
+# =============================================================================
+#         layHButtons = QHBoxLayout()
+#         #layHButtons.addWidget(pixIcon)
+#         layHButtons.addWidget(butLicMIT)
+#         layHButtons.addWidget(butLicGPLv3)
+#         layHButtons.addStretch(1)
+#         layHButtons.addWidget(butClipboard)
+#         layHButtons.addWidget(butClose)
+#         
+# =============================================================================
         # butClipboard.adjustSize()
         # butClipboard.setFixedSize(self.checkLayout.sizeHint())
         self.txtAboutBrowser = QTextBrowser(self)
@@ -164,8 +173,8 @@ class AboutWindow(QDialog):
         
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
+        layVMain.addLayout(layGButtons)
         layVMain.addWidget(self.txtAboutBrowser)
-        layVMain.addLayout(layHButtons)
         layVMain.setContentsMargins(*params['wdg_margins_spc'])
         self.setLayout(layVMain)
     
