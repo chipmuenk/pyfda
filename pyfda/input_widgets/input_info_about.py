@@ -35,6 +35,7 @@ class AboutWindow(QDialog):
     def __init__(self, parent):
         super(AboutWindow, self).__init__(parent)
         self.setWindowTitle("About pyFDA")
+        self.collect_info()
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
@@ -55,8 +56,27 @@ class AboutWindow(QDialog):
             my_string = my_string.replace(k, v)
         fb.clipboard.setText(my_string)
 
- 
-    def collect_about_string(self):
+#------------------------------------------------------------------------------
+
+    def collect_info(self):
+        """
+        Collect information about version, imported modules in strings:
+            
+        `self.info_str` : General info, copyright, version, link to readthedocs
+                          This info is always visible.
+        
+        `self.about_str`: OS, user name, directories, versions of installed software
+        """
+
+
+        self.info_str = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
+        "Version {0} (c) 2013 - 2020 Christian Münker</b><br />"
+        "Design, analyze and synthesize digital filters. Docs @ "
+        "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
+        " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<br />"\
+        .format(version.__version__))
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
         user_dirs_str = ""
         if dirs.USER_DIRS:
@@ -64,13 +84,6 @@ class AboutWindow(QDialog):
                 user_dirs_str += d + '<br />'
         else:
             user_dirs_str = "None<br />"
-
-        info_str = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-        "Version {0} (c) 2013 - 2020 Christian Münker</b><br />"
-        "Design, analyze and synthesize digital filters. Docs @ "
-        "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
-        " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
-        .format(version.__version__))
             
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -104,14 +117,13 @@ class AboutWindow(QDialog):
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
         
         if False: #dirs.PYINSTALLER:
-            lic_str = ""
+            self.lic_str = ""
         else:
             with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r') as f:
-                lic_str = markdown.markdown(f.read(), output_format='html5', extensions=['tables'])
+                self.lic_str = markdown.markdown(f.read(), output_format='html5', extensions=['tables'])
 
-        about_string = info_str + os_str + dirs_str + ver_str + lic_str
+        self.about_str = os_str + dirs_str + ver_str
         logger.warning(os.path.abspath("."))
-        return about_string
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -149,22 +161,37 @@ class AboutWindow(QDialog):
 #         
 # =============================================================================
 
+        txtInfo = QLabel(self)
+        txtInfo.setText(self.info_str)
+        txtInfo.setFixedHeight(txtInfo.height()*1.2)
+        txtInfo.adjustSize()
+        
+        lblIcon = QLabel(self)
+        lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(txtInfo.height(), Qt.SmoothTransformation))
+        butClipboard.setFixedWidth(txtInfo.height())
+        
+        layHInfo = QHBoxLayout()
+        layHInfo.addWidget(lblIcon)
+        layHInfo.addWidget(txtInfo)
+
         self.txtAboutBrowser = QTextBrowser(self)
-        self.txtAboutBrowser.setText(self.collect_about_string())
+        self.txtAboutBrowser.setText(self.about_str + self.lic_str)
+        txtInfo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layGButtons)
+        layVMain.addLayout(layHInfo)
         layVMain.addWidget(self.txtAboutBrowser)
 
         layVMain.setContentsMargins(*params['wdg_margins_spc'])
         self.setLayout(layVMain)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.resize(0,0)
+        #self.resize(0,0)
         self.adjustSize()
         #QApplication.processEvents()
     
-        butClipboard.clicked.connect(lambda: self.to_clipboard(self.collect_about_string()))
+        butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
         butClose.clicked.connect(self.close)
 
 # =============================================================================
