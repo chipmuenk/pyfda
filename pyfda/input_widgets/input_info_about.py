@@ -103,6 +103,8 @@ class AboutWindow(QDialog):
     
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
         butAbout.clicked.connect(self.display_about_str)
+        butLicMIT.clicked.connect(self.display_MIT_lic)
+        butLicGPLv3.clicked.connect(self.display_GPL_lic)
         butClose.clicked.connect(self.close)
         
 #------------------------------------------------------------------------------
@@ -197,6 +199,22 @@ class AboutWindow(QDialog):
         """ Display general "About" info """
 
         self.txtDisplay.setText(self.about_str + self.lic_str)
+        
+#------------------------------------------------------------------------------
+
+    def display_MIT_lic(self):
+        """ Display MIT license """
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE.md"), 'r') as f:
+            lic_str = markdown.markdown(f.read(), output_format='html5')
+        self.txtDisplay.setText(lic_str)
+
+#------------------------------------------------------------------------------
+
+    def display_GPL_lic(self):
+        """ Display MIT license """
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPL3_0.html"), 'r') as f:
+            lic_str = f.read()        
+        self.txtDisplay.setText(lic_str)
 
 # =============================================================================
 if __name__ == '__main__':
