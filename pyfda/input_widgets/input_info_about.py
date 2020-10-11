@@ -39,6 +39,72 @@ class AboutWindow(QDialog):
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
+
+#------------------------------------------------------------------------------
+    def _construct_UI(self):
+        """ initialize the User Interface """
+
+        butClipboard = QPushButton(self)
+        butClipboard.setIcon(QIcon(':/clipboard.svg'))
+        butClipboard.setToolTip("Copy text to clipboard.")
+
+        butAbout = QPushButton(self)
+        butAbout.setText("About")
+        butAbout.setToolTip("Display 'About' info")
+
+        butLicMIT = QPushButton(self)
+        butLicMIT.setText("MIT License")        
+        butLicMIT.setToolTip("MIT License for pyFDA source code")
+        
+        butLicGPLv3 = QPushButton(self)
+        butLicGPLv3.setText("GPLv3 License")        
+        butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
+
+        butClose = QPushButton(self)
+        butClose.setText("Close")
+        butClose.setToolTip("Close Window.")
+
+        layGButtons = QGridLayout()
+        layGButtons.addWidget(butClipboard,0,0)
+        layGButtons.addWidget(butAbout, 0,1)       
+        layGButtons.addWidget(butLicMIT, 0,2)
+        layGButtons.addWidget(butLicGPLv3,0,3)
+        layGButtons.addWidget(butClose,0,4)
+
+        txtInfo = QLabel(self)
+        txtInfo.setText(self.info_str)
+        txtInfo.setFixedHeight(txtInfo.height()*1.2)
+        #txtInfo.adjustSize()
+
+        lblIcon = QLabel(self)
+        lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(txtInfo.height(), Qt.SmoothTransformation))
+        butClipboard.setFixedWidth(txtInfo.height())
+        
+        layHInfo = QHBoxLayout()
+        layHInfo.addWidget(lblIcon)
+        layHInfo.addWidget(txtInfo)
+
+        self.txtDisplay = QTextBrowser(self)
+        self.display_about_str()
+        self.txtDisplay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        layVMain = QVBoxLayout()
+        # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
+        layVMain.addLayout(layGButtons)
+        layVMain.addLayout(layHInfo)
+        layVMain.addWidget(self.txtDisplay)
+
+        layVMain.setContentsMargins(*params['wdg_margins_spc'])
+        self.setLayout(layVMain)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.resize(0,0)
+        self.adjustSize()
+        #QApplication.processEvents()
+    
+        butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
+        butAbout.clicked.connect(self.display_about_str)
+        butClose.clicked.connect(self.close)
+        
 #------------------------------------------------------------------------------
 
     def to_clipboard(self, my_string):
@@ -126,73 +192,11 @@ class AboutWindow(QDialog):
         logger.warning(os.path.abspath("."))
 
 #------------------------------------------------------------------------------
-    def _construct_UI(self):
-        """ initialize the User Interface """
-            
-        butClipboard = QPushButton(self)
-        butClipboard.setIcon(QIcon(':/clipboard.svg'))
-        butClipboard.setToolTip("Copy text to clipboard.")
-        
-        butClose = QPushButton(self)
-        butClose.setText("Close")
-        butClose.setToolTip("Close Window.")
-        
-        butLicMIT = QPushButton(self)
-        butLicMIT.setText("MIT License")        
-        butLicMIT.setToolTip("MIT License for pyFDA source code")
-        
-        butLicGPLv3 = QPushButton(self)
-        butLicGPLv3.setText("GPLv3 License")        
-        butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
 
-        layGButtons = QGridLayout()
-        layGButtons.addWidget(butClipboard,0,0)
-        layGButtons.addWidget(butLicMIT, 0,1)
-        layGButtons.addWidget(butLicGPLv3,0,2)
-        layGButtons.addWidget(butClose,0,3)
-# =============================================================================
-#         layHButtons = QHBoxLayout()
-#         #layHButtons.addWidget(pixIcon)
-#         layHButtons.addWidget(butLicMIT)
-#         layHButtons.addWidget(butLicGPLv3)
-#         layHButtons.addStretch(1)
-#         layHButtons.addWidget(butClipboard)
-#         layHButtons.addWidget(butClose)
-#         
-# =============================================================================
+    def display_about_str(self):
+        """ Display general "About" info """
 
-        txtInfo = QLabel(self)
-        txtInfo.setText(self.info_str)
-        txtInfo.setFixedHeight(txtInfo.height()*1.2)
-        txtInfo.adjustSize()
-        
-        lblIcon = QLabel(self)
-        lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(txtInfo.height(), Qt.SmoothTransformation))
-        butClipboard.setFixedWidth(txtInfo.height())
-        
-        layHInfo = QHBoxLayout()
-        layHInfo.addWidget(lblIcon)
-        layHInfo.addWidget(txtInfo)
-
-        self.txtAboutBrowser = QTextBrowser(self)
-        self.txtAboutBrowser.setText(self.about_str + self.lic_str)
-        txtInfo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        
-        layVMain = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
-        layVMain.addLayout(layGButtons)
-        layVMain.addLayout(layHInfo)
-        layVMain.addWidget(self.txtAboutBrowser)
-
-        layVMain.setContentsMargins(*params['wdg_margins_spc'])
-        self.setLayout(layVMain)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #self.resize(0,0)
-        self.adjustSize()
-        #QApplication.processEvents()
-    
-        butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
-        butClose.clicked.connect(self.close)
+        self.txtDisplay.setText(self.about_str + self.lic_str)
 
 # =============================================================================
 if __name__ == '__main__':
