@@ -51,6 +51,10 @@ class AboutWindow(QDialog):
         butAbout = QPushButton(self)
         butAbout.setText("About")
         butAbout.setToolTip("Display 'About' info")
+        
+        butChangelog = QPushButton(self)
+        butChangelog.setText("Changelog")
+        butChangelog.setToolTip("Display changelog")
 
         butLicMIT = QPushButton(self)
         butLicMIT.setText("MIT License")        
@@ -61,15 +65,16 @@ class AboutWindow(QDialog):
         butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
 
         butClose = QPushButton(self)
-        butClose.setText("Close")
+        butClose.setIcon(QIcon(':/circle-x.svg'))
         butClose.setToolTip("Close Window.")
 
-        layGButtons = QGridLayout()
+        layGButtons = QGridLayout()      
         layGButtons.addWidget(butClipboard,0,0)
-        layGButtons.addWidget(butAbout, 0,1)       
-        layGButtons.addWidget(butLicMIT, 0,2)
-        layGButtons.addWidget(butLicGPLv3,0,3)
-        layGButtons.addWidget(butClose,0,4)
+        layGButtons.addWidget(butAbout, 0,1)
+        layGButtons.addWidget(butChangelog, 0,2)  
+        layGButtons.addWidget(butLicMIT, 0,3)
+        layGButtons.addWidget(butLicGPLv3,0,4)
+        layGButtons.addWidget(butClose,0,5)
 
         lblInfo = QLabel(self)
         lblInfo.setText(self.info_str)
@@ -79,12 +84,14 @@ class AboutWindow(QDialog):
         lblIcon = QLabel(self)
         lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(lblInfo.height(), Qt.SmoothTransformation))
         butClipboard.setFixedWidth(lblInfo.height())
+        butClose.setFixedWidth(lblInfo.height())
         
         layHInfo = QHBoxLayout()
         layHInfo.addWidget(lblIcon)
         layHInfo.addWidget(lblInfo)
 
         self.txtDisplay = QTextBrowser(self)
+        self.txtDisplay.setOpenExternalLinks(True)
         self.display_about_str()
         self.txtDisplay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
@@ -103,6 +110,7 @@ class AboutWindow(QDialog):
     
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
         butAbout.clicked.connect(self.display_about_str)
+        butChangelog.clicked.connect(self.display_changelog)
         butLicMIT.clicked.connect(self.display_MIT_lic)
         butLicGPLv3.clicked.connect(self.display_GPL_lic)
         butClose.clicked.connect(self.close)
@@ -199,6 +207,15 @@ class AboutWindow(QDialog):
         """ Display general "About" info """
 
         self.txtDisplay.setText(self.about_str + self.lic_str)
+        
+#------------------------------------------------------------------------------
+
+    def display_changelog(self):
+        """ Display changelog """
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 
+                  'r') as f:
+            lic_str = markdown.markdown(f.read(), output_format='html5')     
+        self.txtDisplay.setText(lic_str)
         
 #------------------------------------------------------------------------------
 
