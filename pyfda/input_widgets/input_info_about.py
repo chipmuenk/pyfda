@@ -35,7 +35,6 @@ class AboutWindow(QDialog):
     def __init__(self, parent):
         super(AboutWindow, self).__init__(parent)
         self.setWindowTitle("About pyFDA")
-        #self.setWindowIcon(QIcon(':/pyfda_icon.svg'))
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
@@ -100,20 +99,7 @@ class AboutWindow(QDialog):
         dirs_str = markdown.markdown(dirs_md, output_format='html5', extensions=['tables'])
         
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# =============================================================================
-#         with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
-#             # return a list, split at linebreaks while keeping linebreaks    
-#             v = f.read().splitlines(True) 
-#         
-#         for l in v:
-#             try:
-#                 v_md += l.format(**MOD_VERSIONS) # evaluate {V_...} from MOD_VERSIONS entries
-#             except (KeyError) as e: # encountered undefined {V_...}
-#                 logger.warning("KeyError: {0}".format(e)) # simply drop the line
-# 
-#         ver_str = markdown.markdown(v_md, output_format='html5', extensions=['tables'])
-# 
-# =============================================================================
+
         ver_str = pyfda_lib.mod_version()
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
         
@@ -130,11 +116,10 @@ class AboutWindow(QDialog):
 #------------------------------------------------------------------------------
     def _construct_UI(self):
         """ initialize the User Interface """
+            
         butClipboard = QPushButton(self)
         butClipboard.setIcon(QIcon(':/clipboard.svg'))
         butClipboard.setToolTip("Copy text to clipboard.")
-        
-        #pixIcon = QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation)
         
         butClose = QPushButton(self)
         butClose.setText("Close")
@@ -164,8 +149,7 @@ class AboutWindow(QDialog):
 #         layHButtons.addWidget(butClose)
 #         
 # =============================================================================
-        # butClipboard.adjustSize()
-        # butClipboard.setFixedSize(self.checkLayout.sizeHint())
+
         self.txtAboutBrowser = QTextBrowser(self)
         self.txtAboutBrowser.setText(self.collect_about_string())
         
