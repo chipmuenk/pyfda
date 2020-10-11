@@ -71,18 +71,18 @@ class AboutWindow(QDialog):
         layGButtons.addWidget(butLicGPLv3,0,3)
         layGButtons.addWidget(butClose,0,4)
 
-        txtInfo = QLabel(self)
-        txtInfo.setText(self.info_str)
-        txtInfo.setFixedHeight(txtInfo.height()*1.2)
-        #txtInfo.adjustSize()
+        lblInfo = QLabel(self)
+        lblInfo.setText(self.info_str)
+        lblInfo.setFixedHeight(lblInfo.height()*1.2)
+        lblInfo.setOpenExternalLinks(True)
 
         lblIcon = QLabel(self)
-        lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(txtInfo.height(), Qt.SmoothTransformation))
-        butClipboard.setFixedWidth(txtInfo.height())
+        lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(lblInfo.height(), Qt.SmoothTransformation))
+        butClipboard.setFixedWidth(lblInfo.height())
         
         layHInfo = QHBoxLayout()
         layHInfo.addWidget(lblIcon)
-        layHInfo.addWidget(txtInfo)
+        layHInfo.addWidget(lblInfo)
 
         self.txtDisplay = QTextBrowser(self)
         self.display_about_str()
