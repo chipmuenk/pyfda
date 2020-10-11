@@ -133,11 +133,10 @@ class AboutWindow(QDialog):
         butLicGPLv3.setText("GPLv3 License")        
         butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
 
-
         layGButtons = QGridLayout()
-        layGButtons.addWidget(butLicMIT, 0,0)
-        layGButtons.addWidget(butLicGPLv3,0,1)
-        layGButtons.addWidget(butClipboard,0,2)
+        layGButtons.addWidget(butClipboard,0,0)
+        layGButtons.addWidget(butLicMIT, 0,1)
+        layGButtons.addWidget(butLicGPLv3,0,2)
         layGButtons.addWidget(butClose,0,3)
 # =============================================================================
 #         layHButtons = QHBoxLayout()
