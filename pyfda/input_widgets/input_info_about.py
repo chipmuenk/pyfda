@@ -16,7 +16,7 @@ import markdown
 
 from pyfda.libs.compat import (Qt, QPushButton, QFrame, QDialog,
                       QVBoxLayout, QHBoxLayout, QIcon, QPixmap,
-                      QSizePolicy, QTextBrowser, QGridLayout, QApplication, QLabel)
+                      QSizePolicy, QTextBrowser, QGridLayout, QLabel)
 
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 import pyfda.version as version
@@ -179,6 +179,7 @@ class AboutWindow(QDialog):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.resize(0,0)
         self.adjustSize()
+        #QApplication.processEvents()
     
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.collect_about_string()))
         butClose.clicked.connect(self.close)
