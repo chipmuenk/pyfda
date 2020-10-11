@@ -14,9 +14,9 @@ import logging
 logger = logging.getLogger(__name__)
 import markdown
 
-from pyfda.libs.compat import (Qt, QWidget, QPushButton, QFont, QFrame, QDialog,
-                      QVBoxLayout, QHBoxLayout, QMessageBox, QIcon, QPixmap, 
-                      QSizePolicy, QTextBrowser, QGridLayout)
+from pyfda.libs.compat import (Qt, QPushButton, QFrame, QDialog,
+                      QVBoxLayout, QHBoxLayout, QIcon, QPixmap,
+                      QSizePolicy, QTextBrowser, QGridLayout, QApplication, QLabel)
 
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 import pyfda.version as version
@@ -24,8 +24,6 @@ import pyfda.libs.pyfda_lib as pyfda_lib
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-# from pyfda import qrc_resources # contains all icons
-
 
 #------------------------------------------------------------------------------
 class AboutWindow(QDialog):
