@@ -281,6 +281,7 @@ if __name__ == '__main__':
 # =============================================================================
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
+    fb.clipboard = QApplication.clipboard()
     mainw = AboutWindow(None) # Test_button
 
     app.setActiveWindow(mainw)
