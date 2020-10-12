@@ -19,28 +19,40 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, sin, cos
 import numexpr
+import markdown
 
 import scipy.signal as sig
 
 from distutils.version import LooseVersion
+import pyfda.libs.pyfda_dirs as dirs
 
 ####### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
 # ==
 # == When one of the following imports fails, terminate the program
-from numpy import __version__ as V_NP
-from numpy import show_config
+V_NP = np.__version__
+V_NUM = numexpr.__version__
+from scipy import __version__ as V_SCI
+from matplotlib import __version__ as V_MPL
+from .compat import QT_VERSION_STR as V_QT
+from .compat import PYQT_VERSION_STR as V_PYQT
+from markdown import __version__ as V_MD
+
 # redirect stdio output of show_config to string
 f = io.StringIO()
 with redirect_stdout(f):
-    show_config()
+    np.show_config()
 INFO_NP = f.getvalue()
+
+if 'mkl_info' in INFO_NP:
+    MKL = " (mkl)"
+else:
+    MKL = ""
+    
 
 logger.warning(INFO_NP)
 
-from scipy import __version__ as V_SCI
-from matplotlib import __version__ as V_MPL
-from .compat import QT_VERSION_STR as V_QT # imports pyQt
+
 
 __all__ = ['cmp_version', 'mod_version',
            'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
@@ -52,53 +64,68 @@ __all__ = ['cmp_version', 'mod_version',
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
-MODULES = {}
-MODULES.update({'python': ".".join(map(str, sys.version_info[:3]))
-                            + " (" + str(PY32_64) + " Bit)"})
-#MODULES.update({'matplotlib': {'v':V_MPL, 'lic':'PSF', 'url':'https://matplotlib.org/'}})
-MODULES.update({'matplotlib': V_MPL})
-MODULES.update({'pyqt': V_QT})
-MODULES.update({'numpy': V_NP})
-MODULES.update({'numexpr': numexpr.__version__})
-MODULES.update({'scipy': V_SCI})
+V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
+
+# ================ Required Modules ============================
+MODULES = {'python':       {'V_PY':V_PY},
+           'matplotlib':   {'V_MPL':V_MPL},
+           'Qt5':          {'V_QT':V_QT},
+           'pyqt':         {'V_PYQT':V_PYQT},
+           'numpy':        {'V_NP':V_NP},
+           'numexpr':      {'V_NUM':V_NUM},
+           'scipy':        {'V_SCI':V_SCI + MKL},
+           'markdown':     {'V_MD':V_MD}
+           }
 
 # ================ Optional Modules ============================
 
 try:
-    from pyfixp import __version__ as v
-    MODULES.update('pyfixp', v)
+    from pyfixp import __version__ as V_FX
+    MODULES.update({'pyfixp' : {'V_FX':V_FX}})
 except ImportError:
-    MODULES.update({'pyfixp': None})
+    MODULES.update({'pyfixp': {'V_FX':None}})
     
 try:
     import migen
-    MODULES.update({'migen': 'installed'})
+    MODULES.update({'migen': {'V_MG':'installed'}})
 except (ImportError,SyntaxError):
-    MODULES.update({'migen': None})
+    MODULES.update({'migen':{'V_MG':None}})
 
 try:
-    from nmigen import __version__ as v
-    MODULES.update({'nMigen': v})
+    from nmigen import __version__ as V_NMG
+    MODULES.update({'nMigen': {'V_NMG':V_NMG}})
 except ImportError:
     pass
 
 try:
-    from docutils import __version__ as v
-    MODULES.update({'docutils': v})
+    from docutils import __version__ as V_DOC
+    MODULES.update({'docutils': {'V_DOC':V_DOC}})
 except ImportError:
     pass
 
 try:
-    from xlwt import __version__ as v
-    MODULES.update({'xlwt': v})
+    from mplcursors import __version__ as V_CUR
+    MODULES.update({'mplcursors': {'V_CUR':V_CUR}})
 except ImportError:
     pass
 
 try:
-    from xlsxwriter import __version__ as v
-    MODULES.update({'xlsx': v})
+    from xlwt import __version__ as V_XLWT
+    MODULES.update({'xlwt': {'V_XLWT':V_XLWT}})
 except ImportError:
     pass
+
+try:
+    from xlsxwriter import __version__ as V_XLSX
+    MODULES.update({'xlsx': {'V_XLSX':V_XLSX}})
+except ImportError:
+    pass
+
+# Remove module names as keys and return a dict with items like
+#  {'V_MPL':'3.3.1', ...}
+MOD_VERSIONS = {}
+for k in MODULES.keys():
+    MOD_VERSIONS.update(MODULES[k])
 
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
@@ -133,16 +160,20 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in MODULES or not MODULES[mod]:
+        if mod not in MODULES or not MODULES[mod].values(): 
             return -2
-        elif LooseVersion(MODULES[mod]) > LooseVersion(version):
+        else:
+            inst_ver = list(MODULES[mod].values())[0] # get dict value without knowing the key
+
+        if LooseVersion(inst_ver) > LooseVersion(version):
             return 1
-        elif  LooseVersion(MODULES[mod]) == LooseVersion(version):
+        elif  LooseVersion(inst_ver) == LooseVersion(version):
             return 0
         else:
             return -1
-    except TypeError:
-        logger.warning("Version number of {0} could not be determined.".format(mod))
+    except (TypeError, KeyError) as e:
+        logger.warning("Version number of {0} could not be determined.\n"
+                       "({1})".format(mod,e))
         return -1
 
 
@@ -154,30 +185,29 @@ def mod_version(mod = None):
     """
     if mod:
         if mod in MODULES:
-            return LooseVersion(MODULES[mod])
+            return LooseVersion(list(MODULES[mod].values())[0])
         else:
             return None
     else:
-        v = ""
-        keys = sorted(list(MODULES.keys()))
-        for k in keys:
+        v_md = ""                             
+        with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
+            # return a list, split at linebreaks while keeping linebreaks    
+            v = f.read().splitlines(True) 
+        
+        for l in v:
             try:
-                mod = '<a href="{0}"><{1}>'.format(MODULES[k]['url'], k)
-            except (KeyError, TypeError):
-                mod =  k
-                
-            if MODULES[k]:
-                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td>".format(mod, LooseVersion(MODULES[k]))
-            else:
-                v += "<tr><td>{0}</td><td>missing</td>".format(mod)
-            v += "</tr>"
-        return v
+                v_md += l.format(**MOD_VERSIONS) # evaluate {V_...} from MOD_VERSIONS entries
+            except (KeyError) as e: # encountered undefined {V_...}
+                logger.warning("KeyError: {0}".format(e)) # simply drop the line
+
+        v_html = markdown.markdown(v_md, output_format='html5', extensions=['tables'])
+        return v_html
 
 #------------------------------------------------------------------------------
+logger.info(mod_version())
+#logger.info("Found the following modules:" + "\n" + mod_version())
 
-logger.info("Found the following modules:" + "\n" + mod_version())
-
-SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
+SOS_AVAIL = True # TODO: remove from software?
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)

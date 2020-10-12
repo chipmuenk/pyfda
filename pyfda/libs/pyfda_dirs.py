@@ -12,7 +12,7 @@ Upon import, all the variables are set.
 This is imported first by pyfdax.
 """
 
-import os
+import os, sys
 import shutil
 import platform
 import tempfile
@@ -111,7 +111,29 @@ def get_conf_dir():
             print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
             return HOME_DIR
 
+#------------------------------------------------------------------------------        
+def create_conf_files():
+    if not os.path.isfile(USER_CONF_DIR_FILE):
+        # Copy default configuration file to user directory if it doesn't exist
+        # This file can be easily edited by the user without admin access rights
+        try:
+            shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
+            print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
+        except IOError as e:
+            print(e)
+            
+    if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
+        # Copy default logging configuration file to user directory if it doesn't exist
+        # This file can be easily edited by the user without admin access rights
+        try:
+            shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
+            print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
+        except IOError as e:
+            print(e)
+
 #==============================================================================
+# is the software running in a bundled PyInstaller environment?
+PYINSTALLER = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
 OS     = platform.system()
 OS_VER = platform.release()
@@ -120,7 +142,7 @@ CONF_FILE = 'pyfda.conf'            #: name for general configuration file
 LOG_CONF_FILE = 'pyfda_log.conf'    #: name for logging configuration file
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
-INSTALL_DIR = os.path.join(THIS_DIR, '..')
+INSTALL_DIR = os.path.normpath(os.path.join(THIS_DIR, '..'))
 
 TEMP_DIR = tempfile.gettempdir() #: Temp directory for constructing logging dir
 USER_DIRS = [] #: Placeholder for user widgets directory list, set by treebuilder
@@ -135,30 +157,19 @@ if LOG_DIR:
 else:
     LOG_FILE = None
     LOG_DIR_FILE = None
-    
-CONF_DIR = get_conf_dir()
-USER_CONF_DIR_FILE     = os.path.join(CONF_DIR, CONF_FILE)
- #: full path name of user configuration file
-USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
-#: full path name of logging configuration file
 
-if not os.path.isfile(USER_CONF_DIR_FILE):
-    # Copy default configuration file to user directory if it doesn't exist
-    # This file can be easily edited by the user without admin access rights
-    try:
-        shutil.copyfile(os.path.join(THIS_DIR, 'pyfda_template.conf'), USER_CONF_DIR_FILE)
-        print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
-    except IOError as e:
-        print(e)
-        
-if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
-    # Copy default logging configuration file to user directory if it doesn't exist
-    # This file can be easily edited by the user without admin access rights
-    try:
-        shutil.copyfile(os.path.join(THIS_DIR, 'pyfda_log_template.conf'), USER_LOG_CONF_DIR_FILE)
-        print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
-    except IOError as e:
-        print(e)
+
+CONF_DIR = get_conf_dir()
+# full path name of user configuration file:
+USER_CONF_DIR_FILE     = os.path.join(CONF_DIR, CONF_FILE)
+# full path name of logging configuration file:
+USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
+# full path name of configuration template:
+TMPL_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_template.conf')
+# full path name of logging configuration template:
+TMPL_LOG_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_log_template.conf')
+
+create_conf_files()
 
 #------------------------------------------------------------------------------
 """ Place holder for storing the directory location where the last file was saved"""

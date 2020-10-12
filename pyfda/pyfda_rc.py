@@ -21,7 +21,8 @@ from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.pyfda_lib import cmp_version, CRLF
+from pyfda.libs.pyfda_lib import CRLF
+from cycler import cycler
 
 # #############################################################################
 # General layout settings
@@ -55,6 +56,7 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
           'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
           'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
+          'wdg_margins_spc' : (2,2,2,2),  # R, T, L, B widget margins with more vertical spacing
           'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
 mpl_params_dark = {
@@ -127,15 +129,10 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'ytick.direction'           : 'out',
           #'xtick.top'                 : False, 2.0 only
           'figure.figsize'            : (5,4),
-          'figure.dpi'                : 100
-            }
-
-mpl_2 =  {'hatch.color'               : '#808080',
-          'hatch.linewidth'           : 0.5
+          'figure.dpi'                : 100,
+          'hatch.color'               : '#808080', # since mpl2.0
+          'hatch.linewidth'           : 0.5 # since mpl2.0
           }
-
-if cmp_version('matplotlib', '2.0') >= 0:
-    mpl_rc.update(mpl_2)
 
 # dark theme for matplotlib widgets
 mpl_rc_dark = {
@@ -152,16 +149,8 @@ mpl_rc_dark = {
             'grid.color'        : '#CCCCCC'
             }
 
-try:
-    # cycler is used by default with matplotlib 1.5 upwards
-    from cycler import cycler
-    CYC = True
-    mpl_rc_dark.update(
-            {'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
-except ImportError:
-    CYC = False
-    mpl_rc_dark.update(
-            {'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})
+mpl_rc_dark.update(
+    {'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
 
 # light theme for matplotlib widgets
 mpl_rc_light = {
@@ -177,11 +166,9 @@ mpl_rc_light = {
             'text.color'        : 'black',
             'grid.color'        : '#222222'
             }
-if CYC:
-    mpl_rc_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
-else:
-    mpl_rc_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
-            
+
+mpl_rc_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
+
 
 # --------------------- Matplotlib Fonts --------------------------------------
 import matplotlib.font_manager

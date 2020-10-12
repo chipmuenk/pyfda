@@ -18,6 +18,11 @@ import os, re, io
 import csv
 import datetime
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+
 import numpy as np
 from scipy.io import loadmat, savemat
 
@@ -29,7 +34,7 @@ from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
+from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFD,
                      QFileDialog, QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
@@ -1279,6 +1284,142 @@ def export_coe_TI(f):
     ** not implemented yet **
     """
     pass
+
+#------------------------------------------------------------------------------
+
+#==============================================================================
+
+def load_filter(self):
+    """
+    Load filter from zipped binary numpy array or (c)pickled object to
+    filter dictionary and update input and plot widgets
+    """
+    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+    dlg = QFD(self)
+    file_name, file_type = dlg.getOpenFileName_(
+            caption = "Load filter ", directory = dirs.save_dir,
+            filter = file_filters)
+    file_name = str(file_name) # QString -> str
+
+    for t in extract_file_ext(file_filters): # get a list of file extensions
+        if t in str(file_type):
+            file_type = t
+
+    if file_name != "": # cancelled file operation returns empty string
+        if os.stat(file_name).st_size == 0:
+            dirs.save_dir = os.path.dirname(file_name)
+            logger.error('"{0}" has size zero, aborting.'.format(file_name))
+            return
+
+        # strip extension from returned file name (if any) + append file type:
+        file_name = os.path.splitext(file_name)[0] + file_type
+
+        file_type_err = False
+        fb.fil[1] = fb.fil[0].copy() # backup filter dict
+        try:
+            with io.open(file_name, 'rb') as f:
+                if file_type == '.npz':
+                    # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
+
+                    # What encoding to use when reading Py2 strings. Only
+                    # needed for loading py2 generated pickled files on py3.
+                    # fix_imports will try to map old py2 names to new py3
+                    # names when unpickling.
+                    a = np.load(f, fix_imports=True, encoding='bytes', allow_pickle = True) # array containing dict, dtype 'object'
+                    
+                    logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
+                    for key in sorted(a):
+                        logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
+
+                        if np.ndim(a[key]) == 0:
+                            # scalar objects may be extracted with the item() method
+                            fb.fil[0][key] = a[key].item()
+                        else:
+                            # array objects are converted to list first
+                            fb.fil[0][key] = a[key].tolist()
+                elif file_type == '.pkl':
+                    # this only works for python >= 3.3
+                    fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
+                else:
+                    logger.error('Unknown file type "{0}"'.format(file_type))
+                    file_type_err = True
+                if not file_type_err:
+                    # sanitize values in filter dictionary, keys are ok by now
+                    for k in fb.fil[0]:
+                         # Bytes need to be decoded for py3 to be used as keys later on
+                        if type(fb.fil[0][k]) == bytes:
+                            fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                        if fb.fil[0][k] is None:
+                            logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+
+                    logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
+                     # emit signal -> InputTabWidgets.load_all:
+                    self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
+                    dirs.save_dir = os.path.dirname(file_name) # update working dir
+        except IOError as e:
+            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+        except Exception as e:
+            logger.error("Unexpected error:\n{0}".format(e))
+            fb.fil[0] = fb.fil[1] # restore backup
+            
+#------------------------------------------------------------------------------
+
+def save_filter(self):
+    """
+    Save filter as zipped binary numpy array or pickle object
+    """
+    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+    dlg = QFD(self)
+    # return selected file name (with or without extension) and filter (Linux: full text)
+    file_name, file_type = dlg.getSaveFileName_(
+            caption = "Save filter as", directory = dirs.save_dir,
+            filter = file_filters)
+
+    file_name = str(file_name)  # QString -> str() needed for Python 2.x
+    # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
+    # be extracted reproducibly across file systems, so it is done manually:
+
+    for t in extract_file_ext(file_filters): # get a list of file extensions
+        if t in str(file_type):
+            file_type = t           # return the last matching extension
+
+    if file_name != "": # cancelled file operation returns empty string
+
+        # strip extension from returned file name (if any) + append file type:
+        file_name = os.path.splitext(file_name)[0] + file_type
+
+        file_type_err = False
+        try:
+# =============================================================================
+#  # move this part to ellip_zero()
+#                 if file_type == '.txt_rpk':
+#                     # save as a custom residue/pole text output for apply with custom tool
+#                     # make sure we have the residues
+#                     if 'rpk' in fb.fil[0]:
+#                         with io.open(file_name, 'w', encoding="utf8") as f:
+#                             self.file_dump(f)
+#                     else:
+#                         file_type_err = True
+#                         logger.error('Filter has no residues/poles, cannot save as *.txt_rpk file')
+#                 else:
+# =============================================================================
+            with io.open(file_name, 'wb') as f:
+                if file_type == '.npz':
+                    np.savez(f, **fb.fil[0])
+                elif file_type == '.pkl':
+                    # save in default pickle version, only compatible with Python 3.x
+                    pickle.dump(fb.fil[0], f, protocol = 3)
+                else:
+                    file_type_err = True
+                    logger.error('Unknown file type "{0}"'.format(file_type))
+
+            if not file_type_err:
+                logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
+                dirs.save_dir = os.path.dirname(file_name) # save new dir
+
+        except IOError as e:
+            logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
+
 
 #==============================================================================
 

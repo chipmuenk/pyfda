@@ -23,14 +23,18 @@ API version info:
     
     
 """
+import os, io
 import scipy.signal as sig
 from numpy import conj, sqrt, sum, zeros
+import numpy as np
 from scipy.signal import ellipord
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_io_lib import extract_file_ext
+import pyfda.libs.pyfda_dirs as dirs
 
 from .common import Common
-from pyfda.libs.compat import (QWidget, QFrame, pyqtSignal,
+from pyfda.libs.compat import (QWidget, QFrame, pyqtSignal, QFD,
                       QCheckBox, QVBoxLayout, QHBoxLayout)
 
 import logging
@@ -331,6 +335,189 @@ to be complex (no real values).
 #       inserted into fil dictionary after fil_save and convert
         # sig_tx -> select_filter -> filter_specs   
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'ellip_zero'})
+        
+#------------------------------------------------------------------------------
+
+    def save_filter(self):
+        file_filters = ("Text file pole/residue (*.txt_rpk)")
+        dlg = QFD(self)
+        # return selected file name (with or without extension) and filter (Linux: full text)
+        file_name, file_type = dlg.getSaveFileName_(
+                caption = "Save filter as", directory = dirs.save_dir,
+                filter = file_filters)
+    
+        file_name = str(file_name)  # QString -> str() needed for Python 2.x
+        # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
+        # be extracted reproducibly across file systems, so it is done manually:
+    
+        for t in extract_file_ext(file_filters): # get a list of file extensions
+            if t in str(file_type):
+                file_type = t           # return the last matching extension
+    
+        if file_name != "": # cancelled file operation returns empty string
+    
+            # strip extension from returned file name (if any) + append file type:
+            file_name = os.path.splitext(file_name)[0] + file_type
+    
+            file_type_err = False
+            try:
+
+                # save as a custom residue/pole text output for apply with custom tool
+                # make sure we have the residues
+                if 'rpk' in fb.fil[0]:
+                    with io.open(file_name, 'w', encoding="utf8") as f:
+                        self.file_dump(f)
+                else:
+                    file_type_err = True
+                    logger.error('Filter has no residues/poles, cannot save as *.txt_rpk file')
+                if not file_type_err:
+                    logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
+                    dirs.save_dir = os.path.dirname(file_name) # save new dir
+    
+            except IOError as e:
+                logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
+   
+        
+        
+        def file_dump (self, fOut):
+            """
+            Dump file out in custom text format that apply tool can read to know filter coef's
+            """
+    
+    #       Fixed format widths for integers and doubles
+            intw = '10'
+            dblW = 27
+            frcW = 20
+    
+    #       Fill up character string with filter output
+            filtStr = '# IIR filter\n'
+    
+    #       parameters that made filter (choose smallest eps)
+    #       Amp is stored in Volts (linear units)
+    #       the second amp terms aren't really used (for ellip filters)
+    
+            FA_PB  = fb.fil[0]['A_PB']
+            FA_SB  = fb.fil[0]['A_SB']
+            FAmp = min(FA_PB, FA_SB)
+    
+    #       Freq terms in radians so move from -1:1 to -pi:pi
+            f_lim = fb.fil[0]['freqSpecsRange']
+            f_unit = fb.fil[0]['freq_specs_unit']
+    
+            F_S   = fb.fil[0]['f_S']
+            if fb.fil[0]['freq_specs_unit'] == 'f_S':
+                F_S = F_S*2
+            F_SB  = fb.fil[0]['F_SB'] * F_S * np.pi
+            F_SB2 = fb.fil[0]['F_SB2'] * F_S * np.pi
+            F_PB  = fb.fil[0]['F_PB'] * F_S * np.pi
+            F_PB2 = fb.fil[0]['F_PB2'] * F_S * np.pi
+    
+    #       Determine pass/stop bands depending on filter response type
+            passMin = []
+            passMax = []
+            stopMin = []
+            stopMax = []
+    
+            if fb.fil[0]['rt'] == 'LP':
+                passMin = [ -F_PB,      0,    0]
+                passMax = [  F_PB,      0,    0]
+                stopMin = [-np.pi,   F_SB,    0]
+                stopMax = [ -F_SB,  np.pi,    0]
+                f1 = F_PB
+                f2 = F_SB
+                f3 = f4 = 0
+                Ftype = 1
+                Fname = 'Low_Pass'
+    
+            if fb.fil[0]['rt'] == 'HP':
+                passMin = [-np.pi,   F_PB,    0]
+                passMax = [ -F_PB,  np.pi,    0]
+                stopMin = [ -F_SB,      0,    0]
+                stopMax = [  F_SB,      0,    0]
+                f1 = F_SB
+                f2 = F_PB
+                f3 = f4 = 0
+                Ftype = 2
+                Fname = 'Hi_Pass'
+    
+            if fb.fil[0]['rt'] == 'BS':
+                passMin = [-np.pi,  -F_PB, F_PB2]
+                passMax = [-F_PB2,   F_PB, np.pi]
+                stopMin = [-F_SB2,   F_SB,     0]
+                stopMax = [ -F_SB,  F_SB2,     0]
+                f1 = F_PB
+                f2 = F_SB
+                f3 = F_SB2
+                f4 = F_PB2
+                Ftype = 4
+                Fname = 'Band_Stop'
+    
+            if fb.fil[0]['rt'] == 'BP':
+                passMin = [-F_PB2,   F_PB,     0]
+                passMax = [ -F_PB,  F_PB2,     0]
+                stopMin = [-np.pi,  -F_SB, F_SB2]
+                stopMax = [-F_SB2,   F_SB, np.pi]
+                f1 = F_SB
+                f2 = F_PB
+                f3 = F_PB2
+                f4 = F_SB2
+                Ftype = 3
+                Fname = 'Band_Pass'
+    
+            filtStr = filtStr + '{:{align}{width}}'.format('10',align='>',width=intw)+ ' IIRFILT_4SYM\n'
+            filtStr = filtStr + '{:{align}{width}}'.format(str(Ftype),align='>',width=intw)+ ' ' + Fname + '\n'
+            filtStr = filtStr + '{:{d}.{p}f}'.format(FAmp,d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMin[0],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMax[0],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMin[1],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMax[1],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMin[2],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(passMax[2],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMin[0],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMax[0],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMin[1],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMax[1],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMin[2],d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(stopMax[2],d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(f1,d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(f2,d=dblW,p=frcW) + '\n'
+            filtStr = filtStr + '{: {d}.{p}f}'.format(f3,d=dblW,p=frcW)
+            filtStr = filtStr + '{: {d}.{p}f}'.format(f4,d=dblW,p=frcW) + '\n'
+    
+    #       move pol/res/gain into terms we need
+            Fdc  = fb.fil[0]['rpk'][2]
+            rC   = fb.fil[0]['rpk'][0]
+            pC   = fb.fil[0]['rpk'][1]
+            Fnum = len(pC)
+    
+    #       Gain term
+            filtStr = filtStr + '{: {d}.{p}e}'.format(Fdc,d=dblW,p=frcW) + '\n'
+    
+    #       Real pole count inside the unit circle (none of these)
+    
+            filtStr = filtStr + '{:{align}{width}}'.format(str(0),align='>',width=intw) + '\n'
+    
+    #       Complex pole/res count inside the unit circle
+    
+            filtStr = filtStr + '{:{i}d}'.format(Fnum, i=intw)+ '\n'
+    
+    #       Now dump poles/residues
+            for j in range(Fnum):
+                filtStr = filtStr + '{:{i}d}'.format(j, i=intw) + ' '
+                filtStr = filtStr + '{: {d}.{p}e}'.format(rC[j].real,d=dblW,p=frcW) + ' '
+                filtStr = filtStr + '{: {d}.{p}e}'.format(rC[j].imag,d=dblW,p=frcW) + ' '
+                filtStr = filtStr + '{: {d}.{p}e}'.format(pC[j].real,d=dblW,p=frcW) + ' '
+                filtStr = filtStr + '{: {d}.{p}e}'.format(pC[j].imag,d=dblW,p=frcW) + '\n'
+    
+    #       Real pole count outside the unit circle (none of these)
+            filtStr = filtStr + '{:{align}{width}}'.format(str(0),align='>',width=intw) + '\n'
+    
+    #       Complex pole count outside the unit circle (none of these)
+            filtStr = filtStr + '{:{align}{width}}'.format(str(0),align='>',width=intw) + '\n'
+    
+    #       Now write huge text string to file
+            fOut.write(filtStr)
+
 
 #------------------------------------------------------------------------------
 #
