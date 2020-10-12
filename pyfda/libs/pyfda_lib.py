@@ -1397,28 +1397,59 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
+        if any(isinstance(el, list) for el in arg):
+            frmt = "lol" # list or ndarray or tuple of lists
+        elif any(isinstance(el, np.ndarray) for el in arg):
+            frmt = "lon" # list or ndarray or tuple of ndarrays
+        elif isinstance(arg, list):
+            frmt = "lst"
+        elif isinstance(arg, np.ndarray):
+            frmt = "nd"
         format_error = False
-        if np.ndim(arg) == 1:
-            if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
-                z = arg
-                p = np.zeros(len(z))
-                k = 1
-                fil_dict['zpk'] = [z, p, k]
-                fil_dict['ft'] = 'FIR'
-            elif np.ndim(arg[0]) == 1: # list of lists
-                if np.shape(arg)[0] == 3:
-                    fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
-                    if np.any(arg[1]): # non-zero poles -> IIR
-                        fil_dict['ft'] = 'IIR'
-                    else:
-                        fil_dict['ft'] = 'FIR'
+        #logger.error(arg)
+        #logger.error(frmt)
+        if frmt in {'lst', 'nd'}: # list / array with z only -> FIR
+            z = arg
+            p = np.zeros(len(z))
+            k = 1
+            fil_dict['zpk'] = [z, p, k]
+            fil_dict['ft'] = 'FIR'
+        elif frmt in {'lol', 'lon'}: # list of lists
+            if len(arg) == 3:
+                fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+                if np.any(arg[1]): # non-zero poles -> IIR
+                    fil_dict['ft'] = 'IIR'
                 else:
-                    format_error = True
+                    fil_dict['ft'] = 'FIR'
             else:
                 format_error = True
         else:
             format_error = True
 
+
+# =============================================================================
+#         if np.ndim(arg) == 1:
+#             if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
+#                 z = arg
+#                 p = np.zeros(len(z))
+#                 k = 1
+#                 fil_dict['zpk'] = [z, p, k]
+#                 fil_dict['ft'] = 'FIR'
+#             elif np.ndim(arg[0]) == 1: # list of lists
+#                 if np.shape(arg)[0] == 3:
+#                     fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+#                     if np.any(arg[1]): # non-zero poles -> IIR
+#                         fil_dict['ft'] = 'IIR'
+#                     else:
+#                         fil_dict['ft'] = 'FIR'
+#                 else:
+#                     format_error = True
+#             else:
+#                 format_error = True
+#         else:
+#             format_error = True
+# 
+# =============================================================================
         if format_error:
             raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
 
