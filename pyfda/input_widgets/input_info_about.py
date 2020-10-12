@@ -79,6 +79,7 @@ class AboutWindow(QDialog):
         lblInfo = QLabel(self)
         lblInfo.setText(self.info_str)
         lblInfo.setFixedHeight(lblInfo.height()*1.2)
+        #lblInfo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         lblInfo.setOpenExternalLinks(True)
 
         lblIcon = QLabel(self)
@@ -94,6 +95,7 @@ class AboutWindow(QDialog):
         self.txtDisplay.setOpenExternalLinks(True)
         self.display_about_str()
         self.txtDisplay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.txtDisplay.setFixedHeight(self.txtDisplay.width() * 2)
         
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
@@ -103,9 +105,9 @@ class AboutWindow(QDialog):
 
         layVMain.setContentsMargins(*params['wdg_margins_spc'])
         self.setLayout(layVMain)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.resize(0,0)
-        self.adjustSize()
+        #self.adjustSize()
         #QApplication.processEvents()
     
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
@@ -128,10 +130,16 @@ class AboutWindow(QDialog):
                    ('<th>',''), ('&emsp;',' '), ('<table>',''),# ('</a>',''),
                    ("<th style='font-size:large;'>","\n")
                    ]
-        for k, v in mapping:
-            my_string = my_string.replace(k, v)
+# =============================================================================
+#         """ Map some HTML tags to control codes"""
+#         for k, v in mapping:
+#             my_string = my_string.replace(k, v)
+#             
+#         """Remove html tags from a string"""
+#         clean = re.compile('<.*?>')
+#         fb.clipboard.setText(re.sub(clean, '', my_string)) 
+# =============================================================================
         fb.clipboard.setText(my_string)
-
 #------------------------------------------------------------------------------
 
     def collect_info(self):
@@ -199,7 +207,6 @@ class AboutWindow(QDialog):
                 self.lic_str = markdown.markdown(f.read(), output_format='html5', extensions=['tables'])
 
         self.about_str = os_str + dirs_str + ver_str
-        logger.warning(os.path.abspath("."))
 
 #------------------------------------------------------------------------------
 
