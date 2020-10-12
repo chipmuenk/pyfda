@@ -51,27 +51,27 @@ class AboutWindow(QDialog):
         butAbout = QPushButton(self)
         butAbout.setText("About")
         butAbout.setToolTip("Display 'About' info")
-        
+
         butChangelog = QPushButton(self)
         butChangelog.setText("Changelog")
         butChangelog.setToolTip("Display changelog")
 
         butLicMIT = QPushButton(self)
-        butLicMIT.setText("MIT License")        
+        butLicMIT.setText("MIT License")
         butLicMIT.setToolTip("MIT License for pyFDA source code")
-        
+
         butLicGPLv3 = QPushButton(self)
-        butLicGPLv3.setText("GPLv3 License")        
+        butLicGPLv3.setText("GPLv3 License")
         butLicGPLv3.setToolTip("GPLv3 License for bundled distribution")
 
         butClose = QPushButton(self)
         butClose.setIcon(QIcon(':/circle-x.svg'))
         butClose.setToolTip("Close Window.")
 
-        layGButtons = QGridLayout()      
+        layGButtons = QGridLayout()
         layGButtons.addWidget(butClipboard,0,0)
         layGButtons.addWidget(butAbout, 0,1)
-        layGButtons.addWidget(butChangelog, 0,2)  
+        layGButtons.addWidget(butChangelog, 0,2)
         layGButtons.addWidget(butLicMIT, 0,3)
         layGButtons.addWidget(butLicGPLv3,0,4)
         layGButtons.addWidget(butClose,0,5)
@@ -86,7 +86,7 @@ class AboutWindow(QDialog):
         lblIcon.setPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(lblInfo.height(), Qt.SmoothTransformation))
         butClipboard.setFixedWidth(lblInfo.height())
         butClose.setFixedWidth(lblInfo.height())
-        
+
         layHInfo = QHBoxLayout()
         layHInfo.addWidget(lblIcon)
         layHInfo.addWidget(lblInfo)
@@ -96,7 +96,7 @@ class AboutWindow(QDialog):
         self.display_about_str()
         self.txtDisplay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.txtDisplay.setFixedHeight(self.txtDisplay.width() * 2)
-        
+
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layGButtons)
@@ -109,14 +109,14 @@ class AboutWindow(QDialog):
         #self.resize(0,0)
         #self.adjustSize()
         #QApplication.processEvents()
-    
+
         butClipboard.clicked.connect(lambda: self.to_clipboard(self.info_str + self.about_str))
         butAbout.clicked.connect(self.display_about_str)
         butChangelog.clicked.connect(self.display_changelog)
         butLicMIT.clicked.connect(self.display_MIT_lic)
         butLicGPLv3.clicked.connect(self.display_GPL_lic)
         butClose.clicked.connect(self.close)
-        
+
 #------------------------------------------------------------------------------
 
     def to_clipboard(self, my_string):
@@ -134,10 +134,10 @@ class AboutWindow(QDialog):
 #         """ Map some HTML tags to control codes"""
 #         for k, v in mapping:
 #             my_string = my_string.replace(k, v)
-#             
+#
 #         """Remove html tags from a string"""
 #         clean = re.compile('<.*?>')
-#         fb.clipboard.setText(re.sub(clean, '', my_string)) 
+#         fb.clipboard.setText(re.sub(clean, '', my_string))
 # =============================================================================
         fb.clipboard.setText(my_string)
 #------------------------------------------------------------------------------
@@ -145,10 +145,10 @@ class AboutWindow(QDialog):
     def collect_info(self):
         """
         Collect information about version, imported modules in strings:
-            
+
         `self.info_str` : General info, copyright, version, link to readthedocs
                           This info is always visible.
-        
+
         `self.about_str`: OS, user name, directories, versions of installed software
         """
 
@@ -160,7 +160,7 @@ class AboutWindow(QDialog):
         " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<br />"\
         .format(version.__version__))
 
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         user_dirs_str = ""
         if dirs.USER_DIRS:
@@ -168,13 +168,13 @@ class AboutWindow(QDialog):
                 user_dirs_str += d + '<br />'
         else:
             user_dirs_str = "None<br />"
-            
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         os_str =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}"
                     .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
-        
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         dirs_md = ("### Directories ###\n"
                       "| *Function*    | *Path*|\n"#"|  <!-- -->     |  <!-- -->  |\n"
@@ -192,14 +192,14 @@ class AboutWindow(QDialog):
                               conf_dir=dirs.CONF_DIR, user_dir=user_dirs_str[:-6],
                               temp_dir=dirs.TEMP_DIR, pyfda_conf=dirs.USER_CONF_DIR_FILE,
                               log_conf=dirs.USER_LOG_CONF_DIR_FILE, log_file=dirs.LOG_DIR_FILE))
-                      
+
         dirs_str = markdown.markdown(dirs_md, output_format='html5', extensions=['tables'])
-        
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         ver_str = pyfda_lib.mod_version()
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
         if False: #dirs.PYINSTALLER:
             self.lic_str = ""
         else:
@@ -214,16 +214,16 @@ class AboutWindow(QDialog):
         """ Display general "About" info """
 
         self.txtDisplay.setText(self.about_str + self.lic_str)
-        
+
 #------------------------------------------------------------------------------
 
     def display_changelog(self):
         """ Display changelog """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"),
                   'r') as f:
-            lic_str = markdown.markdown(f.read(), output_format='html5')     
+            lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(lic_str)
-        
+
 #------------------------------------------------------------------------------
 
     def display_MIT_lic(self):
@@ -237,7 +237,7 @@ class AboutWindow(QDialog):
     def display_GPL_lic(self):
         """ Display MIT license """
         with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPL3_0.html"), 'r') as f:
-            lic_str = f.read()        
+            lic_str = f.read()
         self.txtDisplay.setText(lic_str)
 
 # =============================================================================
