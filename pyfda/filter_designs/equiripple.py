@@ -10,11 +10,11 @@
 Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in coefficients format ('ba')
 
-Attention: 
+Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-API version info:   
+API version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
@@ -27,8 +27,8 @@ API version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
-    
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import logging
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
 from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
-from .common import remezord 
+from .common import remezord
 
 __version__ = "2.2"
 
@@ -85,12 +85,12 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self.grid_density = 16
 
         self.ft = 'FIR'
-        
+
         self.rt_dicts = ('com',)
 
         self.rt_dict = {
             'COM': {'man': {'fo':('a', 'N'),
-                            'msg':('a', 
+                            'msg':('a',
                                 "<span>Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
                                 "&nbsp; and <b><i>F<sub>SB</sub></i></b>&nbsp;, and relative weight "
@@ -107,48 +107,48 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                             }
                 },
             'LP': {'man':{'wspecs': ('a','W_PB','W_SB'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB'), 
+                          'tspecs': ('u', {'frq':('a','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                           },
                    'min':{'wspecs': ('d','W_PB','W_SB'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
                                            'amp':('a','A_PB','A_SB')})
                         }
                 },
             'HP': {'man':{'wspecs': ('a','W_SB','W_PB'),
-                          'tspecs': ('u', {'frq':('a','F_SB','F_PB'), 
+                          'tspecs': ('u', {'frq':('a','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                          },
                    'min':{'wspecs': ('d','W_SB','W_PB'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
                                            'amp':('a','A_SB','A_PB')})
                          }
                     },
             'BP': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
-                          'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                          'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          },
                    'min':{'wspecs': ('d','W_SB','W_PB','W_SB2'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('a','A_SB','A_PB','A_SB2')})
                          },
                     },
             'BS': {'man':{'wspecs': ('a','W_PB','W_SB','W_PB2'),
-                          'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                          'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('u','A_PB','A_SB','A_PB2')})
                           },
                    'min':{'wspecs': ('d','W_PB','W_SB','W_PB2'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('a','A_PB','A_SB','A_PB2')})
                         }
                 },
             'HIL': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
-                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          }
                     },
             'DIFF': {'man':{'wspecs': ('a','W_PB'),
-                            'tspecs': ('u', {'frq':('a','F_PB'), 
+                            'tspecs': ('u', {'frq':('a','F_PB'),
                                            'amp':('i',)}),
                             'msg':('a',"Enter the max. frequency up to where the differentiator "
                                         "works.")
@@ -166,7 +166,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design:
-        These subwidgets are instantiated dynamically when needed in 
+        These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
         self.lbl_remez_1 = QLabel("Grid Density", self)
@@ -196,14 +196,14 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 
         self._load_dict() # get initial / last setting from dictionary
         self._update_UI()
-        
+
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer) and store parameter settings in filter 
+        and converted to integer) and store parameter settings in filter
         dictionary
         """
-        self.grid_density = safe_eval(self.led_remez_1.text(), self.grid_density, 
+        self.grid_density = safe_eval(self.led_remez_1.text(), self.grid_density,
                                       return_type='int', sign='pos' )
         self.led_remez_1.setText(str(self.grid_density))
 
@@ -212,14 +212,14 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         fb.fil[0]['wdg_fil'].update({'equiripple':
                                         {'grid_density':self.grid_density}
                                     })
-        
-        # sig_tx -> select_filter -> filter_specs   
+
+        # sig_tx -> select_filter -> filter_specs
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'equiripple'})
 
 
     def _load_dict(self):
         """
-        Reload parameter(s) from filter dictionary (if they exist) and set 
+        Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. _load_dict() is called upon initialization
         and when the filter is loaded from disk.
         """
@@ -246,9 +246,9 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self.A_PB2 = fil_dict['A_PB2']
         self.A_SB  = fil_dict['A_SB']
         self.A_SB2 = fil_dict['A_SB2']
-        
+
         self.alg = 'ichige'
-        
+
     def _test_N(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter
@@ -273,7 +273,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                          "the following error occurred:\n{0}".format(e))
             return -1
 
-        if str(fil_dict['fo']) == 'min': 
+        if str(fil_dict['fo']) == 'min':
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
 
 
@@ -281,7 +281,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self._save(fil_dict, 
+        self._save(fil_dict,
                   sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                         weight = [fil_dict['W_PB'],fil_dict['W_SB']], fs = 1,
                         grid_density = self.grid_density))
@@ -303,12 +303,12 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         if not self._test_N():
             return -1
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
-            self._save(fil_dict, 
+            self._save(fil_dict,
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
-        else: # odd order, 
-            self._save(fil_dict, 
+        else: # odd order,
+            self._save(fil_dict,
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
@@ -323,10 +323,10 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, fs = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
@@ -408,7 +408,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
-    
+
     # instantiate filter widget
     filt = Equiripple()
     filt.construct_UI()
@@ -416,13 +416,13 @@ if __name__ == '__main__':
 
     layVDynWdg = QVBoxLayout()
     layVDynWdg.addWidget(wdg_equiripple, stretch = 1)
-    
+
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-    frmMain.setLayout(layVDynWdg)    
+    frmMain.setLayout(layVDynWdg)
 
     form = frmMain
 
@@ -430,4 +430,5 @@ if __name__ == '__main__':
 
     app.exec_()
     #------------------------------------------------------------------------------
+# test using "python -m pyfda.filter_designs.equiripple"
 

@@ -14,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-API version info:   
+API version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
@@ -27,14 +27,14 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove empty methods construct_UI and destruct_UI and attributes 
+    2.1: Remove empty methods construct_UI and destruct_UI and attributes
          self.wdg and self.hdl
-         
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import scipy.signal as sig
 from scipy.signal import cheb1ord
-    
+
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
 from .common import Common
@@ -46,9 +46,9 @@ classes = {'Cheby1':'Chebychev 1'} #: Dict containing class name : display name
 class Cheby1(object):
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    
+
     def __init__(self):
- 
+
         self.ft = 'IIR'
 
         c = Common()
@@ -60,7 +60,7 @@ class Cheby1(object):
                  "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
                  "the maximum ripple "
                  "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
-                 "passband.")},                                  
+                 "passband.")},
                                   },
             'LP': {'man':{}, 'min':{}},
             'HP': {'man':{}, 'min':{}},
@@ -73,7 +73,7 @@ class Cheby1(object):
 
 maximize the rate of cutoff between the frequency response’s passband and stopband,
 at the expense of passband ripple :math:`A_PB` and increased ringing in
-the step response. The stopband drops monotonously. 
+the step response. The stopband drops monotonously.
 
 Type I filters roll off faster than Type II, but Type II filters do not
 have any ripple in the passband.
@@ -86,7 +86,7 @@ For a manual filter design, the order :math:`N`, the passband ripple :math:`A_PB
 the critical frequency / frequencies :math:`F_C` where the gain drops below
 :math:`-A_PB` have to be specified.
 
-The ``cheb1ord()`` helper routine calculates the minimum order :math:`N` and the 
+The ``cheb1ord()`` helper routine calculates the minimum order :math:`N` and the
 critical passband frequency :math:`F_C` from passband / stopband specifications.
 
 **Design routines:**
@@ -100,7 +100,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.info_doc.append(sig.cheby1.__doc__)
         self.info_doc.append('cheb1ord()\n==========')
         self.info_doc.append(sig.cheb1ord.__doc__)
-      
+
     #--------------------------------------------------------------------------
     def _get_params(self, fil_dict):
         """
@@ -122,7 +122,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
         self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
 
-        
+
         # cheby1 filter routines support only one amplitude spec for
         # pass- and stop band each
         if str(fil_dict['rt']) == 'BS':
@@ -144,16 +144,16 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)
-        and store them in the global filter dictionary. 
-        
-        Corner frequencies and order calculated for minimum filter order are 
+        and store them in the global filter dictionary.
+
+        Corner frequencies and order calculated for minimum filter order are
         also stored to allow for an easy subsequent manual filter optimization.
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
-        if str(fil_dict['fo']) == 'min': 
+        if str(fil_dict['fo']) == 'min':
             fil_dict['N'] = self.N
 
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
@@ -161,7 +161,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
             else: # BP or BS - two corner frequencies
                 fil_dict['F_C'] = self.F_PBC[0] / 2.
                 fil_dict['F_C2'] = self.F_PBC[1] / 2.
-                    
+
 #------------------------------------------------------------------------------
 #
 #         DESIGN ROUTINES
@@ -177,7 +177,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
             return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
- 
+
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
@@ -247,5 +247,5 @@ if __name__ == '__main__':
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
-    
+
 # test using "python -m pyfda.filter_designs.cheby1"

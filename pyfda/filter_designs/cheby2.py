@@ -27,14 +27,14 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove empty methods  construct_UI anddestruct_UI and attributes 
+    2.1: Remove empty methods  construct_UI anddestruct_UI and attributes
          self.wdg and self.hdl
 
-   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import scipy.signal as sig
 from scipy.signal import cheb2ord
-from .common import Common 
+from .common import Common
 
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
@@ -42,30 +42,30 @@ from pyfda.libs.pyfda_qt_lib import qfilter_warning
 __version__ = "2.2"
 
 classes = {'Cheby2':'Chebychev 2'} #: Dict containing class name : display name
-    
+
 class Cheby2(object):
 
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
     def __init__(self):
-              
-        self.ft = 'IIR'      
+
+        self.ft = 'IIR'
 
         c = Common()
         self.rt_dict = c.rt_base_iir
-        
+
         self.rt_dict_add = {
             'COM':{'man':{'msg':('a',
                 r"Enter the filter order <b><i>N</i></b> and the critical "
                  "frequency / frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain "
                  "first drops below the minimum stop band "
-                 "attenuation <b><i>A<sub>SB</sub></i></b> .")},                                  
+                 "attenuation <b><i>A<sub>SB</sub></i></b> .")},
                                   },
             'LP': {'man':{}, 'min':{}},
             'HP': {'man':{}, 'min':{}},
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
-            }    
+            }
 
         self.info = """
 **Chebyshev Type 2 filters**
@@ -84,7 +84,7 @@ critical frequency / frequencies :math:`F_C` where the stop band attenuation
 The corner frequency/ies of the pass band can only be controlled indirectly
 by the filter order and by adapting the value(s) of :math:`F_C`.
 
-The ``cheb2ord()`` helper routine calculates the minimum order :math:`N` and the 
+The ``cheb2ord()`` helper routine calculates the minimum order :math:`N` and the
 critical stop band frequency :math:`F_C` from pass and stop band specifications.
 
 **Design routines:**
@@ -105,7 +105,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         parameters, scaling / transforming them if needed.
         """
         self.analog = False # set to True for analog filters
-        
+
         self.N     = fil_dict['N']
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.F_PB  = fil_dict['F_PB'] * 2
@@ -115,11 +115,11 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         self.F_SB2 = fil_dict['F_SB2'] * 2
         self.F_C2 = fil_dict['F_C2'] * 2
         self.F_SBC = None
-        
+
         self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
         self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
 
-        
+
         # cheby2 filter routines support only one amplitude spec for
         # pass- and stop band each
         if str(fil_dict['rt']) == 'BS':
@@ -142,18 +142,18 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)
-        and store them in the global filter dictionary. 
-        
-        Corner frequencies and order calculated for minimum filter order are 
+        and store them in the global filter dictionary.
+
+        Corner frequencies and order calculated for minimum filter order are
         also stored to allow for an easy subsequent manual filter optimization.
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
-                
+
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_SBC
-        if str(fil_dict['fo']) == 'min': 
+        if str(fil_dict['fo']) == 'min':
 
-            fil_dict['N'] = self.N 
+            fil_dict['N'] = self.N
 
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
                 fil_dict['F_C'] = self.F_SBC / 2. # HP or LP - single  corner frequency
@@ -245,5 +245,5 @@ if __name__ == '__main__':
     filt = Cheby2()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
-    
+
 # test using "python -m pyfda.filter_designs.cheby2"

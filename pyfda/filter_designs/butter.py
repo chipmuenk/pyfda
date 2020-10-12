@@ -278,4 +278,3 @@ if __name__ == '__main__':
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
 # test using "python -m pyfda.filter_designs.butter"
-    

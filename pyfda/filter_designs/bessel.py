@@ -15,29 +15,29 @@ is selected, reinitializing instance attributes.
 
 API version info:
     :1.0: initial working release
-    
+
     :1.1: - copy ``A_PB`` -> ``A_PB2`` and ``A_SB -> ``A_SB2`` for BS / BP designs
-    
+
           - mark private methods as private
-         
+
     :1.2: new API using fil_save (enable SOS features)
-    
-    :1.3: new public methods ``destruct_UI`` and ``construct_UI`` (no longer 
+
+    :1.3: new public methods ``destruct_UI`` and ``construct_UI`` (no longer
          called by ``__init__``)
-    
+
     :1.4: - module attribute ``filter_classes`` contains class name and combo box name instead of class attribute ``name``
-         
+
           - ``FRMT`` is now a class attribute
-         
+
     :2.0: Specify the parameters for each subwidget as tuples in a dict where the
          first element controls whether the widget is visible and / or enabled.
          This dict is now called ``self.rt_dict``. When present, the dict ``self.rt_dict_add``
          is read and merged with the first one.
-         
-    :2.1: Remove empty methods ``construct_UI`` and ``destruct_UI`` and attributes 
+
+    :2.1: Remove empty methods ``construct_UI`` and ``destruct_UI`` and attributes
          ``self.wdg`` and ``self.hdl``
-         
-    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+
+    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
 import scipy.signal as sig
 from scipy.signal import buttord
@@ -110,7 +110,7 @@ class Bessel(object):
                                            'amp':('a','A_PB','A_SB')})
                         }
                 }
-            } 
+            }
 
         self.info = """
 **Bessel filters**

@@ -219,3 +219,10 @@ if __name__ == '__main__':
     filt = Manual_IIR()    # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][FRMT]) # return results in default format
+
+    filt = Manual_FIR()    # instantiate filter
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][FRMT]) # return results in default format
+
+# test using "python -m pyfda.filter_designs.manual"
+#---------------------------------------------------------------------------
