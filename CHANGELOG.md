@@ -24,8 +24,9 @@
 
 #### Enhancements
 
-- Include license information for distribution of pyFDA as source code and in bundled form, redesign the whole 
-  about window
+- [PR \#183:](https://github.com/chipmuenk/pyfda/pull/187) Include license information for 
+  distribution of pyFDA as source code and in bundled form, redesign the whole 
+  "About" window, add CHANGELOG.md (this file) and move attributions to AUTHORS.md
 
 - Add cursor / annotations in plots ([Issue \#112](https://github.com/chipmuenk/pyfda/issues/112)) This is only available when 
   [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.
@@ -43,8 +44,4 @@
   
 - User and user log config files now can be replaced automatically if the config file version number is wrong 
    ([Issue \#44](https://github.com/chipmuenk/pyfda/issues/144))
-
-- Add CHANGELOG.md (this file)
-
-- Move attributions to AUTHORS.md
 
