@@ -4,11 +4,11 @@ The **pyFDA source code** is published under a permissive **MIT license** at the
 Icons (except the pyFDA icon itself) are taken from the ["Open Iconic"](https://useiconic.com/open/) collection 
 (MIT license).
 
-The **pyFDA binary** is published under a **GPLv3 license** 
+The **self-contained pyFDA package** (bundled e.g. with the help of pyInstaller or as a flatpak) is published under a **GPLv3 license** 
 as it bundles some components with (L)GPL licenses, requiring an 
-[(L)GPL compliant license](https://velovix.github.io/post/lgpl-gpl-license-compliance-with-pyinstaller/), 
+[(L)GPL compliant license](https://velovix.github.io/post/lgpl-gpl-license-compliance-with-pyinstaller/). 
 See also [wikipedia](https://en.wikipedia.org/wiki/License_compatibility) on license compatibility.
 
-While the [pyInstaller](https://www.pyinstaller.org/) used to bundle this binary has a GPLv2 licence, 
-the pyFDA binary only contains the pyInstaller bootloader which has a permissive license.
+While [pyInstaller](https://www.pyinstaller.org/) itself is distributed under a GPLv2 licence, 
+the bundled pyFDA package only contains the pyInstaller bootloader which has a permissive license.
 
