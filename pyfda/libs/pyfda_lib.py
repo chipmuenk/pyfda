@@ -48,10 +48,8 @@ if 'mkl_info' in INFO_NP:
     MKL = " (mkl)"
 else:
     MKL = ""
-    
 
-logger.warning(INFO_NP)
-
+#logger.warning(INFO_NP)
 
 
 __all__ = ['cmp_version', 'mod_version',
