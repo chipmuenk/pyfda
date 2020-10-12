@@ -207,8 +207,6 @@ def mod_version(mod = None):
 logger.info(mod_version())
 #logger.info("Found the following modules:" + "\n" + mod_version())
 
-SOS_AVAIL = True # TODO: remove from software?
-
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
 MIN_PB_AMP  = 1e-5  # min pass band ripple

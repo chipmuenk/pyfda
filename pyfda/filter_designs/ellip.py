@@ -34,7 +34,7 @@ API version info:
 """
 import scipy.signal as sig
 from scipy.signal import ellipord
-from pyfda.libs.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
@@ -45,10 +45,7 @@ classes = {'Ellip':'Elliptic'} #: Dict containing class name : display name
     
 class Ellip(object):
 
-    if SOS_AVAIL:
-        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    else:
-        FRMT = 'zpk'
+    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
         
     info = """
 **Elliptic filters**
@@ -255,3 +252,5 @@ if __name__ == '__main__':
     filt = Ellip()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
+    
+# test using "python -m pyfda.filter_designs.ellip"

@@ -36,7 +36,7 @@ import scipy.signal as sig
 from scipy.signal import cheb2ord
 from .common import Common 
 
-from pyfda.libs.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.libs.pyfda_lib import fil_save, lin2unit
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.2"
@@ -44,11 +44,8 @@ __version__ = "2.2"
 classes = {'Cheby2':'Chebychev 2'} #: Dict containing class name : display name
     
 class Cheby2(object):
-    
-    if SOS_AVAIL:
-        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    else:
-        FRMT = 'zpk'
+
+    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
     def __init__(self):
               
@@ -248,3 +245,5 @@ if __name__ == '__main__':
     filt = Cheby2()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
+    
+# test using "python -m pyfda.filter_designs.cheby2"

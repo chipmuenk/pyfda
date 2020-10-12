@@ -41,7 +41,7 @@ API version info:
 """
 import scipy.signal as sig
 from scipy.signal import buttord
-from pyfda.libs.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.libs.pyfda_lib import fil_save, lin2unit
 import logging
 logger = logging.getLogger(__name__)
 
@@ -55,10 +55,7 @@ class Bessel(object):
     the filter design in zeros, poles, gain (zpk) format
     """
 
-    if SOS_AVAIL:
-        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    else:
-        FRMT = 'zpk'
+    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
     def __init__(self):
 
@@ -292,3 +289,5 @@ if __name__ == '__main__':
     filt = Bessel()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
+
+# test using "python -m pyfda.filter_designs.bessel"
