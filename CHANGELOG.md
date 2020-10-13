@@ -22,7 +22,7 @@
 
 - Enforce correct sign for various input fields
 
-#### Enhancements
+#### New features
 
 - [PR \#183:](https://github.com/chipmuenk/pyfda/pull/187) Include license information for 
   distribution of pyFDA as source code and in bundled form, redesign the whole 
@@ -45,3 +45,32 @@
 - User and user log config files now can be replaced automatically if the config file version number is wrong 
    ([Issue \#44](https://github.com/chipmuenk/pyfda/issues/144))
 
+### Release 0.3 (2020-03)
+
+### Release 0.2 (2019-05)
+
+#### New features
+
+- **Rework of signal-slot connections**
+    * Clearer structure: only one RX / TX signal connection per widget
+    * More flexibility: transport dicts or lists via the signals
+    * Much improved modularity - new functionality can be easily added
+    
+- **Reorganization of configuration files**
+    * Specify module names instead of class names for widgets, class names are defined in the modules 
+    * More flexibility in defining user directories
+    * List suitable fixpoint implementations for each filter design as well as the other way around
+    
+- **HDL synthesis (beta status, expect bugs)**
+    * Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation 
+    * When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
+- **Didactic improvements**
+    * Improved display of transient response and FFT of transient response
+    * Display magnitude frequency response in the PZ plot to ease understanding the relationship
+- **Documentation using Sphinx / ReadTheDocs**
+
+    Could be more and better ... but hey, it's a start!
+  
+### Release 0.1 (2018-02-04)
+
+Initial release 
