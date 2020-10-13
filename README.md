@@ -34,11 +34,13 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
   <tr>
 </table>
 
-## Binaries
+## Binaries / Bundles
 
 Currently, binaries are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed.
 
-The binaries have been created using [pyInstaller](https://www.pyinstaller.org/). A `pyfdax.spec` is provided, making it easy to create and distribute binaries for your system by running ``pyinstaller pyfdax.spec``. 
+The binaries have been created using [pyInstaller](https://www.pyinstaller.org/), bundling all needed modules. A `pyfdax.spec` is provided, making it easy to create and distribute binaries for your system by running ``pyinstaller pyfdax.spec``. If you can provide an executable for Mac OS, I'll be happy to share it here.
+
+pyFDA source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Prerequisites
 
@@ -48,7 +50,7 @@ The binaries have been created using [pyInstaller](https://www.pyinstaller.org/)
   * **PyQt5**
   * **numpy**
   * **scipy**: **1.2.0** or higher
-  * **matplotlib**: **2.0** or higher (**3.3 not supported yet**) 
+  * **matplotlib**: **2.0** or higher (**3.3 supported in v0.4.0**) 
   
 ### Optional libraries:
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
@@ -203,34 +205,10 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 * **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
 * **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are expensive. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
 * **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [migen](https://github.com/m-labs/migen) allows to describe and test fixpoint behaviour within the python ecosystem. providing easy stimulus generation and plotting in time and frequency domain. When everythin works fine, the filter can be exported as synthesizable Verilog code.
+
 ## Release History / Roadmap
 
-### Release 0.1 (Jan. 1st 2018)
-
-Initial release 
-
-### Release 0.2b1 (May 2019)
-
-* **Rework of signal-slot connections**
-    * Clearer structure: only one RX / TX signal connection per widget
-    * More flexibility: transport dicts or lists via the signals
-    * Much improved modularity - new functionality can be easily added
-    
-* **Reorganization of configuration files**
-    * Specify module names instead of class names for widgets, class names are defined in the modules 
-    * More flexibility in defining user directories
-    * List suitable fixpoint implementations for each filter design as well as the other way around
-    
-* **HDL synthesis (beta status, expect bugs)**
-    * Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation 
-    * When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
-* **Didactic improvements**
-  * Improved display of transient response and FFT of transient response
-  * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
-* **Documentation using Sphinx / ReadTheDocs**
-  Could be more and better ... but hey, it's a start!
-
-### Release 0.3.1 (May 2019)
+see [CHANGELOG.md](./CHANGELOG.md)
 
 ### Release 1.0 (planned for some time in the not so near future)
 
