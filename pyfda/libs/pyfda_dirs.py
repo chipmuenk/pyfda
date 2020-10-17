@@ -59,6 +59,8 @@ def get_home_dir():
     else:
         # same for windows
         user_name = os.getenv('USER')
+        if not user_name:
+            user_name = os.getlogin() # alternative
         # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
         home_dir = env( 'USERPROFILE' )
         if not valid(home_dir):
