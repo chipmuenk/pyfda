@@ -18,6 +18,10 @@ import platform
 import tempfile
 import datetime
 
+# ANSI color codes
+CSEL = '\033[96;1m'# highlight select key (CYAN bold and bright)
+CEND = '\033[0m'   # end coloring
+os.system('color') # activate colored terminal under windows
 
 def valid(path):
     """ Check whether path exists and is valid"""
@@ -74,6 +78,8 @@ def get_log_dir():
     """
     Try different OS-dependent locations for creating log files and return 
     the first suitable directory name. Only called once at startup.
+    
+    see https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
     """
 
      # list of base directories for constructing the logging directory
@@ -130,6 +136,45 @@ def create_conf_files():
             print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
         except IOError as e:
             print(e)
+#-----------------------------------------------------------------------------
+def update_conf_files(logger, conf_version=0, req_version=100):
+    """
+    Copy templates to user config and logging config files, making backups
+    of the old versions.
+    """
+    logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_version}' "
+                    "(required: '{req_version}'). You can\n\n".format(conf_file=USER_CONF_DIR_FILE, 
+                                                                      conf_version=conf_version,
+                                                                      req_version=req_version) +
+
+                    "\t- "+CSEL+"[R]"+CEND+"eplace the existing user config files (backups will be "
+                    " created) by copies of the templates\n"
+                    "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
+                    .format(tmpl_conf=TMPL_CONF_DIR_FILE,
+                            tmpl_log=TMPL_LOG_CONF_DIR_FILE) +
+                    
+                    "\t- "+CSEL+"[Q]"+CEND+"uit and edit the user config files or delete them.\n\t"
+                    "     When deleted, new config files will be created at the next start.\n\n"
+                    "\tEnter 'q' to quit or 'r' to replace existing user config file:")
+
+    val = input("Enter 'q' to quit or 'r' to replace the existing user config file:").lower()
+    if val == 'r':
+        # Create backups of old user and logging config files, copy templates to user directory.
+        try:
+            shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_v" + conf_version)
+            shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
+            logger.info('Created new user config file "{0}".'.format(USER_CONF_DIR_FILE))
+            
+            shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_v" + conf_version)
+            shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
+            logger.info('Created new user logging config file "{0}".'.format(USER_LOG_CONF_DIR_FILE))
+        except IOError as e:
+            logger.error("IOError: {0}".format(e))
+
+    elif val == 'q':
+        sys.exit()
+    else:
+        sys.exit("Unknown option '{0}', quitting.".format(val))
 
 #==============================================================================
 # is the software running in a bundled PyInstaller environment?

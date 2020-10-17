@@ -203,46 +203,6 @@ class Tree_Builder(object):
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
-#-----------------------------------------------------------------------------
-    def update_conf_files(self):
-        """
-        Copy templates to user config and logging config files, making backups
-        of the old versions.
-        """
-        logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_version}' "
-                        "(required: '{req_version}'). You can\n"
-                        "\t- [R]eplace the existing user config files by copying the templates\n"
-                        "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
-                        "\t  Backup files will be created.\n"
-                        "\t- [Q]uit and edit the files or delete them.\n\t"
-                        "  When deleted, new configuration files will be created at the next start.\n\n\t"
-                        "Enter 'q' to quit or 'r' to replace existing user config file:"\
-                        .format(conf_file=dirs.USER_CONF_DIR_FILE,
-                                conf_version=int(self.commons['version'][0]),
-                                req_version=self.REQ_VERSION,
-                                tmpl_conf=dirs.TMPL_CONF_DIR_FILE,
-                                tmpl_log=dirs.TMPL_LOG_CONF_DIR_FILE))
-
-        val = input("Enter 'q' to quit or 'r' to replace the existing user config file:").lower()
-        if val == 'r':
-            # Create backups of old user and logging config files, copy templates to user directory.
-            try:
-                shutil.move(dirs.USER_CONF_DIR_FILE, dirs.USER_CONF_DIR_FILE + "_bak_v" + self.commons['version'][0])
-                shutil.copyfile(dirs.TMPL_CONF_DIR_FILE, dirs.USER_CONF_DIR_FILE)
-                logger.info('Created new user config file "{0}".'.format(dirs.USER_CONF_DIR_FILE))
-                
-                shutil.move(dirs.USER_LOG_CONF_DIR_FILE, dirs.USER_LOG_CONF_DIR_FILE + "_bak_v" + self.commons['version'][0])
-                shutil.copyfile(dirs.TMPL_LOG_CONF_DIR_FILE, dirs.USER_LOG_CONF_DIR_FILE)
-                logger.info('Created new user logging config file "{0}".'.format(dirs.USER_LOG_CONF_DIR_FILE))
-            except IOError as e:
-                logger.error("IOError: {0}".format(e))
-
-        elif val == 'q':
-            sys.exit()
-        else:
-            sys.exit("Unknown option '{0}', quitting.".format(val))
-
-        
 #==============================================================================
     def parse_conf_file(self):
         """
@@ -319,7 +279,8 @@ class Tree_Builder(object):
             logger.info("Found {0} entries in [Common]".format(len(self.commons)))
 
             if not 'version' in self.commons or int(self.commons['version'][0]) != self.REQ_VERSION:
-                self.update_conf_files()
+                dirs.update_conf_files(logger, conf_version=self.commons['version'][0],
+                                       req_version=self.REQ_VERSION)
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
                 logger.info("Found {0} entries in [Common] (new config file)".format(len(self.commons)))
