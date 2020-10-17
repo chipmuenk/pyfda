@@ -49,7 +49,6 @@
 ### [v0.3](https://github.com/chipmuenk/pyfda/tree/v0.3.1) (2020-05)
 
 #### New Features
-- transient response can be visualized in the frequency domain
 - display pop-up window for showing time and frequency properties of FFT windows for filter design and spectral analysis of transient signals.
 - overlay ideal frequency response in impulse response window and scale it with the number of FFT points for impulse responses. This allows a direct comparison of the fixpoint frequency response (calculated from the transient response) and the ideal response (calculated from the filter coefficients).
 -  improve parameter entry and tooltipps for windowed FIR filter design
