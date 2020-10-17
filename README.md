@@ -44,16 +44,18 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 
 ## Prerequisites
 
-* Python versions: **3.3 ... 3.7**
+* Python versions: **3.3 ... 3.8**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
   * **PyQt5**
   * **numpy**
+  * **numexpr**
   * **scipy**: **1.2.0** or higher
   * **matplotlib**: **2.0** or higher (**3.3 supported in v0.4.0**) 
   
 ### Optional libraries:
 * **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
+* [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursorsd
 * **docutils** for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
@@ -179,52 +181,57 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
     * only widgets needed for the currently selected design method are visible
     * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)
     * display help files (own / Python docstrings) as rich text
-    * tooltips for all control and entry widgets
+    * tooltips for all UI widgets
 * **Common interface for all filter design methods:**
     * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
     * specify ripple and attenuations in dB, as voltage or as power ratios
-    * enter expressions like exp(-pi/4 * 1j) and create your own stimuli with the help of the [numexpr](https://github.com/pydata/numexpr) module
+    * enter expressions like exp(-pi/4 * 1j)
 * **Graphical Analyses**
     * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
-    * Phase response (wrapped / unwrapped)
-    * Group delay
+    * Phase response (wrapped / unwrapped) and group delay
     * Pole / Zero plot
-    * Impulse response and step response (lin / log)
+    * Transient response (impulse, step and various stimulus signals) in the time and frequency domain. Roll your own stimuli (courtesy of [numexpr](https://github.com/pydata/numexpr) module)!
     * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
-    * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
+    * Filter design files not only contain the actual algorithm but the GUI definition
     * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
-* **Saving and loading**
-    * Save and load filter designs in pickled and in numpy's NPZ-format
-    * Export and import coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format
-    * Export coefficients in FPGA vendor specific formats like Xilinx (R) COE-format
+* **Import / export**
+    * Export and import filter designs in pickled and in numpy's NPZ-format
+    * Export and import coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) as a Matlab (R) workspace or in FPGA vendor specific formats like Xilinx (R) COE-format
 
 ## Why yet another filter design tool?
-* **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
-* **Show-off:** Demonstrate that Python is a potent tool for digital signal processing applications as well. The interfaces for textual filter design routines are a nightmare: linear vs. logarithmic specs, frequencies normalized w.r.t. to sampling or Nyquist frequency, -3 dB vs. -6 dB vs. band-edge frequencies ... (This is due to the different backgrounds and the history of filter design algorithms and not Python-specific.)
-* **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
-* **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are expensive. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
-* **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [migen](https://github.com/m-labs/migen) allows to describe and test fixpoint behaviour within the python ecosystem. providing easy stimulus generation and plotting in time and frequency domain. When everythin works fine, the filter can be exported as synthesizable Verilog code.
+* **Education:** Provide an easy-to-use FOSS tool for demonstrating basic digital stuff and filter design interactively that also works with the limited resolution of a beamer.
+* **Show-off:** Demonstrate that Python is a potent tool for digital signal processing as well.
+* **Fixpoint filter design:** Recursive fixpoint filter design has become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable especially for uCs and low-budget FPGAs.
+* **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [nMigen](https://github.com/nmigen/nmigen) allows to describe and test fixpoint behaviour within the python ecosystem, allowing for easy stimulus generation and plotting in time and frequency domain. When everythin works fine, the filter can be exported as synthesizable Verilog code.
 
 ## Release History / Roadmap
 
-see [CHANGELOG.md](./CHANGELOG.md)
+For details, see [CHANGELOG.md](./CHANGELOG.md).
 
-### Planned features for some time in the not so near future)
+### Upcoming release (0.4.0)
+* Matplotlib 3.3 compatibility
+* Define your own stimulus interactively (based on the [numexpr](https://github.com/pydata/numexpr) module)
+* Add cursor / annotations in plots using the [mplcursors](https://mplcursors.readthedocs.io/) module
+* Derive the name of the top level Verilog module from the name of the Verilog file
+* Improve setup of user and user log config files
+* State licensing conditions more clearly
 
-* **Filter Manager**
-  * Store multiple designs in one filter dict
-  * Compare multiple designs in plots
-* **Filter coefficients and poles / zeros**
-  * Display and edit second-order sections (SOS) in PZ editor
-  
-* Apply filter on audio files (in the impz widget) to hear the filtering effect
+### Planned features 
 
-### Following releases
-* Add a tracking cursor
+#### Started
+* Distribution as Flatpak
+* Display filtered data as spectrogram plot
+* Move fixpoint library to [https://github.com/chipmuenk/pyfixp]
+* Simulate and synthesize IIR filters with [nMigen](https://github.com/nmigen/nmigen)
+* Dark mode
+
+#### Ideas (for the not so near future or for )
+* Use audio files as stimuli in the impz widget and store results. Maybe real-time for FIR filters?
+* Keep multiple designs in memory, switch between them, compare results and store the whole set
 * Graphical modification of poles / zeros
-* Export of filter properties as PDF / HTML files
-* Design, analysis and export of filters as second-order sections
-* Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
+* Document filter designs in PDF / HTML format
+* Design, analysis and export of filters as second-order sections, display and edit them in the P/Z widget
+* Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...) for fixpoint filters with a low number of multipliers (or none at all)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
