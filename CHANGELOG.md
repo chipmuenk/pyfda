@@ -24,6 +24,11 @@
   
 - User and user log config files now can be replaced automatically if the config file version number is wrong 
    ([Issue \#44](https://github.com/chipmuenk/pyfda/issues/144))
+   
+- Comment out filter `ellip_zero` in configuration template as it is too special for 
+general usage. If needed, it can be commented back in the user config file.
+
+- Eliminate tab *Files*, its three buttons have been moved to the *Specs* and the *Info* tab
 
 #### Bug Fixes
 - Make compatible to matplotlib 3.3 by cleaning up hierarchy for NavigationToolbar in mpl_widgets.py
