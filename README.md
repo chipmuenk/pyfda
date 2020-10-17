@@ -210,7 +210,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 
 see [CHANGELOG.md](./CHANGELOG.md)
 
-### Release 1.0 (planned for some time in the not so near future)
+### Planned features for some time in the not so near future)
 
 * **Filter Manager**
   * Store multiple designs in one filter dict
