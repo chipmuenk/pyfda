@@ -203,7 +203,6 @@ def mod_version(mod = None):
 
 #------------------------------------------------------------------------------
 logger.info(mod_version())
-#logger.info("Found the following modules:" + "\n" + mod_version())
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
@@ -214,11 +213,63 @@ MIN_SB_AMP  = 1e-6  # max stop band attenuation
 MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
+class ANSIcolors:
+    """
+    ANSI Codes for colors etc. in the console
+    
+    see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+    """
+    os.system('color') # needed to activate colored terminal in Windows
+  
+    CEND      = '\33[0m'
+    CBOLD     = '\33[1m'
+    CFAINT    = '\33[2m'   
+    CITALIC   = '\33[3m'
+    CURL      = '\33[4m' # underlined
+    CBLINK    = '\33[5m' # slow blink
+    CBLINK2   = '\33[6m' # fast blink
+    CSELECTED = '\33[7m' # reverse video
+    
+    # Foreground colors
+    BLACK  = '\33[30m'
+    RED    = '\33[31m'
+    GREEN  = '\33[32m'
+    YELLOW = '\33[33m'
+    BLUE   = '\33[34m'
+    VIOLET = '\33[35m'
+    CYAN   = '\33[36m'
+    WHITE  = '\33[37m'
+    
+    # Background colors
+    BLACKBG  = '\33[40m'
+    REDBG    = '\33[41m'
+    GREENBG  = '\33[42m'
+    YELLOWBG = '\33[43m'
+    BLUEBG   = '\33[44m'
+    VIOLETBG = '\33[45m'
+    CYANBG   = '\33[46m'
+    WHITEBG  = '\33[47m'
+    
+    # Bright foreground colors
+    GREY2   = '\33[90m'
+    RED2    = '\33[91m'
+    GREEN2  = '\33[92m'
+    YELLOW2 = '\33[93m'
+    BLUE2   = '\33[94m'
+    VIOLET2 = '\33[95m'
+    CYAN2   = '\33[96m'
+    WHITE2  = '\33[97m'
 
-# https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
+    # Bright foreground colors    
+    GREYBG    = '\33[100m'
+    REDBG2    = '\33[101m'
+    GREENBG2  = '\33[102m'
+    YELLOWBG2 = '\33[103m'
+    BLUEBG2   = '\33[104m'
+    VIOLETBG2 = '\33[105m'
+    CYANBG2   = '\33[106m'
+    WHITEBG2  = '\33[107m'
 
-###############################################################################
-#### Py2/3 functions ########################################################
 
 def clean_ascii(arg):
     """
