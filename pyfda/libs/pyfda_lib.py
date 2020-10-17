@@ -82,7 +82,7 @@ try:
     MODULES.update({'pyfixp' : {'V_FX':V_FX}})
 except ImportError:
     MODULES.update({'pyfixp': {'V_FX':None}})
-    
+
 try:
     import migen
     MODULES.update({'migen': {'V_MG':'installed'}})
@@ -158,7 +158,7 @@ def cmp_version(mod, version):
 
     """
     try:
-        if mod not in MODULES or not MODULES[mod].values(): 
+        if mod not in MODULES or not MODULES[mod].values():
             return -2
         else:
             inst_ver = list(MODULES[mod].values())[0] # get dict value without knowing the key
@@ -187,11 +187,11 @@ def mod_version(mod = None):
         else:
             return None
     else:
-        v_md = ""                             
+        v_md = ""
         with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
-            # return a list, split at linebreaks while keeping linebreaks    
-            v = f.read().splitlines(True) 
-        
+            # return a list, split at linebreaks while keeping linebreaks
+            v = f.read().splitlines(True)
+
         for l in v:
             try:
                 v_md += l.format(**MOD_VERSIONS) # evaluate {V_...} from MOD_VERSIONS entries
@@ -216,20 +216,20 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 class ANSIcolors:
     """
     ANSI Codes for colors etc. in the console
-    
+
     see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
     """
     os.system('color') # needed to activate colored terminal in Windows
-  
+
     CEND      = '\33[0m'
     CBOLD     = '\33[1m'
-    CFAINT    = '\33[2m'   
+    CFAINT    = '\33[2m'
     CITALIC   = '\33[3m'
     CURL      = '\33[4m' # underlined
     CBLINK    = '\33[5m' # slow blink
     CBLINK2   = '\33[6m' # fast blink
     CSELECTED = '\33[7m' # reverse video
-    
+
     # Foreground colors
     BLACK  = '\33[30m'
     RED    = '\33[31m'
@@ -239,7 +239,7 @@ class ANSIcolors:
     VIOLET = '\33[35m'
     CYAN   = '\33[36m'
     WHITE  = '\33[37m'
-    
+
     # Background colors
     BLACKBG  = '\33[40m'
     REDBG    = '\33[41m'
@@ -249,7 +249,7 @@ class ANSIcolors:
     VIOLETBG = '\33[45m'
     CYANBG   = '\33[46m'
     WHITEBG  = '\33[47m'
-    
+
     # Bright foreground colors
     GREY2   = '\33[90m'
     RED2    = '\33[91m'
@@ -260,7 +260,7 @@ class ANSIcolors:
     CYAN2   = '\33[96m'
     WHITE2  = '\33[97m'
 
-    # Bright foreground colors    
+    # Bright foreground colors
     GREYBG    = '\33[100m'
     REDBG2    = '\33[101m'
     GREENBG2  = '\33[102m'
@@ -476,14 +476,14 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
        Expression to be evaluated, is cast to a string
 
     alt_expr: str or scalar
-        Expression to be evaluated when evaluation of first string fails, is 
+        Expression to be evaluated when evaluation of first string fails, is
         cast to a string.
 
     return_type: str
         Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
     sign: str
-        enforce positive / negative sign of result ['pos', 'poszero' / None (default) 
+        enforce positive / negative sign of result ['pos', 'poszero' / None (default)
                                                     'negzero' / 'neg']
 
     Returns
@@ -1499,7 +1499,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 #                 format_error = True
 #         else:
 #             format_error = True
-# 
+#
 # =============================================================================
         if format_error:
             raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
@@ -1584,7 +1584,7 @@ def fil_convert(fil_dict, format_in):
     Returns
     -------
     None
-    
+
     Exceptions
     ----------
     ValueError for Nan / Inf elements or other unsuitable parameters

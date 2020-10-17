@@ -32,12 +32,12 @@ def valid(path):
 def env(name):
     """
     Get value for environment variable ``name`` from the OS.
-    
+
     Parameters
     ----------
     name : str
        environment variable
-       
+
     Returns
     -------
     str
@@ -73,12 +73,12 @@ def get_home_dir():
                         home_dir = 'C:\\'
     return home_dir, user_name
 
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 def get_log_dir():
     """
-    Try different OS-dependent locations for creating log files and return 
+    Try different OS-dependent locations for creating log files and return
     the first suitable directory name. Only called once at startup.
-    
+
     see https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
     """
 
@@ -117,7 +117,7 @@ def get_conf_dir():
             print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
             return HOME_DIR
 
-#------------------------------------------------------------------------------        
+#------------------------------------------------------------------------------
 def create_conf_files():
     if not os.path.isfile(USER_CONF_DIR_FILE):
         # Copy default configuration file to user directory if it doesn't exist
@@ -127,7 +127,7 @@ def create_conf_files():
             print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
         except IOError as e:
             print(e)
-            
+
     if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
         # Copy default logging configuration file to user directory if it doesn't exist
         # This file can be easily edited by the user without admin access rights
@@ -143,7 +143,7 @@ def update_conf_files(logger, conf_version=0, req_version=100):
     of the old versions.
     """
     logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_version}' "
-                    "(required: '{req_version}'). You can\n\n".format(conf_file=USER_CONF_DIR_FILE, 
+                    "(required: '{req_version}'). You can\n\n".format(conf_file=USER_CONF_DIR_FILE,
                                                                       conf_version=conf_version,
                                                                       req_version=req_version) +
 
@@ -152,7 +152,7 @@ def update_conf_files(logger, conf_version=0, req_version=100):
                     "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
                     .format(tmpl_conf=TMPL_CONF_DIR_FILE,
                             tmpl_log=TMPL_LOG_CONF_DIR_FILE) +
-                    
+
                     "\t- "+CSEL+"[Q]"+CEND+"uit and edit the user config files or delete them.\n\t"
                     "     When deleted, new config files will be created at the next start.\n\n"
                     "\tEnter 'q' to quit or 'r' to replace existing user config file:")
@@ -164,7 +164,7 @@ def update_conf_files(logger, conf_version=0, req_version=100):
             shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_v" + conf_version)
             shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
             logger.info('Created new user config file "{0}".'.format(USER_CONF_DIR_FILE))
-            
+
             shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_v" + conf_version)
             shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
             logger.info('Created new user logging config file "{0}".'.format(USER_LOG_CONF_DIR_FILE))
@@ -198,7 +198,7 @@ LOG_DIR  = get_log_dir()
 if LOG_DIR:
     LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     #: Name of the log file, can be changed in ``pyfdax.py``
-    LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE) 
+    LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE)
 else:
     LOG_FILE = None
     LOG_DIR_FILE = None

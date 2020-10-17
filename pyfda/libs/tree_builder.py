@@ -32,22 +32,22 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     modified in place and returned
 
     Parameters
-    ---------- 
+    ----------
     d1 : dict
         hierarchical dictionary 1
-    
+
     d2 : dict
         hierarchical dictionary 2
-    
-    mode : str 
+
+    mode : str
         Select the behaviour when the same key is present in both dictionaries:
-    
+
         * :'keep1': keep the entry from ``d1`` (default)
-        
+
         * :'keep2': keep the entry from ``d2``
-        
+
         * :'add1': merge the entries, putting the values from ``d2`` first (important for lists)
-    
+
         * :'add2': merge the entries, putting the values from ``d1`` first (  "  )
 
     path : str
@@ -65,17 +65,17 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 
     Notes
     -----
-    If you don't want to modify ``d1`` in place, call the function using: 
-    
+    If you don't want to modify ``d1`` in place, call the function using:
+
     >>> new_dict = merge_dicts(dict(d1), d2)
-    
+
     If you need to merge more than two dicts use:
 
     >>> from functools import reduce   # only for py3
     >>> reduce(merge, [d1, d2, d3...]) # add / merge all other dicts into d1
 
     Taken with some modifications from:
-        
+
     http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
     """
     if not(isinstance(d1, dict) and isinstance(d2, dict)):
@@ -129,7 +129,7 @@ class Tree_Builder(object):
 
 
     """
-    
+
     def __init__(self):
 
         logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
@@ -141,34 +141,34 @@ class Tree_Builder(object):
     def init_filters(self):
         """
         Run at startup to populate global dictionaries and lists:
-        
-        - :func:`parse_conf_file()`:  Parse the configuration file `pyfda.conf` 
+
+        - :func:`parse_conf_file()`:  Parse the configuration file `pyfda.conf`
           (specified in ``dirs.USER_CONF_DIR_FILE``) using :func:`build_class_dict()`
           which calls :func:`parse_conf_section()`: Try to find and import the
-          modules specified in the corresponding sections  there; extract and 
+          modules specified in the corresponding sections  there; extract and
           import the classes defined in each module and give back an OrderedDict
-          containing successfully imported classes with their options 
-          (like fully qualified module names, display name, associated fixpoint 
-          widgets etc.). Information for each  section is stored in globally 
+          containing successfully imported classes with their options
+          (like fully qualified module names, display name, associated fixpoint
+          widgets etc.). Information for each  section is stored in globally
           accessible OrderdDicts like`fb.filter_classes`.
-              
+
         - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
           in the global dict ``fb.filter_classes`` and store them in the filter
           tree dict ``fil_tree`` with the hierarchy
-                                        
+
             **rt-ft-fc-fo-subwidget:params** .
 
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None, but populates the following global attributes:
-            
+
             - `fb.fil_tree` :
-                
+
         """
 
         self.parse_conf_file()
@@ -209,7 +209,7 @@ class Tree_Builder(object):
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
 
         :[Commons]:
-            Try to find user directories; if they exist add them to 
+            Try to find user directories; if they exist add them to
             `dirs.USER_DIRS` and `sys.path`
 
         For the other sections, OrderedDicts are returned with the class names
@@ -223,7 +223,7 @@ class Tree_Builder(object):
 
         :[Filter Designs]:
             Store (user) filter designs in `fb.filter_dict`
-            
+
         :[Fixpoint Widgets]:
             Store (user) fixpoint widgets in `fb.fixpoint_dict`
 
@@ -269,7 +269,7 @@ class Tree_Builder(object):
 #                 sect += "\t\t[" + str(s) + "]\n"
 #             logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
 #                         .format(dirs.USER_CONF_DIR_FILE, sect))
-# 
+#
 # =============================================================================
             read_conf_file()
             # -----------------------------------------------------------------
@@ -284,10 +284,10 @@ class Tree_Builder(object):
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
                 logger.info("Found {0} entries in [Common] (new config file)".format(len(self.commons)))
-                
+
                 if not 'version' in self.commons or int(self.commons['version'][0]) != self.REQ_VERSION:
                     logger.critical("User config file\n\t'{conf_file:s}'\n\t still has the wrong version '{conf_version}' "
-                        "(required: '{req_version}'), terminating."                       
+                        "(required: '{req_version}'), terminating."
                         .format(conf_file=dirs.USER_CONF_DIR_FILE,
                                 conf_version=int(self.commons['version'][0]),
                                 req_version=self.REQ_VERSION))
@@ -302,8 +302,8 @@ class Tree_Builder(object):
                             sys.path.append(d)
                     else:
                         logger.warning("User directory doesn't exist:\n\t{0}\n".format(d))
-                
-            if dirs.USER_DIRS: 
+
+            if dirs.USER_DIRS:
                 logger.info("User directory(s):\n\t{0}\n".format(dirs.USER_DIRS))
             else:
                 logger.info("No valid user directory specified.")
@@ -333,7 +333,7 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
 
-            # First check whether fixpoint options of the filter designs are 
+            # First check whether fixpoint options of the filter designs are
             # valid fixpoint classes by comparing them to the verified items of
             # fb.fixpoint_classes:
             for c in fb.filter_classes:
@@ -374,7 +374,7 @@ class Tree_Builder(object):
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
         with the elements ``{key:<OPTION>}`` where `key` and <OPTION>
-        have been read from the config file. <OPTION> has been sanitized and 
+        have been read from the config file. <OPTION> has been sanitized and
         converted to a list or a dict.
 
         Parameters
@@ -384,13 +384,13 @@ class Tree_Builder(object):
 
         Returns
         -------
-        section_conf_dict : dict 
+        section_conf_dict : dict
             Ordered dict with the keys of the config files and corresponding values
         """
         try:
             section_conf_dict = OrderedDict()
             items_list = self.conf.items(section) # entries from config file with [name, path]
-                
+
             if len(items_list) > 0:
                 for i in items_list:
                     # sanitize value and convert to a list, split at \n and ,
@@ -424,7 +424,7 @@ class Tree_Builder(object):
         except configparser.InterpolationMissingOptionError as e:
             # catch unresolvable interpolations like ${wrongSection:wrongOption}
             # Attention: This terminates  current section() without result!
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
 
         return section_conf_dict
 
@@ -432,7 +432,7 @@ class Tree_Builder(object):
     def build_class_dict(self, section, subpackage=""):
         """
         - Try to dynamically import the modules (= files) parsed in `section`
-          reading their module level attribute `classes` with classes contained 
+          reading their module level attribute `classes` with classes contained
           in the module.
 
           `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
@@ -441,29 +441,29 @@ class Tree_Builder(object):
 
         - When `classes` is a string or a list, use the string resp. the list items
           for both class and display name.
-          
+
         - Try to import the filter classes
-        
+
         Parameters
         ----------
         section: str
             Name of the section in the configuration file to be parsed by
             ``self.parse_conf_section``.
-        
+
         subpackage: str
             Name of the subpackage containing the module to be imported. Module
             names are prepended successively with
             `['pyfda.' + subpackage + '.', '', subpackage + '.']`
-        
+
         Returns
         -------
         classes_dict : dict
-        
-        A dictionary with the classes as keys; values are dicts which define 
+
+        A dictionary with the classes as keys; values are dicts which define
         the options (like display name, module path, fixpoint implementations etc).
-        
+
         Each entry has the form e.g.
-        
+
         {<class name>:{'name':<display name>, 'mod':<full module name>}} e.g.
 
         .. code-block:: python
@@ -477,9 +477,9 @@ class Tree_Builder(object):
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
         pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.'] # search in that order
-        
+
         section_conf_dict = self.parse_conf_section(section)
-        
+
         for mod_name in section_conf_dict: # iterate over dict keys found in config file
             for p in pckg_names:
                 try:  # Try to import the module from the package list above
@@ -508,7 +508,7 @@ class Tree_Builder(object):
                 elif isinstance(mod.classes, str): # String, create a dict with the
                     mod_dict = {mod.classes:mod.classes} # string as both key and value
                 elif isinstance(mod.classes, list): # list, create a dict with list items
-                    mod_dict = {l:l for l in list}  # as both key and value 
+                    mod_dict = {l:l for l in list}  # as both key and value
                 else:
                     logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
                     %(str(mod_name), str(type(mod.classes).__name__)))
@@ -529,14 +529,14 @@ class Tree_Builder(object):
                     classes_dict.update({c:{'name':mod_dict[c],  # Class name
                                             'mod':mod_fq_name}}) # Fully qualified module name
                     # when module + class import was successful, add a new entry
-                    # to the dict with the class name as key and a dict containing 
+                    # to the dict with the class name as key and a dict containing
                     # "name":display name and "mod":fully qualified module name as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
                     # check whether options have been defined in the config file
                     opt = section_conf_dict[mod_name]
                     if opt:
-                        if type(opt) == dict: 
+                        if type(opt) == dict:
                             classes_dict[c].update(opt)
                         elif type(opt) in {str, list}: # create dict {'opt':<OPTION>}
                             classes_dict[c].update({"opt":opt})
