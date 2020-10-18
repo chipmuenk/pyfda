@@ -21,7 +21,6 @@ import datetime
 # ANSI color codes
 CSEL = '\033[96;1m'# highlight select key (CYAN bold and bright)
 CEND = '\033[0m'   # end coloring
-os.system('color') # activate colored terminal under windows
 
 def valid(path):
     """ Check whether path exists and is valid"""
@@ -139,35 +138,34 @@ def create_conf_files():
         except IOError as e:
             print(e)
 #-----------------------------------------------------------------------------
-def update_conf_files(logger, conf_version=0, req_version=100):
+def update_conf_files(logger):
     """
     Copy templates to user config and logging config files, making backups
     of the old versions.
     """
-    logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_version}' "
-                    "(required: '{req_version}'). You can\n\n".format(conf_file=USER_CONF_DIR_FILE,
-                                                                      conf_version=conf_version,
-                                                                      req_version=req_version) +
+    if OS.lower() == "windows":
+        os.system('color') # activate colored terminal under windows
 
-                    "\t- "+CSEL+"[R]"+CEND+"eplace the existing user config files (backups will be "
-                    " created) by copies of the templates\n"
-                    "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
-                    .format(tmpl_conf=TMPL_CONF_DIR_FILE,
-                            tmpl_log=TMPL_LOG_CONF_DIR_FILE) +
-
-                    "\t- "+CSEL+"[Q]"+CEND+"uit and edit the user config files or delete them.\n\t"
-                    "     When deleted, new config files will be created at the next start.\n\n"
-                    "\tEnter 'q' to quit or 'r' to replace existing user config file:")
-
+    logger.error("Please either\n"
+                 "\t- {R_str}eplace the existing user and log config files (backups will be "
+                 " created) by copies of the templates\n"
+                 "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
+                 "\t- {Q_str}uit and edit or delete the user config files yourself.\n\t"
+                 "     When deleted, new config files will be created at the next start.\n\n"
+                 "\tEnter 'q' to quit or 'r' to replace existing user config file:"
+                 .format(tmpl_conf=TMPL_CONF_DIR_FILE,
+                        tmpl_log=TMPL_LOG_CONF_DIR_FILE,
+                        R_str=CSEL+"[R]"+CEND,
+                        Q_str=CSEL+"[Q]"+CEND))
     val = input("Enter 'q' to quit or 'r' to replace the existing user config file:").lower()
     if val == 'r':
         # Create backups of old user and logging config files, copy templates to user directory.
         try:
-            shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_v" + conf_version)
+            shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_" + TODAY)
             shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
             logger.info('Created new user config file "{0}".'.format(USER_CONF_DIR_FILE))
 
-            shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_v" + conf_version)
+            shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY)
             shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
             logger.info('Created new user logging config file "{0}".'.format(USER_LOG_CONF_DIR_FILE))
         except IOError as e:
@@ -196,9 +194,11 @@ USER_DIRS = [] #: Placeholder for user widgets directory list, set by treebuilde
 
 HOME_DIR, USER_NAME = get_home_dir() #: Home dir and user name
 
+TODAY = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
 LOG_DIR  = get_log_dir()
 if LOG_DIR:
-    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    LOG_FILE = 'pyfda_{0}.log'.format(TODAY)
     #: Name of the log file, can be changed in ``pyfdax.py``
     LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE)
 else:

@@ -245,7 +245,33 @@ class Tree_Builder(object):
                 sect += "\t\t[" + str(s) + "]\n"
             logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
                         .format(dirs.USER_CONF_DIR_FILE, sect))
+        # -----------------------------------------------------------------
 
+        def read_conf_version():
+            """
+            Try to read out the version of the config file, if the version
+            number cannot be read or is not equal to the required number,
+            return False.
+            """
+            success = True
+            try:
+                conf_ver = int(self.commons['version'][0])
+                if conf_ver != self.REQ_VERSION:
+                    logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_ver}' "
+                                 "(required: '{req_version}')."
+                                 .format(conf_file=dirs.USER_CONF_DIR_FILE,
+                                         conf_ver=conf_ver,
+                                         req_version=self.REQ_VERSION))
+                    success = False
+            except KeyError:
+                logger.error("No entry 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
+                success = False
+            except (IndexError, ValueError, TypeError):
+                logger.error("No suitable value for 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
+                success  = False
+
+            return success
+       # -----------------------------------------------------------------
 
         try:
             # Test whether user config file is readable, this is necessary as
@@ -262,35 +288,23 @@ class Tree_Builder(object):
             self.conf.optionxform = str
             # Allow interpolation across sections, ${Dirs:dir1}
             self.conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
-# =============================================================================
-#             self.conf.read(dirs.USER_CONF_DIR_FILE)
-#             sect = ""
-#             for s in self.conf.sections():
-#                 sect += "\t\t[" + str(s) + "]\n"
-#             logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
-#                         .format(dirs.USER_CONF_DIR_FILE, sect))
-#
-# =============================================================================
+
             read_conf_file()
             # -----------------------------------------------------------------
             # Parsing [Common]
             #------------------------------------------------------------------
             self.commons = self.parse_conf_section("Common")
             logger.info("Found {0} entries in [Common]".format(len(self.commons)))
+            logger.warning("{0} | '{1}'".format(type(self.commons['version']), self.commons['version']))
 
-            if not 'version' in self.commons or int(self.commons['version'][0]) != self.REQ_VERSION:
-                dirs.update_conf_files(logger, conf_version=self.commons['version'][0],
-                                       req_version=self.REQ_VERSION)
+            if not read_conf_version():
+                dirs.update_conf_files(logger)
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
                 logger.info("Found {0} entries in [Common] (new config file)".format(len(self.commons)))
 
-                if not 'version' in self.commons or int(self.commons['version'][0]) != self.REQ_VERSION:
-                    logger.critical("User config file\n\t'{conf_file:s}'\n\t still has the wrong version '{conf_version}' "
-                        "(required: '{req_version}'), terminating."
-                        .format(conf_file=dirs.USER_CONF_DIR_FILE,
-                                conf_version=int(self.commons['version'][0]),
-                                req_version=self.REQ_VERSION))
+                if not read_conf_version():
+                    logger.critical("Version number is still invalid, terminating.")
                     sys.exit()
 
             if 'user_dirs' in self.commons:
