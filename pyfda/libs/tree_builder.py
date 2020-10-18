@@ -10,7 +10,7 @@
 Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
-import os, sys, re, ast, shutil
+import os, sys, re, ast
 from collections import OrderedDict
 from pprint import pformat
 import importlib
@@ -295,7 +295,6 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             self.commons = self.parse_conf_section("Common")
             logger.info("Found {0} entries in [Common]".format(len(self.commons)))
-            logger.warning("{0} | '{1}'".format(type(self.commons['version']), self.commons['version']))
 
             if not read_conf_version():
                 dirs.update_conf_files(logger)
