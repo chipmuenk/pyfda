@@ -218,8 +218,10 @@ class ANSIcolors:
     ANSI Codes for colors etc. in the console
 
     see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+        https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
     """
-    os.system('color') # needed to activate colored terminal in Windows
+    if dirs.OS.lower() == "windows":
+        os.system('color') # needed to activate colored terminal in Windows
 
     CEND      = '\33[0m'
     CBOLD     = '\33[1m'
