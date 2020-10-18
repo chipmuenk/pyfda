@@ -27,9 +27,10 @@ mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
 from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
-                     QMessageBox, QPlainTextEdit, QAction, QMenu, pyqtSignal)
+                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 
 from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 
 #========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
@@ -44,9 +45,17 @@ class DynFileHandler(logging.FileHandler):
         if not os.path.isabs(filename): # path to logging file given in config_file?
             dirs.LOG_DIR_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
         logging.FileHandler.__init__(self, dirs.LOG_DIR_FILE, mode, encoding)
-        
-# TODO: coloured logger: https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 
+# =============================================================================
+#         logging.addLevelName(logging.WARNING, ACol.YELLOW2 + 
+#                              logging.getLevelName(logging.WARNING) + ACol.CEND)
+#         logging.addLevelName(logging.ERROR, ACol.RED2 +
+#                              logging.getLevelName(logging.ERROR) + ACol.CEND)
+#         logging.addLevelName(logging.CRITICAL, ACol.RED2 + ";" + ACol.CSELECTED +
+#                              logging.getLevelName(logging.CRITICAL) + ACol.CEND)
+# https://stackoverflow.com/questions/24469662/how-to-redirect-logger-output-into-pyqt-text-widget
+# coloured logger: https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
+# =============================================================================
 class XStream(QtCore.QObject):
     """
     subclass for log messages on logger window
