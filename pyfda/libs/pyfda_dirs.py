@@ -147,8 +147,8 @@ def update_conf_files(logger):
         os.system('color') # activate colored terminal under windows
 
     logger.error("Please either\n"
-                 "\t- {R_str}eplace the existing user and log config files (backups will be "
-                 " created) by copies of the templates\n"
+                 "\t- {R_str}eplace the existing user and log config files \n"
+                 "\t     by copies of the templates (backups will be created).\n"
                  "\t\t{tmpl_conf} and \n\t\t{tmpl_log}\n"
                  "\t- {Q_str}uit and edit or delete the user config files yourself.\n\t"
                  "     When deleted, new config files will be created at the next start.\n\n"
