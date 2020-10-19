@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-xx)
+### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-19)
 
 #### New features
 
