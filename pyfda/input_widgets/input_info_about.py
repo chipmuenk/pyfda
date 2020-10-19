@@ -219,8 +219,7 @@ class AboutWindow(QDialog):
 
     def display_changelog(self):
         """ Display changelog """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"),
-                  'r') as f:
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "CHANGELOG.md"), 'r') as f:
             lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(lic_str)
 
@@ -235,9 +234,9 @@ class AboutWindow(QDialog):
 #------------------------------------------------------------------------------
 
     def display_GPL_lic(self):
-        """ Display MIT license """
-        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPL3_0.html"), 'r') as f:
-            lic_str = f.read()
+        """ Display GPL license """
+        with open(os.path.join(dirs.INSTALL_DIR, "..", "LICENSE_GPLv3.md"), 'r') as f:
+            lic_str = markdown.markdown(f.read(), output_format='html5')
         self.txtDisplay.setText(lic_str)
 
 # =============================================================================
