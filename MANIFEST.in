@@ -1,6 +1,9 @@
-include pyfda/fixpoint_widgets/*.png
-include pyfda/libs/pyfda_*.conf
-include README*.md
-include AUTHORS.md
-include LICENSE.md
+#include pyfda/fixpoint_widgets/*.png
+#include pyfda/libs/pyfda_*.conf
+recursive-include pyfda/ *
+include *.md
 include requirements.txt
+
+# exclude byte-code files and github readme
+exclude README.md
+global-exclude *.py[cod]
