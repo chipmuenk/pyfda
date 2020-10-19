@@ -198,7 +198,10 @@ def mod_version(mod = None):
             except (KeyError) as e: # encountered undefined {V_...}
                 logger.warning("KeyError: {0}".format(e)) # simply drop the line
 
-        v_html = markdown.markdown(v_md, output_format='html5', extensions=['tables'])
+        v_html = markdown.markdown(v_md, output_format='html5',
+                                   extensions=['markdown.extensions.tables'])
+        # pyinstaller needs explicit definition of extensions path
+        
         return v_html
 
 #------------------------------------------------------------------------------

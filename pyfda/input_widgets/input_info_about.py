@@ -193,7 +193,10 @@ class AboutWindow(QDialog):
                               temp_dir=dirs.TEMP_DIR, pyfda_conf=dirs.USER_CONF_DIR_FILE,
                               log_conf=dirs.USER_LOG_CONF_DIR_FILE, log_file=dirs.LOG_DIR_FILE))
 
-        dirs_str = markdown.markdown(dirs_md, output_format='html5', extensions=['tables'])
+
+        dirs_str = markdown.markdown(dirs_md, output_format='html5',
+                                     extensions=['markdown.extensions.tables'])
+        # pyinstaller needs explicit definition of extensions path
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -204,7 +207,9 @@ class AboutWindow(QDialog):
             self.lic_str = ""
         else:
             with open(os.path.join(dirs.INSTALL_DIR, "license_info.md"), 'r') as f:
-                self.lic_str = markdown.markdown(f.read(), output_format='html5', extensions=['tables'])
+                self.lic_str = markdown.markdown(f.read(), output_format='html5',
+                                                 extensions=['markdown.extensions.tables'])
+                                                # pyinstaller needs explicit definition of extensions path
 
         self.about_str = os_str + dirs_str + ver_str
 
