@@ -40,8 +40,10 @@ datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py file
 
 # add images and configuration files
 datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
-            ('pyfda/libs/*.conf', 'pyfda/libs')]
+            ('pyfda/libs/*.conf', 'pyfda/libs'),
+            ('*.md', '.')]
 
+hiddenimports += ['markdown']
 ### Plot Widgets
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
@@ -50,16 +52,16 @@ hiddenimports += [
 hiddenimports += [
     'pyfda.input_widgets.input_specs','pyfda.input_widgets.input_coeffs',
     'pyfda.input_widgets.input_pz','pyfda.input_widgets.input_info',
-    'pyfda.input_widgets.input_files','pyfda.input_widgets.input_fixpoint_specs']
+    'pyfda.input_widgets.input_fixpoint_specs']
 ### Filter Designs
 hiddenimports += [
     'pyfda.filter_designs.equiripple','pyfda.filter_designs.firwin','pyfda.filter_designs.ma',
     'pyfda.filter_designs.bessel','pyfda.filter_designs.butter','pyfda.filter_designs.ellip',
-    'pyfda.filter_designs.cheby1','pyfda.filter_designs.cheby2','pyfda.filter_designs.ellip_zero',
+    'pyfda.filter_designs.cheby1','pyfda.filter_designs.cheby2',
 	'pyfda.filter_designs.manual'] 
 ### Fixpoint Widgets
 hiddenimports += [
-    'pyfda.fixpoint_widgets.fir_df','pyfda.fixpoint_widgets.fx_delay']
+    'pyfda.fixpoint_widgets.fir_df']# ,'pyfda.fixpoint_widgets.fx_delay']
 
 excludes  = collect_submodules('tornado') 
 excludes += collect_submodules('colorama')
