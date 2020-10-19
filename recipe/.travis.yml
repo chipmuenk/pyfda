@@ -1,0 +1,46 @@
+language: python
+# adapted from https://github.com/GriMel/Kindleo/blob/master/.travis.yml
+
+global:
+#use xvfb (X Virtual Framebuffer) to imitate a display
+  - SETUP_XVFB=True
+ 
+sudo: required
+
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+
+before_install:
+  - uname -a
+  - free -m
+  - df -h
+  - ulimit -a
+  # Creat downloads directory with suitable access rights
+  - sudo mkdir -p /downloads
+  - sudo chmod a+rw /downloads
+  - curl -L https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.2/sip-4.19.2.tar.gz  -o /downloads/sip.tar.gz 
+  # Builds directory 
+  - sudo mkdir -p /builds
+  - sudo chmod a+rw /builds
+
+install:
+  - pip install -U pip wheel setuptools
+  - pip install -r requirements.txt
+  - python -V
+  
+  # SIP
+  - tar xzf /downloads/sip.tar.gz --keep-newer-files
+  - pushd sip-4.19.2
+  - python configure.py
+  - make
+  - sudo make install
+  - popd
+
+  - pip install .
+
+services: 
+  - xvfb
+
+script: nosetests --verbosity=2
