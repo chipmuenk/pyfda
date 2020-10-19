@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25">
+<desc>
+  Text [Q] as Font, use &quot; for quotation marks
+</desc>
+
+  <text x="0" y="20"
+        style="font-size:18px; fill:black; font-family: Helvetica;
+               stroke:black; stroke-width:1px; font-style:normal;
+			   font-weight:bold;">[Q]</text>
+</svg>
