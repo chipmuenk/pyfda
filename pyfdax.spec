@@ -44,7 +44,8 @@ datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
             ('./*.md', '.'),
             ('pyfda/*.md', 'pyfda')]
 
-#hiddenimports += ['markdown']
+hiddenimports += ['html.parser'] # needed for markdown 3.3 compatibility
+hiddenimports += ['scipy.special.cython_special']
 ### Plot Widgets
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
