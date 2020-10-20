@@ -41,9 +41,10 @@ datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py file
 # add images and configuration files
 datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
             ('pyfda/libs/*.conf', 'pyfda/libs'),
-            ('*.md', '.')]
+            ('./*.md', '.'),
+            ('pyfda/*.md', 'pyfda')]
 
-hiddenimports += ['markdown']
+#hiddenimports += ['markdown']
 ### Plot Widgets
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
