@@ -863,11 +863,16 @@ class Input_Coeffs(QWidget):
         sel = qget_selected(self.tblCoeff)['sel']
 
         if not any(sel): # nothing selected, append one row of zeros to table
-            self.ba = np.hstack((self.ba,[[0],[0]]))
+            self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1) #"insert" row after last
         elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR': # only complete rows selected
             self.ba = np.insert(self.ba, sel[0], 0, axis=1)
+#        elif len(sel[0]) == len(sel[1]):
+#            self.ba = np.insert(self.ba, sel, 0, axis=1)
+#       not allowed, sel needs to be a scalar or one-dimensional
         else:
-            logger.warning("Cannot insert single values")
+            logger.warning("It is only possible to insert complete rows!")
+            # The following doesn't work because the subarrays wouldn't have 
+            # the same length for a moment
             #self.ba[0] = np.insert(self.ba[0], sel[0], 0)
             #self.ba[1] = np.insert(self.ba[1], sel[1], 0)
             return

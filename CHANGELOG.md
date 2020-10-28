@@ -1,5 +1,14 @@
 ## Changelog
 
+### [v0.4.1](https://github.com/chipmuenk/pyfda/tree/v0.4.1) (2020-xx-yy)
+
+### New features
+
+### Bug fixes
+
+- Fix error with complex-valued entries in newly created row in `input_coeffs` widget
+  (ID: 26ba25f4f947)
+
 ### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-19)
 
 #### New features
@@ -30,7 +39,7 @@ general usage. If needed, it can be commented back in the user config file.
 
 - Eliminate tab *Files*, its three buttons have been moved to the *Specs* and the *Info* tab
 
-#### Bug Fixes
+#### Bug fixes
 - Make compatible to matplotlib 3.3 by cleaning up hierarchy for NavigationToolbar in mpl_widgets.py
  ([Issue \#179](https://github.com/chipmuenk/pyfda/issues/179), [Issue \#44](https://github.com/chipmuenk/pyfda/issues/144)) 
   and get rid of mpl 3.3 related deprecation warnings. Disable zoom rectangle and pan when zoom is locked. 
