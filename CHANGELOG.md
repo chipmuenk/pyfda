@@ -8,6 +8,9 @@
 
 - Fix error with complex-valued entries in newly created row in `input_coeffs` widget
   (ID: 26ba25f4f947)
+  
+- Complex stimuli are now plotted as real and imaginary parts just like the response
+  (ID: 5b20228c93a98a8c601b8ef172f0162dc97d52c1)
 
 ### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-19)
 

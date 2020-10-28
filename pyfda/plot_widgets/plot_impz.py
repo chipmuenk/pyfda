@@ -508,7 +508,7 @@ class Plot_Impz(QWidget):
         (Re-)calculate float filter response `self.y` from stimulus `self.x`.
 
         Split response into imag. and real components `self.y_i` and `self.y_r`
-        and set the flag `self.cmplx`.
+        and set the flag `self.cmplx` (also when stimulus `self.x` is complex).
         """
         # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -539,7 +539,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw[:] = [True] * 2
 
         # Calculate imag. and real components from response
-        self.cmplx = np.any(np.iscomplex(self.y))
+        self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
         if self.cmplx:
             self.y_i = self.y.imag
             self.y_r = self.y.real
@@ -834,12 +834,12 @@ class Plot_Impz(QWidget):
         plot_stim_dict = self.fmt_plot_stim.copy()
         plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r,
                                       plot_stim_dict, self.ui.bottom_t)
-        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
+        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].real, label='$x[n]$',
                       **plot_stim_dict)
 
         # Add plot markers, this is way faster than normal stem plotting
         if self.plt_time_stim_mkr:
-            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], **self.fmt_mkr_stim)
+            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].real, **self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
@@ -871,8 +871,9 @@ class Plot_Impz(QWidget):
         self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
-        if self.cmplx and self.plt_time_resp != "none":
+        if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
             #plot_resp_dict = self.fmt_plot_resp.copy()
+            # --- imag. part of response -----
             plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
                                           plot_resp_dict, self.ui.bottom_t)
 
@@ -883,6 +884,19 @@ class Plot_Impz(QWidget):
                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
                                   marker=mkfmt_i, **self.fmt_mkr_resp)
 
+            # --- imag. part of stimulus ----- 
+            plot_stim_dict = self.fmt_plot_stim.copy()
+            plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_i,
+                                      plot_stim_dict, self.ui.bottom_t)
+            plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, label='$x_i[n]$',
+                      **plot_stim_dict)
+
+            # Add plot markers, this is way faster than normal stem plotting
+            if self.plt_time_stim_mkr:
+                self.ax_i.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, 
+                                  marker=mkfmt_i, **self.fmt_mkr_stim)
+
+            # --- labels and markers ----- 
 #            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
 #                bottom=self.ui.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
 #            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
