@@ -420,7 +420,7 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Chirp":
             self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,  
                                             method=self.ui.chirp_method.lower(), phi=phi1)
-            self.title_str += r'to ' + self.ui.chirp_method + 'Chirp Signal '
+            self.title_str += r'to ' + self.ui.chirp_method + ' Chirp Signal '
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
