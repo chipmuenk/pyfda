@@ -1,7 +1,7 @@
-# Distributing and installing pyFDA
+# Installing and packaging pyFDA
 
 There are several options to install pyfda either from source or from a binary / 
-bundle. The ">" signs below only indicates a command line, don't enter them.
+bundle. The ">" signs below only indicate the command lines, don't enter them.
 
 ## Installation
 ### pip and PyPI
@@ -27,7 +27,7 @@ A **specific version** instead of the latest stable version can be selected with
 	
 where the specified path points to `pyfda/setup.py` (without including `setup.py`).
 In this case, you need to have a local copy of the pyfda project, preferrably 
-obtained using git (see below).
+synchronized to the GitHub repo using git.
 
 Install the latest development version from **GitHub** using
 
@@ -39,7 +39,7 @@ Install the latest development version from **GitHub** using
 
 ### conda
 I'm not providing conda builds anymore (too messy) but so far I've had no major
-problems installing pyfda with pip under Anaconda 
+problems installing pyfda with pip under Anaconda.
 
 ### setup.py   
 You can also download the project as a zip file from GitHub and extract it to 
@@ -96,7 +96,7 @@ Local installation:
 
     > flatpak install --user --from FLATPAKREF 
 
-## Building
+## Building / packaging
 
 ### pip and PyPI
 
@@ -128,7 +128,7 @@ by running
 
     > python flatpak-pip-generator pyfda 
     
-You can also read the dependencies from pip's `requirements.txt`:
+You can also get the dependencies from pip's `requirements.txt`:
 
     > python flatpak-pip-generator --requirements-file=requirements.txt
     
@@ -154,7 +154,7 @@ The manifest also specifies which of the
 is selected.
 
 Runtime and SDK need to be installed first to your local computer using 
-(omit the version number to get a selection)
+(omit the version number for a command line selection)
 
     > flatpak install flathub org.kde.Platform//5.15
     > flatpak install flathub org.kde.Sdk//5.15
@@ -202,20 +202,19 @@ resp. in `org.flatpak.pyfda.yaml`:
       - --socket=wayland
       - --filesystem=host
       - --device=dri
+      - --own-name=org.flatpak.pyfda
+      - --filesystem=home # which part of the file system can be accessed by the app
       # I don't know what the following arguments do
       - --filesystem=xdg-run/dconf
       - --filesystem=~/.config/dconf:ro
       - --talk-name=ca.desrt.dconf
       - --env=DCONF_USER_CONFIG_DIR=.config/dconf
-      - --own-name=org.flatpak.pyfda
-      - --filesystem=home # where can files be stored
-    
     modules:
       - python3-requests.json
       
     rename-icon:pyfda_icon # Image will renamed to match the app-id konvention
     rename-appdata-file: pyfda.appdata.xml
-    rename-desktop-file: pyfda.desktop
+    rename-desktop-file: pyfda.desktop # launcher for the desktop
 
 
 Finally, the build process is started with
