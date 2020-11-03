@@ -5,7 +5,6 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 
 ## Installation
 ### pip and PyPI
-
 Installing pyfda from the Python Package Inventory <https://pypi.org> is most 
 straightforward (if you have Python installed on your computer), required libraries 
 are installed automatically if missing. Just run (you might need `pip3` instead
@@ -37,11 +36,57 @@ Install the latest development version from **GitHub** using
 
     > pip uninstall pyfda
 
-### conda
-I'm not providing conda builds anymore (too messy) but so far I've had no major
-problems installing pyfda with pip under Anaconda.
+### Running from source
+You can simply download and unpack the zip file from GitHub and start the program 
+from the `pyfda` top project directory with
 
-### setup.py   
+    > python -m pyfda.pyfdax     # Plain Python interpreter 
+
+or
+    
+    In [1]: %run -m pyfda.pyfdax # IPython
+    
+For testing purposes, most individual files from pyFDA can be run using e.g.
+
+    > python -m pyfda.input_widgets.input_pz       # Plain python interpreter
+
+or
+    
+    In [2]: %run -m pyfda.input_widgets.input_pz   # IPython 
+    
+However, installing pyfda makes life easier as it creates a run script `pyfdax`
+in your path.
+
+### conda
+I'm not providing conda builds for the Anaconda distribution anymore (too messy) 
+but so far I've had no major problems installing pyfda with pip under Anaconda.
+
+You need to be careful with `PyQt5` as conda installs it under the name
+`pyqt` and pip under the name `pyqt5`:
+
+- `pip install` **`pyqt5`** installs system wide
+
+- `conda install` **`pyqt`** installs sytem wide or in an environment.
+
+`pip install pyfda` checks whether PyQt5 is installed already (but conda doesn't) 
+so you **need** to do `conda install pyqt` before pip.
+
+
+If you end up having *both* installed, you're in 
+[trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If you do
+
+    > conda list qt
+
+    pyqt                      5.6.0                    py36_2
+    PyQt5                     5.8.2                     <pip>
+    
+and get a similar result as above, you probably have a corrupted system. 
+
+Don't use the `base` environment  for installing pyfda (you shouldn't do this 
+for *any* software) but rather switch to another environment (`conda activate my_fancy_environment`) 
+or create a new one (`conda create --name my_new_environment`). 
+
+### setuptools   
 You can also download the project as a zip file from GitHub and extract it to 
 a directory of your choice. Either install a copy to your `<python>/Lib/site-packages` 
 subdirectory using
@@ -53,7 +98,7 @@ or just create a link to where you have copied the python source files (for test
 
     > python setup.py develop
     
-Attention: There is no automatic uninstall option in this case!
+Attention: There is no automatic uninstall option when installing pyfda this way!
     
 ### pyInstaller
 pyInstaller bundles all required Python and data files together with a bootloader
@@ -99,9 +144,10 @@ Local installation:
 ## Building / packaging
 
 ### pip and PyPI
+The standard pip packaging flow (only sdist) is used, packages are uploaded to 
+<https://pypi.org/project/pyfda/> with twine.
 
 ### pyInstaller
-
 pyInstaller can build executables with the help of a `*.spec`  file that is provided 
 in the directory `ressource`. Hopefully, this works out of the box across operating
 systems with
@@ -150,7 +196,7 @@ resp. for a YaML manifest
 
 The manifest also specifies which of the 
 [three available runtimes](https://docs.flatpak.org/en/latest/available-runtimes.html)
-(Freedesktop, Gnome or KDE) shall be used. As pyfda uses a lot of Qt, the KDE runtime
+(Freedesktop, Gnome or KDE) will be used. As pyfda builds upon (py)Qt, the KDE runtime
 is selected.
 
 Runtime and SDK need to be installed first to your local computer using 
@@ -224,3 +270,6 @@ Finally, the build process is started with
 resp.
 
     > flatpak-builder build-dir org.flatpak.pyfda.yaml
+    
+Currently, this process fails, probably due to 
+<https://github.com/flatpak/flatpak-builder-tools/issues/47>
