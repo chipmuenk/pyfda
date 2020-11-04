@@ -756,7 +756,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.fig.clf() # clear figure with axes
 
         if plt_time:
-            num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
+            num_subplots = 1 + self.cmplx
 
             ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
                                                sharex=True, squeeze = False)
@@ -766,7 +766,7 @@ class Plot_Impz(QWidget):
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
-            if self.cmplx and self.plt_time_resp != "none":
+            if self.cmplx:
                 self.ax_i = ax[1][0]
                 self.ax_i.cla()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
