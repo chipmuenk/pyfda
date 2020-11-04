@@ -10,7 +10,12 @@
   (ID: 26ba25f4f947)
   
 - Complex stimuli are now plotted as real and imaginary parts just like the response
-  (ID: 5b20228c93a98a8c601b8ef172f0162dc97d52c1)
+  (a.o. ID: 5b20228c93a98a8c601b8ef172f0162dc97d52c1)
+  
+- Fix scaling for spectra of complex-valued time signals, allow complex amplitudes
+  in the impz UI
+  
+- Fix missing taskbar icon under Windows 
 
 ### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-19)
 
