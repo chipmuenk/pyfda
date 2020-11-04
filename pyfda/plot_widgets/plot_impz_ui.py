@@ -344,7 +344,7 @@ class PlotImpz_UI(QWidget):
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
 
-        self.lblStimulus = QLabel(to_html("Shape ", frmt='bi'), self)
+        self.lblStimulus = QLabel(to_html("Type: ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine", "Chirp",
                                    "Triang","Saw","Rect","Comb","AM","FM","PM","Formula"])
@@ -395,13 +395,13 @@ class PlotImpz_UI(QWidget):
         self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
-        self.ledAmp1.setToolTip("Stimulus amplitude")
+        self.ledAmp1.setToolTip("Stimulus amplitude, complex values like 3j - 1 are allowed")
         self.ledAmp1.setObjectName("stimAmp1")
 
         self.lblAmp2 = QLabel(to_html("A_2", frmt='bi') + " =", self)
         self.ledAmp2 = QLineEdit(self)
         self.ledAmp2.setText(str(self.A2))
-        self.ledAmp2.setToolTip("Stimulus amplitude 2")
+        self.ledAmp2.setToolTip("Stimulus amplitude 2, complex values like 3j - 1 are allowed")
         self.ledAmp2.setObjectName("stimAmp2")
 
         layVlblAmp = QVBoxLayout()
@@ -707,13 +707,13 @@ class PlotImpz_UI(QWidget):
 
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
-        self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
+        self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='cmplx')
         self.ledAmp1.setText(str(self.A1))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'a1'})
 
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
-        self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
+        self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='cmplx')
         self.ledAmp2.setText(str(self.A2))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'a2'})
 
