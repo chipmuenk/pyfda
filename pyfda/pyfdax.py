@@ -293,15 +293,27 @@ def main():
             style = 'Using system style "{0}".'.format(rc.qss_rc)
         else:
             style = 'Style "{0}" not found, falling back to default style.'.format(rc.qss_rc)
-        
-    app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
     logger.info(style)
 
-    # Sets the active window to the active widget in response to a system event.
-    app.setActiveWindow(mainw) 
+    if dirs.OS.lower() == "windows":
+        # Windows taskbar is not for "Application Windows" but for "Application
+        # User Models", grouping several instances of an application under one
+        # common taskbar icon. Python apps are sometimes grouped under the icon
+        # for Pythonw.exe, sometimes the icon is just blank. The following
+        # instructions tell Windows that pythonw is merely hosting other applications.
+        import ctypes
+        myappid = u'chipmuenk.pyfda.v0.4'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+    # set taskbar icon    
+    app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
+
+    # Sets the active window to the active widget in response to a system event
+    app.setActiveWindow(mainw)
+    # Set default icon for window
     mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
     screen_resolution = app.desktop().screenGeometry()
