@@ -977,6 +977,36 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the frequency domain mplwidget
         """
+        def calc_ssb_spectrum(A):
+            """
+            Calculate the single-sideband spectrum from a double-sideband 
+            spectrum by adding the mirrored conjugate complex of the second half 
+            of the spectrum to the first while leaving the DC value untouched.
+            
+            When len(A) is even, A[N//2] represents half the sampling frequencvy
+            and has to be discarded (Q: also for the power calculation?). Both
+            tasks are addressed by
+            
+            Parameters
+            ----------
+            A : array-like
+                double-sided spectrum, usually complex. The sequence is as follows:
+                    
+                    [0, 1, 2, ..., 4, -5, -4, ... , -1] for len(A) = 10
+
+            Returns
+            -------
+            A_SSB : array-like
+                single-sided spectrum with half the number of input values
+
+            """
+            N = len(A)
+            A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),
+                              0, A[0])
+            
+            return A_SSB
+            #--------------------------------------------------------------
+            
         self._init_axes_freq()
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
@@ -1010,33 +1040,32 @@ class Plot_Impz(QWidget):
             else:
                 freq_resp = False
                 scale_impz = 1.
-                
+
             if plt_stimulus:
                 X = self.X.copy() * self.scale_i
                 Px = np.sum(np.square(X)) * scale_impz / self.ui.nenbw
                 X *= scale_impz # scale display of frequency response
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X[1:] = 2 * X[1:]
+                    X = calc_ssb_spectrum(X)
 
             if plt_stimulus_q:
                 X_q = self.X_q.copy() * self.scale_i
                 Pxq = np.sum(np.square(X_q)) * scale_impz / self.ui.nenbw
                 X_q *= scale_impz
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X_q[1:] = 2 * X_q[1:]
+                    X_q = calc_ssb_spectrum(X_q)
 
             if plt_response:
                 Y = self.Y.copy() * self.scale_o
                 Py = np.sum(np.square(Y)) * scale_impz / self.ui.nenbw
                 Y *= scale_impz # scale display of frequency response
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    Y[1:] = 2 * Y[1:]
+                    Y = calc_ssb_spectrum(Y)
 
 #            if self.ui.chk_win_freq.isChecked():
 #                Win = self.Win.copy()/np.sqrt(2)
 #                if fb.fil[0]['freqSpecsRangeType'] == 'half':
 #                    Win[1:] = 2 * Win[1:]
-
 
         #-----------------------------------------------------------------
         # Set frequency range
