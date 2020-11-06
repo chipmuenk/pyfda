@@ -541,12 +541,15 @@ class Plot_Impz(QWidget):
         # Calculate imag. and real components from response
         self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
         if self.cmplx:
-            self.y_i = self.y.imag
+            self.x_r = self.x.real
+            self.x_i = self.x.imag
             self.y_r = self.y.real
+            self.y_i = self.y.imag
         else:
             self.y_r = self.y
             self.y_i = None
-
+            self.x_r = self.x.real
+            self.x_i = None
 #------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
@@ -736,6 +739,51 @@ class Plot_Impz(QWidget):
         else:
             plot_fnc = no_plot
         return plot_fnc
+    
+    def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
+                  plt_fmt=None, mkr=False, mkr_fmt=None):
+        """
+        Parameters
+        ----------
+        plt_style : str
+            one of "line", "stem", "step", "dots"
+        ax : matplotlib axis
+            Handle to the axis where signal is 
+        x : array-like
+            x-axis: time or frequency data
+        y : array-like
+            y-data
+        bottom : float
+            Bottom line for stem plot. The default is 0.
+        label : str
+            Plot label
+        plt_fmt : dict
+            General styles (color, linewidth etc.) for plotting. The default is None.
+        mkr : bool
+            Enable markers?
+        mkr_fmt : dict
+            Marker styles
+        Returns
+        -------
+        None
+
+        """
+
+        if plt_fmt is None:
+            plt_fmt = {}
+        if plt_style == "line":
+            ax.plot(x,y, label=label, **plt_fmt)
+        elif plt_style == "stem":
+            stems(x,y, ax=ax, bottom=bottom, label=label, **plt_fmt)
+        elif plt_style == "step":
+            ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
+        elif plt_style == "dots":
+            ax.scatter(x,y, label=label, **plt_fmt)
+        else:
+            pass
+
+        if mkr:
+            ax.scatter(x, y, **mkr_fmt)
 
     #================ Plotting routine time domain =========================
     def _init_axes_time(self):
@@ -800,26 +848,30 @@ class Plot_Impz(QWidget):
             x_q = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
-            H_str = '$|$' + self.H_str + '$|$ in dBV'
-            x = np.maximum(20 * np.log10(abs(self.x * self.scale_i)), self.ui.bottom_t)
-            y = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
             win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
+            x = np.maximum(20 * np.log10(abs(self.x_r * self.scale_i)), self.ui.bottom_t)
+            y = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
+
             if self.cmplx:
-                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom_t)
+                x_i = np.maximum(20 * np.log10(abs(self.x_i * self.scale_i)), self.ui.bottom_t)
+                y_i = np.maximum(20 * np.log10(abs(self.y_i * self.scale_o)), self.ui.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + r'$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
+            else:
+                H_str = '$|$' + self.H_str + '$|$ in dBV'
+                
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
-            x = self.x * self.scale_i
+            x = self.x_r * self.scale_i
             y = self.y_r * self.scale_o
             fx_max = self.fx_max
             fx_min = self.fx_min
             win = self.ui.win
             if self.cmplx:
+                x_i = self.x_i * self.scale_i
                 y_i = self.y_i * self.scale_o
 
-            if self.cmplx:
                 H_i_str = r'$\Im\{$' + self.H_str + r'$\}$ in V'
                 H_str = r'$\Re\{$' + self.H_str + r'$\}$ in V'
             else:
@@ -830,40 +882,34 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_min, 0, 1, color='k', linestyle='--')
 
         # --------------- Stimulus plot ----------------------------------
-        # TODO: local copying of dictionary and modifying is _very_ kludgy
-        plot_stim_dict = self.fmt_plot_stim.copy()
-        plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r,
-                                      plot_stim_dict, self.ui.bottom_t)
-        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].real, label='$x[n]$',
-                      **plot_stim_dict)
-
-        # Add plot markers, this is way faster than normal stem plotting
-        if self.plt_time_stim_mkr:
-            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].real, **self.fmt_mkr_stim)
+        self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:], 
+              x[self.ui.N_start:], label='$x[n]$', bottom=self.ui.bottom_t,
+              plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
-            plot_stmq_dict = self.fmt_plot_stmq.copy()
-            plot_stmq_fnc = self.plot_fnc(self.plt_time_stmq, self.ax_r,
-                                          plot_stmq_dict, self.ui.bottom_t)
-            plot_stmq_fnc(self.t[self.ui.N_start:], x_q[self.ui.N_start:], label='$x_q[n]$',
-                          **plot_stmq_dict)
-
-            if self.plt_time_stmq_mkr:
-                self.ax_r.scatter(self.t[self.ui.N_start:], x_q[self.ui.N_start:],
-                                  **self.fmt_mkr_stmq)
+            self.draw_data(self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:], 
+                  x_q[self.ui.N_start:], label='$x_q[n]$', bottom=self.ui.bottom_t,
+                  plt_fmt=self.fmt_plot_stmq, mkr=self.plt_time_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
         # --------------- Response plot ----------------------------------
-        plot_resp_dict = self.fmt_plot_resp.copy()
-        plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r,
-                                      plot_resp_dict, self.ui.bottom_t)
+        self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:], 
+              y[self.ui.N_start:], label='$y[n]$', bottom=self.ui.bottom_t,
+              plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
-        plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
-                      **plot_resp_dict)
-        # Add plot markers, this is way faster than normal stem plotting
-        if self.plt_time_resp_mkr:
-            self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
 
+# =============================================================================
+#         plot_resp_dict = self.fmt_plot_resp.copy()
+#         plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r,
+#                                       plot_resp_dict, self.ui.bottom_t)
+# 
+#         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
+#                       **plot_resp_dict)
+#         # Add plot markers, this is way faster than normal stem plotting
+#         if self.plt_time_resp_mkr:
+#             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
+# 
+# =============================================================================
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
@@ -872,7 +918,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
-            #plot_resp_dict = self.fmt_plot_resp.copy()
+            plot_resp_dict = self.fmt_plot_resp.copy()
             # --- imag. part of response -----
             plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
                                           plot_resp_dict, self.ui.bottom_t)
@@ -885,17 +931,24 @@ class Plot_Impz(QWidget):
                                   marker=mkfmt_i, **self.fmt_mkr_resp)
 
             # --- imag. part of stimulus ----- 
-            plot_stim_dict = self.fmt_plot_stim.copy()
-            plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_i,
-                                      plot_stim_dict, self.ui.bottom_t)
-            plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, label='$x_i[n]$',
-                      **plot_stim_dict)
-
-            # Add plot markers, this is way faster than normal stem plotting
-            if self.plt_time_stim_mkr:
-                self.ax_i.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, 
-                                  marker=mkfmt_i, **self.fmt_mkr_stim)
-
+            self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:], 
+                  x_i[self.ui.N_start:], label='$x_i[n]$', bottom=self.ui.bottom_t,
+                  plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
+          
+            
+# =============================================================================
+#             plot_stim_dict = self.fmt_plot_stim.copy()
+#             plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_i,
+#                                       plot_stim_dict, self.ui.bottom_t)
+#             plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, label='$x_i[n]$',
+#                       **plot_stim_dict)
+# 
+#             # Add plot markers, this is way faster than normal stem plotting
+#             if self.plt_time_stim_mkr:
+#                 self.ax_i.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, 
+#                                   marker=mkfmt_i, **self.fmt_mkr_stim)
+# 
+# =============================================================================
             # --- labels and markers ----- 
 #            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
 #                bottom=self.ui.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
