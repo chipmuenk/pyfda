@@ -1023,7 +1023,7 @@ class Plot_Impz(QWidget):
 
 
         self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_stmq == "none"\
-                                    and self.plt_freq_resp == "none"
+                                    and self.plt_freq_resp == "none" and not self.ui.chk_Hf.isChecked()
 
         if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
             self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
