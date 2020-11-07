@@ -1214,15 +1214,22 @@ class Plot_Impz(QWidget):
 
             # --------------- Plot stimulus and response ----------------------
             if plt_stimulus:
-                plot_stim_dict = self.fmt_plot_stim.copy()
-                plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft,
-                                              plot_stim_dict, self.ui.bottom_f)
+                label_P = "$X(f)$:  " + "$P$ = {0:.3g} {1}".format(Px, unit_P)
+                self.draw_data(self.plt_freq_stim, self.ax_fft, F, X,
+                    label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                    mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
-                label_P = "$P$ = {0:.3g} {1}".format(Px, unit_P)
-                plot_stim_fnc(F, X, label='$X(f)$:  ' + label_P, **plot_stim_dict)
-
-                if self.plt_freq_stim_mkr:
-                    self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
+# =============================================================================
+#                 plot_stim_dict = self.fmt_plot_stim.copy()
+#                 plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft,
+#                                               plot_stim_dict, self.ui.bottom_f)
+#
+#                 label_P = "$P$ = {0:.3g} {1}".format(Px, unit_P)
+#                 plot_stim_fnc(F, X, label='$X(f)$:  ' + label_P, **plot_stim_dict)
+#
+#                 if self.plt_freq_stim_mkr:
+#                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
+# =============================================================================
 
             if plt_stimulus_q:
                 plot_stmq_dict = self.fmt_plot_stmq.copy()
