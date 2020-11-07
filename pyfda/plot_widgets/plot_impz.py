@@ -22,8 +22,8 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, rect_bl,
-        sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
+from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, np_type,
+        rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
@@ -387,7 +387,12 @@ class Plot_Impz(QWidget):
         self.title_str = r'System Response '
 
         if self.ui.stim == "Pulse":
-            self.x = np.zeros(self.ui.N_end)
+            if np_type(self.ui.A1) == complex:
+                A_type = complex
+            else:
+                A_type = float
+         
+            self.x = np.zeros(self.ui.N_end, dtype=A_type)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
@@ -741,7 +746,7 @@ class Plot_Impz(QWidget):
         return plot_fnc
     
     def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
-                  plt_fmt=None, mkr=False, mkr_fmt=None):
+                  plt_fmt=None, mkr=False, mkr_fmt=None, **args):
         """
         Parameters
         ----------
@@ -783,7 +788,10 @@ class Plot_Impz(QWidget):
             pass
 
         if mkr:
-            ax.scatter(x, y, **mkr_fmt)
+            if 'marker' in args:
+                ax.scatter(x,y, **mkr_fmt, marker=args['marker'])
+            else:
+                ax.scatter(x, y, **mkr_fmt)
 
     #================ Plotting routine time domain =========================
     def _init_axes_time(self):
@@ -918,22 +926,32 @@ class Plot_Impz(QWidget):
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
-            plot_resp_dict = self.fmt_plot_resp.copy()
+
             # --- imag. part of response -----
-            plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
-                                          plot_resp_dict, self.ui.bottom_t)
-
-            plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
-                          **plot_resp_dict)
-            # Add plot markers, this is way faster than normal stem plotting
-            if self.plt_time_resp_mkr:
-                self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-                                  marker=mkfmt_i, **self.fmt_mkr_resp)
-
+            self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:], 
+                  y_i[self.ui.N_start:], label='$y_i[n]$', bottom=self.ui.bottom_t,
+                  plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp,
+                  marker=mkfmt_i)
+ 
+# =============================================================================
+#             plot_resp_dict = self.fmt_plot_resp.copy()
+#             # --- imag. part of response -----
+#             plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
+#                                           plot_resp_dict, self.ui.bottom_t)
+# 
+#             plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
+#                           **plot_resp_dict)
+#             # Add plot markers, this is way faster than normal stem plotting
+#             if self.plt_time_resp_mkr:
+#                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
+#                                   marker=mkfmt_i, **self.fmt_mkr_resp)
+# 
+# =============================================================================
             # --- imag. part of stimulus ----- 
             self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:], 
                   x_i[self.ui.N_start:], label='$x_i[n]$', bottom=self.ui.bottom_t,
-                  plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
+                  plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim,
+                  marker=mkfmt_i)
           
             
 # =============================================================================
