@@ -391,7 +391,7 @@ class Plot_Impz(QWidget):
                 A_type = complex
             else:
                 A_type = float
-         
+
             self.x = np.zeros(self.ui.N_end, dtype=A_type)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
@@ -421,9 +421,9 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'to Sinusoidal Signal '
-            
+
         elif self.ui.stim == "Chirp":
-            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,  
+            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,
                                             method=self.ui.chirp_method.lower(), phi=phi1)
             self.title_str += r'to ' + self.ui.chirp_method + ' Chirp Signal '
 
@@ -744,7 +744,7 @@ class Plot_Impz(QWidget):
         else:
             plot_fnc = no_plot
         return plot_fnc
-    
+
     def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
                   plt_fmt=None, mkr=False, mkr_fmt=None, **args):
         """
@@ -753,7 +753,7 @@ class Plot_Impz(QWidget):
         plt_style : str
             one of "line", "stem", "step", "dots"
         ax : matplotlib axis
-            Handle to the axis where signal is 
+            Handle to the axis where signal is
         x : array-like
             x-axis: time or frequency data
         y : array-like
@@ -867,7 +867,7 @@ class Plot_Impz(QWidget):
                 H_str =   r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
             else:
                 H_str = '$|$' + self.H_str + '$|$ in dBV'
-                
+
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
@@ -890,34 +890,22 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_min, 0, 1, color='k', linestyle='--')
 
         # --------------- Stimulus plot ----------------------------------
-        self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:], 
+        self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
               x[self.ui.N_start:], label='$x[n]$', bottom=self.ui.bottom_t,
               plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
-            self.draw_data(self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:], 
+            self.draw_data(self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:],
                   x_q[self.ui.N_start:], label='$x_q[n]$', bottom=self.ui.bottom_t,
                   plt_fmt=self.fmt_plot_stmq, mkr=self.plt_time_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
         # --------------- Response plot ----------------------------------
-        self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:], 
+        self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
               y[self.ui.N_start:], label='$y[n]$', bottom=self.ui.bottom_t,
               plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
 
-# =============================================================================
-#         plot_resp_dict = self.fmt_plot_resp.copy()
-#         plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r,
-#                                       plot_resp_dict, self.ui.bottom_t)
-# 
-#         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
-#                       **plot_resp_dict)
-#         # Add plot markers, this is way faster than normal stem plotting
-#         if self.plt_time_resp_mkr:
-#             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
-# 
-# =============================================================================
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
@@ -928,50 +916,18 @@ class Plot_Impz(QWidget):
         if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
 
             # --- imag. part of response -----
-            self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:], 
+            self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
                   y_i[self.ui.N_start:], label='$y_i[n]$', bottom=self.ui.bottom_t,
                   plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp,
                   marker=mkfmt_i)
- 
-# =============================================================================
-#             plot_resp_dict = self.fmt_plot_resp.copy()
-#             # --- imag. part of response -----
-#             plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
-#                                           plot_resp_dict, self.ui.bottom_t)
-# 
-#             plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
-#                           **plot_resp_dict)
-#             # Add plot markers, this is way faster than normal stem plotting
-#             if self.plt_time_resp_mkr:
-#                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-#                                   marker=mkfmt_i, **self.fmt_mkr_resp)
-# 
-# =============================================================================
-            # --- imag. part of stimulus ----- 
-            self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:], 
+
+            # --- imag. part of stimulus -----
+            self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
                   x_i[self.ui.N_start:], label='$x_i[n]$', bottom=self.ui.bottom_t,
                   plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim,
                   marker=mkfmt_i)
-          
-            
-# =============================================================================
-#             plot_stim_dict = self.fmt_plot_stim.copy()
-#             plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_i,
-#                                       plot_stim_dict, self.ui.bottom_t)
-#             plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, label='$x_i[n]$',
-#                       **plot_stim_dict)
-# 
-#             # Add plot markers, this is way faster than normal stem plotting
-#             if self.plt_time_stim_mkr:
-#                 self.ax_i.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:].imag, 
-#                                   marker=mkfmt_i, **self.fmt_mkr_stim)
-# 
-# =============================================================================
-            # --- labels and markers ----- 
-#            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-#                bottom=self.ui.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
-#            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
-            # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
+
+            # --- labels and markers -----
             # plt.setp(ax_r.get_xticklabels(), visible=False)
             # is shorter but imports matplotlib, set property directly instead:
             [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
@@ -1050,19 +1006,19 @@ class Plot_Impz(QWidget):
         """
         def calc_ssb_spectrum(A):
             """
-            Calculate the single-sideband spectrum from a double-sideband 
-            spectrum by adding the mirrored conjugate complex of the second half 
+            Calculate the single-sideband spectrum from a double-sideband
+            spectrum by adding the mirrored conjugate complex of the second half
             of the spectrum to the first while leaving the DC value untouched.
-            
+
             When len(A) is even, A[N//2] represents half the sampling frequencvy
             and has to be discarded (Q: also for the power calculation?). Both
             tasks are addressed by
-            
+
             Parameters
             ----------
             A : array-like
                 double-sided spectrum, usually complex. The sequence is as follows:
-                    
+
                     [0, 1, 2, ..., 4, -5, -4, ... , -1] for len(A) = 10
 
             Returns
@@ -1074,10 +1030,10 @@ class Plot_Impz(QWidget):
             N = len(A)
             A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),
                               0, A[0])
-            
+
             return A_SSB
             #--------------------------------------------------------------
-            
+
         self._init_axes_freq()
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
@@ -1103,7 +1059,7 @@ class Plot_Impz(QWidget):
         # - Calculate total power P from FFT, corrected by window equivalent noise
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
-        # - Scale impulse response with N_FFT to calculate frequency response if requested      
+        # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.chk_scale_impz_f.isEnabled() and self.ui.stim == "Pulse"\
                 and self.ui.chk_scale_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
@@ -1266,13 +1222,13 @@ class Plot_Impz(QWidget):
             sorted_pairs = sorted(zip(labels, handles))
             # convert back to two lists
             labels, handles = [ list(tuple) for tuple in  zip(*sorted_pairs)]
-            
+
             # Create two empty patches for NENBW and CGAIN and extend handles list with them
             handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
                                                  ec="white", lw=0, alpha=0)] * 2)
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g} {1}".format(cgain, unit_cgain))
-            
+
             self.ax_fft.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
 
