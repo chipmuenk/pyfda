@@ -273,3 +273,4 @@ resp.
     
 Currently, this process fails, probably due to 
 <https://github.com/flatpak/flatpak-builder-tools/issues/47>
+<https://stackoverflow.com/questions/64189236/using-flatpak-pip-generator-resulting-in-error-could-not-find-a-version-when>
