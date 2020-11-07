@@ -345,6 +345,32 @@ def qstr(text):
 
 ###############################################################################
 #### General functions ########################################################
+###############################################################################
+
+def np_type(a):
+    """
+    Return the python type of `a`, either of the parameter itself or (if it's a
+    numpy array) of its items.
+
+    Parameters
+    ----------
+    a : Python or numpy data type
+        DESCRIPTION.
+
+    Returns
+    -------
+    a_type : class
+        Type of the Python variable resp. of the items of the numpy array
+
+    """
+    if isinstance(a, np.ndarray):
+        a_type = type(a.item())
+    else:
+        a_type = type(a)
+        
+    return a_type
+
+#-----------------------------------------------------------------------------
 
 def set_dict_defaults(d, default_dict):
     """
@@ -547,6 +573,101 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     return result
 
 #------------------------------------------------------------------------------
+def to_html(text, frmt=None):
+    """
+    Convert text to HTML format:
+        - pretty-print logger messages
+        - convert "\\n" to "<br />
+        - convert "< " and "> " to "&lt;" and "&gt;"
+        - format strings with italic and / or bold HTML tags, depending on
+          parameter `frmt`. When `frmt=None`, put the returned string between
+          <span> tags to enforce HTML rendering downstream
+        - replace '_' by HTML subscript tags. Numbers 0 ... 9 are never set to
+          italic format
+
+    Parameters
+    ----------
+
+    text: string
+        Text to be converted
+
+    frmt: string
+        define text style
+
+        - 'b' : bold text
+        - 'i' : italic text
+        - 'bi' or 'ib' : bold and italic text
+
+    Returns
+    -------
+
+    string
+        HTML - formatted text
+
+    Examples
+    --------
+
+        >>> to_html("F_SB", frmt='bi')
+        "<b><i>F<sub>SB</sub></i></b>"
+        >>> to_html("F_1", frmt='i')
+        "<i>F</i><sub>1</sub>"
+    """
+    # see https://danielfett.de/de/tutorials/tutorial-regulare-ausdrucke/
+    # arguments for regex replacement with illegal characters
+    # [a-dA-D] list of characters
+    # \w : meta character for [a-zA-Z0-9_]
+    # \s : meta character for all sorts of whitespace
+    # [123][abc] test for e.g. '2c'
+    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character,
+    # '+' means once or more, '?' means zero or once, '*' means zero or more
+    #   '[^a]' means except for 'a'
+    # () defines a group that can be referenced by \1, \2, ...
+    #
+    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
+    # '(' must be escaped as '\('
+
+    # mappings text -> HTML formatted logging messages
+
+    if frmt == 'log':
+        # only in logging messages replace e.g. in <class> the angled brackets
+        # by HTML code
+        mapping = [ ('<','&lt;'), ('>','&gt;')]
+        for k,v in mapping:
+            text = text.replace(k,v)
+
+    mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
+                ('\t','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
+                ('[  DEBUG]','<b>[  DEBUG]</b>'),
+                ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
+                ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
+                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
+              ]
+
+    for k, v in mapping:
+         text = text.replace(k, v)
+    html = text
+    if frmt in {'i', 'bi', 'ib'}:
+        html = "<i>" + html + "</i>"
+    if frmt in {'b', 'bi', 'ib'}:
+        html = "<b>" + html + "</b>"
+    if frmt == None:
+        html = "<span>" + html + "</span>"
+
+    if frmt != 'log': # this is a label, not a logger message
+        # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
+        html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
+        # don't render numbers as italic
+#        if "<i>" in html:
+#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)', r'\1<span class="font-style:normal">\2</span>', html)
+
+    #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
+    # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
+
+    return html
+
+###############################################################################
+####     Scipy-like    ########################################################
+###############################################################################
 
 def dB(lin, power = False):
     """
@@ -742,6 +863,7 @@ def rect_bl(t, duty=0.5):
     # Sum all multiple sine waves up to the Nyquist frequency:
     y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
     return y
+
 def comb_bl(t):
     """
     Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
@@ -1751,99 +1873,6 @@ def floor_even(x):
     """
     return round_even(x-1)
 
-
-#------------------------------------------------------------------------------
-def to_html(text, frmt=None):
-    """
-    Convert text to HTML format:
-        - pretty-print logger messages
-        - convert "\\n" to "<br />
-        - convert "< " and "> " to "&lt;" and "&gt;"
-        - format strings with italic and / or bold HTML tags, depending on
-          parameter `frmt`. When `frmt=None`, put the returned string between
-          <span> tags to enforce HTML rendering downstream
-        - replace '_' by HTML subscript tags. Numbers 0 ... 9 are never set to
-          italic format
-
-    Parameters
-    ----------
-
-    text: string
-        Text to be converted
-
-    frmt: string
-        define text style
-
-        - 'b' : bold text
-        - 'i' : italic text
-        - 'bi' or 'ib' : bold and italic text
-
-    Returns
-    -------
-
-    string
-        HTML - formatted text
-
-    Examples
-    --------
-
-        >>> to_html("F_SB", frmt='bi')
-        "<b><i>F<sub>SB</sub></i></b>"
-        >>> to_html("F_1", frmt='i')
-        "<i>F</i><sub>1</sub>"
-    """
-    # see https://danielfett.de/de/tutorials/tutorial-regulare-ausdrucke/
-    # arguments for regex replacement with illegal characters
-    # [a-dA-D] list of characters
-    # \w : meta character for [a-zA-Z0-9_]
-    # \s : meta character for all sorts of whitespace
-    # [123][abc] test for e.g. '2c'
-    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character,
-    # '+' means once or more, '?' means zero or once, '*' means zero or more
-    #   '[^a]' means except for 'a'
-    # () defines a group that can be referenced by \1, \2, ...
-    #
-    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-    # '(' must be escaped as '\('
-
-    # mappings text -> HTML formatted logging messages
-
-    if frmt == 'log':
-        # only in logging messages replace e.g. in <class> the angled brackets
-        # by HTML code
-        mapping = [ ('<','&lt;'), ('>','&gt;')]
-        for k,v in mapping:
-            text = text.replace(k,v)
-
-    mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
-                ('\t','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
-                ('[  DEBUG]','<b>[  DEBUG]</b>'),
-                ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
-                ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
-                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
-              ]
-
-    for k, v in mapping:
-         text = text.replace(k, v)
-    html = text
-    if frmt in {'i', 'bi', 'ib'}:
-        html = "<i>" + html + "</i>"
-    if frmt in {'b', 'bi', 'ib'}:
-        html = "<b>" + html + "</b>"
-    if frmt == None:
-        html = "<span>" + html + "</span>"
-
-    if frmt != 'log': # this is a label, not a logger message
-        # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
-        html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
-        # don't render numbers as italic
-#        if "<i>" in html:
-#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)', r'\1<span class="font-style:normal">\2</span>', html)
-
-    #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
-    # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
-
-    return html
 
 #------------------------------------------------------------------------------
 
