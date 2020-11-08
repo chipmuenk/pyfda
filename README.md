@@ -35,26 +35,26 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 </table>
 
 ## Binaries / Bundles
-Currently, binaries (created with [pyInstaller](https://www.pyinstaller.org/)) are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see <INSTALLATION.md>.
+Currently, binaries (created with [pyInstaller](https://www.pyinstaller.org/)) are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
 
 pyFDA source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Prerequisites
 
-* Python versions: **3.3 ... 3.8**
+* Python versions: **3.5 ... 3.8**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
-  * **PyQt5**
-  * **numpy**
-  * **numexpr**
-  * **scipy**: **1.2.0** or higher
-  * **matplotlib**: **2.0** or higher (**3.3 supported in v0.4.0**) 
-  * **markdown**
+  * [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) / [**Qt5**](https://qt.io/)
+  * [**numpy**](https://numpy.org/)
+  * [**numexpr**](https://github.com/pydata/numexpr)
+  * [**scipy**](https://scipy.org/): **1.2.0** or higher
+  * [**matplotlib**](https://matplotlib.org/): **2.0** or higher (**3.3 supported in v0.4.0**) 
+  * [**Markdown**](https://github.com/Python-Markdown/markdown)
   
 ### Optional libraries:
-* **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
+* [**migen**](https://github.com/m-labs/migen) for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
 * [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursorsd
-* **docutils** for rich text in documentation
+* [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ## Installing pyFDA
@@ -70,7 +70,7 @@ or upgrade using
 
     > pip3 install pyfda -U
     
-For more details and options see <INSTALLATION.md>.
+For more details and options see [INSTALLATION.md](INSTALLATION.md).
 
 ### setup.py   
 You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
@@ -80,8 +80,6 @@ You can also download the zip file and extract it to a temp directory of your ch
 or just create a link to where you have copied the python source files (for testing / development) using
 
     > python setup.py develop
-
-
 
 ### git
 For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
