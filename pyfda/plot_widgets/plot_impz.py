@@ -89,6 +89,7 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
+        self.mplwidget_t.setToolTip("Impulse and transient response of filter")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         #----------------------------------------------------------------------
@@ -96,6 +97,7 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
+        self.mplwidget_f.setToolTip("Spectral representation of impulse or transient response")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
