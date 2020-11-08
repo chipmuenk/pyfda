@@ -723,33 +723,12 @@ class Plot_Impz(QWidget):
 
         self.draw()
 
-    def plot_fnc(self, plt_style, ax, plt_dict=None, bottom=0):
-        """
-        Return a plot method depending on the parameter `plt_style` (str)
-        and the axis instance `ax`. An optional `plt_dict` is modified in place.
-        """
-
-        if plt_dict is None:
-            plt_dict = {}
-        if plt_style == "line":
-            plot_fnc = getattr(ax, "plot")
-        elif plt_style == "stem":
-            plot_fnc = stems
-            plt_dict.update({'ax':ax, 'bottom':bottom})
-        elif plt_style == "step":
-            plot_fnc = getattr(ax, "plot")
-            plt_dict.update({'drawstyle':'steps-mid'})
-        elif plt_style == "dots":
-            plot_fnc = getattr(ax, "scatter")
-        elif plt_style == "none":
-            plot_fnc = no_plot
-        else:
-            plot_fnc = no_plot
-        return plot_fnc
-
     def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
                   plt_fmt=None, mkr=False, mkr_fmt=None, **args):
         """
+        Plot x, y data (numpy arrays with equal length) in a plot style defined
+        by `plt_style`.
+
         Parameters
         ----------
         plt_style : str
@@ -767,9 +746,12 @@ class Plot_Impz(QWidget):
         plt_fmt : dict
             General styles (color, linewidth etc.) for plotting. The default is None.
         mkr : bool
-            Enable markers?
+            Plot a marker for every data point if enabled
         mkr_fmt : dict
             Marker styles
+        args : dictionary with additional keys and values. As they might not be
+            compatible with every plot style, they have to be added individually
+
         Returns
         -------
         None
@@ -1177,39 +1159,17 @@ class Plot_Impz(QWidget):
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                     mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
-# =============================================================================
-#                 plot_stim_dict = self.fmt_plot_stim.copy()
-#                 plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft,
-#                                               plot_stim_dict, self.ui.bottom_f)
-#
-#                 label_P = "$P$ = {0:.3g} {1}".format(Px, unit_P)
-#                 plot_stim_fnc(F, X, label='$X(f)$:  ' + label_P, **plot_stim_dict)
-#
-#                 if self.plt_freq_stim_mkr:
-#                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
-# =============================================================================
-
             if plt_stimulus_q:
-                plot_stmq_dict = self.fmt_plot_stmq.copy()
-                plot_stmq_fnc = self.plot_fnc(self.plt_freq_stmq, self.ax_fft,
-                                              plot_stmq_dict, self.ui.bottom_f)
-
-                label_P = "$P$ = {0:.3g} {1}".format(Pxq, unit_P)
-                plot_stmq_fnc(F, X_q, label='$X_q(f)$: ' + label_P, **plot_stmq_dict)
-
-                if self.plt_freq_stmq_mkr:
-                    self.ax_fft.scatter(F, X_q, **self.fmt_mkr_stmq)
+                label_P = "$X_q(f)$: " + "$P$ = {0:.3g} {1}".format(Pxq, unit_P)
+                self.draw_data(self.plt_freq_stmq, self.ax_fft, F, X_q,
+                    label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
+                    mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
             if plt_response:
-                plot_resp_dict = self.fmt_plot_resp.copy()
-                plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft,
-                                              plot_resp_dict, self.ui.bottom_f)
-
-                label_P = "$P$ = {0:.3g} {1}".format(Py, unit_P)
-                plot_resp_fnc(F, Y, label='$Y(f)$:   ' + label_P, **plot_resp_dict)
-
-                if self.plt_freq_resp_mkr:
-                    self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
+                label_P = "$Y(f)$:  " + "$P$ = {0:.3g} {1}".format(Py, unit_P)
+                self.draw_data(self.plt_freq_resp, self.ax_fft, F, Y,
+                    label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
+                    mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
             if self.ui.chk_Hf.isChecked():
                 self.ax_fft.plot(F_id, H_id, c="gray",label="$H_{id}(f)$")
