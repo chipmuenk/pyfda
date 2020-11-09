@@ -77,7 +77,7 @@ class PlotImpz_UI(QWidget):
         self.plt_freq_stim = "None"
         self.plt_freq_stmq = "None"
 
-        self.stim = "Pulse"
+        self.stim = "Impulse"
         self.chirp_method = 'Linear'
         self.noise = "None"
 
@@ -347,7 +347,7 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel(to_html("Type: ", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine", "Chirp",
+        self.cmbStimulus.addItems(["None","Impulse","Step","StepErr","Cos","Sine", "Chirp",
                                    "Triang","Saw","Rect","Comb","AM","FM","PM","Formula"])
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
@@ -645,7 +645,7 @@ class PlotImpz_UI(QWidget):
 
         self.lblAmp1.setVisible(self.stim != "None")
         self.ledAmp1.setVisible(self.stim != "None")
-        self.chk_scale_impz_f.setVisible(self.stim == 'Pulse')
+        self.chk_scale_impz_f.setVisible(self.stim == 'Impulse')
         self.chk_scale_impz_f.setEnabled((self.noi == 0 or self.cmbNoise.currentText() == 'None')\
                                          and self.DC == 0)
 

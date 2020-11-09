@@ -388,7 +388,7 @@ class Plot_Impz(QWidget):
         self.H_str = r'$y[n]$'
         self.title_str = r'System Response '
 
-        if self.ui.stim == "Pulse":
+        if self.ui.stim == "Impulse":
             if np_type(self.ui.A1) == complex:
                 A_type = complex
             else:
@@ -1044,7 +1044,7 @@ class Plot_Impz(QWidget):
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
         # - Scale impulse response with N_FFT to calculate frequency response if requested
-            if self.ui.chk_scale_impz_f.isEnabled() and self.ui.stim == "Pulse"\
+            if self.ui.chk_scale_impz_f.isEnabled() and self.ui.stim == "Impulse"\
                 and self.ui.chk_scale_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
