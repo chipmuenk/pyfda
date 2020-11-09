@@ -72,6 +72,7 @@ class PlotImpz_UI(QWidget):
         self.plt_time_resp = "Stem"
         self.plt_time_stim = "None"
         self.plt_time_stmq = "None"
+        self.plt_time_spec = "None"
 
         self.plt_freq_resp = "Line"
         self.plt_freq_stim = "None"
@@ -179,37 +180,45 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_time_stmq = QLabel(to_html("Fixp. Stim. x_Q", frmt='bi'), self)
+        self.lbl_plt_time_stmq = QLabel(to_html("&nbsp;&nbsp;Fixp. Stim. x_Q", frmt='bi'), self)
         self.cmb_plt_time_stmq = QComboBox(self)
         self.cmb_plt_time_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
         
-        lbl_plt_time_resp = QLabel(to_html("Response y", frmt='bi'), self)
+        lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_log_time = QCheckBox("dB : min.", self)
+        lbl_plt_time_spec = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
+        self.cmb_plt_time_spec = QComboBox(self)
+        self.cmb_plt_time_spec.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
+        qset_cmb_box(self.cmb_plt_time_spec, self.plt_time_spec)
+        self.cmb_plt_time_spec.setToolTip("<span>Show Spectrogram for selected signal.</span>")
+
+        lbl_win_time = QLabel(to_html("&nbsp;&nbsp;FFT Window", frmt='bi'), self)
+        self.chk_win_time = QCheckBox(self)
+        self.chk_win_time.setObjectName("chk_win_time")
+        self.chk_win_time.setToolTip('<span>Show FFT windowing function (can be modified in the "Frequency" tab).</span>')
+        self.chk_win_time.setChecked(False)
+
+        lbl_log_time = QLabel(to_html("dB", frmt='b'), self)
+        self.chk_log_time = QCheckBox(self)
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setChecked(False)
 
+        self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
+        self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked())
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_time.setVisible(self.chk_log_time.isChecked())
 
         if not self.chk_log_time.isChecked():
-            self.chk_log_time.setText("dB")
             self.bottom_t = 0
-
-        self.chk_win_time = QCheckBox("FFT Window", self)
-        #to_html("FFT Window", frmt='bi'
-        self.chk_win_time.setObjectName("chk_win_time")
-        self.chk_win_time.setToolTip("<span>Show FFT windowing function.</span>")
-        self.chk_win_time.setChecked(False)
 
         self.chk_fx_limits = QCheckBox("Min/max.", self)
         self.chk_fx_limits.setObjectName("chk_fx_limits")
@@ -221,17 +230,25 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
-        layH_ctrl_time.addStretch(1)
+        #
         layH_ctrl_time.addWidget(self.lbl_plt_time_stmq)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stmq)
-        layH_ctrl_time.addStretch(1)
+        #
         layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
+        #
+        layH_ctrl_time.addWidget(lbl_plt_time_spec)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_spec)
+        #
+        layH_ctrl_time.addWidget(lbl_win_time)
+        layH_ctrl_time.addWidget(self.chk_win_time)
         layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chk_log_time)
+        layH_ctrl_time.addWidget(lbl_log_time)
+        layH_ctrl_time.addWidget(self.chk_log_time)       
+        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.chk_win_time)
+
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
@@ -253,33 +270,35 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
         self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_freq_stmq = QLabel(to_html("Fixp. Stim. X_Q", frmt='bi'), self)
+        self.lbl_plt_freq_stmq = QLabel(to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
         self.cmb_plt_freq_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
-        lbl_plt_freq_resp = QLabel(to_html("Response Y", frmt='bi'), self)
+        lbl_plt_freq_resp = QLabel(to_html("&nbsp;&nbsp;&nbsp;Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_log_freq = QCheckBox("dB : min.", self)
+        lbl_log_freq = QLabel(to_html("dB", frmt='b'), self)
+        self.chk_log_freq = QCheckBox(self)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setChecked(True)
 
+        self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
+        self.lbl_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
 
         if not self.chk_log_freq.isChecked():
-            self.chk_log_freq.setText("dB")
             self.bottom_f = 0
 
-        self.lbl_win_fft = QLabel("Window: ", self)
+        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
@@ -311,14 +330,19 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
-        layH_ctrl_freq.addStretch(1)
+        #
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stmq)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stmq)
-        layH_ctrl_freq.addStretch(1)
+        #
         layH_ctrl_freq.addWidget(lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
-        layH_ctrl_freq.addStretch(2)
+        #
+        layH_ctrl_freq.addWidget(self.chk_Hf_lbl)
+        layH_ctrl_freq.addWidget(self.chk_Hf)
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(lbl_log_freq)
         layH_ctrl_freq.addWidget(self.chk_log_freq)
+        layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
@@ -328,9 +352,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addWidget(self.lblWinPar2)
         layH_ctrl_freq.addWidget(self.ledWinPar2)
-        layH_ctrl_freq.addStretch(2)
-        layH_ctrl_freq.addWidget(self.chk_Hf)
-        layH_ctrl_freq.addWidget(self.chk_Hf_lbl)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])

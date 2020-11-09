@@ -133,6 +133,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_time_spec.currentIndexChanged.connect(self.draw)
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
@@ -691,15 +692,14 @@ class Plot_Impz(QWidget):
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
         log = self.ui.chk_log_time.isChecked()
+        self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
 
         if log:
             self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
                                          self.ui.bottom_t, return_type='float', sign='neg')
             self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
-            self.ui.chk_log_time.setText("dB : min.")
         else:
-            self.ui.chk_log_time.setText("dB")
             self.ui.bottom_t = 0
 
         self.draw()
@@ -710,16 +710,15 @@ class Plot_Impz(QWidget):
         """
 
         log = self.ui.chk_log_freq.isChecked()
+        self.ui.lbl_log_bottom_freq.setVisible(log)
         self.ui.led_log_bottom_freq.setVisible(log)
         if log:
             self.ui.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(),
                                          self.ui.bottom_f, return_type='float',
                                          sign='neg')
             self.ui.led_log_bottom_freq.setText(str(self.ui.bottom_f))
-            self.ui.chk_log_freq.setText("dB : min.")
         else:
             self.ui.bottom_f = 0
-            self.ui.chk_log_freq.setText("dB")
 
         self.draw()
 
