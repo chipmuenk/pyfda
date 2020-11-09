@@ -366,7 +366,7 @@ class PlotImpz_UI(QWidget):
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
 
-        self.lblStimulus = QLabel(to_html("Type: ", frmt='bi'), self)
+        self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["None","Impulse","Step","StepErr","Cos","Sine", "Chirp",
                                    "Triang","Saw","Rect","Comb","AM","FM","PM","Formula"])
@@ -414,13 +414,13 @@ class PlotImpz_UI(QWidget):
         layVCmbDC.addWidget(self.ledDC)
         
         #----------------------------------------------
-        self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
+        self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
         self.ledAmp1.setToolTip("Stimulus amplitude, complex values like 3j - 1 are allowed")
         self.ledAmp1.setObjectName("stimAmp1")
 
-        self.lblAmp2 = QLabel(to_html("A_2", frmt='bi') + " =", self)
+        self.lblAmp2 = QLabel(to_html("&nbsp;A_2", frmt='bi') + " =", self)
         self.ledAmp2 = QLineEdit(self)
         self.ledAmp2.setText(str(self.A2))
         self.ledAmp2.setToolTip("Stimulus amplitude 2, complex values like 3j - 1 are allowed")
@@ -437,14 +437,14 @@ class PlotImpz_UI(QWidget):
         #layVledAmp.setAlignment(Qt.AlignTop)
 
         #----------------------------------------------
-        self.lblPhi1 = QLabel(to_html("&phi;_1", frmt='bi') + " =", self)
+        self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
         self.ledPhi1 = QLineEdit(self)
         self.ledPhi1.setText(str(self.phi1))
         self.ledPhi1.setToolTip("Stimulus phase")
         self.ledPhi1.setObjectName("stimPhi1")
         self.lblPhU1 = QLabel(to_html("&deg;", frmt='b'), self)
 
-        self.lblPhi2 = QLabel(to_html("&phi;_2", frmt='bi') + " =", self)
+        self.lblPhi2 = QLabel(to_html("&nbsp;&phi;_2", frmt='bi') + " =", self)
         self.ledPhi2 = QLineEdit(self)
         self.ledPhi2.setText(str(self.phi2))
         self.ledPhi2.setToolTip("Stimulus phase 2")
@@ -464,14 +464,14 @@ class PlotImpz_UI(QWidget):
         layVlblPhU.addWidget(self.lblPhU2)
 
         #----------------------------------------------
-        self.lblFreq1 = QLabel(to_html("f_1", frmt='bi') + " =", self)
+        self.lblFreq1 = QLabel(to_html("&nbsp;f_1", frmt='bi') + " =", self)
         self.ledFreq1 = QLineEdit(self)
         self.ledFreq1.setText(str(self.f1))
         self.ledFreq1.setToolTip("Stimulus frequency 1")
         self.ledFreq1.setObjectName("stimFreq1")
         self.lblFreqUnit1 = QLabel("f_S", self)
 
-        self.lblFreq2 = QLabel(to_html("f_2", frmt='bi') + " =", self)
+        self.lblFreq2 = QLabel(to_html("&nbsp;f_2", frmt='bi') + " =", self)
         self.ledFreq2 = QLineEdit(self)
         self.ledFreq2.setText(str(self.f2))
         self.ledFreq2.setToolTip("Stimulus frequency 2")
@@ -491,7 +491,7 @@ class PlotImpz_UI(QWidget):
 
         #----------------------------------------------
  
-        self.lblNoise = QLabel(to_html("Noise: ", frmt='bi'), self)
+        self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
         self.cmbNoise.setToolTip("Type of additive noise.")
@@ -766,17 +766,17 @@ class PlotImpz_UI(QWidget):
             self.noi = safe_eval(self.ledNoi.text(), 0, return_type='float', sign='poszero')
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
-                self.lblNoi.setText(to_html("&sigma; =", frmt='bi'))
+                self.lblNoi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Standard deviation of statistical process,"
                                        "noise power is <i>P</i> = &sigma;<sup>2</sup></span>")
             elif self.noise == 'uniform':
-                self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
+                self.lblNoi.setText(to_html("&nbsp;&Delta; =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Interval size for uniformly distributed process "
                                        "(e.g. quantization step size for quantization noise), "
                                        "centered around 0. Noise power is "
                                        "<i>P</i> = &Delta;<sup>2</sup>/12.</span>")
             elif self.noise == 'prbs':
-                self.lblNoi.setText(to_html("A =", frmt='bi'))
+                self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
                                        "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
 
