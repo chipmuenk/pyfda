@@ -136,7 +136,8 @@ class PlotImpz_UI(QWidget):
 
         self.but_fft_win = QPushButton(self)
         self.but_fft_win.setText("WIN FFT")
-        self.but_fft_win.setToolTip("Show time and frequency response of FFT Window")
+        self.but_fft_win.setToolTip('<span> time and frequency response of FFT Window '
+                                    '(can be modified in the "Frequency" tab)</span>')
         self.but_fft_win.setCheckable(True)
         self.but_fft_win.setChecked(False)
 

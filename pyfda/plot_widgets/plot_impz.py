@@ -33,7 +33,7 @@ from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 
-classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
+classes = {'Plot_Impz':'y[n]'} #: Dict containing class name : display name
 
 class Plot_Impz(QWidget):
     """
@@ -59,7 +59,7 @@ class Plot_Impz(QWidget):
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
         self.fx_sim_old = self.fx_sim
         self.tool_tip = "Impulse and transient response"
-        self.tab_label = "h[n]"
+        self.tab_label = "y[n]"
         self.active_tab = 0 # index for active tab
 
         self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
@@ -89,7 +89,6 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
-        self.mplwidget_t.setToolTip("Impulse and transient response of filter")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         #----------------------------------------------------------------------
@@ -97,7 +96,6 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
-        self.mplwidget_f.setToolTip("Spectral representation of impulse or transient response")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
@@ -106,7 +104,9 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         self.tabWidget = QTabWidget(self)
         self.tabWidget.addTab(self.mplwidget_t, "Time")
+        self.tabWidget.setTabToolTip(0,"Impulse and transient response of filter")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
+        self.tabWidget.setTabToolTip(1,"Spectral representation of impulse or transient response")
         # list with tabWidgets
         self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
         self.tabWidget.setTabPosition(QTabWidget.West)
