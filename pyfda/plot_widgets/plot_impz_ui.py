@@ -800,7 +800,7 @@ class PlotImpz_UI(QWidget):
         # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
-        update the window and fire "data_changed" or "ui_changed"?!
+        update the window and fire "ui_changed"
         """
         if not isinstance(emit, bool):
             logger.error("update N: emit={0}".format(emit))

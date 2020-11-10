@@ -640,7 +640,7 @@ class Plot_Impz(QWidget):
             unit_frmt = None
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
-        #self.t = self.t = self.n / fb.fil[0]['f_S']
+        self.t = self.n / fb.fil[0]['f_S']
         self.ui.load_fs()
 
         self.scale_i = self.scale_o = 1
