@@ -133,7 +133,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
-        self.ui.cmb_plt_time_spec.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self.draw)
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
@@ -581,7 +581,6 @@ class Plot_Impz(QWidget):
 
                 self.sig_tx.emit({'sender':__name__, 'fx_sim':'finish'})
 
-
 #------------------------------------------------------------------------------
     def calc_fft(self):
         """
@@ -687,6 +686,7 @@ class Plot_Impz(QWidget):
 
         self.ui.show_fft_win()
 
+#------------------------------------------------------------------------------
     def _log_mode_time(self):
         """
         Select / deselect log. mode for time domain and update self.ui.bottom_t
@@ -704,6 +704,7 @@ class Plot_Impz(QWidget):
 
         self.draw()
 
+#------------------------------------------------------------------------------
     def _log_mode_freq(self):
         """
         Select / deselect log. mode for frequency domain and update self.ui.bottom_f
@@ -722,6 +723,7 @@ class Plot_Impz(QWidget):
 
         self.draw()
 
+#------------------------------------------------------------------------------
     def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
                   plt_fmt=None, mkr=False, mkr_fmt=None, **args):
         """

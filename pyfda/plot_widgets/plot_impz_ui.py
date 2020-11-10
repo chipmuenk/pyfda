@@ -72,7 +72,7 @@ class PlotImpz_UI(QWidget):
         self.plt_time_resp = "Stem"
         self.plt_time_stim = "None"
         self.plt_time_stmq = "None"
-        self.plt_time_spec = "None"
+        self.plt_time_spgr = "None"
 
         self.plt_freq_resp = "Line"
         self.plt_freq_stim = "None"
@@ -192,11 +192,11 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        lbl_plt_time_spec = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
-        self.cmb_plt_time_spec = QComboBox(self)
-        self.cmb_plt_time_spec.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
-        qset_cmb_box(self.cmb_plt_time_spec, self.plt_time_spec)
-        self.cmb_plt_time_spec.setToolTip("<span>Show Spectrogram for selected signal.</span>")
+        lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
+        self.cmb_plt_time_spgr = QComboBox(self)
+        self.cmb_plt_time_spgr.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
+        qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
+        self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
 
         lbl_win_time = QLabel(to_html("&nbsp;&nbsp;FFT Window", frmt='bi'), self)
         self.chk_win_time = QCheckBox(self)
@@ -237,8 +237,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         #
-        layH_ctrl_time.addWidget(lbl_plt_time_spec)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_spec)
+        layH_ctrl_time.addWidget(lbl_plt_time_spgr)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
         #
         layH_ctrl_time.addWidget(lbl_win_time)
         layH_ctrl_time.addWidget(self.chk_win_time)
@@ -792,12 +792,11 @@ class PlotImpz_UI(QWidget):
         """Update string with formula to be evaluated by numexpr"""
         self.stim_formula = self.ledStimFormula.text()
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
-        
-        
+
     # -------------------------------------------------------------------------
 
     def update_N(self, emit=True):
-        # TODO: dict_sig not needed here, call directly from impz, distinguish
+        # called directly from impz or locally
         # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
