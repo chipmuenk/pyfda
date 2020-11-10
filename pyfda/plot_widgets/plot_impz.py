@@ -935,23 +935,51 @@ class Plot_Impz(QWidget):
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
             if self.plt_time_spgr == "stimulus":
-                s = self.x
+                s = self.x[self.ui.N_start:]
             elif self.plt_time_spgr == "fixp. stim.":
-                s = self.x_q
+                s = self.x_q[self.ui.N_start:]
             elif self.plt_time_spgr == "response":
-                s = self.y
+                s = self.y[self.ui.N_start:]
             else:
                 s = None
-            
-            f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'], 
-                                        nperseg=None, noverlap=None, nfft=None,
-                                        return_onesided = fb.fil[0]['freqSpecsRangeType'] == 'half',
-                                        scaling='density',mode='psd')
-            # mode: 'psd', 'complex','magnitude','angle', 'phase'
+                
+            if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                sides = 'onesided'
+            else:
+                sides = 'twosided'
+                
             if self.ui.chk_log_time.isChecked():
-                Sxx = 10*np.log10(Sxx)
-            self.ax_s.pcolormesh(t*fb.fil[0]['f_S'], np.fft.fftshift(f), 
-                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud')
+                scale = 'dB'
+                # 10 log10 for 'psd', otherwise 20 log10
+            else:
+                scale = 'linear'
+                # must be linear if mode is 'angle' or 'phase' 
+                
+            t_range = (self.t[self.ui.N_start], self.t[-1])
+            # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
+            
+# =============================================================================
+#             f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'], 
+#                                         nperseg=None, noverlap=None, nfft=None,
+#                                         return_onesided = fb.fil[0]['freqSpecsRangeType'] == 'half',
+#                                         scaling='density',mode='psd')
+#             # mode: 'psd', 'complex','magnitude','angle', 'phase'
+# =============================================================================
+            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=256,
+                                        noverlap=128, pad_to=None, xextent=t_range,
+                                        sides=sides, scale_by_freq=True,mode='psd',
+                                        scale=scale, vmin=self.ui.bottom_t, cmap=None)
+            # Fs : sampling frequency for scaling
+            # window: callable or ndarray, default window_hanning
+            # NFFT : data points for each block
+            # pad_to: create zero-padding
+            # xextent: image extent along x-axis; None or (xmin, xmax)
+            # scale_by_freq: True gives spectral density, scaled by f_S
+
+#            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f), 
+#                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
+            #self.ax_s.colorbar(col_mesh)
+            self.mplwidget_t.fig.colorbar(im, ax=self.ax_s)
             self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])          
 
         # --------------- 3D Complex  -----------------------------------------
