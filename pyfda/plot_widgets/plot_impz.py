@@ -548,16 +548,6 @@ class Plot_Impz(QWidget):
 
         # Calculate imag. and real components from response
         self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
-        if self.cmplx:
-            self.x_r = self.x.real
-            self.x_i = self.x.imag
-            self.y_r = self.y.real
-            self.y_i = self.y.imag
-        else:
-            self.y_r = self.y
-            self.y_i = None
-            self.x_r = self.x.real
-            self.x_i = None
 #------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
@@ -848,11 +838,22 @@ class Plot_Impz(QWidget):
             logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
+            
+        if self.cmplx:
+            self.x_r = self.x.real
+            self.x_i = self.x.imag
+            self.y_r = self.y.real
+            self.y_i = self.y.imag
+        else:
+            self.y_r = self.y
+            self.y_i = None
+            self.x_r = self.x.real
+            self.x_i = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
-            x = np.maximum(20 * np.log10(abs(self.x_r * self.scale_i)), self.ui.bottom_t)
-            y = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
+            x_r = np.maximum(20 * np.log10(abs(self.x_r * self.scale_i)), self.ui.bottom_t)
+            y_r = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
 
             if self.cmplx:
                 x_i = np.maximum(20 * np.log10(abs(self.x_i * self.scale_i)), self.ui.bottom_t)
@@ -865,8 +866,8 @@ class Plot_Impz(QWidget):
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
-            x = self.x_r * self.scale_i
-            y = self.y_r * self.scale_o
+            x_r = self.x_r * self.scale_i
+            y_r = self.y_r * self.scale_o
             fx_max = self.fx_max
             fx_min = self.fx_min
             win = self.ui.win
@@ -885,7 +886,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Stimulus plot ----------------------------------
         self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
-              x[self.ui.N_start:], label='$x[n]$', bottom=self.ui.bottom_t,
+              x_r[self.ui.N_start:], label='$x[n]$', bottom=self.ui.bottom_t,
               plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
@@ -896,7 +897,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Response plot ----------------------------------
         self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
-              y[self.ui.N_start:], label='$y[n]$', bottom=self.ui.bottom_t,
+              y_r[self.ui.N_start:], label='$y[n]$', bottom=self.ui.bottom_t,
               plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
 
@@ -987,11 +988,11 @@ class Plot_Impz(QWidget):
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
             for i in range(self.ui.N_start, self.ui.N_end):
-                self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
+                self.ax3d.plot([self.t[i], self.t[i]], [y_r[i], y_r[i]], [0, y_i[i]],
                                '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], y_i[self.ui.N_start:],
+            self.ax3d.plot(self.t[self.ui.N_start:], y_r[self.ui.N_start:], y_i[self.ui.N_start:],
                             'o', markersize=8, markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
