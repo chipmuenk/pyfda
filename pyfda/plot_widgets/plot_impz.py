@@ -791,32 +791,40 @@ class Plot_Impz(QWidget):
 
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower().replace("*", "")
         self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False)
+    
+        self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr, data=False).lower()
+        self.spgr = self.plt_time_spgr != "none"
 
-        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none" or self.plt_time_stmq != "none"
+        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
+            or self.plt_time_stmq != "none" or self.spgr or self.ui.chk_win_time.isChecked()
 
         self.mplwidget_t.fig.clf() # clear figure with axes
 
         if plt_time:
-            num_subplots = 1 + self.cmplx
+            num_subplots = 1 + self.cmplx + self.spgr
 
-            ax = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
+            self.ax_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
                                                sharex=True, squeeze = False)
 
-            self.ax_r = ax[0][0]
+            self.ax_r = self.ax_time[0][0]
             self.ax_r.cla()
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
             if self.cmplx:
-                self.ax_i = ax[1][0]
+                self.ax_i = self.ax_time[1][0]
                 self.ax_i.cla()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
                 self.mplwidget_t.fig.align_ylabels()
+            
+            if self.spgr:
+                self.ax_s = self.ax_time[-1][0] # assign last axis
 
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
+#------------------------------------------------------------------------------
     def draw_time(self):
         """
         (Re-)draw the time domain mplwidget
@@ -917,18 +925,36 @@ class Plot_Impz(QWidget):
             # is shorter but imports matplotlib, set property directly instead:
             [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
-            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
+
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
             self.ax_i.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
         else:
-            self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
+#            self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
-        self.ax_r.set_title(self.title_str)
-        self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
-        expand_lim(self.ax_r, 0.02)
+        # --------------- Spectrogram -----------------------------------------
+        if self.spgr:
+            if self.plt_time_spgr == "stimulus":
+                s = self.x
+            elif self.plt_time_spgr == "fixp. stim.":
+                s = self.x_q
+            elif self.plt_time_spgr == "response":
+                s = self.y
+            else:
+                s = None
+            
+            f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'], 
+                                        nperseg=None, noverlap=None, nfft=None,
+                                        return_onesided = fb.fil[0]['freqSpecsRangeType'] == 'half',
+                                        scaling='density',mode='psd')
+            # mode: 'psd', 'complex','magnitude','angle', 'phase'
+            if self.ui.chk_log_time.isChecked():
+                Sxx = 10*np.log10(Sxx)
+            self.ax_s.pcolormesh(t*fb.fil[0]['f_S'], np.fft.fftshift(f), 
+                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud')
+            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])          
 
-
+        # --------------- 3D Complex  -----------------------------------------
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
             for i in range(self.ui.N_start, self.ui.N_end):
@@ -942,6 +968,12 @@ class Plot_Impz(QWidget):
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
+
+        # --------------- Title and common labels ----------------------------        
+        self.ax_time[-1][0].set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.ax_time[0][0].set_title(self.title_str)
+        self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
+        expand_lim(self.ax_r, 0.02)
 
         self.redraw() # redraw currently active mplwidget
 
