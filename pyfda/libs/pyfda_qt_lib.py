@@ -18,13 +18,13 @@ from .pyfda_lib import qstr
 from .compat import QFrame, QMessageBox, Qt
 from .pyfda_dirs import OS
 
-#------------------------------------------------------------------------------        
+#------------------------------------------------------------------------------
 def qwindow_stay_on_top(win, top):
     """
     Set flags for a window such that it stays on top (True) or not
 
-    On Windows (7) the new window stays on top anyway (check for Win10), 
-    Additionally setting WindowStaysOnTopHint blocks the message window when 
+    On Windows (7) the new window stays on top anyway (check for Win10),
+    Additionally setting WindowStaysOnTopHint blocks the message window when
     trying to close pyfda.
     """
 
@@ -51,7 +51,7 @@ def qget_cmb_box(cmb_box, data=True):
     QString, next to a "normal" non-unicode string.
 
     Returns:
-    
+
     The current text or data of combobox as a string
     """
     if data:
@@ -60,7 +60,7 @@ def qget_cmb_box(cmb_box, data=True):
         cmb_str = qstr(cmb_data) # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
-  
+
     cmb_str = str(cmb_str)
 
     return cmb_str
@@ -86,7 +86,7 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
 
     fireSignals: bool (default: False)
         When True, fire a signal if the index is changed (useful for GUI testing)
-        
+
     caseInsensitive: bool (default: False)
         When true, perform case sensitive search.
 
@@ -101,23 +101,23 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
         flag = Qt.MatchFixedString # string based matching (case insensitive)
 
     # Other more or less self explanatory flags:
-    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith,
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
 
     ret = idx
 
     if idx == -1: # data does not exist, use first entry instead
         idx = 0
-        
+
     cmb_box.blockSignals(not fireSignals)
     cmb_box.setCurrentIndex(idx) # set index
     cmb_box.blockSignals(False)
-    
+
     return ret
 
 #------------------------------------------------------------------------------
@@ -133,14 +133,14 @@ def qdel_item_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensit
     ----------
 
     string: str
-        The label in the text or data field to be deleted. 
+        The label in the text or data field to be deleted.
 
     data: bool (default: False)
         Whether the string refers to the data or text fields of the combo box
 
     fireSignals: bool (default: False)
         When True, fire a signal if the index is changed (useful for GUI testing)
-        
+
     caseInsensitive: bool (default: False)
         When true, perform case sensitive search.
 
@@ -155,19 +155,19 @@ def qdel_item_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensit
         flag = Qt.MatchFixedString # string based matching (case insensitive)
 
     # Other more or less self explanatory flags:
-    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith,
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
 
-    if idx > -1: # data  / text exists in combo box, delete it.   
+    if idx > -1: # data  / text exists in combo box, delete it.
         cmb_box.blockSignals(not fireSignals)
         cmb_box.removeItem(idx) # set index
         cmb_box.blockSignals(False)
-        
+
     return idx
 
 #------------------------------------------------------------------------------
@@ -183,20 +183,20 @@ def qadd_item_cmb_box(cmb_box, string, fireSignals=False, caseSensitive=False):
     ----------
 
     string: str
-        The string for item in the text or data field to be added. 
+        The string for item in the text or data field to be added.
 
     data: bool (default: False)
         Whether the string refers to the data or text fields of the combo box
 
     fireSignals: bool (default: False)
         When True, fire a signal if the index is changed (useful for GUI testing)
-        
+
     caseInsensitive: bool (default: False)
         When true, perform case sensitive search.
 
     Returns
     -------
-        The index of the found item with string / data. When not found in the 
+        The index of the found item with string / data. When not found in the
         combo box, return index -1.
     """
     data = False
@@ -206,27 +206,27 @@ def qadd_item_cmb_box(cmb_box, string, fireSignals=False, caseSensitive=False):
         flag = Qt.MatchFixedString # string based matching (case insensitive)
 
     # Other more or less self explanatory flags:
-    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith,
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
 
     if idx == -1: # data  / text doesn'r exist in combo box, add it.
         cmb_box.blockSignals(not fireSignals)
         cmb_box.addItem(string) # set index
         cmb_box.blockSignals(False)
-    
+
     return idx
 
 #------------------------------------------------------------------------------
 def qstyle_widget(widget, state):
     """
-    Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  
+    Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
-    
+
     - "normal": default, no color styling
     - "ok":  green, filter has been designed, everything ok
     - "changed": yellow, filter specs have been changed
@@ -253,29 +253,29 @@ def qstyle_widget(widget, state):
 #------------------------------------------------------------------------------
 def qhline(widget):
     # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-    # solution 
+    # solution
     """
     Create a horizontal line
-    
+
     Parameters
     ----------
-    
+
     widget: widget containing the QFrame to be created
     """
     line = QFrame(widget)
     line.setFrameShape(QFrame.HLine)
     line.setFrameShadow(QFrame.Sunken)
     return line
-    
+
 #------------------------------------------------------------------------------
 def qget_selected(table, select_all=False, reverse=True):
     """
     Get selected cells in ``table`` and return a dictionary with the following keys:
-    
+
     'idx': indices of selected cells as an unsorted list of tuples
-    
+
     'sel': list of lists of selected cells per column, by default sorted in reverse
-    
+
     'cur':  current cell selection as a tuple
 
     Parameters
