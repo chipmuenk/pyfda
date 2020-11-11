@@ -134,12 +134,12 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
-        self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self.draw)
+        self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
         self.ui.chk_log_time.clicked.connect(self.draw)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_bottom)
         self.ui.chk_log_spgr_time.clicked.connect(self.draw)
         self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
-        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
+        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)        
         self.ui.chk_fx_limits.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
@@ -1030,7 +1030,9 @@ class Plot_Impz(QWidget):
 #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f), 
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
             #self.ax_s.colorbar(col_mesh)
-            self.mplwidget_t.fig.colorbar(im, ax=self.ax_s)
+
+            self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.01)
+
             self.ax_s.set_ylabel(y_lbl + ":  " + fb.fil[0]['plt_fLabel'])        
 
         # --------------- 3D Complex  -----------------------------------------
