@@ -521,7 +521,7 @@ class Plot_Impz(QWidget):
 
         Set the flag `self.cmplx` when response `self.y` or stimulus `self.x` are complex.
         """
-        # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
+
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
         if min(len(self.aa), len(self.bb)) < 2:
@@ -558,7 +558,7 @@ class Plot_Impz(QWidget):
         """
         if self.needs_calc:
             self.needs_redraw = [True] * 2
-            t_draw_start = time.process_time()
+            #t_draw_start = time.process_time()
             self.y = np.asarray(dict_sig['fx_results'])
             if self.y is None:
                 qstyle_widget(self.ui.but_run, "error")
@@ -839,25 +839,28 @@ class Plot_Impz(QWidget):
         else:
             x_q = None
             
+        x = self.x * self.scale_i
+        y = self.y * self.scale_o
+        
         if self.cmplx:
-            self.x_r = self.x.real
-            self.x_i = self.x.imag
-            self.y_r = self.y.real
-            self.y_i = self.y.imag
+            x_r = x.real
+            x_i = x.imag
+            y_r = y.real
+            y_i = y.imag
         else:
-            self.y_r = self.y
-            self.y_i = None
-            self.x_r = self.x.real
-            self.x_i = None
+            x_r = x.real
+            x_i = None
+            y_r = y
+            y_i = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
-            x_r = np.maximum(20 * np.log10(abs(self.x_r * self.scale_i)), self.ui.bottom_t)
-            y_r = np.maximum(20 * np.log10(abs(self.y_r * self.scale_o)), self.ui.bottom_t)
+            x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
+            y_r = np.maximum(20 * np.log10(abs(y_r)), self.ui.bottom_t)
 
             if self.cmplx:
-                x_i = np.maximum(20 * np.log10(abs(self.x_i * self.scale_i)), self.ui.bottom_t)
-                y_i = np.maximum(20 * np.log10(abs(self.y_i * self.scale_o)), self.ui.bottom_t)
+                x_i = np.maximum(20 * np.log10(abs(x_i)), self.ui.bottom_t)
+                y_i = np.maximum(20 * np.log10(abs(y_i)), self.ui.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + r'$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
             else:
@@ -866,15 +869,10 @@ class Plot_Impz(QWidget):
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
-            x_r = self.x_r * self.scale_i
-            y_r = self.y_r * self.scale_o
             fx_max = self.fx_max
             fx_min = self.fx_min
             win = self.ui.win
             if self.cmplx:
-                x_i = self.x_i * self.scale_i
-                y_i = self.y_i * self.scale_o
-
                 H_i_str = r'$\Im\{$' + self.H_str + r'$\}$ in V'
                 H_str = r'$\Re\{$' + self.H_str + r'$\}$ in V'
             else:
@@ -937,11 +935,11 @@ class Plot_Impz(QWidget):
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
             if self.plt_time_spgr == "stimulus":
-                s = self.x[self.ui.N_start:]
+                s = x[self.ui.N_start:]
             elif self.plt_time_spgr == "fixp. stim.":
-                s = self.x_q[self.ui.N_start:]
+                s = x_q[self.ui.N_start:]
             elif self.plt_time_spgr == "response":
-                s = self.y[self.ui.N_start:]
+                s = y[self.ui.N_start:]
             else:
                 s = None
                 
