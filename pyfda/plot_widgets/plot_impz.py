@@ -502,7 +502,10 @@ class Plot_Impz(QWidget):
             self.title_str = r'$Fixpoint$ ' + self.title_str
             self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI']) # setup quantizer for input quantization
             self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
-            self.x_q = self.q_i.fixp(self.x)
+            if np.any(np.iscomplex(self.x)):
+                logger.warning("Complex stimulus: Only its real part will be processed by the fixpoint filter!")
+            
+            self.x_q = self.q_i.fixp(self.x.real)
 
             self.sig_tx.emit({'sender':__name__, 'fx_sim':'send_stimulus',
                     'fx_stimulus':np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
@@ -562,9 +565,6 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
             else:
                 self.needs_calc = False
-                self.y_r = self.y
-                self.y_i = None
-                self.cmplx = False
 
                 self.draw()
                 qstyle_widget(self.ui.but_run, "normal")
