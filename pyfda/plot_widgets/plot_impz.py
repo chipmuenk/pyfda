@@ -134,8 +134,8 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self.draw)
-        self.ui.chk_log_time.clicked.connect(self._log_mode_time)
-        self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
+        self.ui.chk_log_time.clicked.connect(self.draw)
+        self.ui.led_log_bottom_time.editingFinished.connect(self._log_bottom)
         self.ui.chk_log_spgr_time.clicked.connect(self.draw)
         self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
         self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
@@ -700,7 +700,7 @@ class Plot_Impz(QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _log_mode_time(self):
+    def _log_bottom(self):
         """
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
@@ -708,12 +708,9 @@ class Plot_Impz(QWidget):
         #self.ui.lbl_log_bottom_time.setVisible(log)
         #self.ui.led_log_bottom_time.setVisible(log)
 
-        if log:
-            self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
+        self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
                                          self.ui.bottom_t, return_type='float', sign='neg')
-            self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
-        else:
-            self.ui.bottom_t = 0
+        self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
 
         self.draw()
 
@@ -876,6 +873,7 @@ class Plot_Impz(QWidget):
             y_i = None
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
+            bottom_t = self.ui.bottom_t
             win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
             x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
             y_r = np.maximum(20 * np.log10(abs(y_r)), self.ui.bottom_t)
@@ -891,6 +889,7 @@ class Plot_Impz(QWidget):
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
         else:
+            bottom_t = 0
             fx_max = self.fx_max
             fx_min = self.fx_min
             win = self.ui.win
@@ -906,18 +905,18 @@ class Plot_Impz(QWidget):
 
         # --------------- Stimulus plot ----------------------------------
         self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
-              x_r[self.ui.N_start:], label='$x[n]$', bottom=self.ui.bottom_t,
+              x_r[self.ui.N_start:], label='$x[n]$', bottom=bottom_t,
               plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
             self.draw_data(self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:],
-                  x_q[self.ui.N_start:], label='$x_q[n]$', bottom=self.ui.bottom_t,
+                  x_q[self.ui.N_start:], label='$x_q[n]$', bottom=bottom_t,
                   plt_fmt=self.fmt_plot_stmq, mkr=self.plt_time_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
         # --------------- Response plot ----------------------------------
         self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
-              y_r[self.ui.N_start:], label='$y[n]$', bottom=self.ui.bottom_t,
+              y_r[self.ui.N_start:], label='$y[n]$', bottom=bottom_t,
               plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
 
@@ -932,13 +931,13 @@ class Plot_Impz(QWidget):
 
             # --- imag. part of response -----
             self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
-                  y_i[self.ui.N_start:], label='$y_i[n]$', bottom=self.ui.bottom_t,
+                  y_i[self.ui.N_start:], label='$y_i[n]$', bottom=bottom_t,
                   plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp,
                   marker=mkfmt_i)
 
             # --- imag. part of stimulus -----
             self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
-                  x_i[self.ui.N_start:], label='$x_i[n]$', bottom=self.ui.bottom_t,
+                  x_i[self.ui.N_start:], label='$x_i[n]$', bottom=bottom_t,
                   plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim,
                   marker=mkfmt_i)
 
@@ -976,8 +975,10 @@ class Plot_Impz(QWidget):
             if self.ui.chk_log_spgr_time.isChecked():
                 scale = 'dB'
                 # 10 log10 for 'psd', otherwise 20 log10
+                bottom_spgr = self.ui.bottom_t
             else:
                 scale = 'linear'
+                bottom_spgr = 0
                 # must be linear if mode is 'angle' or 'phase' 
                 
             t_range = (self.t[self.ui.N_start], self.t[-1])
@@ -994,7 +995,7 @@ class Plot_Impz(QWidget):
                 0]['f_S'], NFFT=self.ui.nfft_spgr_time,
                                         noverlap=self.ui.ovlp_spgr_time, pad_to=None, xextent=t_range,
                                         sides=sides, scale_by_freq=True,mode='psd',
-                                        scale=scale, vmin=self.ui.bottom_t, cmap=None)
+                                        scale=scale, vmin=bottom_spgr, cmap=None)
             # Fs : sampling frequency for scaling
             # window: callable or ndarray, default window_hanning
             # NFFT : data points for each block
