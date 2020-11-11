@@ -703,6 +703,24 @@ class Plot_Impz(QWidget):
             logger.warning("N_OVLP must be less than N_FFT!")
 
         self.draw()
+        
+#------------------------------------------------------------------------------
+    def _spgr_cmb(self):
+        """
+        Update spectrogram ui
+        """
+        spgr_en = self.ui.cmb_plt_time_spgr.currentText() != "None"
+
+        self.ui.lbl_log_spgr_time.setVisible(spgr_en)
+        self.ui.chk_log_spgr_time.setVisible(spgr_en)   
+        self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
+        self.ui.led_nfft_spgr_time.setVisible(spgr_en)
+
+
+        self.ui.lbl_ovlp_spgr_time.setVisible(spgr_en)
+        self.ui.led_ovlp_spgr_time.setVisible(spgr_en)
+
+        self.draw()
 
 
 #------------------------------------------------------------------------------
