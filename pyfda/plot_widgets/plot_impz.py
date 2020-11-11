@@ -24,7 +24,8 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, np_type,
         rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
+                                     qadd_item_cmb_box, qdel_item_cmb_box)
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 
@@ -370,6 +371,11 @@ class Plot_Impz(QWidget):
         self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
+        
+        if self.fx_sim:
+            qadd_item_cmb_box(self.ui.cmb_plt_time_spgr, "x_q[n]")
+        else:
+            qdel_item_cmb_box(self.ui.cmb_plt_time_spgr, "x_q[n]")
 
         if self.fx_sim != self.fx_sim_old:
             qstyle_widget(self.ui.but_run, "changed")
