@@ -513,10 +513,10 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_response(self):
         """
-        (Re-)calculate float filter response `self.y` from stimulus `self.x`.
+        (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and 
+        the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
 
-        Split response into imag. and real components `self.y_i` and `self.y_r`
-        and set the flag `self.cmplx` (also when stimulus `self.x` is complex).
+        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x` are complex.
         """
         # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====
         self.bb = np.asarray(fb.fil[0]['ba'][0])
