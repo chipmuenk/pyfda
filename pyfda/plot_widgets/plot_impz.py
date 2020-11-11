@@ -979,13 +979,13 @@ class Plot_Impz(QWidget):
 
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
-            if self.plt_time_spgr == "stimulus":
+            if self.plt_time_spgr == "x[n]":
                 s = x[self.ui.N_start:]
                 y_lbl = r'$|X(f,t)|$'
-            elif self.plt_time_spgr == "fixp. stim.":
-                s = x_q[self.ui.N_start:]
+            elif self.plt_time_spgr == "x_q[n]":
+                s = self.x_q[self.ui.N_start:]
                 y_lbl = r'$|X_Q(f,t)|$'
-            elif self.plt_time_spgr == "response":
+            elif self.plt_time_spgr == "y[n]":
                 s = y[self.ui.N_start:]
                 y_lbl = r'$|Y(f,t)|$'
             else:

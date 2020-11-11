@@ -220,7 +220,7 @@ class PlotImpz_UI(QWidget):
             
         lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
-        self.cmb_plt_time_spgr.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
+        self.cmb_plt_time_spgr.addItems(["None", "x[n]", "x_q[n]", "y[n]"])
         qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
         self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
         spgr_en = self.plt_time_spgr != "None"
