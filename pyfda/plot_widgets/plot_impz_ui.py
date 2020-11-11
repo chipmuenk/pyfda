@@ -54,7 +54,21 @@ class PlotImpz_UI(QWidget):
         self.N_user = 0
         self.N = 0
 
-        self.bottom_t = -80 # initial value for log. scale
+        # time
+        self.plt_time_resp = "Stem"
+        self.plt_time_stim = "None"
+        self.plt_time_stmq = "None"
+        self.plt_time_spgr = "None"
+        
+        self.bottom_t = -80 # initial value for log. scale (time)
+        self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
+        self.ovlp_spgr_time = 128 # number of overlap points between spectrogram segments
+        
+        # stimuli
+        self.stim = "Impulse"
+        self.chirp_method = 'Linear'
+        self.noise = "None"
+
         self.f1 = 0.02
         self.f2 = 0.03
         self.A1 = 1.0
@@ -64,23 +78,15 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * t))"
-
-        self.bottom_f = -120 # initial value for log. scale
-        self.param = None
-
-        # initial settings for comboboxes
-        self.plt_time_resp = "Stem"
-        self.plt_time_stim = "None"
-        self.plt_time_stmq = "None"
-        self.plt_time_spgr = "None"
-
+ 
+        # frequency
         self.plt_freq_resp = "Line"
         self.plt_freq_stim = "None"
         self.plt_freq_stmq = "None"
 
-        self.stim = "Impulse"
-        self.chirp_method = 'Linear'
-        self.noise = "None"
+        self.bottom_f = -120 # initial value for log. scale
+        self.param = None
+
 
         # dictionary for fft window settings
         self.win_dict = fb.fil[0]['win_fft']
@@ -192,12 +198,6 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
-        self.cmb_plt_time_spgr = QComboBox(self)
-        self.cmb_plt_time_spgr.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
-        qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
-        self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
-
         lbl_win_time = QLabel(to_html("&nbsp;&nbsp;FFT Window", frmt='bi'), self)
         self.chk_win_time = QCheckBox(self)
         self.chk_win_time.setObjectName("chk_win_time")
@@ -211,14 +211,41 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setChecked(False)
 
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked())
+        self.lbl_log_bottom_time.setVisible(True)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
-        self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_time.setVisible(self.chk_log_time.isChecked())
+        self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
+                                            "and spectrogram plots with log. scale.</span>")
+        self.led_log_bottom_time.setVisible(True)
 
         if not self.chk_log_time.isChecked():
             self.bottom_t = 0
+            
+        lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
+        self.cmb_plt_time_spgr = QComboBox(self)
+        self.cmb_plt_time_spgr.addItems(["None", "Stimulus", "Fixp. Stim.", "Response"])
+        qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
+        self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
+
+        lbl_log_spgr_time = QLabel(to_html("&nbsp;dB", frmt='b'), self)
+        self.chk_log_spgr_time = QCheckBox(self)
+        self.chk_log_spgr_time.setObjectName("chk_log_spgr")
+        self.chk_log_spgr_time.setToolTip("<span>Logarithmic scale for spectrogram.</span>")
+        self.chk_log_spgr_time.setChecked(True)
+        
+        self.lbl_nfft_spgr_time = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
+        self.lbl_nfft_spgr_time.setVisible(True)
+        self.led_nfft_spgr_time = QLineEdit(self)
+        self.led_nfft_spgr_time.setText(str(self.nfft_spgr_time))
+        self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per spectrogram segment.</span>")
+        self.led_nfft_spgr_time.setVisible(True)
+        
+        self.lbl_ovlp_spgr_time = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
+        self.lbl_ovlp_spgr_time.setVisible(True)
+        self.led_ovlp_spgr_time = QLineEdit(self)
+        self.led_ovlp_spgr_time.setText(str(self.ovlp_spgr_time))
+        self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points between spectrogram segments.</span>")
+        self.led_ovlp_spgr_time.setVisible(True)
 
         self.chk_fx_limits = QCheckBox("Min/max.", self)
         self.chk_fx_limits.setObjectName("chk_fx_limits")
@@ -237,17 +264,24 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         #
-        layH_ctrl_time.addWidget(lbl_plt_time_spgr)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
-        #
         layH_ctrl_time.addWidget(lbl_win_time)
         layH_ctrl_time.addWidget(self.chk_win_time)
-        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(lbl_log_time)
         layH_ctrl_time.addWidget(self.chk_log_time)       
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
+        #
         layH_ctrl_time.addStretch(1)
+        #
+        layH_ctrl_time.addWidget(lbl_plt_time_spgr)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
+        layH_ctrl_time.addWidget(lbl_log_spgr_time)
+        layH_ctrl_time.addWidget(self.chk_log_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_nfft_spgr_time)
+        layH_ctrl_time.addWidget(self.led_nfft_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_ovlp_spgr_time)
+        layH_ctrl_time.addWidget(self.led_ovlp_spgr_time)
 
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)

@@ -136,6 +136,9 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self.draw)
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
+        self.ui.chk_log_spgr_time.clicked.connect(self.draw)
+        self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
+        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
@@ -678,13 +681,32 @@ class Plot_Impz(QWidget):
         self.ui.show_fft_win()
 
 #------------------------------------------------------------------------------
+    def _spgr_params(self):
+        """
+        Update parameters for spectrogram
+        """
+        self.ui.nfft_spgr_time = safe_eval(self.ui.led_nfft_spgr_time.text(),
+                                         self.ui.nfft_spgr_time, return_type='int', sign='pos')
+        self.ui.led_nfft_spgr_time.setText(str(self.ui.nfft_spgr_time))
+
+        self.ui.ovlp_spgr_time = safe_eval(self.ui.led_ovlp_spgr_time.text(),
+                                         self.ui.ovlp_spgr_time, return_type='int', sign='poszero')
+        self.ui.led_ovlp_spgr_time.setText(str(self.ui.ovlp_spgr_time))
+        
+        if self.ui.nfft_spgr_time <= self.ui.ovlp_spgr_time:
+            logger.warning("N_OVLP must be less than N_FFT!")
+
+        self.draw()
+
+
+#------------------------------------------------------------------------------
     def _log_mode_time(self):
         """
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
         log = self.ui.chk_log_time.isChecked()
-        self.ui.lbl_log_bottom_time.setVisible(log)
-        self.ui.led_log_bottom_time.setVisible(log)
+        #self.ui.lbl_log_bottom_time.setVisible(log)
+        #self.ui.led_log_bottom_time.setVisible(log)
 
         if log:
             self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
@@ -936,10 +958,13 @@ class Plot_Impz(QWidget):
         if self.spgr:
             if self.plt_time_spgr == "stimulus":
                 s = x[self.ui.N_start:]
+                y_lbl = r'$|X(f,t)|$'
             elif self.plt_time_spgr == "fixp. stim.":
                 s = x_q[self.ui.N_start:]
+                y_lbl = r'$|X_Q(f,t)|$'
             elif self.plt_time_spgr == "response":
                 s = y[self.ui.N_start:]
+                y_lbl = r'$|Y(f,t)|$'
             else:
                 s = None
                 
@@ -948,7 +973,7 @@ class Plot_Impz(QWidget):
             else:
                 sides = 'twosided'
                 
-            if self.ui.chk_log_time.isChecked():
+            if self.ui.chk_log_spgr_time.isChecked():
                 scale = 'dB'
                 # 10 log10 for 'psd', otherwise 20 log10
             else:
@@ -965,8 +990,9 @@ class Plot_Impz(QWidget):
 #                                         scaling='density',mode='psd')
 #             # mode: 'psd', 'complex','magnitude','angle', 'phase'
 # =============================================================================
-            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=256,
-                                        noverlap=128, pad_to=None, xextent=t_range,
+            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[
+                0]['f_S'], NFFT=self.ui.nfft_spgr_time,
+                                        noverlap=self.ui.ovlp_spgr_time, pad_to=None, xextent=t_range,
                                         sides=sides, scale_by_freq=True,mode='psd',
                                         scale=scale, vmin=self.ui.bottom_t, cmap=None)
             # Fs : sampling frequency for scaling
@@ -980,7 +1006,7 @@ class Plot_Impz(QWidget):
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
             #self.ax_s.colorbar(col_mesh)
             self.mplwidget_t.fig.colorbar(im, ax=self.ax_s)
-            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])          
+            self.ax_s.set_ylabel(y_lbl + ":  " + fb.fil[0]['plt_fLabel'])        
 
         # --------------- 3D Complex  -----------------------------------------
         if self.ACTIVE_3D: # not implemented / tested yet
