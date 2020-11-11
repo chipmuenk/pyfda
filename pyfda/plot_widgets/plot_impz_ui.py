@@ -217,9 +217,6 @@ class PlotImpz_UI(QWidget):
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
                                             "and spectrogram plots with log. scale.</span>")
         self.led_log_bottom_time.setVisible(True)
-
-        if not self.chk_log_time.isChecked():
-            self.bottom_t = 0
             
         lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
