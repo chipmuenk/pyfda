@@ -85,7 +85,7 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
         Whether the string refers to the data or text fields of the combo box
 
     fireSignals: bool (default: False)
-        When False, fire a signal if the index is changed (useful for GUI testing)
+        When True, fire a signal if the index is changed (useful for GUI testing)
         
     caseInsensitive: bool (default: False)
         When true, perform case sensitive search.
@@ -119,6 +119,107 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     cmb_box.blockSignals(False)
     
     return ret
+
+#------------------------------------------------------------------------------
+def qdel_item_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
+    """
+    Try to find the entry in combobox corresponding to `string` in a text field (`data = False`)
+    or in a data field (`data=True`) and delete the item. When `string` is not found,
+    do nothing. Signals are blocked during the update of the combobox unless
+    `fireSignals` is set `True`. By default, the search is case insensitive, this
+    can be changed by passing `caseSensitive=False`.
+
+    Parameters
+    ----------
+
+    string: str
+        The label in the text or data field to be deleted. 
+
+    data: bool (default: False)
+        Whether the string refers to the data or text fields of the combo box
+
+    fireSignals: bool (default: False)
+        When True, fire a signal if the index is changed (useful for GUI testing)
+        
+    caseInsensitive: bool (default: False)
+        When true, perform case sensitive search.
+
+    Returns
+    -------
+        The index of the item with string / data. When not found in the combo box,
+        return index -1.
+    """
+    if caseSensitive:
+        flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
+    else:
+        flag = Qt.MatchFixedString # string based matching (case insensitive)
+
+    # Other more or less self explanatory flags:
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchRegExp, MatchWildcard, MatchRecursive
+
+    if data:
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
+    else:
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
+
+    if idx > -1: # data  / text exists in combo box, delete it.   
+        cmb_box.blockSignals(not fireSignals)
+        cmb_box.removeItem(idx) # set index
+        cmb_box.blockSignals(False)
+        
+    return idx
+
+#------------------------------------------------------------------------------
+def qadd_item_cmb_box(cmb_box, string, fireSignals=False, caseSensitive=False):
+    """
+    Add an entry in combobox with `string` in a text field (`data = False`)
+    or in a data field (`data=True`, not implemented yet). When `string` is already in combobox,
+    do nothing. Signals are blocked during the update of the combobox unless
+    `fireSignals` is set `True`. By default, the search is case insensitive, this
+    can be changed by passing `caseSensitive=False`.
+
+    Parameters
+    ----------
+
+    string: str
+        The string for item in the text or data field to be added. 
+
+    data: bool (default: False)
+        Whether the string refers to the data or text fields of the combo box
+
+    fireSignals: bool (default: False)
+        When True, fire a signal if the index is changed (useful for GUI testing)
+        
+    caseInsensitive: bool (default: False)
+        When true, perform case sensitive search.
+
+    Returns
+    -------
+        The index of the found item with string / data. When not found in the 
+        combo box, return index -1.
+    """
+    data = False
+    if caseSensitive:
+        flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
+    else:
+        flag = Qt.MatchFixedString # string based matching (case insensitive)
+
+    # Other more or less self explanatory flags:
+    # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith, 
+    # MatchRegExp, MatchWildcard, MatchRecursive
+
+    if data:
+        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string        
+    else:
+        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string    
+
+    if idx == -1: # data  / text doesn'r exist in combo box, add it.
+        cmb_box.blockSignals(not fireSignals)
+        cmb_box.addItem(string) # set index
+        cmb_box.blockSignals(False)
+    
+    return idx
 
 #------------------------------------------------------------------------------
 def qstyle_widget(widget, state):
