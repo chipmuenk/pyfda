@@ -1053,7 +1053,8 @@ class Plot_Impz(QWidget):
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
             #self.ax_s.colorbar(col_mesh)
 
-            self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.01)
+            cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.01)
+            cbar.ax.set_ylabel(y_lbl + spgr_unit)
 
             self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])        
 
