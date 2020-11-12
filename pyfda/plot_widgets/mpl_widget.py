@@ -142,11 +142,8 @@ class MplWidget(QWidget):
         """
         # only execute when at least one axis exists -> tight_layout crashes otherwise
         if self.fig.axes:
+            self.mplToolbar.toggle_draw_grid(Toggle=False, axes=self.fig.axes)
             for ax in self.fig.axes:
-                if hasattr(ax, "is_twin"):
-                    ax.grid(False)  # the axis is a twinx() system, suppress the gridlines
-                else:
-                    ax.grid(self.mplToolbar.a_gr.isChecked())  # collect axes objects and apply grid settings
 
                 if self.mplToolbar.zoom_locked:
                     ax.axis(self.limits) # restore old limits
@@ -368,10 +365,11 @@ class MplToolbar(NavigationToolbar):
         #---------------------------------------------
         # GRID:
         #---------------------------------------------
-        self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_grid)
+        self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_draw_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
+        self.a_gr_state = 1  # 0: off, 1: major, 2: minor
 
         #---------------------------------------------
         # REDRAW:
@@ -469,13 +467,45 @@ class MplToolbar(NavigationToolbar):
 
 
 #------------------------------------------------------------------------------
-    def toggle_grid(self):
-        """Toggle the grid and redraw the figure."""
+    def toggle_draw_grid(self, Toggle=True, axes=None):
+        """
+        Toggle the grid of all axes and redraw the figure.
+
+        Parameters
+        ----------
+        Toggle : bool, optional
+            Toggle the grid display and redraw the canvas in the end when True.
+            When false, only restore the grid settings.
+        axes : matplotlib axes, optional
+            When none is passed, use local `self.mpl_widget.fig.axes`
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if Toggle:
+            self.a_gr_state = (self.a_gr_state + 1) % 3
+            
+        if not axes:
+            axes = self.mpl_widget.fig.axes
+            
         for ax in self.mpl_widget.fig.axes:
             if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
                 ax.grid(False)
             else:
-                ax.grid(self.a_gr.isChecked())#(self.grid)
+                if self.a_gr_state == 0:
+                    ax.grid(False, which='both')
+                    self.a_gr.setChecked(False)
+                elif self.a_gr_state == 1:
+                    ax.grid(True, which='major')
+                    self.a_gr.setChecked(True)                    
+                else:
+                    ax.grid(True, which='both')
+                    self.a_gr.setChecked(True)
+                    #self.a_gr.setIcon(QIcon(':/grid.svg'))
+
         self.canvas.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
 #------------------------------------------------------------------------------
