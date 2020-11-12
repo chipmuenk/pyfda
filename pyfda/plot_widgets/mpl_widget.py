@@ -142,7 +142,7 @@ class MplWidget(QWidget):
         """
         # only execute when at least one axis exists -> tight_layout crashes otherwise
         if self.fig.axes:
-            self.mplToolbar.toggle_draw_grid(Toggle=False, axes=self.fig.axes)
+            self.mplToolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
             for ax in self.fig.axes:
 
                 if self.mplToolbar.zoom_locked:
@@ -365,8 +365,8 @@ class MplToolbar(NavigationToolbar):
         #---------------------------------------------
         # GRID:
         #---------------------------------------------
-        self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_draw_grid)
-        self.a_gr.setToolTip('Toggle Grid')
+        self.a_gr = self.addAction(QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
+        self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
         self.a_gr_state = 1  # 0: off, 1: major, 2: minor
@@ -467,14 +467,15 @@ class MplToolbar(NavigationToolbar):
 
 
 #------------------------------------------------------------------------------
-    def toggle_draw_grid(self, Toggle=True, axes=None):
+    def cycle_draw_grid(self, cycle=True, axes=None):
         """
-        Toggle the grid of all axes and redraw the figure.
+        Cycle the grid of all axes through the states 'off', 'coarse' and 'fine'
+        and redraw the figure.
 
         Parameters
         ----------
-        Toggle : bool, optional
-            Toggle the grid display and redraw the canvas in the end when True.
+        cycle : bool, optional
+            Cycle the grid display and redraw the canvas in the end when True.
             When false, only restore the grid settings.
         axes : matplotlib axes, optional
             When none is passed, use local `self.mpl_widget.fig.axes`
@@ -485,7 +486,7 @@ class MplToolbar(NavigationToolbar):
 
         """
 
-        if Toggle:
+        if cycle:
             self.a_gr_state = (self.a_gr_state + 1) % 3
             
         if not axes:
@@ -498,15 +499,20 @@ class MplToolbar(NavigationToolbar):
                 if self.a_gr_state == 0:
                     ax.grid(False, which='both')
                     self.a_gr.setChecked(False)
+                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))                  
                 elif self.a_gr_state == 1:
-                    ax.grid(True, which='major')
-                    self.a_gr.setChecked(True)                    
-                else:
-                    ax.grid(True, which='both')
+                    ax.grid(True, which='major', lw=0.75, ls='-')
+                    ax.grid(False, which='minor')
                     self.a_gr.setChecked(True)
-                    #self.a_gr.setIcon(QIcon(':/grid.svg'))
+                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))                   
+                else:
+                    ax.grid(True, which='major', lw=0.75, ls='-')
+                    ax.grid(True, which='minor')
+                    self.a_gr.setChecked(True)
+                    self.a_gr.setIcon(QIcon(':/grid_fine.svg'))
 
-        self.canvas.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
+        if cycle:
+            self.canvas.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):

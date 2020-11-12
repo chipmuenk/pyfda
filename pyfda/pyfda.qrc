@@ -15,7 +15,8 @@
     <file alias="file.svg">images/icons/dark/file.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
-    <file alias="grid.svg">images/icons/dark/grid-four-up.svg</file>
+    <file alias="grid_fine.svg">images/icons/dark/grid-four-up.svg</file>
+    <file alias="grid_coarse.svg">images/icons/dark/grid-three-up.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
@@ -37,10 +38,7 @@
 </RCC>
 
 
-<!-- QtPy4: pyrcc4 pyfda.qrc -o qrc_resources.py -py3
+<!-- 
      QtPy5: pyrcc5 pyfda.qrc -o qrc_resources.py
-
-     manual edit in qrc_resources.py : 
-        from PyQtX import QtCore -> from pyfda.libs.compat import QtCore  
 -->
 
