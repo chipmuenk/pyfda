@@ -949,7 +949,9 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_time.isChecked():
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
 
-        self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
+        if self.plt_time_resp != "none" or self.plt_time_stim != "none"\
+            or self.plt_time_stmq != "none" or self.ui.chk_win_time.isChecked():
+                self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
