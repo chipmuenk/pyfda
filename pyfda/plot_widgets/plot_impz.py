@@ -139,7 +139,8 @@ class Plot_Impz(QWidget):
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_bottom)
         self.ui.chk_log_spgr_time.clicked.connect(self.draw)
         self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
-        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)        
+        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
+        self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
@@ -715,10 +716,10 @@ class Plot_Impz(QWidget):
         self.ui.chk_log_spgr_time.setVisible(spgr_en)   
         self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
         self.ui.led_nfft_spgr_time.setVisible(spgr_en)
-
-
         self.ui.lbl_ovlp_spgr_time.setVisible(spgr_en)
         self.ui.led_ovlp_spgr_time.setVisible(spgr_en)
+        self.ui.lbl_mode_spgr_time.setVisible(spgr_en)
+        self.ui.cmb_mode_spgr_time.setVisible(spgr_en)       
 
         self.draw()
 
@@ -981,21 +982,41 @@ class Plot_Impz(QWidget):
         if self.spgr:
             if self.plt_time_spgr == "x[n]":
                 s = x[self.ui.N_start:]
-                y_lbl = r'$|X(f,t)|$'
+                y_lbl = r'$X$'
             elif self.plt_time_spgr == "x_q[n]":
                 s = self.x_q[self.ui.N_start:]
-                y_lbl = r'$|X_Q(f,t)|$'
+                y_lbl = r'$X_Q$'
             elif self.plt_time_spgr == "y[n]":
                 s = y[self.ui.N_start:]
-                y_lbl = r'$|Y(f,t)|$'
+                y_lbl = r'$Y$'
             else:
                 s = None
-                
+            # ------ onesided / twosided ------------
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
                 sides = 'onesided'
             else:
                 sides = 'twosided'
                 
+            # ------- Unit / Mode ----------------------
+            mode = qget_cmb_box(self.ui.cmb_mode_spgr_time, data=True)
+
+            if mode == "psd":
+                # Power Spectral Density in W/Hz
+                spgr_unit = r" in V /$\sqrt{\mathrm{Hz}}$"
+            elif mode in {"magnitude", "complex"}:
+                # "complex" cannot be plotted directly
+                spgr_unit = r" in V"                
+            elif mode in {"angle", "phase"}:
+                spgr_unit = r" in rad"
+                # must be linear if mode is 'angle' or 'phase':
+                self.ui.chk_log_spgr_time.blockSignals(True)
+                self.ui.chk_log_spgr_time.setChecked(False)
+                self.ui.chk_log_spgr_time.blockSignals(False)
+            else:
+                logger.warning("Unknown spectrogram mode {0}".format(mode))
+                mode = None
+
+            # ------- lin / log ----------------------
             if self.ui.chk_log_spgr_time.isChecked():
                 scale = 'dB'
                 # 10 log10 for 'psd', otherwise 20 log10
@@ -1003,8 +1024,7 @@ class Plot_Impz(QWidget):
             else:
                 scale = 'linear'
                 bottom_spgr = 0
-                # must be linear if mode is 'angle' or 'phase' 
-                
+
             t_range = (self.t[self.ui.N_start], self.t[-1])
             # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
             
@@ -1018,7 +1038,7 @@ class Plot_Impz(QWidget):
             Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[
                 0]['f_S'], NFFT=self.ui.nfft_spgr_time,
                                         noverlap=self.ui.ovlp_spgr_time, pad_to=None, xextent=t_range,
-                                        sides=sides, scale_by_freq=True,mode='psd',
+                                        sides=sides, scale_by_freq=True,mode=mode,
                                         scale=scale, vmin=bottom_spgr, cmap=None)
             # Fs : sampling frequency for scaling
             # window: callable or ndarray, default window_hanning
@@ -1033,7 +1053,7 @@ class Plot_Impz(QWidget):
 
             self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.01)
 
-            self.ax_s.set_ylabel(y_lbl + ":  " + fb.fil[0]['plt_fLabel'])        
+            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])        
 
         # --------------- 3D Complex  -----------------------------------------
         if self.ACTIVE_3D: # not implemented / tested yet

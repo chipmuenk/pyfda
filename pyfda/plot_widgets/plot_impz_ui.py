@@ -63,6 +63,7 @@ class PlotImpz_UI(QWidget):
         self.bottom_t = -80 # initial value for log. scale (time)
         self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
         self.ovlp_spgr_time = 128 # number of overlap points between spectrogram segments
+        self.mode_spgr_time = "magnitude"
         
         # stimuli
         self.stim = "Impulse"
@@ -247,6 +248,17 @@ class PlotImpz_UI(QWidget):
         self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points between spectrogram segments.</span>")
         self.led_ovlp_spgr_time.setVisible(spgr_en)
         
+        self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
+        self.lbl_mode_spgr_time.setVisible(spgr_en)
+        self.cmb_mode_spgr_time = QComboBox(self)
+        spgr_modes = [("PSD","psd"), ("Mag.","magnitude"),\
+                      ("Angle","angle"), ("Phase","phase")]
+        for i in spgr_modes:
+            self.cmb_mode_spgr_time.addItem(*i)
+        qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
+        self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
+        self.cmb_mode_spgr_time.setVisible(spgr_en)
+        
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
         # self.lbl_colorbar_time.setVisible(spgr_en)
         # self.chk_colorbar_time = QCheckBox(self)
@@ -290,7 +302,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.led_nfft_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_ovlp_spgr_time)
         layH_ctrl_time.addWidget(self.led_ovlp_spgr_time)
-
+        layH_ctrl_time.addWidget(self.lbl_mode_spgr_time)
+        layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
+        
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
