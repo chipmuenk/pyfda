@@ -21,7 +21,7 @@ from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.pyfda_lib import CRLF
+from pyfda.libs.pyfda_lib import CRLF, cmp_version
 from cycler import cycler
 
 # #############################################################################
@@ -114,8 +114,6 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'font.family'               : 'sans-serif',#'serif',
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',#'stix',
-          #'mathtext.fallback'         : 'cm', # new since mpl 3.3
-          #'mathtext.fallback_to_cm'   : True, # deprecated since mpl 3.3
           'mathtext.default'          : 'it',
           'font.size'                 : 12, 
           'legend.fontsize'           : 12, 
@@ -133,6 +131,15 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'hatch.color'               : '#808080', # since mpl2.0
           'hatch.linewidth'           : 0.5 # since mpl2.0
           }
+
+mpl_rc_33 = {'mathtext.fallback'      : 'cm'} # new since mpl 3.3
+mpl_rc_32 = {'mathtext.fallback_to_cm': True} # deprecated since mpl 3.3
+
+if cmp_version('matplotlib','3.3') < 0:
+    mpl_rc.update(mpl_rc_32) # lower than matplotlib 3.3
+else:
+    mpl_rc.update(mpl_rc_33)
+
 
 # dark theme for matplotlib widgets
 mpl_rc_dark = {
@@ -191,6 +198,9 @@ elif 'Bitstream Vera Sans' in ttf_fonts:
                    'mathtext.it' : 'Bitstream Vera Sans:italic',
                    'mathtext.bf' : 'Bitstream Vera Sans:bold'
                   })
+else:
+    logger.info("Found neither 'DejaVu Sans' nor 'Bitstream Vera Sans' font, "
+                "falling back to 'sans-serif' and 'stix-sans'.")
 # else: use sans-serif and stix-sans
 
 # set all text to Stix font
