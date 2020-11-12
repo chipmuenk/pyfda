@@ -19,6 +19,7 @@ import numpy as np
 from numpy import pi
 import scipy.signal as sig
 import matplotlib.patches as mpl_patches
+from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
@@ -837,27 +838,30 @@ class Plot_Impz(QWidget):
 
         if plt_time:
             num_subplots = 1 + self.cmplx + self.spgr
-
-            self.ax_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
-                                               sharex=True, squeeze = False)
-
-            self.ax_r = self.ax_time[0][0]
+            
+            # return a one-dimensional list with num_subplots axes
+            self.axes_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
+                                               sharex=True, squeeze = False)[:,0]
+            
+            self.ax_r = self.axes_time[0]
             self.ax_r.cla()
-            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
             if self.cmplx:
-                self.ax_i = self.ax_time[1][0]
+                self.ax_i = self.axes_time[1]
                 self.ax_i.cla()
-                self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
-                self.ax_i.get_yaxis().tick_left() # remove axis ticks right
                 self.mplwidget_t.fig.align_ylabels()
             
             if self.spgr:
-                self.ax_s = self.ax_time[-1][0] # assign last axis
+                self.ax_s = self.axes_time[-1] # assign last axis
 
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
+                
+            for ax in self.axes_time:
+                ax.xaxis.tick_bottom() # remove axis ticks on top
+                ax.yaxis.tick_left() # remove axis ticks right
+                ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+                ax.yaxis.set_minor_locator(AutoMinorLocator())               
 
 #------------------------------------------------------------------------------
     def draw_time(self):
@@ -943,7 +947,6 @@ class Plot_Impz(QWidget):
         self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
               y_r[self.ui.N_start:], label='$y[n]$', bottom=bottom_t,
               plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
-
 
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
@@ -1074,8 +1077,8 @@ class Plot_Impz(QWidget):
             self.ax3d.set_zlabel('z')
 
         # --------------- Title and common labels ----------------------------        
-        self.ax_time[-1][0].set_xlabel(fb.fil[0]['plt_tLabel'])
-        self.ax_time[0][0].set_title(self.title_str)
+        self.axes_time[-1].set_xlabel(fb.fil[0]['plt_tLabel'])
+        self.axes_time[0].set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
 
@@ -1083,7 +1086,9 @@ class Plot_Impz(QWidget):
 
         self.needs_redraw[0] = False
 
-    #--------------------------------------------------------------------------
+    #=========================================================================
+    # Frequency Plots
+    #=========================================================================
     def _init_axes_freq(self):
         """
         Clear the axes of the frequency domain matplotlib widgets and
@@ -1107,8 +1112,7 @@ class Plot_Impz(QWidget):
 
         if len(self.mplwidget_f.fig.get_axes()) == 0: # empty figure, no axes
             self.ax_fft = self.mplwidget_f.fig.subplots()
-            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+  
             self.ax_fft.set_title("FFT of Transient Response")
 
         for ax in self.mplwidget_f.fig.get_axes(): # clear but don't delete all axes
@@ -1118,6 +1122,12 @@ class Plot_Impz(QWidget):
             # create second axis scaled for noise power scale if it doesn't exist yet
             self.ax_fft_noise = self.ax_fft.twinx()
             self.ax_fft_noise.is_twin = True
+
+        self.ax_fft.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax_fft.yaxis.tick_left() # remove axis ticks right
+        self.ax_fft.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+        self.ax_fft.yaxis.set_minor_locator(AutoMinorLocator()) 
+
 
         self.calc_fft()
 
