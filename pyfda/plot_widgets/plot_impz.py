@@ -1080,7 +1080,7 @@ class Plot_Impz(QWidget):
         self.axes_time[-1].set_xlabel(fb.fil[0]['plt_tLabel'])
         self.axes_time[0].set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
-        expand_lim(self.ax_r, 0.02)
+        #expand_lim(self.ax_r, 0.02)
 
         self.redraw() # redraw currently active mplwidget
 
