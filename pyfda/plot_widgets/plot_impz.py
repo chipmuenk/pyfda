@@ -152,6 +152,7 @@ class Plot_Impz(QWidget):
         self.ui.chk_Hf.clicked.connect(self.draw)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
+        self.ui.chk_show_info_freq.clicked.connect(self.draw)
         #self.ui.chk_win_freq.clicked.connect(self.draw)
 
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
@@ -990,15 +991,18 @@ class Plot_Impz(QWidget):
         if self.spgr:
             if self.plt_time_spgr == "x[n]":
                 s = x[self.ui.N_start:]
-                y_lbl = r'$X$'
+                sig_lbl = 'X'
             elif self.plt_time_spgr == "x_q[n]":
                 s = self.x_q[self.ui.N_start:]
-                y_lbl = r'$X_Q$'
+                sig_lbl = 'X_Q'
             elif self.plt_time_spgr == "y[n]":
                 s = y[self.ui.N_start:]
-                y_lbl = r'$Y$'
+                sig_lbl = 'Y'
             else:
                 s = None
+                sig_lbl = 'None'
+            spgr_args = r"$({0}, {1})$".format(fb.fil[0]['plt_tLabel'][1],
+                                          fb.fil[0]['plt_fLabel'][1])
             # ------ onesided / twosided ------------
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
                 sides = 'onesided'
@@ -1010,20 +1014,28 @@ class Plot_Impz(QWidget):
             self.ui.lbl_byfs_spgr_time.setVisible(mode=='psd')
             self.ui.chk_byfs_spgr_time.setVisible(mode=='psd')
             spgr_pre =  ""
+            if self.ui.chk_log_spgr_time.isChecked():
+                dB_unit = "dB"
+            else:
+                dB_unit = ""
             if mode == "psd":
+                spgr_symb = r"$S_{{{0}}}$".format(sig_lbl.lower()+sig_lbl.lower())
                 # Power Spectral Density
                 if self.ui.chk_byfs_spgr_time.isChecked():
                     # scale result by f_S
-                    spgr_unit = r" in $\mathrm{V}^2 / \mathrm{Hz}$"
+                    spgr_unit = r" in {0}W / Hz".format(dB_unit)
                 else:
-                    spgr_unit = r" in $\mathrm{V}^2$"
+                    spgr_unit = r" in {0}W".format(dB_unit)
                 
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
-                spgr_unit = r"| in V"                
+                spgr_symb = "${0}$".format(sig_lbl)
+                spgr_unit = r"| in {0}V".format(dB_unit)
+                
             elif mode in {"angle", "phase"}:
                 spgr_unit = r" in rad"
+                spgr_symb = "${0}$".format(sig_lbl)
                 spgr_pre = r"$\angle$"
                 # must be linear if mode is 'angle' or 'phase':
                 self.ui.chk_log_spgr_time.blockSignals(True)
@@ -1068,7 +1080,7 @@ class Plot_Impz(QWidget):
             #self.ax_s.colorbar(col_mesh)
 
             cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.005)
-            cbar.ax.set_ylabel(spgr_pre + y_lbl + spgr_unit)
+            cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
             self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])        
 
