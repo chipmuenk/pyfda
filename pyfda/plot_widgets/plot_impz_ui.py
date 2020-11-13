@@ -332,7 +332,7 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
-        lbl_plt_freq_resp = QLabel(to_html("&nbsp;&nbsp;&nbsp;Response Y", frmt='bi'), self)
+        lbl_plt_freq_resp = QLabel(to_html("&nbsp;Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         self.cmb_plt_freq_resp.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
