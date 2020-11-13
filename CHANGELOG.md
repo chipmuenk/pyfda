@@ -4,7 +4,14 @@
 
 ### New features
 
+- Add spectrogram view in the time tab of the transient response widget
+
+- Grid mode can now be cycled through off / coarse (former grid mode) / fine (with minor grid)
+
 ### Bug fixes
+
+- Add fallback mode (cm fonts) again for matplotlib that had been removed due to matplotlib 3.3
+  incompatibilities. Fallback mode now supports both mechanisms of mpl 3.3 and older versions.
 
 - Fix error with complex-valued entries in newly created row in `input_coeffs` widget
   (ID: 26ba25f4f947)
