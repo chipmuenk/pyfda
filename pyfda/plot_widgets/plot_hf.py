@@ -21,6 +21,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
 import matplotlib.ticker as ticker
+from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
@@ -191,8 +192,8 @@ class Plot_Hf(QWidget):
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots()
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax.yaxis.tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
     def align_y_axes(self, ax1, ax2):
@@ -682,7 +683,9 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
-            self.ax.set_title(r'Magnitude Frequency Response')   
+            self.ax.set_title(r'Magnitude Frequency Response')
+            self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+            self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
 
             np.seterr(**old_settings_seterr)
 

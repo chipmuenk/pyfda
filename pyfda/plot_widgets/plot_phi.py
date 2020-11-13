@@ -18,6 +18,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
+from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
@@ -137,8 +138,8 @@ class Plot_Phi(QWidget):
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots()
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax.yaxis.tick_left() # remove axis ticks right
         
 #------------------------------------------------------------------------------
     def unit_changed(self):
@@ -218,6 +219,8 @@ class Plot_Phi(QWidget):
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(y_str)

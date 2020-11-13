@@ -19,8 +19,8 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from scipy.signal import group_delay
-#from pyfda.libs.pyfda_lib import group_delay
 from pyfda.plot_widgets.mpl_widget import MplWidget
+from matplotlib.ticker import AutoMinorLocator
 
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?
@@ -108,11 +108,12 @@ class Plot_tau_g(QWidget):
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
-        Initialize and clear the axes
+        Initialize the axes and set some stuff that is not cleared by 
+        `ax.clear()` later on.
         """
         self.ax = self.mplwidget.fig.subplots()
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax.yaxis.tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
     def calc_tau_g(self):
@@ -173,6 +174,8 @@ class Plot_tau_g(QWidget):
         line_tau_g, = self.ax.plot(F, tau_g, label = "Group Delay")
         #---------------------------------------------------------
 
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(tau_str)

@@ -22,6 +22,7 @@ from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import unique_roots
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
+from matplotlib.ticker import AutoMinorLocator
 
 from  matplotlib import patches
 
@@ -144,8 +145,8 @@ class Plot_PZ(QWidget):
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots() #.add_subplot(111)
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax.yaxis.tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -187,6 +188,8 @@ class Plot_PZ(QWidget):
             plt_poles=self.chkFIR_P.isChecked() or fb.fil[0]['ft'] == 'IIR',
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
