@@ -369,7 +369,7 @@ class MplToolbar(NavigationToolbar):
         self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
-        self.a_gr_state = 1  # 0: off, 1: major, 2: minor
+        self.a_gr_state = 2  # 0: off, 1: major, 2: minor
 
         #---------------------------------------------
         # REDRAW:
