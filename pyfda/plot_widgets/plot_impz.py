@@ -1309,22 +1309,31 @@ class Plot_Impz(QWidget):
 
             XY_str = XY_str + ' in ' + unit
 
-
             # --------------- Plot stimulus and response ----------------------
+            show_info = self.ui.chk_show_info_freq.isChecked()
             if plt_stimulus:
-                label_P = "$X(f)$:  " + "$P$ = {0:.3g} {1}".format(Px, unit_P)
+                if show_info:
+                    label_P = "$X(f)$" + "\t: $P$ = {0:.3g} {1}".format(Px, unit_P)
+                else:
+                    label_P = "$X(f)$"
                 self.draw_data(self.plt_freq_stim, self.ax_fft, F, X,
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                     mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
             if plt_stimulus_q:
-                label_P = "$X_q(f)$: " + "$P$ = {0:.3g} {1}".format(Pxq, unit_P)
+                if show_info:
+                    label_P = "$X_q(f)$" + "\t: $P$ = {0:.3g} {1}".format(Pxq, unit_P)
+                else:
+                    label_P = "$X_q(f)$"
                 self.draw_data(self.plt_freq_stmq, self.ax_fft, F, X_q,
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
             if plt_response:
-                label_P = "$Y(f)$:  " + "$P$ = {0:.3g} {1}".format(Py, unit_P)
+                if show_info:
+                    label_P = "$Y(f)$" + "\t: $P$ = {0:.3g} {1}".format(Py, unit_P)
+                else:
+                    label_P = "$Y(f)$"
                 self.draw_data(self.plt_freq_resp, self.ax_fft, F, Y,
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
@@ -1343,11 +1352,12 @@ class Plot_Impz(QWidget):
             # convert back to two lists
             labels, handles = [ list(tuple) for tuple in  zip(*sorted_pairs)]
 
-            # Create two empty patches for NENBW and CGAIN and extend handles list with them
-            handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
-                                                 ec="white", lw=0, alpha=0)] * 2)
-            labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
-            labels.append("$CGAIN$  = {0:.4g} {1}".format(cgain, unit_cgain))
+            if show_info:
+                # Create two empty patches for NENBW and CGAIN and extend handles list with them
+                handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
+                                                     ec="white", lw=0, alpha=0)] * 2)
+                labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
+                labels.append("$CGAIN$  = {0:.4g} {1}".format(cgain, unit_cgain))
 
             self.ax_fft.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)

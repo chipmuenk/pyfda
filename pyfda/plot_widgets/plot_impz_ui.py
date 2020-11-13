@@ -391,6 +391,13 @@ class PlotImpz_UI(QWidget):
                                "from the filter coefficients.</span>")
         self.chk_Hf.setChecked(False)
         self.chk_Hf_lbl = QLabel(to_html("H_id (f)", frmt="bi"), self)
+        
+        lbl_show_info_freq = QLabel(to_html("Infos", frmt='b'), self)
+        self.chk_show_info_freq = QCheckBox(self)
+        self.chk_show_info_freq.setObjectName("chk_show_info_freq")
+        self.chk_show_info_freq.setToolTip("<span>Show infos about signal power "
+                                           "and window properties.</span>")
+        self.chk_show_info_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
@@ -419,6 +426,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addWidget(self.lblWinPar2)
         layH_ctrl_freq.addWidget(self.ledWinPar2)
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(lbl_show_info_freq)
+        layH_ctrl_freq.addWidget(self.chk_show_info_freq)        
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
