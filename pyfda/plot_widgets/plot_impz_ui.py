@@ -259,6 +259,15 @@ class PlotImpz_UI(QWidget):
         self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
         self.cmb_mode_spgr_time.setVisible(spgr_en)
         
+        self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
+        self.lbl_byfs_spgr_time.setVisible(spgr_en)        
+        self.chk_byfs_spgr_time = QCheckBox(self)
+        self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
+        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density i.e. scale by f_S</span>")
+        self.chk_byfs_spgr_time.setChecked(True)
+        self.chk_byfs_spgr_time.setVisible(spgr_en)
+        
+        
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
         # self.lbl_colorbar_time.setVisible(spgr_en)
         # self.chk_colorbar_time = QCheckBox(self)
@@ -304,6 +313,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.led_ovlp_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_mode_spgr_time)
         layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
+        layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
         
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)

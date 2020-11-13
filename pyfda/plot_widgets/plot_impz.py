@@ -142,6 +142,7 @@ class Plot_Impz(QWidget):
         self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
         self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
+        self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
@@ -720,7 +721,9 @@ class Plot_Impz(QWidget):
         self.ui.lbl_ovlp_spgr_time.setVisible(spgr_en)
         self.ui.led_ovlp_spgr_time.setVisible(spgr_en)
         self.ui.lbl_mode_spgr_time.setVisible(spgr_en)
-        self.ui.cmb_mode_spgr_time.setVisible(spgr_en)       
+        self.ui.cmb_mode_spgr_time.setVisible(spgr_en)
+        self.ui.lbl_byfs_spgr_time.setVisible(spgr_en)
+        self.ui.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.draw()
 
@@ -1040,17 +1043,16 @@ class Plot_Impz(QWidget):
 #                                         scaling='density',mode='psd')
 #             # mode: 'psd', 'complex','magnitude','angle', 'phase'
 # =============================================================================
-            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[
-                0]['f_S'], NFFT=self.ui.nfft_spgr_time,
+            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.nfft_spgr_time,
                                         noverlap=self.ui.ovlp_spgr_time, pad_to=None, xextent=t_range,
-                                        sides=sides, scale_by_freq=True,mode=mode,
-                                        scale=scale, vmin=bottom_spgr, cmap=None)
+                                        sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
+                                        mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
             # Fs : sampling frequency for scaling
             # window: callable or ndarray, default window_hanning
             # NFFT : data points for each block
             # pad_to: create zero-padding
             # xextent: image extent along x-axis; None or (xmin, xmax)
-            # scale_by_freq: True gives spectral density, scaled by f_S
+            # scale_by_freq: True scales power spectral density by f_S
 
 #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f), 
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
