@@ -120,11 +120,15 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'axes.labelsize'            : 12, 
           'axes.titlesize'            : 14, 
           'axes.linewidth'            : 1, # linewidth for coordinate system
+          # grid settings are partially overwritten in mpl_widget.py
           'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
           'grid.linestyle'            : ':',
-          'grid.linewidth'            : 0.5,
-          'xtick.direction'           : 'out',
-          'ytick.direction'           : 'out',
+          'grid.linewidth'            : 0.5,    # in points
+          #'grid.color'               : b0b0b0, # grid color, set in dark / light styles
+          'grid.alpha'                : 0.5,    # transparency, between 0.0 and 1.0
+          
+          'xtick.direction'           : 'in',
+          'ytick.direction'           : 'in',
           #'xtick.top'                 : False, 2.0 only
           'figure.figsize'            : (5,4),
           'figure.dpi'                : 100,
@@ -153,11 +157,9 @@ mpl_rc_dark = {
             'xtick.color'       : 'white',
             'ytick.color'       : 'white',
             'text.color'        : 'white',
-            'grid.color'        : '#CCCCCC'
+            'grid.color'        : '#CCCCCC',
+            'axes.prop_cycle'   : cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])
             }
-
-mpl_rc_dark.update(
-    {'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
 
 # light theme for matplotlib widgets
 mpl_rc_light = {
@@ -171,11 +173,9 @@ mpl_rc_light = {
             'xtick.color'       : 'black',
             'ytick.color'       : 'black',
             'text.color'        : 'black',
-            'grid.color'        : '#222222'
+            'grid.color'        : '#222222',
+            'axes.prop_cycle'   : cycler('color', ['r', 'b', 'c', 'm', 'k'])
             }
-
-mpl_rc_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
-
 
 # --------------------- Matplotlib Fonts --------------------------------------
 import matplotlib.font_manager
@@ -206,6 +206,7 @@ else:
 # set all text to Stix font
 #matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
 #matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
 
 # #############################################################################
 # QWidget style sheets (QSS)
