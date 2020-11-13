@@ -1007,15 +1007,24 @@ class Plot_Impz(QWidget):
                 
             # ------- Unit / Mode ----------------------
             mode = qget_cmb_box(self.ui.cmb_mode_spgr_time, data=True)
-
+            self.ui.lbl_byfs_spgr_time.setVisible(mode=='psd')
+            self.ui.chk_byfs_spgr_time.setVisible(mode=='psd')
+            spgr_pre =  ""
             if mode == "psd":
-                # Power Spectral Density in W/Hz
-                spgr_unit = r" in V /$\sqrt{\mathrm{Hz}}$"
+                # Power Spectral Density
+                if self.ui.chk_byfs_spgr_time.isChecked():
+                    # scale result by f_S
+                    spgr_unit = r" in $\mathrm{V}^2 / \mathrm{Hz}$"
+                else:
+                    spgr_unit = r" in $\mathrm{V}^2$"
+                
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
-                spgr_unit = r" in V"                
+                spgr_pre = r"|"
+                spgr_unit = r"| in V"                
             elif mode in {"angle", "phase"}:
                 spgr_unit = r" in rad"
+                spgr_pre = r"$\angle$"
                 # must be linear if mode is 'angle' or 'phase':
                 self.ui.chk_log_spgr_time.blockSignals(True)
                 self.ui.chk_log_spgr_time.setChecked(False)
@@ -1058,8 +1067,8 @@ class Plot_Impz(QWidget):
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
             #self.ax_s.colorbar(col_mesh)
 
-            cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.01)
-            cbar.ax.set_ylabel(y_lbl + spgr_unit)
+            cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.005)
+            cbar.ax.set_ylabel(spgr_pre + y_lbl + spgr_unit)
 
             self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])        
 
