@@ -201,7 +201,7 @@ def mod_version(mod = None):
         v_html = markdown.markdown(v_md, output_format='html5',
                                    extensions=['markdown.extensions.tables'])
         # pyinstaller needs explicit definition of extensions path
-        
+
         return v_html
 
 #------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ def np_type(a):
         a_type = type(a.item())
     else:
         a_type = type(a)
-        
+
     return a_type
 
 #-----------------------------------------------------------------------------

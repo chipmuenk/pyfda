@@ -419,7 +419,7 @@ class MplToolbar(NavigationToolbar):
                                   QSizePolicy.Ignored))
             labelAction = self.addWidget(self.locLabel)
             labelAction.setVisible(True)
-            
+
         #---------------------------------------------
         # HELP:
         #---------------------------------------------
@@ -477,7 +477,7 @@ class MplToolbar(NavigationToolbar):
         """
         Open help page from https://pyfda.rtfd.org in browser
         """
-        
+
         url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/' + self.a_he.info)
         if not url.isValid():
             logger.warning("Invalid URL\n\t{0}\n\tOpening "
@@ -485,7 +485,7 @@ class MplToolbar(NavigationToolbar):
             url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/')
             #if url.isLocalFile()
         QtGui.QDesktopServices.openUrl(url)
-        
+
         #https://stackoverflow.com/questions/28494571/how-in-qt5-to-check-if-url-is-available
         #https://stackoverflow.com/questions/16778435/python-check-if-website-exists
 
@@ -512,10 +512,10 @@ class MplToolbar(NavigationToolbar):
 
         if cycle:
             self.a_gr_state = (self.a_gr_state + 1) % 3
-            
+
         if not axes:
             axes = self.mpl_widget.fig.axes
-            
+
         for ax in self.mpl_widget.fig.axes:
             if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
                 ax.grid(False)
@@ -523,12 +523,12 @@ class MplToolbar(NavigationToolbar):
                 if self.a_gr_state == 0:
                     ax.grid(False, which='both')
                     self.a_gr.setChecked(False)
-                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))                  
+                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))
                 elif self.a_gr_state == 1:
                     ax.grid(True, which='major', lw=0.75, ls='-')
                     ax.grid(False, which='minor')
                     self.a_gr.setChecked(True)
-                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))                   
+                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))
                 else:
                     ax.grid(True, which='major', lw=0.75, ls='-')
                     ax.grid(True, which='minor')
