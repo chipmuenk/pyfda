@@ -9,7 +9,7 @@
 """
 The ``Plot_Hf`` class constructs the widget to plot the magnitude
 frequency response \|H(f)\| of the filter either in linear or logarithmic
-scale. Optionally, the magnitude specifications and the phase 
+scale. Optionally, the magnitude specifications and the phase
 can be overlayed.
 """
 import logging
@@ -37,7 +37,7 @@ class Plot_Hf(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
-    def __init__(self, parent): 
+    def __init__(self, parent):
         super(Plot_Hf, self).__init__(parent)
         self.needs_calc = True   # flag whether plot needs to be updated
         self.needs_draw = True # flag whether plot needs to be redrawn
@@ -56,7 +56,7 @@ class Plot_Hf(QWidget):
         """
         logger.debug("SIG_RX - needs_calc = {0}, vis = {1}\n{2}"\
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
-        
+
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or 'home' in dict_sig or self.needs_calc:
@@ -66,7 +66,7 @@ class Plot_Hf(QWidget):
             if 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False
-        else: 
+        else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
             if 'view_changed' in dict_sig:
@@ -94,7 +94,7 @@ class Plot_Hf(QWidget):
         self.cmbUnitsA.setToolTip("<span>Set unit for y-axis:\n"
         "dB is attenuation (positive values), V and W are gain (less than 1).</span>")
         self.cmbUnitsA.setCurrentIndex(0)
-        
+
         self.lbl_log_bottom = QLabel("Bottom", self)
         self.led_log_bottom = QLineEdit(self)
         self.led_log_bottom.setText(str(self.log_bottom))
@@ -133,8 +133,8 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.cmbShowH)
         layHControls.addWidget(self.lblIn)
         layHControls.addWidget(self.cmbUnitsA)
-        layHControls.addStretch(1)       
-        layHControls.addWidget(self.lbl_log_bottom)    
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.lbl_log_bottom)
         layHControls.addWidget(self.led_log_bottom)
         layHControls.addWidget(self.lbl_log_unit)
         layHControls.addStretch(1)
@@ -155,8 +155,8 @@ class Plot_Hf(QWidget):
         #----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # main widget, encompassing the other widgets 
-        #----------------------------------------------------------------------  
+        # main widget, encompassing the other widgets
+        #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -186,7 +186,7 @@ class Plot_Hf(QWidget):
         self.chkPhase.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-                
+
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
@@ -199,7 +199,7 @@ class Plot_Hf(QWidget):
 
 #------------------------------------------------------------------------------
     def align_y_axes(self, ax1, ax2):
-        """ Sets tick marks of twinx axes to line up with total number of 
+        """ Sets tick marks of twinx axes to line up with total number of
             ax1 tick marks
             """
 
@@ -225,8 +225,8 @@ class Plot_Hf(QWidget):
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
         #logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
 
-        ax2.set_yticks(np.linspace(ax2_yticks[0], 
-                                   (ax2_yticks[1]-ax2_yticks[0]), 
+        ax2.set_yticks(np.linspace(ax2_yticks[0],
+                                   (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
@@ -246,9 +246,9 @@ class Plot_Hf(QWidget):
 #             f = lambda x : l_p[0]+(x-l_H[0])/(l_H[1]-l_H[0])*(l_p[1]-l_p[0])
 #             ticks = f(ax.get_yticks())
 #             self.ax_p.yaxis.set_major_locator(ticker.FixedLocator(ticks))
-# 
+#
 # =============================================================================
-            
+
             # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
             # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
             # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
@@ -520,10 +520,10 @@ class Plot_Hf(QWidget):
             else:
                 phi_str += ' in deg ' + r'$\rightarrow $'
                 scale = 180./np.pi
-                
+
             # replace nan and inf by finite values, otherwise np.unwrap yields
             # an array full of nans
-            phi = np.angle(np.nan_to_num(self.H_c)) 
+            phi = np.angle(np.nan_to_num(self.H_c))
         #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(phi)*scale,
                                'g-.', label = "Phase")
@@ -556,7 +556,7 @@ class Plot_Hf(QWidget):
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
 
-        # Get corners for spec display from the parameters of the target specs subwidget       
+        # Get corners for spec display from the parameters of the target specs subwidget
         try:
             param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
                                     [fb.fil[0]['fc']][fb.fil[0]['fo']]['tspecs'][1]['amp']
@@ -566,7 +566,7 @@ class Plot_Hf(QWidget):
 
         SB = [l for l in param_list if 'A_SB' in l]
         PB = [l for l in param_list if 'A_PB' in l]
-        
+
         if SB:
             A_min = min([fb.fil[0][l] for l in SB])
         else:
@@ -587,10 +587,10 @@ class Plot_Hf(QWidget):
 
         # only display log bottom widget for unit dB
         self.lbl_log_bottom.setVisible(self.unitA == 'dB')
-        self.led_log_bottom.setVisible(self.unitA == 'dB')        
+        self.led_log_bottom.setVisible(self.unitA == 'dB')
         self.lbl_log_unit.setVisible(self.unitA == 'dB')
-        
-        # Linphase settings only makes sense for amplitude plot and 
+
+        # Linphase settings only makes sense for amplitude plot and
         # for plottin real/imag. part of H, not its magnitude
         self.chkZerophase.setCheckable(self.unitA == 'V')
         self.chkZerophase.setEnabled(self.unitA == 'V')
@@ -623,7 +623,7 @@ class Plot_Hf(QWidget):
         else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
             # use H and F as calculated
             self.H_c = self.H_cmplx
-            
+
         # now calculate mag / real / imaginary part of H_c:
         if self.chkZerophase.isChecked(): # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
@@ -664,7 +664,7 @@ class Plot_Hf(QWidget):
                 A_lim = [0, (1.03 + A_max)**2.]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
-                
+
             #logger.debug("lim: {0}, min: {1}, max: {2} - {3}".format(A_lim, A_min, A_max, self.H_plt[0]))
 
             #-----------------------------------------------------------
@@ -673,9 +673,9 @@ class Plot_Hf(QWidget):
             # TODO: self.draw_inset() # this gives an infinite recursion
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
-            
+
             #============= Set Limits and draw specs =========================
-            if self.chkSpecs.isChecked(): 
+            if self.chkSpecs.isChecked():
                 self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
@@ -686,13 +686,13 @@ class Plot_Hf(QWidget):
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
             self.ax.set_title(r'Magnitude Frequency Response')
-            self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+            self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
             self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
 
             np.seterr(**old_settings_seterr)
 
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
@@ -709,10 +709,10 @@ class Plot_Hf(QWidget):
 def main():
     import sys
     from pyfda.libs.compat import QApplication
-    
+
     app = QApplication(sys.argv)
     mainw = Plot_Hf(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 

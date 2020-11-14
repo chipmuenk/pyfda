@@ -54,10 +54,10 @@ class Plot_Phi(QWidget):
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
-                self.needs_draw = False               
+                self.needs_draw = False
             elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
-                self.needs_draw = False                
+                self.needs_draw = False
             # elif ('ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized')\
             #     or self.needs_redraw:
             #     self.redraw()
@@ -65,7 +65,7 @@ class Plot_Phi(QWidget):
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
-                self.needs_draw = True 
+                self.needs_draw = True
             # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
             #     self.needs_redraw = True
 
@@ -142,7 +142,7 @@ class Plot_Phi(QWidget):
             self.ax = self.mplwidget.fig.subplots()
         self.ax.xaxis.tick_bottom() # remove axis ticks on top
         self.ax.yaxis.tick_left() # remove axis ticks right
-        
+
 #------------------------------------------------------------------------------
     def unit_changed(self):
         """
@@ -221,7 +221,7 @@ class Plot_Phi(QWidget):
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 
-        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])

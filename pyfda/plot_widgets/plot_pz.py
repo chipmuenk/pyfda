@@ -190,7 +190,7 @@ class Plot_PZ(QWidget):
             plt_poles=self.chkFIR_P.isChecked() or fb.fil[0]['ft'] == 'IIR',
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
-        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')
@@ -391,7 +391,7 @@ class Plot_PZ(QWidget):
 #         for tick in ax.get_yaxis().get_major_ticks():
 #             tick.set_pad(12.)
 #             tick.label1 = tick._get_text1()
-# 
+#
 # =============================================================================
         xl = ax.get_xlim(); Dx = max(abs(xl[1]-xl[0]), 0.05)
         yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)

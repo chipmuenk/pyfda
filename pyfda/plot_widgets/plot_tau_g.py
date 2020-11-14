@@ -60,12 +60,12 @@ class Plot_tau_g(QWidget):
 #        self.chkScipy = QCheckBox("Scipy", self)
 #        self.chkScipy.setChecked(False)
 #        self.chkScipy.setToolTip("Use scipy group delay routine")
-#    
+#
 #        layHControls = QHBoxLayout()
 #        layHControls.addStretch(10)
 #        layHControls.addWidget(self.chkWarnings)
 #        layHControls.addWidget(self.chkScipy)
-#    
+#
 #        # This widget encompasses all control subwidgets:
 #        self.frmControls = QFrame(self)
 #        self.frmControls.setObjectName("frmControls")
@@ -110,7 +110,7 @@ class Plot_tau_g(QWidget):
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
-        Initialize the axes and set some stuff that is not cleared by 
+        Initialize the axes and set some stuff that is not cleared by
         `ax.clear()` later on.
         """
         self.ax = self.mplwidget.fig.subplots()
@@ -176,7 +176,7 @@ class Plot_tau_g(QWidget):
         line_tau_g, = self.ax.plot(F, tau_g, label = "Group Delay")
         #---------------------------------------------------------
 
-        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks        
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])

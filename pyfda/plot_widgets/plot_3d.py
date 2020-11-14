@@ -108,7 +108,7 @@ class Plot_3D(QWidget):
         self.ledBottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
         self.lblBottomdB.setVisible(self.chkLog.isChecked())
-        
+
         self.lblTop = QLabel("Top:", self)
         self.ledTop = QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
@@ -116,7 +116,7 @@ class Plot_3D(QWidget):
         self.ledTop.setToolTip("Maximum display value.")
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.chkLog.isChecked())
-        
+
         self.chkUC = QCheckBox("UC", self)
         self.chkUC.setObjectName("chkUC")
         self.chkUC.setToolTip("Plot unit circle")
@@ -192,10 +192,10 @@ class Plot_3D(QWidget):
         layGControls.addWidget(self.chk_plot_in_UC, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
         layGControls.addWidget(self.ledTop, 0, 4)
-        layGControls.addWidget(self.lblTopdB, 0, 5)        
+        layGControls.addWidget(self.lblTopdB, 0, 5)
         layGControls.addWidget(self.lblBottom, 1, 2)
         layGControls.addWidget(self.ledBottom, 1, 4)
-        layGControls.addWidget(self.lblBottomdB, 1, 5)   
+        layGControls.addWidget(self.lblBottomdB, 1, 5)
         layGControls.setColumnStretch(5,1)
 
         layGControls.addWidget(self.chkUC, 0, 6)
@@ -267,15 +267,15 @@ class Plot_3D(QWidget):
     def _init_cmb_colormap(self, cmap_init):
         """
         Initialize combobox with available colormaps and try to set it to `cmap_init`
-        
+
         Since matplotlib 3.2 the reversed "*_r" colormaps are no longer contained in
         `cm.datad`. They are now obtained by using the `reversed()` method (much simpler!)
-        
-        `cm.datad` doesn't return the "new" colormaps like viridis, instead the 
+
+        `cm.datad` doesn't return the "new" colormaps like viridis, instead the
         `colormaps()` method is used.
         """
         self.cmbColormap.addItems([m for m in colormaps() if not m.endswith("_r")])
-        
+
         idx = self.cmbColormap.findText(cmap_init)
         if idx == -1:
             idx = 0
@@ -386,7 +386,7 @@ class Plot_3D(QWidget):
                 self.ledTop.setText(str(self.zmax))
                 self.lblTopdB.setVisible(False)
                 self.lblBottomdB.setVisible(False)
-                
+
         else: # finishing a lineEdit field triggered the slot
             if self.log:
                 self.zmin_dB = safe_eval(self.ledBottom.text(), self.zmin_dB, return_type='float')

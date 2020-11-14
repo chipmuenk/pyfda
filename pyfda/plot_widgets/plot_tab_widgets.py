@@ -36,24 +36,24 @@ class PlotTabWidgets(QTabWidget):
 #---------------------------------------------- --------------------------------
     def _construct_UI(self):
         """
-        Initialize UI with tabbed subwidgets: Instantiate dynamically each widget 
+        Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
         from the dict `fb.plot_classes` and try to
 
         - set the TabToolTip from the instance attribute `tool_tip`
 
         - set the tab label from the instance attribute `tab_label`
           for each widget.
-            
+
         - connect the available signals of all subwidgets (not all widgets have
           both `sig_rx` and `sig_tx` signals).
-            
+
             - `self.sig_rx` is distributed to all `inst.sig_rx` signals
-    
+
             - all `inst.sig_tx` signals are collected in `self.sig_tx`
-    
+
             - `self.sig_tx.connect(self.sig_rx)` distributes incoming signals (via
                pyfdax or coming from the input widgets) among all input widgets.
-            
+
            In order to prevent infinite loops, every widget needs to block in-
            coming signals with its own name!
         """
@@ -74,7 +74,7 @@ class PlotTabWidgets(QTabWidget):
                     logger.warning('Class "{0}" could not be imported from {1}:\n{2}.'\
                                .format(plot_class, mod_fq_name, e))
                     continue # unsuccessful, try next widget
-                
+
             if hasattr(inst, 'tab_label'):
                 tabWidget.addTab(inst, inst.tab_label)
             else:
@@ -161,9 +161,9 @@ class PlotTabWidgets(QTabWidget):
             logger.warning("SIG_RX\n{0}"\
                 .format(pprint_log(dict_sig)))
         else:
-            logger.warning("empty dict")  
+            logger.warning("empty dict")
 
-        
+
 #------------------------------------------------------------------------------
     def current_tab_changed(self):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'tab'})
