@@ -59,12 +59,12 @@ class PlotImpz_UI(QWidget):
         self.plt_time_stim = "None"
         self.plt_time_stmq = "None"
         self.plt_time_spgr = "None"
-        
+
         self.bottom_t = -80 # initial value for log. scale (time)
         self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
         self.ovlp_spgr_time = 128 # number of overlap points between spectrogram segments
         self.mode_spgr_time = "magnitude"
-        
+
         # stimuli
         self.stim = "Impulse"
         self.chirp_method = 'Linear'
@@ -79,7 +79,7 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * t))"
- 
+
         # frequency
         self.plt_freq_resp = "Line"
         self.plt_freq_stim = "None"
@@ -192,7 +192,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
-        
+
         lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(plot_styles_list)
@@ -218,7 +218,7 @@ class PlotImpz_UI(QWidget):
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
                                             "and spectrogram plots with log. scale.</span>")
         self.led_log_bottom_time.setVisible(True)
-            
+
         lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
         self.cmb_plt_time_spgr.addItems(["None", "x[n]", "x_q[n]", "y[n]"])
@@ -227,27 +227,27 @@ class PlotImpz_UI(QWidget):
         spgr_en = self.plt_time_spgr != "None"
 
         self.lbl_log_spgr_time = QLabel(to_html("&nbsp;dB", frmt='b'), self)
-        self.lbl_log_spgr_time.setVisible(spgr_en)        
+        self.lbl_log_spgr_time.setVisible(spgr_en)
         self.chk_log_spgr_time = QCheckBox(self)
         self.chk_log_spgr_time.setObjectName("chk_log_spgr")
         self.chk_log_spgr_time.setToolTip("<span>Logarithmic scale for spectrogram.</span>")
         self.chk_log_spgr_time.setChecked(True)
         self.chk_log_spgr_time.setVisible(spgr_en)
-        
+
         self.lbl_nfft_spgr_time = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
         self.lbl_nfft_spgr_time.setVisible(spgr_en)
         self.led_nfft_spgr_time = QLineEdit(self)
         self.led_nfft_spgr_time.setText(str(self.nfft_spgr_time))
         self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per spectrogram segment.</span>")
         self.led_nfft_spgr_time.setVisible(spgr_en)
-        
+
         self.lbl_ovlp_spgr_time = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
         self.lbl_ovlp_spgr_time.setVisible(spgr_en)
         self.led_ovlp_spgr_time = QLineEdit(self)
         self.led_ovlp_spgr_time.setText(str(self.ovlp_spgr_time))
         self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points between spectrogram segments.</span>")
         self.led_ovlp_spgr_time.setVisible(spgr_en)
-        
+
         self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
         self.lbl_mode_spgr_time.setVisible(spgr_en)
         self.cmb_mode_spgr_time = QComboBox(self)
@@ -258,16 +258,16 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
         self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
         self.cmb_mode_spgr_time.setVisible(spgr_en)
-        
+
         self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
-        self.lbl_byfs_spgr_time.setVisible(spgr_en)        
+        self.lbl_byfs_spgr_time.setVisible(spgr_en)
         self.chk_byfs_spgr_time = QCheckBox(self)
         self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
         self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
         self.chk_byfs_spgr_time.setVisible(spgr_en)
-        
-        
+
+
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
         # self.lbl_colorbar_time.setVisible(spgr_en)
         # self.chk_colorbar_time = QCheckBox(self)
@@ -297,7 +297,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.chk_win_time)
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(lbl_log_time)
-        layH_ctrl_time.addWidget(self.chk_log_time)       
+        layH_ctrl_time.addWidget(self.chk_log_time)
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
         #
@@ -315,7 +315,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
         layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
-        
+
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
@@ -391,7 +391,7 @@ class PlotImpz_UI(QWidget):
                                "from the filter coefficients.</span>")
         self.chk_Hf.setChecked(False)
         self.chk_Hf_lbl = QLabel(to_html("H_id (f)", frmt="bi"), self)
-        
+
         lbl_show_info_freq = QLabel(to_html("Infos", frmt='b'), self)
         self.chk_show_info_freq = QCheckBox(self)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
@@ -428,7 +428,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.ledWinPar2)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(lbl_show_info_freq)
-        layH_ctrl_freq.addWidget(self.chk_show_info_freq)        
+        layH_ctrl_freq.addWidget(self.chk_show_info_freq)
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
@@ -456,7 +456,7 @@ class PlotImpz_UI(QWidget):
                                     "than the regular version.</span>")
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
-        
+
         self.cmbChirpMethod = QComboBox(self)
         for t in [("Lin","Linear"),("Square","Quadratic"),("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
             self.cmbChirpMethod.addItem(*t)
@@ -468,7 +468,7 @@ class PlotImpz_UI(QWidget):
                                     "turned off.</span>")
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
-        
+
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
         self.ledDC = QLineEdit(self)
         self.ledDC.setText(str(self.DC))
@@ -478,7 +478,7 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
-        layHCmbStim.addWidget(self.chk_scale_impz_f)   
+        layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.cmbChirpMethod)
 
         layVlblCmbDC = QVBoxLayout()
@@ -489,7 +489,7 @@ class PlotImpz_UI(QWidget):
         layVCmbDC = QVBoxLayout()
         layVCmbDC.addLayout(layHCmbStim)
         layVCmbDC.addWidget(self.ledDC)
-        
+
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -567,13 +567,13 @@ class PlotImpz_UI(QWidget):
         layVlblfreqU.addWidget(self.lblFreqUnit2)
 
         #----------------------------------------------
- 
+
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
         self.cmbNoise.setToolTip("Type of additive noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
-        
+
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setText(str(self.noi))
@@ -585,9 +585,9 @@ class PlotImpz_UI(QWidget):
         layVlblNoi.addWidget(self.lblNoi)
 
         layVcmbledNoi = QVBoxLayout()
-        layVcmbledNoi.addWidget(self.cmbNoise)        
+        layVcmbledNoi.addWidget(self.cmbNoise)
         layVcmbledNoi.addWidget(self.ledNoi)
-        
+
         #----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
         self.ledStimFormula = QLineEdit(self)
@@ -603,7 +603,7 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------
         #layG_ctrl_stim = QGridLayout()
         layH_ctrl_stim_par = QHBoxLayout()
-        
+
         layH_ctrl_stim_par.addLayout(layVlblCmbDC)
         layH_ctrl_stim_par.addLayout(layVCmbDC)
         layH_ctrl_stim_par.addStretch(1)
@@ -620,7 +620,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim_par.addLayout(layVlblNoi)
         layH_ctrl_stim_par.addLayout(layVcmbledNoi)
         layH_ctrl_stim_par.addStretch(10)
-        
+
         layV_ctrl_stim = QVBoxLayout()
         layV_ctrl_stim.addLayout(layH_ctrl_stim_par)
         layV_ctrl_stim.addLayout(layH_ctrl_stim_formula)
@@ -767,7 +767,7 @@ class PlotImpz_UI(QWidget):
 
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
-        
+
         self.lblStimFormula.setVisible(self.stim == "Formula")
         self.ledStimFormula.setVisible(self.stim == "Formula")
 
@@ -827,7 +827,7 @@ class PlotImpz_UI(QWidget):
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi2'})
-        
+
     def _update_chirp_method(self):
         """ Update value for self.chirp_method from the QLineEditWidget"""
         self.chirp_method = qget_cmb_box(self.cmbChirpMethod) # read current data string
@@ -864,7 +864,7 @@ class PlotImpz_UI(QWidget):
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
-        
+
     def _update_stim_formula(self):
         """Update string with formula to be evaluated by numexpr"""
         self.stim_formula = self.ledStimFormula.text()
