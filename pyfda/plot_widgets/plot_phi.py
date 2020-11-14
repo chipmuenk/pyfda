@@ -113,6 +113,8 @@ class Plot_Phi(QWidget):
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget.mplToolbar.a_he.setEnabled(True)
+        self.mplwidget.mplToolbar.a_he.info = "manual/plot_phi.html"
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()
