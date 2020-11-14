@@ -33,7 +33,7 @@ try:
 except ImportError:
     figureoptions = None
 
-from pyfda.libs.compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
+from pyfda.libs.compat import (QtCore, QtGui, QWidget, QLabel, pyqtSignal, pyqtSlot,
                       QSizePolicy, QIcon, QImage, QVBoxLayout, QHBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
@@ -419,6 +419,13 @@ class MplToolbar(NavigationToolbar):
                                   QSizePolicy.Ignored))
             labelAction = self.addWidget(self.locLabel)
             labelAction.setVisible(True)
+            
+        #---------------------------------------------
+        # HELP:
+        #---------------------------------------------
+        self.a_he = self.addAction(QIcon(':/help.svg'), 'help', self.help)
+        self.a_he.setToolTip('Open help page from https://pyfda.rtfd.org in browser')
+        self.a_he.setDisabled(True)
 
 #------------------------------------------------------------------------------
     if figureoptions is not None:
@@ -464,6 +471,23 @@ class MplToolbar(NavigationToolbar):
         self.push_current()
         self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
         self.mpl_widget.redraw()
+
+#------------------------------------------------------------------------------
+    def help(self):
+        """
+        Open help page from https://pyfda.rtfd.org in browser
+        """
+        
+        url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/' + self.a_he.info)
+        if not url.isValid():
+            logger.warning("Invalid URL\n\t{0}\n\tOpening "
+                           "'https://pyfda.readthedocs.io/en/latest/' instead".format(url.toString()))
+            url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/')
+            #if url.isLocalFile()
+        QtGui.QDesktopServices.openUrl(url)
+        
+        #https://stackoverflow.com/questions/28494571/how-in-qt5-to-check-if-url-is-available
+        #https://stackoverflow.com/questions/16778435/python-check-if-website-exists
 
 
 #------------------------------------------------------------------------------
