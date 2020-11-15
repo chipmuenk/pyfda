@@ -651,7 +651,7 @@ class Plot_Impz(QWidget):
             logger.error("Response should have been calculated by now!")
             return
 
-        f_unit = fb.fil[0]['freq_specs_unit']
+        f_unit = fb.fil[0]['plt_fUnit']
         if f_unit in {"f_S", "f_Ny"}:
             unit_frmt = "i" # italic
         else:

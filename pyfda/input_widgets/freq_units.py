@@ -162,6 +162,7 @@ class FreqUnits(QWidget):
 
         self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # only vis. when
         self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # not normalized
+        f_S_scale = 1 # default setting for f_S scale
 
         if f_unit in {"f_S", "f_Ny", "k"}: # normalized frequency
             self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
@@ -184,14 +185,28 @@ class FreqUnits(QWidget):
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}: # previous setting
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
+            
+            if fb.fil[0]['freq_specs_unit'] == "kHz":
+                f_S_scale = 1.e3
+            elif fb.fil[0]['freq_specs_unit'] == "MHz":
+                f_S_scale = 1.e6
+            elif fb.fil[0]['freq_specs_unit'] == "GHz":
+                f_S_scale = 1.e9
+            else:
+                logger.warning("Unknown frequency unit {0}".format(f_unit))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
+        if f_unit == "k":
+            plt_f_unit = "f_S"
+        else:
+            plt_f_unit = f_unit
+        fb.fil[0].update({'f_S_scale':f_S_scale}) # scale factor for f_S
         fb.fil[0].update({'freq_specs_unit':f_unit}) # frequency unit
         fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
         fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
-        fb.fil[0].update({"plt_fUnit":f_unit}) # frequency unit as string
+        fb.fil[0].update({"plt_fUnit":plt_f_unit}) # frequency unit as string
         fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
 
         self._freq_range() # update f_lim setting and emit sigUnitChanged signal

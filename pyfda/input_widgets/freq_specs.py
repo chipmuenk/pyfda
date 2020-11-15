@@ -222,7 +222,7 @@ class FreqSpecs(QWidget):
         """
         Set label for frequency unit according to selected unit.
         """
-        unit = fb.fil[0]['freq_specs_unit']
+        unit = fb.fil[0]['plt_fUnit']
         if unit in {"f_S", "f_Ny"}:
             unit_frmt = 'bi'
         else:
