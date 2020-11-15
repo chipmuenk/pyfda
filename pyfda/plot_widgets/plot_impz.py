@@ -877,6 +877,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the time domain mplwidget
         """
+        # self.t = self.n / fb.fil[0]['f_S']
 
         if self.y is None: # safety net for empty responses
             for ax in self.mplwidget_t.fig.get_axes(): # remove all axes
@@ -1199,7 +1200,7 @@ class Plot_Impz(QWidget):
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
 
         # freqz-based ideal frequency response
-        F_id, H_id = np.abs(calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=fb.fil[0]['f_S']))
+        F_id, H_id = np.abs(calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=fb.fil[0]['f_max']))
 
         if not self.plt_freq_disabled:
             if plt_response and not plt_stimulus:
@@ -1209,8 +1210,16 @@ class Plot_Impz(QWidget):
             else:
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             # frequency vector for FFT-based frequency plots
-            F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_S'])
 
+            F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_max'])
+            F_range = fb.fil[0]['freqSpecsRange']
+
+            if fb.fil[0]['freq_specs_unit'] == 'k':
+                # scale frequency axes to fit the number of frequency points self.ui.N
+                F_range = [i * self.ui.N / fb.fil[0]['f_max'] for i in F_range]
+                F *= self.ui.N / fb.fil[0]['f_max']
+                F_id *= self.ui.N / fb.fil[0]['f_max']
+                
         #-----------------------------------------------------------------
         # Scale frequency response and calculate power
         #-----------------------------------------------------------------
@@ -1381,7 +1390,8 @@ class Plot_Impz(QWidget):
 
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
-            self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
+            #self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
+            self.ax_fft.set_xlim(F_range)
             self.ax_fft.set_title(self.title_str)
 
             if self.ui.chk_log_freq.isChecked():

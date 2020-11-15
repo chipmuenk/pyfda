@@ -342,11 +342,11 @@ class Plot_Hf(QWidget):
             A_SB2 = self.A_SB2 ** exp
             A_SB_maxx = A_PB_min / 10.
 
-        F_max = self.f_S/2
+        F_max = self.f_max/2
         F_PB  = self.F_PB
-        F_SB  = fb.fil[0]['F_SB'] * self.f_S
-        F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
-        F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
+        F_SB  = fb.fil[0]['F_SB'] * self.f_max
+        F_SB2 = fb.fil[0]['F_SB2'] * self.f_max
+        F_PB2 = fb.fil[0]['F_PB2'] * self.f_max
 
         F_lim_upl = F_lim_lol = [] # left side limits, lower and upper
         A_lim_upl = A_lim_lol = []
@@ -427,12 +427,12 @@ class Plot_Hf(QWidget):
                 F_lim_upr = -F_lim_upr
                 F_lim_lor = -F_lim_lor
             else: # -> 'whole'
-                F_lim_upl = self.f_S - F_lim_upl
-                F_lim_lol = self.f_S - F_lim_lol
-                F_lim_upc = self.f_S - F_lim_upc
-                F_lim_loc = self.f_S - F_lim_loc
-                F_lim_upr = self.f_S - F_lim_upr
-                F_lim_lor = self.f_S - F_lim_lor
+                F_lim_upl = self.f_max - F_lim_upl
+                F_lim_lol = self.f_max - F_lim_lol
+                F_lim_upc = self.f_max - F_lim_upc
+                F_lim_loc = self.f_max - F_lim_loc
+                F_lim_upr = self.f_max - F_lim_upr
+                F_lim_lor = self.f_max - F_lim_lor
 
             _plot_specs()
 
@@ -597,9 +597,10 @@ class Plot_Hf(QWidget):
 
         self.specs = self.chkSpecs.isChecked()
 
-        self.f_S  = fb.fil[0]['f_S']
-        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
-        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
+        self.f_max  = fb.fil[0]['f_max']
+
+        self.F_PB = fb.fil[0]['F_PB'] * self.f_max
+        self.f_maxB = fb.fil[0]['F_SB'] * self.f_max
 
         self.A_PB  = fb.fil[0]['A_PB']
         self.A_PB2 = fb.fil[0]['A_PB2']
@@ -610,12 +611,12 @@ class Plot_Hf(QWidget):
 
         #========= select frequency range to be displayed =====================
         #=== shift, scale and select: W -> F, H_cplx -> H_c
-        self.F = self.W / (2 * np.pi) * self.f_S
+        self.F = self.W / (2 * np.pi) * self.f_max
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift H and F by f_S/2
             self.H_c = np.fft.fftshift(self.H_cmplx)
-            self.F -= self.f_S/2.
+            self.F -= self.f_max/2.
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
             # only use the first half of H and F
             self.H_c = self.H_cmplx[0:params['N_FFT']//2]

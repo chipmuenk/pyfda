@@ -180,16 +180,16 @@ class Plot_Phi(QWidget):
 
         self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
 
-        f_S2 = fb.fil[0]['f_S'] / 2.
+        f_max_2 = fb.fil[0]['f_max'] / 2.
 
         #========= select frequency range to be displayed =====================
         #=== shift, scale and select: W -> F, H_cplx -> H_c
-        F = self.W * f_S2 / np.pi
+        F = self.W * f_max_2 / np.pi
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift H and F by f_S/2
             H = np.fft.fftshift(self.H_cmplx)
-            F -= f_S2
+            F -= f_max_2
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
             # only use the first half of H and F
             H = self.H_cmplx[0:params['N_FFT']//2]

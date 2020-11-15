@@ -28,6 +28,19 @@ from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g
 class FreqUnits(QWidget):
     """
     Build and update widget for entering the frequency units
+    
+    The following key-value pairs of the `fb.fil[0]` dict are modified:
+
+        - `'freq_specs_unit'` : The unit ('k', 'f_S', 'f_Ny', 'Hz' etc.) as a string
+        - `'freqSpecsRange'` : A list with two entries for minimum and maximum frequency
+                               values for labelling the frequency axis
+        - `'f_S'` : The sampling frequency for referring frequency values to as a float
+        - `'f_max'` : maximum frequency for scaling frequency axis              
+        - `'plt_fUnit'`: frequency unit as string
+        - `'plt_tUnit'`: time unit as string
+        - `'plt_fLabel'`: label for frequency axis
+        - `'plt_tLabel'`: label for time axis
+
     """
 
     # class variables (shared between instances if more than one exists)
@@ -47,8 +60,8 @@ class FreqUnits(QWidget):
         """
         self.layVMain = QVBoxLayout() # Widget main layout
 
-        f_units = ['f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
-        self.t_units = ['', '', 's', 'ms', r'$\mu$s', 'ns']
+        f_units = ['k','f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
+        self.t_units = ['', '', '', 's', 'ms', r'$\mu$s', 'ns']
 
         bfont = QFont()
         bfont.setBold(True)
@@ -70,10 +83,11 @@ class FreqUnits(QWidget):
         self.cmbUnits.setObjectName("cmbUnits")
         self.cmbUnits.addItems(f_units)
         self.cmbUnits.setToolTip(
-        "Select whether frequencies are specified with respect to \n"
-        "the sampling frequency f_S, to the Nyquist frequency \n"
-        "f_Ny = f_S/2 or as absolute values.")
-        self.cmbUnits.setCurrentIndex(0)
+        'Select whether frequencies are specified w.r.t. \n'
+        'the sampling frequency "f_S", to the Nyquist frequency \n'
+        'f_Ny = f_S/2 or as absolute values. "k" specifies frequencies w.r.t. f_S '
+        'but plots graphs over the frequency index k.')
+        self.cmbUnits.setCurrentIndex(1)
 #        self.cmbUnits.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
 #        self.cmbUnits.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
@@ -146,24 +160,29 @@ class FreqUnits(QWidget):
         idx = self.cmbUnits.currentIndex() # read index of units combobox
         f_unit = str(self.cmbUnits.currentText()) # and the label
 
-        self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # only vis. when
-        self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # not normalized
+        self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # only vis. when
+        self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # not normalized
 
-        if f_unit in {"f_S", "f_Ny"}: # normalized frequency
+        if f_unit in {"f_S", "f_Ny", "k"}: # normalized frequency
             self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
+
             if f_unit == "f_S": # normalized to f_S
-                fb.fil[0]['f_S'] = 1.
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
-            else:   # idx == 1: normalized to f_nyq = f_S / 2
-                fb.fil[0]['f_S'] = 2.
+            elif f_unit == "f_Ny":   # idx == 1: normalized to f_nyq = f_S / 2
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
+            else:
+                fb.fil[0]['f_S'] = 1
+                fb.fil[0]['f_max'] = params['N_FFT']
+                f_label = r"$k \; \rightarrow$"               
             t_label = r"$n \; \rightarrow$"
 
             self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else: # Hz, kHz, ...
-            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}: # previous setting
-                fb.fil[0]['f_S'] = self.fs_old # restore prev. sampling frequency
+            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}: # previous setting
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
@@ -235,12 +254,14 @@ class FreqUnits(QWidget):
         rangeType = qget_cmb_box(self.cmbFRange)
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
+        f_max = fb.fil[0]["f_max"]
+
         if rangeType == 'whole':
-            f_lim = [0, fb.fil[0]["f_S"]]
+            f_lim = [0, f_max]
         elif rangeType == 'sym':
-            f_lim = [-fb.fil[0]["f_S"]/2., fb.fil[0]["f_S"]/2.]
+            f_lim = [-f_max/2., f_max/2.]
         else:
-            f_lim = [0, fb.fil[0]["f_S"]/2.]
+            f_lim = [0, f_max/2.]
 
         fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
 

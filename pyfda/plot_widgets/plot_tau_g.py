@@ -146,13 +146,13 @@ class Plot_tau_g(QWidget):
         """
         #========= select frequency range to be displayed =====================
         #=== shift, scale and select: W -> F, H_cplx -> H_c
-        f_S2 = fb.fil[0]['f_S'] / 2.
-        F = self.W * f_S2 / np.pi
+        f_max_2 = fb.fil[0]['f_max'] / 2.
+        F = self.W * f_max_2 / np.pi
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift tau_g and F by f_S/2
             tau_g = np.fft.fftshift(self.tau_g)
-            F -= f_S2
+            F -= f_max_2
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
             # only use the first half of H and F
             tau_g = self.tau_g[0:params['N_FFT']//2]
