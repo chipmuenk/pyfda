@@ -811,7 +811,7 @@ class PlotImpz_UI(QWidget):
         self.lblNoi.setVisible(self.noise!='none')
         self.ledNoi.setVisible(self.noise!='none')
         if self.noise!='none':
-            self.noi = safe_eval(self.ledNoi.text(), 0, return_type='float', sign='poszero')
+            self.noi = safe_eval(self.ledNoi.text(), 0, return_type='cmplx')
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
                 self.lblNoi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))

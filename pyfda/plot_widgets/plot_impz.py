@@ -494,24 +494,32 @@ class Plot_Impz(QWidget):
                           "f_S":fb.fil[0]['f_S'], "n":self.n}
 
             self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
+            self.title_str += r'Formula Defined Signal'
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
 
         # Add noise to stimulus
+        noi = 0
         if self.ui.noise == "gauss":
-            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.ui.N)
+            noi = self.ui.noi * np.random.randn(len(self.x))
             self.title_str += r' w/ Gaussian Noise'
         elif self.ui.noise == "uniform":
-            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
+            noi = self.ui.noi * (np.random.rand(len(self.x))-0.5)
             self.title_str += r' w/ Uniform Noise'
         elif self.ui.noise == "prbs":
-            self.x[self.ui.N_start:] += self.ui.noi * 2 * \
-                        (np.random.randint(0, 2, self.ui.N)-0.5)
+            noi = self.ui.noi * 2 * (np.random.randint(0, 2, len(self.x))-0.5)
             self.title_str += r' w/ PRBS'
+        if type(self.ui.noi) == complex:
+            self.x = self.x.astype(complex) + noi
+        else:
+            self.x += noi
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
-            self.x += self.ui.DC
+            if type(self.ui.DC) == complex:
+                self.x = self.x.astype(complex) + self.ui.DC
+            else:
+                self.x += self.ui.DC
             if self.ui.DC != 0:
                 self.title_str += r' and DC'
 
