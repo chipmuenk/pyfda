@@ -403,8 +403,8 @@ class Plot_Impz(QWidget):
         phi2 = self.ui.phi2 / 180 * pi
 
         # calculate stimuli x[n] ==============================================
-        self.H_str = r'$y[n]$'
-        self.title_str = r'System Response '
+        self.H_str = ''
+        self.title_str = ""
 
         if self.ui.stim == "Impulse":
             if np_type(self.ui.A1) == complex:
@@ -435,58 +435,58 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'to Cosine Signal'
+            self.title_str += r'Cosine Signal'
 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'to Sinusoidal Signal '
+            self.title_str += r'Sinusoidal Signal '
 
         elif self.ui.stim == "Chirp":
             self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,
                                             method=self.ui.chirp_method.lower(), phi=phi1)
-            self.title_str += r'to ' + self.ui.chirp_method + ' Chirp Signal '
+            self.title_str += self.ui.chirp_method + ' Chirp Signal'
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'to Bandlim. Triangular Signal'
+                self.title_str += r'Bandlim. Triangular Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1, width=0.5)
-                self.title_str += r'to Triangular Signal'
+                self.title_str += r'Triangular Signal'
 
         elif self.ui.stim == "Saw":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'to Bandlim. Sawtooth Signal'
+                self.title_str += r'Bandlim. Sawtooth Signal'
             else:
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'to Sawtooth Signal'
+                self.title_str += r'Sawtooth Signal'
 
         elif self.ui.stim == "Rect":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str += r'to Bandlimited Rect. Signal'
+                self.title_str += r'Bandlimited Rect. Signal'
             else:
                 self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
-                self.title_str += r'to Rect. Signal'
+                self.title_str += r'Rect. Signal'
 
         elif self.ui.stim == "Comb":
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str += r'to Bandlim. Comb Signal'
+            self.title_str += r'Bandlim. Comb Signal'
 
         elif self.ui.stim == "AM":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
                 * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'to AM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1) \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
+            self.title_str += r'AM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1) \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
         elif self.ui.stim == "PM":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2))
-            self.title_str += r'to PM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
+            self.title_str += r'PM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
         elif self.ui.stim == "FM":
             self.x = self.ui.A1 * np.sin(phi1 + 2*pi * self.n\
                         * (self.ui.f1 + self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)))
-            self.title_str += r'to FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
+            self.title_str += r'FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
         elif self.ui.stim == "Formula":
             param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
                           "f1":self.ui.f1, "f2":self.ui.f2,
@@ -503,13 +503,13 @@ class Plot_Impz(QWidget):
         noi = 0
         if self.ui.noise == "gauss":
             noi = self.ui.noi * np.random.randn(len(self.x))
-            self.title_str += r' w/ Gaussian Noise'
+            self.title_str += r' + Gaussian Noise'
         elif self.ui.noise == "uniform":
             noi = self.ui.noi * (np.random.rand(len(self.x))-0.5)
-            self.title_str += r' w/ Uniform Noise'
+            self.title_str += r' + Uniform Noise'
         elif self.ui.noise == "prbs":
             noi = self.ui.noi * 2 * (np.random.randint(0, 2, len(self.x))-0.5)
-            self.title_str += r' w/ PRBS'
+            self.title_str += r' + PRBS Noise'
         if type(self.ui.noi) == complex:
             self.x = self.x.astype(complex) + noi
         else:
@@ -521,7 +521,7 @@ class Plot_Impz(QWidget):
             else:
                 self.x += self.ui.DC
             if self.ui.DC != 0:
-                self.title_str += r' and DC'
+                self.title_str += r' + DC'
 
         if self.fx_sim:
             self.title_str = r'$Fixpoint$ ' + self.title_str
@@ -848,7 +848,8 @@ class Plot_Impz(QWidget):
         self.spgr = self.plt_time_spgr != "none"
 
         plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
-            or self.plt_time_stmq != "none" or self.spgr or self.ui.chk_win_time.isChecked()
+            or (self.plt_time_stmq != "none" and self.fx_sim)\
+            or self.spgr or self.ui.chk_win_time.isChecked()
 
         self.mplwidget_t.fig.clf() # clear figure with axes
 
@@ -888,6 +889,16 @@ class Plot_Impz(QWidget):
             for ax in self.mplwidget_t.fig.get_axes(): # remove all axes
                 self.mplwidget_t.fig.delaxes(ax)
             return
+
+        if not self.H_str or self.H_str[1] != 'h': # '$h... = some impulse response, don't change
+            self.H_str = ''
+            if qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower() != "none":
+                self.H_str += r'$x[n]$, '
+            if qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower() != "none" and self.fx_sim:
+                self.H_str += r'$x_Q[n]$, '
+            if qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower() != "none":
+                self.H_str += r'$y[n]$'
+            self.H_str = self.H_str.rstrip(', ')
 
         mkfmt_i = 'd'
 
@@ -968,7 +979,7 @@ class Plot_Impz(QWidget):
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
 
         if self.plt_time_resp != "none" or self.plt_time_stim != "none"\
-            or self.plt_time_stmq != "none" or self.ui.chk_win_time.isChecked():
+            or (self.plt_time_stmq != "none" and self.fx_sim) or self.ui.chk_win_time.isChecked():
                 self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
@@ -1209,11 +1220,11 @@ class Plot_Impz(QWidget):
 
         if not self.plt_freq_disabled:
             if plt_response and not plt_stimulus:
-                XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+                H_F_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             elif not plt_response and plt_stimulus:
-                XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
+                H_F_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
             else:
-                XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+                H_F_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             # frequency vector for FFT-based frequency plots
 
             F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_max'])
@@ -1338,7 +1349,7 @@ class Plot_Impz(QWidget):
                 nenbw = self.ui.nenbw
                 cgain = self.ui.cgain
 
-            XY_str = XY_str + ' in ' + unit
+            H_F_str = H_F_str + ' in ' + unit
 
             # --------------- Plot stimulus and response ----------------------
             show_info = self.ui.chk_show_info_freq.isChecked()
@@ -1394,10 +1405,10 @@ class Plot_Impz(QWidget):
                                fancybox=True, framealpha=0.7)
 
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
-            self.ax_fft.set_ylabel(XY_str)
+            self.ax_fft.set_ylabel(H_F_str)
             #self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
             self.ax_fft.set_xlim(F_range)
-            self.ax_fft.set_title(self.title_str)
+            self.ax_fft.set_title("Spectrum of " + self.title_str)
 
             if self.ui.chk_log_freq.isChecked():
                 # scale second axis for noise power
