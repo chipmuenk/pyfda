@@ -492,6 +492,9 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
     if np.shape(np_expr) != fallback_shape:
             logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
             np_expr = np.zeros(fallback_shape)
+    if not type(np_expr.item(0)) in {float, complex}:
+        np_expr = np_expr.astype(float)
+        
     return np_expr
 
 
