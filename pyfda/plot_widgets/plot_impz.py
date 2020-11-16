@@ -399,7 +399,6 @@ class Plot_Impz(QWidget):
         (Re-)calculate stimulus `self.x`
         """
         self.n = np.arange(self.ui.N_end)
-        #self.t = self.n / fb.fil[0]['f_S']
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
 
@@ -877,8 +876,6 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the time domain mplwidget
         """
-        # self.t = self.n / fb.fil[0]['f_S']
-
         if self.y is None: # safety net for empty responses
             for ax in self.mplwidget_t.fig.get_axes(): # remove all axes
                 self.mplwidget_t.fig.delaxes(ax)
