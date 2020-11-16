@@ -364,6 +364,12 @@ class PlotImpz_UI(QWidget):
 
         if not self.chk_log_freq.isChecked():
             self.bottom_f = 0
+            
+        lbl_re_im_freq = QLabel(to_html("Re / Im", frmt='b'), self)
+        self.chk_re_im_freq = QCheckBox(self)
+        self.chk_re_im_freq.setObjectName("chk_re_im_freq")
+        self.chk_re_im_freq.setToolTip("<span>Show real and imaginary part of spectrum</span>")
+        self.chk_re_im_freq.setChecked(False)
 
         self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
@@ -418,6 +424,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_log_freq)
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(lbl_re_im_freq)
+        layH_ctrl_freq.addWidget(self.chk_re_im_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
