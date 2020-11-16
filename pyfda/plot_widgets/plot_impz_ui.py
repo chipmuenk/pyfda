@@ -832,7 +832,7 @@ class PlotImpz_UI(QWidget):
 
     def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
-        self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
+        self.DC = safe_eval(self.ledDC.text(), 0, return_type='cmplx')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'dc'})
 
