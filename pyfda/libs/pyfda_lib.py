@@ -494,7 +494,7 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
             np_expr = np.zeros(fallback_shape)
     if not type(np_expr.item(0)) in {float, complex}:
         np_expr = np_expr.astype(float)
-        
+
     return np_expr
 
 
