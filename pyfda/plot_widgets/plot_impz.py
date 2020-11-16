@@ -23,7 +23,7 @@ from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_lib import (expand_lim, to_html, safe_eval, pprint_log, np_type,
+from pyfda.libs.pyfda_lib import (to_html, safe_eval, pprint_log, np_type, calc_ssb_spectrum,
         rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
                                      qadd_item_cmb_box, qdel_item_cmb_box)
@@ -1180,35 +1180,6 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the frequency domain mplwidget
         """
-        def calc_ssb_spectrum(A):
-            """
-            Calculate the single-sideband spectrum from a double-sideband
-            spectrum by adding the mirrored conjugate complex of the second half
-            of the spectrum to the first while leaving the DC value untouched.
-
-            When len(A) is even, A[N//2] represents half the sampling frequencvy
-            and has to be discarded (Q: also for the power calculation?). Both
-            tasks are addressed by
-
-            Parameters
-            ----------
-            A : array-like
-                double-sided spectrum, usually complex. The sequence is as follows:
-
-                    [0, 1, 2, ..., 4, -5, -4, ... , -1] for len(A) = 10
-
-            Returns
-            -------
-            A_SSB : array-like
-                single-sided spectrum with half the number of input values
-
-            """
-            N = len(A)
-            A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),
-                              0, A[0])
-
-            return A_SSB
-            #--------------------------------------------------------------
 
         self._init_axes_freq()
         plt_response = self.plt_freq_resp != "none"
