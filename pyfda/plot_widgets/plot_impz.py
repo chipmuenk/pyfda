@@ -155,6 +155,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
         self.ui.chk_Hf.clicked.connect(self.draw)
+        self.ui.chk_re_im_freq.clicked.connect(self.draw)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
         self.ui.chk_show_info_freq.clicked.connect(self.draw)
@@ -614,7 +615,7 @@ class Plot_Impz(QWidget):
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
             # calculate absolute value and scale by N_FFT
-            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+            self.X = np.fft.fft(x_win) / self.ui.N
             #self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
@@ -847,13 +848,13 @@ class Plot_Impz(QWidget):
         self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr, data=False).lower()
         self.spgr = self.plt_time_spgr != "none"
 
-        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
+        self.plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
             or (self.plt_time_stmq != "none" and self.fx_sim)\
             or self.spgr or self.ui.chk_win_time.isChecked()
 
         self.mplwidget_t.fig.clf() # clear figure with axes
 
-        if plt_time:
+        if self.plt_time:
             num_subplots = 1 + self.cmplx + self.spgr
             
             # return a one-dimensional list with num_subplots axes
@@ -921,11 +922,17 @@ class Plot_Impz(QWidget):
             x_i = x.imag
             y_r = y.real
             y_i = y.imag
+            lbl_x_r = "$x_r[n]$"
+            lbl_x_i = "$x_i[n]$"
+            lbl_y_r = "$y_r[n]$"
+            lbl_y_i = "$y_i[n]$"
         else:
             x_r = x.real
             x_i = None
             y_r = y
             y_i = None
+            lbl_x_r = "$x[n]$"
+            lbl_y_r = "$y[n]$"
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             bottom_t = self.ui.bottom_t
@@ -960,7 +967,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Stimulus plot ----------------------------------
         self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
-              x_r[self.ui.N_start:], label='$x[n]$', bottom=bottom_t,
+              x_r[self.ui.N_start:], label=lbl_x_r, bottom=bottom_t,
               plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
         #-------------- Stimulus <q> plot --------------------------------
@@ -971,29 +978,29 @@ class Plot_Impz(QWidget):
 
         # --------------- Response plot ----------------------------------
         self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
-              y_r[self.ui.N_start:], label='$y[n]$', bottom=bottom_t,
+              y_r[self.ui.N_start:], label=lbl_y_r, bottom=bottom_t,
               plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
 
-        if self.plt_time_resp != "none" or self.plt_time_stim != "none"\
-            or (self.plt_time_stmq != "none" and self.fx_sim) or self.ui.chk_win_time.isChecked():
-                self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
+        # --------------- LEGEND (real part) ----------------------------------
+        if self.plt_time:
+            self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
 
             # --- imag. part of response -----
             self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
-                  y_i[self.ui.N_start:], label='$y_i[n]$', bottom=bottom_t,
+                  y_i[self.ui.N_start:], label=lbl_y_i, bottom=bottom_t,
                   plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp,
                   marker=mkfmt_i)
 
             # --- imag. part of stimulus -----
             self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
-                  x_i[self.ui.N_start:], label='$x_i[n]$', bottom=bottom_t,
+                  x_i[self.ui.N_start:], label=lbl_x_i, bottom=bottom_t,
                   plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim,
                   marker=mkfmt_i)
 
@@ -1001,13 +1008,13 @@ class Plot_Impz(QWidget):
             # plt.setp(ax_r.get_xticklabels(), visible=False)
             # is shorter but imports matplotlib, set property directly instead:
             [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
-            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+            #self.ax_r.set_ylabel(H_str + r'$\rightarrow $') # common x-axis
 
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
             self.ax_i.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
-        else:
+        #else:
 #            self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
-            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+        self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
@@ -1149,30 +1156,41 @@ class Plot_Impz(QWidget):
         self.plt_freq_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq, data=False)
 
 
-        self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_stmq == "none"\
-                                    and self.plt_freq_resp == "none" and not self.ui.chk_Hf.isChecked()
+        self.plt_freq_enabled = self.plt_freq_stim != "none" or self.plt_freq_stmq != "none"\
+                                    or self.plt_freq_resp != "none"
 
-        if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
-            self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
+        #if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
+        #    self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
+        
+        self.mplwidget_f.fig.clf() # clear figure with axes
 
-        if len(self.mplwidget_f.fig.get_axes()) == 0: # empty figure, no axes
-            self.ax_fft = self.mplwidget_f.fig.subplots()
-  
-            self.ax_fft.set_title("FFT of Transient Response")
+        self.ax_f_re_im = self.ui.chk_re_im_freq.isChecked()
 
-        for ax in self.mplwidget_f.fig.get_axes(): # clear but don't delete all axes
-            ax.cla()
+        num_subplots_f = 1 + self.ax_f_re_im
+        
+        self.axes_f = self.mplwidget_f.fig.subplots(nrows=num_subplots_f, ncols=1,
+                                               sharex=True, squeeze = False)[:,0]
+        self.ax_f1 = self.axes_f[0]
 
-        if self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 1:
+        #for ax in self.axes_f:
+        #    ax.cla()
+
+        if self.ui.chk_log_freq.isChecked():# and len(self.mplwidget_f.fig.get_axes()) == 1:
             # create second axis scaled for noise power scale if it doesn't exist yet
-            self.ax_fft_noise = self.ax_fft.twinx()
-            self.ax_fft_noise.is_twin = True
+            self.ax_f1_noise = self.ax_f1.twinx()
+            self.ax_f1_noise.is_twin = True
 
-        self.ax_fft.xaxis.tick_bottom() # remove axis ticks on top
-        self.ax_fft.yaxis.tick_left() # remove axis ticks right
-        self.ax_fft.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
-        self.ax_fft.yaxis.set_minor_locator(AutoMinorLocator()) 
-
+        self.ax_f1.xaxis.tick_bottom() # remove axis ticks on top
+        self.ax_f1.yaxis.tick_left() # remove axis ticks right
+        self.ax_f1.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+        self.ax_f1.yaxis.set_minor_locator(AutoMinorLocator())
+        
+        if self.ax_f_re_im:
+            self.ax_f2 = self.axes_f[1]
+            self.ax_f2.xaxis.tick_bottom() # remove axis ticks on top
+            self.ax_f2.yaxis.tick_left() # remove axis ticks right
+            self.ax_f2.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+            self.ax_f2.yaxis.set_minor_locator(AutoMinorLocator())
 
         self.calc_fft()
 
@@ -1189,7 +1207,7 @@ class Plot_Impz(QWidget):
         # freqz-based ideal frequency response
         F_id, H_id = np.abs(calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=fb.fil[0]['f_max']))
 
-        if not self.plt_freq_disabled:
+        if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
             if plt_response and not plt_stimulus:
                 H_F_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             elif not plt_response and plt_stimulus:
@@ -1224,11 +1242,17 @@ class Plot_Impz(QWidget):
                 scale_impz = 1.
 
             if plt_stimulus:
-                X = self.X.copy() * self.scale_i
-                Px = np.sum(np.square(X)) * scale_impz / self.ui.nenbw
-                X *= scale_impz # scale display of frequency response
+                # scale display of frequency response
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X = calc_ssb_spectrum(X)
+                    X = calc_ssb_spectrum(self.X) * self.scale_i * scale_impz
+                else:
+                    X = self.X * self.scale_i * scale_impz
+                if self.ax_f_re_im:
+                    X_r = X.real
+                    X_i = X.imag * self.scale_i
+                else:
+                    X_r = np.abs(X)
+                Px = np.sum(np.square(self.X)) * scale_impz / self.ui.nenbw
 
             if plt_stimulus_q:
                 X_q = self.X_q.copy() * self.scale_i
@@ -1257,7 +1281,9 @@ class Plot_Impz(QWidget):
                 if plt_response:
                     Y = np.fft.fftshift(Y)
                 if plt_stimulus:
-                    X = np.fft.fftshift(X)
+                    X_r = np.fft.fftshift(X_r)
+                    if self.ax_f_re_im:
+                        X_i = np.fft.fftshift(X_i)
                 if plt_stimulus_q:
                     X_q = np.fft.fftshift(X_q)
 #                if self.ui.chk_win_freq.isChecked():
@@ -1275,7 +1301,9 @@ class Plot_Impz(QWidget):
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
-                    X = X[0:self.ui.N//2]
+                    X_r = X_r[0:self.ui.N//2]
+                    if self.ax_f_re_im:
+                        X_i = X_i[0:self.ui.N//2]
                 if plt_stimulus_q:
                     X_q = X_q[0:self.ui.N//2]
 #                if self.ui.chk_win_freq.isChecked():
@@ -1302,8 +1330,10 @@ class Plot_Impz(QWidget):
                 cgain = 20 * np.log10(self.ui.cgain)
                 H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
                 if plt_stimulus:
-                    X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
                     Px = 10*np.log10(Px)
+                    X_r = np.maximum(20 * np.log10(np.abs(X_r)), self.ui.bottom_f)
+                    if self.ax_f_re_im:
+                            X_i = np.maximum(20 * np.log10(np.abs(X_i)), self.ui.bottom_f)
                 if plt_stimulus_q:
                     X_q = np.maximum(20 * np.log10(X_q), self.ui.bottom_f)
                     Pxq = 10*np.log10(Pxq)
@@ -1325,12 +1355,19 @@ class Plot_Impz(QWidget):
             # --------------- Plot stimulus and response ----------------------
             show_info = self.ui.chk_show_info_freq.isChecked()
             if plt_stimulus:
+                label_1 = "$|X(f)|$"
+
+                if self.ax_f_re_im:
+                    label_1 = "$X_r(f)$"
+                    label_2 = "$X_i(f)$"
+                    self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
+                        label=label_2, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                        mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
                 if show_info:
-                    label_P = "$X(f)$" + "\t: $P$ = {0:.3g} {1}".format(Px, unit_P)
-                else:
-                    label_P = "$X(f)$"
-                self.draw_data(self.plt_freq_stim, self.ax_fft, F, X,
-                    label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                    label_1 += "\t: $P$ = {0:.3g} {1}".format(Px, unit_P)
+
+                self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
+                    label=label_1, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                     mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
             if plt_stimulus_q:
@@ -1338,7 +1375,7 @@ class Plot_Impz(QWidget):
                     label_P = "$X_q(f)$" + "\t: $P$ = {0:.3g} {1}".format(Pxq, unit_P)
                 else:
                     label_P = "$X_q(f)$"
-                self.draw_data(self.plt_freq_stmq, self.ax_fft, F, X_q,
+                self.draw_data(self.plt_freq_stmq, self.ax_f1, F, X_q,
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
@@ -1347,19 +1384,19 @@ class Plot_Impz(QWidget):
                     label_P = "$Y(f)$" + "\t: $P$ = {0:.3g} {1}".format(Py, unit_P)
                 else:
                     label_P = "$Y(f)$"
-                self.draw_data(self.plt_freq_resp, self.ax_fft, F, Y,
+                self.draw_data(self.plt_freq_resp, self.ax_f1, F, Y,
                     label=label_P, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
             if self.ui.chk_Hf.isChecked():
-                self.ax_fft.plot(F_id, H_id, c="gray",label="$H_{id}(f)$")
+                self.ax_f1.plot(F_id, H_id, c="gray",label="$H_{id}(f)$")
 
 #            if self.ui.chk_win_freq.isChecked():
-#                self.ax_fft.plot(F, Win, c="gray", label="win")
+#                self.ax_f1.plot(F, Win, c="gray", label="win")
 #                labels.append("{0}".format(self.ui.window_type))
 
             # get handles and labels for all plots so far
-            handles, labels = self.ax_fft.get_legend_handles_labels()
+            handles, labels = self.ax_f1.get_legend_handles_labels()
             # get a tuple with pairs of (label, handle), sorted for the label
             sorted_pairs = sorted(zip(labels, handles))
             # convert back to two lists
@@ -1372,21 +1409,26 @@ class Plot_Impz(QWidget):
                 labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
                 labels.append("$CGAIN$  = {0:.4g} {1}".format(cgain, unit_cgain))
 
-            self.ax_fft.legend(handles, labels, loc='best', fontsize='small',
+            self.ax_f1.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
+            
+            if self.ax_f_re_im and  self.plt_freq_enabled:
+                self.ax_f2.legend(loc='best', fontsize='small',
+                               fancybox=True, framealpha=0.7)
+                self.ax_f2.set_ylabel(H_F_str)
 
-            self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
-            self.ax_fft.set_ylabel(H_F_str)
-            #self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
-            self.ax_fft.set_xlim(F_range)
-            self.ax_fft.set_title("Spectrum of " + self.title_str)
+            self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax_f1.set_ylabel(H_F_str)
+            #self.ax_f1.set_xlim(fb.fil[0]['freqSpecsRange'])
+            self.ax_f1.set_xlim(F_range)
+            self.ax_f1.set_title("Spectrum of " + self.title_str)
 
             if self.ui.chk_log_freq.isChecked():
                 # scale second axis for noise power
                 corr = 10*np.log10(self.ui.N / self.ui.nenbw)
-                mn, mx = self.ax_fft.get_ylim()
-                self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
-                self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
+                mn, mx = self.ax_f1.get_ylim()
+                self.ax_f1_noise.set_ylim(mn+corr, mx+corr)
+                self.ax_f1_noise.set_ylabel(r'$P_N$ in dBW')
 
         self.redraw() # redraw currently active mplwidget
 
