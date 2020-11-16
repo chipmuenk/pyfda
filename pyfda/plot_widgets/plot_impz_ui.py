@@ -78,7 +78,7 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
-        self.stim_formula = "A1 * abs(sin(2 * pi * f1 * t))"
+        self.stim_formula = "A1 * abs(sin(2 * pi * f1 * n))"
 
         # frequency
         self.plt_freq_resp = "Line"

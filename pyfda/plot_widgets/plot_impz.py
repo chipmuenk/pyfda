@@ -399,7 +399,7 @@ class Plot_Impz(QWidget):
         (Re-)calculate stimulus `self.x`
         """
         self.n = np.arange(self.ui.N_end)
-        self.t = self.n / fb.fil[0]['f_S']
+        #self.t = self.n / fb.fil[0]['f_S']
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
 
@@ -492,7 +492,7 @@ class Plot_Impz(QWidget):
             param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
                           "f1":self.ui.f1, "f2":self.ui.f2,
                           "phi1":self.ui.phi1, "phi2":self.ui.phi2,
-                          "t":self.t, "n":self.n}
+                          "f_S":fb.fil[0]['f_S'], "n":self.n}
 
             self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
         else:
