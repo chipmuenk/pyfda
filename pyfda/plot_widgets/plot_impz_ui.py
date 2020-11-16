@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
-                      QHBoxLayout, QVBoxLayout, pyqtSignal, QEvent, Qt)
+                      QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal, QEvent, Qt)
 
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -365,7 +365,7 @@ class PlotImpz_UI(QWidget):
         if not self.chk_log_freq.isChecked():
             self.bottom_f = 0
 
-        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
+        self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
@@ -392,7 +392,7 @@ class PlotImpz_UI(QWidget):
         self.chk_Hf.setChecked(False)
         self.chk_Hf_lbl = QLabel(to_html("H_id (f)", frmt="bi"), self)
 
-        lbl_show_info_freq = QLabel(to_html("Infos", frmt='b'), self)
+        lbl_show_info_freq = QLabel(to_html("Info", frmt='b'), self)
         self.chk_show_info_freq = QCheckBox(self)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
         self.chk_show_info_freq.setToolTip("<span>Show infos about signal power "
@@ -481,15 +481,6 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.cmbChirpMethod)
 
-        layVlblCmbDC = QVBoxLayout()
-        layVlblCmbDC.addWidget(self.lblStimulus)
-        layVlblCmbDC.addWidget(self.lblDC)
-        #layVlblAmp.setAlignment(Qt.AlignTop)
-
-        layVCmbDC = QVBoxLayout()
-        layVCmbDC.addLayout(layHCmbStim)
-        layVCmbDC.addWidget(self.ledDC)
-
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -502,16 +493,6 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setText(str(self.A2))
         self.ledAmp2.setToolTip("Stimulus amplitude 2, complex values like 3j - 1 are allowed")
         self.ledAmp2.setObjectName("stimAmp2")
-
-        layVlblAmp = QVBoxLayout()
-        layVlblAmp.addWidget(self.lblAmp1)
-        layVlblAmp.addWidget(self.lblAmp2)
-        #layVlblAmp.setAlignment(Qt.AlignTop) # labels are aligned incorrectly
-
-        layVledAmp = QVBoxLayout()
-        layVledAmp.addWidget(self.ledAmp1)
-        layVledAmp.addWidget(self.ledAmp2)
-        #layVledAmp.setAlignment(Qt.AlignTop)
 
         #----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
@@ -528,18 +509,6 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
 
-        layVlblPhi = QVBoxLayout()
-        layVlblPhi.addWidget(self.lblPhi1)
-        layVlblPhi.addWidget(self.lblPhi2)
-
-        layVledPhi = QVBoxLayout()
-        layVledPhi.addWidget(self.ledPhi1)
-        layVledPhi.addWidget(self.ledPhi2)
-
-        layVlblPhU = QVBoxLayout()
-        layVlblPhU.addWidget(self.lblPhU1)
-        layVlblPhU.addWidget(self.lblPhU2)
-
         #----------------------------------------------
         self.lblFreq1 = QLabel(to_html("&nbsp;f_1", frmt='bi') + " =", self)
         self.ledFreq1 = QLineEdit(self)
@@ -554,20 +523,8 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
-        layVlblfreq = QVBoxLayout()
-        layVlblfreq.addWidget(self.lblFreq1)
-        layVlblfreq.addWidget(self.lblFreq2)
-
-        layVledfreq = QVBoxLayout()
-        layVledfreq.addWidget(self.ledFreq1)
-        layVledfreq.addWidget(self.ledFreq2)
-
-        layVlblfreqU = QVBoxLayout()
-        layVlblfreqU.addWidget(self.lblFreqUnit1)
-        layVlblfreqU.addWidget(self.lblFreqUnit2)
-
+        
         #----------------------------------------------
-
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
@@ -579,14 +536,44 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
+        
+        layGStim = QGridLayout()
+        
+        layGStim.addWidget(self.lblStimulus, 0, 0)
+        layGStim.addWidget(self.lblDC, 1, 0)
 
-        layVlblNoi = QVBoxLayout()
-        layVlblNoi.addWidget(self.lblNoise)
-        layVlblNoi.addWidget(self.lblNoi)
+        layGStim.addLayout(layHCmbStim, 0, 1)
+        layGStim.addWidget(self.ledDC,  1, 1)
 
-        layVcmbledNoi = QVBoxLayout()
-        layVcmbledNoi.addWidget(self.cmbNoise)
-        layVcmbledNoi.addWidget(self.ledNoi)
+        layGStim.addWidget(self.lblAmp1, 0, 2)
+        layGStim.addWidget(self.lblAmp2, 1, 2)
+
+        layGStim.addWidget(self.ledAmp1, 0, 3)
+        layGStim.addWidget(self.ledAmp2, 1, 3)
+        
+        layGStim.addWidget(self.lblPhi1, 0, 4)
+        layGStim.addWidget(self.lblPhi2, 1, 4)
+
+        layGStim.addWidget(self.ledPhi1, 0, 5)
+        layGStim.addWidget(self.ledPhi2, 1, 5)
+
+        layGStim.addWidget(self.lblPhU1, 0, 6)
+        layGStim.addWidget(self.lblPhU2, 1, 6)
+
+        layGStim.addWidget(self.lblFreq1, 0, 7)
+        layGStim.addWidget(self.lblFreq2, 1, 7)
+
+        layGStim.addWidget(self.ledFreq1, 0, 8)
+        layGStim.addWidget(self.ledFreq2, 1, 8)
+
+        layGStim.addWidget(self.lblFreqUnit1, 0, 9)
+        layGStim.addWidget(self.lblFreqUnit2, 1, 9)
+        
+        layGStim.addWidget(self.lblNoise, 0, 10)
+        layGStim.addWidget(self.lblNoi, 1, 10)
+
+        layGStim.addWidget(self.cmbNoise, 0, 11)
+        layGStim.addWidget(self.ledNoi, 1, 11)
 
         #----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
@@ -604,22 +591,7 @@ class PlotImpz_UI(QWidget):
         #layG_ctrl_stim = QGridLayout()
         layH_ctrl_stim_par = QHBoxLayout()
 
-        layH_ctrl_stim_par.addLayout(layVlblCmbDC)
-        layH_ctrl_stim_par.addLayout(layVCmbDC)
-        layH_ctrl_stim_par.addStretch(1)
-        layH_ctrl_stim_par.addLayout(layVlblAmp)
-        layH_ctrl_stim_par.addLayout(layVledAmp)
-        layH_ctrl_stim_par.addLayout(layVlblPhi)
-        layH_ctrl_stim_par.addLayout(layVledPhi)
-        layH_ctrl_stim_par.addLayout(layVlblPhU)
-        layH_ctrl_stim_par.addStretch(1)
-        layH_ctrl_stim_par.addLayout(layVlblfreq)
-        layH_ctrl_stim_par.addLayout(layVledfreq)
-        layH_ctrl_stim_par.addLayout(layVlblfreqU)
-        layH_ctrl_stim_par.addStretch(1)
-        layH_ctrl_stim_par.addLayout(layVlblNoi)
-        layH_ctrl_stim_par.addLayout(layVcmbledNoi)
-        layH_ctrl_stim_par.addStretch(10)
+        layH_ctrl_stim_par.addLayout(layGStim)
 
         layV_ctrl_stim = QVBoxLayout()
         layV_ctrl_stim.addLayout(layH_ctrl_stim_par)
@@ -630,7 +602,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addStretch(1)
         layH_ctrl_stim.addLayout(layV_ctrl_stim)
         layH_ctrl_stim.addStretch(10)
-
 
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
