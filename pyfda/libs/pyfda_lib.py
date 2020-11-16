@@ -548,11 +548,11 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
             if ex_num is not None:
 
                 if return_type == 'cmplx':
-                    result = ex_num
+                    result = ex_num.item()
                 elif return_type == '' or return_type =='auto':
                     result = np.real_if_close(ex_num).item()
                 else: # return_type == 'float' or 'int'
-                    result = ex_num.real
+                    result = ex_num.real.item()
 
                 if sign in {'pos', 'poszero'}:
                     result = np.abs(result)
