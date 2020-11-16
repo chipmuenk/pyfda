@@ -186,11 +186,11 @@ class FreqUnits(QWidget):
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
             
-            if fb.fil[0]['freq_specs_unit'] == "kHz":
+            if f_unit == "kHz":
                 f_S_scale = 1.e3
-            elif fb.fil[0]['freq_specs_unit'] == "MHz":
+            elif f_unit == "MHz":
                 f_S_scale = 1.e6
-            elif fb.fil[0]['freq_specs_unit'] == "GHz":
+            elif f_unit == "GHz":
                 f_S_scale = 1.e9
             else:
                 logger.warning("Unknown frequency unit {0}".format(f_unit))
