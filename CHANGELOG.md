@@ -1,12 +1,21 @@
 ## Changelog
 
-### [v0.4.1](https://github.com/chipmuenk/pyfda/tree/v0.4.1) (2020-xx-yy)
+### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 
 ### New features
 
 - Add spectrogram view in the time tab of the transient response widget
 
-- Grid mode can now be cycled through off / coarse (former grid mode) / fine (with minor grid)
+- Minor grid lines have been added, grid mode can be cycled through off / coarse (former grid mode) / fine (with minor grid)
+
+- Add links to corresponding documentation page on ReadTheDocs for plot widgets. Doc pages need
+  to be updated though ...
+  
+- Overhaul plotting of spectra in the y[n] tab
+
+- Clean up of the UI of the y[n] tab
+
+- Real and imaginary parts of spectra in the y[n] tab now can be plotted
 
 ### Bug fixes
 
@@ -24,6 +33,8 @@
 - Allow for complex amplitudes in the impz UI (ID 8664401933c7b8e5e3137a1d255d0b6f2494450f)
   
 - Fix missing taskbar icon under Windows (ID: fe60993a1c1e6ae9c2b6f2b9433ee8e94e55c7d5)
+
+- Lots of small fixes
 
 ### [v0.4.0](https://github.com/chipmuenk/pyfda/tree/v0.4.0) (2020-10-19)
 
