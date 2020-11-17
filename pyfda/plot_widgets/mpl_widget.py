@@ -367,8 +367,6 @@ class MplToolbar(NavigationToolbar):
         #---------------------------------------------
         self.a_gr = self.addAction(QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
         self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
-        self.a_gr.setCheckable(True)
-        self.a_gr.setChecked(True)
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
 
         #---------------------------------------------
@@ -522,17 +520,15 @@ class MplToolbar(NavigationToolbar):
             else:
                 if self.a_gr_state == 0:
                     ax.grid(False, which='both')
-                    self.a_gr.setChecked(False)
-                    self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))
+
+                    self.a_gr.setIcon(QIcon(':/grid_none.svg'))
                 elif self.a_gr_state == 1:
                     ax.grid(True, which='major', lw=0.75, ls='-')
                     ax.grid(False, which='minor')
-                    self.a_gr.setChecked(True)
                     self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))
                 else:
                     ax.grid(True, which='major', lw=0.75, ls='-')
                     ax.grid(True, which='minor')
-                    self.a_gr.setChecked(True)
                     self.a_gr.setIcon(QIcon(':/grid_fine.svg'))
 
         if cycle:
