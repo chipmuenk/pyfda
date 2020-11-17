@@ -15,9 +15,10 @@
     <file alias="file.svg">images/icons/dark/file.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
-    <file alias="grid_fine.svg">images/icons/dark/grid-four-up.svg</file>
-    <file alias="grid_coarse.svg">images/icons/dark/grid-three-up.svg</file>
-    <file alias="help.svg">images/icons/dark/question-mark.svg</file>
+    <file alias="grid_none.svg">images/icons/grid_none.svg</file>
+    <file alias="grid_fine.svg">images/icons/grid_fine.svg</file>
+    <file alias="grid_coarse.svg">images/icons/grid_coarse.svg</file>
+    <file alias="help.svg">images/icons/help.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
