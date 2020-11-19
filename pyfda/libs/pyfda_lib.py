@@ -463,7 +463,7 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
         fallback_shape = np.shape(fallback)
 
     try:
-        np_expr = numexpr.evaluate(expr, local_dict=local_dict)
+        np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
         logger.warning("Syntax error:\n\t{0}".format(e))
     except KeyError as e:

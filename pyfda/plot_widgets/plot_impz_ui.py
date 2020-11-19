@@ -847,7 +847,8 @@ class PlotImpz_UI(QWidget):
 
     def _update_stim_formula(self):
         """Update string with formula to be evaluated by numexpr"""
-        self.stim_formula = self.ledStimFormula.text()
+        self.stim_formula = self.ledStimFormula.text().strip()
+        self.ledStimFormula.setText(str(self.stim_formula))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
 
     # -------------------------------------------------------------------------
