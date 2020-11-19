@@ -186,7 +186,9 @@ class FreqUnits(QWidget):
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
             
-            if f_unit == "kHz":
+            if f_unit == "Hz":
+                f_S_scale = 1.
+            elif f_unit == "kHz":
                 f_S_scale = 1.e3
             elif f_unit == "MHz":
                 f_S_scale = 1.e6
