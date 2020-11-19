@@ -1,8 +1,9 @@
-#include pyfda/fixpoint_widgets/*.png
-#include pyfda/libs/pyfda_*.conf
-recursive-include pyfda/ *
+include pyfda/fixpoint_widgets/*.png
+include pyfda/libs/pyfda_*.conf
+recursive-include pyfda *.md pyfda_icon.*
 include *.md
 include requirements.txt
+include pyfdax.spec
 
 # exclude byte-code files and github readme
 exclude README.md
