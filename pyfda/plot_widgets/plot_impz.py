@@ -1226,10 +1226,16 @@ class Plot_Impz(QWidget):
             F_range = fb.fil[0]['freqSpecsRange']
 
             if fb.fil[0]['freq_specs_unit'] == 'k':
-                # scale frequency axes to fit the number of frequency points self.ui.N
-                F_range = [i * self.ui.N / fb.fil[0]['f_max'] for i in F_range]
-                F *= self.ui.N / fb.fil[0]['f_max']
-                F_id *= self.ui.N / fb.fil[0]['f_max']
+                # By default, k = params['N_FFT'] which is used for the calculation
+                # of the non-transient tabs and for F_id / H_id here. 
+                # Here, the frequency axes must be scaled to fit the number of 
+                # frequency points self.ui.N
+                k_scale = self.ui.N / fb.fil[0]['f_max']
+                F_id *= k_scale
+                F_range = [f * k_scale for f in F_range]
+                f_max = self.ui.N
+            else:
+                f_max = fb.fil[0]['f_max']
                 
         #-----------------------------------------------------------------
         # Scale frequency response and calculate power
@@ -1273,7 +1279,7 @@ class Plot_Impz(QWidget):
         # Set frequency range
         #-----------------------------------------------------------------
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            # shift X, Y and F by f_S/2
+            # display -f_S/2 ... f_S/2 ->  shift X, Y and F using fftshift()
                 if plt_response:
                     Y = np.fft.fftshift(Y)
                     
@@ -1285,13 +1291,13 @@ class Plot_Impz(QWidget):
 
                 F    = np.fft.fftshift(F)
                 # shift H_id and F_id by f_S/2
+                F_id -= fb.fil[0]['f_S']/2.
                 H_id = np.fft.fftshift(H_id)
                 if not freq_resp:
                     H_id /= 2
-                F_id -= fb.fil[0]['f_S']/2.
 
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-                # only use the first half of X, Y and F
+                # display 0 ... f_S/2 -> only use the first half of X, Y and F 
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
@@ -1304,11 +1310,10 @@ class Plot_Impz(QWidget):
                 H_id = H_id[0:params['N_FFT']//2]
 
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
-                # plot for F = 0 ... 1
-                F    = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+                # display 0 ... f_S -> shift frequency axis
+                F    = np.fft.fftshift(F) + f_max/2.
                 if not freq_resp:
                     H_id /= 2
-
         #-----------------------------------------------------------------
         # Calculate log FFT and power if selected, set units
         #-----------------------------------------------------------------
