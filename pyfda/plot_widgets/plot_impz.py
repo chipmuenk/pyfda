@@ -480,14 +480,10 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
                 * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'AM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1) \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
-        elif self.ui.stim == "PM":
+        elif self.ui.stim == "PM / FM":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2))
-            self.title_str += r'PM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
-        elif self.ui.stim == "FM":
-            self.x = self.ui.A1 * np.sin(phi1 + 2*pi * self.n\
-                        * (self.ui.f1 + self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)))
-            self.title_str += r'FM Signal $A_1 \sin\left(2 \pi n (f_1 + A_2 \sin(2 \pi f_2 n + \varphi_2)) + \varphi_1\right)$'
+            self.title_str += r'PM / FM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
         elif self.ui.stim == "Formula":
             param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
                           "f1":self.ui.f1, "f2":self.ui.f2,
