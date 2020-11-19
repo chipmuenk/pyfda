@@ -1222,7 +1222,7 @@ class Plot_Impz(QWidget):
 
             # frequency vector for FFT-based frequency plots
 
-            F = np.fft.fftfreq(self.ui.N, d=1. / fb.fil[0]['f_max'])
+
             F_range = fb.fil[0]['freqSpecsRange']
 
             if fb.fil[0]['freq_specs_unit'] == 'k':
@@ -1233,10 +1233,12 @@ class Plot_Impz(QWidget):
                 k_scale = self.ui.N / fb.fil[0]['f_max']
                 F_id *= k_scale
                 F_range = [f * k_scale for f in F_range]
+                #
                 f_max = self.ui.N
             else:
                 f_max = fb.fil[0]['f_max']
-                
+ 
+            F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
         #-----------------------------------------------------------------
         # Scale frequency response and calculate power
         #-----------------------------------------------------------------
