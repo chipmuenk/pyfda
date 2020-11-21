@@ -125,7 +125,7 @@ class Tree_Builder(object):
     Read the config file and construct dictionary trees with
 
     - all filter combinations
-    - valid combinations of filter designs and fixpoint implementations
+    - valid combinations of filter widgets and fixpoint implementations
 
 
     """
@@ -134,7 +134,8 @@ class Tree_Builder(object):
 
         logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
 
-        self.REQ_VERSION = 3 # required version for config file
+        self.REQ_VERSION = 4 # required version for config file
+        self.parse_conf_file()
         self.init_filters()
 
 #==============================================================================
@@ -171,7 +172,7 @@ class Tree_Builder(object):
 
         """
 
-        self.parse_conf_file()
+        #self.parse_conf_file()
 
         fil_tree = {}
 
@@ -221,8 +222,8 @@ class Tree_Builder(object):
         :[Plot Widgets]:
             Store (user) plot widgets in `fb.plot_dict`
 
-        :[Filter Designs]:
-            Store (user) filter designs in `fb.filter_dict`
+        :[Filter Widgets]:
+            Store (user) filter widgets in `fb.filter_dict`
 
         :[Fixpoint Widgets]:
             Store (user) fixpoint widgets in `fb.fixpoint_dict`
@@ -330,9 +331,9 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
             # -----------------------------------------------------------------
-            # Parsing [Filter Designs]
+            # Parsing [Filter Widgets]
             #------------------------------------------------------------------
-            fb.filter_classes = self.build_class_dict("Filter Designs", "filter_designs")
+            fb.filter_classes = self.build_class_dict("Filter Widgets", "filter_widgets")
             # currently, option "opt" can only be an association with a fixpoint
             # widget, so replace key "opt" by key "fix":
             # Convert to list in any case
@@ -346,7 +347,7 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
 
-            # First check whether fixpoint options of the filter designs are
+            # First check whether fixpoint options of the filter widgets are
             # valid fixpoint classes by comparing them to the verified items of
             # fb.fixpoint_classes:
             for c in fb.filter_classes:
