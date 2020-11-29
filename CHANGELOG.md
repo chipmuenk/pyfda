@@ -2,6 +2,16 @@
 
 ### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 
+### Bug fixes
+
+- Stimulus FM modulation had a false definition. For sinusoidal modulation, it
+  is identical to PM modulation. FM modulation is deleted, PM modulation is renamed
+  to "PM / FM".
+  
+- Various scaling errors for new frequency specification "k" have been fixed
+
+### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
+
 ### New features
 
 - Add spectrogram view in the time tab of the transient response widget
