@@ -216,7 +216,7 @@ class FreqUnits(QWidget):
         fb.fil[0].update({"plt_fUnit":plt_f_unit}) # frequency unit as string
         fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
 
-        self._freq_range() # update f_lim setting and emit sigUnitChanged signal
+        self._freq_range() # update f_lim setting and emit viewChanged signal
 
 #------------------------------------------------------------------------------
 

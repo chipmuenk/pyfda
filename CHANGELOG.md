@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
+### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-xx)
 
 ### Bug fixes
 
@@ -10,29 +10,32 @@
   
 - Various scaling errors for new frequency specification "k" have been fixed
 
-- Correct calculation of single-sided spectra and 
+- Fixed wrong time scaling for frequency unit "f_Ny"
+
+- Corrected calculation of single-sided spectra and 
   
 ### New features
 
-- Add stimulus "sinc"
+- Added stimulus "sinc"
 
-- Add indicator for complex valued time signals, single-sided spectra may be wrong
+- Added indicator for complex valued time signals, display of single-sided
+  spectra may be wrong
 
 
 ### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 
 ### New features
 
-- Add spectrogram view in the time tab of the transient response widget
+- Added spectrogram view in the time tab of the transient response widget
 
 - Minor grid lines have been added, grid mode can be cycled through off / coarse (former grid mode) / fine (with minor grid)
 
-- Add links to corresponding documentation page on ReadTheDocs for plot widgets. Doc pages need
+- Added links to corresponding documentation page on ReadTheDocs for plot widgets. Doc pages need
   to be updated though ...
   
-- Overhaul plotting of spectra in the y[n] tab
+- Overhauled plotting of spectra in the y[n] tab
 
-- Clean up of the UI of the y[n] tab
+- Cleaned up the UI of the y[n] tab
 
 - Real and imaginary parts of spectra in the y[n] tab now can be plotted
 
