@@ -169,12 +169,15 @@ class FreqUnits(QWidget):
 
             if f_unit == "f_S": # normalized to f_S
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
+                fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
             elif f_unit == "f_Ny":   # idx == 1: normalized to f_nyq = f_S / 2
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
+                fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
             else:
-                fb.fil[0]['f_S'] = 1
+                fb.fil[0]['f_S'] = 1.
+                fb.fil[0]['T_S'] = 1.
                 fb.fil[0]['f_max'] = params['N_FFT']
                 f_label = r"$k \; \rightarrow$"               
             t_label = r"$n \; \rightarrow$"
@@ -182,8 +185,10 @@ class FreqUnits(QWidget):
             self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else: # Hz, kHz, ...
+            # Restore sampling frequency when returning from f_S / f_Ny / k
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}: # previous setting
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
+                fb.fil[0]['T_S'] = 1./self.fs_old
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
             
             if f_unit == "Hz":
@@ -237,6 +242,7 @@ class FreqUnits(QWidget):
             """
             if self.spec_edited:
                 fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')})
+                fb.fil[0].update({'T_S':1./fb.fil[0]['f_S']})
                 # TODO: ?!
                 self._freq_range(emit_sig_range = False) # update plotting range 
                 self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
