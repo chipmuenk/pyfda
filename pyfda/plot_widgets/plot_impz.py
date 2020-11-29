@@ -18,6 +18,7 @@ from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 import numpy as np
 from numpy import pi
 import scipy.signal as sig
+from scipy.special import sinc
 import matplotlib.patches as mpl_patches
 from matplotlib.ticker import AutoMinorLocator
 
@@ -442,6 +443,12 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Sinusoidal Signal '
+            self.stim_wdg = ["Amp1", "Amp2", "Phi1","Phi2", "Freq1", "Freq2"]
+
+        elif self.ui.stim == "Sinc":
+            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2) * self.ui.f1 + phi1) +\
+                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2) * self.ui.f2 + phi2)
+            self.title_str += r'Sinc Signal '
 
         elif self.ui.stim == "Chirp":
             self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,
