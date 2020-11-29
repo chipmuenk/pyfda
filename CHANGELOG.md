@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
+### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 
 ### Bug fixes
 
@@ -9,6 +9,15 @@
   to "PM / FM".
   
 - Various scaling errors for new frequency specification "k" have been fixed
+
+- Correct calculation of single-sided spectra and 
+  
+### New features
+
+- Add stimulus "sinc"
+
+- Add indicator for complex valued time signals, single-sided spectra may be wrong
+
 
 ### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 

@@ -580,6 +580,7 @@ class Plot_Impz(QWidget):
 
         # Calculate imag. and real components from response
         self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
+        self.ui.but_stim_cmplx_warn.setVisible(self.cmplx)
 #------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
