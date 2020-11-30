@@ -144,7 +144,7 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
-        
+
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
         self.lbl_stim_cmplx_warn.setToolTip('<span>Signal is complex valued, '
@@ -375,7 +375,7 @@ class PlotImpz_UI(QWidget):
 
         if not self.chk_log_freq.isChecked():
             self.bottom_f = 0
-            
+
         lbl_re_im_freq = QLabel(to_html("Re / Im", frmt='b'), self)
         self.chk_re_im_freq = QCheckBox(self)
         self.chk_re_im_freq.setObjectName("chk_re_im_freq")
@@ -543,7 +543,7 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
-        
+
         #----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
@@ -556,9 +556,9 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
-        
+
         layGStim = QGridLayout()
-        
+
         layGStim.addWidget(self.lblStimulus, 0, 0)
         layGStim.addWidget(self.lblDC, 1, 0)
 
@@ -570,7 +570,7 @@ class PlotImpz_UI(QWidget):
 
         layGStim.addWidget(self.ledAmp1, 0, 3)
         layGStim.addWidget(self.ledAmp2, 1, 3)
-        
+
         layGStim.addWidget(self.lblPhi1, 0, 4)
         layGStim.addWidget(self.lblPhi2, 1, 4)
 
@@ -588,7 +588,7 @@ class PlotImpz_UI(QWidget):
 
         layGStim.addWidget(self.lblFreqUnit1, 0, 9)
         layGStim.addWidget(self.lblFreqUnit2, 1, 9)
-        
+
         layGStim.addWidget(self.lblNoise, 0, 10)
         layGStim.addWidget(self.lblNoi, 1, 10)
 
@@ -774,6 +774,9 @@ class PlotImpz_UI(QWidget):
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
+        The value for f_scale (which is equal to f_S except when the frequency
+        unit is k) is updated in the draw() routine of plot_impz.py
+
         load_fs() is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
@@ -782,7 +785,11 @@ class PlotImpz_UI(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        self.f_scale = fb.fil[0]['f_S']
+        if fb.fil[0]['freq_specs_unit'] == 'k':
+            self.f_scale = self.N
+        else:
+            self.f_scale = fb.fil[0]['f_S']
+
         if self.ledFreq1.hasFocus():
             # widget has focus, show full precision
             self.ledFreq1.setText(str(self.f1 * self.f_scale))
