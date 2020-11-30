@@ -664,11 +664,19 @@ class Plot_Impz(QWidget):
             logger.error("Response should have been calculated by now!")
             return
 
-        f_unit = fb.fil[0]['plt_fUnit']
+        if fb.fil[0]['freq_specs_unit'] == 'k':
+            f_unit = ''
+            self.ui.lblFreq1.setText(self.ui.txtFreq1_k)
+            self.ui.lblFreq2.setText(self.ui.txtFreq2_k)
+        else:
+            f_unit = fb.fil[0]['plt_fUnit']
+            self.ui.lblFreq1.setText(self.ui.txtFreq1_f)
+            self.ui.lblFreq2.setText(self.ui.txtFreq2_f)
+
         if f_unit in {"f_S", "f_Ny"}:
             unit_frmt = "i" # italic
         else:
-            unit_frmt = None
+            unit_frmt = None # don't print units like kHz in italic
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.t = self.n * fb.fil[0]['T_S']

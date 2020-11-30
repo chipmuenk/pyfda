@@ -530,14 +530,18 @@ class PlotImpz_UI(QWidget):
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
 
         #----------------------------------------------
-        self.lblFreq1 = QLabel(to_html("&nbsp;f_1", frmt='bi') + " =", self)
+        self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
+        self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
+        self.lblFreq1 = QLabel(self.txtFreq1_f, self)
         self.ledFreq1 = QLineEdit(self)
         self.ledFreq1.setText(str(self.f1))
         self.ledFreq1.setToolTip("Stimulus frequency 1")
         self.ledFreq1.setObjectName("stimFreq1")
         self.lblFreqUnit1 = QLabel("f_S", self)
 
-        self.lblFreq2 = QLabel(to_html("&nbsp;f_2", frmt='bi') + " =", self)
+        self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
+        self.txtFreq2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
+        self.lblFreq2 = QLabel(self.txtFreq2_f, self)
         self.ledFreq2 = QLineEdit(self)
         self.ledFreq2.setText(str(self.f2))
         self.ledFreq2.setToolTip("Stimulus frequency 2")
