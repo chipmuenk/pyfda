@@ -548,7 +548,8 @@ class Plot_Impz(QWidget):
         (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and 
         the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
 
-        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x` are complex.
+        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x` 
+        are complex and make warning field visible.
         """
 
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -580,7 +581,7 @@ class Plot_Impz(QWidget):
 
         # Calculate imag. and real components from response
         self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
-        self.ui.but_stim_cmplx_warn.setVisible(self.cmplx)
+        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 #------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """

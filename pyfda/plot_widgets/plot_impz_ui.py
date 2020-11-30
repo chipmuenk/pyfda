@@ -142,14 +142,13 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.chk_stim_options.setChecked(True)
-
-        self.but_stim_cmplx_warn = QPushButton(self)
-        self.but_stim_cmplx_warn.setText("COMPLEX!")
-        self.but_stim_cmplx_warn.setToolTip('<span>Signal is complex valued, '
-                                    'single-sided spectrum may be wrong.</span>')
-        self.but_stim_cmplx_warn.setCheckable(False)
-        qstyle_widget(self.but_stim_cmplx_warn, "changed")
-
+        
+        self.lbl_stim_cmplx_warn = QLabel(self)
+        self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
+        self.lbl_stim_cmplx_warn.setToolTip('<span>Signal is complex valued, '
+                                    'single-sided and H<sub>id</sub> spectra may be wrong.</span>')
+        self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
+                                               "border : 1px solid grey")
 
         self.but_fft_win = QPushButton(self)
         self.but_fft_win.setText("WIN FFT")
@@ -173,7 +172,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(lbl_stim_options)
         layH_ctrl_run.addWidget(self.chk_stim_options)
         layH_ctrl_run.addStretch(2)
-        layH_ctrl_run.addWidget(self.but_stim_cmplx_warn)
+        layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.but_fft_win)
         layH_ctrl_run.addStretch(10)

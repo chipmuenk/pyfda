@@ -12,14 +12,14 @@
 
 - Fixed wrong time scaling for frequency unit "f_Ny"
 
-- Corrected calculation of single-sided spectra and 
+- Corrected calculation and display of single-sided spectra and H_id
   
 ### New features
 
 - Added stimulus "sinc"
 
 - Added indicator for complex valued time signals, display of single-sided
-  spectra may be wrong
+  and H_id spectra may be wrong
 
 
 ### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
