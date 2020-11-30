@@ -382,7 +382,7 @@ class Plot_Impz(QWidget):
         self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
-        
+
         if self.fx_sim:
             qadd_item_cmb_box(self.ui.cmb_plt_time_spgr, "x_q[n]")
         else:
@@ -533,7 +533,7 @@ class Plot_Impz(QWidget):
             self.q_i.setQobj({'frmt':'dec'})    # always use integer decimal format
             if np.any(np.iscomplex(self.x)):
                 logger.warning("Complex stimulus: Only its real part will be processed by the fixpoint filter!")
-            
+
             self.x_q = self.q_i.fixp(self.x.real)
 
             self.sig_tx.emit({'sender':__name__, 'fx_sim':'send_stimulus',
@@ -545,10 +545,10 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_response(self):
         """
-        (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and 
+        (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and
         the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
 
-        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x` 
+        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x`
         are complex and make warning field visible.
         """
 
@@ -677,6 +677,7 @@ class Plot_Impz(QWidget):
             unit_frmt = "i" # italic
         else:
             unit_frmt = None # don't print units like kHz in italic
+
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.t = self.n * fb.fil[0]['T_S']
@@ -728,12 +729,12 @@ class Plot_Impz(QWidget):
         self.ui.ovlp_spgr_time = safe_eval(self.ui.led_ovlp_spgr_time.text(),
                                          self.ui.ovlp_spgr_time, return_type='int', sign='poszero')
         self.ui.led_ovlp_spgr_time.setText(str(self.ui.ovlp_spgr_time))
-        
+
         if self.ui.nfft_spgr_time <= self.ui.ovlp_spgr_time:
             logger.warning("N_OVLP must be less than N_FFT!")
 
         self.draw()
-        
+
 #------------------------------------------------------------------------------
     def _spgr_cmb(self):
         """
@@ -742,7 +743,7 @@ class Plot_Impz(QWidget):
         spgr_en = self.ui.cmb_plt_time_spgr.currentText() != "None"
 
         self.ui.lbl_log_spgr_time.setVisible(spgr_en)
-        self.ui.chk_log_spgr_time.setVisible(spgr_en)   
+        self.ui.chk_log_spgr_time.setVisible(spgr_en)
         self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
         self.ui.led_nfft_spgr_time.setVisible(spgr_en)
         self.ui.lbl_ovlp_spgr_time.setVisible(spgr_en)
@@ -857,7 +858,7 @@ class Plot_Impz(QWidget):
 
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower().replace("*", "")
         self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False)
-    
+
         self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr, data=False).lower()
         self.spgr = self.plt_time_spgr != "none"
 
@@ -869,11 +870,11 @@ class Plot_Impz(QWidget):
 
         if self.plt_time:
             num_subplots = 1 + self.cmplx + self.spgr
-            
+
             # return a one-dimensional list with num_subplots axes
             self.axes_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
                                                sharex=True, squeeze = False)[:,0]
-            
+
             self.ax_r = self.axes_time[0]
             self.ax_r.cla()
 
@@ -881,18 +882,18 @@ class Plot_Impz(QWidget):
                 self.ax_i = self.axes_time[1]
                 self.ax_i.cla()
                 self.mplwidget_t.fig.align_ylabels()
-            
+
             if self.spgr:
                 self.ax_s = self.axes_time[-1] # assign last axis
 
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
-                
+
             for ax in self.axes_time:
                 ax.xaxis.tick_bottom() # remove axis ticks on top
                 ax.yaxis.tick_left() # remove axis ticks right
                 ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
-                ax.yaxis.set_minor_locator(AutoMinorLocator())               
+                ax.yaxis.set_minor_locator(AutoMinorLocator())
 
 #------------------------------------------------------------------------------
     def draw_time(self):
@@ -926,10 +927,10 @@ class Plot_Impz(QWidget):
             logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
-            
+
         x = self.x * self.scale_i
         y = self.y * self.scale_o
-        
+
         if self.cmplx:
             x_r = x.real
             x_i = x.imag
@@ -1050,7 +1051,7 @@ class Plot_Impz(QWidget):
                 sides = 'onesided'
             else:
                 sides = 'twosided'
-                
+
             # ------- Unit / Mode ----------------------
             mode = qget_cmb_box(self.ui.cmb_mode_spgr_time, data=True)
             self.ui.lbl_byfs_spgr_time.setVisible(mode=='psd')
@@ -1068,13 +1069,13 @@ class Plot_Impz(QWidget):
                     spgr_unit = r" in {0}W / Hz".format(dB_unit)
                 else:
                     spgr_unit = r" in {0}W".format(dB_unit)
-                
+
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
                 spgr_symb = "${0}$".format(sig_lbl)
                 spgr_unit = r"| in {0}V".format(dB_unit)
-                
+
             elif mode in {"angle", "phase"}:
                 spgr_unit = r" in rad"
                 spgr_symb = "${0}$".format(sig_lbl)
@@ -1098,9 +1099,9 @@ class Plot_Impz(QWidget):
 
             t_range = (self.t[self.ui.N_start], self.t[-1])
             # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
-            
+
 # =============================================================================
-#             f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'], 
+#             f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'],
 #                                         nperseg=None, noverlap=None, nfft=None,
 #                                         return_onesided = fb.fil[0]['freqSpecsRangeType'] == 'half',
 #                                         scaling='density',mode='psd')
@@ -1117,14 +1118,14 @@ class Plot_Impz(QWidget):
             # xextent: image extent along x-axis; None or (xmin, xmax)
             # scale_by_freq: True scales power spectral density by f_S
 
-#            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f), 
+#            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
 #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
             #self.ax_s.colorbar(col_mesh)
 
             cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.005)
             cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])        
+            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
 
         # --------------- 3D Complex  -----------------------------------------
         if self.ACTIVE_3D: # not implemented / tested yet
@@ -1141,7 +1142,7 @@ class Plot_Impz(QWidget):
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
 
-        # --------------- Title and common labels ----------------------------        
+        # --------------- Title and common labels ----------------------------
         self.axes_time[-1].set_xlabel(fb.fil[0]['plt_tLabel'])
         self.axes_time[0].set_title(self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start], self.t[self.ui.N_end-1]])
@@ -1177,13 +1178,13 @@ class Plot_Impz(QWidget):
 
         #if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
         #    self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
-        
+
         self.mplwidget_f.fig.clf() # clear figure with axes
 
         en_re_im_f = self.ui.chk_re_im_freq.isChecked()
 
         num_subplots_f = 1 + en_re_im_f
-        
+
         self.axes_f = self.mplwidget_f.fig.subplots(nrows=num_subplots_f, ncols=1,
                                                sharex=True, squeeze = False)[:,0]
         self.ax_f1 = self.axes_f[0]
@@ -1200,7 +1201,7 @@ class Plot_Impz(QWidget):
         self.ax_f1.yaxis.tick_left() # remove axis ticks right
         self.ax_f1.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax_f1.yaxis.set_minor_locator(AutoMinorLocator())
-        
+
         if en_re_im_f:
             self.ax_f2 = self.axes_f[1]
             self.ax_f2.xaxis.tick_bottom() # remove axis ticks on top
@@ -1239,8 +1240,8 @@ class Plot_Impz(QWidget):
 
             if fb.fil[0]['freq_specs_unit'] == 'k':
                 # By default, k = params['N_FFT'] which is used for the calculation
-                # of the non-transient tabs and for F_id / H_id here. 
-                # Here, the frequency axes must be scaled to fit the number of 
+                # of the non-transient tabs and for F_id / H_id here.
+                # Here, the frequency axes must be scaled to fit the number of
                 # frequency points self.ui.N
                 F_range = [f * self.ui.N / fb.fil[0]['f_max'] for f in F_range]
                 f_max = self.ui.N
@@ -1269,7 +1270,7 @@ class Plot_Impz(QWidget):
 
             if plt_stimulus:
                 # scale display of frequency response
-                Px = np.sum(np.square(np.abs(self.X))) * scale_impz / self.ui.nenbw  
+                Px = np.sum(np.square(np.abs(self.X))) * scale_impz / self.ui.nenbw
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     X = calc_ssb_spectrum(self.X) * self.scale_i * scale_impz
                 else:
@@ -1296,7 +1297,7 @@ class Plot_Impz(QWidget):
             # display -f_S/2 ... f_S/2 ->  shift X, Y and F using fftshift()
                 if plt_response:
                     Y = np.fft.fftshift(Y)
-                    
+
                 if plt_stimulus:
                     X = np.fft.fftshift(X)
 
@@ -1312,7 +1313,7 @@ class Plot_Impz(QWidget):
                     H_id /= 2
 
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-                # display 0 ... f_S/2 -> only use the first half of X, Y and F 
+                # display 0 ... f_S/2 -> only use the first half of X, Y and F
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
@@ -1350,8 +1351,8 @@ class Plot_Impz(QWidget):
                         X_r = np.maximum(20 * np.log10(np.abs(X.real)), self.ui.bottom_f)
                         X_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
                     else:
-                        X_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)                        
- 
+                        X_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)
+
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
                     if en_re_im_f:
@@ -1359,7 +1360,7 @@ class Plot_Impz(QWidget):
                         X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)), self.ui.bottom_f)
                     else:
                         X_q_r = np.maximum(20 * np.log10(np.abs(X_q)), self.ui.bottom_f)
-                        
+
                 if plt_response:
                     Py = 10*np.log10(Py)
                     if en_re_im_f:
@@ -1389,7 +1390,7 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     if en_re_im_f:
                         X_q_r = X_q.real
-                        X_q_i = X_q.imag                        
+                        X_q_i = X_q.imag
                     else:
                         X_q_r = np.abs(X_q)
 
@@ -1414,7 +1415,7 @@ class Plot_Impz(QWidget):
                 unit_cgain = ""
                 nenbw = self.ui.nenbw
                 cgain = self.ui.cgain
-            
+
             if en_re_im_f:
                 H_Fi_str = r'$\Im\{$' + H_F_str + r'$\}$'
                 H_Fr_str = r'$\Re\{$' + H_F_str + r'$\}$'
@@ -1426,7 +1427,7 @@ class Plot_Impz(QWidget):
 
             H_Fi_str = H_F_pre + H_Fi_str + H_F_post + unit
             H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit
-          
+
             # -----------------------------------------------------------------
             # --------------- Plot stimulus and response ----------------------
             #------------------------------------------------------------------
@@ -1481,9 +1482,9 @@ class Plot_Impz(QWidget):
                 if en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
-                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)            
+                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
                 self.ax_f1.plot(F_id, H_id_r, c="gray",label=label_re)
-           
+
             # --------------- LEGEND (real part) ----------------------------------
             if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
                 self.ax_f1.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
@@ -1493,16 +1494,16 @@ class Plot_Impz(QWidget):
                 sorted_pairs = sorted(zip(labels, handles))
                 # convert back to two lists
                 labels, handles = [ list(tuple) for tuple in  zip(*sorted_pairs)]
-    
+
                 if show_info:
                     # Create two empty patches for NENBW and CGAIN and extend handles list with them
                     handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
                                                          ec="white", lw=0, alpha=0)] * 2)
                     labels.append("$NENBW$:\t{0:.4g} {1}".format(nenbw, unit_nenbw))
-                    labels.append("$CGAIN$:\t{0:.4g} {1}".format(cgain, unit_cgain))               
+                    labels.append("$CGAIN$:\t{0:.4g} {1}".format(cgain, unit_cgain))
 
                     self.ax_f1.legend(handles, labels, loc='best', fontsize='small',
-                               fancybox=True, framealpha=0.7)                
+                               fancybox=True, framealpha=0.7)
 
             if en_re_im_f and self.plt_freq_enabled:
                 self.ax_f2.legend(loc='best', fontsize='small',
