@@ -94,6 +94,8 @@ class PlotImpz_UI(QWidget):
         self.fft_window = None # handle for FFT window pop-up widget
         self.window_name = "Rectangular"
 
+        self.f_scale = fb.fil[0]['f_S']
+
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
@@ -677,17 +679,18 @@ class PlotImpz_UI(QWidget):
         def _store_entry(source):
             if self.spec_edited:
                 if source.objectName() == "stimFreq1":
-                   self.f1 = safe_eval(source.text(), self.f1 * fb.fil[0]['f_S'],
-                                            return_type='float') / fb.fil[0]['f_S']
-                   source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                   self.f1 = safe_eval(source.text(), self.f1 * self.f_scale,
+                                            return_type='float') / self.f_scale
+                   source.setText(str(params['FMT'].format(self.f1 * self.f_scale)))
 
                 elif source.objectName() == "stimFreq2":
-                   self.f2 = safe_eval(source.text(), self.f2 * fb.fil[0]['f_S'],
-                                            return_type='float') / fb.fil[0]['f_S']
-                   source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                   self.f2 = safe_eval(source.text(), self.f2 * self.f_scale,
+                                            return_type='float') / self.f_scale
+                   source.setText(str(params['FMT'].format(self.f2 * self.f_scale)))
 
                 self.spec_edited = False # reset flag
                 self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
+        # --------------------------------------------------------------------
 
 #        if isinstance(source, QLineEdit):
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
@@ -703,9 +706,9 @@ class PlotImpz_UI(QWidget):
                 elif key == Qt.Key_Escape: # revert changes
                     self.spec_edited = False
                     if source.objectName() == "stimFreq1":
-                        source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                        source.setText(str(params['FMT'].format(self.f1 * self.f_scale)))
                     elif source.objectName() == "stimFreq2":
-                        source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                        source.setText(str(params['FMT'].format(self.f2 * self.f_scale)))
 
             elif event.type() == QEvent.FocusOut:
                 _store_entry(source)
@@ -779,18 +782,19 @@ class PlotImpz_UI(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
+        self.f_scale = fb.fil[0]['f_S']
         if self.ledFreq1.hasFocus():
             # widget has focus, show full precision
-            self.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
+            self.ledFreq1.setText(str(self.f1 * self.f_scale))
         elif self.ledFreq2.hasFocus():
             # widget has focus, show full precision
-            self.ledFreq2.setText(str(self.f2 * fb.fil[0]['f_S']))
+            self.ledFreq2.setText(str(self.f2 * self.f_scale))
         else:
             # widgets have no focus, round the display
             self.ledFreq1.setText(
-                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                str(params['FMT'].format(self.f1 * self.f_scale)))
             self.ledFreq2.setText(
-                str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                str(params['FMT'].format(self.f2 * self.f_scale)))
 
 
     def _update_amp1(self):
