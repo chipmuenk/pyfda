@@ -1212,9 +1212,6 @@ class Plot_Impz(QWidget):
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
         en_re_im_f = self.ui.chk_re_im_freq.isChecked()
 
-        # freqz-based ideal frequency response
-        F_id, H_id = np.abs(calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=fb.fil[0]['f_max']))
-
         H_F_str = ""
         ejO_str = r"$(\mathrm{e}^{\mathrm{j} \Omega})$"
         if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
@@ -1228,8 +1225,6 @@ class Plot_Impz(QWidget):
                 H_F_str += r'$H_{id}$, '
             H_F_str = H_F_str.rstrip(', ') + ejO_str
 
-            # frequency vector for FFT-based frequency plots
-
 
             F_range = fb.fil[0]['freqSpecsRange']
 
@@ -1238,14 +1233,14 @@ class Plot_Impz(QWidget):
                 # of the non-transient tabs and for F_id / H_id here. 
                 # Here, the frequency axes must be scaled to fit the number of 
                 # frequency points self.ui.N
-                k_scale = self.ui.N / fb.fil[0]['f_max']
-                F_id *= k_scale
-                F_range = [f * k_scale for f in F_range]
-                #
+                F_range = [f * self.ui.N / fb.fil[0]['f_max'] for f in F_range]
                 f_max = self.ui.N
             else:
                 f_max = fb.fil[0]['f_max']
- 
+
+            # freqz-based ideal frequency response:
+            F_id, H_id = calc_Hcomplex(fb.fil[0], params['N_FFT'], True, fs=f_max)
+            # frequency vector for FFT-based frequency plots:
             F = np.fft.fftfreq(self.ui.N, d=1. / f_max)
         #-----------------------------------------------------------------
         # Scale frequency response and calculate power
@@ -1300,8 +1295,9 @@ class Plot_Impz(QWidget):
                     X_q = np.fft.fftshift(X_q)
 
                 F    = np.fft.fftshift(F)
+
                 # shift H_id and F_id by f_S/2
-                F_id -= fb.fil[0]['f_S']/2.
+                F_id -= f_max/2
                 H_id = np.fft.fftshift(H_id)
                 if not freq_resp:
                     H_id /= 2
@@ -1338,7 +1334,7 @@ class Plot_Impz(QWidget):
 
                 nenbw = 10 * np.log10(self.ui.nenbw)
                 cgain = 20 * np.log10(self.ui.cgain)
-                H_id = np.maximum(20 * np.log10(H_id), self.ui.bottom_f)
+
                 if plt_stimulus:
                     Px = 10*np.log10(Px)
                     if en_re_im_f:
@@ -1361,7 +1357,15 @@ class Plot_Impz(QWidget):
                         Y_r = np.maximum(20 * np.log10(np.abs(Y.real)), self.ui.bottom_f)
                         Y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
                     else:
-                        Y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)                        
+                        Y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
+
+                if self.ui.chk_Hf.isChecked():
+                    if en_re_im_f:
+                        H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)), self.ui.bottom_f)
+                        H_id_i = np.maximum(20 * np.log10(np.abs(H_id.imag)), self.ui.bottom_f)
+                    else:
+                        H_id_r = np.maximum(20 * np.log10(np.abs(H_id)), self.ui.bottom_f)
+
 
             else:
                 H_F_pre = ""
@@ -1387,6 +1391,14 @@ class Plot_Impz(QWidget):
                     else:
                         Y_r = np.abs(Y)
 
+                if self.ui.chk_Hf.isChecked():
+                    if en_re_im_f:
+                        H_id_r = H_id.real
+                        H_id_i = H_id.imag
+                    else:
+                        H_id_r = np.abs(H_id)
+
+
                 unit = " in V"
                 unit_P = "W"
                 unit_nenbw = "bins"
@@ -1405,59 +1417,64 @@ class Plot_Impz(QWidget):
 
             H_Fi_str = H_F_pre + H_Fi_str + H_F_post + unit
             H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit
-
+          
             # -----------------------------------------------------------------
             # --------------- Plot stimulus and response ----------------------
             #------------------------------------------------------------------
             show_info = self.ui.chk_show_info_freq.isChecked()
             if plt_stimulus:
-                label_1 = "|$X$" + ejO_str + "|"
+                label_re = "|$X$" + ejO_str + "|"
                 if en_re_im_f:
-                    label_1 = "$X_r$" + ejO_str
-                    label_2 = "$X_i$" + ejO_str
+                    label_re = "$X_r$" + ejO_str
+                    label_im = "$X_i$" + ejO_str
                     self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
-                        label=label_2, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                         mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
                 if show_info:
-                    label_1 += ":\t$P$ = {0:.3g} {1}".format(Px, unit_P)
+                    label_re += ":\t$P$ = {0:.3g} {1}".format(Px, unit_P)
 
                 self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
-                    label=label_1, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                     mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
 
             if plt_stimulus_q:
-                label_1 = "$|X_Q$" + ejO_str + "|"
+                label_re = "$|X_Q$" + ejO_str + "|"
                 if en_re_im_f:
-                    label_1 = "$X_{Q,r}$" + ejO_str
-                    label_2 = "$X_{Q,i}$" + ejO_str
+                    label_re = "$X_{Q,r}$" + ejO_str
+                    label_im = "$X_{Q,i}$" + ejO_str
                     self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
-                        label=label_2, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                         mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
                 if show_info:
-                    label_1 += ":\t$P$ = {0:.3g} {1}".format(Pxq, unit_P)
+                    label_re += ":\t$P$ = {0:.3g} {1}".format(Pxq, unit_P)
 
                 self.draw_data(self.plt_freq_stmq, self.ax_f1, F, X_q_r,
-                    label=label_1, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
 
             if plt_response:
-                label_1 = "$|Y$" + ejO_str + "|"
+                label_re = "$|Y$" + ejO_str + "|"
                 if en_re_im_f:
-                    label_1 = "$Y_r$" + ejO_str
-                    label_2 = "$Y_i$" + ejO_str
+                    label_re = "$Y_r$" + ejO_str
+                    label_im = "$Y_i$" + ejO_str
                     self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
-                        label=label_2, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                         mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
                 if show_info:
-                    label_1 += ":\t$P$ = {0:.3g} {1}".format(Py, unit_P)
+                    label_re += ":\t$P$ = {0:.3g} {1}".format(Py, unit_P)
 
                 self.draw_data(self.plt_freq_resp, self.ax_f1, F, Y_r,
-                    label=label_1, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
 
             if self.ui.chk_Hf.isChecked():
-                self.ax_f1.plot(F_id, H_id, c="gray",label="$H_{id}$" + ejO_str)
-            
+                label_re = "$|H_{id}$" + ejO_str + "|"
+                if en_re_im_f:
+                    label_re = "$H_{id,r}$" + ejO_str
+                    label_im = "$H_{id,i}$" + ejO_str
+                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)            
+                self.ax_f1.plot(F_id, H_id_r, c="gray",label=label_re)
+           
             # --------------- LEGEND (real part) ----------------------------------
             if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
                 self.ax_f1.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
