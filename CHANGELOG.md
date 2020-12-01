@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-xx)
+### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
 
 ### Bug fixes
 
@@ -8,9 +8,9 @@
   is identical to PM modulation. FM modulation is deleted, PM modulation is renamed
   to "PM / FM".
   
-- Various scaling errors for new frequency specification "k" have been fixed
+- Various scaling errors for new frequency unit "k" have been fixed
 
-- Fixed wrong time scaling for frequency unit "f_Ny"
+- Wrong time scaling for frequency unit "f_Ny"
 
 - Corrected calculation and display of single-sided spectra and H_id
   
