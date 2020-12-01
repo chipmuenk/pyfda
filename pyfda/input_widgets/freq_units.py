@@ -279,6 +279,9 @@ class FreqUnits(QWidget):
 
         Emit 'view_changed':'f_range' when `emit=True`
         """
+        if type(emit) == int: # signal was emitted by combobox
+            emit = True
+
         rangeType = qget_cmb_box(self.cmbFRange)
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
