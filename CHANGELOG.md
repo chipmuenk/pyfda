@@ -18,7 +18,7 @@
 
 - Added stimulus "sinc"
 
-- Added indicator for complex valued time signals, display of single-sided
+- Added warning indicator for complex valued time signals where display of single-sided
   and H_id spectra may be wrong
 
 
