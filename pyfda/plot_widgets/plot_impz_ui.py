@@ -97,7 +97,7 @@ class PlotImpz_UI(QWidget):
         self.window_name = "Rectangular"
 
         self.f_scale = fb.fil[0]['f_S']
-        
+
         self.stim_wdg_dict = collections.OrderedDict()
         self.stim_wdg_dict.update(
         {"None":    {"dc", "noise"},
@@ -489,7 +489,7 @@ class PlotImpz_UI(QWidget):
         self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
-        
+
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.ledStimPar1 = QLineEdit(self)
         self.ledStimPar1.setText("0.5")
@@ -800,9 +800,9 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimFormula.setVisible(self.stim == "Formula")
         self.ledStimFormula.setVisible(self.stim == "Formula")
-        
+
         self.cmbChirpMethod.setVisible(self.stim == 'Chirp')
-        
+
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
 #-------------------------------------------------------------
@@ -910,10 +910,10 @@ class PlotImpz_UI(QWidget):
         self.stim_formula = self.ledStimFormula.text().strip()
         self.ledStimFormula.setText(str(self.stim_formula))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
-        
+
     def _update_stim_par1(self):
         """ Update value for self.par1 from QLineEditWidget"""
-        self.stim_par1 = safe_eval(self.ledStimPar1.text(), self.stim_par1, 
+        self.stim_par1 = safe_eval(self.ledStimPar1.text(), self.stim_par1,
                                    sign = 'pos', return_type='float')
         self.ledStimPar1.setText(str(self.stim_par1))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_par1'})
