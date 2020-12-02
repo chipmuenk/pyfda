@@ -12,6 +12,7 @@ Create the UI for the PlotImz class
 import logging
 logger = logging.getLogger(__name__)
 
+import collections
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
                       QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal, QEvent, Qt)
 
@@ -79,6 +80,7 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * n))"
+        self.stim_par1 = 0.5
 
         # frequency
         self.plt_freq_resp = "Line"
@@ -95,6 +97,25 @@ class PlotImpz_UI(QWidget):
         self.window_name = "Rectangular"
 
         self.f_scale = fb.fil[0]['f_S']
+        
+        self.stim_wdg_dict = collections.OrderedDict()
+        self.stim_wdg_dict.update(
+        {"None":    {"dc", "noise"},
+         "Impulse": {"dc", "a1", "scale", "noise"},
+         "Step":    {"a1", "noise"},
+         "StepErr": {"a1", "noise"},
+         "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "Sinc":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "Chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
+         "Triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
+         "Saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
+         "Rect":    {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+         "Comb":    {"dc", "a1", "phi1", "f1", "noise"},
+         "AM":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "PM / FM": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "Formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"}
+         })
 
         self._construct_UI()
         self._enable_stim_widgets()
@@ -465,10 +486,15 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["None","Impulse","Step","StepErr","Cos","Sine", "Sinc", "Chirp",
-                                   "Triang","Saw","Rect","Comb","AM","PM / FM","Formula"])
+        self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
         self.cmbStimulus.setToolTip("Stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
+        
+        self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
+        self.ledStimPar1 = QLineEdit(self)
+        self.ledStimPar1.setText("0.5")
+        self.ledStimPar1.setToolTip("Duty Cycle, 0 ... 1")
+        self.ledStimPar1.setObjectName("ledStimPar1")
 
         self.chk_stim_bl = QCheckBox("BL", self)
         self.chk_stim_bl.setToolTip("<span>The signal is bandlimited to the Nyquist frequency "
@@ -498,6 +524,8 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.chk_stim_bl)
+        layHCmbStim.addWidget(self.lblStimPar1)
+        layHCmbStim.addWidget(self.ledStimPar1)
         layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.cmbChirpMethod)
 
@@ -663,6 +691,7 @@ class PlotImpz_UI(QWidget):
         self.cmbChirpMethod.currentIndexChanged.connect(self._update_chirp_method)
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
+        self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -735,44 +764,45 @@ class PlotImpz_UI(QWidget):
 
 
     def _enable_stim_widgets(self):
-        """ Enable / disable widgets depending on the selected stimulus"""
+        """ Enable / disable widgets depending on the selected stimulus """
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
-        f1_en = self.stim in {"Cos","Sine","Sinc","Chirp","PM / FM","AM","Formula","Rect","Saw","Triang","Comb"}
-        f2_en = self.stim in {"Cos","Sine","Sinc","Chirp","PM / FM","AM","Formula"}
-        dc_en = self.stim not in {"Step", "StepErr"}
+        stim_wdg = self.stim_wdg_dict[self.stim]
 
-        self.chk_stim_bl.setVisible(self.stim in {"Triang", "Saw", "Rect"})
+        self.lblDC.setVisible("dc" in stim_wdg)
+        self.ledDC.setVisible("dc" in stim_wdg)
 
-        self.lblAmp1.setVisible(self.stim != "None")
-        self.ledAmp1.setVisible(self.stim != "None")
         self.chk_scale_impz_f.setVisible(self.stim == 'Impulse')
-        self.chk_scale_impz_f.setEnabled((self.noi == 0 or self.cmbNoise.currentText() == 'None')\
-                                         and self.DC == 0)
+        self.chk_scale_impz_f.setEnabled(self.DC == 0 and (self.noi == 0 or\
+            self.cmbNoise.currentText() == 'None'))
 
-        self.cmbChirpMethod.setVisible(self.stim == 'Chirp')
+        self.lblStimPar1.setVisible("par1" in stim_wdg)
+        self.ledStimPar1.setVisible("par1" in stim_wdg)
 
-        self.lblPhi1.setVisible(f1_en)
-        self.ledPhi1.setVisible(f1_en)
-        self.lblPhU1.setVisible(f1_en)
-        self.lblFreq1.setVisible(f1_en)
-        self.ledFreq1.setVisible(f1_en)
-        self.lblFreqUnit1.setVisible(f1_en)
+        self.chk_stim_bl.setVisible("bl" in stim_wdg)
 
-        self.lblFreq2.setVisible(f2_en)
-        self.ledFreq2.setVisible(f2_en)
-        self.lblFreqUnit2.setVisible(f2_en)
-        self.lblAmp2.setVisible(f2_en and self.stim != "Chirp")
-        self.ledAmp2.setVisible(f2_en and self.stim != "Chirp")
-        self.lblPhi2.setVisible(f2_en and self.stim != "Chirp")
-        self.ledPhi2.setVisible(f2_en and self.stim != "Chirp")
-        self.lblPhU2.setVisible(f2_en and self.stim != "Chirp")
+        self.lblAmp1.setVisible("a1" in stim_wdg)
+        self.ledAmp1.setVisible("a1" in stim_wdg)
+        self.lblPhi1.setVisible("phi1" in stim_wdg)
+        self.ledPhi1.setVisible("phi1" in stim_wdg)
+        self.lblPhU1.setVisible("phi1" in stim_wdg)
+        self.lblFreq1.setVisible("f1" in stim_wdg)
+        self.ledFreq1.setVisible("f1" in stim_wdg)
+        self.lblFreqUnit1.setVisible("f1" in stim_wdg)
 
-        self.lblDC.setVisible(dc_en)
-        self.ledDC.setVisible(dc_en)
+        self.lblAmp2.setVisible("a2" in stim_wdg)
+        self.ledAmp2.setVisible("a2" in stim_wdg)
+        self.lblPhi2.setVisible("phi2" in stim_wdg)
+        self.ledPhi2.setVisible("phi2" in stim_wdg)
+        self.lblPhU2.setVisible("phi2" in stim_wdg)
+        self.lblFreq2.setVisible("f2" in stim_wdg)
+        self.ledFreq2.setVisible("f2" in stim_wdg)
+        self.lblFreqUnit2.setVisible("f2" in stim_wdg)
 
         self.lblStimFormula.setVisible(self.stim == "Formula")
         self.ledStimFormula.setVisible(self.stim == "Formula")
-
+        
+        self.cmbChirpMethod.setVisible(self.stim == 'Chirp')
+        
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
 #-------------------------------------------------------------
@@ -880,6 +910,13 @@ class PlotImpz_UI(QWidget):
         self.stim_formula = self.ledStimFormula.text().strip()
         self.ledStimFormula.setText(str(self.stim_formula))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_formula'})
+        
+    def _update_stim_par1(self):
+        """ Update value for self.par1 from QLineEditWidget"""
+        self.stim_par1 = safe_eval(self.ledStimPar1.text(), self.stim_par1, 
+                                   sign = 'pos', return_type='float')
+        self.ledStimPar1.setText(str(self.stim_par1))
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_par1'})
 
     # -------------------------------------------------------------------------
 
