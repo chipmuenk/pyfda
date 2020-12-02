@@ -443,7 +443,6 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Sinusoidal Signal '
-            self.stim_wdg = ["Amp1", "Amp2", "Phi1","Phi2", "Freq1", "Freq2"]
 
         elif self.ui.stim == "Sinc":
             self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2) * self.ui.f1 + phi1) +\
@@ -473,10 +472,10 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "Rect":
             if self.ui.chk_stim_bl.isChecked():
-                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
+                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
                 self.title_str += r'Bandlimited Rect. Signal'
             else:
-                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=0.5)
+                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
                 self.title_str += r'Rect. Signal'
 
         elif self.ui.stim == "Comb":

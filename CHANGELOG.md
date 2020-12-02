@@ -1,5 +1,15 @@
 ## Changelog
 
+### [v0.5.2](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-xx)
+
+### Bug fixes
+
+### New features
+
+- Added widget duty cycle for the rect pulse, enabling and disabling of widgets
+  is now structured much cleaner
+
+
 ### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
 
 ### Bug fixes
