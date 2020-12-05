@@ -463,7 +463,7 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
         fallback_shape = np.shape(fallback)
 
     try:
-        np_expr = numexpr.evaluate(expr, local_dict=local_dict)
+        np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
         logger.warning("Syntax error:\n\t{0}".format(e))
     except KeyError as e:
@@ -1129,12 +1129,15 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
 def calc_ssb_spectrum(A):
     """
     Calculate the single-sideband spectrum from a double-sideband
-    spectrum by adding the mirrored conjugate complex of the second half
-    of the spectrum to the first while leaving the DC value untouched.
+    spectrum by doubling the spectrum below fS/2 (leaving the DC-value
+    untouched). This approach is wrong when the spectrum is not symmetric.
+    
+    The alternative approach of  adding the mirrored conjugate complex of the
+    second half of the spectrum to the first doesn't work, spectra of either 
+    sine-like or cosine-like signals are cancelled out.
 
     When len(A) is even, A[N//2] represents half the sampling frequencvy
-    and has to be discarded (Q: also for the power calculation?). Both
-    tasks are addressed by
+    and is discarded (Q: also for the power calculation?).
 
     Parameters
     ----------
@@ -1150,8 +1153,9 @@ def calc_ssb_spectrum(A):
 
     """
     N = len(A)
-    A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),
-                      0, A[0])
+    
+    A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
+    # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
 
     return A_SSB
 

@@ -144,8 +144,27 @@ Local installation:
 ## Building / packaging
 
 ### pip and PyPI
-The standard pip packaging flow (only sdist) is used, packages are uploaded to 
-<https://pypi.org/project/pyfda/> with twine.
+Pip packages (source only) are created using the `setuptools` flow:
+
+    > python setup.py clean
+    > python setup.py sdist
+    
+which creates a `dist` directory containing a `pyfda-<VERSION>.tar.gz` archive.
+
+Non-python files to be included in the package have to be declared in 
+`MANIFEST.in`, see 
+<https://packaging.python.org/guides/using-manifest-in/>.
+
+Beware of an [old bug](https://github.com/pypa/setuptools/issues/436) where updates
+to the `MANIFEST.in` file are ignored.
+
+As a workaround, delete the directory after each change to the file structure or MANIFEST.in, the directory `pyfda.egg-info` containing `SOURCES.txt`. It seems
+this file is not updated if it exists.
+
+This package is uploaded to <https://pypi.org/project/pyfda/> using twine by
+
+    > twine upload dist/*
+
 
 ### pyInstaller
 pyInstaller can build executables with the help of a `*.spec`  file that is provided 

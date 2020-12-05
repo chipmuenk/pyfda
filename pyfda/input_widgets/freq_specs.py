@@ -81,7 +81,7 @@ class FreqSpecs(QWidget):
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(self.lblUnit)
         layHTitle.addStretch(1)
-        
+
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
         self.layGSpecs = QGridLayout() # sublayout for spec fields
@@ -109,7 +109,7 @@ class FreqSpecs(QWidget):
         # EVENT FILTER
         #----------------------------------------------------------------------
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self.store_entries 
+        # Every time a field is edited, call self.store_entries
         # This is achieved by dynamically installing and
         # removing event filters when creating / deleting subwidgets.
         # The event filter monitors the focus of the input fields.
@@ -142,9 +142,9 @@ class FreqSpecs(QWidget):
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
-                    self.spec_edited = False                    
+                    self.spec_edited = False
                     self.load_dict()
-                
+
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
@@ -153,9 +153,9 @@ class FreqSpecs(QWidget):
 #------------------------------------------------------------------------------
     def _store_entry(self, event_source):
         """
-        _store_entry is triggered by `QEvent.focusOut` in the eventFilter:        
+        _store_entry is triggered by `QEvent.focusOut` in the eventFilter:
         When the textfield of `widget` has been edited (`self.spec_edited` =  True),
-        sort and store all entries in filter dict, then reload the text fields. 
+        sort and store all entries in filter dict, then reload the text fields.
         Finally, emit a SpecsChanged signal.
         """
         if self.spec_edited:
@@ -165,6 +165,10 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs()
             self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
             self.spec_edited = False # reset flag
+
+        # nothing has changed, but display frequencies in rounded format anyway
+        else:
+            self.load_dict()
 
 #-------------------------------------------------------------
     def update_UI(self, new_labels = ()):
@@ -202,7 +206,7 @@ class FreqSpecs(QWidget):
             else: # convert 'F' to 'f' for frequencies in Hz
                 self.qlabels[i].setText(to_html(new_labels[i][0].lower()\
                             + new_labels[i][1:], frmt='bi'))
-           
+
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
@@ -229,15 +233,15 @@ class FreqSpecs(QWidget):
             unit_frmt = 'b'
         self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
 
-#-------------------------------------------------------------        
+#-------------------------------------------------------------
     def load_dict(self):
         """
-        Reload textfields from filter dictionary 
+        Reload textfields from filter dictionary
         Transform the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
-        
+
         Update the displayed frequency unit
 
         load_dict is called during init and when the frequency unit or the
@@ -250,7 +254,7 @@ class FreqSpecs(QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_dict")
         self.update_f_unit()
-        
+
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]
@@ -266,13 +270,13 @@ class FreqSpecs(QWidget):
 #------------------------------------------------------------------------
     def _show_entries(self, num_new_labels):
         """
-        - check whether subwidgets need to be shown or hidden       
-        - check whether enough subwidgets (QLabel und QLineEdit) exist for the 
-          the required number of `num_new_labels`: 
-              - create new ones if required 
+        - check whether subwidgets need to be shown or hidden
+        - check whether enough subwidgets (QLabel und QLineEdit) exist for the
+          the required number of `num_new_labels`:
+              - create new ones if required
               - initialize them with dummy information
-              - install eventFilter for new QLineEdit widgets so that the filter 
-                  dict is updated automatically when a QLineEdit field has been 
+              - install eventFilter for new QLineEdit widgets so that the filter
+                  dict is updated automatically when a QLineEdit field has been
                   edited.
         - if enough subwidgets exist already, make enough of them visible to
           show all spec fields
@@ -292,10 +296,10 @@ class FreqSpecs(QWidget):
                 self.qlineedit[i].show()
 
         else: # new subwidgets need to be generated
-            for i in range(num_tot_labels, num_new_labels):                   
+            for i in range(num_tot_labels, num_new_labels):
                 self.qlabels.append(QLabel(self))
                 self.qlabels[i].setText(to_html("dummy", frmt='bi'))
-    
+
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
@@ -307,18 +311,18 @@ class FreqSpecs(QWidget):
 #------------------------------------------------------------------------------
     def sort_dict_freqs(self):
         """
-        - Sort visible filter dict frequency spec entries with ascending frequency if 
+        - Sort visible filter dict frequency spec entries with ascending frequency if
              the sort button is activated
         - Update the visible QLineEdit frequency widgets
 
         The method is called when:
-        - update_UI has been called after changing the filter design algorithm                                
-          that the response type has been changed 
+        - update_UI has been called after changing the filter design algorithm
+          that the response type has been changed
           eg. from LP -> HP, requiring a different order of frequency entries
         - a frequency spec field has been edited
         - the sort button has been clicked (from filter_specs.py)
         """
-        
+
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                         for i in range(self.n_cur_labels)]
         if fb.fil[0]['freq_specs_sort']:
@@ -339,7 +343,7 @@ class FreqSpecs(QWidget):
                 f_specs[i] = MAX_FREQ - MIN_FREQ_STEP
 
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
-            
+
         # check for (nearly) identical elements:
         _, mult = unique_roots(f_specs, tol = MIN_FREQ_STEP)
         ident = [x for x in mult if x > 1]
@@ -360,6 +364,6 @@ if __name__ == '__main__':
     mainw.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
 #    mainw.update_UI(new_labels = ['F_PB','F_PB2'])
 
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

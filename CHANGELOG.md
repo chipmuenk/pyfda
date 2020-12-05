@@ -1,19 +1,41 @@
 ## Changelog
 
+### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
+
+### Bug fixes
+
+- Stimulus FM modulation had a false definition. For sinusoidal modulation, it
+  is identical to PM modulation. FM modulation is deleted, PM modulation is renamed
+  to "PM / FM".
+  
+- Various scaling errors for new frequency unit "k" have been fixed
+
+- Wrong time scaling for frequency unit "f_Ny"
+
+- Corrected calculation and display of single-sided spectra and H_id
+  
+### New features
+
+- Added stimulus "sinc"
+
+- Added indicator for complex valued time signals, display of single-sided
+  and H_id spectra may be wrong
+
+
 ### [v0.5.0](https://github.com/chipmuenk/pyfda/tree/v0.5.0) (2020-11-17)
 
 ### New features
 
-- Add spectrogram view in the time tab of the transient response widget
+- Added spectrogram view in the time tab of the transient response widget
 
 - Minor grid lines have been added, grid mode can be cycled through off / coarse (former grid mode) / fine (with minor grid)
 
-- Add links to corresponding documentation page on ReadTheDocs for plot widgets. Doc pages need
+- Added links to corresponding documentation page on ReadTheDocs for plot widgets. Doc pages need
   to be updated though ...
   
-- Overhaul plotting of spectra in the y[n] tab
+- Overhauled plotting of spectra in the y[n] tab
 
-- Clean up of the UI of the y[n] tab
+- Cleaned up the UI of the y[n] tab
 
 - Real and imaginary parts of spectra in the y[n] tab now can be plotted
 
