@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 from pyfda.libs.compat import (QtCore,
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QToolButton,
-                      QVBoxLayout, QHBoxLayout, QGridLayout,
+                      QIcon, QVBoxLayout, QHBoxLayout, QGridLayout,
                       pyqtSignal, QEvent)
 
 
@@ -68,17 +68,30 @@ class FreqUnits(QWidget):
         bfont.setBold(True)
 
         self.lblUnits=QLabel(self)
-        self.lblUnits.setText("Freq. Unit:")
+        self.lblUnits.setText("Freq. Unit")
         self.lblUnits.setFont(bfont)
 
         self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
+
+        self.lblF_S = QLabel(self)
+        self.lblF_S.setText(to_html("f_S =", frmt='bi'))
+
         self.ledF_S = QLineEdit()
         self.ledF_S.setText(str(fb.fil[0]["f_S"]))
         self.ledF_S.setObjectName("f_S")
         self.ledF_S.installEventFilter(self)  # filter events
-
-        self.lblF_S = QLabel(self)
-        self.lblF_S.setText(to_html("f_S", frmt='bi'))
+        
+        self.butLock = QToolButton(self)
+        self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+        self.butLock.setCheckable(True)
+        self.butLock.setChecked(True)
+        self.butLock.setToolTip("Lock frequencies to sampling frequency; when f_S changes, "
+                                "all frequencies are scaled to f_S.")
+        #self.butLock.setStyleSheet("QToolButton:checked {font-weight:bold}")
+        
+        layHF_S = QHBoxLayout()
+        layHF_S.addWidget(self.ledF_S)
+        layHF_S.addWidget(self.butLock)
 
         self.cmbUnits = QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
@@ -106,6 +119,8 @@ class FreqUnits(QWidget):
 
         self.butSort = QToolButton(self)
         self.butSort.setText("Sort")
+        self.butSort.setIcon(QIcon(':/sort-ascending.svg'))
+        #self.butDelCells.setIconSize(q_icon_size)
         self.butSort.setCheckable(True)
         self.butSort.setChecked(True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
@@ -120,7 +135,8 @@ class FreqUnits(QWidget):
         # for setting f_S, the units and the actual frequency specs:
         self.layGSpecWdg = QGridLayout() # sublayout for spec fields
         self.layGSpecWdg.addWidget(self.lblF_S,1,0)
-        self.layGSpecWdg.addWidget(self.ledF_S,1,1)
+        # self.layGSpecWdg.addWidget(self.ledF_S,1,1)
+        self.layGSpecWdg.addLayout(layHF_S,1,1)
         self.layGSpecWdg.addWidget(self.lblUnits,0,0)
         self.layGSpecWdg.addLayout(self.layHUnits,0,1)
 
@@ -136,12 +152,45 @@ class FreqUnits(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
+        self.butLock.clicked.connect(self.update_UI)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
         #----------------------------------------------------------------------
 
         self.update_UI() # first-time initialization
 
+#-------------------------------------------------------------
+    def lock_fs(self):
+        """
+        Lock / unlock the sampling frequency: The current sampling frequency is
+        stored in `fb.fil[0]['f_S']`. This frequency is used by frequency related
+        widgets to scale absolute frequencies and store the values in normalized
+        form. When the sampling frequency changes, absolute frequencies change
+        their values. Most of the time, this is the desired behaviour, the properties
+        of a system or a signal are defined by the normalized frequencies.
+        
+        When the effect of varying the sampling frequency is to be analyzed, the
+        current value of `f_S` can be locked as `fb.fil[0]['f_S_locked']`
+        by pressing the Lock button. Widgets can then use this value for scaling
+        the normalized frequencies.
+            
+        - When the button is locked, the current sampling frequency is frozen
+          in  `fb.fil[0]['f_S_locked']`
+        - When the button is unlocked, the dictionary entry is replaced by 
+          `None`. Frequency related widgets are forced to use the current
+          `f_S` setting.
+        """
+
+        if self.butLock.isChecked():
+            # Lock has been activated, store current f_S
+            fb.fil[0].update({'f_S_locked':fb.fil[0]['f_S']})
+            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+        else:
+            # Lock has been unlocked, replace old f_S setting by None
+            fb.fil[0].update({'f_S_locked':None})
+            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
 
 #-------------------------------------------------------------
     def update_UI(self):
@@ -158,38 +207,40 @@ class FreqUnits(QWidget):
 
         Update the freqSpecsRange and finally, emit 'view_changed' signal
         """
-        idx = self.cmbUnits.currentIndex() # read index of units combobox
-        f_unit = str(self.cmbUnits.currentText()) # and the label
+        f_unit = str(self.cmbUnits.currentText()) # selected frequency unit
+        
+        is_normalized_freq = f_unit in  {"f_S", "f_Ny", "k"}
 
-        self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # only vis. when
-        self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny", "k"}) # not normalized
+        self.ledF_S.setVisible(not is_normalized_freq) # only vis. when
+        self.lblF_S.setVisible(not is_normalized_freq) # not normalized
+        self.butLock.setVisible(not is_normalized_freq)#
         f_S_scale = 1 # default setting for f_S scale
 
-        if f_unit in {"f_S", "f_Ny", "k"}: # normalized frequency
+        if is_normalized_freq:
             self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
+            t_label = r"$n \; \rightarrow$"
 
             if f_unit == "f_S": # normalized to f_S
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
                 fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
-            elif f_unit == "f_Ny":   # idx == 1: normalized to f_nyq = f_S / 2
+            elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
                 fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
-            else:
+            else: # frequency index k, 
                 fb.fil[0]['f_S'] = 1.
                 fb.fil[0]['T_S'] = 1.
                 fb.fil[0]['f_max'] = params['N_FFT']
                 f_label = r"$k \; \rightarrow$"
-            t_label = r"$n \; \rightarrow$"
 
             self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else: # Hz, kHz, ...
             # Restore sampling frequency when returning from f_S / f_Ny / k
-            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}: # previous setting
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # restore prev. sampling frequency
-                fb.fil[0]['T_S'] = 1./self.fs_old
+            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}: # previous setting normalized?
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old # yes, restore prev.
+                fb.fil[0]['T_S'] = 1./self.fs_old # settings for sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             if f_unit == "Hz":
@@ -204,20 +255,34 @@ class FreqUnits(QWidget):
                 logger.warning("Unknown frequency unit {0}".format(f_unit))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
+            idx = self.cmbUnits.currentIndex() # read index of units combobox
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
         if f_unit == "k":
             plt_f_unit = "f_S"
         else:
             plt_f_unit = f_unit
-        fb.fil[0].update({'f_S_scale':f_S_scale}) # scale factor for f_S
-        fb.fil[0].update({'freq_specs_unit':f_unit}) # frequency unit
-        fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
-        fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
-        fb.fil[0].update({"plt_fUnit":plt_f_unit}) # frequency unit as string
-        fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
 
-        self._freq_range(emit=False) # update f_lim setting
+        fb.fil[0].update({'f_S_scale':f_S_scale}) # scale factor for f_S (Hz, kHz, ...)
+
+# =============================================================================
+#         if self.butLock.isChecked():
+#             fb.fil[0].update({'f_S_locked':fb.fil[0]['f_S']}) # f_S locked, store old fs here or none?
+#             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+#         else:
+#             fb.fil[0].update({'f_S_locked':None}) # f_S locked, store old fs here or none? 
+#             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+#         # the unit or label that is selected in the combo box
+# =============================================================================
+        fb.fil[0].update({'freq_specs_unit':f_unit}) # frequency unit
+        # time and frequency unit as string e.g. for plot axis labeling
+        fb.fil[0].update({"plt_fUnit":plt_f_unit}) 
+        fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) 
+        # complete plot axis labels including unit and arrow
+        fb.fil[0].update({"plt_fLabel":f_label})
+        fb.fil[0].update({"plt_tLabel":t_label})
+
+        self._freq_range(emit=False) # update f_lim setting without emitting signal
 
         self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
 
