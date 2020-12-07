@@ -827,8 +827,10 @@ class PlotImpz_UI(QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.f_scale = self.N
+        elif fb.fil[0]['f_S_locked'] is not None:
+            self.f_scale = fb.fil[0]['f_S_locked']
         else:
-            self.f_scale = fb.fil[0]['f_S']
+            self.f_scale = fb.fil[0]['f_S']            
 
         if self.ledFreq1.hasFocus():
             # widget has focus, show full precision

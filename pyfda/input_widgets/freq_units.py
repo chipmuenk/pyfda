@@ -84,9 +84,11 @@ class FreqUnits(QWidget):
         self.butLock = QToolButton(self)
         self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         self.butLock.setCheckable(True)
-        self.butLock.setChecked(True)
-        self.butLock.setToolTip("Lock frequencies to sampling frequency; when f_S changes, "
-                                "all frequencies are scaled to f_S.")
+        self.butLock.setChecked(False)
+        self.butLock.setToolTip("<span>Unlocked: All frequencies are stored as normalized values; "
+                                "when f_S is changed all frequency related values change their values. "
+                                "Locked: Lock sampling frequency to current value; when f_S is changed, "
+                                "absolute values in frequency related widgets don't change.</span>")
         #self.butLock.setStyleSheet("QToolButton:checked {font-weight:bold}")
         
         layHF_S = QHBoxLayout()
@@ -152,7 +154,7 @@ class FreqUnits(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
-        self.butLock.clicked.connect(self.update_UI)
+        self.butLock.clicked.connect(self.lock_fs)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
         #----------------------------------------------------------------------
@@ -208,6 +210,7 @@ class FreqUnits(QWidget):
         Update the freqSpecsRange and finally, emit 'view_changed' signal
         """
         f_unit = str(self.cmbUnits.currentText()) # selected frequency unit
+        idx = self.cmbUnits.currentIndex() # and its index
         
         is_normalized_freq = f_unit in  {"f_S", "f_Ny", "k"}
 
@@ -255,7 +258,6 @@ class FreqUnits(QWidget):
                 logger.warning("Unknown frequency unit {0}".format(f_unit))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
-            idx = self.cmbUnits.currentIndex() # read index of units combobox
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
         if f_unit == "k":
