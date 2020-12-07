@@ -251,7 +251,11 @@ class Plot_Impz(QWidget):
                 self.impz()
 
             elif 'view_changed' in dict_sig:
-                self.draw()
+                if dict_sig['view_changed'] == 'f_S':
+                    self.ui.load_fs()
+                    self.draw()
+                else:
+                    self.draw()
 
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
@@ -680,7 +684,7 @@ class Plot_Impz(QWidget):
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.t = self.n * fb.fil[0]['T_S']
-        self.ui.load_fs()
+#        self.ui.load_fs()
 
         self.scale_i = self.scale_o = 1
         self.fx_min = -1.

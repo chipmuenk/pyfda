@@ -808,17 +808,21 @@ class PlotImpz_UI(QWidget):
 #-------------------------------------------------------------
     def load_fs(self):
         """
-        Reload sampling frequency from filter dictionary and transform
-        the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
-        in the dictionary; when f_S or the unit are changed, only the displayed values
-        of the frequency entries are updated, not the dictionary!
+        `load_fs()` is called during init and when the frequency unit or the
+        sampling frequency have been changed.
+
+        The sampling frequency is loaded from filter dictionary and displayed 
+        frequency fields are updated according to the units w.r.t. f_S setting.
+        Frequency field entries are always stored normalized 
+        in the dictionary: Normally, when f_S or the unit are changed, only the 
+        displayed values of the frequency entries are updated, not the dictionary.
+        
+        When the `f_S` lock button is selected, the absolute frequency values in
+        the widget fields are kept constant, and the dictionary entries are updated.
 
         The value for f_scale (which is equal to f_S except when the frequency
         unit is k) is updated in the draw() routine of plot_impz.py
 
-        load_fs() is called during init and when the frequency unit or the
-        sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
         at another place, indicating that a reload is required.
@@ -828,7 +832,7 @@ class PlotImpz_UI(QWidget):
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.f_scale = self.N
         elif fb.fil[0]['f_S_locked'] is not None:
-            self.f_scale = fb.fil[0]['f_S_locked']
+            self.f1 = self.f1 #* fb.fil[0]['f_S_locked']
         else:
             self.f_scale = fb.fil[0]['f_S']            
 
@@ -844,6 +848,8 @@ class PlotImpz_UI(QWidget):
                 str(params['FMT'].format(self.f1 * self.f_scale)))
             self.ledFreq2.setText(
                 str(params['FMT'].format(self.f2 * self.f_scale)))
+
+#-------------------------------------------------------------
 
 
     def _update_amp1(self):
