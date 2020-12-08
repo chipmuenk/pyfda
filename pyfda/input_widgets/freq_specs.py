@@ -233,7 +233,6 @@ class FreqSpecs(QWidget):
                 f_name = str(self.qlineedit[i].objectName()).split(":",1)
                 f_label = f_name[0]
                 f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
-                logger.warning("{0}:{1}".format(f_label,f_value))
 
                 fb.fil[0].update({f_label:f_value})
                 self.sort_dict_freqs()
