@@ -60,8 +60,9 @@ class FreqSpecs(QWidget):
             logger.warning("Infinite loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()
-        elif 'view_changed' in dict_sig:
-            self.load_dict()
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            self.recalc_freqs()
+            #self.load_dict()
 
 #-------------------------------------------------------------
     def _construct_UI(self):
@@ -228,7 +229,6 @@ class FreqSpecs(QWidget):
         ['ui_changed':'f_S']
         """
         if fb.fil[0]['freq_locked']:
-            logger.warning("recalc: {}".format(fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']))
             for i in range(len(self.qlineedit)):
                 f_name = str(self.qlineedit[i].objectName()).split(":",1)
                 f_label = f_name[0]

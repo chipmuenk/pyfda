@@ -143,6 +143,7 @@ class Input_Specs(QWidget):
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
         self.f_specs.sig_tx.connect(self.sig_rx_local)
+        self.sig_tx.connect(self.f_specs.sig_rx)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")

@@ -38,20 +38,22 @@ class TargetSpecs(QWidget):
         
         self._construct_UI()
 
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming in via subwidgets and sig_rx
-        """
-        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected")
-            return
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-            # update target frequencies with new f_S
-            self.f_specs.recalc_freqs()
+# =============================================================================
+# #------------------------------------------------------------------------------
+#     def process_sig_rx(self, dict_sig=None):
+#         """
+#         Process signals coming in via subwidgets and sig_rx
+#         """
+#         logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+#         if dict_sig['sender'] == __name__:
+#             logger.warning("Infinite loop detected")
+#             return
+#         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+#             # update target frequencies with new f_S
+#             self.f_specs.recalc_freqs()
+# 
+# =============================================================================
 
-#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct user interface
@@ -59,7 +61,7 @@ class TargetSpecs(QWidget):
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
         self.f_specs.sig_tx.connect(self.sig_tx) # pass signal upwards
-        #self.sig_tx.connect(self.f_specs.sig_rx)
+        self.sig_rx.connect(self.f_specs.sig_rx) # pass on received signals
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
@@ -100,7 +102,7 @@ class TargetSpecs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
+        # self.sig_rx.connect(self.process_sig_rx)
         
         self.update_UI() # first time initialization
 
