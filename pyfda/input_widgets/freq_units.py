@@ -155,7 +155,7 @@ class FreqUnits(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
-        self.butLock.clicked.connect(self.lock_fs)
+        self.butLock.clicked.connect(self._lock_freqs)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
         #----------------------------------------------------------------------
@@ -163,25 +163,26 @@ class FreqUnits(QWidget):
         self.update_UI() # first-time initialization
 
 #-------------------------------------------------------------
-    def lock_fs(self):
+    def _lock_freqs(self):
         """
-        Lock / unlock the sampling frequency: The current sampling frequency is
-        stored in `fb.fil[0]['f_S']`. This frequency is used by frequency related
-        widgets to scale absolute frequencies and store the values in normalized
-        form. When the sampling frequency changes, absolute frequencies change
-        their values. Most of the time, this is the desired behaviour, the properties
-        of a system or a signal are defined by the normalized frequencies.
+        Lock / unlock frequency entries: The values of frequency related widgets
+        are stored in normalized form (w.r.t. sampling frequency)`fb.fil[0]['f_S']`.
+
+        When the sampling frequency changes, absolute frequencies displayed in the
+        widgets change their values. Most of the time, this is the desired behaviour,
+        the properties of discrete time systems or signals are usually defined
+        by the normalized frequencies.
         
         When the effect of varying the sampling frequency is to be analyzed, the
-        current value of `f_S` can be locked as `fb.fil[0]['f_S_locked']`
-        by pressing the Lock button. Widgets can then use this value for scaling
-        the normalized frequencies.
-            
-        - When the button is locked, the current sampling frequency is frozen
-          in  `fb.fil[0]['f_S_locked']`
-        - When the button is unlocked, the dictionary entry is replaced by 
-          `None`. Frequency related widgets are forced to use the current
-          `f_S` setting.
+        displayed values in the widgets can be locked by pressing the Lock button. 
+        After changing the sampling frequency, normalized frequencies have to be
+        rescaled like `f_a *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']` to maintain
+        the displayed value `f_a * f_S`.
+        
+        This has to be accomplished by each frequency widget.
+        
+        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`
+        the signal 'view_changed':'f_unit' is emitted.
         """
 
         if self.butLock.isChecked():
