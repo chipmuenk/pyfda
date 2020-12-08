@@ -55,7 +55,7 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             logger.warning("Infinite loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
