@@ -186,12 +186,12 @@ class FreqUnits(QWidget):
         """
 
         if self.butLock.isChecked():
-            # Lock has been activated, store current f_S
-            fb.fil[0].update({'f_S_locked':fb.fil[0]['f_S']})
+            # Lock has been activated, keep displayed frequencies locked
+            fb.fil[0]['freq_locked'] = True
             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         else:
-            # Lock has been unlocked, replace old f_S setting by None
-            fb.fil[0].update({'f_S_locked':None})
+            # Lock has been unlocked, scale displayed frequencies with f_S
+            fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
@@ -302,6 +302,7 @@ class FreqUnits(QWidget):
             again.
             """
             if self.spec_edited:
+                fb.fil[0].update({'f_S_prev':fb.fil[0]['f_S']})
                 fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')})
                 fb.fil[0].update({'T_S':1./fb.fil[0]['f_S']})
                 fb.fil[0].update({'f_max':fb.fil[0]['f_S']})

@@ -744,7 +744,7 @@ class PlotImpz_UI(QWidget):
         if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_fs()
+                self.update_freqs()()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -814,33 +814,43 @@ class PlotImpz_UI(QWidget):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
 #-------------------------------------------------------------
-    def load_fs(self):
+    def recalc_freqs(self):
         """
-        `load_fs()` is called during init and when the frequency unit or the
-        sampling frequency have been changed.
+        Update normalized frequencies if required. This is called by via signal 
+        ['ui_changed':'f_S'] from plot_impz.process_sig_rx
+        """
+        if fb.fil[0]['freq_locked']:
+            self.f1 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
+            self.f2 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
 
-        The sampling frequency is loaded from filter dictionary and displayed 
-        frequency fields are updated according to the units w.r.t. f_S setting.
-        Frequency field entries are always stored normalized 
-        in the dictionary: Normally, when f_S or the unit are changed, only the 
-        displayed values of the frequency entries are updated, not the dictionary.
-        
-        When the `f_S` lock button is selected, the absolute frequency values in
+        self.update_freqs()
+
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'f1_f2'})       
+               
+#-------------------------------------------------------------
+    def update_freqs(self):
+        """
+        `update_freqs()` is called:
+            
+        - when one of the stimulus frequencies has changed via eventFilter()
+        - sampling frequency has been changed via signal ['ui_changed':'f_S']
+          from plot_impz.process_sig_rx -> self.recalc_freqs
+
+        The sampling frequency is loaded from filter dictionary and stored as 
+        `self.f_scale` (except when the frequency unit is k when `f_scale = self.N`).
+                
+        Frequency field entries are always stored normalized w.r.t. f_S in the
+        dictionary: When the `f_S` lock button is unlocked, only the displayed
+        values for frequency entries are updated with f_S, not the dictionary.
+       
+        When the `f_S` lock button is pressed, the absolute frequency values in
         the widget fields are kept constant, and the dictionary entries are updated.
 
-        The value for f_scale (which is equal to f_S except when the frequency
-        unit is k) is updated in the draw() routine of plot_impz.py
-
-
-        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
-        at another place, indicating that a reload is required.
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.f_scale = self.N
-        elif fb.fil[0]['f_S_locked'] is not None:
-            self.f1 = self.f1 #* fb.fil[0]['f_S_locked']
         else:
             self.f_scale = fb.fil[0]['f_S']            
 

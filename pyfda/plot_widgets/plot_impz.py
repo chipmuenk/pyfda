@@ -252,7 +252,7 @@ class Plot_Impz(QWidget):
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
-                    self.ui.load_fs()
+                    self.ui.recalc_freqs()
                     self.draw()
                 else:
                     self.draw()
