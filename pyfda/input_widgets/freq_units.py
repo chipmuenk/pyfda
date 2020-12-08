@@ -82,15 +82,16 @@ class FreqUnits(QWidget):
         self.ledF_S.installEventFilter(self)  # filter events
         
         self.butLock = QToolButton(self)
-        self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+        self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
         self.butLock.setCheckable(True)
         self.butLock.setChecked(False)
-        self.butLock.setToolTip("<span>Unlocked: All frequencies are stored as normalized values; "
-                                "when f_S is changed all frequency related values change their values. "
-                                "Locked: Lock sampling frequency to current value; when f_S is changed, "
-                                "absolute values in frequency related widgets don't change.</span>")
+        self.butLock.setToolTip(
+            "<span><b>Unlocked:</b> When f_S is changed, all frequency related "
+            "widgets are updated, normalized frequencies stay the same.<br />"
+            "<b>Locked:</b> When f_S is changed, displayed absolute frequency "
+            "values don't change but normalized frequencies do.</span>")
         #self.butLock.setStyleSheet("QToolButton:checked {font-weight:bold}")
-        
+
         layHF_S = QHBoxLayout()
         layHF_S.addWidget(self.ledF_S)
         layHF_S.addWidget(self.butLock)
