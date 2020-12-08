@@ -55,7 +55,7 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             logger.warning("Infinite loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
@@ -220,6 +220,25 @@ class FreqSpecs(QWidget):
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
+
+#-------------------------------------------------------------
+    def recalc_freqs(self):
+        """
+        Update normalized frequencies if required. This is called by via signal 
+        ['ui_changed':'f_S']
+        """
+        if fb.fil[0]['freq_locked']:
+            logger.warning("recalc: {}".format(fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']))
+            for i in range(len(self.qlineedit)):
+                f_name = str(self.qlineedit[i].objectName()).split(":",1)
+                f_label = f_name[0]
+                f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
+                logger.warning("{0}:{1}".format(f_label,f_value))
+
+                fb.fil[0].update({f_label:f_value})
+                self.sort_dict_freqs()
+
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
 
 #-------------------------------------------------------------
     def update_f_unit(self):

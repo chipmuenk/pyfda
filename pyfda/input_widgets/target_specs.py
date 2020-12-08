@@ -28,7 +28,7 @@ class TargetSpecs(QWidget):
     and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
     # class variables (shared between instances if more than one exists)
-    # sig_rx = pyqtSignal(object) # incoming
+    sig_rx = pyqtSignal(object) # incoming
     sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Target Specs"):
@@ -38,18 +38,20 @@ class TargetSpecs(QWidget):
         
         self._construct_UI()
 
-# =============================================================================
-# #------------------------------------------------------------------------------
-#     def process_sig_rx(self, dict_sig=None):
-#         """
-#         Process signals coming in via subwidgets and sig_rx
-#         """
-#         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-#         if dict_sig['sender'] == __name__:
-#             logger.warning("Infinite loop detected")
-#             return
-# #------------------------------------------------------------------------------
-# =============================================================================
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected")
+            return
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            # update target frequencies with new f_S
+            self.f_specs.recalc_freqs()
+
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct user interface
@@ -98,7 +100,7 @@ class TargetSpecs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        # self.sig_rx.connect(self.process_sig_rx)
+        self.sig_rx.connect(self.process_sig_rx)
         
         self.update_UI() # first time initialization
 

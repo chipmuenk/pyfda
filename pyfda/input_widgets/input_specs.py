@@ -155,7 +155,7 @@ class Input_Specs(QWidget):
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         self.t_specs.sig_tx.connect(self.sig_rx_local)
-        # self.sig_tx.connect(self.t_specs.sig_rx)
+        self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
