@@ -223,7 +223,8 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stmq = QComboBox(self)
         self.cmb_plt_time_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
-        self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
+        self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
+                                          "(quantized) stimulus.</span>")
 
         lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
@@ -234,7 +235,8 @@ class PlotImpz_UI(QWidget):
         lbl_win_time = QLabel(to_html("&nbsp;&nbsp;FFT Window", frmt='bi'), self)
         self.chk_win_time = QCheckBox(self)
         self.chk_win_time.setObjectName("chk_win_time")
-        self.chk_win_time.setToolTip('<span>Show FFT windowing function (can be modified in the "Frequency" tab).</span>')
+        self.chk_win_time.setToolTip('<span>Show FFT windowing function (can be '
+                                     'modified in the "Frequency" tab).</span>')
         self.chk_win_time.setChecked(False)
 
         lbl_log_time = QLabel(to_html("dB", frmt='b'), self)
@@ -270,14 +272,16 @@ class PlotImpz_UI(QWidget):
         self.lbl_nfft_spgr_time.setVisible(spgr_en)
         self.led_nfft_spgr_time = QLineEdit(self)
         self.led_nfft_spgr_time.setText(str(self.nfft_spgr_time))
-        self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per spectrogram segment.</span>")
+        self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per "
+                                           "spectrogram segment.</span>")
         self.led_nfft_spgr_time.setVisible(spgr_en)
 
         self.lbl_ovlp_spgr_time = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
         self.lbl_ovlp_spgr_time.setVisible(spgr_en)
         self.led_ovlp_spgr_time = QLineEdit(self)
         self.led_ovlp_spgr_time.setText(str(self.ovlp_spgr_time))
-        self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points between spectrogram segments.</span>")
+        self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points "
+                                           "between spectrogram segments.</span>")
         self.led_ovlp_spgr_time.setVisible(spgr_en)
 
         self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
@@ -295,7 +299,8 @@ class PlotImpz_UI(QWidget):
         self.lbl_byfs_spgr_time.setVisible(spgr_en)
         self.chk_byfs_spgr_time = QCheckBox(self)
         self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
-        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density i.e. scale by f_S</span>")
+        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density i.e. "
+                                           "scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
@@ -373,7 +378,8 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_stmq = QComboBox(self)
         self.cmb_plt_freq_stmq.addItems(plot_styles_list)
         qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
-        self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
+        self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
+                                          "(quantized) stimulus.</span>")
 
         lbl_plt_freq_resp = QLabel(to_html("&nbsp;Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
@@ -707,6 +713,8 @@ class PlotImpz_UI(QWidget):
         - When a QLineEdit widget loses input focus (``QEvent.FocusOut``), store
           current value normalized to f_S with full precision (only if
           ``spec_edited == True``) and display the stored value in selected format
+          
+          Emit 'ui_changed':'stim'
         """
 
         def _store_entry(source):
@@ -848,9 +856,8 @@ class PlotImpz_UI(QWidget):
                 str(params['FMT'].format(self.f1 * self.f_scale)))
             self.ledFreq2.setText(
                 str(params['FMT'].format(self.f2 * self.f_scale)))
-
+ 
 #-------------------------------------------------------------
-
 
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
@@ -881,6 +888,7 @@ class PlotImpz_UI(QWidget):
         self.chirp_method = qget_cmb_box(self.cmbChirpMethod) # read current data string
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_method'})
 
+#-------------------------------------------------------------
 
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
