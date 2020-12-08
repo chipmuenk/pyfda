@@ -744,7 +744,7 @@ class PlotImpz_UI(QWidget):
         if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.update_freqs()()
+                self.update_freqs()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
