@@ -198,7 +198,7 @@ class Input_Specs(QWidget):
         #----------------------------------------------------------------------
         self.sig_rx_local.connect(self.process_sig_rx_local)
         self.butLoadFilt.clicked.connect(lambda: load_filter(self))
-        self.butSaveFilt.clicked.connect(lambda: save_filter(self))        
+        self.butSaveFilt.clicked.connect(lambda: save_filter(self))
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
@@ -378,7 +378,7 @@ class Input_Specs(QWidget):
         When <QUIT> button is pressed, send 'quit_program'
         """
         self.sig_tx.emit({'sender':__name__, 'quit_program':''})
-        
+
 
 
 #------------------------------------------------------------------------------

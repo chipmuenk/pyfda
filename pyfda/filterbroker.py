@@ -50,7 +50,7 @@ design_filt_state = "changed" #: State of filter design: "ok", "changed", "error
 # -----------------------------------------------------------------------------
 # Dicts with class names found in the main configuration file,
 # parsed in `tree_builder.build_class_dict()`. Those initial definitions
-# are only meant as examples and for module test, they are overwritten during 
+# are only meant as examples and for module test, they are overwritten during
 # the initialization.
 #------------------------------------------------------------------------------
 
@@ -225,7 +225,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
             'N':10, # filter order
             'f_S':1, 'T_S':1, # current sampling frequency and period
             'f_S_prev': 1, # previous sampling frequency
-            'freq_locked': False, # don't update absolute frequencies when f_S is changed        
+            'freq_locked': False, # don't update absolute frequencies when f_S is changed
             'f_S_scale':1, #
             'f_max':1,
             'freqSpecsRangeType':'Half',
@@ -256,7 +256,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
                         'scale':2, 'frmt':'float'},
                  'QCA':{'WI':2, 'WF':13, 'W':16, 'ovfl':'wrap', 'quant':'floor',
                         'scale':4, 'frmt':'float'},
-                 'b': [32768, 32768, 32768], 
+                 'b': [32768, 32768, 32768],
                  'a': [65536, 6553, 0]
                  },
 
@@ -290,7 +290,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
                 {'name':'Hann', # Window name
                  'fnct':'hann', # function name or array with values
                  'par':[],      # set of list of window parameters
-                 'n_par' : 0,   # number of window parameters                 
+                 'n_par' : 0,   # number of window parameters
                  'info':"",     # Docstring for the window
                  'win_len':1024
                  }

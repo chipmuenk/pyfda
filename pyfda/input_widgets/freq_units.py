@@ -80,7 +80,7 @@ class FreqUnits(QWidget):
         self.ledF_S.setText(str(fb.fil[0]["f_S"]))
         self.ledF_S.setObjectName("f_S")
         self.ledF_S.installEventFilter(self)  # filter events
-        
+
         self.butLock = QToolButton(self)
         self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
         self.butLock.setCheckable(True)
@@ -172,15 +172,15 @@ class FreqUnits(QWidget):
         widgets change their values. Most of the time, this is the desired behaviour,
         the properties of discrete time systems or signals are usually defined
         by the normalized frequencies.
-        
+
         When the effect of varying the sampling frequency is to be analyzed, the
-        displayed values in the widgets can be locked by pressing the Lock button. 
+        displayed values in the widgets can be locked by pressing the Lock button.
         After changing the sampling frequency, normalized frequencies have to be
         rescaled like `f_a *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']` to maintain
         the displayed value `f_a * f_S`.
-        
+
         This has to be accomplished by each frequency widget.
-        
+
         The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`
         the signal 'view_changed':'f_unit' is emitted.
         """
@@ -202,7 +202,7 @@ class FreqUnits(QWidget):
         update_UI is called
         - during init
         - when the unit combobox is changed
-        
+
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
@@ -210,7 +210,7 @@ class FreqUnits(QWidget):
         """
         f_unit = str(self.cmbUnits.currentText()) # selected frequency unit
         idx = self.cmbUnits.currentIndex() # and its index
-        
+
         is_normalized_freq = f_unit in  {"f_S", "f_Ny", "k"}
 
         self.ledF_S.setVisible(not is_normalized_freq) # only vis. when
@@ -232,7 +232,7 @@ class FreqUnits(QWidget):
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
                 fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
-            else: # frequency index k, 
+            else: # frequency index k,
                 fb.fil[0]['f_S'] = 1.
                 fb.fil[0]['T_S'] = 1.
                 fb.fil[0]['f_max'] = params['N_FFT']
@@ -269,8 +269,8 @@ class FreqUnits(QWidget):
         fb.fil[0].update({'f_S_scale':f_S_scale}) # scale factor for f_S (Hz, kHz, ...)
         fb.fil[0].update({'freq_specs_unit':f_unit}) # frequency unit
         # time and frequency unit as string e.g. for plot axis labeling
-        fb.fil[0].update({"plt_fUnit":plt_f_unit}) 
-        fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) 
+        fb.fil[0].update({"plt_fUnit":plt_f_unit})
+        fb.fil[0].update({"plt_tUnit":self.t_units[idx]})
         # complete plot axis labels including unit and arrow
         fb.fil[0].update({"plt_fLabel":f_label})
         fb.fil[0].update({"plt_tLabel":t_label})

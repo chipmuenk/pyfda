@@ -713,7 +713,7 @@ class PlotImpz_UI(QWidget):
         - When a QLineEdit widget loses input focus (``QEvent.FocusOut``), store
           current value normalized to f_S with full precision (only if
           ``spec_edited == True``) and display the stored value in selected format
-          
+
           Emit 'ui_changed':'stim'
         """
 
@@ -816,7 +816,7 @@ class PlotImpz_UI(QWidget):
 #-------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies if required. This is called by via signal 
+        Update normalized frequencies if required. This is called by via signal
         ['ui_changed':'f_S'] from plot_impz.process_sig_rx
         """
         if fb.fil[0]['freq_locked']:
@@ -825,24 +825,24 @@ class PlotImpz_UI(QWidget):
 
         self.update_freqs()
 
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'f1_f2'})       
-               
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'f1_f2'})
+
 #-------------------------------------------------------------
     def update_freqs(self):
         """
         `update_freqs()` is called:
-            
+
         - when one of the stimulus frequencies has changed via eventFilter()
         - sampling frequency has been changed via signal ['ui_changed':'f_S']
           from plot_impz.process_sig_rx -> self.recalc_freqs
 
-        The sampling frequency is loaded from filter dictionary and stored as 
+        The sampling frequency is loaded from filter dictionary and stored as
         `self.f_scale` (except when the frequency unit is k when `f_scale = self.N`).
-                
+
         Frequency field entries are always stored normalized w.r.t. f_S in the
         dictionary: When the `f_S` lock button is unlocked, only the displayed
         values for frequency entries are updated with f_S, not the dictionary.
-       
+
         When the `f_S` lock button is pressed, the absolute frequency values in
         the widget fields are kept constant, and the dictionary entries are updated.
 
@@ -852,7 +852,7 @@ class PlotImpz_UI(QWidget):
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.f_scale = self.N
         else:
-            self.f_scale = fb.fil[0]['f_S']            
+            self.f_scale = fb.fil[0]['f_S']
 
         if self.ledFreq1.hasFocus():
             # widget has focus, show full precision
@@ -866,7 +866,7 @@ class PlotImpz_UI(QWidget):
                 str(params['FMT'].format(self.f1 * self.f_scale)))
             self.ledFreq2.setText(
                 str(params['FMT'].format(self.f2 * self.f_scale)))
- 
+
 #-------------------------------------------------------------
 
     def _update_amp1(self):
