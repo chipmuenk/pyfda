@@ -1,5 +1,21 @@
 ## Changelog
 
+### [v0.5.2](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-08)
+
+### Bug fixes
+
+- Use f_C widgets in elliptic manual filter design (entered values had not been
+  used for the filter design)
+
+### New features
+
+- Added widget duty cycle for the rect pulse, enabling and disabling of widgets
+  is now structured much cleaner
+  
+- Absolute frequencies can be locked now, i.e. normalized frequencies change 
+  with the sampling frequency, absolute frequencies remain unchanged
+
+
 ### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
 
 ### Bug fixes
@@ -18,7 +34,7 @@
 
 - Added stimulus "sinc"
 
-- Added indicator for complex valued time signals, display of single-sided
+- Added warning indicator for complex valued time signals where display of single-sided
   and H_id spectra may be wrong
 
 

@@ -60,8 +60,9 @@ class FreqSpecs(QWidget):
             logger.warning("Infinite loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()
-        elif 'view_changed' in dict_sig:
-            self.load_dict()
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            self.recalc_freqs()
+            #self.load_dict()
 
 #-------------------------------------------------------------
     def _construct_UI(self):
@@ -220,6 +221,23 @@ class FreqSpecs(QWidget):
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
+
+#-------------------------------------------------------------
+    def recalc_freqs(self):
+        """
+        Update normalized frequencies if required. This is called by via signal 
+        ['ui_changed':'f_S']
+        """
+        if fb.fil[0]['freq_locked']:
+            for i in range(len(self.qlineedit)):
+                f_name = str(self.qlineedit[i].objectName()).split(":",1)
+                f_label = f_name[0]
+                f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
+
+                fb.fil[0].update({f_label:f_value})
+                self.sort_dict_freqs()
+
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
 
 #-------------------------------------------------------------
     def update_f_unit(self):

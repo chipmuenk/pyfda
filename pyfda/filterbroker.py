@@ -50,7 +50,7 @@ design_filt_state = "changed" #: State of filter design: "ok", "changed", "error
 # -----------------------------------------------------------------------------
 # Dicts with class names found in the main configuration file,
 # parsed in `tree_builder.build_class_dict()`. Those initial definitions
-# are only meant as examples and for module test, they are overwritten during 
+# are only meant as examples and for module test, they are overwritten during
 # the initialization.
 #------------------------------------------------------------------------------
 
@@ -221,8 +221,21 @@ fil_tree = freeze_hierarchical({
 # auxiliary information, the initial definition here is overwritten by
 # input widgets and design routines:
 #------------------------------------------------------------------------------
-fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man',
-            'N':10, 'f_S':1, 'T_S':1, 'f_S_scale':1, 'f_max':1,
+fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
+            'N':10, # filter order
+            'f_S':1, 'T_S':1, # current sampling frequency and period
+            'f_S_prev': 1, # previous sampling frequency
+            'freq_locked': False, # don't update absolute frequencies when f_S is changed
+            'f_S_scale':1, #
+            'f_max':1,
+            'freqSpecsRangeType':'Half',
+            'freqSpecsRange': [0, 0.5],
+            'freq_specs_sort' : True, # sort freq. specs in ascending order
+            'freq_specs_unit' : 'f_S',
+            'plt_fLabel':r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
+            'plt_fUnit':'f_S',
+            'plt_tLabel':r'$n \; \rightarrow$',
+            'plt_tUnit':'s',
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
             'W_PB':1, 'W_PB2':1, 'W_SB':1, 'W_SB2':1,
@@ -243,20 +256,13 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man',
                         'scale':2, 'frmt':'float'},
                  'QCA':{'WI':2, 'WF':13, 'W':16, 'ovfl':'wrap', 'quant':'floor',
                         'scale':4, 'frmt':'float'},
-                 'b': [32768, 32768, 32768], 
+                 'b': [32768, 32768, 32768],
                  'a': [65536, 6553, 0]
                  },
 
             'creator':('ba', 'filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit':'dB',
-            'freqSpecsRangeType':'Half',
-            'freqSpecsRange': [0, 0.5],
-            'freq_specs_sort' : True,
-            'freq_specs_unit' : 'f_S',
-            'plt_fLabel':r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
-            'plt_fUnit':'f_S',
-            'plt_tLabel':r'$n \; \rightarrow$',
-            'plt_tUnit':'s',
+
             'plt_phiUnit': 'rad',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
                     + r'$\rightarrow $',
@@ -284,7 +290,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man',
                 {'name':'Hann', # Window name
                  'fnct':'hann', # function name or array with values
                  'par':[],      # set of list of window parameters
-                 'n_par' : 0,   # number of window parameters                 
+                 'n_par' : 0,   # number of window parameters
                  'info':"",     # Docstring for the window
                  'win_len':1024
                  }
