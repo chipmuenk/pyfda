@@ -407,6 +407,7 @@ class Plot_Impz(QWidget):
         self.n = np.arange(self.ui.N_end)
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
+        T_S = fb.fil[0]['T_S']
 
         # calculate stimuli x[n] ==============================================
         self.H_str = ''
@@ -449,8 +450,8 @@ class Plot_Impz(QWidget):
             self.title_str += r'Sinusoidal Signal '
 
         elif self.ui.stim == "Sinc":
-            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2) * self.ui.f1 + phi1) +\
-                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2) * self.ui.f2 + phi2)
+            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T1 * T_S) * self.ui.f1 ) +\
+                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T2 * T_S) * self.ui.f2)
             self.title_str += r'Sinc Signal '
 
         elif self.ui.stim == "Chirp":
@@ -669,12 +670,15 @@ class Plot_Impz(QWidget):
 
         if fb.fil[0]['freq_specs_unit'] == 'k':
             f_unit = ''
+            t_unit = ''
             self.ui.lblFreq1.setText(self.ui.txtFreq1_k)
             self.ui.lblFreq2.setText(self.ui.txtFreq2_k)
         else:
             f_unit = fb.fil[0]['plt_fUnit']
+            t_unit = fb.fil[0]['plt_tUnit'].replace("$\mu$", "&mu;")
             self.ui.lblFreq1.setText(self.ui.txtFreq1_f)
             self.ui.lblFreq2.setText(self.ui.txtFreq2_f)
+
 
         if f_unit in {"f_S", "f_Ny"}:
             unit_frmt = "i" # italic
@@ -683,6 +687,9 @@ class Plot_Impz(QWidget):
 
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
+        self.ui.lbl_TU1.setText(to_html(t_unit, frmt=unit_frmt))
+        self.ui.lbl_TU2.setText(to_html(t_unit, frmt=unit_frmt))
+
         self.t = self.n * fb.fil[0]['T_S']
 #        self.ui.load_fs()
 
