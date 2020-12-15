@@ -1,6 +1,22 @@
 ## Changelog
 
-### [v0.5.2](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-08)
+### [v0.5.4](https://github.com/chipmuenk/pyfda/tree/v0.5.4) (2020-12-xx)
+
+### Bug fixes
+
+- Recalculate frequency specs in 'k' in the y[n] widget when `self.N` has been changed
+
+- Update frequency specs when the frequency unit has been changed (regression)
+
+- Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
+  angle character
+
+### New features
+
+- 
+
+### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
+(There is no release v0.5.2)
 
 ### Bug fixes
 
