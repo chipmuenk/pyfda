@@ -967,6 +967,10 @@ class PlotImpz_UI(QWidget):
             self.led_N_points.setText(str(self.N)) # update widget
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
+        
+        # recalculate displayed freq. index values when freq. unit == 'k'
+        if fb.fil[0]['freq_specs_unit'] == 'k':
+            self.update_freqs()
 
         # FFT window needs to be updated due to changed number of data points
         self._update_win_fft(emit=False) # don't emit anything here
