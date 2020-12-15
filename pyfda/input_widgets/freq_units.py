@@ -182,7 +182,7 @@ class FreqUnits(QWidget):
         This has to be accomplished by each frequency widget.
 
         The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`
-        the signal 'view_changed':'f_unit' is emitted.
+        the signal 'view_changed':'f_S' is emitted.
         """
 
         if self.butLock.isChecked():
@@ -194,7 +194,7 @@ class FreqUnits(QWidget):
             fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
 
 #-------------------------------------------------------------
     def update_UI(self):
@@ -206,7 +206,7 @@ class FreqUnits(QWidget):
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
-        Update the freqSpecsRange and finally, emit 'view_changed':'f_unit' signal
+        Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
         f_unit = str(self.cmbUnits.currentText()) # selected frequency unit
         idx = self.cmbUnits.currentIndex() # and its index
@@ -277,7 +277,7 @@ class FreqUnits(QWidget):
 
         self._freq_range(emit=False) # update f_lim setting without emitting signal
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
 
 #------------------------------------------------------------------------------
 
