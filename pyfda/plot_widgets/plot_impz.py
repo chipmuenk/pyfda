@@ -279,6 +279,12 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
 
+            elif 'view_changed' in dict_sig:
+                # update frequency related widgets (visible or not)
+                if dict_sig['view_changed'] == 'f_S':
+                    self.ui.recalc_freqs()
+
+
 #            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
 #                    self.needs_calc = True # always require recalculation when triggered externally
 #                    qstyle_widget(self.ui.but_run, "changed")
@@ -450,8 +456,8 @@ class Plot_Impz(QWidget):
             self.title_str += r'Sinusoidal Signal '
 
         elif self.ui.stim == "Sinc":
-            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T1 * T_S) * self.ui.f1 ) +\
-                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T2 * T_S) * self.ui.f2)
+            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T1) * self.ui.f1 ) +\
+                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T2) * self.ui.f2)
             self.title_str += r'Sinc Signal '
 
         elif self.ui.stim == "Chirp":
