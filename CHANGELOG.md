@@ -13,7 +13,7 @@
 
 ### New features
 
-- 
+- Add widgets for delays T1 and T2 in stimuli for y[n] and use them with sinc
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)
