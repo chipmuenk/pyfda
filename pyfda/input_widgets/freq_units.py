@@ -62,7 +62,7 @@ class FreqUnits(QWidget):
         self.layVMain = QVBoxLayout() # Widget main layout
 
         f_units = ['k','f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
-        self.t_units = ['', '', '', 's', 'ms', r'$\mu$s', 'ns']
+        self.t_units = ['', 'T_S', 'T_S', 's', 'ms', r'$\mu$s', 'ns']
 
         bfont = QFont()
         bfont.setBold(True)
@@ -222,21 +222,23 @@ class FreqUnits(QWidget):
             # store current sampling frequency to restore it when returning to
             # unnormalized frequencies
             self.fs_old = fb.fil[0]['f_S']
-            t_label = r"$n \; \rightarrow$"
 
             if f_unit == "f_S": # normalized to f_S
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
                 fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
+                t_label = r"$n = t\, /\, T_S \; \rightarrow$"
             elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
                 fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
+                t_label = r"$n = t\, /\, T_S \; \rightarrow$"
             else: # frequency index k,
                 fb.fil[0]['f_S'] = 1.
                 fb.fil[0]['T_S'] = 1.
                 fb.fil[0]['f_max'] = params['N_FFT']
                 f_label = r"$k \; \rightarrow$"
+                t_label = r"$n\; \rightarrow$"
 
             self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 

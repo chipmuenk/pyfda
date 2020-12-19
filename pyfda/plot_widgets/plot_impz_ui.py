@@ -103,9 +103,9 @@ class PlotImpz_UI(QWidget):
         self.stim_wdg_dict = collections.OrderedDict()
         self.stim_wdg_dict.update(
         {"None":    {"dc", "noise"},
-         "Impulse": {"dc", "a1", "scale", "noise"},
-         "Step":    {"a1", "noise"},
-         "StepErr": {"a1", "noise"},
+         "Impulse": {"dc", "a1", "T1", "scale", "noise"},
+         "Step":    {"a1", "T1", "noise"},
+         "StepErr": {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
@@ -566,14 +566,14 @@ class PlotImpz_UI(QWidget):
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
         
         #----------------------------------------------
-        self.lbl_T1 = QLabel(to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
+        self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
         self.led_T1.setText(str(self.T1))
         self.led_T1.setToolTip("Stimulus time shift")
         self.led_T1.setObjectName("stimT1")
         self.lbl_TU1 = QLabel(to_html("T_S", frmt='b'), self)
 
-        self.lbl_T2 = QLabel(to_html("&nbsp;&Delta;T_2", frmt='bi') + " =", self)
+        self.lbl_T2 = QLabel(to_html("&nbsp;T_2", frmt='bi') + " =", self)
         self.led_T2 = QLineEdit(self)
         self.led_T2.setText(str(self.T2))
         self.led_T2.setToolTip("Stimulus time shift 2")
