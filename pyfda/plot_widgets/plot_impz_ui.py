@@ -603,6 +603,12 @@ class PlotImpz_UI(QWidget):
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
+        self.cmbNoise.setItemData(1, "<span>Normal- or Gauss-distributed white noise with "
+                                      "std. deviation &sigma;.</span>", Qt.ToolTipRole)
+        self.cmbNoise.setItemData(2, "<span>Uniform distributed white noise in the range &plusmn; "
+                                      "&Delta;/2.</span>", Qt.ToolTipRole)
+        self.cmbNoise.setItemData(3, "<span>Pseudo-Random Binary Sequence with &plusmn; A."
+                                      "</span>", Qt.ToolTipRole)
         self.cmbNoise.setToolTip("Type of additive noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
 
