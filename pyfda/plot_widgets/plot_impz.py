@@ -413,7 +413,10 @@ class Plot_Impz(QWidget):
         self.n = np.arange(self.ui.N_end)
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
-        T_S = fb.fil[0]['T_S']
+        #T_S = fb.fil[0]['T_S']
+        # calculate index from T1 entry for creating stimulus vectors, shifted 
+        # by T1. Limit the value to N_end - 1.
+        self.T1_int = min(int(np.round(self.ui.T1)), self.ui.N_end-1)
 
         # calculate stimuli x[n] ==============================================
         self.H_str = ''
@@ -426,7 +429,7 @@ class Plot_Impz(QWidget):
                 A_type = float
 
             self.x = np.zeros(self.ui.N_end, dtype=A_type)
-            self.x[0] = self.ui.A1 # create dirac impulse as input signal
+            self.x[self.T1_int] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
@@ -437,11 +440,15 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
+            self.x[0:self.T1_int].fill(0)
+            
             self.title_str = r'Step Response'
             self.H_str = r'$h_{\epsilon}[n]$'
 
         elif self.ui.stim == "StepErr":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
+            self.x[0:self.T1_int].fill(0)
+            # The final (DC) value is subtracted in self.calc_response()
             self.title_str = r'Settling Error'
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
 
@@ -461,7 +468,11 @@ class Plot_Impz(QWidget):
             self.title_str += r'Sinc Signal '
 
         elif self.ui.stim == "Chirp":
-            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, self.ui.N_end, self.ui.f2,
+            if True: # sig.chirp is buggy, T_sim cannot be larger than T_end
+                T_end = self.ui.N_end
+            else:
+                T_end = self.ui.T2
+            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, T_end, self.ui.f2,
                                             method=self.ui.chirp_method.lower(), phi=phi1)
             self.title_str += self.ui.chirp_method + ' Chirp Signal'
 
@@ -583,7 +594,8 @@ class Plot_Impz(QWidget):
 
         if self.ui.stim == "StepErr":
             dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
-            y = y - abs(dc[1]) # subtract DC (final) value from response
+             # subtract DC (final) value from response
+            y[self.T1_int:] = y[self.T1_int:] - abs(dc[1])
 
         self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 
