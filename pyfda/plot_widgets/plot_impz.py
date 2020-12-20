@@ -422,7 +422,12 @@ class Plot_Impz(QWidget):
         self.H_str = ''
         self.title_str = ""
 
-        if self.ui.stim == "Impulse":
+        if self.ui.stim == "None":
+            self.x = np.zeros(self.ui.N_end)
+            self.title_str = r'Zero Input System Response'
+            self.H_str = r'$h_0[n]$' # default
+
+        elif self.ui.stim == "Dirac":
             if np_type(self.ui.A1) == complex:
                 A_type = complex
             else:
@@ -432,11 +437,6 @@ class Plot_Impz(QWidget):
             self.x[self.T1_int] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
-
-        elif self.ui.stim == "None":
-            self.x = np.zeros(self.ui.N_end)
-            self.title_str = r'Zero Input System Response'
-            self.H_str = r'$h_0[n]$' # default
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function

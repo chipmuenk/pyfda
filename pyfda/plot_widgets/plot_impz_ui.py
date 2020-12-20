@@ -67,8 +67,10 @@ class PlotImpz_UI(QWidget):
         self.mode_spgr_time = "magnitude"
 
         # stimuli
-        self.stim = "Impulse"
-        self.chirp_method = 'Linear'
+        self.cmb_stim = "Impulse"
+        self.stim = "Dirac"
+        self.chirp_type = 'Linear'
+        self.impulse_type = 'Dirac'
         self.noise = "None"
 
         self.f1 = 0.02
@@ -103,7 +105,7 @@ class PlotImpz_UI(QWidget):
         self.stim_wdg_dict = collections.OrderedDict()
         self.stim_wdg_dict.update(
         {"None":    {"dc", "noise"},
-         "Impulse": {"dc", "a1", "T1", "scale", "noise"},
+         "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
          "Step":    {"a1", "T1", "noise"},
          #"StepErr": {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -118,7 +120,16 @@ class PlotImpz_UI(QWidget):
          "PM / FM": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"}
          })
-
+        self.stim_cmb_items = [("None", ""),
+                              ("Impulse", "<span>Different impulses</span>"),
+                              ("Step", "<span>Calculate step response and its error.</span>"),
+                              ("Cos", ""),
+                              ("Sine", ""),
+                              ("Chirp", "<span>Different frequency sweeps.</span>"),
+                              ("Edges", "<span>Periodic functions with steep edges.</span>"),
+                              ("AM",""),
+                              ("PM / FM", ""),
+                              ("Formula", "<span>Formula defined stimulus.</span>")]
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
@@ -494,9 +505,12 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
+        for i in range(len(self.stim_cmb_items)):
+            self.cmbStimulus.addItem(self.stim_cmb_items[i][0])
+            self.cmbStimulus.setItemData(i, self.stim_cmb_items[i][1], Qt.ToolTipRole)
         self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
         self.cmbStimulus.setToolTip("Stimulus type.")
-        qset_cmb_box(self.cmbStimulus, self.stim)
+        qset_cmb_box(self.cmbStimulus, self.cmb_stim)
 
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.ledStimPar1 = QLineEdit(self)
@@ -517,6 +531,11 @@ class PlotImpz_UI(QWidget):
             self.cmbChirpType.addItem(*t)
         qset_cmb_box(self.cmbChirpType, self.chirp_type, data=False)
         
+        self.cmbImpulseType = QComboBox(self)
+        for t in [("Dirac","Dirac"),("Gauss","Gauss"),
+                  ("Sinc", "Sinc")]: # text, data , ("Rect", "Rect")
+            self.cmbImpulseType.addItem(*t)
+        qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=False)
 
         self.chk_scale_impz_f = QCheckBox("Scale", self)
         self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response "
@@ -544,6 +563,7 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
         layHCmbStim.addWidget(self.cmbChirpType)
+        layHCmbStim.addWidget(self.cmbImpulseType)
         layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.chk_step_err)
         #----------------------------------------------
@@ -892,13 +912,18 @@ class PlotImpz_UI(QWidget):
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
-        self.stim = qget_cmb_box(self.cmbStimulus, data=False)
+        self.cmb_stim = qget_cmb_box(self.cmbStimulus, data=False)
+        if self.cmb_stim == "Impulse":
+            self.stim = qget_cmb_box(self.cmbImpulseType, data=False)
+        else:
+            self.stim = qget_cmb_box(self.cmbStimulus, data=False)
+
         stim_wdg = self.stim_wdg_dict[self.stim]
 
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
-        self.chk_scale_impz_f.setVisible(self.stim == 'Impulse')
+        self.chk_scale_impz_f.setVisible(self.stim == 'Dirac')
         self.chk_scale_impz_f.setEnabled(self.DC == 0 and (self.noi == 0 or\
             self.cmbNoise.currentText() == 'None'))
         
