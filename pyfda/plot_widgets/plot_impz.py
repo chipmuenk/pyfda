@@ -473,8 +473,8 @@ class Plot_Impz(QWidget):
             else:
                 T_end = self.ui.T2
             self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, T_end, self.ui.f2,
-                                            method=self.ui.chirp_method.lower(), phi=phi1)
-            self.title_str += self.ui.chirp_method + ' Chirp Signal'
+                                            method=self.ui.chirp_type.lower(), phi=phi1)
+            self.title_str += self.ui.chirp_type + ' Chirp Signal'
 
         elif self.ui.stim == "Triang":
             if self.ui.chk_stim_bl.isChecked():
@@ -494,10 +494,12 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "Rect":
             if self.ui.chk_stim_bl.isChecked():
-                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
+                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1,
+                                              duty=self.ui.stim_par1)
                 self.title_str += r'Bandlimited Rect. Signal'
             else:
-                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
+                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1,
+                                                 duty=self.ui.stim_par1)
                 self.title_str += r'Rect. Signal'
 
         elif self.ui.stim == "Comb":

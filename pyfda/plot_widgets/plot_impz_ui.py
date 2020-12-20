@@ -511,15 +511,17 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
 
-        self.cmbChirpMethod = QComboBox(self)
-        for t in [("Lin","Linear"),("Square","Quadratic"),("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
-            self.cmbChirpMethod.addItem(*t)
-        qset_cmb_box(self.cmbChirpMethod, self.chirp_method, data=False)
+        self.cmbChirpType = QComboBox(self)
+        for t in [("Lin","Linear"),("Square","Quadratic"),
+                  ("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
+            self.cmbChirpType.addItem(*t)
+        qset_cmb_box(self.cmbChirpType, self.chirp_type, data=False)
+        
 
         self.chk_scale_impz_f = QCheckBox("Scale", self)
-        self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response with <i>N<sub>FFT</sub></i> "
-                                    "so that it has the same magnitude as |H(f)|. DC and Noise need to be "
-                                    "turned off.</span>")
+        self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response "
+                        "with <i>N<sub>FFT</sub></i> so that it has the same magnitude "
+                            "as |H(f)|. DC and Noise need to be turned off.</span>")
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
 
@@ -534,9 +536,9 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.chk_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
+        layHCmbStim.addWidget(self.cmbChirpType)
         layHCmbStim.addWidget(self.chk_scale_impz_f)
-        layHCmbStim.addWidget(self.cmbChirpMethod)
-
+        layHCmbStim.addWidget(self.chk_step_err)
         #----------------------------------------------
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -663,7 +665,7 @@ class PlotImpz_UI(QWidget):
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
         self.ledStimFormula = QLineEdit(self)
         self.ledStimFormula.setText(str(self.stim_formula))
-        self.ledStimFormula.setToolTip("<span>Enter formula for stimulus in numexpr syntax"
+        self.ledStimFormula.setToolTip("<span>Enter formula for stimulus in numexpr syntax."
                                   "</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
@@ -722,7 +724,8 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
-        self.cmbChirpMethod.currentIndexChanged.connect(self._update_chirp_method)
+        self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
+        self.cmbImpulseType.currentIndexChanged.connect(self._update_impulse_type)
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
@@ -923,7 +926,8 @@ class PlotImpz_UI(QWidget):
         self.lblStimFormula.setVisible(self.stim == "Formula")
         self.ledStimFormula.setVisible(self.stim == "Formula")
 
-        self.cmbChirpMethod.setVisible(self.stim == 'Chirp')
+        self.cmbChirpType.setVisible(self.cmb_stim == 'Chirp')
+        self.cmbImpulseType.setVisible(self.cmb_stim == 'Impulse')
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -953,10 +957,12 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.setText(str(self.phi2))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi2'})
         
-    def _update_chirp_method(self):
-        """ Update value for self.chirp_method from the QLineEditWidget"""
-        self.chirp_method = qget_cmb_box(self.cmbChirpMethod) # read current data string
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_method'})
+    def _update_chirp_type(self):
+        """ Update value for self.chirp_type from the QLineEditWidget"""
+        self.chirp_type = qget_cmb_box(self.cmbChirpType) # read current data string
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_type'})
+        
+    def _update_impulse_type(self):
 
 #-------------------------------------------------------------
 
@@ -1015,9 +1021,11 @@ class PlotImpz_UI(QWidget):
         """
         if not isinstance(emit, bool):
             logger.error("update N: emit={0}".format(emit))
-        self.N_start = safe_eval(self.led_N_start.text(), self.N_start, return_type='int', sign='poszero')
+        self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
+                                 return_type='int', sign='poszero')
         self.led_N_start.setText(str(self.N_start)) # update widget
-        self.N_user = safe_eval(self.led_N_points.text(), self.N_user, return_type='int', sign='poszero')
+        self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
+                                return_type='int', sign='poszero')
 
         if self.N_user == 0: # automatic calculation
             self.N = self.calc_n_points(self.N_user) # widget remains set to 0
