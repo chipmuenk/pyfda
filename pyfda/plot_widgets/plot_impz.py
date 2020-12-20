@@ -441,16 +441,19 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.x[0:self.T1_int].fill(0)
-            
-            self.title_str = r'Step Response'
-            self.H_str = r'$h_{\epsilon}[n]$'
+            if self.ui.chk_step_err.isChecked():
+                self.title_str = r'Settling Error'
+                self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+            else:
+                self.title_str = r'Step Response'
+                self.H_str = r'$h_{\epsilon}[n]$'
 
-        elif self.ui.stim == "StepErr":
-            self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
-            self.x[0:self.T1_int].fill(0)
-            # The final (DC) value is subtracted in self.calc_response()
-            self.title_str = r'Settling Error'
-            self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+        # elif self.ui.stim == "StepErr":
+        #     self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
+        #     self.x[0:self.T1_int].fill(0)
+        #     # The final (DC) value is subtracted in self.calc_response()
+        #     self.title_str = r'Settling Error'
+        #     self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
 
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
@@ -594,7 +597,7 @@ class Plot_Impz(QWidget):
         else: # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
 
-        if self.ui.stim == "StepErr":
+        if self.ui.stim == "Step" and self.ui.chk_step_err.isChecked():
             dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
              # subtract DC (final) value from response
             y[self.T1_int:] = y[self.T1_int:] - abs(dc[1])

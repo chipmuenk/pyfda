@@ -105,7 +105,7 @@ class PlotImpz_UI(QWidget):
         {"None":    {"dc", "noise"},
          "Impulse": {"dc", "a1", "T1", "scale", "noise"},
          "Step":    {"a1", "T1", "noise"},
-         "StepErr": {"a1", "T1", "noise"},
+         #"StepErr": {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
@@ -524,6 +524,13 @@ class PlotImpz_UI(QWidget):
                             "as |H(f)|. DC and Noise need to be turned off.</span>")
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
+        
+        self.chk_step_err = QCheckBox("Error", self)
+        self.chk_step_err.setToolTip("<span>Display the step response error. "
+                                     "DC and Noise need to be turned off.</span>")
+        self.chk_step_err.setChecked(False)
+        self.chk_step_err.setObjectName("stim_step_err")
+       
 
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
         self.ledDC = QLineEdit(self)
@@ -716,6 +723,7 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_options.clicked.connect(self._show_stim_options)
 
         self.chk_stim_bl.clicked.connect(self._enable_stim_widgets)
+        self.chk_step_err.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
 
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
@@ -893,6 +901,8 @@ class PlotImpz_UI(QWidget):
         self.chk_scale_impz_f.setVisible(self.stim == 'Impulse')
         self.chk_scale_impz_f.setEnabled(self.DC == 0 and (self.noi == 0 or\
             self.cmbNoise.currentText() == 'None'))
+        
+        self.chk_step_err.setVisible(self.stim == "Step")
 
         self.lblStimPar1.setVisible("par1" in stim_wdg)
         self.ledStimPar1.setVisible("par1" in stim_wdg)
@@ -963,6 +973,10 @@ class PlotImpz_UI(QWidget):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_type'})
         
     def _update_impulse_type(self):
+        """ Update value for self.impulse_type from the QLineEditWidget"""
+        self.impulse_type = qget_cmb_box(self.cmbImpulseType) # read current data string
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'impulse_type'})
+
 
 #-------------------------------------------------------------
 
