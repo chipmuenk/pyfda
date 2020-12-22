@@ -112,7 +112,7 @@ class PlotImpz_UI(QWidget):
          "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
          "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
          "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
-         "Rect":    {"dc", "a1", "T1", "noise"},         
+         "Rect":    {"dc", "a1", "T1", "noise"},
          "Step":    {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -540,10 +540,10 @@ class PlotImpz_UI(QWidget):
                   ("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
             self.cmbChirpType.addItem(*t)
         qset_cmb_box(self.cmbChirpType, self.chirp_type, data=False)
-        
+
         self.cmbImpulseType = QComboBox(self)
         for t in [("Dirac","Dirac"),("Gauss","Gauss"),
-                  ("Sinc", "Sinc"), ("Rect", "Rect")]: # text, data 
+                  ("Sinc", "Sinc"), ("Rect", "Rect")]: # text, data
             self.cmbImpulseType.addItem(*t)
         qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=False)
 
@@ -567,14 +567,14 @@ class PlotImpz_UI(QWidget):
                             "as |H(f)|. DC and Noise need to be turned off.</span>")
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
-        
+
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
         self.chk_step_err.setMaximumWidth(7*self.mSize)
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
-       
+
 
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
         self.ledDC = QLineEdit(self)
@@ -620,7 +620,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.setToolTip("Stimulus phase 2")
         self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
-        
+
         #----------------------------------------------
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
@@ -696,7 +696,7 @@ class PlotImpz_UI(QWidget):
 
         layGStim.addWidget(self.lblPhU1, 0, 6)
         layGStim.addWidget(self.lblPhU2, 1, 6)
-        
+
         layGStim.addWidget(self.lbl_T1, 0, 7)
         layGStim.addWidget(self.lbl_T2, 1, 7)
 
@@ -819,7 +819,7 @@ class PlotImpz_UI(QWidget):
                 source.setText(str(params['FMT'].format(self.T1 * self.t_scale)))
             elif source.objectName() == "stimT2":
                 source.setText(str(params['FMT'].format(self.T2 * self.t_scale)))
-        
+
 
         def _store_entry(source):
             if self.spec_edited:
@@ -962,7 +962,7 @@ class PlotImpz_UI(QWidget):
         self.chk_scale_impz_f.setVisible(self.stim == 'Dirac')
         self.chk_scale_impz_f.setEnabled(self.DC == 0 and (self.noi == 0 or\
             self.cmbNoise.currentText() == 'None'))
-        
+
         self.chk_step_err.setVisible(self.stim == "Step")
 
         self.lblStimPar1.setVisible("par1" in stim_wdg)
@@ -1028,17 +1028,17 @@ class PlotImpz_UI(QWidget):
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi2'})
-        
+
     def _update_chirp_type(self):
         """ Update value for self.chirp_type from the QLineEditWidget"""
         self.chirp_type = qget_cmb_box(self.cmbChirpType) # read current data string
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'chirp_type'})
-        
+
     def _update_impulse_type(self):
         """ Update value for self.impulse_type from the QLineEditWidget"""
         self.impulse_type = qget_cmb_box(self.cmbImpulseType) # read current data string
         self._enable_stim_widgets()
-        
+
     def _update_periodic_type(self):
         """ Update value for self.periodic_type from the QLineEditWidget"""
         self.periodic_type = qget_cmb_box(self.cmbPeriodicType) # read current data string
@@ -1116,7 +1116,7 @@ class PlotImpz_UI(QWidget):
             self.led_N_points.setText(str(self.N)) # update widget
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
-        
+
         # recalculate displayed freq. index values when freq. unit == 'k'
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.update_freqs()

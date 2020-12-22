@@ -414,7 +414,7 @@ class Plot_Impz(QWidget):
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
         #T_S = fb.fil[0]['T_S']
-        # calculate index from T1 entry for creating stimulus vectors, shifted 
+        # calculate index from T1 entry for creating stimulus vectors, shifted
         # by T1. Limit the value to N_end - 1.
         self.T1_int = min(int(np.round(self.ui.T1)), self.ui.N_end-1)
 
@@ -447,7 +447,7 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), fc=self.ui.f1 ) +\
                 self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2), fc=self.ui.f2)
             self.title_str += r'Gaussian Pulse '
-         
+
         elif self.ui.stim == "Rect":
             n_min = int(np.round(self.ui.N/2 - self.ui.T1/2))
             n_max = int(np.round(self.ui.N/2 + self.ui.T1/2))
