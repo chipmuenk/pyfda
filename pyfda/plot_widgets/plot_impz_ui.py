@@ -13,8 +13,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 import collections
-from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
-                      QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal, QEvent, Qt)
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
+                               QPushButton, QFontMetrics, pyqtSignal, QEvent, Qt,
+                               QHBoxLayout, QVBoxLayout, QGridLayout)
 
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -49,6 +50,8 @@ class PlotImpz_UI(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
+        self.mSize = QFontMetrics(QPushButton().font()).width("m")
+        # row4_height = mSize.lineSpacing() * 4
 
         # initial settings
         self.N_start = 0
@@ -520,10 +523,13 @@ class PlotImpz_UI(QWidget):
         self.ledStimPar1.setToolTip("Duty Cycle, 0 ... 1")
         self.ledStimPar1.setObjectName("ledStimPar1")
 
-        self.chk_stim_bl = QCheckBox("BL", self)
-        self.chk_stim_bl.setToolTip("<span>The signal is bandlimited to the Nyquist frequency "
-                                    "to avoid aliasing. However, it is much slower to generate "
-                                    "than the regular version.</span>")
+        self.chk_stim_bl = QPushButton(self)
+        self.chk_stim_bl.setText("BL")
+        self.chk_stim_bl.setToolTip("<span>Bandlimit the signal to the Nyquist "
+                            "frequency to avoid aliasing. However, it is much slower "
+                            "to generate than the regular version.</span>")
+        self.chk_stim_bl.setMaximumWidth(self.mSize * 4)
+        self.chk_stim_bl.setCheckable(True)
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
 
@@ -556,9 +562,10 @@ class PlotImpz_UI(QWidget):
         self.chk_scale_impz_f.setChecked(True)
         self.chk_scale_impz_f.setObjectName("scale_impz_f")
         
-        self.chk_step_err = QCheckBox("Error", self)
-        self.chk_step_err.setToolTip("<span>Display the step response error. "
-                                     "DC and Noise need to be turned off.</span>")
+        self.chk_step_err = QPushButton("Error", self)
+        self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
+        self.chk_step_err.setMaximumWidth(7*self.mSize)
+        self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
        
