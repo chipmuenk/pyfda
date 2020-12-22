@@ -495,7 +495,7 @@ class Plot_Impz(QWidget):
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Sawtooth Signal'
 
-        elif self.ui.stim == "Rect":
+        elif self.ui.stim == "Square":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1,
                                               duty=self.ui.stim_par1)

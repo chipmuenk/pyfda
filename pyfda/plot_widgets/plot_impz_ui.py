@@ -71,6 +71,7 @@ class PlotImpz_UI(QWidget):
         self.stim = "Dirac"
         self.chirp_type = 'Linear'
         self.impulse_type = 'Dirac'
+        self.periodic_type = 'Square'
         self.noise = "None"
 
         self.f1 = 0.02
@@ -114,7 +115,7 @@ class PlotImpz_UI(QWidget):
          "Chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
          "Triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
          "Saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
-         "Rect":    {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+         "Square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
          "Comb":    {"dc", "a1", "phi1", "f1", "noise"},
          "AM":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "PM / FM": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -126,7 +127,7 @@ class PlotImpz_UI(QWidget):
                               ("Cos", ""),
                               ("Sine", ""),
                               ("Chirp", "<span>Different frequency sweeps.</span>"),
-                              ("Edges", "<span>Periodic functions with steep edges.</span>"),
+                              ("Periodic", "<span>Periodic functions with steep edges.</span>"),
                               ("AM",""),
                               ("PM / FM", ""),
                               ("Formula", "<span>Formula defined stimulus.</span>")]
@@ -537,6 +538,16 @@ class PlotImpz_UI(QWidget):
             self.cmbImpulseType.addItem(*t)
         qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=False)
 
+        #-------------------------------------
+        self.cmbPeriodicType = QComboBox(self)
+        self.cmbPeriodicType.addItems(["Square","Saw","Triang","Comb"])
+        self.cmbPeriodicType.setItemData(1, "<span>Periodic square signal with duty cycle &alpha;, "
+                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setItemData(2, "<span></span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setItemData(3, "<span>/span>", Qt.ToolTipRole)
+        qset_cmb_box(self.cmbPeriodicType, self.periodic_type)
+
+        #-------------------------------------
         self.chk_scale_impz_f = QCheckBox("Scale", self)
         self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response "
                         "with <i>N<sub>FFT</sub></i> so that it has the same magnitude "
@@ -559,6 +570,7 @@ class PlotImpz_UI(QWidget):
 
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
+        layHCmbStim.addWidget(self.cmbPeriodicType)
         layHCmbStim.addWidget(self.chk_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
@@ -760,6 +772,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
         self.cmbImpulseType.currentIndexChanged.connect(self._update_impulse_type)
+        self.cmbPeriodicType.currentIndexChanged.connect(self._update_periodic_type)
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
@@ -921,6 +934,8 @@ class PlotImpz_UI(QWidget):
         self.cmb_stim = qget_cmb_box(self.cmbStimulus, data=False)
         if self.cmb_stim == "Impulse":
             self.stim = qget_cmb_box(self.cmbImpulseType, data=False)
+        elif self.cmb_stim == "Periodic":
+            self.stim = qget_cmb_box(self.cmbPeriodicType, data=False)
         else:
             self.stim = qget_cmb_box(self.cmbStimulus, data=False)
 
@@ -969,6 +984,7 @@ class PlotImpz_UI(QWidget):
 
         self.cmbChirpType.setVisible(self.cmb_stim == 'Chirp')
         self.cmbImpulseType.setVisible(self.cmb_stim == 'Impulse')
+        self.cmbPeriodicType.setVisible(self.cmb_stim == 'Periodic')
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -1006,7 +1022,12 @@ class PlotImpz_UI(QWidget):
     def _update_impulse_type(self):
         """ Update value for self.impulse_type from the QLineEditWidget"""
         self.impulse_type = qget_cmb_box(self.cmbImpulseType) # read current data string
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'impulse_type'})
+        self._enable_stim_widgets()
+        
+    def _update_periodic_type(self):
+        """ Update value for self.periodic_type from the QLineEditWidget"""
+        self.periodic_type = qget_cmb_box(self.cmbPeriodicType) # read current data string
+        self._enable_stim_widgets()
 
 
 #-------------------------------------------------------------
