@@ -438,6 +438,18 @@ class Plot_Impz(QWidget):
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
+        elif self.ui.stim == "Sinc":
+            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T1) * self.ui.f1 ) +\
+                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T2) * self.ui.f2)
+            self.title_str += r'Sinc Signal '
+
+        elif self.ui.stim == "Gauss":
+            self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), fc=self.ui.f1 ) +\
+                self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2), fc=self.ui.f2)
+            self.title_str += r'Gaussian Pulse '
+            
+
+
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.x[0:self.T1_int].fill(0)
@@ -465,10 +477,7 @@ class Plot_Impz(QWidget):
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Sinusoidal Signal '
 
-        elif self.ui.stim == "Sinc":
-            self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T1) * self.ui.f1 ) +\
-                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 + self.ui.T2) * self.ui.f2)
-            self.title_str += r'Sinc Signal '
+
 
         elif self.ui.stim == "Chirp":
             if True: # sig.chirp is buggy, T_sim cannot be larger than T_end

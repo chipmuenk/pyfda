@@ -107,11 +107,12 @@ class PlotImpz_UI(QWidget):
         self.stim_wdg_dict.update(
         {"None":    {"dc", "noise"},
          "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
+         "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
+         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},         
          "Step":    {"a1", "T1", "noise"},
-         #"StepErr": {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
+
          "Chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
          "Triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
          "Saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
