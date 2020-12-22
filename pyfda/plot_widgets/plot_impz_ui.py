@@ -534,6 +534,7 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
 
+        #-------------------------------------
         self.cmbChirpType = QComboBox(self)
         for t in [("Lin","Linear"),("Square","Quadratic"),
                   ("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
@@ -549,10 +550,14 @@ class PlotImpz_UI(QWidget):
         #-------------------------------------
         self.cmbPeriodicType = QComboBox(self)
         self.cmbPeriodicType.addItems(["Square","Saw","Triang","Comb"])
-        self.cmbPeriodicType.setItemData(1, "<span>Periodic square signal with duty cycle &alpha;, "
+        self.cmbPeriodicType.setItemData(0, "<span>Periodic square signal with duty cycle &alpha;, "
                                      "band-limited or with aliasing.</span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setItemData(2, "<span></span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setItemData(3, "<span>/span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setItemData(1, "<span>Periodic sawtooth signal, "
+                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setItemData(2, "<span>Periodic triangular signal, "
+                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setItemData(3, "<span>Periodic comb signal.</span>", Qt.ToolTipRole)
+        self.cmbPeriodicType.setToolTip("Periodic signals with sharp edges.")
         qset_cmb_box(self.cmbPeriodicType, self.periodic_type)
 
         #-------------------------------------
@@ -585,9 +590,10 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.ledStimPar1)
         layHCmbStim.addWidget(self.cmbChirpType)
         layHCmbStim.addWidget(self.cmbImpulseType)
+
         layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.chk_step_err)
-        #----------------------------------------------
+        #======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
