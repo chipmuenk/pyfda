@@ -447,8 +447,12 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), fc=self.ui.f1 ) +\
                 self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2), fc=self.ui.f2)
             self.title_str += r'Gaussian Pulse '
-            
-
+         
+        elif self.ui.stim == "Rect":
+            n_min = int(np.round(self.ui.N/2 - self.ui.T1/2))
+            n_max = int(np.round(self.ui.N/2 + self.ui.T1/2))
+            self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1,0)
+            self.title_str += r'Rect Pulse '
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function

@@ -111,7 +111,8 @@ class PlotImpz_UI(QWidget):
         {"None":    {"dc", "noise"},
          "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
          "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
-         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},         
+         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
+         "Rect":    {"dc", "a1", "T1", "noise"},         
          "Step":    {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -502,9 +503,9 @@ class PlotImpz_UI(QWidget):
         self.wdg_ctrl_freq.setLayout(layH_ctrl_freq)
         # ---- end Frequency Domain ------------------
 
-        # ---------------------------------------------------------------
+        # =====================================================================
         # Controls for stimuli
-        # ---------------------------------------------------------------
+        # =====================================================================
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
 
@@ -541,7 +542,7 @@ class PlotImpz_UI(QWidget):
         
         self.cmbImpulseType = QComboBox(self)
         for t in [("Dirac","Dirac"),("Gauss","Gauss"),
-                  ("Sinc", "Sinc")]: # text, data , ("Rect", "Rect")
+                  ("Sinc", "Sinc"), ("Rect", "Rect")]: # text, data 
             self.cmbImpulseType.addItem(*t)
         qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=False)
 
