@@ -112,7 +112,7 @@ class PlotImpz_UI(QWidget):
          "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
          "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
          "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
-         "Rect":    {"dc", "a1", "T1", "noise"},
+         "Rect":    {"dc", "a1", "T1", "noise", "bl"},
          "Step":    {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -527,8 +527,8 @@ class PlotImpz_UI(QWidget):
         self.chk_stim_bl = QPushButton(self)
         self.chk_stim_bl.setText("BL")
         self.chk_stim_bl.setToolTip("<span>Bandlimit the signal to the Nyquist "
-                            "frequency to avoid aliasing. However, it is much slower "
-                            "to generate than the regular version.</span>")
+                            "frequency to avoid aliasing. However, this is much slower "
+                            "to calculate especially for a large number of points.</span>")
         self.chk_stim_bl.setMaximumWidth(self.mSize * 4)
         self.chk_stim_bl.setCheckable(True)
         self.chk_stim_bl.setChecked(True)
@@ -585,11 +585,11 @@ class PlotImpz_UI(QWidget):
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.cmbPeriodicType)
+        layHCmbStim.addWidget(self.cmbChirpType)
+        layHCmbStim.addWidget(self.cmbImpulseType)
         layHCmbStim.addWidget(self.chk_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
-        layHCmbStim.addWidget(self.cmbChirpType)
-        layHCmbStim.addWidget(self.cmbImpulseType)
 
         layHCmbStim.addWidget(self.chk_scale_impz_f)
         layHCmbStim.addWidget(self.chk_step_err)
@@ -1072,7 +1072,7 @@ class PlotImpz_UI(QWidget):
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
                                        "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
-                
+
             elif self.noise == 'mls':
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of Maximum Length Sequence. "

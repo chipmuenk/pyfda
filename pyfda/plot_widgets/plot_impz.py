@@ -451,8 +451,14 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Rect":
             n_min = int(np.round(self.ui.N/2 - self.ui.T1/2))
             n_max = int(np.round(self.ui.N/2 + self.ui.T1/2))
-            self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1,0)
+
             self.title_str += r'Rect Pulse '
+            if self.ui.chk_stim_bl.isChecked():
+                self.x = self.ui.A1 * np.abs(np.fft.fftshift(
+                    np.fft.ifft(sinc(self.n * self.ui.T1/self.ui.N)))) * np.sqrt(2) * self.ui.T1
+            else:
+                self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1,0)
+
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
@@ -464,12 +470,6 @@ class Plot_Impz(QWidget):
                 self.title_str = r'Step Response'
                 self.H_str = r'$h_{\epsilon}[n]$'
 
-        # elif self.ui.stim == "StepErr":
-        #     self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
-        #     self.x[0:self.T1_int].fill(0)
-        #     # The final (DC) value is subtracted in self.calc_response()
-        #     self.title_str = r'Settling Error'
-        #     self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
 
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
@@ -522,6 +522,7 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'Bandlim. Comb Signal'
 
+
         elif self.ui.stim == "AM":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
                 * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
@@ -557,7 +558,7 @@ class Plot_Impz(QWidget):
             # max_len_seq returns `sequence, state`. The state is not stored here,
             # hence, an identical sequence is created every time.
             noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(len(self.x)))),
-                                        length=len(self.x), state=None)[0] - 0.5) 
+                                        length=len(self.x), state=None)[0] - 0.5)
             self.title_str += r' + max. length sequence'
         if type(self.ui.noi) == complex:
             self.x = self.x.astype(complex) + noi
