@@ -13,7 +13,17 @@
 
 ### New features
 
-- Add widgets for delays T1 and T2 in stimuli for y[n] and use them with sinc
+- Add widgets T1 and T2 for time / delays in y[n] and use them for sinc impulse
+
+- New stimuli Gauss and Rect impulse
+
+- New noise type "Maximum Length Sequence"
+
+- Tooltips for combo box items
+
+- Replace some check boxes by checkable push bottons for a cleaner UI
+
+- Group stimuli in `y[n]` for a better overview
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)

@@ -658,13 +658,16 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
-        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS"])
-        self.cmbNoise.setItemData(1, "<span>Normal- or Gauss-distributed white noise with "
+        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS", "MLS"])
+        self.cmbNoise.setItemData(1, "<span>Normal- or Gauss-distributed process with "
                                       "std. deviation &sigma;.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(2, "<span>Uniform distributed white noise in the range &plusmn; "
+        self.cmbNoise.setItemData(2, "<span>Uniformly distributed process in the range &plusmn; "
                                       "&Delta;/2.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(3, "<span>Pseudo-Random Binary Sequence with &plusmn; A."
+        self.cmbNoise.setItemData(3, "<span>Pseudo-Random Binary Sequence with values &plusmn; A."
                                       "</span>", Qt.ToolTipRole)
+        self.cmbNoise.setItemData(4, "<span>Maximum Length Sequence with values &plusmn; A. The sequence "
+                                      "is always the same as the state is not stored and used for "
+                                      "the next sequence.</span>", Qt.ToolTipRole)
         self.cmbNoise.setToolTip("Type of additive noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
 
@@ -1069,6 +1072,12 @@ class PlotImpz_UI(QWidget):
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
                                        "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
+                
+            elif self.noise == 'mls':
+                self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
+                self.ledNoi.setToolTip("<span>Amplitude of Maximum Length Sequence. "
+                                       "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
+
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'noi'})
 

@@ -553,6 +553,12 @@ class Plot_Impz(QWidget):
         elif self.ui.noise == "prbs":
             noi = self.ui.noi * 2 * (np.random.randint(0, 2, len(self.x))-0.5)
             self.title_str += r' + PRBS Noise'
+        elif self.ui.noise == "mls":
+            # max_len_seq returns `sequence, state`. The state is not stored here,
+            # hence, an identical sequence is created every time.
+            noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(len(self.x)))),
+                                        length=len(self.x), state=None)[0] - 0.5) 
+            self.title_str += r' + max. length sequence'
         if type(self.ui.noi) == complex:
             self.x = self.x.astype(complex) + noi
         else:
