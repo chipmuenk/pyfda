@@ -13,12 +13,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 from pyfda.libs.compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSignal, pyqtSlot
+from pyfda.libs.pyfda_lib import group_delay
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from scipy.signal import group_delay
+#from scipy.signal import group_delay
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 
@@ -126,8 +127,9 @@ class Plot_tau_g(QWidget):
         aa = fb.fil[0]['ba'][1]
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
-            #verbose = self.verbose) # self.chkWarnings.isChecked())
+        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
+        self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole = True,
+        verbose = self.verbose, use_scipy=False) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
