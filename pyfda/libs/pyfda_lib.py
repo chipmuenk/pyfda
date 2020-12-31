@@ -1582,7 +1582,148 @@ def group_delayz(b, a, w, plot=None, fs=2*np.pi):
         plot(w, gd)
     return w, gd
 
+#==============================================================================
+#
+# The *_group_delayz routines and subroutines have been copied from 
+#
+# https://github.com/spatialaudio/group-delay-of-filters
+#
+# committed by Nara Hahn under MIT license
+#
+#==============================================================================
+def sos_group_delayz(sos, w, plot=None, fs=2*np.pi):
+    """
+    Compute group delay of digital filter in SOS format.
+
+    Parameters
+    ----------
+    sos : array_like
+        Array of second-order filter coefficients, must have shape
+        ``(n_sections, 6)``. Each row corresponds to a second-order
+        section, with the first three columns providing the numerator
+        coefficients and the last three providing the denominator
+        coefficients.
+    w : array_like
+        Frequencies in the same units as `fs`.
+    plot : callable, optional
+        A callable that takes two arguments. If given, the return parameters
+        `w` and `gd` are passed to plot.
+    fs : float, optional
+        The sampling frequency of the digital system.
+
+    Returns
+    -------
+    w : ndarray
+        The frequencies at which `gd` was computed.
+    gd : ndarray
+        The group delay in seconds.
+    """
+    sos, n_sections = sig.filter_design._validate_sos(sos)
+    if n_sections == 0:
+        raise ValueError('Cannot compute group delay with no sections')
+    gd = 0
+    for biquad in sos:
+        gd += quadfilt_group_delayz(biquad[:3], w, fs)[1]
+        gd -= quadfilt_group_delayz(biquad[3:], w, fs)[1]
+    if plot is not None:
+        plot(w, gd)
     return w, gd
+
+
+def quadfilt_group_delayz(b, w, fs=2*np.pi):
+    """
+    Compute group delay of 2nd-order digital filter.
+
+    Parameters
+    ----------
+    b : array_like
+        Coefficients of a 2nd-order digital filter.
+    w : array_like
+        Frequencies in the same units as `fs`.
+    fs : float, optional
+        The sampling frequency of the digital system.
+
+    Returns
+    -------
+    w : ndarray
+        The frequencies at which `gd` was computed.
+    gd : ndarray
+        The group delay in seconds.
+    """
+    W = 2 * np.pi * w / fs
+    c1 = np.cos(W)
+    c2 = np.cos(2*W)
+    u0, u1, u2 = b**2  # b[0]**2, b[1]**2, b[2]**2
+    v0, v1, v2 = b * np.roll(b, -1)  # b[0]*b[1], b[1]*b[2], b[2]*b[0]
+    num = (u1+2*u2) + (v0+3*v1)*c1 + 2*v2*c2
+    den = (u0+u1+u2) + 2*(v0+v1)*c1 + 2*v2*c2
+    return w, 1 / fs * num / den
+
+
+def zpk_group_delay(z, p, k, w, plot=None, fs=2*np.pi):
+    """
+    Compute group delay of digital filter in zpk format.
+
+    Parameters
+    ----------
+    z : array_like
+        Zeroes of a linear filter
+    p : array_like
+        Poles of a linear filter
+    k : scalar
+        Gain of a linear filter
+    w : array_like
+        Frequencies in the same units as `fs`.
+    plot : callable, optional
+        A callable that takes two arguments. If given, the return parameters
+        `w` and `gd` are passed to plot.
+    fs : float, optional
+        The sampling frequency of the digital system.
+
+    Returns
+    -------
+    w : ndarray
+        The frequencies at which `gd` was computed.
+    gd : ndarray
+        The group delay in seconds.
+    """
+    gd = 0
+    for z_i in z:
+        gd += zorp_group_delayz(z_i, w)[1]
+    for p_i in p:
+        gd -= zorp_group_delayz(p_i, w)[1]
+    if plot is not None:
+        plot(w, gd)
+    return w, gd
+
+
+def zorp_group_delayz(zorp, w, fs=1):
+    """
+    Compute group delay of digital filter with a single zero/pole.
+
+    Parameters
+    ----------
+    zorp : complex
+        Zero or pole of a 1st-order linear filter
+    w : array_like
+        Frequencies in the same units as `fs`.
+    fs : float, optional
+        The sampling frequency of the digital system.
+
+    Returns
+    -------
+    w : ndarray
+        The frequencies at which `gd` was computed.
+    gd : ndarray
+        The group delay in seconds.
+    """
+    W = 2 * np.pi * w / fs
+    r, phi = np.abs(zorp), np.angle(zorp)
+    r2 = r**2
+    cos = np.cos(W - phi)
+    return w, (r2 - r*cos) / (r2 + 1 - 2*r*cos)
+
+#==============================================================================
 
 #==================================================================
 def expand_lim(ax, eps_x, eps_y = None):
