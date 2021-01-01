@@ -25,6 +25,8 @@
 
 - Group stimuli in `y[n]` for a better overview
 
+- Allow changing the number of FFT data points via `Info -> Settings`
+
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)
 
