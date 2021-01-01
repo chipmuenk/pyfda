@@ -95,7 +95,7 @@ class Input_Info(QWidget):
         self.butSettings.setCheckable(True)
         self.butSettings.setChecked(False)
         self.butSettings.setToolTip("Display and set some settings")
-        
+
         layHControls1 = QHBoxLayout()
         layHControls1.addWidget(self.butFiltPerf)
         layHControls1.addWidget(self.butAbout)
@@ -221,14 +221,14 @@ class Input_Info(QWidget):
         Show / hide debug options depending on the state of the debug button
         """
         self.frmControls2.setVisible(self.butDebug.isChecked())
-        
+
 #------------------------------------------------------------------------------
     def _show_settings(self):
         """
         Show / hide settings options depending on the state of the settings button
         """
         self.frmSettings.setVisible(self.butSettings.isChecked())
-        
+
     def _update_settings_nfft(self):
         """ Update value for self.par1 from QLineEdit Widget"""
         params['N_FFT'] = safe_eval(self.led_settings_NFFT.text(), params['N_FFT'],
