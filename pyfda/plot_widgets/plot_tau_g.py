@@ -12,8 +12,10 @@ Widget for plotting the group delay
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSignal, pyqtSlot
-from pyfda.libs.pyfda_lib import group_delay
+from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
+                               QHBoxLayout, pyqtSignal, pyqtSlot)
+from pyfda.libs.pyfda_sig_lib import group_delay, group_delayz
+from pyfda.libs.pyfda_qt_lib import qset_cmb_box
 
 import numpy as np
 
@@ -39,7 +41,8 @@ class Plot_tau_g(QWidget):
 
     def __init__(self, parent):
         super(Plot_tau_g, self).__init__(parent)
-        self.verbose = True # suppress warnings
+        self.verbose = False # suppress warnings
+        self.algorithm = "Diff"
         self.needs_calc = True   # flag whether plot needs to be recalculated
         self.tool_tip = "Group delay"
         self.tab_label = "\U0001D70F(f)"#"tau_g" \u03C4
@@ -49,31 +52,34 @@ class Plot_tau_g(QWidget):
         """
         Intitialize the widget, consisting of:
         - Matplotlib widget with NavigationToolbar
-        - Frame with control elements (currently commented out)
+        - Frame with control elements
         """
+        self.chkWarnings = QCheckBox("Enable Warnings", self)
+        self.chkWarnings.setChecked(self.verbose)
+        self.chkWarnings.setToolTip("Print warnings about singular group delay")
+ 
+        self.cmbAlgorithm = QComboBox(self)
+        self.cmbAlgorithm.addItems(["Scipy", "JOS", "Diff", "Shpak"])
+        qset_cmb_box(self.cmbAlgorithm, self.algorithm)
+        self.cmbAlgorithm.setToolTip("<span>Select algorithm for calculating the group delay.</span>")
 
-# =============================================================================
-# #### not needed at the moment ###
-#        self.chkWarnings = QCheckBox("Enable Warnings", self)
-#        self.chkWarnings.setChecked(False)
-#        self.chkWarnings.setToolTip("Print warnings about singular group delay")
-#
-#        self.chkScipy = QCheckBox("Scipy", self)
-#        self.chkScipy.setChecked(False)
-#        self.chkScipy.setToolTip("Use scipy group delay routine")
-#
-#        layHControls = QHBoxLayout()
-#        layHControls.addStretch(10)
-#        layHControls.addWidget(self.chkWarnings)
-#        layHControls.addWidget(self.chkScipy)
-#
-#        # This widget encompasses all control subwidgets:
-#        self.frmControls = QFrame(self)
-#        self.frmControls.setObjectName("frmControls")
-#        self.frmControls.setLayout(layHControls)
-# =============================================================================
+        #self.chkScipy = QCheckBox("Scipy", self)
+        #self.chkScipy.setChecked(False)
+        #self.chkScipy.setToolTip("Use scipy group delay routine")
+ 
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
+        layHControls.addWidget(self.chkWarnings)
+        #layHControls.addWidget(self.chkScipy)
+        layHControls.addWidget(self.cmbAlgorithm)
+ 
+        # This widget encompasses all control subwidgets:
+        self.frmControls = QFrame(self)
+        self.frmControls.setObjectName("frmControls")
+        self.frmControls.setLayout(layHControls)
+
         self.mplwidget = MplWidget(self)
-        #self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_tau_g"
@@ -90,6 +96,7 @@ class Plot_tau_g(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.cmbAlgorithm.currentIndexChanged.connect(self.draw)
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -129,7 +136,8 @@ class Plot_tau_g(QWidget):
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
         self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole = True,
-        verbose = self.verbose, use_scipy=False) # self.chkWarnings.isChecked())
+                                         verbose = self.chkWarnings.isChecked(), 
+                                         alg=self.cmbAlgorithm.currentText()) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
