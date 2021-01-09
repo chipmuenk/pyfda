@@ -10,6 +10,9 @@
 
 - Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
   angle character
+  
+- It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
+  (didn't work), changing the filter type also highlights the save button now.
 
 ### New features
 
