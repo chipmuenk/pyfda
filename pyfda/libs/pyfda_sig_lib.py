@@ -300,9 +300,9 @@ J.O. Smith's algorithm for IIR filters (conversion to FIR case)
 `````````````````````````````````````````````````````````````````
 
 As a further optimization, the group delay of an IIR filter :math:`H(z) = B(z)/A(z)`
-can be calculated from a FIR filter :math:`C(z)` with the same phase response (and
-hence group delay) as the original filter. This filter is obtained by the following
-steps:
+can be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
+response (and hence group delay) as the original filter. This filter is obtained 
+by the following steps:
     
 * The zeros of :math:`A(z)` are the poles of :math:`1/A(z)`, its phase response is
   :math:`\\angle A(z) = - \\angle 1/A(z)`. 
@@ -314,6 +314,10 @@ steps:
   which mirrors the zeros at the real axis. This effect has to be compensated,
   yielding the polynome :math:`\\tilde{A}(z)`. It is the "flip-conjugate" or 
   "Hermitian conjugate" of :math:`A(z)`.
+  
+  Frequently (e.g. in the scipy and until recently in the Matlab implementation)
+  the conjugate operation is omitted which gives wrong results for complex
+  coefficients.
   
 * Finally, :math:`C(z) = B(z) \\tilde{A}(z)`. The coefficients of :math:`C(z)`
   are calculated efficiently by convolving the coefficients of :math:`B(z)` and 
@@ -327,8 +331,12 @@ where
 
 .. math::
     
-    \\tilde{A}(z) =  z^{-N}{A}^{*}(1/z)
-    
+    \\begin{align}
+    \\tilde{A}(z) &=  z^{-N}{A}^{*}(1/z) = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\\\
+    \Rightarrow \\tilde{A}(e^{j\omega T}) &=  e^{-jN \omega T}{A}^{*}(e^{-j\omega T}) \\\\
+    \\Rightarrow \\angle\\tilde{A}(e^{j\omega T}) &= -\\angle A(e^{j\omega T}) - N\omega T
+    \\end{align}    
+
 
 or, in Python:
 
@@ -338,6 +346,9 @@ or, in Python:
 
 where :math:`b` and :math:`a` are the coefficient vectors of the original 
 numerator and denominator polynomes.
+
+The actual group delay is calculated from the equivalent polynome as in the FIR
+case.
 
 The algorithm described above is numerically efficient but not robust for
 narrowband IIR filters as pointed out in scipy issues [SC9310]_ and [SC1175]_. 
@@ -370,7 +381,9 @@ multiplied by the ramp `k` + 1, yielding
 References
 ```````````
 
-.. [JOS] https://ccrma.stanford.edu/%7Ejos/fp/Numerical_Computation_Group_Delay.html
+.. [JOS] https://ccrma.stanford.edu/%7Ejos/fp/Numerical_Computation_Group_Delay.html or
+
+         https://www.dsprelated.com/freebooks/filters/Numerical_Computation_Group_Delay.html
 
 .. [Lyons] https://www.dsprelated.com/showarticle/69.php
 
@@ -399,6 +412,8 @@ Examples
 #
     w = fs * np.arange(0, nfft)/nfft # create frequency vector
     minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
+    
+    tau_g = np.zeros_like(w) # initialize tau_g
 
     logger.info(alg.lower())
     if sos and alg != "shpak":
@@ -412,7 +427,6 @@ Examples
         H[singular] = 0
         tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
 
-   
     elif alg.lower() == 'jos':
         logger.warning("Octave / JOS!")
         try: len(a)
@@ -424,12 +438,12 @@ Examples
                logger.error('No proper filter coefficients: len(a) = len(b) = 1 !')
         else:
             oa = len(a)-1               # order of denom. a(z) resp. a(s)
-            c = np.convolve(b,a[::-1])  # a[::-1] reverses denominator coeffs a
+            c = np.convolve(b, a[::-1])  # equivalent FIR polynome
                                         # c(z) = b(z) * a(1/z)*z^(-oa)
         try: len(b)
         except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
         else:
-            ob = len(b)-1             # order of b(z)
+            ob = len(b)-1               # order of numerator b(z)
 
         if analog:
             a_b = np.convolve(a,b)
@@ -443,13 +457,13 @@ Examples
             den = np.fft.fft(a_b,nfft)
         else:
             oc = oa + ob                  # order of c(z)
-            cr = c * np.arange(0,oc+1) # multiply with ramp -> derivative of c wrt 1/z
+            cr = c * np.arange(c.size) # multiply with ramp -> derivative of c wrt 1/z
 
             num = np.fft.fft(cr,nfft) #
             den = np.fft.fft(c,nfft)  #
     #
         polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
-    #    polebins = np.where(abs(num) < minmag)[0] # find zeros of numerator
+
         if np.size(polebins) > 0 and verbose:  # check whether polebins array is empty
             logger.warning('*** grpdelay warning: group delay singular -> setting to 0 at:')
             for i in polebins:
@@ -487,11 +501,12 @@ Examples
     
         w = np.atleast_1d(w)
         b, a = map(np.atleast_1d, (b, a))
-        c = np.convolve(b, a[::-1])
-        cr = c * np.arange(c.size) # calculate ramping function
-        z = np.exp(-1j * w) # calculate unit circle coordinates
-        num = np.polyval(cr[::-1], z)
-        den = np.polyval(c[::-1], z)
+        c = np.convolve(b, a[::-1])   # coefficients of equivalent FIR polynome
+        cr = c * np.arange(c.size)    #  and of the ramped polynome
+        z = np.exp(-1j * w) # complex frequency points around the unit circle
+        den = np.polyval(c[::-1], z)  # evaluate polynome 
+        num = np.polyval(cr[::-1], z) # and ramped polynome 
+
         singular = np.absolute(den) < 10 * minmag
         if np.any(singular) and verbose:
             singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
@@ -499,11 +514,10 @@ Examples
                 "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
             )
     
-        tau_g = np.zeros_like(w)
         tau_g[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
 
     elif alg.lower() == "shpak":
-        logger.info("Using algorithm Shpak!")
+        logger.info("Using Shpak's algorithm")
         if sos:
             w, tau_g = sos_group_delayz(b, w, fs=fs)            
         else:
