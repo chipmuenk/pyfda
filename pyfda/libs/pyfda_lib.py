@@ -539,7 +539,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     for ex in [expr, alt_expr]:
         if ex == "":
             result = None
-            logger.error("Empty string passed to safe_eval!")
+            logger.warning("Passed an empty string, nothing was changed!")
         else:
             if not return_type in {'float', 'int', 'cmplx', 'auto', ''}:
                 logger.error('Unknown return type "{0}", setting result to 0.'.format(return_type))
