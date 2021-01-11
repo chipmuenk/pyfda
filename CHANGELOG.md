@@ -6,13 +6,17 @@
 
 - Recalculate frequency specs in 'k' in the y[n] widget when `self.N` has been changed
 
+- Renamed file `iir_df1.py` to `iir_df1.py_bak` to prevent it from being analyzed
+  by `python setup.py install`. The myhdl keyword `async` creates an error with 
+  python 3.7 and up.
+
 - Update frequency specs when the frequency unit has been changed (regression)
 
 - Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
   angle character
   
 - It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
-  (didn't work), changing the filter type also highlights the save button now.
+  (didn't work befor), changing the filter type now highlights the save button.
 
 ### New features
 
@@ -29,6 +33,9 @@
 - Group stimuli in `y[n]` for a better overview
 
 - Allow changing the number of FFT data points via `Info -> Settings`
+
+- Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
+  and `dirs.YOSYS_VER`
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)

@@ -95,6 +95,8 @@ try:
 except ImportError:
     pass
 
+MODULES.update({'yosys':{'V_YO':dirs.YOSYS_VER}})
+
 try:
     from docutils import __version__ as V_DOC
     MODULES.update({'docutils': {'V_DOC':V_DOC}})

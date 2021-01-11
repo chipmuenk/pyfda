@@ -14,4 +14,5 @@
 | [migen](https://github.com/m-labs/migen) | {V_MG} | BSD-2 | Fixpoint simulation and synthesis |
 | [nMigen](https://github.com/nmigen/nmigen) | {V_NMG} |  BSD-2 | Fixpoint simulation and synthesis |
 | [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
+| [YOSYS](http://www.clifford.at/yosys/download.html) | {V_YO} | ISC | Framework for Verilog RTL synthesis |
 

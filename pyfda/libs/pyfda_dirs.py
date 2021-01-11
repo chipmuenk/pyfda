@@ -13,6 +13,7 @@ This is imported first by pyfdax.
 """
 
 import os, sys
+from subprocess import check_output, CalledProcessError, STDOUT
 import shutil
 import platform
 import tempfile
@@ -101,6 +102,30 @@ def get_log_dir():
                 return d # use base directory instead if it is writable
     print("ERROR: No suitable directory found for logging.")
     return None
+
+#------------------------------------------------------------------------------
+def get_yosys_dir():
+    """
+    Try to find YOSYS path and version from environment variable or path:
+    """
+    yosys_exe = env("YOSYS")
+    
+    if yosys_exe:
+        # redirect `yosys -V` output to string
+        command = [yosys_exe, "-V"]
+        try:
+            output = check_output(command, stderr=STDOUT).decode().split(' ', 2)
+            if len(output) > 1:
+                yosys_ver = output[1]
+            else:
+                yosys_ver = ""
+
+        except CalledProcessError as e:
+            print(e.output.decode())
+
+    print("YOSYS: {0}, ver. {1}".format(yosys_exe, yosys_ver))
+    return yosys_exe, yosys_ver
+        
 
 #------------------------------------------------------------------------------
 def get_conf_dir():
@@ -215,6 +240,8 @@ USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 TMPL_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_template.conf')
 # full path name of logging configuration template:
 TMPL_LOG_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_log_template.conf')
+
+YOSYS_EXE, YOSYS_VER = get_yosys_dir()
 
 create_conf_files()
 
