@@ -109,6 +109,7 @@ def get_yosys_dir():
     Try to find YOSYS path and version from environment variable or path:
     """
     yosys_exe = env("YOSYS")
+    yosys_ver = ""
     
     if yosys_exe:
         # redirect `yosys -V` output to string
@@ -117,15 +118,12 @@ def get_yosys_dir():
             output = check_output(command, stderr=STDOUT).decode().split(' ', 2)
             if len(output) > 1:
                 yosys_ver = output[1]
-            else:
-                yosys_ver = ""
 
         except CalledProcessError as e:
             print(e.output.decode())
 
-    print("YOSYS: {0}, ver. {1}".format(yosys_exe, yosys_ver))
+    #print("YOSYS: {0}, ver. {1}".format(yosys_exe, yosys_ver))
     return yosys_exe, yosys_ver
-        
 
 #------------------------------------------------------------------------------
 def get_conf_dir():
