@@ -17,6 +17,8 @@
   
 - It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
   (didn't work befor), changing the filter type now highlights the save button.
+  
+- Improve group delay algorithms for IIR filters
 
 ### New features
 
@@ -36,6 +38,9 @@
 
 - Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
   and `dirs.YOSYS_VER`
+  
+- Allow turning off automatic grid alignment between mag. and phase in the 
+  H(f) tab
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)
