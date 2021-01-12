@@ -13,7 +13,7 @@ import time
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
-from numpy import pi, log10, sin, cos
+from numpy import pi
 
 
 import scipy.signal as sig
@@ -296,8 +296,8 @@ If the denominator of the computation becomes too small, the group delay
 is set to zero.  (The group delay approaches infinity when
 there are poles or zeros very close to the unit circle in the z plane.)
 
-J.O. Smith's algorithm for IIR filters (conversion to FIR case) 
-`````````````````````````````````````````````````````````````````
+J.O. Smith's algorithm for IIR filters (with conversion to FIR case) 
+``````````````````````````````````````````````````````````````````````
 
 As a further optimization, the group delay of an IIR filter :math:`H(z) = B(z)/A(z)`
 can be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
@@ -415,20 +415,19 @@ Examples
     
     tau_g = np.zeros_like(w) # initialize tau_g
 
-    logger.info(alg.lower())
     if sos and alg != "shpak":
         b,a = sig.sos2tf(b)
         
     time_0 = time.perf_counter_ns()
     if alg.lower() == 'diff':
-        logger.warning("Diff!")
+        #logger.info("Diff!")
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
         singular = np.absolute(H) < 10 * minmag
         H[singular] = 0
         tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
 
     elif alg.lower() == 'jos':
-        logger.warning("Octave / JOS!")
+        #logger.info("Octave / JOS!")
         try: len(a)
         except TypeError:
             a = 1; oa = 0 # a is a scalar or empty -> order of a = 0
@@ -482,7 +481,7 @@ Examples
             w = w[0:nfft]
 
     elif alg.lower() == "scipy":
-        logger.warning("Scipy!")
+        #logger.info("Scipy!")
 
 ###############################################################################
 #
@@ -517,9 +516,9 @@ Examples
         tau_g[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
 
     elif alg.lower() == "shpak":
-        logger.info("Using Shpak's algorithm")
+        #logger.info("Using Shpak's algorithm")
         if sos:
-            w, tau_g = sos_group_delayz(b, w, fs=fs)            
+            w, tau_g = sos_group_delayz(b, w, fs=fs)
         else:
             w, tau_g = group_delayz(b,a, w, fs=fs)
             
@@ -529,7 +528,8 @@ Examples
     
     time_1 = time.perf_counter_ns()
     delta_t = time_1 - time_0
-    logger.info("grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
+    if verbose:
+        logger.info("grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
     return w, tau_g
     
 # ----------------------------------------------------------------------
@@ -550,7 +550,7 @@ def group_delayz(b, a, w, plot=None, fs=2*np.pi):
         A callable that takes two arguments. If given, the return parameters
         `w` and `gd` are passed to plot.
     fs : float, optional
-        The sampling frequency of the digital system.
+        The angular sampling frequency of the digital system.
 
     Returns
     -------
@@ -638,14 +638,14 @@ def quadfilt_group_delayz(b, w, fs=2*np.pi):
     gd : ndarray
         The group delay in seconds.
     """
-    W = 2 * np.pi * w / fs
+    W = 2 * pi * w / fs
     c1 = np.cos(W)
     c2 = np.cos(2*W)
     u0, u1, u2 = b**2  # b[0]**2, b[1]**2, b[2]**2
     v0, v1, v2 = b * np.roll(b, -1)  # b[0]*b[1], b[1]*b[2], b[2]*b[0]
     num = (u1+2*u2) + (v0+3*v1)*c1 + 2*v2*c2
     den = (u0+u1+u2) + 2*(v0+v1)*c1 + 2*v2*c2
-    return w, 1 / fs * num / den
+    return w, 2 * pi / fs * num / den
 
 
 def zpk_group_delay(z, p, k, w, plot=None, fs=2*np.pi):
@@ -705,8 +705,8 @@ def zorp_group_delayz(zorp, w, fs=1):
     gd : ndarray
         The group delay in seconds.
     """
-    W = 2 * np.pi * w / fs
+    W = 2 * pi * w / fs
     r, phi = np.abs(zorp), np.angle(zorp)
     r2 = r**2
     cos = np.cos(W - phi)
-    return w, (r2 - r*cos) / (r2 + 1 - 2*r*cos)
+    return w, 2 * pi * (r2 - r*cos) / (r2 + 1 - 2*r*cos)

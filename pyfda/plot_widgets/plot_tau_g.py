@@ -54,9 +54,10 @@ class Plot_tau_g(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.chkWarnings = QCheckBox("Enable Warnings", self)
+        self.chkWarnings = QCheckBox("Verbose", self)
         self.chkWarnings.setChecked(self.verbose)
-        self.chkWarnings.setToolTip("Print warnings about singular group delay")
+        self.chkWarnings.setToolTip("<span>Print messages about singular group delay"
+                                    "and calculation times.")
  
         self.cmbAlgorithm = QComboBox(self)
         self.cmbAlgorithm.addItems(["Scipy", "JOS", "Diff", "Shpak"])
