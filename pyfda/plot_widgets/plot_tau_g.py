@@ -193,7 +193,7 @@ class Plot_tau_g(QWidget):
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(tau_str)
         # widen y-limits to suppress numerical inaccuracies when tau_g = constant
-        self.ax.set_ylim([max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        self.ax.set_ylim([max(np.nanmin(tau_g)-0.5,0), np.nanmax(tau_g) + 0.5])
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.redraw()

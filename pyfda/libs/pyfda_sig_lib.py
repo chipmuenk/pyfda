@@ -90,6 +90,54 @@ Examples
     return hn, td
 
 #==================================================================
+def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
+#==================================================================
+    """
+    Check whether denominator (`den`) coefficients approach zero, check also
+    whether numerator (`num`) or denominator coefficients are finite. Replace
+    denoninator coefficient by `1` and numerator coefficient by `0` when flagged.
+
+    Parameters
+    ----------
+    num : array_like
+        numerator coefficients
+    den : array_like
+        denominator coefficients
+        
+    n_eps : float
+        n_eps * machine resolution is the limit for the denominator below which 
+        the ratio is set to zero. The machine resolution in numpy is given by 
+        `np.spacing(1)`, the distance to the nearest number which is equivalent 
+        to matlab's "eps".
+    
+    i_scale : float
+        The scale for the index `i` for `num, den` for printing the index of 
+        the singularities.
+    
+    verbose : bool, optional
+        whether to print  The default is False.
+
+    Returns
+    -------
+    ratio : array_like
+            The ratio of num and den (zero at every singularity)
+
+    """
+    singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
+                        (abs(den) < n_eps * np.spacing(1)))[0] 
+
+    if np.size(singular) > 0:  # check whether singular array is empty
+        if verbose:
+            logger.warning('div_safe singularity -> setting to 0 at:')
+        for i in singular:
+            num[i] = 0
+            den[i] = 1
+            if verbose:
+                logger.warning('i = {0} '.format(i * i_scale))
+                    
+    return num / den
+                    
+#==================================================================
 def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, 
                 sos=False, alg="scipy"):
 #==================================================================
@@ -406,23 +454,25 @@ Examples
     #     w, gd = sig.group_delay((b,a),w=nfft,whole=whole)
     #     return w, gd
     #alg = 'diff' # 'scipy', 'scipy_mod' 'shpak'
-
+                
     if not whole:
         nfft = 2*nfft
-#
+
     w = fs * np.arange(0, nfft)/nfft # create frequency vector
-    minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
     
     tau_g = np.zeros_like(w) # initialize tau_g
+    
+    #----------------
 
     if sos and alg != "shpak":
         b,a = sig.sos2tf(b)
         
     time_0 = time.perf_counter_ns()
+    
     if alg.lower() == 'diff':
         #logger.info("Diff!")
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
-        singular = np.absolute(H) < 10 * minmag
+        singular = np.absolute(H) < 100. * np.spacing(1) # equivalent to matlab "eps"
         H[singular] = 0
         tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
 
@@ -460,25 +510,19 @@ Examples
 
             num = np.fft.fft(cr,nfft) #
             den = np.fft.fft(c,nfft)  #
-    #
-        polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
 
-        if np.size(polebins) > 0 and verbose:  # check whether polebins array is empty
-            logger.warning('*** grpdelay warning: group delay singular -> setting to 0 at:')
-            for i in polebins:
-                logger.warning('f = {0} '.format((fs*i/nfft)))
-                num[i] = 0
-                den[i] = 1
+        # for some strange reason, warnings "invalid value encountered in true 
+        # divide" pop-up here
+        with np.errstate(invalid='ignore', divide='ignore'):
+            tau_g = np.real(div_safe(num, den, n_eps=100, i_scale=fs/nfft, verbose=verbose))
 
-        if analog: # this doesn't work yet
-            tau_g = np.real(num / den)
-        else:
-            tau_g = np.real(num / den) - oa
-    #
-        if not whole:
-            nfft = nfft/2
-            tau_g = tau_g[0:nfft]
-            w = w[0:nfft]
+        if not analog: # analog = True doesn't work yet
+            tau_g -= oa
+
+            if not whole:
+                nfft = nfft/2
+                tau_g = tau_g[0:nfft]
+                w = w[0:nfft]
 
     elif alg.lower() == "scipy":
         #logger.info("Scipy!")
@@ -505,15 +549,20 @@ Examples
         z = np.exp(-1j * w) # complex frequency points around the unit circle
         den = np.polyval(c[::-1], z)  # evaluate polynome 
         num = np.polyval(cr[::-1], z) # and ramped polynome 
+        
+        tau_g = np.real(div_safe(num, den, n_eps=100, i_scale=fs/nfft, verbose=verbose))\
+                - a.size + 1
 
-        singular = np.absolute(den) < 10 * minmag
-        if np.any(singular) and verbose:
-            singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
-            logger.warning("pyfda_lib.py:grpdelay:\n"
-                "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
-            )
-    
-        tau_g[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
+# =============================================================================
+#         singular = np.absolute(den) < 10 * minmag
+#         if np.any(singular) and verbose:
+#             singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
+#             logger.warning("pyfda_lib.py:grpdelay:\n"
+#                 "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
+#             )
+#     
+#         tau_g[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
+# =============================================================================
 
     elif alg.lower() == "shpak":
         #logger.info("Using Shpak's algorithm")
@@ -645,7 +694,10 @@ def quadfilt_group_delayz(b, w, fs=2*np.pi):
     v0, v1, v2 = b * np.roll(b, -1)  # b[0]*b[1], b[1]*b[2], b[2]*b[0]
     num = (u1+2*u2) + (v0+3*v1)*c1 + 2*v2*c2
     den = (u0+u1+u2) + 2*(v0+v1)*c1 + 2*v2*c2
-    return w, 2 * pi / fs * num / den
+
+    ratio = div_safe(num, den, n_eps=100, verbose=False)
+
+    return w, 2 * pi / fs * ratio
 
 
 def zpk_group_delay(z, p, k, w, plot=None, fs=2*np.pi):
