@@ -82,7 +82,7 @@ class Plot_tau_g(QWidget):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
-        self.mplwidget.mplToolbar.a_he.info = "manual/plot_tau_g"
+        self.mplwidget.mplToolbar.a_he.info = "manual/plot_tau_g.html"
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()

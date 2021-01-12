@@ -15,6 +15,9 @@ group delay, here, an elliptical filter (IIR) is shown.
 
 There are no user servicable parts on this tab. 
 
+The algorithm for calculating the group delay is explained in detail in 
+link :func:`pyfda.libs.pyfda_sig_lib.group_delay`.
+
    
 Development
 -----------
