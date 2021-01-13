@@ -98,9 +98,13 @@ Examples
 def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
 #==================================================================
     """
-    Check whether denominator (`den`) coefficients approach zero, check also
-    whether numerator (`num`) or denominator coefficients are finite. Replace
-    denoninator coefficient by `1` and numerator coefficient by `0` when flagged.
+    Perform polynomial after treating singularities, meaning:
+    - check whether denominator (`den`) coefficients approach zero
+    - check whether numerator (`num`) or denominator coefficients are finite, i.e.
+    not `nan`, `ìnf` or `ninf`. 
+    
+    For singularities, replace denominator coefficient by `1` and numerator 
+    coefficient by `0` when flagged.
 
     Parameters
     ----------
@@ -125,7 +129,7 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
     Returns
     -------
     ratio : array_like
-            The ratio of num and den (zero at every singularity)
+            The ratio of num and den (zero at singularities)
 
     """
     singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
@@ -195,7 +199,7 @@ w : ndarray
 Notes
 =======
 
-**Definition and direct calculation**
+***Definition and direct calculation***
 
 The following explanation follows [JOS]_.
 
@@ -262,7 +266,7 @@ In the following, it will be shown that the derivative of birational functions
 delay.
 
 
-** J.O. Smith's algorithm for FIR filters **
+***J.O. Smith's algorithm for FIR filters***
 
 
 An efficient form of calculating the group delay of FIR filters based on the derivative of the logarithmic frequency response has been described in [JOS]_ and [Lyons]_ for
@@ -410,7 +414,7 @@ from the definition or using the Shpak algorithm (see below).
 
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
-*J.O. Smith's algorithm for CT filters*
+***J.O. Smith's algorithm for CT filters***
 
 The derivative of a CT polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
 

@@ -56,8 +56,6 @@ pyfda_io_lib
 pyfda_fix_lib
 --------------
 
-:mod:`pyfda.libs.pyfda_fix_lib`
--------------------------------
 .. automodule:: pyfda.libs.pyfda_fix_lib
 	:members:
 
