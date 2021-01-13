@@ -3,17 +3,15 @@ Libraries
 
 pyfda contains the following libraries:
 
-pyfda_lib
----------
-General library for pyfda at :ref:`dev_libs_pyfda_lib`.
+* :ref:`dev_libs_pyfda_lib`: General functions
 
-
-* :ref:`dev_libs_pyfda_sig_lib`: Library with functions related to 
-  signal processing
+* :ref:`dev_libs_pyfda_sig_lib`: Functions related to  signal processing
   
-* :ref:`dev_libs_pyfda_fix_lib`: Library with fixpoint functions 
+* :ref:`dev_libs_pyfda_qt_lib`: Functions related to Qt
 
-
+* :ref:`dev_libs_pyfda_io_lib`: Functions related to file I/O
+  
+* :ref:`dev_libs_pyfda_fix_lib`: Fixpoint classes and functions 
 
 
    
@@ -34,6 +32,26 @@ pyfda_sig_lib
 Library with functions similar to :mod:`scipy.signal`:
 
 .. automodule:: pyfda.libs.pyfda_sig_lib
+	:members:
+
+
+.. _dev_libs_pyfda_qt_lib:
+
+pyfda_qt_lib
+--------------
+Library with functions related to Qt:
+
+.. automodule:: pyfda.libs.pyfda_qt_lib
+	:members:
+
+
+.. _dev_libs_pyfda_io_lib:
+
+pyfda_io_lib
+--------------
+Library with functions related to file I/O:
+
+.. automodule:: pyfda.libs.pyfda_io_lib
 	:members:
 
 
