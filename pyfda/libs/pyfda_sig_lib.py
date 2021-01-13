@@ -195,9 +195,9 @@ w : ndarray
 Notes
 =======
 
----------------------------------
+
 Definition and direct calculation
----------------------------------
+``````````````````````````````````
 
 The following explanation follows [JOS]_.
 
@@ -265,7 +265,7 @@ delay.
 
 
 J.O. Smith's algorithm for FIR filters
-+++++++++++++++++++++++++++++++++++++++
+```````````````````````````````````````
 
 An efficient form of calculating the group delay of FIR filters based on the derivative of the logarithmic frequency response has been described in [JOS]_ and [Lyons]_ for
 discrete time systems. 
@@ -303,7 +303,7 @@ the magnitude of the denominator is larger than e.g. 10 times the machine eps.
 In this case, :math:`\\tau_g` can be set to zero or nan. 
 
 J.O. Smith's algorithm for IIR filters (direct calculation)
-“““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
+““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
 
 IIR filters are defined by
 
@@ -352,7 +352,7 @@ is set to zero.  (The group delay approaches infinity when
 there are poles or zeros very close to the unit circle in the z plane.)
 
 J.O. Smith's algorithm for IIR filters (with conversion to FIR case) 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+“““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
 
 As a further optimization, the group delay of an IIR filter :math:`H(z) = B(z)/A(z)`
 can be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
@@ -413,7 +413,7 @@ from the definition or using the Shpak algorithm (see below).
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
 J.O. Smith's algorithm for CT filters
----
+“““““““““““““““““““““““““““““““““““““““
 
 The derivative of a CT polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
 
