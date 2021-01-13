@@ -151,6 +151,31 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.
                 sos=False, alg="scipy"):
 #==================================================================
     """
+    
+.. raw:: html
+
+<style type="text/css">
+     span.underlined {
+       text-decoration: underline;
+     }
+     .red { color: red; }
+     .bolditalic {
+  font-weight: bold;
+  font-style: italic;        
+         }
+</style>
+
+.. role:: red
+  :class: red
+
+.. role:: bolditalic
+  :class: bolditalic
+  
+
+
+:red:`WARNING` :bolditalic:`Don't be stupid!`
+
+
 Calculate group delay of a discrete time filter, specified by
 numerator coefficients `b` and denominator coefficients `a` of the system
 function `H` ( `z`).
