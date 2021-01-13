@@ -239,6 +239,8 @@ class Plot_Hf(QWidget):
         ax2.set_yticks(np.linspace(ax2_yticks[0],
                                    (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
+        logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
+                                   ax2_yticks[1],ax2_yticks[-1]))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
@@ -698,7 +700,10 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
-            self.ax.set_title(r'Magnitude Frequency Response')
+            if self.chkPhase.isChecked():
+                self.ax.set_title(r'Magnitude and Phase Frequency Response')
+            else:
+                self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
             self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
 
