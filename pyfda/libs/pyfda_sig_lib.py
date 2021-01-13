@@ -195,9 +195,7 @@ w : ndarray
 Notes
 =======
 
-
-Definition and direct calculation
-``````````````````````````````````
+**Definition and direct calculation**
 
 The following explanation follows [JOS]_.
 
@@ -264,8 +262,8 @@ In the following, it will be shown that the derivative of birational functions
 delay.
 
 
-J.O. Smith's algorithm for FIR filters
-```````````````````````````````````````
+** J.O. Smith's algorithm for FIR filters **
+
 
 An efficient form of calculating the group delay of FIR filters based on the derivative of the logarithmic frequency response has been described in [JOS]_ and [Lyons]_ for
 discrete time systems. 
@@ -412,8 +410,7 @@ from the definition or using the Shpak algorithm (see below).
 
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
-J.O. Smith's algorithm for CT filters
-“““““““““““““““““““““““““““““““““““““““
+*J.O. Smith's algorithm for CT filters*
 
 The derivative of a CT polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
 
