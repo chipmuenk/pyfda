@@ -42,11 +42,16 @@ FS : float (optional, default: FS = 1)
 N :  float (optional)
      Number of calculated points.
      Default: N = len(b) for FIR filters, N = 100 for IIR filters
+     
+step : bool (optional, default False)
+     return the step response instead of the impulse response
 
 Returns
 -------
-hn : ndarray with length N (see above)
-td : ndarray containing the time steps with same
+hn : ndarray 
+    impulse or step response with length N (see above)
+td : ndarray 
+    contains the time steps with same length as hn
 
 
 Examples
@@ -191,7 +196,7 @@ Notes
 =======
 
 Definition and direct calculation
-````````````````````````````````````
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following explanation follows [JOS]_.
 
 The group delay :math:`\\tau_g(\\omega)` of discrete time (DT) and continuous time
@@ -296,7 +301,7 @@ the magnitude of the denominator is larger than e.g. 10 times the machine eps.
 In this case, :math:`\\tau_g` can be set to zero or nan. 
 
 J.O. Smith's algorithm for IIR filters (direct calculation)
-`````````````````````````````````````````````````````````````
+“““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
 
 IIR filters are defined by
 
