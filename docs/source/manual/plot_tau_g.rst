@@ -28,7 +28,9 @@ The algorithm for calculating the group delay is explained in detail in
  
  or in :class:`pyfda.plot_widgets.plot_impz.Plot_Impz`
  
-  or in :func:`pyfda.plot_widgets.plot_impz.main`
+  or in :func:`pyfda.plot_widgets.plot_impz.Plot_Impz.draw_data`
+  
+  or in :mod:`pyfda.libs.pyfda_sig_lib`
  
 .. automodule:: pyfda.libs.pyfda_sig_lib
 
