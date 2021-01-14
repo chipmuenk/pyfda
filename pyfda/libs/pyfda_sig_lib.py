@@ -151,27 +151,6 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.
                 sos=False, alg="scipy"):
 #==================================================================
     """
-    
-.. raw:: html
-
-   span.underlined {
-       text-decoration: underline;
-     }
-     .red { color: red; }
-     .bolditalic {
-  font-weight: bold;
-  font-style: italic;        
-         }
-</style>
-.. role:: red
-  :class: red
-.. role:: bolditalic
-  :class: bolditalic
-  
-
-:red:`WARNING` :bolditalic:`Don't be stupid!`
-
-
 Calculate group delay of a discrete time filter, specified by
 numerator coefficients `b` and denominator coefficients `a` of the system
 function `H` ( `z`).
@@ -220,7 +199,7 @@ w : ndarray
 Notes
 =======
 
-:bolditalic:`Definition and direct calculation`
+**Definition and direct calculation ('diff')**
 
 The following explanation follows [JOS]_.
 
@@ -287,11 +266,11 @@ In the following, it will be shown that the derivative of birational functions
 delay.
 
 
-***J.O. Smith's algorithm for FIR filters***
+**J.O. Smith's basic algorithm for FIR filters ('scipy')**
 
-
-An efficient form of calculating the group delay of FIR filters based on the derivative of the logarithmic frequency response has been described in [JOS]_ and [Lyons]_ for
-discrete time systems. 
+An efficient form of calculating the group delay of FIR filters based on the 
+derivative of the logarithmic frequency response has been described in [JOS]_ 
+and [Lyons]_ for discrete time systems. 
 
 A FIR filter is defined via its polyome :math:`H(z) = \\sum_k b_k z^{-k}` and has
 the following derivative:
@@ -325,7 +304,7 @@ algorithm runs into numerical problems. Hence, it is neccessary to check whether
 the magnitude of the denominator is larger than e.g. 10 times the machine eps. 
 In this case, :math:`\\tau_g` can be set to zero or nan. 
 
-:red:`J.O. Smith's algorithm for IIR filters (direct calculation)`
+**J.O. Smith's basic algorithm for IIR filters ('scipy')**
 
 
 IIR filters are defined by
@@ -374,11 +353,18 @@ If the denominator of the computation becomes too small, the group delay
 is set to zero.  (The group delay approaches infinity when
 there are poles or zeros very close to the unit circle in the z plane.)
 
-J.O. Smith's algorithm for IIR filters (with conversion to FIR case) 
-“““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
+**J.O. Smith's improved algorithm for IIR filters ('jos')**
 
-As a further optimization, the group delay of an IIR filter :math:`H(z) = B(z)/A(z)`
-can be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
+J.O. Smith gives the following speed and accuracy optimizations for the basic 
+algorithm:
+
+* convert the filter to a FIR filter with identical phase and group delay 
+    (but with different magnitude response)
+    
+* use FFT instead of polyval to calculate the frequency response
+
+The group delay of an IIR filter :math:`H(z) = B(z)/A(z)` can also
+be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
 response (and hence group delay) as the original filter. This filter is obtained 
 by the following steps:
     
@@ -428,14 +414,23 @@ numerator and denominator polynomes.
 The actual group delay is calculated from the equivalent polynome as in the FIR
 case.
 
+A more robust (and much faster!) implementation is obtained by using the FFT 
+instead of polyval.
+
+This measure fixes already most of the problems described for narrowband IIR 
+filters in scipy issues [SC9310]_ and [SC1175]_. In my experience, these problems
+occur for all narrowband IIR response types.
+
+**Shpak algorithm for IIR filters**
+
 The algorithm described above is numerically efficient but not robust for
-narrowband IIR filters as pointed out in scipy issues [SC9310]_ and [SC1175]_. 
+narrowband IIR  
 In the issues, it is recommended to calculate the group delay of IIR filters 
 from the definition or using the Shpak algorithm (see below).
 
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
-***J.O. Smith's algorithm for CT filters***
+**J.O. Smith's algorithm for CT filters**
 
 The derivative of a CT polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
 
