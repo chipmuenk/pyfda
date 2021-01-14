@@ -12,7 +12,7 @@ Widget for plotting the group delay
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
+from pyfda.libs.compat import (Qt, QCheckBox, QWidget, QFrame, QComboBox,
                                QHBoxLayout, pyqtSignal, pyqtSlot)
 from pyfda.libs.pyfda_sig_lib import group_delay, group_delayz
 from pyfda.libs.pyfda_qt_lib import qset_cmb_box
@@ -60,9 +60,18 @@ class Plot_tau_g(QWidget):
                                     "and calculation times.")
  
         self.cmbAlgorithm = QComboBox(self)
-        self.cmbAlgorithm.addItems(["Scipy", "JOS", "Diff", "Shpak"])
+        self.cmbAlgorithm.addItems(["Auto", "Scipy", "JOS", "Diff", "Shpak"])
         qset_cmb_box(self.cmbAlgorithm, self.algorithm)
-        self.cmbAlgorithm.setToolTip("<span>Select algorithm for calculating the group delay.</span>")
+        self.cmbAlgorithm.setToolTip("<span>Select algorithm for calculating "
+                                     "the group delay.</span>")
+        self.cmbAlgorithm.setItemData(0, "<span>Try to find best-suited algorithm."
+                                      "<span>",Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(1, "<span>Scipy algorithm.<span>",Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(2, "<span>J.O. Smith's algorithm.<span>",Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(3, "<span>Textbook-style, differentiate "
+                                      "the phase.<span>",Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(4, "<span>Shpak's algorithm for SOS and other "
+                                      "IIR filters.<span>",Qt.ToolTipRole)        
 
         #self.chkScipy = QCheckBox("Scipy", self)
         #self.chkScipy.setChecked(False)
