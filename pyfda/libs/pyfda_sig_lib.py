@@ -199,9 +199,9 @@ w : ndarray
 Notes
 =======
 
-**Definition and direct calculation ('diff')**
+The following explanations follow [JOS]_.
 
-The following explanation follows [JOS]_.
+**Definition and direct calculation ('diff')**
 
 The group delay :math:`\\tau_g(\\omega)` of discrete time (DT) and continuous time
 (CT) systems is the rate of change of phase with respect to angular frequency. 
@@ -296,16 +296,14 @@ with a ramp :math:`k`, yielding
 
 scipy's grpdelay directly calculates the complex frequency response 
 :math:`H(e^{j\\omega T})` and its ramped function at the frequency points using 
-the polyval function. However, it is faster (probably numerically more robust) 
-to use the FFT for calculating the frequency response at the NFFT points. 
+the polyval function.
 
 When zeros of the frequency response are on or near the data points of the DFT, this 
 algorithm runs into numerical problems. Hence, it is neccessary to check whether
-the magnitude of the denominator is larger than e.g. 10 times the machine eps. 
-In this case, :math:`\\tau_g` can be set to zero or nan. 
+the magnitude of the denominator is less than e.g. 100 times the machine eps. 
+In this case, :math:`\\tau_g` is set to zero. 
 
 **J.O. Smith's basic algorithm for IIR filters ('scipy')**
-
 
 IIR filters are defined by
 
@@ -353,15 +351,38 @@ If the denominator of the computation becomes too small, the group delay
 is set to zero.  (The group delay approaches infinity when
 there are poles or zeros very close to the unit circle in the z plane.)
 
+**J.O. Smith's algorithm for CT filters**
+
+The same process can be applied for CT systems as well: The derivative of a CT 
+polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
+
+.. math::
+
+    \\frac{\\partial }{\\partial \\omega} P(s = j \\omega)
+    = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N c_k (j \\omega)^k
+    =  j \\sum_{k = 0}^{N-1} (k+1) c_{k+1} (j \\omega)^{k}
+    =  j P_R(s = j \\omega)
+
+where :math:`P_R` is the "ramped" polynome, i.e. its `k` th coefficient is
+multiplied by the ramp `k` + 1, yielding the same form as for DT systems (but
+the ramped polynome has to be calculated differently).
+
+.. math::
+
+    \\tau_g(\\omega) = -\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
+                     = -\\Im \\left\\{j \\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
+                     = -\\Re \\left\\{\\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
+
+
 **J.O. Smith's improved algorithm for IIR filters ('jos')**
 
 J.O. Smith gives the following speed and accuracy optimizations for the basic 
 algorithm:
 
-* convert the filter to a FIR filter with identical phase and group delay 
-    (but with different magnitude response)
-    
-* use FFT instead of polyval to calculate the frequency response
+    * convert the filter to a FIR filter with identical phase and group delay 
+      (but with different magnitude response)
+        
+    * use FFT instead of polyval to calculate the frequency response
 
 The group delay of an IIR filter :math:`H(z) = B(z)/A(z)` can also
 be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
@@ -409,13 +430,13 @@ or, in Python:
     c = np.convolve(b, np.conj(a[::-1]))
 
 where :math:`b` and :math:`a` are the coefficient vectors of the original 
-numerator and denominator polynomes.
+numerator and denominator polynomes. The actual group delay is then calculated 
+from the equivalent FIR filter as described above.
 
-The actual group delay is calculated from the equivalent polynome as in the FIR
-case.
-
-A more robust (and much faster!) implementation is obtained by using the FFT 
-instead of polyval.
+Calculating the frequency response with the `np.polyval(p,z)` function at the 
+`NFFT` frequency points along the unit circle, :math:`z = \\exp(-j \\omega)`, 
+seems to be numerically less robust than using the FFT for the same task, it 
+is also much slower.
 
 This measure fixes already most of the problems described for narrowband IIR 
 filters in scipy issues [SC9310]_ and [SC1175]_. In my experience, these problems
@@ -424,31 +445,14 @@ occur for all narrowband IIR response types.
 **Shpak algorithm for IIR filters**
 
 The algorithm described above is numerically efficient but not robust for
-narrowband IIR  
-In the issues, it is recommended to calculate the group delay of IIR filters 
-from the definition or using the Shpak algorithm (see below).
+narrowband IIR filters. Especially for filters defined by second-order sections,
+it is recommended to calculate the group delay using the D. J. Shpak's algorithm.
 
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
-**J.O. Smith's algorithm for CT filters**
-
-The derivative of a CT polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
-
-.. math::
-
-    \\frac{\\partial }{\\partial \\omega} P(s = j \\omega)
-    = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N c_k (j \\omega)^k
-    =  j \\sum_{k = 0}^{N-1} (k+1) c_{k+1} (j \\omega)^{k}
-    =  j P_R(s = j \\omega)
-
-where :math:`P_R` is the "ramped" polynome, i.e. its `k` th coefficient is
-multiplied by the ramp `k` + 1, yielding
-
-.. math::
-
-    \\tau_g(\\omega) = -\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
-                     = -\\Im \\left\\{j \\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
-                     = -\\Re \\left\\{\\frac{H_R(\\omega)}{H(\\omega)} \\right\\}
+This algorithm sums the group delays of the individual sections which is much
+more robust as only second-order functions are involved. However, converting `(b,a)` 
+coefficients to SOS coefficients introduces inaccuracies.
 
 References
 ```````````
