@@ -154,8 +154,7 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.
     
 .. raw:: html
 
-<style type="text/css">
-     span.underlined {
+   span.underlined {
        text-decoration: underline;
      }
      .red { color: red; }
@@ -164,14 +163,11 @@ def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.
   font-style: italic;        
          }
 </style>
-
 .. role:: red
   :class: red
-
 .. role:: bolditalic
   :class: bolditalic
   
-
 
 :red:`WARNING` :bolditalic:`Don't be stupid!`
 
@@ -224,7 +220,7 @@ w : ndarray
 Notes
 =======
 
-***Definition and direct calculation***
+:bolditalic:`Definition and direct calculation`
 
 The following explanation follows [JOS]_.
 
@@ -329,8 +325,8 @@ algorithm runs into numerical problems. Hence, it is neccessary to check whether
 the magnitude of the denominator is larger than e.g. 10 times the machine eps. 
 In this case, :math:`\\tau_g` can be set to zero or nan. 
 
-J.O. Smith's algorithm for IIR filters (direct calculation)
-““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““““
+:red:`J.O. Smith's algorithm for IIR filters (direct calculation)`
+
 
 IIR filters are defined by
 
@@ -502,6 +498,9 @@ Examples
         
     time_0 = time.perf_counter_ns()
     
+    if alg.lower() == 'auto':
+        alg = 'jos' # use J.O. Smith's algorithm for the moment
+
     if alg.lower() == 'diff':
         #logger.info("Diff!")
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
