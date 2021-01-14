@@ -404,9 +404,7 @@ by the following steps:
   the conjugate operation is omitted which gives wrong results for complex
   coefficients.
   
-* Finally, :math:`C(z) = B(z) \\tilde{A}(z)`. The coefficients of :math:`C(z)`
-  are calculated efficiently by convolving the coefficients of :math:`B(z)` and 
-  :math:`\\tilde{A}(z)`.
+* Finally, :math:`C(z) = B(z) \\tilde{A}(z)`:
 
 .. math::
     
@@ -423,7 +421,8 @@ where
     \\end{align}    
 
 
-or, in Python:
+In Python, the coefficients of :math:`C(z)` are calculated efficiently by 
+convolving the coefficients of :math:`B(z)` and  :math:`\\tilde{A}(z)`:
 
 .. code-block:: python
 
