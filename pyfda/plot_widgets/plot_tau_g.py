@@ -42,7 +42,7 @@ class Plot_tau_g(QWidget):
     def __init__(self, parent):
         super(Plot_tau_g, self).__init__(parent)
         self.verbose = False # suppress warnings
-        self.algorithm = "Diff"
+        self.algorithm = "diff"
         self.needs_calc = True   # flag whether plot needs to be recalculated
         self.tool_tip = "Group delay"
         self.tab_label = "\U0001D70F(f)"#"tau_g" \u03C4
@@ -54,24 +54,26 @@ class Plot_tau_g(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.chkWarnings = QCheckBox("Verbose", self)
+        self.chkWarnings = QCheckBox(self.tr("Verbose"), self)
         self.chkWarnings.setChecked(self.verbose)
-        self.chkWarnings.setToolTip("<span>Print messages about singular group delay"
-                                    "and calculation times.")
+        self.chkWarnings.setToolTip(self.tr("<span>Print messages about singular group delay"
+                                    "and calculation times."))
  
         self.cmbAlgorithm = QComboBox(self)
-        self.cmbAlgorithm.addItems(["Auto", "Scipy", "JOS", "Diff", "Shpak"])
-        qset_cmb_box(self.cmbAlgorithm, self.algorithm)
-        self.cmbAlgorithm.setToolTip("<span>Select algorithm for calculating "
-                                     "the group delay.</span>")
-        self.cmbAlgorithm.setItemData(0, "<span>Try to find best-suited algorithm."
-                                      "<span>",Qt.ToolTipRole)
-        self.cmbAlgorithm.setItemData(1, "<span>Scipy algorithm.<span>",Qt.ToolTipRole)
-        self.cmbAlgorithm.setItemData(2, "<span>J.O. Smith's algorithm.<span>",Qt.ToolTipRole)
-        self.cmbAlgorithm.setItemData(3, "<span>Textbook-style, differentiate "
-                                      "the phase.<span>",Qt.ToolTipRole)
-        self.cmbAlgorithm.setItemData(4, "<span>Shpak's algorithm for SOS and other "
-                                      "IIR filters.<span>",Qt.ToolTipRole)        
+        for t in [(self.tr("Auto"),"auto"),(self.tr("Scipy"),"scipy"), (self.tr("JOS"), "jos"),
+                  (self.tr("Diff"), "diff"), (self.tr("Shpak"), "shpak")]: # text, data
+            self.cmbAlgorithm.addItem(*t)
+        qset_cmb_box(self.cmbAlgorithm, self.algorithm,data=True)
+        self.cmbAlgorithm.setToolTip(self.tr("<span>Select algorithm for calculating "
+                                     "the group delay.</span>"))
+        self.cmbAlgorithm.setItemData(0, self.tr("<span>Try to find best-suited algorithm."
+                                      "</span>"),Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(1, self.tr("<span>Scipy algorithm.</span>"),Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(2, self.tr("<span>J.O. Smith's algorithm.</span>"),Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(3, self.tr("<span>Textbook-style, differentiate "
+                                      "the phase.</span>"),Qt.ToolTipRole)
+        self.cmbAlgorithm.setItemData(4, self.tr("<span>Shpak's algorithm for SOS and other "
+                                      "IIR filters.</span>"),Qt.ToolTipRole)        
 
         #self.chkScipy = QCheckBox("Scipy", self)
         #self.chkScipy.setChecked(False)
@@ -147,7 +149,7 @@ class Plot_tau_g(QWidget):
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
         self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole = True,
                                          verbose = self.chkWarnings.isChecked(), 
-                                         alg=self.cmbAlgorithm.currentText()) # self.chkWarnings.isChecked())
+                                         alg=self.cmbAlgorithm.currentData()) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
