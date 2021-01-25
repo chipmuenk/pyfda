@@ -111,9 +111,11 @@ def get_yosys_dir():
     yosys_exe = env("YOSYS")
     yosys_ver = ""
     
-    if yosys_exe:
+    if yosys_exe: # something is stored in the environment variable
         # redirect `yosys -V` output to string
         command = [yosys_exe, "-V"]
+    elif "yosys" in env("PATH"):
+        command = ["yosys", "-V"]
         try:
             output = check_output(command, stderr=STDOUT).decode().split(' ', 2)
             if len(output) > 1:
