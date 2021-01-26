@@ -14,9 +14,9 @@ import logging
 logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi
-
-
 import scipy.signal as sig
+
+import pyfda.filterbroker as fb
 
 
 def impz(b, a=1, FS=1, N=0, step = False):
@@ -98,13 +98,13 @@ Examples
 def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
 #==================================================================
     """
-    Perform polynomial after treating singularities, meaning:
+    Perform elementwise array division after treating singularities, meaning:
     - check whether denominator (`den`) coefficients approach zero
-    - check whether numerator (`num`) or denominator coefficients are finite, i.e.
-    not `nan`, `ìnf` or `ninf`. 
+    - check whether numerator (`num`) or denominator coefficients are non-finite, i.e.
+      one of `nan`, `ìnf` or `ninf`. 
     
-    For singularities, replace denominator coefficient by `1` and numerator 
-    coefficient by `0` when flagged.
+    At each singularity, replace denominator coefficient by `1` and numerator 
+    coefficient by `0`
 
     Parameters
     ----------
@@ -135,20 +135,19 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
     singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
                         (abs(den) < n_eps * np.spacing(1)))[0] 
 
-    if np.size(singular) > 0:  # check whether singular array is empty
-        if verbose:
-            logger.warning('div_safe singularity -> setting to 0 at:')
+    if verbose and np.any(singular):
+        logger.warning('div_safe singularity -> setting to 0 at:')
         for i in singular:
-            num[i] = 0
-            den[i] = 1
-            if verbose:
-                logger.warning('i = {0} '.format(i * i_scale))
-                    
+            logger.warning('i = {0} '.format(i * i_scale))
+    
+    num[singular] = 0
+    den[singular] = 1
+    
     return num / den
                     
 #==================================================================
 def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, 
-                sos=False, alg="scipy"):
+                sos=False, alg="scipy", n_eps=100):
 #==================================================================
     """
 Calculate group delay of a discrete time filter, specified by
@@ -187,6 +186,10 @@ alg : str (default: "scipy")
             the frequency response is calculated with the FFT instead of polyval
           - "diff": Group delay is calculated by differentiating the phase
           - "Shpakh": Group delay is calculated from second-order sections
+          
+n_eps : integer (optional, default : 100)
+        Minimum value in the calculation of intermediate values before tau_g is set 
+        to zero.
 
 Returns
 -------
@@ -477,123 +480,119 @@ Examples
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
 >>> tau_g, td = pyfda_lib.grpdelay(b)
 """
-    # if use_scipy:
-    #     w, gd = sig.group_delay((b,a),w=nfft,whole=whole)
-    #     return w, gd
-    #alg = 'diff' # 'scipy', 'scipy_mod' 'shpak'
                 
     if not whole:
         nfft = 2*nfft
-
     w = fs * np.arange(0, nfft)/nfft # create frequency vector
     
     tau_g = np.zeros_like(w) # initialize tau_g
     
     #----------------
 
+    if alg == 'auto':
+        if sos:
+            logger.warning("sos!")
+            alg = "shpak"
+
+        elif fb.fil[0]['ft'] == 'IIR':
+            alg = 'jos' # TODO: use 'shpak' here as well?
+        else:
+            alg = 'jos'
+
     if sos and alg != "shpak":
         b,a = sig.sos2tf(b)
-        
-    time_0 = time.perf_counter_ns()
-    
-    if alg.lower() == 'auto':
-        alg = 'jos' # use J.O. Smith's algorithm for the moment
 
-    if alg.lower() == 'diff':
+    time_0 = time.perf_counter_ns()
+
+    # ---------------------
+    if alg == 'diff':
         #logger.info("Diff!")
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
-        singular = np.absolute(H) < 100. * np.spacing(1) # equivalent to matlab "eps"
+        singular = np.absolute(H) < n_eps * 10 * np.spacing(1) # equivalent to matlab "eps"
         H[singular] = 0
         tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
 
-    elif alg.lower() == 'jos':
+    # ---------------------
+    elif alg == 'jos':
         #logger.info("Octave / JOS!")
-        try: len(a)
-        except TypeError:
-            a = 1; oa = 0 # a is a scalar or empty -> order of a = 0
-            c = b
-            try: len(b)
-            except TypeError:
-               logger.error('No proper filter coefficients: len(a) = len(b) = 1 !')
-        else:
-            oa = len(a)-1               # order of denom. a(z) resp. a(s)
-            c = np.convolve(b, a[::-1])  # equivalent FIR polynome
-                                        # c(z) = b(z) * a(1/z)*z^(-oa)
-        try: len(b)
-        except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
-        else:
-            ob = len(b)-1               # order of numerator b(z)
+        b, a = map(np.atleast_1d, (b, a))  # when scalars, convert to 1-dim. arrays
 
-        if analog:
-            a_b = np.convolve(a,b)
-            if ob > 1:
-                br_a = np.convolve(b[1:] * np.arange(1,ob), a)
-            else:
-                br_a = 0
-            ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
+        c = np.convolve(b, a[::-1]) # equivalent FIR polynome
+                                    # c(z) = b(z) * a(1/z)*z^(-oa)
+        cr = c * np.arange(c.size)  # multiply with ramp -> derivative of c wrt 1/z
 
-            num = np.fft.fft(ar_b - br_a, nfft)
-            den = np.fft.fft(a_b,nfft)
-        else:
-            oc = oa + ob                  # order of c(z)
-            cr = c * np.arange(c.size) # multiply with ramp -> derivative of c wrt 1/z
+        den = np.fft.fft(c,nfft)   # FFT = evaluate polynome around unit circle
+        num = np.fft.fft(cr,nfft)  # and ramped polynome at NFFT equidistant points
+        
+        # Check for singularities i.e. where denominator (`den`) coefficients 
+        # approach zero or numerator (`num`) or denominator coefficients are 
+        # non-finite, i.e. `nan`, `ìnf` or `ninf`. 
+        singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
+                        (abs(den) < n_eps * np.spacing(1)))[0] 
 
-            num = np.fft.fft(cr,nfft) #
-            den = np.fft.fft(c,nfft)  #
-
-        # for some strange reason, warnings "invalid value encountered in true 
-        # divide" pop-up here
         with np.errstate(invalid='ignore', divide='ignore'):
-            tau_g = np.real(div_safe(num, den, n_eps=100, i_scale=fs/nfft, verbose=verbose))
+            # element-wise division of numerator and denominator FFTs
+            tau_g = np.real(num / den) - a.size + 1
+        
+        # set group delay = 0 at each singularity
+        tau_g[singular] = 0
 
-        if not analog: # analog = True doesn't work yet
-            tau_g -= oa
+        if verbose and np.any(singular):
+            logger.warning('singularity -> setting to 0 at:')
+            for i in singular:
+                logger.warning('i = {0} '.format(i * fs/nfft))
 
-            if not whole:
-                nfft = nfft/2
-                tau_g = tau_g[0:nfft]
-                w = w[0:nfft]
+        if not whole:
+            nfft = nfft/2
+            tau_g = tau_g[0:nfft]
+            w = w[0:nfft]
 
-    elif alg.lower() == "scipy":
-        #logger.info("Scipy!")
-
-###############################################################################
-#
-# group_delay implementation copied and adapted from scipy.signal (0.16)
-#
-###############################################################################
-
-        # if w is None:
-        #     w = 512
-    
-        # if isinstance(w, int):
-        #     if whole:
-        #         w = np.linspace(0, 2 * pi, w, endpoint=False)
+        # if analog: # doesnt work yet
+        #     a_b = np.convolve(a,b)
+        #     if ob > 1:
+        #         br_a = np.convolve(b[1:] * np.arange(1,ob), a)
         #     else:
-        #         w = np.linspace(0, pi, w, endpoint=False)
-    
+        #         br_a = 0
+        #     ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
+
+        #     num = np.fft.fft(ar_b - br_a, nfft)
+        #     den = np.fft.fft(a_b,nfft)
+
+    # ---------------------
+    elif alg == "scipy": # implementation as in scipy.signal
+        #logger.info("Scipy!")
         w = np.atleast_1d(w)
         b, a = map(np.atleast_1d, (b, a))
         c = np.convolve(b, a[::-1])   # coefficients of equivalent FIR polynome
         cr = c * np.arange(c.size)    #  and of the ramped polynome
         z = np.exp(-1j * w) # complex frequency points around the unit circle
         den = np.polyval(c[::-1], z)  # evaluate polynome 
-        num = np.polyval(cr[::-1], z) # and ramped polynome 
+        num = np.polyval(cr[::-1], z) # and ramped polynome
         
-        tau_g = np.real(div_safe(num, den, n_eps=100, i_scale=fs/nfft, verbose=verbose))\
-                - a.size + 1
+        # Check for singularities i.e. where denominator (`den`) coefficients 
+        # approach zero or numerator (`num`) or denominator coefficients are 
+        # non-finite, i.e. `nan`, `ìnf` or `ninf`. 
+        singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
+                        (abs(den) < n_eps * np.spacing(1)))[0] 
 
-# =============================================================================
-#         singular = np.absolute(den) < 10 * minmag
-#         if np.any(singular) and verbose:
-#             singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
-#             logger.warning("pyfda_lib.py:grpdelay:\n"
-#                 "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
-#             )
-#     
-#         tau_g[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
-# =============================================================================
+        with np.errstate(invalid='ignore', divide='ignore'):
+            # element-wise division of numerator and denominator FFTs
+            tau_g = np.real(num / den) - a.size + 1
 
+        # set group delay = 0 at each singularity
+        tau_g[singular] = 0
+        
+        if verbose and np.any(singular):
+            logger.warning('singularity -> setting to 0 at:')
+            for i in singular:
+                logger.warning('i = {0} '.format(i * fs/nfft))
+
+        if not whole:
+            nfft = nfft/2
+            tau_g = tau_g[0:nfft]
+            w = w[0:nfft]
+
+    # ---------------------
     elif alg.lower() == "shpak":
         #logger.info("Using Shpak's algorithm")
         if sos:

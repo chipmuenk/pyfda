@@ -44,7 +44,7 @@ class Plot_tau_g(QWidget):
         self.verbose = False # suppress warnings
         self.algorithm = "diff"
         self.needs_calc = True   # flag whether plot needs to be recalculated
-        self.tool_tip = "Group delay"
+        self.tool_tip = self.tr("Group delay")
         self.tab_label = "\U0001D70F(f)"#"tau_g" \u03C4
         self._construct_UI()
 
@@ -147,14 +147,19 @@ class Plot_tau_g(QWidget):
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
-        self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole = True,
-                                         verbose = self.chkWarnings.isChecked(), 
+
+        if fb.fil[0]['creator'][0] == 'sos': # one of 'sos', 'zpk', 'ba'
+            self.W, self.tau_g = group_delay(fb.fil[0]['sos'], nfft=params['N_FFT'], sos=True,
+                                         whole=True, verbose=self.chkWarnings.isChecked(),
+                                         alg=self.cmbAlgorithm.currentData())
+        else:
+            self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole=True,
+                                         verbose=self.chkWarnings.isChecked(),
                                          alg=self.cmbAlgorithm.currentData()) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
            self.tau_g = np.zeros(self.tau_g.size)
-
 
 #------------------------------------------------------------------------------
     def draw(self):
