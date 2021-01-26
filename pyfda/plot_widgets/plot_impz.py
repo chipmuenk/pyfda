@@ -545,7 +545,9 @@ class Plot_Impz(QWidget):
 
         # Add noise to stimulus
         noi = 0
-        if self.ui.noise == "gauss":
+        if self.ui.noise == "none":
+            pass
+        elif self.ui.noise == "gauss":
             noi = self.ui.noi * np.random.randn(len(self.x))
             self.title_str += r' + Gaussian Noise'
         elif self.ui.noise == "uniform":
@@ -560,6 +562,12 @@ class Plot_Impz(QWidget):
             noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(len(self.x)))),
                                         length=len(self.x), state=None)[0] - 0.5)
             self.title_str += r' + max. length sequence'
+        elif self.ui.noise == "brownian":
+            # brownian noise
+            noi = np.cumsum(self.ui.noi * np.random.randn(len(self.x)))
+            self.title_str += r' + Brownian Noise'
+        else:
+            logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
         if type(self.ui.noi) == complex:
             self.x = self.x.astype(complex) + noi
         else:

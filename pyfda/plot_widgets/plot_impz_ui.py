@@ -658,7 +658,7 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
-        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS", "MLS"])
+        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS", "MLS", "Brownian"])
         self.cmbNoise.setItemData(1, "<span>Normal- or Gauss-distributed process with "
                                       "std. deviation &sigma;.</span>", Qt.ToolTipRole)
         self.cmbNoise.setItemData(2, "<span>Uniformly distributed process in the range &plusmn; "
@@ -668,6 +668,8 @@ class PlotImpz_UI(QWidget):
         self.cmbNoise.setItemData(4, "<span>Maximum Length Sequence with values &plusmn; A. The sequence "
                                       "is always the same as the state is not stored and used for "
                                       "the next sequence.</span>", Qt.ToolTipRole)
+        self.cmbNoise.setItemData(5, "<span>Brownian (cumulated sum) process based on Gaussian "
+                                      " noise with std. deviation &sigma;.</span>", Qt.ToolTipRole)
         self.cmbNoise.setToolTip("Type of additive noise.")
         qset_cmb_box(self.cmbNoise, self.noise)
 
@@ -1077,7 +1079,10 @@ class PlotImpz_UI(QWidget):
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of Maximum Length Sequence. "
                                        "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
-
+            elif self.noise == 'brownian':
+                self.lblNoi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
+                self.ledNoi.setToolTip("<span>Standard deviation of the Gaussian process "
+                                       "that is cumulated.</span>")
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'noi'})
 

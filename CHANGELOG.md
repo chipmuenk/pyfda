@@ -16,9 +16,9 @@
   angle character
   
 - It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
-  (didn't work befor), changing the filter type now highlights the save button.
+  (didn't work before). Changing the filter type now highlights the save button.
   
-- Improve group delay algorithms for IIR filters
+- Improve group delay algorithms for IIR, allow selection between algorithms
 
 ### New features
 
@@ -26,7 +26,7 @@
 
 - New stimuli Gauss and Rect impulse
 
-- New noise type "Maximum Length Sequence"
+- New noise types "Maximum Length Sequence" and "Brownian"
 
 - Tooltips for combo box items
 
@@ -41,6 +41,9 @@
   
 - Allow turning off automatic grid alignment between mag. and phase in the 
   H(f) tab
+  
+- Started preparation of code for i18n
+
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)
