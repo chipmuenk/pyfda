@@ -18,7 +18,7 @@ from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
 import numpy as np
 from numpy import pi
 import scipy.signal as sig
-from scipy.special import sinc
+from scipy.special import sinc, diric
 import matplotlib.patches as mpl_patches
 from matplotlib.ticker import AutoMinorLocator
 
@@ -35,6 +35,10 @@ from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
+# TODO: Spectra of complex stimuli are wrong (im and re swapped?)
+# TODO: Single-sided and double-sided spectra of pulses are identical - ok?
+# TODO: Scaling of bandlimited rect pulse is off
+# TODO: Combobox for Mag / Mag+phi / Re + Im spectra
 
 classes = {'Plot_Impz':'y[n]'} #: Dict containing class name : display name
 
@@ -131,7 +135,7 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
-        self.ui.chk_scale_impz_f.clicked.connect(self.draw)
+        self.ui.chk_norm_impz_f.clicked.connect(self.draw)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.chk_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw)
@@ -320,7 +324,7 @@ class Plot_Impz(QWidget):
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         # allow scaling the frequency response from pure impulse (no DC, no noise)
-        self.ui.chk_scale_impz_f.setEnabled((self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')\
+        self.ui.chk_norm_impz_f.setEnabled((self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')\
                                             and self.ui.DC == 0)
 
         self.fx_select() # check for fixpoint setting and update if needed
@@ -444,20 +448,22 @@ class Plot_Impz(QWidget):
             self.title_str += r'Sinc Signal '
 
         elif self.ui.stim == "Gauss":
-            self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), fc=self.ui.f1 ) +\
-                self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2), fc=self.ui.f2)
+            self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), 
+                                                 fc=self.ui.f1, bw=self.ui.BW1) +\
+                self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2),
+                                            fc=self.ui.f2, bw=self.ui.BW2)
             self.title_str += r'Gaussian Pulse '
 
-        elif self.ui.stim == "Rect":
+        elif self.ui.stim == "Rect": # TODO
             n_min = int(np.round(self.ui.N/2 - self.ui.T1/2))
             n_max = int(np.round(self.ui.N/2 + self.ui.T1/2))
 
             self.title_str += r'Rect Pulse '
             if self.ui.chk_stim_bl.isChecked():
-                self.x = self.ui.A1 * np.abs(np.fft.fftshift(
-                    np.fft.ifft(sinc(self.n * self.ui.T1/self.ui.N)))) * np.sqrt(2) * self.ui.T1
+                self.x = self.ui.A1 * self.ui.T1 * np.sqrt(2) * np.abs(np.fft.fftshift(
+                    np.fft.ifft(diric(self.n * self.ui.T1/self.ui.N, self.ui.T1))))
             else:
-                self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1,0)
+                self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1, 0)
 
 
         elif self.ui.stim == "Step":
@@ -1321,10 +1327,17 @@ class Plot_Impz(QWidget):
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
         # - Scale impulse response with N_FFT to calculate frequency response if requested
-            if self.ui.chk_scale_impz_f.isEnabled() and self.ui.stim == "Impulse"\
-                and self.ui.chk_scale_impz_f.isChecked():
+            if self.ui.chk_norm_impz_f.isEnabled() and self.ui.chk_norm_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
+                if self.ui.stim == "Impulse":
+                    pass
+                elif self.ui.stim == "Sinc":
+                    scale_impz *= self.ui.f1 * 2
+                elif self.ui.stim == "Gauss":
+                    scale_impz *= self.ui.f1 * 2 * self.ui.BW1
+                elif self.ui.stim == "Rect":
+                    scale_impz /= self.ui.T1
             else:
                 freq_resp = False
                 scale_impz = 1.

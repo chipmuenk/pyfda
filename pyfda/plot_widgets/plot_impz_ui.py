@@ -83,6 +83,7 @@ class PlotImpz_UI(QWidget):
         self.A2 = 0.0
         self.phi1 = self.phi2 = 0
         self.T1 = self.T2 = 0
+        self.BW1 = self.BW2 = 0.5
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
@@ -109,10 +110,10 @@ class PlotImpz_UI(QWidget):
         self.stim_wdg_dict = collections.OrderedDict()
         self.stim_wdg_dict.update(
         {"None":    {"dc", "noise"},
-         "Dirac":   {"dc", "a1", "T1", "scale", "noise"},
-         "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
-         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2","noise"},
-         "Rect":    {"dc", "a1", "T1", "noise", "bl"},
+         "Dirac":   {"dc", "a1", "T1", "norm", "noise"},
+         "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
+         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2", "norm", "noise"},
+         "Rect":    {"dc", "a1", "T1", "norm", "noise", "bl"},
          "Step":    {"a1", "T1", "noise"},
          "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -124,9 +125,9 @@ class PlotImpz_UI(QWidget):
          "Comb":    {"dc", "a1", "phi1", "f1", "noise"},
          "AM":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "PM / FM": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "Formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"}
+         "Formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
          })
-        self.stim_cmb_items = [("None", ""),
+        self.stim_cmb_items = [("None", "<span>Only noise and DC can be selected.</span>"),
                               ("Impulse", "<span>Different impulses</span>"),
                               ("Step", "<span>Calculate step response and its error.</span>"),
                               ("Cos", ""),
@@ -561,12 +562,12 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmbPeriodicType, self.periodic_type)
 
         #-------------------------------------
-        self.chk_scale_impz_f = QCheckBox("Scale", self)
-        self.chk_scale_impz_f.setToolTip("<span>Scale the FFT of the impulse response "
-                        "with <i>N<sub>FFT</sub></i> so that it has the same magnitude "
-                            "as |H(f)|. DC and Noise need to be turned off.</span>")
-        self.chk_scale_impz_f.setChecked(True)
-        self.chk_scale_impz_f.setObjectName("scale_impz_f")
+        self.chk_norm_impz_f = QCheckBox("Norm", self)
+        self.chk_norm_impz_f.setToolTip("<span>Normalize the FFT of the stimulus impulse with "
+                        "<i>N<sub>FFT</sub></i> to achieve |<i>X(f)</i>| &le; 1. For the dirac pulse, "
+                        "this yields |<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be turned off.</span>")
+        self.chk_norm_impz_f.setChecked(True)
+        self.chk_norm_impz_f.setObjectName("scale_impz_f")
 
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
@@ -591,7 +592,7 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
 
-        layHCmbStim.addWidget(self.chk_scale_impz_f)
+        layHCmbStim.addWidget(self.chk_norm_impz_f)
         layHCmbStim.addWidget(self.chk_step_err)
         #======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
@@ -654,6 +655,19 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
+        
+        #----------------------------------------------
+        self.lbl_BW1 = QLabel(to_html(self.tr("&nbsp;BW_1"), frmt='bi') + " =", self)
+        self.led_BW1 = QLineEdit(self)
+        self.led_BW1.setText(str(self.BW1))
+        self.led_BW1.setToolTip(self.tr("Relative bandwidth 1"))
+        self.led_BW1.setObjectName("stimBW1")
+
+        self.lbl_BW2 = QLabel(to_html(self.tr("&nbsp;BW_2"), frmt='bi') + " =", self)
+        self.led_BW2 = QLineEdit(self)
+        self.led_BW2.setText(str(self.BW2))
+        self.led_BW2.setToolTip(self.tr("Relative bandwidth 2"))
+        self.led_BW2.setObjectName("stimBW2")
 
         #----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
@@ -719,12 +733,19 @@ class PlotImpz_UI(QWidget):
 
         layGStim.addWidget(self.lblFreqUnit1, 0, 12)
         layGStim.addWidget(self.lblFreqUnit2, 1, 12)
+        
+        layGStim.addWidget(self.lbl_BW1, 0, 13)
+        layGStim.addWidget(self.lbl_BW2, 1, 13)
 
-        layGStim.addWidget(self.lblNoise, 0, 13)
-        layGStim.addWidget(self.lblNoi, 1, 13)
+        layGStim.addWidget(self.led_BW1, 0, 14)
+        layGStim.addWidget(self.led_BW2, 1, 14)
 
-        layGStim.addWidget(self.cmbNoise, 0, 14)
-        layGStim.addWidget(self.ledNoi, 1, 14)
+
+        layGStim.addWidget(self.lblNoise, 0, 15)
+        layGStim.addWidget(self.lblNoi, 1, 15)
+
+        layGStim.addWidget(self.cmbNoise, 0, 16)
+        layGStim.addWidget(self.ledNoi, 1, 16)
 
         #----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
@@ -790,6 +811,8 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledPhi1.editingFinished.connect(self._update_phi1)
         self.ledPhi2.editingFinished.connect(self._update_phi2)
+        self.led_BW1.editingFinished.connect(self._update_BW1)
+        self.led_BW2.editingFinished.connect(self._update_BW2)
         self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
         self.cmbImpulseType.currentIndexChanged.connect(self._update_impulse_type)
         self.cmbPeriodicType.currentIndexChanged.connect(self._update_periodic_type)
@@ -964,9 +987,9 @@ class PlotImpz_UI(QWidget):
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
-        self.chk_scale_impz_f.setVisible(self.stim == 'Dirac')
-        self.chk_scale_impz_f.setEnabled(self.DC == 0 and (self.noi == 0 or\
-            self.cmbNoise.currentText() == 'None'))
+        self.chk_norm_impz_f.setVisible("norm" in stim_wdg)
+        self.chk_norm_impz_f.setEnabled(self.cmb_stim == "Impulse" and self.DC == 0\
+                        and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
 
         self.chk_step_err.setVisible(self.stim == "Step")
 
@@ -986,6 +1009,8 @@ class PlotImpz_UI(QWidget):
         self.lblFreq1.setVisible("f1" in stim_wdg)
         self.ledFreq1.setVisible("f1" in stim_wdg)
         self.lblFreqUnit1.setVisible("f1" in stim_wdg)
+        self.lbl_BW1.setVisible("BW1" in stim_wdg)
+        self.led_BW1.setVisible("BW1" in stim_wdg)
 
         self.lblAmp2.setVisible("a2" in stim_wdg)
         self.ledAmp2.setVisible("a2" in stim_wdg)
@@ -998,7 +1023,8 @@ class PlotImpz_UI(QWidget):
         self.lblFreq2.setVisible("f2" in stim_wdg)
         self.ledFreq2.setVisible("f2" in stim_wdg)
         self.lblFreqUnit2.setVisible("f2" in stim_wdg)
-
+        self.lbl_BW2.setVisible("BW2" in stim_wdg)
+        self.led_BW2.setVisible("BW2" in stim_wdg)
         self.lblStimFormula.setVisible(self.stim == "Formula")
         self.ledStimFormula.setVisible(self.stim == "Formula")
 
@@ -1027,6 +1053,18 @@ class PlotImpz_UI(QWidget):
         self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi1'})
+        
+    def _update_BW1(self):
+        """ Update value for self.BW1 from QLineEditWidget"""
+        self.BW1 = safe_eval(self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
+        self.led_BW1.setText(str(self.BW1))
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'BW1'})
+
+    def _update_BW2(self):
+        """ Update value for self.BW2 from QLineEditWidget"""
+        self.BW2 = safe_eval(self.led_BW2.text(), self.BW2, return_type='float', sign='pos')
+        self.led_BW2.setText(str(self.BW2))
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'BW2'})
 
     def _update_phi2(self):
         """ Update value for self.phi2 from the QLineEditWidget"""
