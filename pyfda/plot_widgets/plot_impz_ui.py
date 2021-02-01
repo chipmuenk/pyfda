@@ -70,11 +70,13 @@ class PlotImpz_UI(QWidget):
         self.mode_spgr_time = "magnitude"
 
         # stimuli
-        self.cmb_stim = "Impulse"
-        self.stim = "Dirac"
-        self.chirp_type = 'Linear'
-        self.impulse_type = 'Dirac'
-        self.periodic_type = 'Square'
+        self.cmb_stim = "impulse"
+        self.stim = "dirac"
+        self.impulse_type = 'dirac'
+        self.sinusoid_type = 'sine'
+        self.periodic_type = 'square'
+        self.chirp_type = 'linear'
+        self.modulation_type = 'am'
         self.noise = "None"
 
         self.f1 = 0.02
@@ -107,36 +109,36 @@ class PlotImpz_UI(QWidget):
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
+        # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
         self.stim_wdg_dict.update(
-        {"None":    {"dc", "noise"},
-         "Dirac":   {"dc", "a1", "T1", "norm", "noise"},
-         "Sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
-         "Gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2", "norm", "noise"},
-         "Rect":    {"dc", "a1", "T1", "norm", "noise", "bl"},
-         "Step":    {"a1", "T1", "noise"},
-         "Cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "Sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+        {"none":    {"dc", "noise"},
+         "dirac":   {"dc", "a1", "T1", "norm", "noise"},
+         "sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
+         "gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2", "norm", "noise"},
+         "rect":    {"dc", "a1", "T1", "norm", "noise"},
+         "step":    {"a1", "T1", "noise"},
+         "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
 
-         "Chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
-         "Triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
-         "Saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
-         "Square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
-         "Comb":    {"dc", "a1", "phi1", "f1", "noise"},
-         "AM":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "PM / FM": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "Formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
+         "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
+         "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
+         "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
+         "square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+         "comb":    {"dc", "a1", "phi1", "f1", "noise"},
+         "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "pmfm": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
          })
-        self.stim_cmb_items = [("None", "<span>Only noise and DC can be selected.</span>"),
-                              ("Impulse", "<span>Different impulses</span>"),
-                              ("Step", "<span>Calculate step response and its error.</span>"),
-                              ("Cos", ""),
-                              ("Sine", ""),
-                              ("Chirp", "<span>Different frequency sweeps.</span>"),
-                              ("Periodic", "<span>Periodic functions with steep edges.</span>"),
-                              ("AM",""),
-                              ("PM / FM", ""),
-                              ("Formula", "<span>Formula defined stimulus.</span>")]
+        # data / text / tooltip for combobox
+        self.stim_cmb_items = [("none", "None", "<span>Only noise and DC can be selected.</span>"),
+                              ("impulse", "Impulse", "<span>Different impulses</span>"),
+                              ("step", "Step", "<span>Calculate step response and its error.</span>"),
+                              ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
+                              ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
+                              ("periodic", "Periodic", "<span>Periodic functions with discontinuities.</span>"),
+                              ("modulation", "Mod.", "<span>Modulated waveforms.</span>"),
+                              ("formula", "Formula", "<span>Formula defined stimulus.</span>")]
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
@@ -510,14 +512,15 @@ class PlotImpz_UI(QWidget):
 
         lbl_title_stim = QLabel("<b>Stimulus:</b>", self)
 
+        # Create combo box with stimulus categories
         self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
         for i in range(len(self.stim_cmb_items)):
-            self.cmbStimulus.addItem(self.stim_cmb_items[i][0])
-            self.cmbStimulus.setItemData(i, self.stim_cmb_items[i][1], Qt.ToolTipRole)
-        self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
-        self.cmbStimulus.setToolTip("Stimulus type.")
-        qset_cmb_box(self.cmbStimulus, self.cmb_stim)
+            self.cmbStimulus.addItem(self.stim_cmb_items[i][1], self.stim_cmb_items[i][0])
+            self.cmbStimulus.setItemData(i, self.stim_cmb_items[i][2], Qt.ToolTipRole)
+        #self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
+        self.cmbStimulus.setToolTip("Stimulus category.")
+        qset_cmb_box(self.cmbStimulus, self.cmb_stim, data=True)
 
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.ledStimPar1 = QLineEdit(self)
@@ -537,20 +540,26 @@ class PlotImpz_UI(QWidget):
 
         #-------------------------------------
         self.cmbChirpType = QComboBox(self)
-        for t in [("Lin","Linear"),("Square","Quadratic"),
-                  ("Log", "Logarithmic"), ("Hyper", "Hyperbolic")]:
+        for t in [("Lin","linear"),("Square","quadratic"),
+                  ("Log", "logarithmic"), ("Hyper", "hyperbolic")]: # text, data
             self.cmbChirpType.addItem(*t)
-        qset_cmb_box(self.cmbChirpType, self.chirp_type, data=False)
+        qset_cmb_box(self.cmbChirpType, self.chirp_type, data=True)
 
         self.cmbImpulseType = QComboBox(self)
-        for t in [("Dirac","Dirac"),("Gauss","Gauss"),
-                  ("Sinc", "Sinc"), ("Rect", "Rect")]: # text, data
+        for t in [("Dirac","dirac"),("Gauss","gauss"),
+                  ("Sinc", "sinc"), ("Rect", "rect")]: # text, data
             self.cmbImpulseType.addItem(*t)
-        qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=False)
+        qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=True)
+        
+        self.cmbSinusoidType = QComboBox(self)
+        for t in [("Sine","sine"),("Cos","cos")]: # text, data
+            self.cmbSinusoidType.addItem(*t)
+        qset_cmb_box(self.cmbSinusoidType, self.sinusoid_type, data=True)
 
-        #-------------------------------------
         self.cmbPeriodicType = QComboBox(self)
-        self.cmbPeriodicType.addItems(["Square","Saw","Triang","Comb"])
+        for t in [("Square","square"),("Saw","saw"),
+                  ("Triang", "triang"), ("Comb", "comb")]: # text, data
+            self.cmbPeriodicType.addItem(*t)
         self.cmbPeriodicType.setItemData(0, "<span>Periodic square signal with duty cycle &alpha;, "
                                      "band-limited or with aliasing.</span>", Qt.ToolTipRole)
         self.cmbPeriodicType.setItemData(1, "<span>Periodic sawtooth signal, "
@@ -560,6 +569,12 @@ class PlotImpz_UI(QWidget):
         self.cmbPeriodicType.setItemData(3, "<span>Periodic comb signal.</span>", Qt.ToolTipRole)
         self.cmbPeriodicType.setToolTip("Periodic signals with sharp edges.")
         qset_cmb_box(self.cmbPeriodicType, self.periodic_type)
+        
+        self.cmbModulationType = QComboBox(self)
+        for t in [("AM", "am"), ("PM / FM", "pmfm")]: # text, data
+            self.cmbModulationType.addItem(*t)
+        qset_cmb_box(self.cmbModulationType, self.modulation_type, data=True)
+
 
         #-------------------------------------
         self.chk_norm_impz_f = QCheckBox("Norm", self)
@@ -585,9 +600,11 @@ class PlotImpz_UI(QWidget):
 
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
-        layHCmbStim.addWidget(self.cmbPeriodicType)
-        layHCmbStim.addWidget(self.cmbChirpType)
         layHCmbStim.addWidget(self.cmbImpulseType)
+        layHCmbStim.addWidget(self.cmbSinusoidType)
+        layHCmbStim.addWidget(self.cmbChirpType)
+        layHCmbStim.addWidget(self.cmbPeriodicType)
+        layHCmbStim.addWidget(self.cmbModulationType)
         layHCmbStim.addWidget(self.chk_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
@@ -813,9 +830,13 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.led_BW1.editingFinished.connect(self._update_BW1)
         self.led_BW2.editingFinished.connect(self._update_BW2)
-        self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
+
         self.cmbImpulseType.currentIndexChanged.connect(self._update_impulse_type)
+        self.cmbSinusoidType.currentIndexChanged.connect(self._update_sinusoid_type)
+        self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
         self.cmbPeriodicType.currentIndexChanged.connect(self._update_periodic_type)
+        self.cmbModulationType.currentIndexChanged.connect(self._update_modulation_type)
+        
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
@@ -974,24 +995,29 @@ class PlotImpz_UI(QWidget):
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
-        self.cmb_stim = qget_cmb_box(self.cmbStimulus, data=False)
-        if self.cmb_stim == "Impulse":
-            self.stim = qget_cmb_box(self.cmbImpulseType, data=False)
-        elif self.cmb_stim == "Periodic":
-            self.stim = qget_cmb_box(self.cmbPeriodicType, data=False)
+        self.cmb_stim = qget_cmb_box(self.cmbStimulus)
+        if self.cmb_stim == "impulse":
+            self.stim = qget_cmb_box(self.cmbImpulseType)
+        elif self.cmb_stim == "sinusoid":
+            self.stim = qget_cmb_box(self.cmbSinusoidType)
+        elif self.cmb_stim == "periodic":
+            self.stim = qget_cmb_box(self.cmbPeriodicType)
+        elif self.cmb_stim == "modulation":
+            self.stim = qget_cmb_box(self.cmbModulationType)
         else:
-            self.stim = qget_cmb_box(self.cmbStimulus, data=False)
+            self.stim = self.cmb_stim
 
+        # read out which stimulus widgets are enabled
         stim_wdg = self.stim_wdg_dict[self.stim]
 
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
         self.chk_norm_impz_f.setVisible("norm" in stim_wdg)
-        self.chk_norm_impz_f.setEnabled(self.cmb_stim == "Impulse" and self.DC == 0\
+        self.chk_norm_impz_f.setEnabled(self.cmb_stim == "impulse" and self.DC == 0\
                         and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
 
-        self.chk_step_err.setVisible(self.stim == "Step")
+        self.chk_step_err.setVisible(self.stim == "step")
 
         self.lblStimPar1.setVisible("par1" in stim_wdg)
         self.ledStimPar1.setVisible("par1" in stim_wdg)
@@ -1025,12 +1051,14 @@ class PlotImpz_UI(QWidget):
         self.lblFreqUnit2.setVisible("f2" in stim_wdg)
         self.lbl_BW2.setVisible("BW2" in stim_wdg)
         self.led_BW2.setVisible("BW2" in stim_wdg)
-        self.lblStimFormula.setVisible(self.stim == "Formula")
-        self.ledStimFormula.setVisible(self.stim == "Formula")
+        self.lblStimFormula.setVisible(self.stim == "formula")
+        self.ledStimFormula.setVisible(self.stim == "formula")
 
-        self.cmbChirpType.setVisible(self.cmb_stim == 'Chirp')
-        self.cmbImpulseType.setVisible(self.cmb_stim == 'Impulse')
-        self.cmbPeriodicType.setVisible(self.cmb_stim == 'Periodic')
+        self.cmbImpulseType.setVisible(self.cmb_stim == 'impulse')
+        self.cmbSinusoidType.setVisible(self.cmb_stim == 'sinusoid')
+        self.cmbChirpType.setVisible(self.cmb_stim == 'chirp')        
+        self.cmbPeriodicType.setVisible(self.cmb_stim == 'periodic')
+        self.cmbModulationType.setVisible(self.cmb_stim == 'modulation')
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
@@ -1082,9 +1110,19 @@ class PlotImpz_UI(QWidget):
         self.impulse_type = qget_cmb_box(self.cmbImpulseType) # read current data string
         self._enable_stim_widgets()
 
+    def _update_sinusoid_type(self):
+        """ Update value for self.sinusoid_type from the QLineEditWidget"""
+        self.sinusoid_type = qget_cmb_box(self.cmbSinusoidType) # read current data string
+        self._enable_stim_widgets()
+
     def _update_periodic_type(self):
         """ Update value for self.periodic_type from the QLineEditWidget"""
         self.periodic_type = qget_cmb_box(self.cmbPeriodicType) # read current data string
+        self._enable_stim_widgets()
+        
+    def _update_modulation_type(self):
+        """ Update value for self.modulation_type from the QLineEditWidget"""
+        self.modulation_type = qget_cmb_box(self.cmbModulationType) # read current data string
         self._enable_stim_widgets()
 
 

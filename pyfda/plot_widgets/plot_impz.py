@@ -37,7 +37,6 @@ from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 # TODO: Spectra of complex stimuli are wrong (im and re swapped?)
 # TODO: Single-sided and double-sided spectra of pulses are identical - ok?
-# TODO: Scaling of bandlimited rect pulse is off
 # TODO: Combobox for Mag / Mag+phi / Re + Im spectra
 
 classes = {'Plot_Impz':'y[n]'} #: Dict containing class name : display name
@@ -426,12 +425,12 @@ class Plot_Impz(QWidget):
         self.H_str = ''
         self.title_str = ""
 
-        if self.ui.stim == "None":
+        if self.ui.stim == "none":
             self.x = np.zeros(self.ui.N_end)
             self.title_str = r'Zero Input System Response'
             self.H_str = r'$h_0[n]$' # default
 
-        elif self.ui.stim == "Dirac":
+        elif self.ui.stim == "dirac":
             if np_type(self.ui.A1) == complex:
                 A_type = complex
             else:
@@ -442,31 +441,27 @@ class Plot_Impz(QWidget):
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
-        elif self.ui.stim == "Sinc":
+        elif self.ui.stim == "sinc":
             self.x = self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T1) * self.ui.f1 ) +\
                 self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T2) * self.ui.f2)
             self.title_str += r'Sinc Signal '
 
-        elif self.ui.stim == "Gauss":
+        elif self.ui.stim == "gauss":
             self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1), 
                                                  fc=self.ui.f1, bw=self.ui.BW1) +\
                 self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2),
                                             fc=self.ui.f2, bw=self.ui.BW2)
             self.title_str += r'Gaussian Pulse '
 
-        elif self.ui.stim == "Rect": # TODO
-            n_min = int(np.round(self.ui.N/2 - self.ui.T1/2))
-            n_max = int(np.round(self.ui.N/2 + self.ui.T1/2))
-
+        elif self.ui.stim == "rect":
+            n_start = int(np.floor((self.ui.N - self.ui.T1)/2))
+            n_min = max(n_start, 0)
+            n_max = min(n_start + self.ui.T1, self.ui.N)
             self.title_str += r'Rect Pulse '
-            if self.ui.chk_stim_bl.isChecked():
-                self.x = self.ui.A1 * self.ui.T1 * np.sqrt(2) * np.abs(np.fft.fftshift(
-                    np.fft.ifft(diric(self.n * self.ui.T1/self.ui.N, self.ui.T1))))
-            else:
-                self.x = self.ui.A1 * np.where((self.n >= n_min) & (self.n <= n_max), 1, 0)
+            self.x = self.ui.A1 * np.where((self.n > n_min) & (self.n <= n_max), 1, 0)
 
 
-        elif self.ui.stim == "Step":
+        elif self.ui.stim == "step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.x[0:self.T1_int].fill(0)
             if self.ui.chk_step_err.isChecked():
@@ -477,28 +472,28 @@ class Plot_Impz(QWidget):
                 self.H_str = r'$h_{\epsilon}[n]$'
 
 
-        elif self.ui.stim == "Cos":
+        elif self.ui.stim == "cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Cosine Signal'
 
-        elif self.ui.stim == "Sine":
+        elif self.ui.stim == "sine":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Sinusoidal Signal '
 
 
 
-        elif self.ui.stim == "Chirp":
+        elif self.ui.stim == "chirp":
             if True: # sig.chirp is buggy, T_sim cannot be larger than T_end
                 T_end = self.ui.N_end
             else:
                 T_end = self.ui.T2
             self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, T_end, self.ui.f2,
-                                            method=self.ui.chirp_type.lower(), phi=phi1)
+                                            method=self.ui.chirp_type, phi=phi1)
             self.title_str += self.ui.chirp_type + ' Chirp Signal'
 
-        elif self.ui.stim == "Triang":
+        elif self.ui.stim == "triang":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Bandlim. Triangular Signal'
@@ -506,7 +501,7 @@ class Plot_Impz(QWidget):
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1, width=0.5)
                 self.title_str += r'Triangular Signal'
 
-        elif self.ui.stim == "Saw":
+        elif self.ui.stim == "saw":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Bandlim. Sawtooth Signal'
@@ -514,7 +509,7 @@ class Plot_Impz(QWidget):
                 self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Sawtooth Signal'
 
-        elif self.ui.stim == "Square":
+        elif self.ui.stim == "square":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1,
                                               duty=self.ui.stim_par1)
@@ -524,20 +519,20 @@ class Plot_Impz(QWidget):
                                                  duty=self.ui.stim_par1)
                 self.title_str += r'Rect. Signal'
 
-        elif self.ui.stim == "Comb":
+        elif self.ui.stim == "comb":
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'Bandlim. Comb Signal'
 
 
-        elif self.ui.stim == "AM":
+        elif self.ui.stim == "am":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
                 * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'AM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1) \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
-        elif self.ui.stim == "PM / FM":
+        elif self.ui.stim == "pmfm":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +\
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2))
             self.title_str += r'PM / FM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
-        elif self.ui.stim == "Formula":
+        elif self.ui.stim == "formula":
             param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
                           "f1":self.ui.f1, "f2":self.ui.f2,
                           "phi1":self.ui.phi1, "phi2":self.ui.phi2,
@@ -1330,13 +1325,13 @@ class Plot_Impz(QWidget):
             if self.ui.chk_norm_impz_f.isEnabled() and self.ui.chk_norm_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
-                if self.ui.stim == "Impulse":
+                if self.ui.stim == "dirac":
                     pass
-                elif self.ui.stim == "Sinc":
+                elif self.ui.stim == "sinc":
                     scale_impz *= self.ui.f1 * 2
-                elif self.ui.stim == "Gauss":
+                elif self.ui.stim == "gauss":
                     scale_impz *= self.ui.f1 * 2 * self.ui.BW1
-                elif self.ui.stim == "Rect":
+                elif self.ui.stim == "rect":
                     scale_impz /= self.ui.T1
             else:
                 freq_resp = False
@@ -1499,8 +1494,8 @@ class Plot_Impz(QWidget):
                 H_Fi_str = 'undefined'
                 H_F_post = "|"
 
-            H_Fi_str = H_F_pre + H_Fi_str + H_F_post + unit
-            H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit
+            H_Fi_str = H_F_pre + H_Fi_str + H_F_post + unit + r" $\rightarrow$"
+            H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit + r" $\rightarrow$"
 
             # -----------------------------------------------------------------
             # --------------- Plot stimulus and response ----------------------
