@@ -70,11 +70,12 @@ class PlotImpz_UI(QWidget):
         self.mode_spgr_time = "magnitude"
 
         # stimuli
-        self.cmb_stim = "impulse"
+        self.cmb_stim_item = "impulse"
+        self.cmb_stim_periodic_item = 'square'
         self.stim = "dirac"
         self.impulse_type = 'dirac'
         self.sinusoid_type = 'sine'
-        self.periodic_type = 'square'
+
         self.chirp_type = 'linear'
         self.modulation_type = 'am'
         self.noise = "None"
@@ -93,6 +94,7 @@ class PlotImpz_UI(QWidget):
         self.stim_par1 = 0.5
 
         # frequency
+        self.cmb_freq_display_item = "mag"
         self.plt_freq_resp = "Line"
         self.plt_freq_stim = "None"
         self.plt_freq_stmq = "None"
@@ -120,6 +122,7 @@ class PlotImpz_UI(QWidget):
          "step":    {"a1", "T1", "noise"},
          "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+         "diric":   {"dc", "a1", "phi1", "f1", "noise"},
 
          "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
          "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
@@ -130,20 +133,55 @@ class PlotImpz_UI(QWidget):
          "pmfm": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
          })
-        # data / text / tooltip for combobox
-        self.stim_cmb_items = [("none", "None", "<span>Only noise and DC can be selected.</span>"),
-                              ("impulse", "Impulse", "<span>Different impulses</span>"),
-                              ("step", "Step", "<span>Calculate step response and its error.</span>"),
-                              ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
-                              ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
-                              ("periodic", "Periodic", "<span>Periodic functions with discontinuities.</span>"),
-                              ("modulation", "Mod.", "<span>Modulated waveforms.</span>"),
-                              ("formula", "Formula", "<span>Formula defined stimulus.</span>")]
+        # data / text / tooltip for stimulus type combobox. Last element is combobox tooltip.
+        self.cmb_stim_items =\
+                [("none", "None", "<span>Only noise and DC can be selected.</span>"),
+                 ("impulse", "Impulse", "<span>Different impulses</span>"),
+                 ("step", "Step", "<span>Calculate step response and its error.</span>"),
+                 ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
+                 ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
+                 ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
+                                          "band-limited or with aliasing.</span>"),
+                 ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
+                 ("formula", "Formula", "<span>Formula defined stimulus.</span>"),
+                 ("<span>Stimulus category.</span>")]
+
+        # data / text / tooltip for periodic signals' combobox. Last element is combobox tooltip. 
+        self.cmb_stim_periodic_items =\
+                [("square","Square", "<span>Square signal with duty cycle &alpha;.</span>"),
+                 ("saw","Saw", "<span>Sawtooth signal.</span>"),
+                 ("triang", "Triang","<span>Triangular signal.</span>"), 
+                 ("comb", "Comb","<span>Comb signal.</span>"),
+                 "<span>Periodic functions with discontinuities.</span>"]
+                
+        self.cmb_freq_display_items =\
+                [("mag","Magnitude", "<span>Spectral magnitude</span>"),
+                 ("mag_phi","Mag. / Phase", "<span>Magnitude and phase.</span>"),
+                 ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>"), 
+                 "<span>Select how to display the spectrum.</span>"]
+
+
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
         self._update_noi()
 
+    def _create_cmb_box(self, combo_box, items_list, init_item):
+        """
+        Fill combo box `combo_box` with text, data and tooltip from the list 
+        `items_list` with initial selection of `init_item` (data)
+        
+        Returns
+        -------
+        None
+        """
+        
+        for i in range(len(items_list)-1):
+            combo_box.addItem(items_list[i][1], items_list[i][0])
+            combo_box.setItemData(i, items_list[i][2], Qt.ToolTipRole)
+        combo_box.setToolTip(items_list[-1])
+        qset_cmb_box(combo_box, init_item, data=True)
+        
 
     def _construct_UI(self):
         # ----------- ---------------------------------------------------
@@ -425,11 +463,10 @@ class PlotImpz_UI(QWidget):
         if not self.chk_log_freq.isChecked():
             self.bottom_f = 0
 
-        lbl_re_im_freq = QLabel(to_html("Re / Im", frmt='b'), self)
-        self.chk_re_im_freq = QCheckBox(self)
-        self.chk_re_im_freq.setObjectName("chk_re_im_freq")
-        self.chk_re_im_freq.setToolTip("<span>Show real and imaginary part of spectrum</span>")
-        self.chk_re_im_freq.setChecked(False)
+        self.cmb_freq_display = QComboBox(self)
+        self._create_cmb_box(self.cmb_freq_display, self.cmb_freq_display_items,
+                             self.cmb_freq_display_item)
+        self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
         self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
@@ -485,8 +522,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
         layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(lbl_re_im_freq)
-        layH_ctrl_freq.addWidget(self.chk_re_im_freq)
+        layH_ctrl_freq.addWidget(self.cmb_freq_display)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
@@ -515,12 +551,7 @@ class PlotImpz_UI(QWidget):
         # Create combo box with stimulus categories
         self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        for i in range(len(self.stim_cmb_items)):
-            self.cmbStimulus.addItem(self.stim_cmb_items[i][1], self.stim_cmb_items[i][0])
-            self.cmbStimulus.setItemData(i, self.stim_cmb_items[i][2], Qt.ToolTipRole)
-        #self.cmbStimulus.addItems(self.stim_wdg_dict.keys())
-        self.cmbStimulus.setToolTip("Stimulus category.")
-        qset_cmb_box(self.cmbStimulus, self.cmb_stim, data=True)
+        self._create_cmb_box(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.ledStimPar1 = QLineEdit(self)
@@ -552,24 +583,14 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmbImpulseType, self.impulse_type, data=True)
         
         self.cmbSinusoidType = QComboBox(self)
-        for t in [("Sine","sine"),("Cos","cos")]: # text, data
+        for t in [("Sine","sine"),("Cos","cos"), ("Sinc", "diric")]: # text, data
             self.cmbSinusoidType.addItem(*t)
         qset_cmb_box(self.cmbSinusoidType, self.sinusoid_type, data=True)
 
         self.cmbPeriodicType = QComboBox(self)
-        for t in [("Square","square"),("Saw","saw"),
-                  ("Triang", "triang"), ("Comb", "comb")]: # text, data
-            self.cmbPeriodicType.addItem(*t)
-        self.cmbPeriodicType.setItemData(0, "<span>Periodic square signal with duty cycle &alpha;, "
-                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setItemData(1, "<span>Periodic sawtooth signal, "
-                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setItemData(2, "<span>Periodic triangular signal, "
-                                     "band-limited or with aliasing.</span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setItemData(3, "<span>Periodic comb signal.</span>", Qt.ToolTipRole)
-        self.cmbPeriodicType.setToolTip("Periodic signals with sharp edges.")
-        qset_cmb_box(self.cmbPeriodicType, self.periodic_type)
-        
+        self._create_cmb_box(self.cmbPeriodicType, self.cmb_stim_periodic_items, 
+                             self.cmb_stim_periodic_item)
+
         self.cmbModulationType = QComboBox(self)
         for t in [("AM", "am"), ("PM / FM", "pmfm")]: # text, data
             self.cmbModulationType.addItem(*t)
@@ -578,9 +599,11 @@ class PlotImpz_UI(QWidget):
 
         #-------------------------------------
         self.chk_norm_impz_f = QCheckBox("Norm", self)
-        self.chk_norm_impz_f.setToolTip("<span>Normalize the FFT of the stimulus impulse with "
-                        "<i>N<sub>FFT</sub></i> to achieve |<i>X(f)</i>| &le; 1. For the dirac pulse, "
-                        "this yields |<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be turned off.</span>")
+        self.chk_norm_impz_f.setToolTip("<span>Normalize the FFT of the stimulus "
+                            "impulse with <i>N<sub>FFT</sub></i> to achieve "
+                            "|<i>X(f)</i>| &le; 1. For the dirac pulse, yielding "
+                            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
+                            "turned off.</span>")
         self.chk_norm_impz_f.setChecked(True)
         self.chk_norm_impz_f.setObjectName("scale_impz_f")
 

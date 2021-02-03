@@ -159,7 +159,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
         self.ui.chk_Hf.clicked.connect(self.draw)
-        self.ui.chk_re_im_freq.clicked.connect(self.draw)
+        self.ui.cmb_freq_display.currentIndexChanged.connect(self.draw)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
         self.ui.chk_show_info_freq.clicked.connect(self.draw)
@@ -522,6 +522,11 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "comb":
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'Bandlim. Comb Signal'
+            
+        elif self.ui.stim == "diric":
+            self.x = self.ui.A1 * diric(2*pi * self.n /10+ phi1, 1/self.ui.f1)
+            self.title_str += r'Periodic Sinc Signal'
+
 
 
         elif self.ui.stim == "am":
@@ -536,6 +541,7 @@ class Plot_Impz(QWidget):
             param_dict = {"A1":self.ui.A1, "A2":self.ui.A2,
                           "f1":self.ui.f1, "f2":self.ui.f2,
                           "phi1":self.ui.phi1, "phi2":self.ui.phi2,
+                          "BW1":self.ui.BW1, "BW2":self.ui.BW2,
                           "f_S":fb.fil[0]['f_S'], "n":self.n}
 
             self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
@@ -1243,9 +1249,10 @@ class Plot_Impz(QWidget):
 
         self.mplwidget_f.fig.clf() # clear figure with axes
 
-        en_re_im_f = self.ui.chk_re_im_freq.isChecked()
+        self.en_re_im_f = qget_cmb_box(self.ui.cmb_freq_display) == "re_im"
+        self.en_mag_phi_f = qget_cmb_box(self.ui.cmb_freq_display) == "mag_phi"
 
-        num_subplots_f = 1 + en_re_im_f
+        num_subplots_f = 1 + self.en_re_im_f + self.en_mag_phi_f
 
         self.axes_f = self.mplwidget_f.fig.subplots(nrows=num_subplots_f, ncols=1,
                                                sharex=True, squeeze = False)[:,0]
@@ -1264,7 +1271,7 @@ class Plot_Impz(QWidget):
         self.ax_f1.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
         self.ax_f1.yaxis.set_minor_locator(AutoMinorLocator())
 
-        if en_re_im_f:
+        if self.en_re_im_f or self.en_mag_phi_f:
             self.ax_f2 = self.axes_f[1]
             self.ax_f2.xaxis.tick_bottom() # remove axis ticks on top
             self.ax_f2.yaxis.tick_left() # remove axis ticks right
@@ -1282,7 +1289,7 @@ class Plot_Impz(QWidget):
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
-        en_re_im_f = self.ui.chk_re_im_freq.isChecked()
+        #en_re_im_f = qget_cmb_box(self.ui.cmb_freq_display) == "re_im"
 
         H_F_str = ""
         ejO_str = r"$(\mathrm{e}^{\mathrm{j} \Omega})$"
@@ -1416,7 +1423,7 @@ class Plot_Impz(QWidget):
 
                 if plt_stimulus:
                     Px = 10*np.log10(Px)
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         X_r = np.maximum(20 * np.log10(np.abs(X.real)), self.ui.bottom_f)
                         X_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
                     else:
@@ -1424,7 +1431,7 @@ class Plot_Impz(QWidget):
 
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         X_q_r = np.maximum(20 * np.log10(np.abs(X_q.real)), self.ui.bottom_f)
                         X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)), self.ui.bottom_f)
                     else:
@@ -1432,14 +1439,14 @@ class Plot_Impz(QWidget):
 
                 if plt_response:
                     Py = 10*np.log10(Py)
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         Y_r = np.maximum(20 * np.log10(np.abs(Y.real)), self.ui.bottom_f)
                         Y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
                     else:
                         Y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
 
                 if self.ui.chk_Hf.isChecked():
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)), self.ui.bottom_f)
                         H_id_i = np.maximum(20 * np.log10(np.abs(H_id.imag)), self.ui.bottom_f)
                     else:
@@ -1450,30 +1457,42 @@ class Plot_Impz(QWidget):
                 H_F_pre = ""
                 H_F_post = ""
                 if plt_stimulus:
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         X_r = X.real
                         X_i = X.imag
+                    elif self.en_mag_phi_f:
+                        X_r = np.abs(X)
+                        X_i = np.angle(X)
                     else:
                         X_r = np.abs(X)
 
                 if plt_stimulus_q:
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         X_q_r = X_q.real
                         X_q_i = X_q.imag
+                    elif self.en_mag_phi_f:
+                        X_r = np.abs(X_q)
+                        X_i = np.angle(X_q)
                     else:
                         X_q_r = np.abs(X_q)
 
                 if plt_response:
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         Y_r = Y.real
                         Y_i = Y.imag
+                    elif self.en_mag_phi_f:
+                        X_r = np.abs(Y)
+                        X_i = np.angle(Y)
                     else:
                         Y_r = np.abs(Y)
 
                 if self.ui.chk_Hf.isChecked():
-                    if en_re_im_f:
+                    if self.en_re_im_f:
                         H_id_r = H_id.real
                         H_id_i = H_id.imag
+                    elif self.en_mag_phi_f:
+                        X_r = np.abs(H_id)
+                        X_i = np.angle(H_id)
                     else:
                         H_id_r = np.abs(H_id)
 
@@ -1485,7 +1504,7 @@ class Plot_Impz(QWidget):
                 nenbw = self.ui.nenbw
                 cgain = self.ui.cgain
 
-            if en_re_im_f:
+            if self.en_re_im_f:
                 H_Fi_str = r'$\Im\{$' + H_F_str + r'$\}$'
                 H_Fr_str = r'$\Re\{$' + H_F_str + r'$\}$'
             else:
@@ -1503,7 +1522,7 @@ class Plot_Impz(QWidget):
             show_info = self.ui.chk_show_info_freq.isChecked()
             if plt_stimulus:
                 label_re = "|$X$" + ejO_str + "|"
-                if en_re_im_f:
+                if self.en_re_im_f:
                     label_re = "$X_r$" + ejO_str
                     label_im = "$X_i$" + ejO_str
                     self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
@@ -1518,7 +1537,7 @@ class Plot_Impz(QWidget):
 
             if plt_stimulus_q:
                 label_re = "$|X_Q$" + ejO_str + "|"
-                if en_re_im_f:
+                if self.en_re_im_f:
                     label_re = "$X_{Q,r}$" + ejO_str
                     label_im = "$X_{Q,i}$" + ejO_str
                     self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
@@ -1533,7 +1552,7 @@ class Plot_Impz(QWidget):
 
             if plt_response:
                 label_re = "$|Y$" + ejO_str + "|"
-                if en_re_im_f:
+                if self.en_re_im_f:
                     label_re = "$Y_r$" + ejO_str
                     label_im = "$Y_i$" + ejO_str
                     self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
@@ -1548,7 +1567,7 @@ class Plot_Impz(QWidget):
 
             if self.ui.chk_Hf.isChecked():
                 label_re = "$|H_{id}$" + ejO_str + "|"
-                if en_re_im_f:
+                if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
                     self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
@@ -1574,7 +1593,7 @@ class Plot_Impz(QWidget):
                     self.ax_f1.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
 
-            if en_re_im_f and self.plt_freq_enabled:
+            if self.en_re_im_f and self.plt_freq_enabled:
                 self.ax_f2.legend(loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
