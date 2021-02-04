@@ -20,7 +20,7 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -135,7 +135,8 @@ class PlotImpz_UI(QWidget):
          })
         # data / text / tooltip for stimulus type combobox. Last element is combobox tooltip.
         self.cmb_stim_items =\
-                [("none", "None", "<span>Only noise and DC can be selected.</span>"),
+                [("<span>Stimulus category.</span>"),
+                 ("none", "None", "<span>Only noise and DC can be selected.</span>"),
                  ("impulse", "Impulse", "<span>Different impulses</span>"),
                  ("step", "Step", "<span>Calculate step response and its error.</span>"),
                  ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
@@ -143,45 +144,55 @@ class PlotImpz_UI(QWidget):
                  ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
                                           "band-limited or with aliasing.</span>"),
                  ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
-                 ("formula", "Formula", "<span>Formula defined stimulus.</span>"),
-                 ("<span>Stimulus category.</span>")]
+                 ("formula", "Formula", "<span>Formula defined stimulus.</span>")
+                ]
 
         # data / text / tooltip for periodic signals' combobox. Last element is combobox tooltip. 
         self.cmb_stim_periodic_items =\
-                [("square","Square", "<span>Square signal with duty cycle &alpha;.</span>"),
-                 ("saw","Saw", "<span>Sawtooth signal.</span>"),
-                 ("triang", "Triang","<span>Triangular signal.</span>"), 
-                 ("comb", "Comb","<span>Comb signal.</span>"),
-                 "<span>Periodic functions with discontinuities.</span>"]
+                ["<span>Periodic functions with discontinuities.</span>",
+                 ("square","Square", "<span>Square signal with duty cycle &alpha;.</span>"),
+                 ("saw","Saw", "Sawtooth signal."),
+                 ("triang", "Triang","Triangular signal."), 
+                 ("comb", "Comb","Comb signal.")
+                ]
+
+        self.cmb_stim_chirp_items =\
+                [ "<span>Type of frequency sweep from <i>f</i><sub>1</sub> to "
+                  "<i>f</i><sub>1</sub></span>",
+                 ("linear", "Lin", "Linear frequency sweep"),
+                 ("quadratic", "Square","Quadratic frequency sweep"),
+                 ("logarithmic", "Log", "Logarithmic frequency sweep"),
+                 ("hyperbolic", "Hyper",  "Hyperbolic frequency sweep")
+                ]
+                
+        self.cmb_stim_noise_items =\
+                [ "Type of additive noise.",
+                 ("None", "None", ""),
+                 ("Gauss", "Gauss", "<span>Normal- or Gauss-distributed process with "
+                                    "std. deviation &sigma;.</span>"),
+                 ("Uniform", "Uniform", "<span>Uniformly distributed process in the "
+                                        "range &plusmn; &Delta;/2.</span>"),
+                 ("PRBS", "PRBS", "<span>Pseudo-Random Binary Sequence with values "
+                                      "&plusmn; A.</span>"),
+                 ("MLS", "MLS", "<span>Maximum Length Sequence with values &plusmn; A. "
+                                 "The sequence is always the same as the state is not "
+                                 "stored for the next sequence start.</span>"),
+                 ("Brownian", "Brownian", "<span>Brownian (cumulated sum) process based "
+                                      " on Gaussian noise with std. deviation &sigma;.</span>")
+                 ]
                 
         self.cmb_freq_display_items =\
-                [("mag","Magnitude", "<span>Spectral magnitude</span>"),
+                ["<span>Select how to display the spectrum.</span>",
+                 ("mag","Magnitude", "<span>Spectral magnitude</span>"),
                  ("mag_phi","Mag. / Phase", "<span>Magnitude and phase.</span>"),
-                 ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>"), 
-                 "<span>Select how to display the spectrum.</span>"]
-
+                 ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>")
+                ]
 
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
         self._update_noi()
 
-    def _create_cmb_box(self, combo_box, items_list, init_item):
-        """
-        Fill combo box `combo_box` with text, data and tooltip from the list 
-        `items_list` with initial selection of `init_item` (data)
-        
-        Returns
-        -------
-        None
-        """
-        
-        for i in range(len(items_list)-1):
-            combo_box.addItem(items_list[i][1], items_list[i][0])
-            combo_box.setItemData(i, items_list[i][2], Qt.ToolTipRole)
-        combo_box.setToolTip(items_list[-1])
-        qset_cmb_box(combo_box, init_item, data=True)
-        
 
     def _construct_UI(self):
         # ----------- ---------------------------------------------------
@@ -464,8 +475,8 @@ class PlotImpz_UI(QWidget):
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self)
-        self._create_cmb_box(self.cmb_freq_display, self.cmb_freq_display_items,
-                             self.cmb_freq_display_item)
+        qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
+                          self.cmb_freq_display_item)
         self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
         self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
@@ -551,7 +562,7 @@ class PlotImpz_UI(QWidget):
         # Create combo box with stimulus categories
         self.lblStimulus = QLabel(to_html("Type", frmt='bi'), self)
         self.cmbStimulus = QComboBox(self)
-        self._create_cmb_box(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
+        qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
         self.ledStimPar1 = QLineEdit(self)
@@ -571,10 +582,7 @@ class PlotImpz_UI(QWidget):
 
         #-------------------------------------
         self.cmbChirpType = QComboBox(self)
-        for t in [("Lin","linear"),("Square","quadratic"),
-                  ("Log", "logarithmic"), ("Hyper", "hyperbolic")]: # text, data
-            self.cmbChirpType.addItem(*t)
-        qset_cmb_box(self.cmbChirpType, self.chirp_type, data=True)
+        qcmb_box_populate(self.cmbChirpType, self.cmb_stim_chirp_items, self.chirp_type)
 
         self.cmbImpulseType = QComboBox(self)
         for t in [("Dirac","dirac"),("Gauss","gauss"),
@@ -588,8 +596,8 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmbSinusoidType, self.sinusoid_type, data=True)
 
         self.cmbPeriodicType = QComboBox(self)
-        self._create_cmb_box(self.cmbPeriodicType, self.cmb_stim_periodic_items, 
-                             self.cmb_stim_periodic_item)
+        qcmb_box_populate(self.cmbPeriodicType, self.cmb_stim_periodic_items, 
+                          self.cmb_stim_periodic_item)
 
         self.cmbModulationType = QComboBox(self)
         for t in [("AM", "am"), ("PM / FM", "pmfm")]: # text, data
@@ -712,20 +720,7 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
-        self.cmbNoise.addItems(["None","Gauss","Uniform","PRBS", "MLS", "Brownian"])
-        self.cmbNoise.setItemData(1, "<span>Normal- or Gauss-distributed process with "
-                                      "std. deviation &sigma;.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(2, "<span>Uniformly distributed process in the range &plusmn; "
-                                      "&Delta;/2.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(3, "<span>Pseudo-Random Binary Sequence with values &plusmn; A."
-                                      "</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(4, "<span>Maximum Length Sequence with values &plusmn; A. The sequence "
-                                      "is always the same as the state is not stored and used for "
-                                      "the next sequence.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setItemData(5, "<span>Brownian (cumulated sum) process based on Gaussian "
-                                      " noise with std. deviation &sigma;.</span>", Qt.ToolTipRole)
-        self.cmbNoise.setToolTip("Type of additive noise.")
-        qset_cmb_box(self.cmbNoise, self.noise)
+        qcmb_box_populate(self.cmbNoise, self.cmb_stim_noise_items, self.noise)
 
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)

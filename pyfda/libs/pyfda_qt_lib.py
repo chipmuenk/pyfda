@@ -40,6 +40,41 @@ def qwindow_stay_on_top(win, top):
         win.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
 
 #------------------------------------------------------------------------------
+def qcmb_box_populate(cmb_box, items_list, item_init):
+    """
+    Clear and populate combo box `cmb_box` with text, data and tooltip from the list 
+    `items_list` with initial selection of `init_item` (data).
+    
+    Text and tooltip are prepared for translation via `self.tr()`
+    
+    Parameters
+    ----------
+    
+    cmb_box: instance of QComboBox
+        Combobox to be populated
+        
+    items_list: list
+        List of combobox entries, in the format
+        [ "Tooltip for Combobox",
+         ("data 1st item", "text 1st item", "tooltip for 1st item"),
+         ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
+        
+    item_init: str
+        data for initial positition of combobox. When data is not found,
+        set combobox to first item.
+
+    Returns
+    -------
+    None
+    """
+    cmb_box.clear()
+    cmb_box.setToolTip(items_list[0])
+    for i in range(1, len(items_list)):
+        cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
+        cmb_box.setItemData(i-1, items_list[i][2], Qt.ToolTipRole)
+    qset_cmb_box(cmb_box, item_init, data=True)
+
+
 def qget_cmb_box(cmb_box, data=True):
     """
     Get current itemData or Text of comboBox and convert it to string.
@@ -121,7 +156,7 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     return ret
 
 #------------------------------------------------------------------------------
-def qdel_item_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
+def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
     """
     Try to find the entry in combobox corresponding to `string` in a text field (`data = False`)
     or in a data field (`data=True`) and delete the item. When `string` is not found,
@@ -171,7 +206,7 @@ def qdel_item_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensit
     return idx
 
 #------------------------------------------------------------------------------
-def qadd_item_cmb_box(cmb_box, string, fireSignals=False, caseSensitive=False):
+def qcmb_box_add_item(cmb_box, string, fireSignals=False, caseSensitive=False):
     """
     Add an entry in combobox with `string` in a text field (`data = False`)
     or in a data field (`data=True`, not implemented yet). When `string` is already in combobox,
