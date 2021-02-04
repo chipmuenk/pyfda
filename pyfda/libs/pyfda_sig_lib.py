@@ -95,6 +95,18 @@ Examples
     return hn, td
 
 #==================================================================
+def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
+#==================================================================
+    """
+    Calculate angle of argument `X` when abs(X) > `n_eps` * machine resolution.
+    Otherwise, zero is returned.
+    """
+    
+    phi = np.angle(np.where((np.abs(X) > n_eps *  np.spacing(1)), X, 0))
+    
+    return phi
+
+#==================================================================
 def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
 #==================================================================
     """
