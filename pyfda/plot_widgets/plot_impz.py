@@ -24,6 +24,7 @@ from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
+from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (to_html, safe_eval, pprint_log, np_type, calc_ssb_spectrum,
         rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
@@ -454,9 +455,9 @@ class Plot_Impz(QWidget):
             self.title_str += r'Gaussian Pulse '
 
         elif self.ui.stim == "rect":
-            n_start = int(np.floor((self.ui.N - self.ui.T1)/2))
+            n_start = int(np.floor((self.ui.N - self.ui.TW1)/2))
             n_min = max(n_start, 0)
-            n_max = min(n_start + self.ui.T1, self.ui.N)
+            n_max = min(n_start + self.ui.TW1, self.ui.N)
             self.title_str += r'Rect Pulse '
             self.x = self.ui.A1 * np.where((self.n > n_min) & (self.n <= n_max), 1, 0)
 
@@ -482,6 +483,14 @@ class Plot_Impz(QWidget):
                 self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
             self.title_str += r'Sinusoidal Signal '
 
+        elif self.ui.stim == "exp":
+            self.x = self.ui.A1 * np.exp(1j * (2 * pi * self.n * self.ui.f1 + phi1)) +\
+                self.ui.A2 * np.exp(1j * (2 * pi * self.n * self.ui.f2 + phi2))
+            self.title_str += r'Complex Exponential Signal '
+
+        elif self.ui.stim == "diric":
+            self.x = self.ui.A1 * diric(2*pi * self.n /10+ phi1, 1/self.ui.f1)
+            self.title_str += r'Periodic Sinc Signal'
 
 
         elif self.ui.stim == "chirp":
@@ -523,11 +532,6 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'Bandlim. Comb Signal'
             
-        elif self.ui.stim == "diric":
-            self.x = self.ui.A1 * diric(2*pi * self.n /10+ phi1, 1/self.ui.f1)
-            self.title_str += r'Periodic Sinc Signal'
-
-
 
         elif self.ui.stim == "am":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
@@ -1329,7 +1333,8 @@ class Plot_Impz(QWidget):
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
         # - Scale impulse response with N_FFT to calculate frequency response if requested
-            if self.ui.chk_norm_impz_f.isEnabled() and self.ui.chk_norm_impz_f.isChecked():
+            if self.ui.chk_norm_impz_f.isVisible() and self.ui.chk_norm_impz_f.isEnabled()\
+                and self.ui.chk_norm_impz_f.isChecked():
                 freq_resp = True # calculate frequency response from impulse response
                 scale_impz = self.ui.N
                 if self.ui.stim == "dirac":
@@ -1339,7 +1344,7 @@ class Plot_Impz(QWidget):
                 elif self.ui.stim == "gauss":
                     scale_impz *= self.ui.f1 * 2 * self.ui.BW1
                 elif self.ui.stim == "rect":
-                    scale_impz /= self.ui.T1
+                    scale_impz /= self.ui.TW1
             else:
                 freq_resp = False
                 scale_impz = 1.
@@ -1428,6 +1433,8 @@ class Plot_Impz(QWidget):
                         X_i = np.maximum(20 * np.log10(np.abs(X.imag)), self.ui.bottom_f)
                     else:
                         X_r = np.maximum(20 * np.log10(np.abs(X)), self.ui.bottom_f)
+                        if self.en_mag_phi_f:
+                            X_i = angle_zero(X)
 
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
@@ -1436,6 +1443,8 @@ class Plot_Impz(QWidget):
                         X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)), self.ui.bottom_f)
                     else:
                         X_q_r = np.maximum(20 * np.log10(np.abs(X_q)), self.ui.bottom_f)
+                        if self.en_mag_phi_f:
+                            X_q_i = angle_zero(X_q)
 
                 if plt_response:
                     Py = 10*np.log10(Py)
@@ -1444,58 +1453,56 @@ class Plot_Impz(QWidget):
                         Y_i = np.maximum(20 * np.log10(np.abs(Y.imag)), self.ui.bottom_f)
                     else:
                         Y_r = np.maximum(20 * np.log10(np.abs(Y)), self.ui.bottom_f)
-
+                        if self.en_mag_phi_f:
+                            Y_i = angle_zero(Y)
+                            
                 if self.ui.chk_Hf.isChecked():
                     if self.en_re_im_f:
                         H_id_r = np.maximum(20 * np.log10(np.abs(H_id.real)), self.ui.bottom_f)
                         H_id_i = np.maximum(20 * np.log10(np.abs(H_id.imag)), self.ui.bottom_f)
                     else:
                         H_id_r = np.maximum(20 * np.log10(np.abs(H_id)), self.ui.bottom_f)
+                        if self.en_mag_phi_f:
+                            H_id_i = angle_zero(H_id)
 
-
-            else:
+            else: # non log
                 H_F_pre = ""
                 H_F_post = ""
                 if plt_stimulus:
                     if self.en_re_im_f:
                         X_r = X.real
                         X_i = X.imag
-                    elif self.en_mag_phi_f:
-                        X_r = np.abs(X)
-                        X_i = np.angle(X)
                     else:
                         X_r = np.abs(X)
+                        if self.en_mag_phi_f:
+                            X_i = angle_zero(X)
 
                 if plt_stimulus_q:
                     if self.en_re_im_f:
                         X_q_r = X_q.real
                         X_q_i = X_q.imag
-                    elif self.en_mag_phi_f:
-                        X_r = np.abs(X_q)
-                        X_i = np.angle(X_q)
                     else:
                         X_q_r = np.abs(X_q)
+                        if self.en_mag_phi_f:
+                            X_q_i = angle_zero(X_q)
 
                 if plt_response:
                     if self.en_re_im_f:
                         Y_r = Y.real
                         Y_i = Y.imag
-                    elif self.en_mag_phi_f:
-                        X_r = np.abs(Y)
-                        X_i = np.angle(Y)
                     else:
                         Y_r = np.abs(Y)
+                        if self.en_mag_phi_f:
+                            Y_i = angle_zero(Y)
 
                 if self.ui.chk_Hf.isChecked():
                     if self.en_re_im_f:
                         H_id_r = H_id.real
                         H_id_i = H_id.imag
-                    elif self.en_mag_phi_f:
-                        X_r = np.abs(H_id)
-                        X_i = np.angle(H_id)
                     else:
                         H_id_r = np.abs(H_id)
-
+                        if self.en_mag_phi_f:
+                            H_id_i = angle_zero(H_id)
 
                 unit = " in V"
                 unit_P = "W"
@@ -1505,15 +1512,18 @@ class Plot_Impz(QWidget):
                 cgain = self.ui.cgain
 
             if self.en_re_im_f:
-                H_Fi_str = r'$\Im\{$' + H_F_str + r'$\}$'
+                H_Fi_str = H_F_pre + r'$\Im\{$' + H_F_str + r'$\}$' + H_F_post\
+                    + unit + r" $\rightarrow$"
                 H_Fr_str = r'$\Re\{$' + H_F_str + r'$\}$'
+            elif self.en_mag_phi_f:
+                H_Fi_str = r'$\angle($' + H_F_str + r'$)$' + " in rad " + r" $\rightarrow$"
+                H_Fr_str = "|" + H_F_str + "|"
             else:
                 H_F_pre = "|"
                 H_Fr_str = H_F_str
                 H_Fi_str = 'undefined'
                 H_F_post = "|"
 
-            H_Fi_str = H_F_pre + H_Fi_str + H_F_post + unit + r" $\rightarrow$"
             H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit + r" $\rightarrow$"
 
             # -----------------------------------------------------------------
@@ -1528,6 +1538,11 @@ class Plot_Impz(QWidget):
                     self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
                         mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle X$" + ejO_str
+                    self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
+                        label=label_im, plt_fmt=self.fmt_plot_stim,
+                        mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)                   
                 if show_info:
                     label_re += ":\t$P$ = {0:.3g} {1}".format(Px, unit_P)
 
@@ -1543,6 +1558,12 @@ class Plot_Impz(QWidget):
                     self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                         mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle X_Q$" + ejO_str
+                    self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
+                        label=label_im, plt_fmt=self.fmt_plot_stmq,
+                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)                   
+
                 if show_info:
                     label_re += ":\t$P$ = {0:.3g} {1}".format(Pxq, unit_P)
 
@@ -1558,6 +1579,11 @@ class Plot_Impz(QWidget):
                     self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                         mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle Y$" + ejO_str
+                    self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
+                        label=label_im, plt_fmt=self.fmt_plot_resp,
+                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)                   
                 if show_info:
                     label_re += ":\t$P$ = {0:.3g} {1}".format(Py, unit_P)
 
@@ -1570,6 +1596,9 @@ class Plot_Impz(QWidget):
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
+                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle H_{id}$" + ejO_str
                     self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
                 self.ax_f1.plot(F_id, H_id_r, c="gray",label=label_re)
 
@@ -1593,7 +1622,8 @@ class Plot_Impz(QWidget):
                     self.ax_f1.legend(handles, labels, loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
 
-            if self.en_re_im_f and self.plt_freq_enabled:
+            # --------------- LEGEND and YLABEL (2nd plot) -------------------
+            if (self.en_re_im_f or self.en_mag_phi_f) and self.plt_freq_enabled:
                 self.ax_f2.legend(loc='best', fontsize='small',
                                fancybox=True, framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)

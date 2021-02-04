@@ -68,13 +68,13 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
     None
     """
     cmb_box.clear()
-    cmb_box.setToolTip(items_list[0])
+    cmb_box.setToolTip(cmb_box.tr(items_list[0]))
     for i in range(1, len(items_list)):
         cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
-        cmb_box.setItemData(i-1, items_list[i][2], Qt.ToolTipRole)
+        cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     qset_cmb_box(cmb_box, item_init, data=True)
 
-
+#------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):
     """
     Get current itemData or Text of comboBox and convert it to string.

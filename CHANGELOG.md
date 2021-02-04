@@ -22,9 +22,12 @@
 
 ### New features
 
-- Add widgets T1 and T2 for time / delays in y[n] and use them for sinc impulse
+- Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
+    for  impulses
 
 - New stimuli Gauss and Rect impulse
+
+- New stimulus Exp (complex exponentials)
 
 - New noise types "Maximum Length Sequence" and "Brownian"
 
@@ -35,6 +38,8 @@
 - Group stimuli in `y[n]` for a better overview
 
 - Allow changing the number of FFT data points via `Info -> Settings`
+
+- Display magnitude and phase in y[n] tab
 
 - Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
   and `dirs.YOSYS_VER`
