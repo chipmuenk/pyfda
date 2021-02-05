@@ -20,7 +20,8 @@ from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
+                                     qstyle_widget, QVLine)
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -254,10 +255,12 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
         self.chk_fx_scale.setChecked(False)
 
-        lbl_stim_options = QLabel(to_html("Show Stim. Options", frmt='b'), self)
-        self.chk_stim_options = QCheckBox(self)
+        #lbl_stim_options = QLabel(to_html("Show Stim. Options", frmt='b'), self)
+        #self.chk_stim_options = QCheckBox(self)
+        self.chk_stim_options = QPushButton("Stimuli")
         self.chk_stim_options.setObjectName("chk_stim_options")
         self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
+        self.chk_stim_options.setCheckable(True)
         self.chk_stim_options.setChecked(True)
 
         self.lbl_stim_cmplx_warn = QLabel(self)
@@ -286,7 +289,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.chk_fx_scale)
         layH_ctrl_run.addStretch(2)
-        layH_ctrl_run.addWidget(lbl_stim_options)
+        #layH_ctrl_run.addWidget(lbl_stim_options)
         layH_ctrl_run.addWidget(self.chk_stim_options)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
@@ -332,13 +335,18 @@ class PlotImpz_UI(QWidget):
         self.chk_win_time.setToolTip('<span>Show FFT windowing function (can be '
                                      'modified in the "Frequency" tab).</span>')
         self.chk_win_time.setChecked(False)
-
-        lbl_log_time = QLabel(to_html("dB", frmt='b'), self)
-        self.chk_log_time = QCheckBox(self)
+        
+        line1 = QVLine()
+        line2 = QVLine(width=5)
+        
+        self.chk_log_time = QPushButton("dB")
+        self.chk_log_time.setMaximumWidth(self.mSize * 4)
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_time.setCheckable(True)
         self.chk_log_time.setChecked(False)
 
+        
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_time.setVisible(True)
         self.led_log_bottom_time = QLineEdit(self)
@@ -354,9 +362,13 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
         spgr_en = self.plt_time_spgr != "None"
 
-        self.lbl_log_spgr_time = QLabel(to_html("&nbsp;dB", frmt='b'), self)
-        self.lbl_log_spgr_time.setVisible(spgr_en)
-        self.chk_log_spgr_time = QCheckBox(self)
+#        self.lbl_log_spgr_time = QLabel(to_html("&nbsp;dB", frmt='b'), self)
+#        self.lbl_log_spgr_time.setVisible(spgr_en)
+#        self.chk_log_spgr_time = QCheckBox(self)
+        self.chk_log_spgr_time = QPushButton("dB")
+        self.chk_log_spgr_time.setMaximumWidth(self.mSize * 4)
+        self.chk_log_spgr_time.setCheckable(True)
+
         self.chk_log_spgr_time.setObjectName("chk_log_spgr")
         self.chk_log_spgr_time.setToolTip("<span>Logarithmic scale for spectrogram.</span>")
         self.chk_log_spgr_time.setChecked(True)
@@ -426,8 +438,9 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_time.addWidget(lbl_win_time)
         layH_ctrl_time.addWidget(self.chk_win_time)
+        layH_ctrl_time.addWidget(line1)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(lbl_log_time)
+        layH_ctrl_time.addWidget(line2)
         layH_ctrl_time.addWidget(self.chk_log_time)
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
@@ -436,7 +449,6 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_time.addWidget(lbl_plt_time_spgr)
         layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
-        layH_ctrl_time.addWidget(self.lbl_log_spgr_time)
         layH_ctrl_time.addWidget(self.chk_log_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_nfft_spgr_time)
         layH_ctrl_time.addWidget(self.led_nfft_spgr_time)
@@ -481,10 +493,11 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        lbl_log_freq = QLabel(to_html("dB", frmt='b'), self)
-        self.chk_log_freq = QCheckBox(self)
+        self.chk_log_freq = QPushButton("dB")
+        self.chk_log_freq.setMaximumWidth(self.mSize * 4)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_freq.setCheckable(True)
         self.chk_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
@@ -551,7 +564,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_Hf_lbl)
         layH_ctrl_freq.addWidget(self.chk_Hf)
         layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(lbl_log_freq)
         layH_ctrl_freq.addWidget(self.chk_log_freq)
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)

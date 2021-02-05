@@ -285,22 +285,6 @@ def qstyle_widget(widget, state):
     widget.style().polish(widget)
     widget.update()
 
-#------------------------------------------------------------------------------
-def qhline(widget):
-    # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-    # solution
-    """
-    Create a horizontal line
-
-    Parameters
-    ----------
-
-    widget: widget containing the QFrame to be created
-    """
-    line = QFrame(widget)
-    line.setFrameShape(QFrame.HLine)
-    line.setFrameShadow(QFrame.Sunken)
-    return line
 
 #------------------------------------------------------------------------------
 def qget_selected(table, select_all=False, reverse=True):
@@ -367,18 +351,42 @@ class QHLine(QFrame):
     """
     Create a thin horizontal line utilizing the HLine property of QFrames
     Usage:
-    mylayout.addWidget(QHLine(), 1, 2)
+        myline = QHLine()
+        mylayout.addWidget(myline)
     """
-    def __init__(self):
+    def __init__(self, width=1):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
-        self.setFrameShadow(QFrame.Sunken)
+        self.setFrameShadow(QFrame.Plain)       
+        self.setLineWidth(width)
+
 
 class QVLine(QFrame):
-    def __init__(self):
+    def __init__(self, width=1):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
-        self.setFrameShadow(QFrame.Sunken)
+        self.setFrameShadow(QFrame.Plain)
+        #self.setFrameShadow(QFrame.Sunken)
+        self.setLineWidth(width)
+        #self.setFrameShape(QFrame.StyledPanel);
+        #self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: solid; border-left-style: none; border-color: blue; ");
+        
+#------------------------------------------------------------------------------
+# def qhline(widget):
+#     # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
+#     # solution
+#     """
+#     Create a horizontal line
+
+#     Parameters
+#     ----------
+
+#     widget: widget containing the QFrame to be created
+#     """
+#     line = QFrame(widget)
+#     line.setFrameShape(QFrame.HLine)
+#     line.setFrameShadow(QFrame.Sunken)
+#     return line
 
 #==============================================================================
 

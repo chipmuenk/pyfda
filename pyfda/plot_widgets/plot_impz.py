@@ -455,8 +455,6 @@ class Plot_Impz(QWidget):
             self.title_str += r'Gaussian Pulse '
 
         elif self.ui.stim == "rect":
-            logger.warning(self.ui.T1)
-            logger.warning(self.ui.TW1)
             n_start = int(np.floor((self.ui.N - self.ui.TW1)/2 - self.ui.T1))
             n_min = max(n_start, 0)
             n_max = min(n_start + self.ui.TW1, self.ui.N)
@@ -816,7 +814,6 @@ class Plot_Impz(QWidget):
         """
         spgr_en = self.ui.cmb_plt_time_spgr.currentText() != "None"
 
-        self.ui.lbl_log_spgr_time.setVisible(spgr_en)
         self.ui.chk_log_spgr_time.setVisible(spgr_en)
         self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
         self.ui.led_nfft_spgr_time.setVisible(spgr_en)
