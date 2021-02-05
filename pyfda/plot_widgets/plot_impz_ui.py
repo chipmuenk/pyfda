@@ -119,12 +119,12 @@ class PlotImpz_UI(QWidget):
          "dirac":   {"dc", "a1", "T1", "norm", "noise"},
          "sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
          "gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2", "norm", "noise"},
-         "rect":    {"dc", "a1", "TW1", "norm", "noise"},
+         "rect":    {"dc", "a1", "T1", "TW1", "norm", "noise"},
          "step":    {"a1", "T1", "noise"},
          "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "diric":   {"dc", "a1", "phi1", "f1", "noise"},
+         "diric":   {"dc", "a1", "phi1", "T1", "TW1", "f1", "noise"},
 
          "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
          "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
@@ -183,7 +183,7 @@ class PlotImpz_UI(QWidget):
                  ("sine","Sine", "Sine signal"),
                  ("cos","Cos", "Cosine signal"),
                  ("exp", "Exp", "Complex exponential"),
-                 ("diric", "Sinc", "Periodic Sinc")
+                 ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
                 ]
              
         # data / text / tooltip for noise stimulus combobox.
@@ -861,6 +861,8 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.installEventFilter(self)
         self.led_T1.installEventFilter(self)
         self.led_T2.installEventFilter(self)
+        self.led_TW1.installEventFilter(self)
+        self.led_TW2.installEventFilter(self)
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
