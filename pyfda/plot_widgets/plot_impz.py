@@ -455,7 +455,9 @@ class Plot_Impz(QWidget):
             self.title_str += r'Gaussian Pulse '
 
         elif self.ui.stim == "rect":
-            n_start = int(np.floor((self.ui.N - self.ui.TW1)/2))
+            logger.warning(self.ui.T1)
+            logger.warning(self.ui.TW1)
+            n_start = int(np.floor((self.ui.N - self.ui.TW1)/2 - self.ui.T1))
             n_min = max(n_start, 0)
             n_max = min(n_start + self.ui.TW1, self.ui.N)
             self.title_str += r'Rect Pulse '
@@ -489,7 +491,7 @@ class Plot_Impz(QWidget):
             self.title_str += r'Complex Exponential Signal '
 
         elif self.ui.stim == "diric":
-            self.x = self.ui.A1 * diric(2*pi * self.n /10+ phi1, 1/self.ui.f1)
+            self.x = self.ui.A1 * diric((4 * pi * (self.n-self.ui.T1) * self.ui.f1 + phi1*2)/ self.ui.TW1, self.ui.TW1)
             self.title_str += r'Periodic Sinc Signal'
 
 
