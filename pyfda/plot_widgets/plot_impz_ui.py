@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 import collections
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
-                               QPushButton, QFontMetrics, pyqtSignal, QEvent, Qt,
-                               QHBoxLayout, QVBoxLayout, QGridLayout)
+                               QPushButton, QPushButtonRT, QFontMetrics, pyqtSignal, 
+                               QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -438,9 +438,11 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_time.addWidget(lbl_win_time)
         layH_ctrl_time.addWidget(self.chk_win_time)
+        layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(line1)
-        layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(line2)
+        layH_ctrl_time.addSpacing(5)
+        #layH_ctrl_time.addStretch(1)
+        #layH_ctrl_time.addWidget(line2)
         layH_ctrl_time.addWidget(self.chk_log_time)
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
@@ -535,12 +537,12 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar2.setText("2")
         self.ledWinPar2.setObjectName("ledWinPar2")
 
-        self.chk_Hf = QCheckBox(self)
+        self.chk_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
         self.chk_Hf.setObjectName("chk_Hf")
         self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
         self.chk_Hf.setChecked(False)
-        self.chk_Hf_lbl = QLabel(to_html("H_id (f)", frmt="bi"), self)
+        self.chk_Hf.setCheckable(True)
 
         lbl_show_info_freq = QLabel(to_html("Info", frmt='b'), self)
         self.chk_show_info_freq = QCheckBox(self)
@@ -561,7 +563,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
         #
-        layH_ctrl_freq.addWidget(self.chk_Hf_lbl)
+        layH_ctrl_freq.addSpacing(5)
         layH_ctrl_freq.addWidget(self.chk_Hf)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_log_freq)
