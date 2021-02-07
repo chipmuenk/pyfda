@@ -16,7 +16,7 @@ from PyQt5 import QtGui, QtCore, QtTest
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
                           QObject, QVariant, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor, 
-                            QBrush, QPalette, QPixmap)
+                            QBrush, QPalette, QPixmap, QPainter)
 from PyQt5.QtWidgets import (QAction, QMenu, 
                              QMainWindow, QTabWidget, QApplication, QRadioButton,
                              QScrollArea, QSplitter, QMessageBox, QDialog,
@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QTableWidget, QTableWidgetItem, QTextBrowser,
                              QSizePolicy, QAbstractItemView,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
-                             QStyledItemDelegate, QStyle)
+                             QStyledItemDelegate, QStyle, QStyleOption)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
@@ -96,10 +96,11 @@ class QPushButtonRT(QPushButton):
         else:
             super().__init__()
         self.__lbl = QLabel(self)
+        self.margin = margin
         if text is not None:
             self.__lbl.setText(text)
         self.__lyt = QHBoxLayout()
-        self.__lyt.setContentsMargins(10, 0, 0, 0) # L, T, R, B
+        self.__lyt.setContentsMargins(margin, 0, 0, 0) # L, T, R, B
         self.__lyt.setSpacing(0)
         self.setLayout(self.__lyt)
         self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
@@ -120,10 +121,21 @@ class QPushButtonRT(QPushButton):
     def sizeHint(self):
         s = QPushButton.sizeHint(self)
         w = self.__lbl.sizeHint()
-        s.setWidth(w.width() + 20)
+        s.setWidth(w.width() + 2 * self.margin)
         #s.setHeight(w.height())
         return s
+    
+    # def clicked(self):
+    #     if self.isChecked():
+    #         self.__lbl.setText("chk!")
+    #     self.updateGeometry()
+    #     return
 
+    # def paintEvent(self, pe):
+    #     o = QStyleOption()
+    #     o.initFrom(self)
+    #     p = QPainter(self)
+    #     self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
 
 if __name__ == '__main__':
     pass

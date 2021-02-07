@@ -308,7 +308,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
 
-        lbl_plt_time_title = QLabel("<b>View:</b>", self)
+        lbl_plt_time_title = QLabel("<b>TIME:</b>", self)
 
         self.lbl_plt_time_stim = QLabel(to_html("Stimulus x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
@@ -362,15 +362,11 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
         spgr_en = self.plt_time_spgr != "None"
 
-#        self.lbl_log_spgr_time = QLabel(to_html("&nbsp;dB", frmt='b'), self)
-#        self.lbl_log_spgr_time.setVisible(spgr_en)
-#        self.chk_log_spgr_time = QCheckBox(self)
         self.chk_log_spgr_time = QPushButton("dB")
         self.chk_log_spgr_time.setMaximumWidth(self.mSize * 4)
-        self.chk_log_spgr_time.setCheckable(True)
-
         self.chk_log_spgr_time.setObjectName("chk_log_spgr")
         self.chk_log_spgr_time.setToolTip("<span>Logarithmic scale for spectrogram.</span>")
+        self.chk_log_spgr_time.setCheckable(True)
         self.chk_log_spgr_time.setChecked(True)
         self.chk_log_spgr_time.setVisible(spgr_en)
 
@@ -426,7 +422,7 @@ class PlotImpz_UI(QWidget):
 
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(lbl_plt_time_title)
-        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addSpacing(10)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
         #
@@ -474,7 +470,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        lbl_plt_freq_title = QLabel("<b>View:</b>", self)
+        lbl_plt_freq_title = QLabel("<b>FREQ:</b>", self)
 
         self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -544,16 +540,16 @@ class PlotImpz_UI(QWidget):
         self.chk_Hf.setChecked(False)
         self.chk_Hf.setCheckable(True)
 
-        lbl_show_info_freq = QLabel(to_html("Info", frmt='b'), self)
-        self.chk_show_info_freq = QCheckBox(self)
+        self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=20)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
         self.chk_show_info_freq.setToolTip("<span>Show infos about signal power "
                                            "and window properties.</span>")
+        self.chk_show_info_freq.setCheckable(True)
         self.chk_show_info_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(lbl_plt_freq_title)
-        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addSpacing(10)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
         #
@@ -580,7 +576,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.lblWinPar2)
         layH_ctrl_freq.addWidget(self.ledWinPar2)
         layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(lbl_show_info_freq)
+        #layH_ctrl_freq.addWidget(lbl_show_info_freq)
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
         layH_ctrl_freq.addStretch(10)
 
