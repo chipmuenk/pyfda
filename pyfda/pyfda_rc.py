@@ -433,6 +433,7 @@ qss_common = """
                 *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 QPushButton:checked {background-color:lightblue; color:black;font-weight:800;}
+                QPushButtonRT:checked {background-color:lightblue; color:black;font-weight:800;}
                 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
