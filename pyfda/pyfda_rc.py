@@ -412,6 +412,7 @@ qss_common = """
                 height: 15px;# not needed
                 border-radius: 1px; # destroys button shape
                 border-style: outset; # destroys button shape
+                padding-left: 5px; padding-right: 3px; # destroys button shape
                  */
                  }
 
