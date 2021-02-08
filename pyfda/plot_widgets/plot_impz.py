@@ -921,16 +921,16 @@ class Plot_Impz(QWidget):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
-        self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower().replace("*", "")
-        self.plt_time_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_resp, data=False)
+        self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
+        self.plt_time_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_resp)
 
-        self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower().replace("*", "")
-        self.plt_time_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stim, data=False)
+        self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
+        self.plt_time_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stim)
 
-        self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower().replace("*", "")
-        self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False)
+        self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
+        self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq)
 
-        self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr, data=False).lower()
+        self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr)
         self.spgr = self.plt_time_spgr != "none"
 
         self.plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
@@ -978,11 +978,11 @@ class Plot_Impz(QWidget):
 
         if not self.H_str or self.H_str[1] != 'h': # '$h... = some impulse response, don't change
             self.H_str = ''
-            if qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower() != "none":
+            if qget_cmb_box(self.ui.cmb_plt_time_stim) != "none":
                 self.H_str += r'$x$, '
-            if qget_cmb_box(self.ui.cmb_plt_time_stmq, data=False).lower() != "none" and self.fx_sim:
+            if qget_cmb_box(self.ui.cmb_plt_time_stmq) != "none" and self.fx_sim:
                 self.H_str += r'$x_Q$, '
-            if qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower() != "none":
+            if qget_cmb_box(self.ui.cmb_plt_time_resp) != "none":
                 self.H_str += r'$y$'
             self.H_str = self.H_str.rstrip(', ')
 
@@ -1231,17 +1231,14 @@ class Plot_Impz(QWidget):
         Clear the axes of the frequency domain matplotlib widgets and
         calculate the fft
         """
-        self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp,
-                                          data=False).lower().replace("*", "")
-        self.plt_freq_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False)
+        self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp).replace("*", "")
+        self.plt_freq_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_resp)
 
-        self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim,
-                                          data=False).lower().replace("*", "")
-        self.plt_freq_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False)
+        self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim).replace("*", "")
+        self.plt_freq_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim)
 
-        self.plt_freq_stmq = qget_cmb_box(self.ui.cmb_plt_freq_stmq,
-                                          data=False).lower().replace("*", "")
-        self.plt_freq_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq, data=False)
+        self.plt_freq_stmq = qget_cmb_box(self.ui.cmb_plt_freq_stmq).replace("*", "")
+        self.plt_freq_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq)
 
 
         self.plt_freq_enabled = self.plt_freq_stim != "none" or self.plt_freq_stmq != "none"\

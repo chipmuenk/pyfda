@@ -13,9 +13,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 import collections
-from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QTabWidget,
                                QPushButton, QPushButtonRT, QFontMetrics, pyqtSignal, 
-                               QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
+                               QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout,)
 
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
@@ -60,10 +60,10 @@ class PlotImpz_UI(QWidget):
         self.N = 0
 
         # time
-        self.plt_time_resp = "Stem"
-        self.plt_time_stim = "None"
-        self.plt_time_stmq = "None"
-        self.plt_time_spgr = "None"
+        self.plt_time_resp = "stem"
+        self.plt_time_stim = "line"
+        self.plt_time_stmq = "none"
+        self.plt_time_spgr = "none"
 
         self.bottom_t = -80 # initial value for log. scale (time)
         self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
@@ -97,9 +97,9 @@ class PlotImpz_UI(QWidget):
 
         # frequency
         self.cmb_freq_display_item = "mag"
-        self.plt_freq_resp = "Line"
-        self.plt_freq_stim = "None"
-        self.plt_freq_stmq = "None"
+        self.plt_freq_resp = "line"
+        self.plt_freq_stim = "none"
+        self.plt_freq_stmq = "none"
 
         self.bottom_f = -120 # initial value for log. scale
         self.param = None
@@ -137,6 +137,17 @@ class PlotImpz_UI(QWidget):
          "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
          })
         # data / text / tooltip for stimulus type combobox. First element is combobox tooltip.
+        self.plot_styles_list =\
+                [("Plot style"),
+                 ("none","None",""),
+                 ("dots","Dots",""),
+                 ("line","Line",""),
+                 ("line*","Line*",""),
+                 ("stem","Stem",""),
+                 ("stem*","Stem*",""),
+                 ("step","Step",""),
+                 ("step*","Step*","")
+                 ]
         self.cmb_stim_items =\
                 [("<span>Stimulus category.</span>"),
                  ("none", "None", "<span>Only noise and DC can be selected.</span>"),
@@ -186,7 +197,15 @@ class PlotImpz_UI(QWidget):
                  ("exp", "Exp", "Complex exponential"),
                  ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
                 ]
-             
+
+        self.cmb_time_spgr_items=\
+                ["<span>Show Spectrogram for selected signal.</span>",
+                 ("none","None",""),
+                 ("x[n]","x[n]",""),
+                 ("x_q[n]","x_q[n]",""),
+                 ("y[n]","y[n]","")
+                 ]
+
         # data / text / tooltip for noise stimulus combobox.
         self.cmb_stim_noise_items =\
                 [ "Type of additive noise.",
@@ -306,27 +325,20 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        plot_styles_list = ["None","Dots","Line","Line*","Stem","Stem*","Step","Step*"]
-
-        lbl_plt_time_title = QLabel("<b>TIME:</b>", self)
-
         self.lbl_plt_time_stim = QLabel(to_html("Stimulus x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
-        self.cmb_plt_time_stim.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
+        qcmb_box_populate(self.cmb_plt_time_stim, self.plot_styles_list, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_time_stmq = QLabel(to_html("&nbsp;&nbsp;Fixp. Stim. x_Q", frmt='bi'), self)
         self.cmb_plt_time_stmq = QComboBox(self)
-        self.cmb_plt_time_stmq.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_time_stmq, self.plt_time_stmq)
+        qcmb_box_populate(self.cmb_plt_time_stmq, self.plot_styles_list, self.plt_time_stmq)
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
                                           "(quantized) stimulus.</span>")
 
         lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Response y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
-        self.cmb_plt_time_resp.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
+        qcmb_box_populate(self.cmb_plt_time_resp, self.plot_styles_list, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
         lbl_win_time = QLabel(to_html("&nbsp;&nbsp;FFT Window", frmt='bi'), self)
@@ -357,9 +369,10 @@ class PlotImpz_UI(QWidget):
 
         lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
-        self.cmb_plt_time_spgr.addItems(["None", "x[n]", "x_q[n]", "y[n]"])
-        qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
-        self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
+        qcmb_box_populate(self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
+        #self.cmb_plt_time_spgr.addItems(["None", "x[n]", "x_q[n]", "y[n]"])
+        #qset_cmb_box(self.cmb_plt_time_spgr, self.plt_time_spgr)
+        #self.cmb_plt_time_spgr.setToolTip("<span>Show Spectrogram for selected signal.</span>")
         spgr_en = self.plt_time_spgr != "None"
 
         self.chk_log_spgr_time = QPushButton("dB")
@@ -421,8 +434,6 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_limits.setChecked(False)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(lbl_plt_time_title)
-        layH_ctrl_time.addSpacing(10)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
         #
@@ -470,25 +481,20 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        lbl_plt_freq_title = QLabel("<b>FREQ:</b>", self)
-
         self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
-        self.cmb_plt_freq_stim.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
-        self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
+        qcmb_box_populate(self.cmb_plt_freq_stim, self.plot_styles_list, self.plt_freq_stim)
+        #self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel(to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
-        self.cmb_plt_freq_stmq.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_freq_stmq, self.plt_freq_stmq)
+        qcmb_box_populate(self.cmb_plt_freq_stmq, self.plot_styles_list, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
                                           "(quantized) stimulus.</span>")
 
         lbl_plt_freq_resp = QLabel(to_html("&nbsp;Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
-        self.cmb_plt_freq_resp.addItems(plot_styles_list)
-        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
+        qcmb_box_populate(self.cmb_plt_freq_resp, self.plot_styles_list, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
         self.chk_log_freq = QPushButton("dB")
@@ -548,8 +554,6 @@ class PlotImpz_UI(QWidget):
         self.chk_show_info_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
-        layH_ctrl_freq.addWidget(lbl_plt_freq_title)
-        layH_ctrl_freq.addSpacing(10)
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
         #
@@ -863,7 +867,27 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim.addStretch(10)
 
         self.wdg_ctrl_stim = QWidget(self)
-        self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
+        self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)        
+        
+# =============================================================================
+#         #----------------------------------------------------------------------
+#         # Tabbed layout with vertical tabs
+#         #----------------------------------------------------------------------
+#         self.tabWidget = QTabWidget(self)
+#         self.tabWidget.addTab(self.mplwidget_t, "Time")
+#         self.tabWidget.setTabToolTip(0,"Impulse and transient response of filter")
+#         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
+#         self.tabWidget.setTabToolTip(1,"Spectral representation of impulse or transient response")
+#         # list with tabWidgets
+#         self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
+#         self.tabWidget.setTabPosition(QTabWidget.West)
+# 
+#         layVMain = QVBoxLayout()
+#         layVMain.addWidget(self.tabWidget)
+#         layVMain.addWidget(self.ui.wdg_ctrl_stim)
+#         layVMain.addWidget(self.ui.wdg_ctrl_run)
+#         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+# =============================================================================
         # --------- end stimuli ---------------------------------
 
         # frequency related widgets require special handling as they are scaled with f_s
