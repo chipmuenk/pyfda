@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import time
-from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
+from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QSizePolicy
 
 import numpy as np
 from numpy import pi
@@ -119,9 +119,10 @@ class Plot_Impz(QWidget):
         self.tabWidget.setTabToolTip(0,"Impulse and transient response of filter")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
         self.tabWidget.setTabToolTip(1,"Spectral representation of impulse or transient response")
+        self.tabWidget.setTabPosition(QTabWidget.West)
+
         # list with tabWidgets
         self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
-        self.tabWidget.setTabPosition(QTabWidget.West)
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
@@ -812,7 +813,7 @@ class Plot_Impz(QWidget):
         """
         Update spectrogram ui
         """
-        spgr_en = self.ui.cmb_plt_time_spgr.currentText() != "None"
+        spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != "none"
 
         self.ui.chk_log_spgr_time.setVisible(spgr_en)
         self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
@@ -1103,13 +1104,13 @@ class Plot_Impz(QWidget):
 
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
-            if self.plt_time_spgr == "x[n]":
+            if self.plt_time_spgr == "xn":
                 s = x[self.ui.N_start:]
                 sig_lbl = 'X'
-            elif self.plt_time_spgr == "x_q[n]":
+            elif self.plt_time_spgr == "xqn":
                 s = self.x_q[self.ui.N_start:]
                 sig_lbl = 'X_Q'
-            elif self.plt_time_spgr == "y[n]":
+            elif self.plt_time_spgr == "yn":
                 s = y[self.ui.N_start:]
                 sig_lbl = 'Y'
             else:

@@ -206,19 +206,20 @@ def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False, caseSensit
     return idx
 
 #------------------------------------------------------------------------------
-def qcmb_box_add_item(cmb_box, string, fireSignals=False, caseSensitive=False):
+def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False, 
+                      caseSensitive=False):
     """
-    Add an entry in combobox with `string` in a text field (`data = False`)
-    or in a data field (`data=True`, not implemented yet). When `string` is already in combobox,
-    do nothing. Signals are blocked during the update of the combobox unless
+    Add an entry in combobox with text / data / tooltipp from `item_list`. 
+    When the item is already in combobox (searching for data or text item, depending
+    `data`), do nothing. Signals are blocked during the update of the combobox unless
     `fireSignals` is set `True`. By default, the search is case insensitive, this
     can be changed by passing `caseSensitive=False`.
 
     Parameters
     ----------
 
-    string: str
-        The string for item in the text or data field to be added.
+    item_list: list
+        List with `["new_data", "new_text", "new_tooltip"]` to be added.
 
     data: bool (default: False)
         Whether the string refers to the data or text fields of the combo box
@@ -234,7 +235,6 @@ def qcmb_box_add_item(cmb_box, string, fireSignals=False, caseSensitive=False):
         The index of the found item with string / data. When not found in the
         combo box, return index -1.
     """
-    data = False
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
@@ -245,15 +245,17 @@ def qcmb_box_add_item(cmb_box, string, fireSignals=False, caseSensitive=False):
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
+        idx = cmb_box.findData(item_list[0], flags=flag) # find index for data 
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
+        idx = cmb_box.findText(item_list[1], flags=flag) # find index for text
 
-    if idx == -1: # data  / text doesn'r exist in combo box, add it.
+    if idx == -1: # data  / text doesn't exist in combo box, add it.
         cmb_box.blockSignals(not fireSignals)
-        cmb_box.addItem(string) # set index
+        cmb_box.addItem(cmb_box.tr(item_list[1]), item_list[0]) # set index
+        idx = cmb_box.findData(item_list[0])
+        cmb_box.setToolTip(idx, item_list[2])
         cmb_box.blockSignals(False)
-
+        
     return idx
 
 #------------------------------------------------------------------------------
