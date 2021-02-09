@@ -270,9 +270,11 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
 
-        self.chk_fx_scale = QCheckBox("Int. scale", self)
+        #self.chk_fx_scale = QCheckBox("Int. scale", self)
+        self.chk_fx_scale = QPushButton("FX Int")
         self.chk_fx_scale.setObjectName("chk_fx_scale")
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
+        self.chk_fx_scale.setCheckable(True)
         self.chk_fx_scale.setChecked(False)
 
         self.chk_stim_options = QPushButton("Stimuli")
