@@ -399,7 +399,7 @@ class Plot_Impz(QWidget):
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
 
         if self.fx_sim:
-            qcmb_box_add_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
+            qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
         else:
             qcmb_box_del_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
 

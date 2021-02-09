@@ -253,7 +253,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
         cmb_box.blockSignals(not fireSignals)
         cmb_box.addItem(cmb_box.tr(item_list[1]), item_list[0]) # set index
         idx = cmb_box.findData(item_list[0])
-        cmb_box.setToolTip(idx, item_list[2])
+        cmb_box.setItemData(idx, cmb_box.tr(item_list[2]), Qt.ToolTipRole)
         cmb_box.blockSignals(False)
         
     return idx
