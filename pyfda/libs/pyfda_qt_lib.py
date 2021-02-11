@@ -74,6 +74,12 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
         cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     qset_cmb_box(cmb_box, item_init, data=True)
 
+    """ icon = QIcon('logo.png') 
+    # adding icon to the given index 
+    self.combo_box.setItemIcon(i, icon) 
+    size = QSize(10, 10) 
+    self.combo_box.setIconSize(size)  """
+
 #------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):
     """
