@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 from .pyfda_lib import qstr
 
-from .compat import QFrame, QMessageBox, Qt
+from .compat import QFrame, QMessageBox, Qt, QtGui
 from .pyfda_dirs import OS
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def qwindow_stay_on_top(win, top):
     """
     Set flags for a window such that it stays on top (True) or not
@@ -28,37 +28,37 @@ def qwindow_stay_on_top(win, top):
     trying to close pyfda.
     """
 
-    win_flags = (Qt.CustomizeWindowHint | Qt.Window |# always needed
-                Qt.WindowTitleHint | # show title bar, make window movable
-                Qt.WindowCloseButtonHint | # show close button
-                Qt.WindowContextHelpButtonHint | # right Mousebutton context menu
-                Qt.WindowMinMaxButtonsHint) # show min/max buttons
+    win_flags = (Qt.CustomizeWindowHint | Qt.Window |  # always needed
+                 Qt.WindowTitleHint |  # show title bar, make window movable
+                 Qt.WindowCloseButtonHint |  # show close button
+                 Qt.WindowContextHelpButtonHint |  # right Mousebutton context menu
+                 Qt.WindowMinMaxButtonsHint)  # show min/max buttons
 
     if OS == "Windows" or not top:
         win.setWindowFlags(win_flags)
     else:
         win.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def qcmb_box_populate(cmb_box, items_list, item_init):
     """
-    Clear and populate combo box `cmb_box` with text, data and tooltip from the list 
+    Clear and populate combo box `cmb_box` with text, data and tooltip from the list
     `items_list` with initial selection of `init_item` (data).
-    
+
     Text and tooltip are prepared for translation via `self.tr()`
-    
+
     Parameters
     ----------
-    
+
     cmb_box: instance of QComboBox
         Combobox to be populated
-        
+
     items_list: list
         List of combobox entries, in the format
         [ "Tooltip for Combobox",
          ("data 1st item", "text 1st item", "tooltip for 1st item"),
          ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
-        
+
     item_init: str
         data for initial positition of combobox. When data is not found,
         set combobox to first item.
@@ -70,7 +70,12 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
     cmb_box.clear()
     cmb_box.setToolTip(cmb_box.tr(items_list[0]))
     for i in range(1, len(items_list)):
-        cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
+        if type (items_list[i][1]) == QtGui.QIcon:
+            logger.warning("Icon!")
+            cmb_box.setItemIcon(i-1, items_list[i][1])
+            cmb_box.setItemData(i-1, items_list[i][0])
+        else:
+            cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
         cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     qset_cmb_box(cmb_box, item_init, data=True)
 
@@ -146,9 +151,9 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
+        idx = cmb_box.findData(str(string), flags=flag)  # find index for data == string
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
+        idx = cmb_box.findText(str(string), flags=flag)  # find index for text == string
 
     ret = idx
 
@@ -161,8 +166,9 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
 
     return ret
 
-#------------------------------------------------------------------------------
-def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
+#-----------------------------------------------------------------------------
+def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
+                      caseSensitive=False):
     """
     Try to find the entry in combobox corresponding to `string` in a text field (`data = False`)
     or in a data field (`data=True`) and delete the item. When `string` is not found,
@@ -200,18 +206,18 @@ def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False, caseSensit
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(str(string), flags=flag) # find index for data = string
+        idx = cmb_box.findData(str(string), flags=flag)  # find index for data == string
     else:
-        idx = cmb_box.findText(str(string), flags=flag) # find index for text = string
+        idx = cmb_box.findText(str(string), flags=flag)  # find index for text == string
 
     if idx > -1: # data  / text exists in combo box, delete it.
         cmb_box.blockSignals(not fireSignals)
-        cmb_box.removeItem(idx) # set index
+        cmb_box.removeItem(idx)  # set index
         cmb_box.blockSignals(False)
 
     return idx
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False, 
                       caseSensitive=False):
     """
@@ -251,20 +257,20 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(item_list[0], flags=flag) # find index for data 
+        idx = cmb_box.findData(item_list[0], flags=flag)  # find index for data 
     else:
-        idx = cmb_box.findText(item_list[1], flags=flag) # find index for text
+        idx = cmb_box.findText(item_list[1], flags=flag)  # find index for text
 
     if idx == -1: # data  / text doesn't exist in combo box, add it.
         cmb_box.blockSignals(not fireSignals)
-        cmb_box.addItem(cmb_box.tr(item_list[1]), item_list[0]) # set index
+        cmb_box.addItem(cmb_box.tr(item_list[1]), item_list[0])  # set index
         idx = cmb_box.findData(item_list[0])
         cmb_box.setItemData(idx, cmb_box.tr(item_list[2]), Qt.ToolTipRole)
         cmb_box.blockSignals(False)
         
     return idx
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def qstyle_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
@@ -294,7 +300,7 @@ def qstyle_widget(widget, state):
     widget.update()
 
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def qget_selected(table, select_all=False, reverse=True):
     """
     Get selected cells in ``table`` and return a dictionary with the following keys:
@@ -322,8 +328,8 @@ def qget_selected(table, select_all=False, reverse=True):
         idx.append([_.column(), _.row(), ])
 
     sel = [[], []]
-    sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = reverse)
-    sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = reverse)
+    sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse=reverse)
+    sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse=reverse)
 
     if select_all:
         table.clearSelection()
@@ -333,9 +339,9 @@ def qget_selected(table, select_all=False, reverse=True):
     # rows = sorted(list({i[1] for i in idx}))
     cur = (table.currentColumn(), table.currentRow())
     # cur_idx_row = table.currentIndex().row()
-    return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
+    return {'idx': idx, 'sel': sel, 'cur': cur}  # 'rows':rows 'cols':cols, }
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def qfilter_warning(self, N, fil_class):
     """
     Pop-up a warning box for very large filter orders
@@ -351,7 +357,7 @@ def qfilter_warning(self, N, fil_class):
     else:
         return False
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class QHLine(QFrame):
     """
     Create a thin horizontal line utilizing the HLine property of QFrames
@@ -375,9 +381,9 @@ class QVLine(QFrame):
         #self.setFrameShadow(QFrame.Sunken)
         #self.setLineWidth(width)
         #self.setFrameShape(QFrame.StyledPanel);
-        self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ");
-        
-#==============================================================================
+        self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
 
-if __name__=='__main__':
+# ==============================================================================
+
+if __name__ == '__main__':
     pass
