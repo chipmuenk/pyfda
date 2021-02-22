@@ -20,6 +20,7 @@ from numpy import pi
 import scipy.signal as sig
 from scipy.special import sinc, diric
 import matplotlib.patches as mpl_patches
+import matplotlib.lines as lines
 from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
@@ -40,7 +41,7 @@ from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 # TODO: Single-sided and double-sided spectra of pulses are identical - ok?
 # TODO: Combobox for Mag / Mag+phi / Re + Im spectra
 
-classes = {'Plot_Impz':'y[n]'} #: Dict containing class name : display name
+classes = {'Plot_Impz':'y[n]'}  #: Dict containing class name : display name
 
 class Plot_Impz(QWidget):
     """
@@ -67,33 +68,32 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "y[n]"
-        self.active_tab = 0 # index for active tab
+        self.active_tab = 0  # index for active tab
 
-        self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}
-        self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_stim = {'color':'blue', 'alpha':0.5}
-        self.fmt_plot_stmq = {'color':'darkgreen', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_stmq = {'color':'darkgreen', 'alpha':0.5}
+        self.fmt_plot_resp = {'color': 'red', 'linewidth': 2, 'alpha': 0.5}
+        self.fmt_mkr_resp = {'color': 'red', 'alpha': 0.5}
+        self.fmt_plot_stim = {'color': 'blue', 'linewidth': 2, 'alpha': 0.5}
+        self.fmt_mkr_stim = {'color': 'blue', 'alpha': 0.5}
+        self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
+        self.fmt_mkr_stmq = {'color': 'darkgreen', 'alpha': 0.5}
 
         self.fmt_stem_stim = params['mpl_stimuli']
 
-
         self._construct_UI()
 
-        #--------------------------------------------
+        # --------------------------------------------
         # initialize routines and settings
         self.fx_select()    # initialize fixpoint or float simulation
-        self.impz() # initial calculation of stimulus and response and drawing
+        self.impz()  # initial calculation of stimulus and response and drawing
 
     def _construct_UI(self):
         """
         Create the top level UI of the widget, consisting of matplotlib widget
         and control frame.
         """
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Define MplWidget for TIME domain plots
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
@@ -101,9 +101,9 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Define MplWidget for FREQUENCY domain plots
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
@@ -111,14 +111,14 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.tabWidget = QTabWidget(self)
         self.tabWidget.addTab(self.mplwidget_t, "Time")
-        self.tabWidget.setTabToolTip(0,"Impulse and transient response of filter")
+        self.tabWidget.setTabToolTip(0, "Impulse and transient response of filter")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
-        self.tabWidget.setTabToolTip(1,"Spectral representation of impulse or transient response")
+        self.tabWidget.setTabToolTip(1, "Spectral representation of impulse or transient response")
         self.tabWidget.setTabPosition(QTabWidget.West)
 
         # list with tabWidgets
@@ -128,12 +128,12 @@ class Plot_Impz(QWidget):
         layVMain.addWidget(self.tabWidget)
         layVMain.addWidget(self.ui.wdg_ctrl_stim)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
-        layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+        layVMain.setContentsMargins(*params['wdg_margins'])  #(left, top, right, bottom)
 
         self.setLayout(layVMain)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.chk_norm_impz_f.clicked.connect(self.draw)
@@ -167,17 +167,17 @@ class Plot_Impz(QWidget):
         self.ui.chk_show_info_freq.clicked.connect(self.draw)
         #self.ui.chk_win_freq.clicked.connect(self.draw)
 
-        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
-        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)  # connect to toolbar
+        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)  # connect to toolbar
 
         # When user has selected a different tab, trigger a recalculation of current tab
-        self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
+        self.tabWidget.currentChanged.connect(self.draw)  # passes number of active tab
 
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -215,7 +215,7 @@ class Plot_Impz(QWidget):
                   and `'fx_stimulus':<quantized stimulus array>`. Stimuli are scaled with the input
                   fractional word length, i.e. with 2**WF (input) to obtain integer values
                   """
-                self.needs_calc = True # always require recalculation when triggered externally
+                self.needs_calc = True  # always require recalculation when triggered externally
                 self.needs_redraw = [True] * 2
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
@@ -243,7 +243,7 @@ class Plot_Impz(QWidget):
             else:
                 logger.error('Unknown value "{0}" for "fx_sim" key\n'\
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
-                                               dict_sig['sender']))
+                                                            dict_sig['sender']))
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible(): # all signals except 'fx_sim'
@@ -266,7 +266,7 @@ class Plot_Impz(QWidget):
                 # exclude those ui elements  / events that don't require a recalculation
                 if dict_sig['ui_changed'] in {'win'}:
                     self.draw()
-                elif dict_sig['ui_changed'] in {'resized','tab'}:
+                elif dict_sig['ui_changed'] in {'resized', 'tab'}:
                     pass
 
                 else: # all the other ui elements are treated here
@@ -280,7 +280,7 @@ class Plot_Impz(QWidget):
                 # redraw method of current mplwidget, always redraws tab 0
                 self.needs_redraw[self.tabWidget.currentIndex()] = False
 
-        else: # invisible
+        else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
 
@@ -328,16 +328,16 @@ class Plot_Impz(QWidget):
         self.ui.chk_norm_impz_f.setEnabled((self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')\
                                             and self.ui.DC == 0)
 
-        self.fx_select() # check for fixpoint setting and update if needed
-        if type(arg) == bool: # but_run has been pressed
-            self.needs_calc = True # force recalculation when but_run is pressed
+        self.fx_select()  # check for fixpoint setting and update if needed
+        if type(arg) == bool:  # but_run has been pressed
+            self.needs_calc = True  # force recalculation when but_run is pressed
         elif not self.ui.chk_auto_run.isChecked():
             return
 
         if self.needs_calc:
             logger.debug("Calc impz started!")
-            if self.fx_sim: # start a fixpoint simulation
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+            if self.fx_sim:  # start a fixpoint simulation
+                self.sig_tx.emit({'sender': __name__, 'fx_sim': 'init'})
                 return
 
             self.calc_stimulus()
@@ -379,7 +379,7 @@ class Plot_Impz(QWidget):
         """
         logger.debug("start fx_select")
 
-        if fx in {0, 1}: # connected to index change of combo box
+        if fx in {0, 1}:  # connected to index change of combo box
             pass
         elif fx in {"Float", "Fixpoint"}: # direct function call
             qset_cmb_box(self.ui.cmb_sim_select, fx)
@@ -410,7 +410,7 @@ class Plot_Impz(QWidget):
 
         self.fx_sim_old = self.fx_sim
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
         (Re-)calculate stimulus `self.x`
@@ -418,7 +418,7 @@ class Plot_Impz(QWidget):
         self.n = np.arange(self.ui.N_end)
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi
-        #T_S = fb.fil[0]['T_S']
+        # T_S = fb.fil[0]['T_S']
         # calculate index from T1 entry for creating stimulus vectors, shifted
         # by T1. Limit the value to N_end - 1.
         self.T1_int = min(int(np.round(self.ui.T1)), self.ui.N_end-1)
@@ -462,7 +462,7 @@ class Plot_Impz(QWidget):
             self.title_str += r'Rect Pulse '
             self.x = self.ui.A1 * np.where((self.n > n_min) & (self.n <= n_max), 1, 0)
 
-
+        # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.x[0:self.T1_int].fill(0)
@@ -473,7 +473,7 @@ class Plot_Impz(QWidget):
                 self.title_str = r'Step Response'
                 self.H_str = r'$h_{\epsilon}[n]$'
 
-
+        # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
             self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
                 self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
@@ -493,7 +493,7 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * diric((4 * pi * (self.n-self.ui.T1) * self.ui.f1 + phi1*2)/ self.ui.TW1, self.ui.TW1)
             self.title_str += r'Periodic Sinc Signal'
 
-
+        # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
             if True: # sig.chirp is buggy, T_sim cannot be larger than T_end
                 T_end = self.ui.N_end
@@ -503,6 +503,7 @@ class Plot_Impz(QWidget):
                                             method=self.ui.chirp_type, phi=phi1)
             self.title_str += self.ui.chirp_type + ' Chirp Signal'
 
+        # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
             if self.ui.chk_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
@@ -533,7 +534,7 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
             self.title_str += r'Bandlim. Comb Signal'
             
-
+        # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
                 * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
@@ -555,6 +556,7 @@ class Plot_Impz(QWidget):
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return
 
+        # ----------------------------------------------------------------------
         # Add noise to stimulus
         noi = 0
         if self.ui.noise == "none":
@@ -894,28 +896,32 @@ class Plot_Impz(QWidget):
 
         Returns
         -------
-        None
+        handle : Handle to plot
 
         """
 
         if plt_fmt is None:
             plt_fmt = {}
         if plt_style == "line":
-            ax.plot(x,y, label=label, **plt_fmt)
+            handle, = ax.plot(x,y, label=label, **plt_fmt)
         elif plt_style == "stem":
-            stems(x,y, ax=ax, bottom=bottom, label=label, **plt_fmt)
+            handle = stems(x,y, ax=ax, bottom=bottom, label=label, mkr_fmt=mkr_fmt, **plt_fmt)
         elif plt_style == "step":
-            ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
+            handle, = ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
         elif plt_style == "dots":
-            ax.scatter(x,y, label=label, **plt_fmt)
+            handle = ax.scatter(x,y, label=label, **plt_fmt)
         else:
-            pass
+            handle = []
 
-        if mkr:
+        if mkr and plt_style != "xxx":
             if 'marker' in args:
-                ax.scatter(x,y, **mkr_fmt, marker=args['marker'])
+                handle_mkr = ax.scatter(x,y, **mkr_fmt, marker=args['marker'])
             else:
-                ax.scatter(x, y, **mkr_fmt)
+                handle_mkr = ax.scatter(x, y, **mkr_fmt)
+            # join handles to plot them on top of each other in the legend
+            logger.warning(args)
+            handle = (handle, handle_mkr)
+        return handle
 
     #================ Plotting routine time domain =========================
     def _init_axes_time(self):
@@ -1280,7 +1286,7 @@ class Plot_Impz(QWidget):
             self.ax_f2.yaxis.set_minor_locator(AutoMinorLocator())
 
         self.calc_fft()
-
+    #------------------------------------------------------------------------------
     def draw_freq(self):
         """
         (Re-)draw the frequency domain mplwidget
@@ -1290,6 +1296,10 @@ class Plot_Impz(QWidget):
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
+        if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim):
+            fmt_mkr_stim = self.fmt_mkr_stim
+        else:
+            fmt_mkr_stim = {'marker':''}
         #en_re_im_f = qget_cmb_box(self.ui.cmb_freq_display) == "re_im"
 
         H_F_str = ""
@@ -1524,105 +1534,145 @@ class Plot_Impz(QWidget):
             H_Fr_str = H_F_pre + H_Fr_str + H_F_post + unit + r" $\rightarrow$"
 
             # -----------------------------------------------------------------
-            # --------------- Plot stimulus and response ----------------------
-            #------------------------------------------------------------------
+            # --------------- Plot stimuli and response -----------------------
+            # -----------------------------------------------------------------
             show_info = self.ui.chk_show_info_freq.isChecked()
-            if plt_stimulus:
-                label_re = "|$X$" + ejO_str + "|"
-                if self.en_re_im_f:
-                    label_re = "$X_r$" + ejO_str
-                    label_im = "$X_i$" + ejO_str
-                    self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
-                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
-                        mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
-                elif self.en_mag_phi_f:
-                    label_im = r"$\angle X$" + ejO_str
-                    self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
-                        label=label_im, plt_fmt=self.fmt_plot_stim,
-                        mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)                   
-                if show_info:
-                    label_re += ":\t$P$ = {0:.3g} {1}".format(Px, unit_P)
+            h_r = [] # plot handles (real / mag. part)
+            h_i = [] # plot handles (imag. / phase part)
+            l_r = [] # labels (real / mag. part)
+            l_i = [] # labels (imag. / phase part)
+            patch_trans = mpl_patches.Rectangle((0, 0), 1, 1, fc="w", fill=False, ec=None, lw=0) # ec = None, lw=0
+            #patch_trans = lines.Line2D([], [], linestyle='-')#markersize=15, label='Blue stars'
+            #patch_filled = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="blue", lw=0.5, alpha=0.5) # ec=white, lw=0,  alpha =0
+            lbl_empty = "        "
 
-                self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
-                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
-                    mkr=self.plt_freq_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
-
-            if plt_stimulus_q:
-                label_re = "$|X_Q$" + ejO_str + "|"
-                if self.en_re_im_f:
-                    label_re = "$X_{Q,r}$" + ejO_str
-                    label_im = "$X_{Q,i}$" + ejO_str
-                    self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
-                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
-                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
-                elif self.en_mag_phi_f:
-                    label_im = r"$\angle X_Q$" + ejO_str
-                    self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
-                        label=label_im, plt_fmt=self.fmt_plot_stmq,
-                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)                   
-
-                if show_info:
-                    label_re += ":\t$P$ = {0:.3g} {1}".format(Pxq, unit_P)
-
-                self.draw_data(self.plt_freq_stmq, self.ax_f1, F, X_q_r,
-                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
-                    mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
-
-            if plt_response:
-                label_re = "$|Y$" + ejO_str + "|"
-                if self.en_re_im_f:
-                    label_re = "$Y_r$" + ejO_str
-                    label_im = "$Y_i$" + ejO_str
-                    self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
-                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
-                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
-                elif self.en_mag_phi_f:
-                    label_im = r"$\angle Y$" + ejO_str
-                    self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
-                        label=label_im, plt_fmt=self.fmt_plot_resp,
-                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)                   
-                if show_info:
-                    label_re += ":\t$P$ = {0:.3g} {1}".format(Py, unit_P)
-
-                self.draw_data(self.plt_freq_resp, self.ax_f1, F, Y_r,
-                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
-                    mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
-
+            # -------------------- Plot H_id ----------------------------------
             if self.ui.chk_Hf.isChecked():
                 label_re = "$|H_{id}$" + ejO_str + "|"
                 if self.en_re_im_f:
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
-                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
+                    h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
+                    l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle H_{id}$" + ejO_str
-                    self.ax_f2.plot(F_id, H_id_i, c="gray",label=label_im)
-                self.ax_f1.plot(F_id, H_id_r, c="gray",label=label_re)
+                    h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
+                h_r.append(self.ax_f1.plot(F_id, H_id_r, c="gray", label=label_re)[0])
+                if show_info:
+                    l_r.extend([lbl_empty, label_re, lbl_empty]) 
+                    h_r.extend([patch_trans, patch_trans])
+                else:
+                    l_r.append(label_re)
+
+            # -------------------- Plot X -------------------------------------
+            if plt_stimulus:
+                label_re = "|$X$" + ejO_str + "|"
+                if self.en_re_im_f:
+                    label_re = "$X_r$" + ejO_str
+                    label_im = "$X_i$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                        mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                    l_i.append(label_im)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle X$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
+                        label=label_im, plt_fmt=self.fmt_plot_stim,
+                        mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                    l_i.append(label_im)
+
+                h_r.append(self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                    mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                if show_info:
+                    l_r.extend([lbl_empty, label_re, "$P_X$ = {0:.3g} {1}".format(Px, unit_P)])
+                    h_r.extend([patch_trans, patch_trans])
+                else:
+                    l_r.append(label_re)
+
+            # -------------------- Plot X_q -----------------------------------
+            if plt_stimulus_q:
+                label_re = "$|X_Q$" + ejO_str + "|"
+                if self.en_re_im_f:
+                    label_re = "$X_{Q,r}$" + ejO_str
+                    label_im = "$X_{Q,i}$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
+                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                    l_i.append(label_im)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle X_Q$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
+                        label=label_im, plt_fmt=self.fmt_plot_stmq,
+                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                    l_i.append(label_im)
+
+                h_r.append(self.draw_data(self.plt_freq_stmq, self.ax_f1, F, X_q_r,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
+                    mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                if show_info:
+                    l_r.extend([lbl_empty, label_re, "$P_{{X,Q}}$ = {0:.3g} {1}".format(Pxq, unit_P)])
+                    h_r.extend([patch_trans, patch_trans])
+                else:
+                    l_r.append(label_re)
+
+            # -------------------- Plot Y -------------------------------------
+            if plt_response:
+                label_re = "$|Y$" + ejO_str + "|"
+                if self.en_re_im_f:
+                    label_re = "$Y_r$" + ejO_str
+                    label_im = "$Y_i$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
+                        label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
+                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                    l_i.append(label_im)
+                elif self.en_mag_phi_f:
+                    label_im = r"$\angle Y$" + ejO_str
+                    h_i.append(self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
+                        label=label_im, plt_fmt=self.fmt_plot_resp,
+                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                    l_i.append(label_im)
+
+                h_r.append(self.draw_data(self.plt_freq_resp, self.ax_f1, F, Y_r,
+                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
+                    mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                if show_info:
+                    l_r.extend([lbl_empty, label_re, "$P_Y$ = {0:.3g} {1}".format(Py, unit_P)])
+                    h_r.extend([patch_trans, patch_trans])
+                else:
+                    l_r.append(label_re)
+            
+            logger.warning(l_r)
+            logger.warning(h_r)
 
             # --------------- LEGEND (real part) ----------------------------------
+            # The legend will fill the first column, then the next from top to bottom etc.
             if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
-                self.ax_f1.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
-                # get handles and labels for all plots so far
-                handles, labels = self.ax_f1.get_legend_handles_labels()
-                # get a tuple with pairs of (label, handle), sorted for the label
-                sorted_pairs = sorted(zip(labels, handles))
-                # convert back to two lists
-                labels, handles = [ list(tuple) for tuple in  zip(*sorted_pairs)]
+                     
+                    #labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}".format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw, unit_nenbw)]])
+                    # see https://stackoverflow.com/questions/25830780/tabular-legend-layout-for-matplotlib
 
                 if show_info:
-                    # Create two empty patches for NENBW and CGAIN and extend handles list with them
-                    handles.extend([mpl_patches.Rectangle((0, 0), 1, 1, fc="white",
-                                                         ec="white", lw=0, alpha=0)] * 2)
-                    labels.append("$NENBW$:\t{0:.4g} {1}".format(nenbw, unit_nenbw))
-                    labels.append("$CGAIN$:\t{0:.4g} {1}".format(cgain, unit_cgain))
+                    # Reorder columns / rows to f
+                    def flip_rc(m, cols):
+                        mf = []
+                        rows = len(m)//cols
+                        for j in range(cols):
+                            for i in range(rows):
+                                mf.append(m[cols*i+j])
+                        return mf
 
-                    self.ax_f1.legend(handles, labels, loc='best', fontsize='small',
-                               fancybox=True, framealpha=0.7)
+                    self.ax_f1.legend(flip_rc(h_r, 3), flip_rc(l_r, 3), loc='best', fontsize='small',
+                            fancybox=True, framealpha=0.7, ncol=3, handletextpad=-2, columnspacing=1, 
+                            labelspacing=1, handleheight=2, handlelength=1.5)
+
+                else:
+                    self.ax_f1.legend(h_r, l_r, loc='best', fontsize='small',
+                            fancybox=True, framealpha=0.7)
 
             # --------------- LEGEND and YLABEL (2nd plot) -------------------
             if (self.en_re_im_f or self.en_mag_phi_f) and self.plt_freq_enabled:
-                self.ax_f2.legend(loc='best', fontsize='small',
-                               fancybox=True, framealpha=0.7)
+                self.ax_f2.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
 
             self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
