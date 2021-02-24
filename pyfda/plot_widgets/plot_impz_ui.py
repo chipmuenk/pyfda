@@ -67,8 +67,8 @@ class PlotImpz_UI(QWidget):
         self.plt_time_spgr = "none"
 
         self.bottom_t = -80 # initial value for log. scale (time)
-        self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
-        self.ovlp_spgr_time = 128 # number of overlap points between spectrogram segments
+        self.time_nfft_spgr = 256 # number of fft points per spectrogram segment
+        self.time_ovlp_spgr = 128 # number of overlap points between spectrogram segments
         self.mode_spgr_time = "magnitude"
 
         # stimuli
@@ -141,7 +141,7 @@ class PlotImpz_UI(QWidget):
         self.plot_styles_list =\
                 [("Plot style"),
                  ("none","None",""),
-                 ("dots","Dots",""),
+                 ("dots*","Dots",""),
                  ("line","Line",""),
                  ("line*","Line*",""),
                  ("stem","Stem",""),
@@ -382,21 +382,21 @@ class PlotImpz_UI(QWidget):
         self.chk_log_spgr_time.setChecked(True)
         self.chk_log_spgr_time.setVisible(spgr_en)
 
-        self.lbl_nfft_spgr_time = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
-        self.lbl_nfft_spgr_time.setVisible(spgr_en)
-        self.led_nfft_spgr_time = QLineEdit(self)
-        self.led_nfft_spgr_time.setText(str(self.nfft_spgr_time))
-        self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per "
+        self.lbl_time_nfft_spgr = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
+        self.lbl_time_nfft_spgr.setVisible(spgr_en)
+        self.led_time_nfft_spgr = QLineEdit(self)
+        self.led_time_nfft_spgr.setText(str(self.time_nfft_spgr))
+        self.led_time_nfft_spgr.setToolTip("<span>Number of FFT points per "
                                            "spectrogram segment.</span>")
-        self.led_nfft_spgr_time.setVisible(spgr_en)
+        self.led_time_nfft_spgr.setVisible(spgr_en)
 
-        self.lbl_ovlp_spgr_time = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
-        self.lbl_ovlp_spgr_time.setVisible(spgr_en)
-        self.led_ovlp_spgr_time = QLineEdit(self)
-        self.led_ovlp_spgr_time.setText(str(self.ovlp_spgr_time))
-        self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points "
+        self.lbl_time_ovlp_spgr = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
+        self.lbl_time_ovlp_spgr.setVisible(spgr_en)
+        self.led_time_ovlp_spgr = QLineEdit(self)
+        self.led_time_ovlp_spgr.setText(str(self.time_ovlp_spgr))
+        self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
                                            "between spectrogram segments.</span>")
-        self.led_ovlp_spgr_time.setVisible(spgr_en)
+        self.led_time_ovlp_spgr.setVisible(spgr_en)
 
         self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
         self.lbl_mode_spgr_time.setVisible(spgr_en)
@@ -457,10 +457,10 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(lbl_plt_time_spgr)
         layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
         layH_ctrl_time.addWidget(self.chk_log_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_nfft_spgr_time)
-        layH_ctrl_time.addWidget(self.led_nfft_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_ovlp_spgr_time)
-        layH_ctrl_time.addWidget(self.led_ovlp_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_time_nfft_spgr)
+        layH_ctrl_time.addWidget(self.led_time_nfft_spgr)
+        layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
+        layH_ctrl_time.addWidget(self.led_time_ovlp_spgr)
         layH_ctrl_time.addWidget(self.lbl_mode_spgr_time)
         layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
@@ -546,8 +546,7 @@ class PlotImpz_UI(QWidget):
 
         self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=20)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
-        self.chk_show_info_freq.setToolTip("<span>Show infos about signal power "
-                                           "and window properties.</span>")
+        self.chk_show_info_freq.setToolTip("<span>Show signal power in legend.</span>")
         self.chk_show_info_freq.setCheckable(True)
         self.chk_show_info_freq.setChecked(False)
 

@@ -31,17 +31,15 @@ from pyfda.libs.pyfda_lib import (to_html, safe_eval, pprint_log, np_type, calc_
 from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
                                      qcmb_box_add_item, qcmb_box_del_item)
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
+from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter, no_plot
 
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
-# TODO: Spectra of complex stimuli are wrong (im and re swapped?)
 # TODO: Single-sided and double-sided spectra of pulses are identical - ok?
-# TODO: Combobox for Mag / Mag+phi / Re + Im spectra
 
-classes = {'Plot_Impz':'y[n]'}  #: Dict containing class name : display name
+classes = {'Plot_Impz':'y[n] / Y(f)'}  #: Dict containing class name : display name
 
 class Plot_Impz(QWidget):
     """
@@ -66,18 +64,23 @@ class Plot_Impz(QWidget):
         # initial setting for fixpoint simulation:
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
         self.fx_sim_old = self.fx_sim
-        self.tool_tip = "Impulse and transient response"
+        self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
         self.active_tab = 0  # index for active tab
-
+        # markersize=None, markeredgewidth=None, markeredgecolor=None,
+        # markerfacecolor=None, markerfacecoloralt='none', fillstyle=None, 
+        self.fmt_mkr_size = 8
         self.fmt_plot_resp = {'color': 'red', 'linewidth': 2, 'alpha': 0.5}
-        self.fmt_mkr_resp = {'color': 'red', 'alpha': 0.5}
+        self.fmt_mkr_resp = {'marker': 'o', 'color': 'red', 'alpha': 0.5,
+                             'ms':self.fmt_mkr_size}
         self.fmt_plot_stim = {'color': 'blue', 'linewidth': 2, 'alpha': 0.5}
-        self.fmt_mkr_stim = {'color': 'blue', 'alpha': 0.5}
+        self.fmt_mkr_stim = {'marker': 's', 'color': 'blue', 'alpha': 0.5,
+                             'ms':self.fmt_mkr_size}
         self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
-        self.fmt_mkr_stmq = {'color': 'darkgreen', 'alpha': 0.5}
+        self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
+                             'ms':self.fmt_mkr_size}
 
-        self.fmt_stem_stim = params['mpl_stimuli']
+        # self.fmt_stem_stim = params['mpl_stimuli']
 
         self._construct_UI()
 
@@ -147,11 +150,11 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
-        self.ui.chk_log_time.clicked.connect(self.draw)
-        self.ui.led_log_bottom_time.editingFinished.connect(self._log_bottom)
-        self.ui.chk_log_spgr_time.clicked.connect(self.draw)
-        self.ui.led_nfft_spgr_time.editingFinished.connect(self._spgr_params)
-        self.ui.led_ovlp_spgr_time.editingFinished.connect(self._spgr_params)
+        self.ui.chk_log_time.clicked.connect(self._log_mode_time)
+        self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
+        self.ui.chk_log_spgr_time.clicked.connect(self._log_mode_time)
+        self.ui.led_time_nfft_spgr.editingFinished.connect(self._spgr_params)
+        self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
@@ -797,16 +800,22 @@ class Plot_Impz(QWidget):
         """
         Update parameters for spectrogram
         """
-        self.ui.nfft_spgr_time = safe_eval(self.ui.led_nfft_spgr_time.text(),
-                                         self.ui.nfft_spgr_time, return_type='int', sign='pos')
-        self.ui.led_nfft_spgr_time.setText(str(self.ui.nfft_spgr_time))
+        time_nfft_spgr = safe_eval(self.ui.led_time_nfft_spgr.text(),
+                                         self.ui.time_nfft_spgr, return_type='int', sign='pos')
+        if time_nfft_spgr <= self.ui.time_ovlp_spgr:
+            logger.warning("N_FFT must be larger than N_OVLP!")
+        else:
+            self.ui.time_nfft_spgr = time_nfft_spgr
+        self.ui.led_time_nfft_spgr.setText(str(self.ui.time_nfft_spgr))
 
-        self.ui.ovlp_spgr_time = safe_eval(self.ui.led_ovlp_spgr_time.text(),
-                                         self.ui.ovlp_spgr_time, return_type='int', sign='poszero')
-        self.ui.led_ovlp_spgr_time.setText(str(self.ui.ovlp_spgr_time))
 
-        if self.ui.nfft_spgr_time <= self.ui.ovlp_spgr_time:
+        time_ovlp_spgr = safe_eval(self.ui.led_time_ovlp_spgr.text(),
+                                         self.ui.time_ovlp_spgr, return_type='int', sign='poszero')
+        if time_ovlp_spgr >= self.ui.time_nfft_spgr:
             logger.warning("N_OVLP must be less than N_FFT!")
+        else:
+            self.ui.time_ovlp_spgr = time_ovlp_spgr        
+        self.ui.led_time_ovlp_spgr.setText(str(self.ui.time_ovlp_spgr))
 
         self.draw()
 
@@ -818,10 +827,10 @@ class Plot_Impz(QWidget):
         spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != "none"
 
         self.ui.chk_log_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_nfft_spgr_time.setVisible(spgr_en)
-        self.ui.led_nfft_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_ovlp_spgr_time.setVisible(spgr_en)
-        self.ui.led_ovlp_spgr_time.setVisible(spgr_en)
+        self.ui.lbl_time_nfft_spgr.setVisible(spgr_en)
+        self.ui.led_time_nfft_spgr.setVisible(spgr_en)
+        self.ui.lbl_time_ovlp_spgr.setVisible(spgr_en)
+        self.ui.led_time_ovlp_spgr.setVisible(spgr_en)
         self.ui.lbl_mode_spgr_time.setVisible(spgr_en)
         self.ui.cmb_mode_spgr_time.setVisible(spgr_en)
         self.ui.lbl_byfs_spgr_time.setVisible(spgr_en)
@@ -846,6 +855,26 @@ class Plot_Impz(QWidget):
         self.draw()
 
 #------------------------------------------------------------------------------
+    def _log_mode_time(self):
+        """
+        Select / deselect log. mode for time domain and update self.ui.bottom_t
+        """
+
+        log = self.ui.chk_log_time.isChecked() or\
+                (self.ui.chk_log_spgr_time.isChecked() and self.spgr)
+        self.ui.lbl_log_bottom_time.setVisible(log)
+        self.ui.led_log_bottom_time.setVisible(log)
+        if log:
+            self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
+                                         self.ui.bottom_t, return_type='float',
+                                         sign='neg')
+            self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
+        else:
+            self.ui.bottom_t = 0
+
+        self.draw()
+
+#------------------------------------------------------------------------------
     def _log_mode_freq(self):
         """
         Select / deselect log. mode for frequency domain and update self.ui.bottom_f
@@ -866,7 +895,7 @@ class Plot_Impz(QWidget):
 
 #------------------------------------------------------------------------------
     def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
-                  plt_fmt=None, mkr=False, mkr_fmt=None, **args):
+                  plt_fmt={}, mkr_fmt={}, **args):
         """
         Plot x, y data (numpy arrays with equal length) in a plot style defined
         by `plt_style`.
@@ -876,7 +905,7 @@ class Plot_Impz(QWidget):
         plt_style : str
             one of "line", "stem", "step", "dots"
         ax : matplotlib axis
-            Handle to the axis where signal is
+            Handle to the axis where signal is to be plotted
         x : array-like
             x-axis: time or frequency data
         y : array-like
@@ -886,9 +915,7 @@ class Plot_Impz(QWidget):
         label : str
             Plot label
         plt_fmt : dict
-            General styles (color, linewidth etc.) for plotting. The default is None.
-        mkr : bool
-            Plot a marker for every data point if enabled
+            Line styles (color, linewidth etc.) for plotting. The default is None.
         mkr_fmt : dict
             Marker styles
         args : dictionary with additional keys and values. As they might not be
@@ -899,7 +926,7 @@ class Plot_Impz(QWidget):
         handle : Handle to plot
 
         """
-
+        # plot lines
         if plt_fmt is None:
             plt_fmt = {}
         if plt_style == "line":
@@ -908,18 +935,15 @@ class Plot_Impz(QWidget):
             handle = stems(x,y, ax=ax, bottom=bottom, label=label, mkr_fmt=mkr_fmt, **plt_fmt)
         elif plt_style == "step":
             handle, = ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
-        elif plt_style == "dots":
-            handle = ax.scatter(x,y, label=label, **plt_fmt)
+        #elif plt_style == "dots":
+        #    handle = scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt)
         else:
             handle = []
 
-        if mkr and plt_style != "xxx":
-            if 'marker' in args:
-                handle_mkr = ax.scatter(x,y, **mkr_fmt, marker=args['marker'])
-            else:
-                handle_mkr = ax.scatter(x, y, **mkr_fmt)
+        # plot markers (and "dots" as well)
+        if mkr_fmt and plt_style not in {'stem'}:
+            handle_mkr = scatter(x, y, ax=ax, mkr_fmt=mkr_fmt)
             # join handles to plot them on top of each other in the legend
-            logger.warning(args)
             handle = (handle, handle_mkr)
         return handle
 
@@ -929,49 +953,41 @@ class Plot_Impz(QWidget):
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
-        self.plt_time_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_resp)
-
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
-        self.plt_time_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stim)
-
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
-        self.plt_time_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq)
-
         self.plt_time_spgr = qget_cmb_box(self.ui.cmb_plt_time_spgr)
         self.spgr = self.plt_time_spgr != "none"
 
-        self.plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
-            or (self.plt_time_stmq != "none" and self.fx_sim)\
-            or self.spgr or self.ui.chk_win_time.isChecked()
+        self.plt_time_enabled = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
+            or (self.plt_time_stmq != "none" and self.fx_sim)
 
         self.mplwidget_t.fig.clf() # clear figure with axes
 
-        if self.plt_time:
-            num_subplots = 1 + self.cmplx + self.spgr
+        num_subplots = max(int(self.plt_time_enabled) + self.cmplx + self.spgr, 1)
 
-            # return a one-dimensional list with num_subplots axes
-            self.axes_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
-                                               sharex=True, squeeze = False)[:,0]
+        # return a one-dimensional list with num_subplots axes
+        self.axes_time = self.mplwidget_t.fig.subplots(nrows=num_subplots, ncols=1,
+                                            sharex=True, squeeze = False)[:,0]
 
-            self.ax_r = self.axes_time[0]
-            self.ax_r.cla()
+        self.ax_r = self.axes_time[0]
+        self.ax_r.cla()
 
-            if self.cmplx:
-                self.ax_i = self.axes_time[1]
-                self.ax_i.cla()
-                self.mplwidget_t.fig.align_ylabels()
+        if self.cmplx:
+            self.ax_i = self.axes_time[1]
+            self.ax_i.cla()
+            self.mplwidget_t.fig.align_ylabels()
 
-            if self.spgr:
-                self.ax_s = self.axes_time[-1] # assign last axis
+        if self.spgr:
+            self.ax_s = self.axes_time[-1] # assign last axis
 
-            if self.ACTIVE_3D: # not implemented / tested yet
-                self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
+        if self.ACTIVE_3D: # not implemented / tested yet
+            self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
-            for ax in self.axes_time:
-                ax.xaxis.tick_bottom() # remove axis ticks on top
-                ax.yaxis.tick_left() # remove axis ticks right
-                ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
-                ax.yaxis.set_minor_locator(AutoMinorLocator())
+        for ax in self.axes_time:
+            ax.xaxis.tick_bottom() # remove axis ticks on top
+            ax.yaxis.tick_left() # remove axis ticks right
+            ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+            ax.yaxis.set_minor_locator(AutoMinorLocator())
 
 #------------------------------------------------------------------------------
     def draw_time(self):
@@ -993,7 +1009,20 @@ class Plot_Impz(QWidget):
                 self.H_str += r'$y$'
             self.H_str = self.H_str.rstrip(', ')
 
-        mkfmt_i = 'd'
+        if "*" in qget_cmb_box(self.ui.cmb_plt_time_stim):
+            fmt_mkr_stim = self.fmt_mkr_stim
+        else:
+            fmt_mkr_stim = {'marker':''}
+
+        if "*" in qget_cmb_box(self.ui.cmb_plt_time_stmq):
+            fmt_mkr_stmq = self.fmt_mkr_stmq
+        else:
+            fmt_mkr_stmq = {'marker':''}
+
+        if "*" in qget_cmb_box(self.ui.cmb_plt_time_resp):
+            fmt_mkr_resp = self.fmt_mkr_resp
+        else:
+            fmt_mkr_resp = {'marker':''}
 
         self._init_axes_time()
 
@@ -1057,44 +1086,56 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_max, 0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min, 0, 1, color='k', linestyle='--')
 
-        # --------------- Stimulus plot ----------------------------------
-        self.draw_data(self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
-              x_r[self.ui.N_start:], label=lbl_x_r, bottom=bottom_t,
-              plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim)
+        h_r = [] # plot handles (real part)
+        h_i = [] # plot handles (imag. part)
+        l_r = [] # labels (real part)
+        l_i = [] # labels (imag. part)
 
-        #-------------- Stimulus <q> plot --------------------------------
+        # --------------- Stimulus plot --------------------------------------
+        if self.plt_time_stim != "none":
+            h_r.append(self.draw_data(self.plt_time_stim, self.ax_r,
+                self.t[self.ui.N_start:], x_r[self.ui.N_start:], label=lbl_x_r,
+                bottom=bottom_t, plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
+            l_r += [lbl_x_r]
+
+        #-------------- Stimulus <q> plot ------------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
-            self.draw_data(self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:],
-                  x_q[self.ui.N_start:], label='$x_q[n]$', bottom=bottom_t,
-                  plt_fmt=self.fmt_plot_stmq, mkr=self.plt_time_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq)
-
+            h_r.append(self.draw_data(self.plt_time_stmq, self.ax_r,
+                    self.t[self.ui.N_start:], x_q[self.ui.N_start:], label='$x_q[n]$',
+                    bottom=bottom_t,plt_fmt=self.fmt_plot_stmq, mkr_fmt=fmt_mkr_stmq))
+            l_r += ['$x_q[n]$']
         # --------------- Response plot ----------------------------------
-        self.draw_data(self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
-              y_r[self.ui.N_start:], label=lbl_y_r, bottom=bottom_t,
-              plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp)
-
+        if self.plt_time_resp != "none":
+            h_r.append(self.draw_data(self.plt_time_resp, self.ax_r,
+                self.t[self.ui.N_start:], y_r[self.ui.N_start:], label=lbl_y_r,
+                bottom=bottom_t, plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
+            l_r += [lbl_y_r]
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
-            self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)
-
+            h_r.append(self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", 
+                        label=self.ui.window_name)[0])
+            l_r += [self.ui.window_name]
         # --------------- LEGEND (real part) ----------------------------------
-        if self.plt_time:
-            self.ax_r.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
+        if self.plt_time_enabled:
+            self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True, 
+                             framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
-        if self.cmplx and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
+        if self.cmplx:# and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
 
-            # --- imag. part of response -----
-            self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
-                  y_i[self.ui.N_start:], label=lbl_y_i, bottom=bottom_t,
-                  plt_fmt=self.fmt_plot_resp, mkr=self.plt_time_resp_mkr, mkr_fmt=self.fmt_mkr_resp,
-                  marker=mkfmt_i)
+            if self.plt_time_stim != "none":         
+                # --- imag. part of stimulus -----
+                h_i.append(self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
+                    x_i[self.ui.N_start:], label=lbl_x_i, bottom=bottom_t,
+                    plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
+                l_i += [lbl_x_i]
 
-            # --- imag. part of stimulus -----
-            self.draw_data(self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
-                  x_i[self.ui.N_start:], label=lbl_x_i, bottom=bottom_t,
-                  plt_fmt=self.fmt_plot_stim, mkr=self.plt_time_stim_mkr, mkr_fmt=self.fmt_mkr_stim,
-                  marker=mkfmt_i)
+            if self.plt_time_resp != "none":            
+                # --- imag. part of response -----
+                h_i.append(self.draw_data(self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
+                    y_i[self.ui.N_start:], label=lbl_y_i, bottom=bottom_t,
+                    plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
+                l_i += [lbl_y_i]
 
             # --- labels and markers -----
             # plt.setp(ax_r.get_xticklabels(), visible=False)
@@ -1103,13 +1144,17 @@ class Plot_Impz(QWidget):
             #self.ax_r.set_ylabel(H_str + r'$\rightarrow $') # common x-axis
 
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
-            self.ax_i.legend(loc='best', fontsize='small', fancybox=True, framealpha=0.7)
+            self.ax_i.legend(h_i, l_i, loc='best', fontsize='small', fancybox=True, 
+                             framealpha=0.7)
         #else:
 #            self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
         self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
         # --------------- Spectrogram -----------------------------------------
         if self.spgr:
+            if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.N:
+                logger.warning("Only one segment is calculated since 2 NFFT - N_OVLP = {0} > N = {1}"
+                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N))     
             if self.plt_time_spgr == "xn":
                 s = x[self.ui.N_start:]
                 sig_lbl = 'X'
@@ -1185,8 +1230,8 @@ class Plot_Impz(QWidget):
 #                                         scaling='density',mode='psd')
 #             # mode: 'psd', 'complex','magnitude','angle', 'phase'
 # =============================================================================
-            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.nfft_spgr_time,
-                                        noverlap=self.ui.ovlp_spgr_time, pad_to=None, xextent=t_range,
+            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
+                                        noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
                                         sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
                                         mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
             # Fs : sampling frequency for scaling
@@ -1239,14 +1284,8 @@ class Plot_Impz(QWidget):
         calculate the fft
         """
         self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp).replace("*", "")
-        self.plt_freq_resp_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_resp)
-
         self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim).replace("*", "")
-        self.plt_freq_stim_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim)
-
         self.plt_freq_stmq = qget_cmb_box(self.ui.cmb_plt_freq_stmq).replace("*", "")
-        self.plt_freq_stmq_mkr = "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq)
-
 
         self.plt_freq_enabled = self.plt_freq_stim != "none" or self.plt_freq_stmq != "none"\
                                     or self.plt_freq_resp != "none"
@@ -1296,10 +1335,22 @@ class Plot_Impz(QWidget):
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
+
         if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim):
             fmt_mkr_stim = self.fmt_mkr_stim
         else:
             fmt_mkr_stim = {'marker':''}
+
+        if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stmq):
+            fmt_mkr_stmq = self.fmt_mkr_stmq
+        else:
+            fmt_mkr_stmq = {'marker':''}
+
+        if "*" in qget_cmb_box(self.ui.cmb_plt_freq_resp):
+            fmt_mkr_resp = self.fmt_mkr_resp
+        else:
+            fmt_mkr_resp = {'marker':''}
+
         #en_re_im_f = qget_cmb_box(self.ui.cmb_freq_display) == "re_im"
 
         H_F_str = ""
@@ -1553,16 +1604,16 @@ class Plot_Impz(QWidget):
                     label_re = "$H_{id,r}$" + ejO_str
                     label_im = "$H_{id,i}$" + ejO_str
                     h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
-                    l_i.append(label_im)
+                    l_i += [label_im]
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle H_{id}$" + ejO_str
                     h_i.append(self.ax_f2.plot(F_id, H_id_i, c="gray", label=label_im)[0])
                 h_r.append(self.ax_f1.plot(F_id, H_id_r, c="gray", label=label_re)[0])
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, lbl_empty]) 
-                    h_r.extend([patch_trans, patch_trans])
+                    l_r += [lbl_empty, label_re, lbl_empty]
+                    h_r += [patch_trans, patch_trans]
                 else:
-                    l_r.append(label_re)
+                    l_r += [label_re]
 
             # -------------------- Plot X -------------------------------------
             if plt_stimulus:
@@ -1572,18 +1623,17 @@ class Plot_Impz(QWidget):
                     label_im = "$X_i$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
-                        mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                        mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_stim, self.ax_f2, F, X_i,
-                        label=label_im, plt_fmt=self.fmt_plot_stim,
-                        mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                        label=label_im, plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
                     label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
-                    mkr=self.plt_freq_stim_mkr, mkr_fmt=fmt_mkr_stim))
+                    mkr_fmt=fmt_mkr_stim))
                 if show_info:
                     l_r.extend([lbl_empty, label_re, "$P_X$ = {0:.3g} {1}".format(Px, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
@@ -1598,20 +1648,20 @@ class Plot_Impz(QWidget):
                     label_im = "$X_{Q,i}$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
-                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                        mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle X_Q$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_stmq, self.ax_f2, F, X_q_i,
                         label=label_im, plt_fmt=self.fmt_plot_stmq,
-                        mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                        mkr_fmt=fmt_mkr_stmq))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(self.plt_freq_stmq, self.ax_f1, F, X_q_r,
                     label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
-                    mkr=self.plt_freq_stmq_mkr, mkr_fmt=self.fmt_mkr_stmq))
+                    mkr_fmt=fmt_mkr_stmq))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_{{X,Q}}$ = {0:.3g} {1}".format(Pxq, unit_P)])
+                    l_r.extend([lbl_empty, label_re, "$P_{{Q}}$ = {0:.3g} {1}".format(Pxq, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1624,26 +1674,22 @@ class Plot_Impz(QWidget):
                     label_im = "$Y_i$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
                         label=label_im, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
-                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                        mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
                 elif self.en_mag_phi_f:
                     label_im = r"$\angle Y$" + ejO_str
                     h_i.append(self.draw_data(self.plt_freq_resp, self.ax_f2, F, Y_i,
-                        label=label_im, plt_fmt=self.fmt_plot_resp,
-                        mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                        label=label_im, plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
                     l_i.append(label_im)
 
                 h_r.append(self.draw_data(self.plt_freq_resp, self.ax_f1, F, Y_r,
                     label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
-                    mkr=self.plt_freq_resp_mkr, mkr_fmt=self.fmt_mkr_resp))
+                    mkr_fmt=fmt_mkr_resp))
                 if show_info:
                     l_r.extend([lbl_empty, label_re, "$P_Y$ = {0:.3g} {1}".format(Py, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
-            
-            logger.warning(l_r)
-            logger.warning(h_r)
 
             # --------------- LEGEND (real part) ----------------------------------
             # The legend will fill the first column, then the next from top to bottom etc.
