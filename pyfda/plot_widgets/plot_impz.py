@@ -931,13 +931,13 @@ class Plot_Impz(QWidget):
             handle = stems(x,y, ax=ax, bottom=bottom, label=label, mkr_fmt=mkr_fmt, **plt_fmt)
         elif plt_style == "step":
             handle, = ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
-        #elif plt_style == "dots":
-        #    handle = scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt)
+        elif plt_style == "dots":
+            handle = scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt)
         else:
             handle = []
 
         # plot markers (and "dots" as well)
-        if mkr_fmt and plt_style not in {'stem'}:
+        if mkr_fmt and plt_style not in {'stem', 'dots'}:
             handle_mkr = scatter(x, y, ax=ax, mkr_fmt=mkr_fmt)
             # join handles to plot them on top of each other in the legend
             handle = (handle, handle_mkr)
