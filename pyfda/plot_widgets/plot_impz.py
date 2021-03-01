@@ -140,7 +140,7 @@ class Plot_Impz(QWidget):
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
-        self.ui.chk_auto_run.clicked.connect(self.calc_auto)
+        self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.chk_fx_scale.clicked.connect(self.draw)
         self.ui.but_fft_win.clicked.connect(self.ui.show_fft_win)
 
@@ -336,7 +336,7 @@ class Plot_Impz(QWidget):
         self.fx_select()  # check for fixpoint setting and update if needed
         if type(arg) == bool:  # but_run has been pressed
             self.needs_calc = True  # force recalculation when but_run is pressed
-        elif not self.ui.chk_auto_run.isChecked():
+        elif not self.ui.but_auto_run.isChecked():
             return
 
         if self.needs_calc:

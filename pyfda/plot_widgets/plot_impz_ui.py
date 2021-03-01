@@ -242,16 +242,18 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.chk_auto_run = QCheckBox("Auto", self)
-        self.chk_auto_run.setObjectName("chk_auto_run")
-        self.chk_auto_run.setToolTip("<span>Update response automatically when "
+        self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=10)
+        #self.but_auto_run.setText("Auto")
+        self.but_auto_run.setObjectName("but_auto_run")
+        self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        self.chk_auto_run.setChecked(True)
+        self.but_auto_run.setCheckable(True)
+        self.but_auto_run.setChecked(True)
 
         self.but_run = QPushButton(self)
         self.but_run.setText("RUN")
         self.but_run.setToolTip("Run simulation")
-        self.but_run.setEnabled(not self.chk_auto_run.isChecked())
+        self.but_run.setEnabled(not self.but_auto_run.isChecked())
 
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
@@ -264,6 +266,16 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.setText(str(self.N))
         self.led_N_points.setToolTip("<span>Number of displayed data points. "
                                    "<i>N</i> = 0 tries to choose for you.</span>")
+        
+        # ----- define measures to define size of LineEditFields
+        self.led_frm =  self.led_N_points.textMargins().left() +\
+                        self.led_N_points.textMargins().right() +\
+                        self.led_N_points.contentsMargins().left() +\
+                        self.led_N_points.contentsMargins().left() +\
+                        8 # 2 * horizontalMargin() + 2 * frame margin.
+        self.led_fm = self.led_N_points.fontMetrics().width('x')
+        #self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
+        # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
 
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
@@ -301,7 +313,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_run)
         #layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
-        layH_ctrl_run.addWidget(self.chk_auto_run)
+        layH_ctrl_run.addWidget(self.but_auto_run)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addWidget(self.lbl_N_points)
@@ -413,6 +425,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
+        self.led_log_bottom_time.setMaximumWidth(self.led_frm + 8 * self.led_fm)
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
                                             "and spectrogram plots with log. scale.</span>")
         self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked() or\
@@ -510,6 +523,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
+        self.led_log_bottom_freq.setMaximumWidth(self.led_frm + 8 * self.led_fm)
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
 
