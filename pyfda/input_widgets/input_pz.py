@@ -81,7 +81,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Display `text` with selected format (cartesian / polar - to be implemented)
+        Display `text` with selected format (cartesian / polar)
         and number of places
 
         text:   string / QVariant from QTableWidget to be rendered
@@ -732,8 +732,11 @@ class Input_PZ(QWidget):
         if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
             return safe_eval(text, default, return_type='auto')
         else:
-            polar_str = text.split('*' + self.angle_char, 1)
+            # try to split text string at "*<" or the angle character
+            polar_str = text.replace(self.angle_char, '<').split('*<', 1)
+            
             if len(polar_str) < 2: # input is real or imaginary
+                # remove special characters
                 r = safe_eval(re.sub('['+self.angle_char+'<∠°]','', text), default, return_type='auto')
                 x = r.real
                 y = r.imag

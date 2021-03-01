@@ -15,9 +15,10 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QtGui, QWidget, QFont, QFrame, QPushButton,
+from pyfda.libs.compat import (QtGui, QWidget, QFont, QFrame, QPushButton, QLabel,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
+                      QLineEdit,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSplitter, Qt, pyqtSignal)
 
 import numpy as np
 from numpy import pi, log10
@@ -25,7 +26,7 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import lin2unit, mod_version
+from pyfda.libs.pyfda_lib import lin2unit, mod_version, to_html, safe_eval
 from pyfda.input_widgets.input_info_about import AboutWindow#about_window
 from pyfda.pyfda_rc import params
 # TODO: Passband and stopband info should show min / max values for each band
@@ -43,6 +44,7 @@ class Input_Info(QWidget):
     Create widget for displaying infos about filter specs and filter design method
     """
     sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         super(Input_Info, self).__init__(parent)
@@ -88,14 +90,16 @@ class Input_Info(QWidget):
         self.butDebug.setToolTip("Show debugging options.")
 
         self.butAbout = QPushButton("About", self)  # pop-up "About" window
-        #self.butLic = QPushButton("License", self) # pop-up Licensing info
+
+        self.butSettings = QPushButton("Settings", self)  #
+        self.butSettings.setCheckable(True)
+        self.butSettings.setChecked(False)
+        self.butSettings.setToolTip("Display and set some settings")
+
         layHControls1 = QHBoxLayout()
         layHControls1.addWidget(self.butFiltPerf)
-        #layHControls1.addStretch(1)
         layHControls1.addWidget(self.butAbout)
-        #layHControls1.addStretch(1)
-        #layHControls1.addWidget(self.butLic)
-        #layHControls1.addStretch(1)
+        layHControls1.addWidget(self.butSettings)
         layHControls1.addWidget(self.butDebug)
 
         self.butDocstring = QPushButton("Doc$", self)
@@ -132,11 +136,26 @@ class Input_Info(QWidget):
         self.frmControls2.setLayout(layHControls2)
         self.frmControls2.setVisible(self.butDebug.isChecked())
         self.frmControls2.setContentsMargins(0,0,0,0)
-        #self.frmControls2.set
+
+        lbl_settings_NFFT = QLabel(to_html("N_FFT =", frmt='bi'), self)
+        self.led_settings_NFFT = QLineEdit(self)
+        self.led_settings_NFFT.setText(str(params['N_FFT']))
+        self.led_settings_NFFT.setToolTip("<span>Number of FFT points for frequency "
+                                          "domain widgets.</span>")
+
+        layGSettings = QGridLayout()
+        layGSettings.addWidget(lbl_settings_NFFT, 1,0)
+        layGSettings.addWidget(self.led_settings_NFFT, 1,1)
+
+        self.frmSettings = QFrame(self)
+        self.frmSettings.setLayout(layGSettings)
+        self.frmSettings.setVisible(self.butSettings.isChecked())
+        self.frmSettings.setContentsMargins(0,0,0,0)
 
         layVControls = QVBoxLayout()
         layVControls.addLayout(layHControls1)
         layVControls.addWidget(self.frmControls2)
+        layVControls.addWidget(self.frmSettings)
 
         self.frmMain = QFrame(self)
         self.frmMain.setLayout(layVControls)
@@ -182,6 +201,8 @@ class Input_Info(QWidget):
         #----------------------------------------------------------------------
         self.butFiltPerf.clicked.connect(self._show_filt_perf)
         self.butAbout.clicked.connect(self._about_window)
+        self.butSettings.clicked.connect(self._show_settings)
+        self.led_settings_NFFT.editingFinished.connect(self._update_settings_nfft)
         self.butDebug.clicked.connect(self._show_debug)
 
         self.butFiltDict.clicked.connect(self._show_filt_dict)
@@ -201,6 +222,19 @@ class Input_Info(QWidget):
         """
         self.frmControls2.setVisible(self.butDebug.isChecked())
 
+#------------------------------------------------------------------------------
+    def _show_settings(self):
+        """
+        Show / hide settings options depending on the state of the settings button
+        """
+        self.frmSettings.setVisible(self.butSettings.isChecked())
+
+    def _update_settings_nfft(self):
+        """ Update value for self.par1 from QLineEdit Widget"""
+        params['N_FFT'] = safe_eval(self.led_settings_NFFT.text(), params['N_FFT'],
+                                   sign = 'pos', return_type='int')
+        self.led_settings_NFFT.setText(str(params['N_FFT']))
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'n_fft'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):

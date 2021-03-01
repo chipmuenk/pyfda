@@ -13,6 +13,7 @@ This is imported first by pyfdax.
 """
 
 import os, sys
+from subprocess import check_output, CalledProcessError, STDOUT
 import shutil
 import platform
 import tempfile
@@ -103,6 +104,30 @@ def get_log_dir():
     return None
 
 #------------------------------------------------------------------------------
+def get_yosys_dir():
+    """
+    Try to find YOSYS path and version from environment variable or path:
+    """
+    yosys_exe = env("YOSYS")
+    yosys_ver = ""
+    
+    if yosys_exe: # something is stored in the environment variable
+        # redirect `yosys -V` output to string
+        command = [yosys_exe, "-V"]
+    elif "yosys" in env("PATH"):
+        command = ["yosys", "-V"]
+        try:
+            output = check_output(command, stderr=STDOUT).decode().split(' ', 2)
+            if len(output) > 1:
+                yosys_ver = output[1]
+
+        except CalledProcessError as e:
+            print(e.output.decode())
+
+    #print("YOSYS: {0}, ver. {1}".format(yosys_exe, yosys_ver))
+    return yosys_exe, yosys_ver
+
+#------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
     conf_dir = os.path.join(HOME_DIR, '.pyfda')
@@ -117,7 +142,6 @@ def get_conf_dir():
         except (IOError, OSError) as e:
             print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
             return HOME_DIR
-
 
 #------------------------------------------------------------------------------
 def copy_conf_files(force_copy=False, logger=None):
@@ -243,6 +267,11 @@ TMPL_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_template.conf')
 # full path name of logging configuration template:
 TMPL_LOG_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_log_template.conf')
 
+
+YOSYS_EXE, YOSYS_VER = get_yosys_dir()
+
+create_conf_files()
+=======
 # store command line options as a list in ARGV, stripping '-' or '--'
 ARGV = []
 for a in sys.argv:
@@ -266,6 +295,7 @@ if 'r' in ARGV:
     copy_conf_files(force_copy=True)
 else:
     copy_conf_files(force_copy=False)
+
 
 
 #------------------------------------------------------------------------------

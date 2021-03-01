@@ -8,6 +8,8 @@
    and http://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#python-roles
    
    Doc: https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html
+   
+   numpy style: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
    #
    I really like the :mod:`threading` module which has the
    :class:`threading.Thread` class.
@@ -18,7 +20,7 @@
 Welcome to pyfda's documentation!
 =================================
 
-Version: 0.2.1
+Version: 0.5.3
 
 .. toctree::
    :maxdepth: 2

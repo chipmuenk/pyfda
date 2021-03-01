@@ -407,10 +407,14 @@ qss_common = """
                 
                 QPushButton
                 {
-                width: 20px;
-                height: 15px;
-                /* border-radius: 1px; destroys button shape */
-                }
+                /*
+                width: 20px; # not needed
+                height: 15px;# not needed
+                border-radius: 1px; # destroys button shape
+                border-style: outset; # destroys button shape
+                padding-left: 5px; padding-right: 3px; # destroys button shape
+                 */
+                 }
 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
@@ -429,7 +433,8 @@ qss_common = """
                                 color: white;}
                 *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
-                QPushButton:checked {background-color:lightblue; color:black;}
+                QPushButton:checked {background-color:lightblue; color:black;font-weight:800;}
+                QPushButtonRT:checked {background-color:lightblue; color:black;font-weight:800;}
                 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */

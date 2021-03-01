@@ -422,8 +422,11 @@ class Input_Coeffs(QWidget):
             self.col = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            self.ba[1] = np.zeros_like(self.ba[1]) # enforce FIR filter
+            self.ba[1][0] = 1.
 
         self._equalize_ba_length()
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -481,21 +484,25 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
     def _refresh_table(self):
         """
-        (Re-)Create the displayed table from `self.ba` (list with 2 columns of
-        float scalars). Data is displayed via `ItemDelegate.displayText()` in
+        (Re-)Create the displayed table from `self.ba` (list with 2 one-dimensional
+        numpy arrays). Data is displayed via `ItemDelegate.displayText()` in
         the number format set by `self.frmt`.
 
-        The table dimensions are set according to the dimensions of `self.ba`:
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
+        
+        The table dimensions are set according to the filter type set in 
+        `fb.fil[0]['ft']` which is either 'FIR' or 'IIR' and by the number of 
+        rows in `self.ba`.
 
         Called at the end of nearly every method.
         """
-        try:
-            self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
-        except IndexError:
+        if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
             self.num_rows = len(self.ba[0])
-        # logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
+        else:
+            self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
+
+        # logger.warning("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
         params['FMT_ba'] = int(self.ui.spnDigits.text())
 
@@ -572,7 +579,7 @@ class Input_Coeffs(QWidget):
         self.ba[0] = np.array(fb.fil[0]['ba'][0]) # deep copy from filter dict to
         self.ba[1] = np.array(fb.fil[0]['ba'][1]) # coefficient register
 
-        # set comboBoxes from dictionary
+        # set quantization comboBoxes from dictionary
         self.qdict2ui()
 
         self._refresh_table()

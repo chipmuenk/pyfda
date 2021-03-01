@@ -327,7 +327,7 @@ class SelectFilter(QWidget):
 #                   %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
 #                     fb.fil_tree[self.rt][self.ft][fc].keys()
 #                     ))
-# 
+#
 # =============================================================================
             if hasattr(ff.fil_inst, 'construct_UI'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
@@ -338,7 +338,7 @@ class SelectFilter(QWidget):
 
 #------------------------------------------------------------------------------
     def load_filter_order(self, enb_signal=False):
-        
+
         """
         Called by set_design_method or from InputSpecs (with enb_signal = False),
           load filter order setting from fb.fil[0] and update widgets
@@ -348,7 +348,7 @@ class SelectFilter(QWidget):
         # design method [fc] from fil_tree (explicit list() needed for Python 3)
         fo_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]
         fo_list = list(fo_dict.keys())
-        
+
         # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in fo_list:
             self.fo = fb.fil[0]['fo'] # keep current setting
@@ -409,7 +409,7 @@ class SelectFilter(QWidget):
         fb.fil[0].update({'N' : ordn})
 
         if enb_signal:
-            logger.debug("Emit 'filt_changed'") 
+            logger.debug("Emit 'filt_changed'")
             self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_widget'})
 
 #------------------------------------------------------------------------------

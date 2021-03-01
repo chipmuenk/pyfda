@@ -143,6 +143,7 @@ class Input_Specs(QWidget):
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
         self.f_specs.sig_tx.connect(self.sig_rx_local)
+        self.sig_tx.connect(self.f_specs.sig_rx)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
@@ -155,7 +156,7 @@ class Input_Specs(QWidget):
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         self.t_specs.sig_tx.connect(self.sig_rx_local)
-        # self.sig_tx.connect(self.t_specs.sig_rx)
+        self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -197,7 +198,7 @@ class Input_Specs(QWidget):
         #----------------------------------------------------------------------
         self.sig_rx_local.connect(self.process_sig_rx_local)
         self.butLoadFilt.clicked.connect(lambda: load_filter(self))
-        self.butSaveFilt.clicked.connect(lambda: save_filter(self))        
+        self.butSaveFilt.clicked.connect(lambda: save_filter(self))
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
@@ -377,7 +378,7 @@ class Input_Specs(QWidget):
         When <QUIT> button is pressed, send 'quit_program'
         """
         self.sig_tx.emit({'sender':__name__, 'quit_program':''})
-        
+
 
 
 #------------------------------------------------------------------------------

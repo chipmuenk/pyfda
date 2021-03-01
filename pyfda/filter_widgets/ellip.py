@@ -77,22 +77,19 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
     def __init__(self):
 
         self.ft = 'IIR'
-
         c = Common()
         self.rt_dict = c.rt_base_iir
-
         self.rt_dict_add = {
             'COM':{'man':{'msg':('a',
-                 "Enter the filter order <b><i>N</i></b>, the minimum stop "
-                 "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
-                 "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first drops "
-                 "below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")}},
+                  "Enter the filter order <b><i>N</i></b>, the minimum stop "
+                  "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
+                  "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first drops "
+                  "below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")}},
             'LP': {'man':{}, 'min':{}},
             'HP': {'man':{}, 'min':{}},
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
             }
-
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
@@ -110,6 +107,8 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.N     = fil_dict['N']
         self.F_PB  = fil_dict['F_PB'] * 2
         self.F_SB  = fil_dict['F_SB'] * 2
+        self.F_C   = fil_dict['F_C']  * 2
+        self.F_C2  = fil_dict['F_C2']  * 2
         self.F_PB2 = fil_dict['F_PB2'] * 2
         self.F_SB2 = fil_dict['F_SB2'] * 2
         self.F_PBC = None
@@ -154,9 +153,12 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
                 fil_dict['F_PB'] = self.F_PBC / 2. # HP or LP - single  corner frequency
+                fil_dict['F_C'] = self.F_PBC / 2. # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies
                 fil_dict['F_PB'] = self.F_PBC[0] / 2.
+                fil_dict['F_C'] = self.F_PBC[0] / 2.
                 fil_dict['F_PB2'] = self.F_PBC[1] / 2.
+                fil_dict['F_C2'] = self.F_PBC[1] / 2.
 
 #------------------------------------------------------------------------------
 #
@@ -180,7 +182,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
+        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_C,
                             btype='low', analog=self.analog, output=self.FRMT))
 
     # HP: F_stop < F_PB -------------------------------------------------------
@@ -199,7 +201,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
+        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_C,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
     # For BP and BS, F_XX have two elements each, A_XX has only one
@@ -221,7 +223,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         if not self._test_N():
             return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
-            [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog,
+            [self.F_C,self.F_C2], btype='bandpass', analog=self.analog,
                                                                 output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
@@ -242,7 +244,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         if not self._test_N():
             return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
-            [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog,
+            [self.F_C,self.F_C2], btype='bandstop', analog=self.analog,
                                                                 output=self.FRMT))
 
 #------------------------------------------------------------------------------

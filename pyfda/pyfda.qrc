@@ -29,6 +29,7 @@
     <file alias="row_delete.svg">images/icons/dark/appbar.list.delete.svg</file>
     <file alias="row_insert_above.svg">images/icons/dark/appbar.list.add.above.svg</file>
     <file alias="save.svg">images/icons/dark/appbar.disk.svg</file>
+    <file alias="sort-ascending.svg">images/icons/dark/sort-ascending.svg</file>    
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>

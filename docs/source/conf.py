@@ -24,7 +24,7 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'pyfda'
-copyright = '2019, Christian Muenker'
+copyright = '2021, Christian Muenker'
 author = 'Christian Muenker'
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
@@ -106,6 +106,9 @@ numfig_format = {'figure':'Fig. %s',
                  'table':'Table %s',
                  'code-block':'Listing %s',
                  'section':'Section'}
+# This is included at the top of every page
+rst_prolog = """
+"""
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

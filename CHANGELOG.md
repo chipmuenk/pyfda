@@ -1,13 +1,70 @@
 ## Changelog
 
-### [v0.5.2](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-xx)
+### [v0.5.4](https://github.com/chipmuenk/pyfda/tree/v0.5.4) (2020-12-xx)
 
 ### Bug fixes
+
+- Recalculate frequency specs in 'k' in the y[n] widget when `self.N` has been changed
+
+- Renamed file `iir_df1.py` to `iir_df1.py_bak` to prevent it from being analyzed
+  by `python setup.py install`. The myhdl keyword `async` creates an error with 
+  python 3.7 and up.
+
+- Update frequency specs when the frequency unit has been changed (regression)
+
+- Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
+  angle character
+  
+- It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
+  (didn't work before). Changing the filter type now highlights the save button.
+  
+- Improve group delay algorithms for IIR, allow selection between algorithms
+
+### New features
+
+- Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
+    for  impulses
+
+- New stimuli Gauss and Rect impulse
+
+- New stimulus Exp (complex exponentials)
+
+- New noise types "Maximum Length Sequence" and "Brownian"
+
+- Tooltips for combo box items
+
+- Replace some check boxes by checkable push bottons for a cleaner UI
+
+- Group stimuli in `y[n]` for a better overview
+
+- Allow changing the number of FFT data points via `Info -> Settings`
+
+- Display magnitude and phase in y[n] tab
+
+- Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
+  and `dirs.YOSYS_VER`
+  
+- Allow turning off automatic grid alignment between mag. and phase in the 
+  H(f) tab
+  
+- Started preparation of code for i18n
+
+
+### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
+(There is no release v0.5.2)
+
+### Bug fixes
+
+- Use f_C widgets in elliptic manual filter design (entered values had not been
+  used for the filter design)
 
 ### New features
 
 - Added widget duty cycle for the rect pulse, enabling and disabling of widgets
   is now structured much cleaner
+  
+- Absolute frequencies can be locked now, i.e. normalized frequencies change 
+  with the sampling frequency, absolute frequencies remain unchanged
 
 
 ### [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)

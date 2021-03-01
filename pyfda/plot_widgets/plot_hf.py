@@ -116,12 +116,19 @@ class Plot_Hf(QWidget):
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0 # store previous index for comparison
 
-        self.chkSpecs = QCheckBox("Show Specs", self)
+        self.chkSpecs = QCheckBox("Specs", self)
         self.chkSpecs.setChecked(False)
         self.chkSpecs.setToolTip("Display filter specs as hatched regions")
 
         self.chkPhase = QCheckBox("Phase", self)
         self.chkPhase.setToolTip("Overlay phase")
+        self.chkPhase.setChecked(False)
+        
+        self.chkAlign = QCheckBox("Align", self)
+        self.chkAlign.setToolTip("<span>Try to align grids for magnitude and phase " 
+                                 "(doesn't work in all cases).</span>")
+        self.chkAlign.setChecked(True)
+        self.chkAlign.setVisible(self.chkPhase.isChecked())
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -146,6 +153,7 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.chkSpecs)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chkPhase)
+        layHControls.addWidget(self.chkAlign)
         layHControls.addStretch(10)
 
         self.frmControls = QFrame(self)
@@ -184,7 +192,8 @@ class Plot_Hf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-
+        self.chkAlign.clicked.connect(self.draw)
+        
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
@@ -208,7 +217,7 @@ class Plot_Hf(QWidget):
         ax1_yticks = [t for t in ax1.get_yticks() if t >= ax1_ylims[0] and t <= ax1_ylims[1]]
         ax1_nticks = len(ax1_yticks)
         ax1_ydelta_lim = ax1_ylims[1] - ax1_ylims[0] # span of limits
-        ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0]
+        ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0] # delta of max. and min tick
         ax1_yoffset = ax1_yticks[0]-ax1_ylims[0] # offset between lower limit and first tick
 
         # calculate scale of Delta Limits / Delta Ticks
@@ -223,11 +232,15 @@ class Plot_Hf(QWidget):
         ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
         # calculate new offset between lower limit and first tick
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
-        #logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
+        logger.warning("ax2: delta_vis: {0}, scale: {1}, offset: {2}"
+                       .format(ax2_ydelta_vis,ax2_scale,ax2_yoffset))
+        logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
 
         ax2.set_yticks(np.linspace(ax2_yticks[0],
                                    (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
+        logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
+                                   ax2_yticks[1],ax2_yticks[-1]))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
@@ -544,6 +557,7 @@ class Plot_Hf(QWidget):
         """
         Re-calculate \|H(f)\| and draw the figure
         """
+        self.chkAlign.setVisible(self.chkPhase.isChecked())
         self.calc_hf()
         self.update_view()
 
@@ -686,7 +700,10 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
-            self.ax.set_title(r'Magnitude Frequency Response')
+            if self.chkPhase.isChecked():
+                self.ax.set_title(r'Magnitude and Phase Frequency Response')
+            else:
+                self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
             self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
 
@@ -699,7 +716,7 @@ class Plot_Hf(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
-        if hasattr(self, 'ax_p'):
+        if hasattr(self, 'ax_p') and self.chkAlign.isChecked():
             # Align gridlines between H(f) and phi nicely
             self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()
