@@ -200,7 +200,7 @@ class Plot_Impz(QWidget):
 
         if 'closeEvent' in dict_sig:
             self.close_FFT_win()
-            return # probably not needed
+            return  # probably not needed
         # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
@@ -213,7 +213,6 @@ class Plot_Impz(QWidget):
             elif dict_sig['fx_sim'] == 'get_stimulus':
                 """
                 - Select Fixpoint mode
-
                 - Calculate stimuli, quantize and pass to dict_sig with `'fx_sim':'send_stimulus'`
                   and `'fx_stimulus':<quantized stimulus array>`. Stimuli are scaled with the input
                   fractional word length, i.e. with 2**WF (input) to obtain integer values
@@ -228,10 +227,13 @@ class Plot_Impz(QWidget):
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
+                - Check whether floating stimuli are complex and set flag correspondingly
                 - Convert simulation results to integer and transfer them to the plotting
-                  routine
+                  routine in `self.draw_response_fx()`
                 """
                 logger.debug("Received fixpoint results.")
+                self.cmplx = np.any(np.iscomplex(self.x))
+                self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
                 self.draw_response_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
