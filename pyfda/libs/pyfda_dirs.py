@@ -266,16 +266,15 @@ USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 TMPL_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_template.conf')
 # full path name of logging configuration template:
 TMPL_LOG_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_log_template.conf')
-
-
+# full path to YOSYS exe (if found) and version
 YOSYS_EXE, YOSYS_VER = get_yosys_dir()
 
-create_conf_files()
-=======
 # store command line options as a list in ARGV, stripping '-' or '--'
 ARGV = []
 for a in sys.argv:
     ARGV.append(a.strip('-'))
+
+# print information about pyfda paths and quit
 if 'i' in ARGV:
     print("\n----- pyfda environment variables ------------")
     print("INSTALL_DIR:            {0}".format(INSTALL_DIR))
@@ -284,6 +283,7 @@ if 'i' in ARGV:
     print("LOG_DIR_FILE:           {0}".format(LOG_DIR_FILE))
     sys.exit()
 
+# print help infos and quit
 if 'h' in ARGV:
     print("Start pyfdax with the following options:\n")
     print("\tpyfdax -h : Show this help message")
@@ -291,10 +291,9 @@ if 'h' in ARGV:
     print("\tpyfdax -r : Replace the config files")
     sys.exit()
 
-if 'r' in ARGV:
-    copy_conf_files(force_copy=True)
-else:
-    copy_conf_files(force_copy=False)
+# force replacement of config files when 'r' is specified
+copy_conf_files(force_copy = ('r' in ARGV))
+
 
 
 
