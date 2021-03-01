@@ -19,12 +19,14 @@ from pyfda.libs.pyfda_lib import cmp_version
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib import rcParams
+from matplotlib import lines
+from matplotlib.pyplot import setp
 
 try:
     MPL_CURS = True
     import mplcursors
     if cmp_version('matplotlib', '3.1') < 0:
-       MPL_CURS = False
+        MPL_CURS = False
 except ImportError:
     MPL_CURS = False
     print(MPL_CURS)
@@ -39,23 +41,53 @@ from pyfda.libs.compat import (QtCore, QtGui, QWidget, QLabel, pyqtSignal, pyqtS
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
-from pyfda import qrc_resources # contains all icons
+from pyfda import qrc_resources  # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
-#------------------------------------------------------------------------------
-def stems(x, y, ax=None, label=None, **kwargs):
+# ------------------------------------------------------------------------------
+def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     """
-    A faster replacement for stem plot using vlines (= LineCollection)
-    LineCollection keywords are supported.
+    Provide a faster replacement for stem plots under matplotlib < 3.1.0 using 
+    vlines (= LineCollection). LineCollection keywords are supported.
     """
-    # pop the 'bottom' key-value pair from the dict, provide default value 0
-    bottom=kwargs.pop('bottom', 0)
-    ax.axhline(bottom, **kwargs)
-    ax.vlines(x, y, bottom, label=label, **kwargs)
-    # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
+    # create a copy of the kwargs dict without 'bottom' key-value pair, provide
+    # default value = 0:
+    bottom = kwargs.get('bottom', 0)
+    kwargs_cp = {k:v for k,v in kwargs.items() if k not in ['bottom']}
+    if cmp_version("matplotlib", "3.1.0") >= 0:
+        kwargs_cp = {k:v for k,v in kwargs.items() if k not in ['bottom']}
+        ax.axhline(bottom, **kwargs_cp)
+        ml, sl, bl = ax.stem(x, y, use_line_collection=True, bottom=bottom)
+        setp(ml, **mkr_fmt)
+        setp(bl, **kwargs_cp)
+        setp(sl, **kwargs_cp)
+    else:
+        ax.axhline(bottom, **kwargs_cp)
+        ax.vlines(x, y, bottom, label=label, **kwargs_cp)
+        # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
+        scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
+ 
+    handle = (lines.Line2D([], [], **kwargs_cp), lines.Line2D([], [], **mkr_fmt))
+    return handle
+
+
+def scatter(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
+    """
+    Create a copy of matplolibs scatter that can handle 'ms' and 'markersize' keys
+    These keys are removed from the mkr_fmt dictionary and translated to s = ms * ms
+    When neither ms nor markersize are provided, a default of ms = 10 is used.
+
+    Return a handle to the scatter plot.
+    """
+    ms = max(mkr_fmt.get('ms', -1), mkr_fmt.get('markersize', -1))
+    if ms == -1:
+        ms = 10  
+    mkr_fmt_cp = {k:v for k,v in mkr_fmt.items() if k not in ['ms', 'markersize']}
+    return ax.scatter(x, y, s=ms*ms, label=label, **mkr_fmt_cp)
+
 
 def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
     """
@@ -63,7 +95,7 @@ def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
     """
     pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
     Construct a subwidget consisting of a Matplotlib canvas and a subclassed
@@ -168,7 +200,7 @@ class MplWidget(QWidget):
 #        else:
 #            self.redraw()
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
     def plt_full_view(self):
         """
         Zoom to full extent of data if axes is set to "navigationable"
@@ -180,11 +212,11 @@ class MplWidget(QWidget):
             if ax.get_navigate():
                 ax.autoscale()
         self.redraw()
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
     def get_full_extent(self, ax, pad=0.0):
         """
-        Get the full extent of axes system `ax`, including axes labels, tick labels
-        and titles.
+        Get the full extent of axes system `ax`, including axes labels, tick 
+        labels and titles.
 
         Needed for inset plot in H(f)
         """
@@ -197,7 +229,7 @@ class MplWidget(QWidget):
         bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
     def toggle_cursor(self):
         """
         Toggle the tracking cursor
@@ -282,7 +314,7 @@ class MplToolbar(NavigationToolbar):
         self.mpl_widget = mpl_widget
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
         #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:

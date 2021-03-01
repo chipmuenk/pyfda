@@ -67,8 +67,8 @@ class PlotImpz_UI(QWidget):
         self.plt_time_spgr = "none"
 
         self.bottom_t = -80 # initial value for log. scale (time)
-        self.nfft_spgr_time = 256 # number of fft points per spectrogram segment
-        self.ovlp_spgr_time = 128 # number of overlap points between spectrogram segments
+        self.time_nfft_spgr = 256 # number of fft points per spectrogram segment
+        self.time_ovlp_spgr = 128 # number of overlap points between spectrogram segments
         self.mode_spgr_time = "magnitude"
 
         # stimuli
@@ -141,7 +141,7 @@ class PlotImpz_UI(QWidget):
         self.plot_styles_list =\
                 [("Plot style"),
                  ("none","None",""),
-                 ("dots","Dots",""),
+                 ("dots*","Dots",""),
                  ("line","Line",""),
                  ("line*","Line*",""),
                  ("stem","Stem",""),
@@ -361,15 +361,7 @@ class PlotImpz_UI(QWidget):
         self.chk_log_time.setCheckable(True)
         self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_time.setVisible(True)
-        self.led_log_bottom_time = QLineEdit(self)
-        self.led_log_bottom_time.setText(str(self.bottom_t))
-        self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
-                                            "and spectrogram plots with log. scale.</span>")
-        self.led_log_bottom_time.setVisible(True)
-
-        lbl_plt_time_spgr = QLabel(to_html("&nbsp;&nbsp;Spectrogram", frmt='bi'), self)
+        lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
         qcmb_box_populate(self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
         spgr_en = self.plt_time_spgr != "none"
@@ -382,21 +374,21 @@ class PlotImpz_UI(QWidget):
         self.chk_log_spgr_time.setChecked(True)
         self.chk_log_spgr_time.setVisible(spgr_en)
 
-        self.lbl_nfft_spgr_time = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
-        self.lbl_nfft_spgr_time.setVisible(spgr_en)
-        self.led_nfft_spgr_time = QLineEdit(self)
-        self.led_nfft_spgr_time.setText(str(self.nfft_spgr_time))
-        self.led_nfft_spgr_time.setToolTip("<span>Number of FFT points per "
+        self.lbl_time_nfft_spgr = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
+        self.lbl_time_nfft_spgr.setVisible(spgr_en)
+        self.led_time_nfft_spgr = QLineEdit(self)
+        self.led_time_nfft_spgr.setText(str(self.time_nfft_spgr))
+        self.led_time_nfft_spgr.setToolTip("<span>Number of FFT points per "
                                            "spectrogram segment.</span>")
-        self.led_nfft_spgr_time.setVisible(spgr_en)
+        self.led_time_nfft_spgr.setVisible(spgr_en)
 
-        self.lbl_ovlp_spgr_time = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
-        self.lbl_ovlp_spgr_time.setVisible(spgr_en)
-        self.led_ovlp_spgr_time = QLineEdit(self)
-        self.led_ovlp_spgr_time.setText(str(self.ovlp_spgr_time))
-        self.led_ovlp_spgr_time.setToolTip("<span>Number of overlap data points "
+        self.lbl_time_ovlp_spgr = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
+        self.lbl_time_ovlp_spgr.setVisible(spgr_en)
+        self.led_time_ovlp_spgr = QLineEdit(self)
+        self.led_time_ovlp_spgr.setText(str(self.time_ovlp_spgr))
+        self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
                                            "between spectrogram segments.</span>")
-        self.led_ovlp_spgr_time.setVisible(spgr_en)
+        self.led_time_ovlp_spgr.setVisible(spgr_en)
 
         self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
         self.lbl_mode_spgr_time.setVisible(spgr_en)
@@ -417,6 +409,16 @@ class PlotImpz_UI(QWidget):
                                            "scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
         self.chk_byfs_spgr_time.setVisible(spgr_en)
+
+        self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
+        self.led_log_bottom_time = QLineEdit(self)
+        self.led_log_bottom_time.setText(str(self.bottom_t))
+        self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
+                                            "and spectrogram plots with log. scale.</span>")
+        self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked() or\
+                                        (spgr_en and self.chk_log_spgr_time.isChecked()))
+        self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
+
 
 
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
@@ -442,25 +444,27 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         #
+        layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(self.chk_win_time)
         layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(line1)
         layH_ctrl_time.addSpacing(5)
-        #layH_ctrl_time.addStretch(1)
-        #layH_ctrl_time.addWidget(line2)
-        layH_ctrl_time.addWidget(self.chk_log_time)
+        #
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
-        #
-        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(self.chk_log_time)
+
+        layH_ctrl_time.addSpacing(5)
+        layH_ctrl_time.addWidget(line2)
+        layH_ctrl_time.addSpacing(5)
         #
         layH_ctrl_time.addWidget(lbl_plt_time_spgr)
         layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
         layH_ctrl_time.addWidget(self.chk_log_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_nfft_spgr_time)
-        layH_ctrl_time.addWidget(self.led_nfft_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_ovlp_spgr_time)
-        layH_ctrl_time.addWidget(self.led_ovlp_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_time_nfft_spgr)
+        layH_ctrl_time.addWidget(self.led_time_nfft_spgr)
+        layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
+        layH_ctrl_time.addWidget(self.led_time_ovlp_spgr)
         layH_ctrl_time.addWidget(self.lbl_mode_spgr_time)
         layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
@@ -544,10 +548,19 @@ class PlotImpz_UI(QWidget):
         self.chk_Hf.setChecked(False)
         self.chk_Hf.setCheckable(True)
 
-        self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=20)
+        self.chk_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
+        self.chk_freq_norm_impz.setToolTip("<span>Normalize the FFT of the stimulus "
+                            "impulse with <i>N<sub>FFT</sub></i> to achieve "
+                            "|<i>X(f)</i>| &le; 1. For the dirac pulse, this yields "
+                            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
+                            "turned off.</span>")
+        self.chk_freq_norm_impz.setCheckable(True)
+        self.chk_freq_norm_impz.setChecked(True)
+        self.chk_freq_norm_impz.setObjectName("freq_norm_impz")
+
+        self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=10)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
-        self.chk_show_info_freq.setToolTip("<span>Show infos about signal power "
-                                           "and window properties.</span>")
+        self.chk_show_info_freq.setToolTip("<span>Show signal power in legend.</span>")
         self.chk_show_info_freq.setCheckable(True)
         self.chk_show_info_freq.setChecked(False)
 
@@ -578,7 +591,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.lblWinPar2)
         layH_ctrl_freq.addWidget(self.ledWinPar2)
         layH_ctrl_freq.addStretch(1)
-        #layH_ctrl_freq.addWidget(lbl_show_info_freq)
+        layH_ctrl_freq.addWidget(self.chk_freq_norm_impz)
+        layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
         layH_ctrl_freq.addStretch(10)
 
@@ -631,17 +645,7 @@ class PlotImpz_UI(QWidget):
             self.cmbModulationType.addItem(*t)
         qset_cmb_box(self.cmbModulationType, self.modulation_type, data=True)
 
-
         #-------------------------------------
-        self.chk_norm_impz_f = QCheckBox("Norm", self)
-        self.chk_norm_impz_f.setToolTip("<span>Normalize the FFT of the stimulus "
-                            "impulse with <i>N<sub>FFT</sub></i> to achieve "
-                            "|<i>X(f)</i>| &le; 1. For the dirac pulse, yielding "
-                            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
-                            "turned off.</span>")
-        self.chk_norm_impz_f.setChecked(True)
-        self.chk_norm_impz_f.setObjectName("scale_impz_f")
-
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
         self.chk_step_err.setMaximumWidth(7*self.mSize)
@@ -667,7 +671,6 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
 
-        layHCmbStim.addWidget(self.chk_norm_impz_f)
         layHCmbStim.addWidget(self.chk_step_err)
         #======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
@@ -1101,8 +1104,9 @@ class PlotImpz_UI(QWidget):
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
-        self.chk_norm_impz_f.setVisible("norm" in stim_wdg)
-        self.chk_norm_impz_f.setEnabled(self.cmb_stim == "impulse" and self.DC == 0\
+        # This widget is part of the frequency tab!
+        self.chk_freq_norm_impz.setVisible("norm" in stim_wdg)
+        self.chk_freq_norm_impz.setEnabled(self.cmb_stim == "impulse" and self.DC == 0\
                         and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
 
         self.chk_step_err.setVisible(self.stim == "step")
