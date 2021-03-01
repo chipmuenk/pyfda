@@ -53,10 +53,11 @@ docs/_build/
 # PyBuilder
 target/
 
-# Spyder
+# Spyder / VSCode
 .spyderproject
 .spyproject
 .spyderworkspace
+.vscode/
 
 # Tex
 *.synctex
