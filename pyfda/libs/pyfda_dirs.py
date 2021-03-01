@@ -144,24 +144,60 @@ def get_conf_dir():
             return HOME_DIR
 
 #------------------------------------------------------------------------------
-def create_conf_files():
-    if not os.path.isfile(USER_CONF_DIR_FILE):
-        # Copy default configuration file to user directory if it doesn't exist
-        # This file can be easily edited by the user without admin access rights
-        try:
-            shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
-            print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
-        except IOError as e:
-            print(e)
+def copy_conf_files(force_copy=False, logger=None):
+    """
+    If they don't exist, create `pyfda.conf` und `pyfda_log.conf` from template files.
+    in the user directory where they can be edited by the user without admin rights.
+    If they exist and `force_copy=True`, make a backup of the old files and then
+    overwrite them.
 
-    if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
-        # Copy default logging configuration file to user directory if it doesn't exist
-        # This file can be easily edited by the user without admin access rights
-        try:
+    Parameters
+    ----------
+    force_copy : bool
+       When True, make a backup and overwrite existing config files.
+
+    logger : logger instance
+        Write info and error messages to `logger` when it exists, otherwise use
+        `print()`. When called during the initial phase, loggers have not been
+        created yet and `print()` has to be used.
+
+    Returns
+    -------
+    None.
+
+    """
+    if logger:
+        log_info = logger.info
+        log_err  = logger.error
+    else:
+        log_info = print
+        log_err  = print
+    # pyfda config file
+    try:
+        # Create Backup
+        if os.path.isfile(USER_CONF_DIR_FILE) and force_copy:
+            shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_" + TODAY)
+            log_info('Created backup "{0}"\n\tof user config file.'.format( USER_CONF_DIR_FILE + "_bak_" + TODAY))
+        # Create config file
+        if not os.path.isfile(USER_CONF_DIR_FILE) or force_copy:
+            shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
+            log_info('Created user config file "{0}" from template.'.format(USER_CONF_DIR_FILE))
+    except (IOError, FileNotFoundError, FileExistsError) as e:
+        log_err("File error: {0}".format(e))
+
+    # Logging config file
+    try:
+        # Create Backup
+        if os.path.isfile(USER_LOG_CONF_DIR_FILE) and force_copy:
+            shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY)
+            log_info('Created backup "{0}"\n\tof user logging config file'.format( USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY))
+        # Create log config file
+        if not os.path.isfile(USER_LOG_CONF_DIR_FILE) or force_copy:
             shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
-            print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
-        except IOError as e:
-            print(e)
+            log_info('Created user logging config file "{0}" from template.'.format(USER_LOG_CONF_DIR_FILE))
+    except (IOError, FileNotFoundError, FileExistsError) as e:
+        log_err("File error: {0}".format(e))
+
 #-----------------------------------------------------------------------------
 def update_conf_files(logger):
     """
@@ -185,17 +221,7 @@ def update_conf_files(logger):
     val = input("Enter 'q' to quit or 'r' to replace the existing user config file:").lower()
     if val == 'r':
         # Create backups of old user and logging config files, copy templates to user directory.
-        try:
-            shutil.move(USER_CONF_DIR_FILE, USER_CONF_DIR_FILE + "_bak_" + TODAY)
-            shutil.copyfile(TMPL_CONF_DIR_FILE, USER_CONF_DIR_FILE)
-            logger.info('Created new user config file "{0}".'.format(USER_CONF_DIR_FILE))
-
-            shutil.move(USER_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE + "_bak_" + TODAY)
-            shutil.copyfile(TMPL_LOG_CONF_DIR_FILE, USER_LOG_CONF_DIR_FILE)
-            logger.info('Created new user logging config file "{0}".'.format(USER_LOG_CONF_DIR_FILE))
-        except IOError as e:
-            logger.error("IOError: {0}".format(e))
-
+        copy_conf_files(force_copy=True, logger=logger)
     elif val == 'q':
         sys.exit()
     else:
@@ -240,10 +266,36 @@ USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 TMPL_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_template.conf')
 # full path name of logging configuration template:
 TMPL_LOG_CONF_DIR_FILE = os.path.join(THIS_DIR, 'pyfda_log_template.conf')
-
+# full path to YOSYS exe (if found) and version
 YOSYS_EXE, YOSYS_VER = get_yosys_dir()
 
-create_conf_files()
+# store command line options as a list in ARGV, stripping '-' or '--'
+ARGV = []
+for a in sys.argv:
+    ARGV.append(a.strip('-'))
+
+# print information about pyfda paths and quit
+if 'i' in ARGV:
+    print("\n----- pyfda environment variables ------------")
+    print("INSTALL_DIR:            {0}".format(INSTALL_DIR))
+    print("USER_CONF_DIR_FILE:     {0}".format(USER_CONF_DIR_FILE))
+    print("USER_LOG_CONF_DIR_FILE: {0}".format(USER_LOG_CONF_DIR_FILE))
+    print("LOG_DIR_FILE:           {0}".format(LOG_DIR_FILE))
+    sys.exit()
+
+# print help infos and quit
+if 'h' in ARGV:
+    print("Start pyfdax with the following options:\n")
+    print("\tpyfdax -h : Show this help message")
+    print("\tpyfdax -i : Print information on user directories")
+    print("\tpyfdax -r : Replace the config files")
+    sys.exit()
+
+# force replacement of config files when 'r' is specified
+copy_conf_files(force_copy = ('r' in ARGV))
+
+
+
 
 #------------------------------------------------------------------------------
 """ Place holder for storing the directory location where the last file was saved"""
