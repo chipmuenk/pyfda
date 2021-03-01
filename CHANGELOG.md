@@ -20,14 +20,20 @@
   
 - Improve group delay algorithms for IIR, allow selection between algorithms
 
+- Complex flag is reset in fixpoint simulation when switching back from complex
+  to real stimuli
+
+- Improved legend in the y[n] / Y(f) tab (markers were missing, tab alignment didn't
+  work)
+
 ### New features
 
 - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
     for  impulses
 
-- New stimuli Gauss and Rect impulse
+- New stimuli 'Gauss' and 'Rect impulse'
 
-- New stimulus Exp (complex exponentials)
+- New stimulus 'Exp' (complex exponentials)
 
 - New noise types "Maximum Length Sequence" and "Brownian"
 
@@ -49,6 +55,15 @@
   
 - Started preparation of code for i18n
 
+- Renamed subdirectory "filter_designs" to "filter_widgets" for consistency with
+  other widgets and updated required config file version from 3 to 4
+
+- Provide  a simple IIR allpass design as an template for a simple filter
+  widget
+
+- New command options when starting pyfda: -h for help, -i for infos on 
+  paths and files and -r for replacing the config files with copies of
+  the templates
 
 ### [v0.5.3](https://github.com/chipmuenk/pyfda/tree/v0.5.3) (2020-12-08)
 (There is no release v0.5.2)
