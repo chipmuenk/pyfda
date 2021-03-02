@@ -358,6 +358,50 @@ def qfilter_warning(self, N, fil_class):
         return False
 
 # ----------------------------------------------------------------------------
+def qled_set_max_width(wdg, str = '', N_x = 17):
+    """
+    Calculate width of QLineEdit widgets in points for a given string
+    and set its maximum width correspondingly.
+
+    Parameters
+    ----------
+
+    wdg: instance of QLineEdit widget
+
+    str: str
+        string for calculating the width of QLineEdit widget
+
+    N_x: int
+        When `str == ''`, calculate the width from `N_x * width('x')`
+
+    Returns
+    -------
+    
+    width: int
+        The required width in points
+
+    """
+    # ----- define measures to define size of LineEditFields
+    #       # contentsMargins() is a property of QWidget, gets 
+    #       # textMargins(), property of QLineEdit, gets margins around the text inside the frame
+    width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
+                wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
+                8 # 2 * horizontalMargin() + 2 * frame margin.
+    width_x = wdg.fontMetrics().width('x')
+    logger.warning("Frm = {0}, FM = {1}".format(width_frm, width_x))
+    if str != '':
+        width = width_frm + wdg.fontMetrics().width(str)
+    else:
+        width = width_frm + N_x * width_x
+
+    wdg.setMaximumWidth(width)
+    return width
+
+    #self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
+    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
+
+
+# ----------------------------------------------------------------------------
 class QHLine(QFrame):
     """
     Create a thin horizontal line utilizing the HLine property of QFrames

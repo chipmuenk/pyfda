@@ -141,7 +141,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
-        self.ui.chk_fx_scale.clicked.connect(self.draw)
+        self.ui.but_fx_scale.clicked.connect(self.draw)
         self.ui.but_fft_win.clicked.connect(self.ui.show_fft_win)
 
         # --- time domain plotting ---
@@ -400,7 +400,7 @@ class Plot_Impz(QWidget):
         self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
         self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
-        self.ui.chk_fx_scale.setVisible(self.fx_sim)
+        self.ui.but_fx_scale.setVisible(self.fx_sim)
         self.ui.chk_fx_limits.setVisible(self.fx_sim)
 
         if self.fx_sim:
@@ -768,7 +768,7 @@ class Plot_Impz(QWidget):
         self.fx_max = 1.
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
             try:
-                if self.ui.chk_fx_scale.isChecked():
+                if self.ui.but_fx_scale.isChecked():
                     # display stimulus and response as integer values:
                     # - multiply stimulus by 2 ** WF
                     # - display response unscaled
