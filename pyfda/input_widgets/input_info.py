@@ -413,10 +413,10 @@ class Input_Info(QWidget):
                 logger.debug("F_test_labels = %s" %f_lbls)
 
                 # Calculate frequency response at test frequencies
-                [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
+                [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(float))
                 # add antiCausals if we have them
                 if (antiC):
-                   wa, ha = sig.freqz(bbA, aaA, 2.0 * pi * f_vals.astype(np.float))
+                   wa, ha = sig.freqz(bbA, aaA, 2.0 * pi * f_vals.astype(float))
                    ha = ha.conjugate()
                    a_test = a_test*ha
 
