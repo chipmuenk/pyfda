@@ -11,7 +11,7 @@ usually imply fixpoint arithmetics but this could change in the future as floati
 arithmetics can be implemented on FPGAs using dedicated floating point units (FPUs).
 
 Order and the coefficients have been
-calculated by a filter design algorithm from the `pyfda.filter_designs` package to meet
+calculated by a filter design algorithm from the `pyfda.filter_widgets` package to meet
 target filter specifications (usually in the frequency domain).
 
 In this tab, a fixpoint implementation can be selected in the upper left corner

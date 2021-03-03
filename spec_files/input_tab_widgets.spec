@@ -13,9 +13,9 @@ hiddenimports += [
     'pyfda.input_widgets.input_pz','pyfda.input_widgets.input_info',
     'pyfda.input_widgets.input_files','pyfda.input_widgets.input_fixpoint_specs']
 hiddenimports += [
-    'pyfda.filter_designs.equiripple','pyfda.filter_designs.firwin','pyfda.filter_designs.ma',
-    'pyfda.filter_designs.equiripple','pyfda.filter_designs.butterworth','pyfda.filter_designs.ellip',
-    'pyfda.filter_designs.cheby1','pyfda.filter_designs.cheby2'
+    'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.firwin','pyfda.filter_widgets.ma',
+    'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.butterworth','pyfda.filter_widgets.ellip',
+    'pyfda.filter_widgets.cheby1','pyfda.filter_widgets.cheby2'
     ] 
 hiddenimports += [
     'pyfda.fixpoint_widgets.fir_df','pyfda.fixpoint_widgets.delay1']

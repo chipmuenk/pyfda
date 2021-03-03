@@ -653,6 +653,6 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-# test using "python -m pyfda.filter_designs.ellip_zero"
+# test using "python -m pyfda.filter_widgets.ellip_zero"
 #-----------------------------------------------------------------------------
 

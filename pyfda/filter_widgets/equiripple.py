@@ -430,5 +430,5 @@ if __name__ == '__main__':
 
     app.exec_()
     #------------------------------------------------------------------------------
-# test using "python -m pyfda.filter_designs.equiripple"
+# test using "python -m pyfda.filter_widgets.equiripple"
 

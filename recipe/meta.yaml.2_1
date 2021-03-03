@@ -39,14 +39,14 @@ requirements:
 test:
   imports:
     - pyfda
-    - pyfda.filter_designs
+    - pyfda.filter_widgets
     - pyfda.fixpoint_widgets
     - pyfda.input_widgets
     - pyfda.plot_widgets
     - pyfda.tests
     - pyfda.tests.widgets
     - pyfda.widget_templates
-    - pyfda.widget_templates.filter_designs
+    - pyfda.widget_templates.filter_widgets
     - pyfda.widget_templates.fixpoint_widgets
     - pyfda.widget_templates.input_widgets
     - pyfda.widget_templates.plot_widgets

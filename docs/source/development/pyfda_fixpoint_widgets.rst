@@ -12,7 +12,7 @@ can be implemented on FPGAs using dedicated floating point units (FPUs).
 
 Filter topologies are defined in the corresponding classes and can be implemented
 in hardware. The filter topologies use the order and the coefficients that have 
-been determined by a filter design algorithm from the `pyfda.filter_designs` 
+been determined by a filter design algorithm from the `pyfda.filter_widgets` 
 package for a target filter specification (usually in the frequency domain). Filter
 coefficients are quantized according to the settings in the fixpoint widget.
 

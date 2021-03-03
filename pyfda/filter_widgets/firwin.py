@@ -641,5 +641,5 @@ if __name__ == '__main__':
 
     app.exec_()
 
-# test using "python -m pyfda.filter_designs.firwin"
+# test using "python -m pyfda.filter_widgets.firwin"
 
