@@ -79,7 +79,7 @@ class Plot_PZ(QWidget):
         self.chkHfLog.setEnabled(True)
 
         self.diaRad_Hf = QDial(self)
-        self.diaRad_Hf.setRange(2., 10.)
+        self.diaRad_Hf.setRange(2, 10)
         self.diaRad_Hf.setValue(2)
         self.diaRad_Hf.setTracking(False) # produce less events when turning
         self.diaRad_Hf.setFixedHeight(30)

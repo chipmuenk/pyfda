@@ -160,7 +160,7 @@ class Plot_3D(QWidget):
 
         self.lblAlpha = QLabel("Alpha", self)
         self.diaAlpha = QDial(self)
-        self.diaAlpha.setRange(0., 10.)
+        self.diaAlpha.setRange(0, 10)
         self.diaAlpha.setValue(10)
         self.diaAlpha.setTracking(False) # produce less events when turning
         self.diaAlpha.setFixedHeight(30)
@@ -170,7 +170,7 @@ class Plot_3D(QWidget):
 
         self.lblHatch = QLabel("Stride", self)
         self.diaHatch = QDial(self)
-        self.diaHatch.setRange(0., 9.)
+        self.diaHatch.setRange(0, 9)
         self.diaHatch.setValue(5)
         self.diaHatch.setTracking(False) # produce less events when turning
         self.diaHatch.setFixedHeight(30)
