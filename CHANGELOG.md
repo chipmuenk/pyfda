@@ -26,6 +26,10 @@
 - Improved legend in the y[n] / Y(f) tab (markers were missing, tab alignment didn't
   work)
 
+- Equalize length of f and tau_g in differentiation algorithm (crashed before) for
+  the calculation of group delay (selecting 'Diff' crashed pyfda for dual sided spectra)
+
+
 ### New features
 
 - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
@@ -55,7 +59,7 @@
   
 - Started preparation of code for i18n
 
-- Renamed subdirectory "filter_designs" to "filter_widgets" for consistency with
+- Renamed subdirectory "filter_widgets" to "filter_widgets" for consistency with
   other widgets and updated required config file version from 3 to 4
 
 - Provide  a simple IIR allpass design as an template for a simple filter
