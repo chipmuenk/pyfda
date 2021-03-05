@@ -1,7 +1,7 @@
-Package filter_designs
+Package filter_widgets
 ======================
 
 Package providing various algorithms for FIR and IIR filter design.
 
-.. automodule:: pyfda.filter_designs
+.. automodule:: pyfda.filter_widgets
 

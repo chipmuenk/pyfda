@@ -54,10 +54,10 @@ hiddenimports += [
     'pyfda.input_widgets.input_fixpoint_specs']
 ### Filter Designs
 hiddenimports += [
-    'pyfda.filter_designs.equiripple','pyfda.filter_designs.firwin','pyfda.filter_designs.ma',
-    'pyfda.filter_designs.bessel','pyfda.filter_designs.butter','pyfda.filter_designs.ellip',
-    'pyfda.filter_designs.cheby1','pyfda.filter_designs.cheby2',
-	'pyfda.filter_designs.manual'] 
+    'pyfda.filter_widgets.equiripple','pyfda.filter_widgets.firwin','pyfda.filter_widgets.ma',
+    'pyfda.filter_widgets.bessel','pyfda.filter_widgets.butter','pyfda.filter_widgets.ellip',
+    'pyfda.filter_widgets.cheby1','pyfda.filter_widgets.cheby2',
+	'pyfda.filter_widgets.manual'] 
 ### Fixpoint Widgets
 hiddenimports += [
     'pyfda.fixpoint_widgets.fir_df']# ,'pyfda.fixpoint_widgets.fx_delay']

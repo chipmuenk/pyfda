@@ -22,7 +22,7 @@ import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
-                                     qstyle_widget, QVLine)
+                                     qstyle_widget, qled_set_max_width, QVLine)
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -257,6 +257,7 @@ class PlotImpz_UI(QWidget):
         self.but_run.setText("RUN")
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.but_auto_run.isChecked())
+        logger.warning(self.but_run.contentsMargins().left())
 
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
@@ -269,34 +270,24 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.setText(str(self.N))
         self.led_N_points.setToolTip("<span>Number of displayed data points. "
                                    "<i>N</i> = 0 tries to choose for you.</span>")
-        
-        # ----- define measures to define size of LineEditFields
-        self.led_frm =  self.led_N_points.textMargins().left() +\
-                        self.led_N_points.textMargins().right() +\
-                        self.led_N_points.contentsMargins().left() +\
-                        self.led_N_points.contentsMargins().left() +\
-                        8 # 2 * horizontalMargin() + 2 * frame margin.
-        self.led_fm = self.led_N_points.fontMetrics().width('x')
-        #self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
-        # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
-
+        qled_set_max_width(self.led_N_points, N_x = 8)
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
+        qled_set_max_width(self.led_N_start, N_x = 8)
 
-        #self.chk_fx_scale = QCheckBox("Int. scale", self)
-        self.chk_fx_scale = QPushButton("FX Int")
-        self.chk_fx_scale.setObjectName("chk_fx_scale")
-        self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
-        self.chk_fx_scale.setCheckable(True)
-        self.chk_fx_scale.setChecked(False)
+        self.but_fx_scale = QPushButton("FX Int")
+        self.but_fx_scale.setObjectName("but_fx_scale")
+        self.but_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
+        self.but_fx_scale.setCheckable(True)
+        self.but_fx_scale.setChecked(False)
 
-        self.chk_stim_options = QPushButton("Stimuli")
-        self.chk_stim_options.setObjectName("chk_stim_options")
-        self.chk_stim_options.setToolTip("<span>Show stimulus options.</span>")
-        self.chk_stim_options.setCheckable(True)
-        self.chk_stim_options.setChecked(True)
+        self.but_stim_options = QPushButton("Stimuli")
+        self.but_stim_options.setObjectName("but_stim_options")
+        self.but_stim_options.setToolTip("<span>Show stimulus options.</span>")
+        self.but_stim_options.setCheckable(True)
+        self.but_stim_options.setChecked(True)
 
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
@@ -322,10 +313,10 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addStretch(2)
-        layH_ctrl_run.addWidget(self.chk_fx_scale)
+        layH_ctrl_run.addWidget(self.but_fx_scale)
         layH_ctrl_run.addStretch(2)
         #layH_ctrl_run.addWidget(lbl_stim_options)
-        layH_ctrl_run.addWidget(self.chk_stim_options)
+        layH_ctrl_run.addWidget(self.but_stim_options)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addStretch(2)
@@ -428,7 +419,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
-        self.led_log_bottom_time.setMaximumWidth(self.led_frm + 8 * self.led_fm)
+        qled_set_max_width(self.led_log_bottom_time, str="xxxxxxxx")
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
                                             "and spectrogram plots with log. scale.</span>")
         self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked() or\
@@ -526,7 +517,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
-        self.led_log_bottom_freq.setMaximumWidth(self.led_frm + 8 * self.led_fm)
+        qled_set_max_width(self.led_log_bottom_freq, N_x=8)
         self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
 
@@ -903,7 +894,7 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar2.editingFinished.connect(self._read_param2)
 
         # --- stimulus control ---
-        self.chk_stim_options.clicked.connect(self._show_stim_options)
+        self.but_stim_options.clicked.connect(self._show_stim_options)
 
         self.chk_stim_bl.clicked.connect(self._enable_stim_widgets)
         self.chk_step_err.clicked.connect(self._enable_stim_widgets)
@@ -1099,7 +1090,7 @@ class PlotImpz_UI(QWidget):
         """
         Hide / show panel with stimulus options
         """
-        self.wdg_ctrl_stim.setVisible(self.chk_stim_options.isChecked())
+        self.wdg_ctrl_stim.setVisible(self.but_stim_options.isChecked())
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """

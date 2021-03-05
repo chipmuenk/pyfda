@@ -503,13 +503,15 @@ Examples
 
     if alg == 'auto':
         if sos:
-            logger.warning("sos!")
+            logger.info("Filter in SOS format, using Shpak algorithm for group delay.")
             alg = "shpak"
 
         elif fb.fil[0]['ft'] == 'IIR':
             alg = 'jos' # TODO: use 'shpak' here as well?
+            logger.info("IIR filter, using J.O. Smith's algorithm for group delay.")
         else:
             alg = 'jos'
+            logger.info("FIR filter, using J.O. Smith's algorithm for group delay.")
 
     if sos and alg != "shpak":
         b,a = sig.sos2tf(b)
@@ -522,7 +524,8 @@ Examples
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
         singular = np.absolute(H) < n_eps * 10 * np.spacing(1) # equivalent to matlab "eps"
         H[singular] = 0
-        tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
+        tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w) # differentiation returns one element less
+        w = w[:-1]
 
     # ---------------------
     elif alg == 'jos':

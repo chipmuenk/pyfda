@@ -78,18 +78,18 @@ fixpoint_classes = OrderedDict(
 
 filter_classes = OrderedDict(
     [# IIR
-     ('Bessel', {'name': 'Bessel', 'mod': 'pyfda.filter_designs.bessel'}),
-     ('Butter', {'name': 'Butterworth', 'mod': 'pyfda.filter_designs.butter'}),
-     ('Cheby1', {'name': 'Chebychev 1', 'mod': 'pyfda.filter_designs.cheby1'}),
-     ('Cheby2', {'name': 'Chebychev 2', 'mod': 'pyfda.filter_designs.cheby2'}),
-     ('Ellip', {'name': 'Elliptic', 'mod': 'pyfda.filter_designs.ellip'}),
-     ('EllipZeroPhz', {'name': 'EllipZeroPhz', 'mod': 'pyfda.filter_designs.ellip_zero'}),
+     ('Bessel', {'name': 'Bessel', 'mod': 'pyfda.filter_widgets.bessel'}),
+     ('Butter', {'name': 'Butterworth', 'mod': 'pyfda.filter_widgets.butter'}),
+     ('Cheby1', {'name': 'Chebychev 1', 'mod': 'pyfda.filter_widgets.cheby1'}),
+     ('Cheby2', {'name': 'Chebychev 2', 'mod': 'pyfda.filter_widgets.cheby2'}),
+     ('Ellip', {'name': 'Elliptic', 'mod': 'pyfda.filter_widgets.ellip'}),
+     ('EllipZeroPhz', {'name': 'EllipZeroPhz', 'mod': 'pyfda.filter_widgets.ellip_zero'}),
      # FIR
-     ('Equiripple', {'name': 'Equiripple', 'mod': 'pyfda.filter_designs.equiripple'}),
-     ('Firwin', {'name': 'Windowed FIR', 'mod': 'pyfda.filter_designs.firwin'}),
-     ('MA', {'name': 'Moving Average', 'mod': 'pyfda.filter_designs.ma'}),
-     ('Manual_FIR', {'name': 'Manual', 'mod': 'pyfda.filter_designs.manual'}),
-     ('Manual_IIR', {'name': 'Manual', 'mod': 'pyfda.filter_designs.manual'})
+     ('Equiripple', {'name': 'Equiripple', 'mod': 'pyfda.filter_widgets.equiripple'}),
+     ('Firwin', {'name': 'Windowed FIR', 'mod': 'pyfda.filter_widgets.firwin'}),
+     ('MA', {'name': 'Moving Average', 'mod': 'pyfda.filter_widgets.ma'}),
+     ('Manual_FIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}),
+     ('Manual_IIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'})
      ])
 
 """

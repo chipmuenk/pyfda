@@ -248,4 +248,4 @@ if __name__ == '__main__':
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
-# test using "python -m pyfda.filter_designs.cheby1"
+# test using "python -m pyfda.filter_widgets.cheby1"
