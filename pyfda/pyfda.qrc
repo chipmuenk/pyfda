@@ -34,6 +34,15 @@
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
+    <file alias="plot_style-none">images/icons/plot_style-none.png</file>
+    <file alias="plot_style-mkr">images/icons/plot_style-mkr.png</file>
+    <file alias="plot_style-line">images/icons/plot_style-line.png</file>
+    <file alias="plot_style-line-mkr">images/icons/plot_style-line-mkr.png</file>
+    <file alias="plot_style-stem">images/icons/plot_style-stem.png</file>
+    <file alias="plot_style-stem-mkr">images/icons/plot_style-stem-mkr.png</file>
+    <file alias="plot_style-steps">images/icons/plot_style-steps.png</file>
+    <file alias="plot_style-steps-mkr">images/icons/plot_style-steps-mkr.png</file>
+
     <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
 </qresource>
 
