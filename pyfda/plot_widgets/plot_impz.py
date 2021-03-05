@@ -901,7 +901,7 @@ class Plot_Impz(QWidget):
         Parameters
         ----------
         plt_style : str
-            one of "line", "stem", "step", "dots"
+            one of "line", "stem", "steps", "dots"
         ax : matplotlib axis
             Handle to the axis where signal is to be plotted
         x : array-like
@@ -931,7 +931,7 @@ class Plot_Impz(QWidget):
             handle, = ax.plot(x,y, label=label, **plt_fmt)
         elif plt_style == "stem":
             handle = stems(x,y, ax=ax, bottom=bottom, label=label, mkr_fmt=mkr_fmt, **plt_fmt)
-        elif plt_style == "step":
+        elif plt_style == "steps":
             handle, = ax.plot(x,y, drawstyle='steps-mid', label=label, **plt_fmt)
         elif plt_style == "dots":
             handle = scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt)

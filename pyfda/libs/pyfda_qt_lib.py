@@ -70,10 +70,10 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
     cmb_box.clear()
     cmb_box.setToolTip(cmb_box.tr(items_list[0]))
     for i in range(1, len(items_list)):
-        if type (items_list[i][1]) == QtGui.QIcon:
-            logger.warning("Icon!")
+        if type(items_list[i][1]) == QtGui.QIcon:
+            cmb_box.addItem("", items_list[i][0])
             cmb_box.setItemIcon(i-1, items_list[i][1])
-            cmb_box.setItemData(i-1, items_list[i][0])
+            #cmb_box.setItemData(i-1, items_list[i][0])
         else:
             cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
         cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)

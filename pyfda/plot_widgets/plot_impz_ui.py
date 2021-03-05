@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 import collections
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QTabWidget,
-                               QPushButton, QPushButtonRT, QFontMetrics, pyqtSignal, 
+                               QPushButton, QPushButtonRT, QFontMetrics, QIcon, pyqtSignal, 
                                QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout,
                                QSizePolicy)
 
@@ -137,18 +137,21 @@ class PlotImpz_UI(QWidget):
          "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
          "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
          })
-        # data / text / tooltip for stimulus type combobox. First element is combobox tooltip.
+
+        # data / icon / tooltipp (none) for plotting styles
         self.plot_styles_list =\
                 [("Plot style"),
-                 ("none","None",""),
-                 ("dots*","Dots",""),
-                 ("line","Line",""),
-                 ("line*","Line*",""),
-                 ("stem","Stem",""),
-                 ("stem*","Stem*",""),
-                 ("step","Step",""),
-                 ("step*","Step*","")
+                 ("none", QIcon(":/plot_style-none"), ""),
+                 ("dots*", QIcon(":/plot_style-mkr"), ""),
+                 ("line", QIcon(":/plot_style-line"), ""),
+                 ("line*", QIcon(":/plot_style-line-mkr"), ""),
+                 ("stem", QIcon(":/plot_style-stem"), ""),
+                 ("stem*", QIcon(":/plot_style-stem-mkr"), ""),
+                 ("steps", QIcon(":/plot_style-steps"),""),
+                 ("steps*", QIcon(":/plot_style-steps-mkr"), "")
                  ]
+
+    # data / text / tooltip for stimulus categoies combobox. 
         self.cmb_stim_items =\
                 [("<span>Stimulus category.</span>"),
                  ("none", "None", "<span>Only noise and DC can be selected.</span>"),
