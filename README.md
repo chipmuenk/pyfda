@@ -116,7 +116,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 ### The following features are currently implemented:
 
 * **Filter design**
-    * **Design methods**: Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebychev 1 and 2 (from scipy.signal and custom methods)
+    * **Design methods**: Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebyshev 1 and 2 (from scipy.signal and custom methods)
     * **Second-Order Sections** are used in the filter design when available for more robust filter design and analysis
     * **Remember all specifications** when changing filter design methods
     * **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms

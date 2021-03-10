@@ -108,7 +108,7 @@ class Butter(object):
 have a maximally flat frequency response in the passband and are monotonous 
 in both pass and stop band(s), the step response has only ~4% overshoot 
 . The roll-off is moderately steep, the non-linearity of phase response and 
-group delay are better than with Chebychev and elliptic designs
+group delay are better than with Chebyshev and elliptic designs
 of the same order. Butterworth filters are a good compromise for many applications.
 
 For manual order filter design, only the order :math:`N` and

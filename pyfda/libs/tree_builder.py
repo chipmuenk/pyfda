@@ -449,7 +449,7 @@ class Tree_Builder(object):
           reading their module level attribute `classes` with classes contained
           in the module.
 
-          `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
+          `classes` is a dictionary, e.g. `{"Cheby":"Chebyshev 1"}` where
           the key is the class name in the module and the value the corresponding
           display name (used for the combo box).
 
@@ -482,7 +482,7 @@ class Tree_Builder(object):
 
         .. code-block:: python
 
-             {'Cheby1':{'name':'Chebychev 1',
+             {'Cheby1':{'name':'Chebyshev 1',
               'mod':'pyfda.filter_design.cheby1',
               'fix': 'IIR_cascade',
               'opt': ["option1", "option2"]}
