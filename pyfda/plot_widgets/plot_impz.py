@@ -152,8 +152,8 @@ class Plot_Impz(QWidget):
         self.ui.chk_log_time.clicked.connect(self.draw)
         self.ui.led_log_bottom_time.editingFinished.connect(self.draw)
         self.ui.chk_log_spgr_time.clicked.connect(self.draw)
-        self.ui.led_time_nfft_spgr.editingFinished.connect(self._spgr_params)
-        self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_params)
+        self.ui.led_time_nfft_spgr.editingFinished.connect(self._spgr_ui2params)
+        self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
@@ -798,9 +798,9 @@ class Plot_Impz(QWidget):
         self.ui.show_fft_win()
 
 #------------------------------------------------------------------------------
-    def _spgr_params(self):
+    def _spgr_ui2params(self):
         """
-        Update overlap and nfft parameters for spectrogram
+        Update overlap and nfft parameters for spectrogram from UI 
         """
         time_nfft_spgr = safe_eval(self.ui.led_time_nfft_spgr.text(),
                                          self.ui.time_nfft_spgr, return_type='int', sign='pos')
@@ -1153,7 +1153,18 @@ class Plot_Impz(QWidget):
         if self.spgr:
             if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.N:
                 logger.warning("Only one segment is calculated since 2 NFFT - N_OVLP = {0} > N = {1}"
-                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N))     
+                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N))
+            if self.ui.time_nfft_spgr > self.ui.N:
+                logger.warning("NFFT per segment = {0} is larger than number N of data points {1}, setting NFFT = N."
+                                    .format(self.ui.time_nfft_spgr, self.ui.N))
+                self.ui.time_nfft_spgr = self.ui.N
+            if self.ui.time_ovlp_spgr >= self.ui.time_nfft_spgr:
+                logger.warning("N_OVLP must be less than NFFT, setting N_OVLP = 0.")
+                self.ui.time_ovlp_spgr = 0
+
+            self.ui.led_time_nfft_spgr.setText(str(self.ui.time_nfft_spgr))
+            self.ui.led_time_ovlp_spgr.setText(str(self.ui.time_ovlp_spgr))
+
             if self.plt_time_spgr == "xn":
                 s = x[self.ui.N_start:]
                 sig_lbl = 'X'
@@ -1179,18 +1190,22 @@ class Plot_Impz(QWidget):
             self.ui.lbl_byfs_spgr_time.setVisible(mode=='psd')
             self.ui.chk_byfs_spgr_time.setVisible(mode=='psd')
             spgr_pre =  ""
+            dB_scale = 20  # default log scale for magnitude in dB
             if self.ui.chk_log_spgr_time.isChecked():
                 dB_unit = "dB"
             else:
                 dB_unit = ""
             if mode == "psd":
                 spgr_symb = r"$S_{{{0}}}$".format(sig_lbl.lower()+sig_lbl.lower())
+                dB_scale = 10  # log scale for PSD
                 # Power Spectral Density
                 if self.ui.chk_byfs_spgr_time.isChecked():
                     # scale result by f_S
                     spgr_unit = r" in {0}W / Hz".format(dB_unit)
+                    scaling="density"
                 else:
                     spgr_unit = r" in {0}W".format(dB_unit)
+                    scaling="spectrum"
 
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
@@ -1223,31 +1238,49 @@ class Plot_Impz(QWidget):
             # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
 
 # =============================================================================
-#             f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'],
-#                                         nperseg=None, noverlap=None, nfft=None,
-#                                         return_onesided = fb.fil[0]['freqSpecsRangeType'] == 'half',
-#                                         scaling='density',mode='psd')
-#             # mode: 'psd', 'complex','magnitude','angle', 'phase'
+
 # =============================================================================
-            Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
-                                        noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
-                                        sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
-                                        mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
+            if False:
+                Sxx,f,t,im = self.ax_s.specgram(s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
+                                            noverlap=self.ui.time_ovlp_spgr, pad_to=None, xextent=t_range,
+                                            sides=sides, scale_by_freq=self.ui.chk_byfs_spgr_time.isChecked(),
+                                            mode=mode, scale=scale, vmin=bottom_spgr, cmap=None)
+                # Fs : sampling frequency for scaling
+                # window: callable or ndarray, default window_hanning
+                # NFFT : data points for each block
+                # pad_to: create zero-padding
+                # xextent: image extent along x-axis; None or (xmin, xmax)
+                # scale_by_freq: True scales power spectral density by f_S
+
+                cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.005)
+                cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
+
+                self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
+            else:
+                f, t, Sxx = sig.spectrogram(s, fb.fil[0]['f_S'], window=('tukey', 0.25),
+                                        nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr, nfft=None,
+                                        return_onesided=fb.fil[0]['freqSpecsRangeType'] == 'half',
+                                        scaling=scaling, mode=mode, detrend='constant')
             # Fs : sampling frequency for scaling
             # window: callable or ndarray, default window_hanning
-            # NFFT : data points for each block
-            # pad_to: create zero-padding
-            # xextent: image extent along x-axis; None or (xmin, xmax)
-            # scale_by_freq: True scales power spectral density by f_S
+            # nperseg : data points for each segment
+            # noverlap : number of overlapping points between segments
+            # nfft: = nperseg by default, can be larger to create zero-padding
+            # return_onesided : For complex data, a two-sided spectrum is returned always
+            # scaling: 'density' scales power spectral density by f_S, 'spectrum' returns power spectrum in V**2
+            # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
-#            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-#                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
-            #self.ax_s.colorbar(col_mesh)
+    #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
+    #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
+                #self.ax_s.colorbar(col_mesh)
 
-            cbar = self.mplwidget_t.fig.colorbar(im, ax=self.ax_s, aspect=30, pad=0.005)
-            cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
+                if self.ui.chk_log_spgr_time.isChecked():
+                    Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)     
+                col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')  # shading: 'auto', 'gouraud', 'nearest'
+                cbar = self.mplwidget_t.fig.colorbar(col_mesh, ax=self.ax_s, aspect=30, pad=0.005)
+                cbar.ax.set_ylabel(spgr_pre + spgr_symb + spgr_args + spgr_unit)
 
-            self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
+                self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
 
         # --------------- 3D Complex  -----------------------------------------
         if self.ACTIVE_3D: # not implemented / tested yet
