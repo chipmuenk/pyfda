@@ -231,13 +231,13 @@ windows =\
                  'par':[{'name':'&alpha;', 'name_tex':r'$\alpha$',
                          'val':0.25, 'min':0, 'max':1,
                          'tooltip':'<span>Shape parameter (see window tool tipp)</span>'}],
-                  'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window 
-                            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction 
-                            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window, 
+                  'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
+                            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
+                            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
                             &alpha; = 1 a Hann window.
                             <br />&nbsp;<br />
                             Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
-                            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely 
+                            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
                             to be altered by this window than e.g. by a Hann window.</span>'''}
     }
 def get_window_names():
@@ -279,7 +279,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     if win_name not in windows:
         logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
         win_name = "Boxcar"
-    d = windows[win_name]
+    d = windows[win_name] # get sub-dictionary for `win_name` from `windows` dictionary
     if 'fn_name' not in d:
         fn_name = win_name.lower()
     else:
@@ -310,8 +310,8 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         win_fnct = getattr(mod, fnct, None)
     
     if not win_fnct:
-        logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
-                     .format(fn_name))
+        logger.error('No window function "{0}" in scipy.signal.windows, '
+                     'using rectangular window instead!'.format(fn_name))
         fn_name  = "boxcar"
         win_fnct = getattr(scipy, fn_name, None)
         
