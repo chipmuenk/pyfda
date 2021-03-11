@@ -98,6 +98,24 @@ windows =\
               'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
               'using Chebyshev polynomials.</span>'),
         },
+    'DPSS':
+        {'fn_name':'dpss',
+         'par':[{
+             'name':'NW', 'name_tex':r'$NW$',
+             'val':3, 'min':0, 'max':100,
+             'tooltip':'<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
+         'info':
+             '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
+             sequences) are often used in multitaper power spectral density
+             estimation. The first window in the sequence can be used to maximize
+             the energy concentration in the main lobe, and is also called the 
+             Slepian window.
+             <br />&nbsp;<br />
+             The Kaiser window is an easier to calculate approximation for the
+             Slepian window with &beta; = &pi; <i>NW</i> .'
+             </span>'''
+         },
+
     'Cosine':
         {'info':
              ('<span>The window is half a cosine period, shifted by pi/2. '
