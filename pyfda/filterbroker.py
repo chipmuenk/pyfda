@@ -80,8 +80,8 @@ filter_classes = OrderedDict(
     [# IIR
      ('Bessel', {'name': 'Bessel', 'mod': 'pyfda.filter_widgets.bessel'}),
      ('Butter', {'name': 'Butterworth', 'mod': 'pyfda.filter_widgets.butter'}),
-     ('Cheby1', {'name': 'Chebychev 1', 'mod': 'pyfda.filter_widgets.cheby1'}),
-     ('Cheby2', {'name': 'Chebychev 2', 'mod': 'pyfda.filter_widgets.cheby2'}),
+     ('Cheby1', {'name': 'Chebyshev 1', 'mod': 'pyfda.filter_widgets.cheby1'}),
+     ('Cheby2', {'name': 'Chebyshev 2', 'mod': 'pyfda.filter_widgets.cheby2'}),
      ('Ellip', {'name': 'Elliptic', 'mod': 'pyfda.filter_widgets.ellip'}),
      ('EllipZeroPhz', {'name': 'EllipZeroPhz', 'mod': 'pyfda.filter_widgets.ellip_zero'}),
      # FIR

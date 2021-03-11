@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Design Chebychev 2 filters (LP, HP, BP, BS) with fixed or minimum order, return
+Design Chebyshev 2 filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) or second-order sections (sos) format.
 
 Attention:
@@ -41,7 +41,7 @@ from pyfda.libs.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.2"
 
-classes = {'Cheby2':'Chebychev 2'} #: Dict containing class name : display name
+classes = {'Cheby2':'Chebyshev 2'} #: Dict containing class name : display name
 
 class Cheby2(object):
 
@@ -134,7 +134,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         design.
         """
         if self.N > 25:
-            return qfilter_warning(None, self.N, "Chebychev 2")
+            return qfilter_warning(None, self.N, "Chebyshev 2")
         else:
             return True
 

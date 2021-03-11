@@ -11,7 +11,7 @@
     <ul>
     	<li> <b>Filter design</b>
 			<ul>
-				<li><b>Design methods:</b> Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebychev 1 and 2 (from scipy.signal and custom methods)</li>
+				<li><b>Design methods:</b> Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebyshev 1 and 2 (from scipy.signal and custom methods)</li>
 				<li><b>Second-Order Sections</b> are used in the filter design when available for more robust filter design and analysis</li>
 				<li><b>Remember all specifications</b> when changing filter design methods</li>				
 				<li><b>Fine-tune</b> manually the filter order and corner frequencies calculated by minimum order algorithms</li>

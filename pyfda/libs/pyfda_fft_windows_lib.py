@@ -87,7 +87,7 @@ windows =\
              },
     'Bohman':
         {'fn_name':'bohman'},
-    'Dolph-Chebychev':
+    'Dolph-Chebyshev':
         {'fn_name':'chebwin',
          'par':[{
             'name':'a', 'name_tex':r'$a$',
@@ -96,7 +96,7 @@ windows =\
          'info':
              ('<span>This window optimizes for the narrowest main lobe width for '
               'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
-              'using Chebychev polynomials.</span>'),
+              'using Chebyshev polynomials.</span>'),
         },
     'Cosine':
         {'info':
