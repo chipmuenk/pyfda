@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Design Chebychev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
+Design Chebyshev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zpk (zeros, poles, gain) or second-order sections (sos) format.
 
 Attention:
@@ -41,7 +41,7 @@ from .common import Common
 
 __version__ = "2.2"
 
-classes = {'Cheby1':'Chebychev 1'} #: Dict containing class name : display name
+classes = {'Cheby1':'Chebyshev 1'} #: Dict containing class name : display name
 
 class Cheby1(object):
 
@@ -69,7 +69,7 @@ class Cheby1(object):
             }
 
         self.info = """
-**Chebychev Type 1 filters**
+**Chebyshev Type 1 filters**
 
 maximize the rate of cutoff between the frequency response’s passband and stopband,
 at the expense of passband ripple :math:`A_PB` and increased ringing in
@@ -136,7 +136,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         design.
         """
         if self.N > 30:
-            return qfilter_warning(None, self.N, "Chebychev 1")
+            return qfilter_warning(None, self.N, "Chebyshev 1")
         else:
             return True
 

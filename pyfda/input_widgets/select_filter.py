@@ -61,7 +61,7 @@ class SelectFilter(QWidget):
 
         - cmbFilterType for selection of filter type (IIR, FIR, ...)
 
-        - cmbFilterClass for selection of design design class (Chebychev, ...)
+        - cmbFilterClass for selection of design design class (Chebyshev, ...)
 
         and populate them from the "filterTree" dict during the initial run.
         Later, calling _set_response_type() updates the three combo boxes.
@@ -246,7 +246,7 @@ class SelectFilter(QWidget):
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
         - (re)construct design method combo, adding
-          displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
+          displayed text (e.g. "Chebyshev 1") and hidden data (e.g. "cheby1")
         """
         # Read out current setting of comboBox and convert to string
         fb.fil[0]['ft'] = self.ft = qget_cmb_box(self.cmbFilterType)

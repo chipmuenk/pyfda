@@ -56,7 +56,7 @@ class EllipZeroPhz(QWidget):
 frequency response’s passband and stopband of all IIR filters. This comes
 at the expense of a constant ripple (equiripple) :math:`A_PB` and :math:`A_SB`
 in both pass and stop band. Ringing of the step response is increased in
-comparison to Chebychev filters.
+comparison to Chebyshev filters.
  
 As the passband ripple :math:`A_PB` approaches 0, the elliptical filter becomes
 a Chebyshev type II filter. As the stopband ripple :math:`A_SB` approaches 0,
