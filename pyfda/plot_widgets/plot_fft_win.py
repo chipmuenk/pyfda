@@ -19,31 +19,33 @@ from scipy.signal import argrelextrema
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qset_cmb_box
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import calc_window_function
+from pyfda.libs.pyfda_fft_windows_lib import calc_window_function, get_window_names
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
                      QDialog, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
-                     QTextBrowser, QSplitter,QTableWidget, QTableWidgetItem)
+                     QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
+                     QComboBox)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Plot_FFT_win(QDialog):
     """
     Create a pop-up widget for displaying time and frequency view of an FFT
     window.
 
-    Data is passed via the dictionary `win_dict` that is passed during construction.
+    Data is passed via the dictionary `win_dict` during construction.
     """
     # incoming
     sig_rx = pyqtSignal(object)
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True, title='pyFDA Window Viewer'):
+    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True,
+                    title='pyFDA Window Viewer'):
         super(Plot_FFT_win, self).__init__(parent)
 
         self.needs_calc = True
@@ -71,7 +73,7 @@ class Plot_FFT_win(QDialog):
 
         qwindow_stay_on_top(self, True)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
         Catch closeEvent (user has tried to close the window) and send a
@@ -81,7 +83,7 @@ class Plot_FFT_win(QDialog):
         self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
         event.accept()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -116,6 +118,26 @@ class Plot_FFT_win(QDialog):
         """
         self.bfont = QFont()
         self.bfont.setBold(True)
+
+        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
+        self.cmb_win_fft = QComboBox(self)
+        self.cmb_win_fft.addItems(get_window_names())
+        self.cmb_win_fft.setToolTip("FFT window type.")
+        qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
+
+        self.cmb_win_fft_variant = QComboBox(self)
+        self.cmb_win_fft_variant.setToolTip("FFT window variant.")
+        self.cmb_win_fft_variant.setVisible(False)
+
+        self.lblWinPar1 = QLabel("Param1")
+        self.ledWinPar1 = QLineEdit(self)
+        self.ledWinPar1.setText("1")
+        self.ledWinPar1.setObjectName("ledWinPar1")
+
+        self.lblWinPar2 = QLabel("Param2")
+        self.ledWinPar2 = QLineEdit(self)
+        self.ledWinPar2.setText("2")
+        self.ledWinPar2.setObjectName("ledWinPar2")
 
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
@@ -162,6 +184,16 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_f = QLabel("dB", self)
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
+        layH_win_select = QHBoxLayout()
+        layH_win_select.addWidget(self.lbl_win_fft)
+        layH_win_select.addWidget(self.cmb_win_fft)
+        layH_win_select.addWidget(self.cmb_win_fft_variant)
+        layH_win_select.addWidget(self.lblWinPar1)
+        layH_win_select.addWidget(self.ledWinPar1)
+        layH_win_select.addWidget(self.lblWinPar2)
+        layH_win_select.addWidget(self.ledWinPar2)
+        layH_win_select.addStretch(1)
+
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chk_auto_N)
         layHControls.addWidget(self.lbl_auto_N)
@@ -179,6 +211,10 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
 
+        layVControls = QVBoxLayout()
+        layVControls.addLayout(layH_win_select)
+        layVControls.addLayout(layHControls)
+
         self.tblWinProperties = QTableWidget(self.tbl_rows, self.tbl_cols, self)
         self.tblWinProperties.setAlternatingRowColors(True)
         self.tblWinProperties.verticalHeader().setVisible(False)
@@ -194,7 +230,7 @@ class Plot_FFT_win(QDialog):
         #----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
-        self.frmControls.setLayout(layHControls)
+        self.frmControls.setLayout(layVControls)
 
         #----------------------------------------------------------------------
         #               ### mplwidget ###
