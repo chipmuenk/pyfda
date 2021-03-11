@@ -209,6 +209,18 @@ windows =\
     #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
     #           '</span>'),
     #        }
+        'Tukey':{'fn_name':'tukey',
+                 'par':[{'name':'&alpha;', 'name_tex':r'$\alpha$',
+                         'val':0.25, 'min':0, 'max':1,
+                         'tooltip':'<span>Shape parameter (see window tool tipp)</span>'}],
+                  'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window 
+                            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction 
+                            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window, 
+                            &alpha; = 1 a Hann window.
+                            <br />&nbsp;<br />
+                            Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
+                            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely 
+                            to be altered by this window than e.g. by a Hann window.</span>'''}
     }
 def get_window_names():
     """
