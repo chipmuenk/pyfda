@@ -301,7 +301,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     mod_fnct = fn_name.split('.') # try to split fully qualified name
     fnct = mod_fnct[-1]
     if len(mod_fnct) == 1: 
-        # only one element, no modules given -> use scipy.signal.windows
+        # only one element, no module given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
     else:
         # remove the leftmost part starting with the last '.'
@@ -313,20 +313,31 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         logger.error('No window function "{0}" in scipy.signal.windows, '
                      'using rectangular window instead!'.format(fn_name))
         fn_name  = "boxcar"
-        win_fnct = getattr(scipy, fn_name, None)
+        n_par = 0
+        win_fnct = getattr(scipy.signal.windows, fn_name, None)
         
     win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info, 
                      'par':par, 'n_par':n_par, 'win_len':N})
 
-    if n_par == 0:
-        return win_fnct(N,sym=sym)
-    elif n_par == 1:
-        return win_fnct(N, par[0]['val'], sym=sym)
-    elif n_par == 2:
-        return win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)        
-    else:
-        logger.error("{0:d} parameters is not supported for windows at the moment!".format(n_par))
+    try:
+        if n_par == 0:
+            w = win_fnct(N,sym=sym)
+        elif n_par == 1:
+            w = win_fnct(N, par[0]['val'], sym=sym)
+        elif n_par == 2:
+            w = win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)
+        else:
+            logger.error("{0:d} parameters are not supported for windows at the moment!".format(n_par))
+            w = None
+    except Exception as e:
+        logger.error('An error occurred calculating the window function "{0}"\n{1}'.format(fn_name, e))
+        w = None
+    if w is None:
+        logger.warning('Falling back to rectangular window.')
+        w = np.ones(N)
+    return w
 
+# -------------------------------------------------------------------------------------
 def blackmanharris5(N, sym):
     """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
     a = [3.232153788877343e-001,
