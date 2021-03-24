@@ -35,7 +35,7 @@ windows =\
             }
          },
     'Rectangular':
-        {'fn_name':'boxcar',
+        {'fn_name': 'boxcar',
          'info':
              ('<span>Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals, i.e. '
               'where the window length is an integer number of the signal period. '
@@ -45,7 +45,7 @@ windows =\
               'This window also has the best SNR of all windows.</span>')
         },
     'Barthann':
-        {'fn_name':'barthann',
+        {'fn_name': 'barthann',
          'info':
              ('<span>A modified Bartlett-Hann Window.'
               '</span>')},
@@ -59,9 +59,9 @@ windows =\
              'hence, its Fourier transform is the product of two (periodic) sinc '
              'functions.<span>'},
     'Blackman':
-        {'fn_name':'blackman'},
+        {'fn_name': 'blackman'},
     'Blackmanharris':
-        {'fn_name':'blackmanharris',
+        {'fn_name': 'blackmanharris',
          'info':
              ('<span>The minimum 4-term Blackman-Harris window gives an excellent '
               'constant side-lobe suppression of more than 90 dB while keeping a '
@@ -85,26 +85,35 @@ windows =\
              ('<span>The 9-term Blackman-Harris window with a side-'
               'lobe suppression of up to 230 dB.</span>')
              },
-    'Bohman':
-        {'fn_name':'bohman'},
-    'Dolph-Chebyshev':
-        {'fn_name':'chebwin',
-         'par':[{
-            'name':'a', 'name_tex':r'$a$',
-            'val':80, 'min':45, 'max':300, 
-            'tooltip':'<span>Side lobe attenuation in dB.</span>'}],
-         'info':
+    'Bohman': {
+        'fn_name': 'bohman'
+        },
+        #
+    'Cosine': {
+        'fn_name': 'cosine',
+        'info':
+             ('<span>The window is half a cosine period, shifted by pi/2. '
+              'For that reason it is also known as "half-cosine" or "sine" window.</span>'),
+        },
+        #
+    'Dolph-Chebyshev': {
+        'fn_name': 'chebwin',
+        'par': [{
+            'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
+            'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
+        'info':
              ('<span>This window optimizes for the narrowest main lobe width for '
               'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
               'using Chebyshev polynomials.</span>'),
         },
-    'DPSS':
-        {'fn_name':'dpss',
-         'par':[{
-             'name':'NW', 'name_tex':r'$NW$',
-             'val':3, 'min':0, 'max':100,
-             'tooltip':'<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
-         'info':
+        #
+    'DPSS': {
+        'fn_name': 'dpss',
+        'par': [{
+             'name': 'NW', 'name_tex': r'$NW$',
+             'val': 3, 'min': 0, 'max': 100,
+             'tooltip': '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
+        'info':
              '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
              sequences) are often used in multitaper power spectral density
              estimation. The first window in the sequence can be used to maximize
@@ -112,55 +121,48 @@ windows =\
              Slepian window.
              <br />&nbsp;<br />
              The Kaiser window is an easier to calculate approximation for the
-             Slepian window with &beta; = &pi; <i>NW</i> .'
+             Slepian window with &beta; = &pi; <i>NW</i> .
              </span>'''
-         },
-
-    'Cosine':
-        {'info':
-             ('<span>The window is half a cosine period, shifted by pi/2. '
-              'For that reason it is also known as "half-cosine" or "sine" window.</span>'),
-             },
-    'Flattop':
-         {'win_fn_name':'flattop'},
-    'General Gaussian':
-        {'fn_name':'general_gaussian',
-         'par':[{
-            'name':'p','name_tex':r'$p$',
-            'val':1.5, 'min':0, 'max':20,
-             'tooltip':'<span>Shape parameter p</span>'
-             },
-             {
-            'name':'&sigma;','name_tex':r'$\sigma$',
-            'val':5, 'min':0, 'max':100,
-             'tooltip':'<span>Standard deviation &sigma;</span>'}
-             ],
-         'info':
+        },
+    #
+    'Flattop': {
+        'fn_name': 'flattop'
+        },
+    'General Gaussian': {
+        'fn_name': 'general_gaussian',
+        'par': [{
+            'name': 'p','name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
+            'tooltip': '<span>Shape parameter p</span>'
+            },
+            {
+            'name': '&sigma;','name_tex': r'$\sigma$', 'val': 5, 'min': 0, 'max': 100,
+            'tooltip': '<span>Standard deviation &sigma;</span>'
+            }],
+        'info':
              ('<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, '
               '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
               '</span>'),
-         },
-    'Gauss':
-        {'fn_name':'gaussian',
-         'par':[{
-             'name':'&sigma;', 'name_tex':r'$\sigma$',
-             'val':5,'min':0, 'max':100,
-             'tooltip':'<span>Standard deviation &sigma;</span>'}],
-         'info':
+        },
+    'Gauss': {
+        'fn_name': 'gaussian',
+         'par': [{
+             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5,'min': 0, 'max': 100,
+             'tooltip': '<span>Standard deviation &sigma;</span>'}],
+        'info':
              ('<span>Gaussian window '
               '</span>')
-         },
-    'Hamming':
-        {'fn_name':'hamming',
-         'info':
+        },
+    'Hamming':{
+        'fn_name':'hamming',
+        'info':
              ('<span>The Hamming Window has been optimized for suppression of '
               'the first side lobe. Compared to the Hann window, this comes at '
               'the cost of a worse (constant) level of higher side lobes.'
               '<br />&nbsp;<br />Mathematically, it is a two-term raised cosine window with '
               'non-zero endpoints (DC-offset).</span>')
          },
-    'Hann':
-        {'fn_name':'hann',
+    'Hann':{
+        'fn_name':'hann',
         'info':
             '<span>The Hann (or, falsely, "Hanning") window is smooth at the '
             'edges. In the frequency domain this corresponds to side-lobes falling '
@@ -170,23 +172,26 @@ windows =\
             '<br />&nbsp;<br />'
             'Mathematically, it is the most simple two-term raised cosine '
             'or squared sine window.</span>'},
-    'Kaiser':
-        {'fn_name':'kaiser',
-         'par':[{
+    'Kaiser':{
+        'fn_name':'kaiser',
+        'par':[{
                 'name':'&beta;', 'name_tex':r'$\beta$',
                 'val':10, 'min':0, 'max':30,
                 'tooltip':
                     ('<span>Shape parameter; lower values reduce  main lobe width, '
                      'higher values reduce side lobe level, typ. in the range '
                      '5 ... 20.</span>')}],
-         'info':
+        'info':
              '<span>The Kaiser window is a very good approximation to the '
              'Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, '
              'which maximizes the energy in the main lobe of the window relative '
              'to the total energy.</span>'
         },
-    'Nuttall':{},
+    'Nuttall':{
+        'fn_name':'nuttall'
+        },
     'Parzen':{
+        'fn_name':'parzen',
         'info':
             '<span>The Parzen window is a 4th order B-spline window whose side-'
             'lobes fall off with -24 dB/oct.'
@@ -196,19 +201,19 @@ windows =\
             'four times).'
             '<br />&nbsp;<br />'
             'See also: Boxcar and Triangular / Bartlett windows.</span>'},
-    'Slepian':
-        {'fn_name':'slepian',
-         'par':[{
+    'Slepian':{
+        'fn_name':'slepian',
+        'par':[{
              'name':'BW', 'name_tex':r'$BW$',
              'val':0.3, 'min':0, 'max':100,
              'tooltip':'<span>Bandwidth</span>'}],
-         'info':
+        'info':
              '<span>Used to maximize the energy concentration in the main lobe. '
              ' Also called the digital prolate spheroidal sequence (DPSS).'
              '<br />&nbsp;<br />'
              'See also: Kaiser window.'
              '</span>'
-         },
+        },
     'Triangular':{'fn_name':'triang'},
     # 'Ultraspherical':
     #     {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
@@ -227,18 +232,20 @@ windows =\
     #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
     #           '</span>'),
     #        }
-        'Tukey':{'fn_name':'tukey',
-                 'par':[{'name':'&alpha;', 'name_tex':r'$\alpha$',
-                         'val':0.25, 'min':0, 'max':1,
-                         'tooltip':'<span>Shape parameter (see window tool tipp)</span>'}],
-                  'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
-                            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
-                            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
-                            &alpha; = 1 a Hann window.
-                            <br />&nbsp;<br />
-                            Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
-                            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
-                            to be altered by this window than e.g. by a Hann window.</span>'''}
+    'Tukey':{
+        'fn_name':'tukey',
+        'par':[{
+            'name':'&alpha;', 'name_tex':r'$\alpha$', 'val':0.25, 'min':0, 'max':1,
+                    'tooltip':'<span>Shape parameter (see window tool tipp)</span>'}],
+        'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
+                    whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
+                    of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
+                    &alpha; = 1 a Hann window.
+                    <br />&nbsp;<br />
+                    Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
+                    window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
+                    to be altered by this window than e.g. by a Hann window.</span>'''
+        }
     }
 def get_window_names():
     """
@@ -249,7 +256,7 @@ def get_window_names():
     for d in windows:
         win_name_list.append(d)
     
-    return sorted(win_name_list)
+    return sorted(win_name_list, key=lambda v: (v.lower(), v)) # always sort lower cased names
         
 
 def calc_window_function(win_dict, win_name, N=32, sym=True):
@@ -280,10 +287,8 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
         win_name = "Boxcar"
     d = windows[win_name] # get sub-dictionary for `win_name` from `windows` dictionary
-    if 'fn_name' not in d:
-        fn_name = win_name.lower()
-    else:
-        fn_name = d['fn_name']
+
+    fn_name = d['fn_name']
 
     if 'par' in d:
         par = d['par']
@@ -320,7 +325,10 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
                      'par':par, 'n_par':n_par, 'win_len':N})
 
     try:
-        if n_par == 0:
+        if fn_name == 'dpss':
+            logger.info("dpss!")
+            w = scipy.signal.windows.dpss(N, par[0]['val'], sym=sym)
+        elif n_par == 0:
             w = win_fnct(N,sym=sym)
         elif n_par == 1:
             w = win_fnct(N, par[0]['val'], sym=sym)
@@ -372,7 +380,11 @@ def blackmanharris9(N, sym):
     return calc_cosine_window(N, sym, a)
    
     
-def calc_cosine_window(N, sym, a):   
+def calc_cosine_window(N, sym, a):
+    """ 
+    Return window based on cosine functions with amplitudes specified
+    by the list `a`.
+    """
     if sym:
         L = N-1
     else:
