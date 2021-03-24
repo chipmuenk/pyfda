@@ -19,7 +19,7 @@ from scipy.signal import argrelextrema
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import calc_window_function, get_window_names
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -48,6 +48,11 @@ class Plot_FFT_win(QDialog):
                     title='pyFDA Window Viewer'):
         super(Plot_FFT_win, self).__init__(parent)
 
+        # # dictionary for fft window settings from plot_pz_ui
+        # self.win_dict = fb.fil[0]['win_fft']
+        # self.fft_window = None # handle for FFT window pop-up widget
+        # self.window_name = "Rectangular"
+    
         self.needs_calc = True
         self.needs_draw = True
         self.needs_redraw = True
@@ -88,7 +93,7 @@ class Plot_FFT_win(QDialog):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"\
+        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
@@ -109,7 +114,7 @@ class Plot_FFT_win(QDialog):
         else:
             logger.error("Unknown content of dict_sig: {0}".format(dict_sig))
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -223,32 +228,32 @@ class Plot_FFT_win(QDialog):
 
         self.txtInfoBox = QTextBrowser(self)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### frmControls ###
         #
         # This widget encompasses all control subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layVControls)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # main widget: Layout layVMainMpl (VBox) is defined with MplWidget,
         #              additional widgets can be added (like self.frmControls)
         #              The widget encompasses all other widgets.
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### frmInfo ###
         #
         # This widget encompasses the text info box and the table with window
         # parameters.
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         layVInfo = QVBoxLayout(self)
         layVInfo.addWidget(self.tblWinProperties)
         layVInfo.addWidget(self.txtInfoBox)
@@ -257,44 +262,43 @@ class Plot_FFT_win(QDialog):
         self.frmInfo.setObjectName("frmInfo")
         self.frmInfo.setLayout(layVInfo)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### splitter ###
         #
         # This widget encompasses all control subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.mplwidget)
         splitter.addWidget(self.frmInfo)
 
-        # setSizes uses absolute pixel values, but can be "misused" by specifying values
-        # that are way too large: in this case, the space is distributed according
-        # to the _ratio_ of the values:
-        splitter.setSizes([3000,1000])
+        # setSizes uses absolute pixel values, but can be "misused" by
+        # specifying values that are way too large: in this case, the space
+        # is distributed according to the _ratio_ of the values:
+        splitter.setSizes([3000, 1000])
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(splitter)
         self.setLayout(layVMain)
 
-
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #           Set subplots
         #
         self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
 
-        self.draw() # initial drawing
+        self.draw()  # initial drawing
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.chk_log_f.clicked.connect(self.update_view)
         self.chk_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
@@ -308,8 +312,121 @@ class Plot_FFT_win(QDialog):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.tblWinProperties.itemClicked.connect(self._handle_item_clicked)
-#------------------------------------------------------------------------------
+
+        # TODO: adapt 
+        # careful! currentIndexChanged passes the current index to _update_win_fft
+        self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
+        self.ledWinPar1.editingFinished.connect(self._read_param1)
+        self.ledWinPar2.editingFinished.connect(self._read_param2)
+
+# ------------------------------------------------------------------------------
+
+    def _read_param1(self):
+        """
+        Read out textbox when editing is finished and update dict and fft window
+        """
+        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
+                          return_type='float')
+        if param < self.win_dict['par'][0]['min']:
+            param = self.win_dict['par'][0]['min']
+        elif param > self.win_dict['par'][0]['max']:
+            param = self.win_dict['par'][0]['max']
+        self.ledWinPar1.setText(str(param))
+        self.win_dict['par'][0]['val'] = param
+        self._update_win_fft()
+
+    def _read_param2(self):
+        """
+        Read out textbox when editing is finished and update dict and fft window
+        """
+        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
+                          return_type='float')
+        if param < self.win_dict['par'][1]['min']:
+            param = self.win_dict['par'][1]['min']
+        elif param > self.win_dict['par'][1]['max']:
+            param = self.win_dict['par'][1]['max']
+        self.ledWinPar2.setText(str(param))
+        self.win_dict['par'][1]['val'] = param
+        self._update_win_fft()
+
+    def _update_win_fft(self, arg=None, emit=True):
+        """
+        Update FFT window when window or parameters have changed.      
+        
+        Depending on the way the function is called, different things happen:
+
+        - signal-slot connection to combo-box -> index (int), absorbed by `arg`
+                                                 emit is not set -> emit=True
+        - called by _read_param() -> empty -> emit=True
+        - called by update_N(emit=False)
+
+        Update the plot and emit 
+
+        """
+        if not isinstance(emit, bool):
+            logger.error("update win: emit={0}".format(emit))
+        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.win_dict['name'] = self.window_name
+        self.calc_win()
+#        self.win = calc_window_function(self.win_dict, self.window_name,
+#                                        N=self.N, sym=False)
+
+        n_par = self.win_dict['n_par']
+
+        self.lblWinPar1.setVisible(n_par > 0)
+        self.ledWinPar1.setVisible(n_par > 0)
+        self.lblWinPar2.setVisible(n_par > 1)
+        self.ledWinPar2.setVisible(n_par > 1)
+
+        if n_par > 0:
+            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
+
+        if n_par > 1:
+            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
+
+        #self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
+
+        #self.cgain = np.sum(self.win) / self.N  # coherent gain
+        #self.win /= self.cgain  # correct gain for periodic signals
+
+        self.update_view()
+
+        # only emit a signal for local triggers to prevent infinite loop:
+        # - signal-slot connection passes a bool or an integer
+        # - local function calls don't pass anything
+        if emit is True:
+            self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
+#        # ... but always notify the FFT widget via sig_tx_fft
+#        self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'win'})
+
+# ------------------------------------------------------------------------------
+
     def _init_table(self, rows, cols, val):
+        """
+        Create a table with `rows` and `cols`, organized in sets of 3:
+        Name (with a checkbox) - value - unit
+        each item.
+
+        Parameters
+        ----------
+
+        rows : int
+            number of rows
+
+        cols : int
+            number of columns (must be multiple of 3)
+
+        val : ???
+            values for the table
+
+        Returns
+        -------
+        None
+        """
         for r in range(rows):
             for c in range(cols):
                 item = QTableWidgetItem(val)
@@ -319,10 +436,10 @@ class Plot_FFT_win(QDialog):
                         item.setCheckState(Qt.Checked)
                     else:
                         item.setCheckState(Qt.Unchecked)
-                self.tblWinProperties.setItem(r,c,item)
+                self.tblWinProperties.setItem(r, c, item)
  #   https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _set_table_item(self, row, col, val, font=None, sel=None):
         """
         Set the table item with the index `row, col` and the value val
@@ -339,7 +456,7 @@ class Plot_FFT_win(QDialog):
             item.setCheckState(Qt.Unchecked)
         # when sel is not specified, don't change anything
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _handle_item_clicked(self, item):
         if item.column() % 3 == 0: # clicked on checkbox
             num = item.row() * 2 + item.column() // 3
@@ -376,12 +493,22 @@ class Plot_FFT_win(QDialog):
         """
         (Re-)Calculate the number of data points when Auto N chkbox has been
         clicked or when the number of data points has been updated outside this
-        class
+        class, recalculate window and update plot
         """
         if self.chk_auto_N.isChecked():
             self.N = self.N_auto
 
-        self.draw()
+        self.calc_win()
+        self.update_view()
+
+# ------------------------------------------------------------------------------
+    def draw(self):
+        """
+        Main entry point:
+        Re-calculate window and update the plot
+        """
+        self.calc_win()
+        self.update_view()
 
 #------------------------------------------------------------------------------
     def calc_win(self):
@@ -403,7 +530,7 @@ class Plot_FFT_win(QDialog):
 
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
-        self.cgain = np.sum(self.win) / self.N
+        self.cgain = np.sum(self.win) / self.N  # coherent gain
 
         self.F = fftfreq(self.N * self.pad, d=1. / fb.fil[0]['f_S']) # use zero padding
         self.Win = np.abs(fft(self.win, self.N * self.pad))
@@ -419,16 +546,7 @@ class Plot_FFT_win(QDialog):
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
 
-#------------------------------------------------------------------------------
-    def draw(self):
-        """
-        Main entry point:
-        Re-calculate \|H(f)\| and draw the figure
-        """
-        self.calc_win()
-        self.update_view()
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etc without recalculating the
