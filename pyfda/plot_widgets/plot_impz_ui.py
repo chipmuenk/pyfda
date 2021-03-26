@@ -24,7 +24,6 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
                                      qstyle_widget, qled_set_max_width, QVLine)
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
-from .plot_fft_win import Plot_FFT_win
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 class PlotImpz_UI(QWidget):
@@ -36,8 +35,6 @@ class PlotImpz_UI(QWidget):
     # sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
-    # outgoing to local fft window
-    sig_tx_fft = pyqtSignal(object)
 
 
     def __init__(self, parent):
@@ -105,14 +102,14 @@ class PlotImpz_UI(QWidget):
         self.bottom_f = -120 # initial value for log. scale
         self.param = None
 
+        self.f_scale = fb.fil[0]['f_S']
+        self.t_scale = fb.fil[0]['T_S']
 
-        # dictionary for fft window settings
+        # TODO:
         self.win_dict = fb.fil[0]['win_fft']
         self.fft_window = None # handle for FFT window pop-up widget
         self.window_name = "Rectangular"
 
-        self.f_scale = fb.fil[0]['f_S']
-        self.t_scale = fb.fil[0]['T_S']
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
@@ -234,6 +231,7 @@ class PlotImpz_UI(QWidget):
                  ("mag_phi","Mag. / Phase", "<span>Magnitude and phase.</span>"),
                  ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>")
                 ]
+
 
         self._construct_UI()
         self._enable_stim_widgets()
@@ -857,7 +855,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim_formula.addWidget(self.ledStimFormula,10)
 
         #----------------------------------------------
-        #layG_ctrl_stim = QGridLayout()
         layH_ctrl_stim_par = QHBoxLayout()
 
         layH_ctrl_stim_par.addLayout(layGStim)
@@ -1390,44 +1387,14 @@ class PlotImpz_UI(QWidget):
         # only emit a signal for local triggers to prevent infinite loop:
         # - signal-slot connection passes a bool or an integer
         # - local function calls don't pass anything
+        # TODO:
         if emit is True:
             self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
         # ... but always notify the FFT widget via sig_tx_fft
-        self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
+        #self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
 
-    #------------------------------------------------------------------------------
-    def show_fft_win(self):
-        """
-        Pop-up FFT window
-        """
-        if self.but_fft_win.isChecked():
-            qstyle_widget(self.but_fft_win, "changed")
-        else:
-            qstyle_widget(self.but_fft_win, "normal")
-
-        if self.fft_window is None: # no handle to the window? Create a new instance
-            if self.but_fft_win.isChecked():
-                # Important: Handle to window must be class attribute otherwise it
-                # (and the attached window) is deleted immediately when it goes out of scope
-                self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
-                                               title="pyFDA Spectral Window Viewer")
-                self.sig_tx_fft.connect(self.fft_window.sig_rx)
-                self.fft_window.sig_tx.connect(self.close_fft_win)
-                self.fft_window.show() # modeless i.e. non-blocking popup window
-        else:
-            if not self.but_fft_win.isChecked():
-                if self.fft_window is None:
-                    logger.warning("FFT window is already closed!")
-                else:
-                    self.fft_window.close()
-
-    def close_fft_win(self):
-        self.fft_window = None
-        self.but_fft_win.setChecked(False)
-        qstyle_widget(self.but_fft_win, "normal")
-
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
         """
         Calculate number of points to be displayed, depending on type of filter

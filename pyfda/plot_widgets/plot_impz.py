@@ -33,6 +33,7 @@ from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter, no_plot
 
+from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for botb mpl widgets
@@ -49,6 +50,8 @@ class Plot_Impz(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, e.g. when stimulus has been calculated
     sig_tx = pyqtSignal(object)
+    # outgoing to local fft window
+    sig_tx_fft = pyqtSignal(object)
 
 
     def __init__(self, parent):
@@ -81,6 +84,16 @@ class Plot_Impz(QWidget):
                              'ms':self.fmt_mkr_size}
 
         # self.fmt_stem_stim = params['mpl_stimuli']
+
+        # instantiate FFT window with dictionary for window settings
+        self.win_dict = fb.fil[0]['win_fft']
+        self.fft_window = None # handle for FFT window pop-up widget
+        #self.window_name = "Rectangular"
+
+        self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
+                                        title="pyFDA Spectral Window Viewer")
+        # hide window initially, this is modeless i.e. a non-blocking popup window
+        self.fft_window.hide()
 
         self._construct_UI()
 
@@ -142,7 +155,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
-        self.ui.but_fft_win.clicked.connect(self.ui.show_fft_win)
+        self.ui.but_fft_win.clicked.connect(self.show_fft_win)
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -179,6 +192,8 @@ class Plot_Impz(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
+        # connect FFT window to widgets and signals upstream:
+        self.fft_window.sig_tx.connect(self.process_sig_rx)#(self.hide_fft_win)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -198,9 +213,15 @@ class Plot_Impz(QWidget):
 
         self.error = False
 
-        if 'closeEvent' in dict_sig:
-            self.close_FFT_win()
-            return  # probably not needed
+        # --- signals coming from the FFT window widget -----------------------
+        if 'fft' in dict_sig['sender']:
+            logger.warning(dict_sig['sender'])# == 'fft':
+            if 'closeEvent' in dict_sig:
+                self.hide_fft_win()
+                return 
+            else:
+                if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'win':
+                    logger.warning(dict_sig)
         # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
@@ -293,12 +314,33 @@ class Plot_Impz(QWidget):
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
                     self.ui.recalc_freqs()
-
+            elif 'ui_changed' in dict_sig:
+                self.needs_redraw = [True] * 2
 
 #            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
 #                    self.needs_calc = True # always require recalculation when triggered externally
 #                    qstyle_widget(self.ui.but_run, "changed")
 #                    self.fx_select("Fixpoint")
+
+    # ------------------------------------------------------------------------------
+    def show_fft_win(self):
+        """
+        Show / hide FFT window depending on the correspondin button
+        """
+        logger.warning(self.ui.but_fft_win.isChecked())
+        if self.ui.but_fft_win.isChecked():
+            self.fft_window.show()
+        else:
+            self.fft_window.hide()
+
+    # --------------------------------------------------------------------------
+    def hide_fft_win(self):
+        """
+        The closeEvent caused by clicking the "x" in the FFT window is caught
+        there and routed here to only hide the window
+        """
+        self.ui.but_fft_win.setChecked(False)
+        self.fft_window.hide()
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -795,7 +837,8 @@ class Plot_Impz(QWidget):
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
-        self.ui.show_fft_win()
+        # TODO: is this needed? to update frequency units?
+        self.show_fft_win()
 
 #------------------------------------------------------------------------------
     def _spgr_ui2params(self):
