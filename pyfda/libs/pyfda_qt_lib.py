@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 from .pyfda_lib import qstr
 
-from .compat import QFrame, QMessageBox, Qt, QtGui
+from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QSize, QWidget
 from .pyfda_dirs import OS
 
 # ------------------------------------------------------------------------------
@@ -426,6 +426,117 @@ class QVLine(QFrame):
         #self.setLineWidth(width)
         #self.setFrameShape(QFrame.StyledPanel);
         self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
+
+
+class RotatedButton(QPushButton):
+    """
+    Create a rotated QPushButton
+    
+    Taken from
+    
+    https://forum.qt.io/topic/9279/moved-how-to-rotate-qpushbutton-63/7
+    """
+    
+    def init(self, text, parent, orientation = "west"):
+        super(RotatedButton,self).init(text, parent)
+        self.orientation = orientation
+
+    def paintEvent(self, event):
+        painter = QtGui.QStylePainter(self)
+        painter.rotate(90)
+        painter.translate(0, -1 * self.width())
+        painter.drawControl(QtGui.QStyle.CE_PushButton, self.getSyleOptions())
+
+    def minimumSizeHint(self):
+        size = super(RotatedButton, self).minimumSizeHint()
+        size.transpose()
+        return size
+
+    def sizeHint(self):
+        size = super(RotatedButton, self).sizeHint()
+        size.transpose()
+        return size
+
+    def getSyleOptions(self):
+        options = QtGui.QStyleOptionButton()
+        options.initFrom(self)
+        size = options.rect.size()
+        size.transpose()
+        options.rect.setSize(size)
+        #options.features = QtGui.QStyleOptionButton.None
+        if self.isFlat():
+            options.features |= QtGui.QStyleOptionButton.Flat
+        if self.menu():
+            options.features |= QtGui.QStyleOptionButton.HasMenu
+        if self.autoDefault() or self.isDefault():
+            options.features |= QtGui.QStyleOptionButton.AutoDefaultButton
+        if self.isDefault():
+            options.features |= QtGui.QStyleOptionButton.DefaultButton
+        if self.isDown() or (self.menu() and self.menu().isVisible()):
+            options.state |= QtGui.QStyle.State_Sunken
+        if self.isChecked():
+            options.state |= QtGui.QStyle.State_On
+        if not self.isFlat() and not self.isDown():
+            options.state |= QtGui.QStyle.State_Raised
+
+        options.text = self.text()
+        options.icon = self.icon()
+        options.iconSize = self.iconSize()
+        return options
+    
+class QLabelVert(QLabel):
+    """
+    Create a vertical label
+    
+    Adapted from 
+    https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/widgets/VerticalLabel.html
+    
+    https://stackoverflow.com/questions/34080798/pyqt-draw-a-vertical-label
+    
+    check https://stackoverflow.com/questions/29892203/draw-rich-text-with-qpainter
+    """
+    
+    def __init__(self, text, orientation='west', forceWidth=True):
+        QLabel.__init__(self, text)
+        #self.forceWidth = forceWidth
+        self.orientation = orientation
+        #self.setOrientation(orientation)
+
+    # def setOrientation(self, o):
+    #     self.orientation = o
+    #     self.update()
+    #     self.updateGeometry()
+        
+    def paintEvent(self, ev):
+        p = QtGui.QPainter(self)
+        # p.setPen(QtCore.Qt.black)
+        p.rotate(-90)
+        rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
+        #align = self.alignment()  # use alignment of original widget 
+        align  = QtCore.Qt.AlignVCenter|QtCore.Qt.AlignHCenter
+        #p.translate(0, -1 * self.width())
+            
+        # Draw plain text in `rgn` with alignment `align` 
+        self.hint = p.drawText(rgn, align, self.text())
+        p.drawText(rgn, align, self.text())  # returns (height, width)
+        #p.drawControl()
+        p.end()
+
+    def sizeHint(self):
+        # if hasattr(self, 'hint'):
+        #     return QSize(self.hint.height(), self.hint.width())
+        # else:
+        #     return QSize(19, 50)
+        size = super(QLabelVert, self).sizeHint()
+        size.transpose()
+        return size
+
+    def minimumSizeHint(self):
+        size = super(QLabelVert, self).minimumSizeHint()
+        size.transpose()
+        return size
+
+
 
 # ==============================================================================
 
