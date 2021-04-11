@@ -79,10 +79,10 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
         cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     qset_cmb_box(cmb_box, item_init, data=True)
 
-    """ icon = QIcon('logo.png') 
-    # adding icon to the given index 
-    self.combo_box.setItemIcon(i, icon) 
-    size = QSize(10, 10) 
+    """ icon = QIcon('logo.png')
+    # adding icon to the given index
+    self.combo_box.setItemIcon(i, icon)
+    size = QSize(10, 10)
     self.combo_box.setIconSize(size)  """
 
 #------------------------------------------------------------------------------
@@ -218,10 +218,10 @@ def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
     return idx
 
 # ----------------------------------------------------------------------------
-def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False, 
+def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
                       caseSensitive=False):
     """
-    Add an entry in combobox with text / data / tooltipp from `item_list`. 
+    Add an entry in combobox with text / data / tooltipp from `item_list`.
     When the item is already in combobox (searching for data or text item, depending
     `data`), do nothing. Signals are blocked during the update of the combobox unless
     `fireSignals` is set `True`. By default, the search is case insensitive, this
@@ -257,7 +257,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
     # MatchRegExp, MatchWildcard, MatchRecursive
 
     if data:
-        idx = cmb_box.findData(item_list[0], flags=flag)  # find index for data 
+        idx = cmb_box.findData(item_list[0], flags=flag)  # find index for data
     else:
         idx = cmb_box.findText(item_list[1], flags=flag)  # find index for text
 
@@ -267,7 +267,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
         idx = cmb_box.findData(item_list[0])
         cmb_box.setItemData(idx, cmb_box.tr(item_list[2]), Qt.ToolTipRole)
         cmb_box.blockSignals(False)
-        
+
     return idx
 
 # ----------------------------------------------------------------------------
@@ -376,13 +376,13 @@ def qled_set_max_width(wdg, str = '', N_x = 17):
 
     Returns
     -------
-    
+
     width: int
         The required width in points
 
     """
     # ----- define measures to define size of LineEditFields
-    #       # contentsMargins() is a property of QWidget, gets 
+    #       # contentsMargins() is a property of QWidget, gets
     #       # textMargins(), property of QLineEdit, gets margins around the text inside the frame
     width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
                 wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
@@ -412,7 +412,7 @@ class QHLine(QFrame):
     def __init__(self, width=1):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
-        self.setFrameShadow(QFrame.Plain)       
+        self.setFrameShadow(QFrame.Plain)
         self.setLineWidth(width)
 
 
@@ -421,7 +421,7 @@ class QVLine(QFrame):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Plain)
-        #self.setStyleSheet('border-color: rgb(50,50,50)')  
+        #self.setStyleSheet('border-color: rgb(50,50,50)')
         #self.setFrameShadow(QFrame.Sunken)
         #self.setLineWidth(width)
         #self.setFrameShape(QFrame.StyledPanel);
@@ -431,12 +431,12 @@ class QVLine(QFrame):
 class RotatedButton(QPushButton):
     """
     Create a rotated QPushButton
-    
+
     Taken from
-    
+
     https://forum.qt.io/topic/9279/moved-how-to-rotate-qpushbutton-63/7
     """
-    
+
     def init(self, text, parent, orientation = "west"):
         super(RotatedButton,self).init(text, parent)
         self.orientation = orientation
@@ -483,19 +483,19 @@ class RotatedButton(QPushButton):
         options.icon = self.icon()
         options.iconSize = self.iconSize()
         return options
-    
+
 class QLabelVert(QLabel):
     """
     Create a vertical label
-    
-    Adapted from 
+
+    Adapted from
     https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/widgets/VerticalLabel.html
-    
+
     https://stackoverflow.com/questions/34080798/pyqt-draw-a-vertical-label
-    
+
     check https://stackoverflow.com/questions/29892203/draw-rich-text-with-qpainter
     """
-    
+
     def __init__(self, text, orientation='west', forceWidth=True):
         QLabel.__init__(self, text)
         #self.forceWidth = forceWidth
@@ -506,17 +506,17 @@ class QLabelVert(QLabel):
     #     self.orientation = o
     #     self.update()
     #     self.updateGeometry()
-        
+
     def paintEvent(self, ev):
         p = QtGui.QPainter(self)
         # p.setPen(QtCore.Qt.black)
         p.rotate(-90)
         rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
-        #align = self.alignment()  # use alignment of original widget 
+        #align = self.alignment()  # use alignment of original widget
         align  = QtCore.Qt.AlignVCenter|QtCore.Qt.AlignHCenter
         #p.translate(0, -1 * self.width())
-            
-        # Draw plain text in `rgn` with alignment `align` 
+
+        # Draw plain text in `rgn` with alignment `align`
         self.hint = p.drawText(rgn, align, self.text())
         p.drawText(rgn, align, self.text())  # returns (height, width)
         #p.drawControl()
@@ -535,8 +535,6 @@ class QLabelVert(QLabel):
         size = super(QLabelVert, self).minimumSizeHint()
         size.transpose()
         return size
-
-
 
 # ==============================================================================
 
