@@ -6,32 +6,35 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
-Store the available fft windows and their properties
-"""
-import logging
-logger = logging.getLogger(__name__)
-
 import importlib
 import numpy as np
 import scipy.signal as sig
 import scipy
 
+from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
+from .compat import (QWidget, QLabel, QComboBox, QLineEdit, QFrame, QFont,
+                         QHBoxLayout, pyqtSignal)
 
-windows =\
-    {'Boxcar':
-        {'fn_name':'boxcar', 
-         'info':
+import logging
+logger = logging.getLogger(__name__)
+
+"""
+Dictionary with available fft windows and their properties
+"""
+windows = {
+    'Boxcar': {
+        'fn_name': 'boxcar',
+        'info':
              ('<span>Rectangular (a.k.a. "Boxcar") window, best suited for coherent signals, i.e. '
               'where the window length is an integer number of the signal period. '
               'It also works great when the signal length is shorter than the window '
               'length (e.g. for the impulse response of a FIR filter). For other signals, '
               'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
               'This window also has the best SNR of all windows.</span>'),
-        'props':{
-            'enbw':1,
-            'cgain':1,
-            'bw':1
+        'props': {
+            'enbw': 1,
+            'cgain': 1,
+            'bw': 1
             }
          },
     'Rectangular':
@@ -50,14 +53,15 @@ windows =\
              ('<span>A modified Bartlett-Hann Window.'
               '</span>')},
     'Bartlett':
-        {'fn_name':'bartlett',
-         'info':'<span>The Bartlett window is very similar to a triangular window, '
-             'except that the end point(s) are at zero. Its side lobes fall off with '
-             '12 dB/oct., the side lobe suppression is 26 dB.'
-             '<br />&nbsp;<br />'
-             'It can be constructed as the convolution of two rectangular windows, '
-             'hence, its Fourier transform is the product of two (periodic) sinc '
-             'functions.<span>'},
+        {'fn_name': 'bartlett',
+         'info':
+            '<span>The Bartlett window is very similar to a triangular window, '
+            'except that the end point(s) are at zero. Its side lobes fall off with '
+            '12 dB/oct., the side lobe suppression is 26 dB.'
+            '<br />&nbsp;<br />'
+            'It can be constructed as the convolution of two rectangular windows, '
+            'hence, its Fourier transform is the product of two (periodic) sinc '
+            'functions.<span>'},
     'Blackman':
         {'fn_name': 'blackman'},
     'Blackmanharris':
@@ -68,19 +72,19 @@ windows =\
               'reasonably narrow main lobe.</span>')
              },
     'Blackmanharris_5':
-        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
+        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
          'info':
              ('<span>The 5-term Blackman-Harris window with a side-'
               'lobe suppression of up to 125 dB.</span>')
              },
     'Blackmanharris_7':
-        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
+        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
          'info':
              ('<span>The 7-term Blackman-Harris window with a side-'
               'lobe suppression of up to 180 dB.</span>')
              },
     'Blackmanharris_9':
-        {'fn_name':'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
+        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
          'info':
              ('<span>The 9-term Blackman-Harris window with a side-'
               'lobe suppression of up to 230 dB.</span>')
@@ -457,3 +461,133 @@ class UserWindows(object):
 # including a comprehensive list of window functions and some new flat-top windows", 
 # February 15, 2002 
 # https://holometer.fnal.gov/GH_FFT.pdf
+
+class QFFTWinSelection(QWidget):
+
+    # incoming
+    #sig_rx = pyqtSignal(object)
+    # outgoing
+    #sig_tx = pyqtSignal(object)
+    win_changed = pyqtSignal(object)
+
+    def __init__(self, parent, win_dict):
+        super(QFFTWinSelection, self).__init__(parent)
+
+        self.win_dict = win_dict
+        self._construct_UI()
+
+    def _construct_UI(self):
+        """
+        Create the FFT window selection widget, consisting of:
+        - combobox for windows
+        - 0, 1 or 2 parameter fields
+        """
+        self.bfont = QFont()
+        self.bfont.setBold(True)
+
+        # FFT window type
+        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
+        self.cmb_win_fft = QComboBox(self)
+        self.cmb_win_fft.addItems(get_window_names())
+        self.cmb_win_fft.setToolTip("FFT window type.")
+        qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
+
+        # Variant of FFT window type (not implemented yet)
+        self.cmb_win_fft_variant = QComboBox(self)
+        self.cmb_win_fft_variant.setToolTip("FFT window variant.")
+        self.cmb_win_fft_variant.setVisible(False)
+
+        # First numeric parameter for FFT window
+        self.lbl_win_par_1 = QLabel("Param1")
+        self.led_win_par_1 = QLineEdit(self)
+        self.led_win_par_1.setText("1")
+        self.led_win_par_1.setObjectName("ledWinPar1")
+        # self.cmb_win_par_1 = QComboBox(self)
+
+        # Second numeric parameter for FFT window
+        self.lbl_win_par_2 = QLabel("Param2")
+        self.led_win_par_2 = QLineEdit(self)
+        self.led_win_par_2.setText("2")
+        self.led_win_par_2.setObjectName("ledWinPar2")
+        # self.cmb_win_par_2 = QComboBox(self)
+
+        layH_win_select = QHBoxLayout()
+        layH_win_select.addWidget(self.lbl_win_fft)
+        layH_win_select.addWidget(self.cmb_win_fft)
+        layH_win_select.addWidget(self.cmb_win_fft_variant)
+        layH_win_select.addWidget(self.lbl_win_par_1)
+        layH_win_select.addWidget(self.led_win_par_1)
+        layH_win_select.addWidget(self.lbl_win_par_2)
+        layH_win_select.addWidget(self.led_win_par_2)
+
+        self.frm_fft_widgets = QFrame(self)
+        self.frm_fft_widgets.setObjectName("frm_fft_widgets")
+        self.frm_fft_widgets.setLayout(layH_win_select)
+
+
+        # careful! currentIndexChanged passes the current index to update_win
+        self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
+        self.led_win_par_1.editingFinished.connect(self.update_win_params)
+        self.led_win_par_2.editingFinished.connect(self.update_win_params)
+
+# ------------------------------------------------------------------------------
+
+    def update_win_params(self):
+        """
+        Read out parameter lineedits when editing is finished and
+        update dict and fft window
+        """
+        if self.win_dict['n_par'] > 1:        
+            param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
+                            return_type='float')
+            if param < self.win_dict['par'][1]['min']:
+                param = self.win_dict['par'][1]['min']
+            elif param > self.win_dict['par'][1]['max']:
+                param = self.win_dict['par'][1]['max']
+            self.ledWinPar2.setText(str(param))
+            self.win_dict['par'][1]['val'] = param
+
+        if self.win_dict['n_par'] > 0:
+            param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
+                            return_type='float')
+            if param < self.win_dict['par'][0]['min']:
+                param = self.win_dict['par'][0]['min']
+            elif param > self.win_dict['par'][0]['max']:
+                param = self.win_dict['par'][0]['max']
+            self.led_win_par_1.setText(str(param))
+            self.win_dict['par'][0]['val'] = param
+            self.update_win()
+
+    def update_win(self, arg=None):
+        """
+        Update FFT window when window or parameters have changed.
+
+        Depending on the way the function is called, different things happen:
+
+        Update the plot and emit 'ui_changed'
+
+        """
+        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        #self.win_dict['name'] = self.window_name
+        #self.calc_win()
+
+        n_par = self.win_dict['n_par']
+
+        self.lbl_win_par_1.setVisible(n_par > 0)
+        self.led_win_par_1.setVisible(n_par > 0)
+        self.lbl_win_par_2.setVisible(n_par > 1)
+        self.led_win_par_2.setVisible(n_par > 1)
+
+        if n_par > 0:
+            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
+            self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
+
+        if n_par > 1:
+            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
+            self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
+
+        #self.update_view()
+
+        self.win_changed.emit()
