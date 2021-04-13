@@ -26,7 +26,7 @@ matplotlib.use("Qt5Agg")
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
-from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
+from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon,
                      QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
 
 from pyfda.libs.pyfda_lib import to_html
@@ -47,7 +47,7 @@ class DynFileHandler(logging.FileHandler):
         logging.FileHandler.__init__(self, dirs.LOG_DIR_FILE, mode, encoding)
 
 # =============================================================================
-#         logging.addLevelName(logging.WARNING, ACol.YELLOW2 + 
+#         logging.addLevelName(logging.WARNING, ACol.YELLOW2 +
 #                              logging.getLevelName(logging.WARNING) + ACol.CEND)
 #         logging.addLevelName(logging.ERROR, ACol.RED2 +
 #                              logging.getLevelName(logging.ERROR) + ACol.CEND)
@@ -59,7 +59,7 @@ class DynFileHandler(logging.FileHandler):
 class XStream(QtCore.QObject):
     """
     subclass for log messages on logger window
-    Overrides stdout to print messages to textWidget 
+    Overrides stdout to print messages to textWidget
     """
     _stdout = None
     messageWritten = pyqtSignal(str) # pass str to slot
@@ -93,7 +93,7 @@ class QEditHandler(logging.Handler):
 
     def emit(self, record):
         msg = self.format(record)
-        if msg: 
+        if msg:
             XStream.stdout().write('%s'%msg)
 
 # "register" custom class DynFileHandler as an attribute for the logging module
@@ -127,7 +127,7 @@ class pyFDA(QMainWindow):
     QMainWindow is used here as it is a class that understands GUI elements like
     toolbar, statusbar, central widget, docking areas etc.
     """
-    sig_rx = pyqtSignal(object) # incoming 
+    sig_rx = pyqtSignal(object) # incoming
     # sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent=None):
@@ -137,7 +137,7 @@ class pyFDA(QMainWindow):
         # create clipboard instance that can be accessed from other modules
         fb.clipboard = QApplication.clipboard()
 
-        # initialize the FilterTreeBuilder class: 
+        # initialize the FilterTreeBuilder class:
         # read config file and construct filter tree from it
         _ = Tree_Builder() # TODO_ couldn't this be a function?
         self._construct_UI()
@@ -164,7 +164,7 @@ class pyFDA(QMainWindow):
         self.popMenu.addAction('Select &All', self.loggerWin.selectAll, "Ctrl+A")
         self.popMenu.addAction('&Copy Selected', self.loggerWin.copy)
         self.popMenu.addSeparator()
-        self.popMenu.addAction('Clear &Window', self.loggerWin.clear)       
+        self.popMenu.addAction('Clear &Window', self.loggerWin.clear)
 
 # =============================================================================
         # only needed for logging window height measured in lines
@@ -217,7 +217,7 @@ class pyFDA(QMainWindow):
         inputTabWidgets.sig_tx.connect(self.process_sig_rx)
         pltTabWidgets.sig_tx.connect(inputTabWidgets.sig_rx)
         # open pop-up "about" window
-        #aboutAction.triggered.connect(self.aboutWindow) 
+        #aboutAction.triggered.connect(self.aboutWindow)
 
         # trigger the close event in response to sigQuit generated in another subwidget:
         # inputTabWidgets.input_filter_specs.sigQuit.connect(self.close)
@@ -243,16 +243,16 @@ class pyFDA(QMainWindow):
 #         Display a message in the statusbar.
 #         """
 #         self.statusBar().showMessage(message)
-# 
-# #------------------------------------------------------------------------------       
+#
+#
 #==============================================================================
-    
+
     def logger_win_context_menu(self, point):
         """ Show right mouse button context  menu """
         self.popMenu.exec_(self.loggerWin.mapToGlobal(point))
 
 # =============================================================================
-    def closeEvent(self, event): 
+    def closeEvent(self, event):
         """
         reimplement QMainWindow.closeEvent() to prompt the user
         """
@@ -261,25 +261,25 @@ class pyFDA(QMainWindow):
 
         if reply == QMessageBox.Yes:
             # Clear clipboard before exit to avoid error message on older Qt versions
-            # "QClipboard: Unable to receive an event from the clipboard manager 
+            # "QClipboard: Unable to receive an event from the clipboard manager
             # in a reasonable time
             fb.clipboard.clear()
             event.accept()
         else:
             event.ignore()
-            
+
 
 #==============================================================================
 def main():
-    """ 
-    entry point for the pyfda application 
+    """
+    entry point for the pyfda application
     see http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html :
-    
+
     "For any GUI application using Qt, there is precisely *one* QApplication object,
     no matter whether the application has 0, 1, 2 or more windows at any given time.
     ...
-    Since the QApplication object does so much initialization, it must be created 
-    *before* any other objects related to the user interface are created."     
+    Since the QApplication object does so much initialization, it must be created
+    *before* any other objects related to the user interface are created."
     """
      # instantiate QApplication object, passing command line arguments
     if len(rc.qss_rc) > 20:
@@ -308,7 +308,7 @@ def main():
         myappid = u'chipmuenk.pyfda.v0.4'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    # set taskbar icon    
+    # set taskbar icon
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
     # Sets the active window to the active widget in response to a system event
@@ -326,9 +326,9 @@ def main():
         delta = 100
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
-    # Give the keyboard input focus to this widget if this widget 
+    # Give the keyboard input focus to this widget if this widget
     # or one of its parents is the active window:
-#    mainw.setFocus() 
+#    mainw.setFocus()
     mainw.show()
 
     #start the application's exec loop, return the exit code to the OS

@@ -123,7 +123,7 @@ windows = {
              '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
              sequences) are often used in multitaper power spectral density
              estimation. The first window in the sequence can be used to maximize
-             the energy concentration in the main lobe, and is also called the 
+             the energy concentration in the main lobe, and is also called the
              Slepian window.
              <br />&nbsp;<br />
              The Kaiser window is an easier to calculate approximation for the
@@ -158,17 +158,19 @@ windows = {
              ('<span>Gaussian window '
               '</span>')
         },
-    'Hamming':{
-        'fn_name':'hamming',
+    'Hamming': {
+        'fn_name': 'hamming',
         'info':
-             ('<span>The Hamming Window has been optimized for suppression of '
-              'the first side lobe. Compared to the Hann window, this comes at '
-              'the cost of a worse (constant) level of higher side lobes.'
-              '<br />&nbsp;<br />Mathematically, it is a two-term raised cosine window with '
-              'non-zero endpoints (DC-offset).</span>')
+             '''<span>
+             The Hamming Window has been optimized for suppression of
+             the first side lobe. Compared to the Hann window, this comes at
+             the cost of a worse (constant) level of higher side lobes.
+             <br />&nbsp;<br />Mathematically, it is a two-term raised cosine window with
+             non-zero endpoints (DC-offset).
+             </span>'''
          },
-    'Hann':{
-        'fn_name':'hann',
+    'Hann': {
+        'fn_name': 'hann',
         'info':
             '<span>The Hann (or, falsely, "Hanning") window is smooth at the '
             'edges. In the frequency domain this corresponds to side-lobes falling '
@@ -178,11 +180,11 @@ windows = {
             '<br />&nbsp;<br />'
             'Mathematically, it is the most simple two-term raised cosine '
             'or squared sine window.</span>'},
-    'Kaiser':{
-        'fn_name':'kaiser',
-        'par':[{
-                'name':'&beta;', 'name_tex':r'$\beta$',
-                'val':10, 'min':0, 'max':30,
+    'Kaiser': {
+        'fn_name': 'kaiser',
+        'par': [{
+                'name': '&beta;', 'name_tex': r'$\beta$',
+                'val': 10, 'min': 0, 'max': 30,
                 'tooltip':
                     ('<span>Shape parameter; lower values reduce  main lobe width, '
                      'higher values reduce side lobe level, typ. in the range '
@@ -193,11 +195,11 @@ windows = {
              'which maximizes the energy in the main lobe of the window relative '
              'to the total energy.</span>'
         },
-    'Nuttall':{
-        'fn_name':'nuttall'
+    'Nuttall': {
+        'fn_name': 'nuttall'
         },
-    'Parzen':{
-        'fn_name':'parzen',
+    'Parzen': {
+        'fn_name': 'parzen',
         'info':
             '<span>The Parzen window is a 4th order B-spline window whose side-'
             'lobes fall off with -24 dB/oct.'
@@ -207,12 +209,12 @@ windows = {
             'four times).'
             '<br />&nbsp;<br />'
             'See also: Boxcar and Triangular / Bartlett windows.</span>'},
-    'Slepian':{
-        'fn_name':'slepian',
-        'par':[{
-             'name':'BW', 'name_tex':r'$BW$',
-             'val':0.3, 'min':0, 'max':100,
-             'tooltip':'<span>Bandwidth</span>'}],
+    'Slepian': {
+        'fn_name': 'slepian',
+        'par': [{
+             'name': 'BW', 'name_tex': r'$BW$',
+             'val': 0.3, 'min': 0, 'max': 100,
+             'tooltip': '<span>Bandwidth</span>'}],
         'info':
              '<span>Used to maximize the energy concentration in the main lobe. '
              ' Also called the digital prolate spheroidal sequence (DPSS).'
@@ -220,7 +222,7 @@ windows = {
              'See also: Kaiser window.'
              '</span>'
         },
-    'Triangular':{'fn_name':'triang'},
+    'Triangular': {'fn_name':'triang'},
     # 'Ultraspherical':
     #     {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
     #      'par':[{
@@ -238,11 +240,11 @@ windows = {
     #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
     #           '</span>'),
     #        }
-    'Tukey':{
-        'fn_name':'tukey',
-        'par':[{
-            'name':'&alpha;', 'name_tex':r'$\alpha$', 'val':0.25, 'min':0, 'max':1,
-                    'tooltip':'<span>Shape parameter (see window tool tipp)</span>'}],
+    'Tukey': {
+        'fn_name': 'tukey',
+        'par': [{
+            'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
+                    'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
         'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
                     whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
                     of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
@@ -253,6 +255,8 @@ windows = {
                     to be altered by this window than e.g. by a Hann window.</span>'''
         }
     }
+
+
 def get_window_names():
     """
     Extract window names (= keys) from the windows dict and return and a list
@@ -361,6 +365,7 @@ def blackmanharris5(N, sym):
          1.261357088292677e-003]
     return calc_cosine_window(N, sym, a)
 
+
 def blackmanharris7(N, sym):
     """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""    
     a = [2.712203605850388e-001,
@@ -371,6 +376,7 @@ def blackmanharris7(N, sym):
          -7.700127105808265e-004,
          1.368088305992921e-005]
     return calc_cosine_window(N, sym, a)
+
 
 def blackmanharris9(N, sym):
     """ 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain"""
@@ -384,8 +390,8 @@ def blackmanharris9(N, sym):
          -1.384355593917030e-005,
          1.161808358932861e-007]
     return calc_cosine_window(N, sym, a)
-   
-    
+
+
 def calc_cosine_window(N, sym, a):
     """ 
     Return window based on cosine functions with amplitudes specified
@@ -400,6 +406,7 @@ def calc_cosine_window(N, sym, a):
     for k in range(1,len(a)):
         win += a[k] * np.cos(k*x)
     return win
+
 
 def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
 
