@@ -21,7 +21,8 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import calc_window_function, get_window_names
+from pyfda.libs.pyfda_fft_windows_lib import (calc_window_function, get_window_names,
+        QFFTWinSelection)
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
@@ -159,6 +160,8 @@ class Plot_FFT_win(QDialog):
         self.led_win_par_2.setObjectName("ledWinPar2")
         # self.cmb_win_par_2 = QComboBox(self)
 
+        self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
+
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("<span>Use number of points from main widget "
@@ -213,6 +216,7 @@ class Plot_FFT_win(QDialog):
         layH_win_select.addWidget(self.led_win_par_1)
         layH_win_select.addWidget(self.lbl_win_par_2)
         layH_win_select.addWidget(self.led_win_par_2)
+        layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.addStretch(1)
 
         layHControls = QHBoxLayout()
