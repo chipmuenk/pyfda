@@ -37,17 +37,32 @@ class Plot_FFT_win(QDialog):
     Create a pop-up widget for displaying time and frequency view of an FFT
     window.
 
-    Data is passed via the dictionary `win_dict` during construction.
-    """
+    Data is passed via the dictionary `win_dict` that is specified during 
+    construction. Available windows, parameters, tooltipps etc are imported
+    from `pyfda_fft_windows_lib.get_window_names`
+
+    Methods
+    -------
+    
+    - `self.calc_N()`
+    - `self.update_view()`: 
+    - `self.draw()`: calculate window and FFT and draw both
+    - `get_win(N)` : Get the window array
+"""
     # incoming
     sig_rx = pyqtSignal(object)
     # outgoing
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True,
-                title='pyFDA Window Viewer'):
+                title='pyFDA Window Viewer', main=False):
         super(Plot_FFT_win, self).__init__(parent)
     
+        self.win_dict = win_dict
+        self.sym = sym
+        self.main = main
+        self.setWindowTitle(title)
+
         self.needs_calc = True
         self.needs_draw = True
         self.needs_redraw = True
@@ -58,18 +73,13 @@ class Plot_FFT_win(QDialog):
         self.N = win_dict['win_len']
         self.N_view = 32
 
-
         self.pad = 16  # zero padding factor for smooth FFT plot
-
-        self.win_dict = win_dict
-        self.sym = sym
 
         self.tbl_rows = 2
         self.tbl_cols = 6
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False]
 
-        self.setWindowTitle(title)
         self._construct_UI()
         qwindow_stay_on_top(self, True)
         self.update_win()
