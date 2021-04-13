@@ -161,7 +161,8 @@ class Plot_FFT_win(QDialog):
 
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
-        self.chk_auto_N.setToolTip("Use number of points from calling routine.")
+        self.chk_auto_N.setToolTip("<span>Use number of points from main widget "
+                                    "for displaying the FFT window.</span>")
 
         self.lbl_auto_N = QLabel("Auto " + to_html("N", frmt='i'))
 
@@ -373,7 +374,7 @@ class Plot_FFT_win(QDialog):
 
     def update_win_params(self):
         """
-        Read out textboxes with parameters when editing is finished and 
+        Read out parameter lineedits when editing is finished and
         update dict and fft window
         """
         if self.win_dict['n_par'] > 1:        
@@ -399,16 +400,11 @@ class Plot_FFT_win(QDialog):
 
     def update_win(self, arg=None, emit=True):
         """
-        Update FFT window when window or parameters have changed.      
-        
+        Update FFT window when window or parameters have changed.
+
         Depending on the way the function is called, different things happen:
 
-        - signal-slot connection to combo-box -> index (int), absorbed by `arg`
-                                                 emit is not set -> emit=True
-        - called by _read_param() -> empty -> emit=True
-        - called by update_N(emit=False)
-
-        Update the plot and emit 
+        Update the plot and emit 'ui_changed'
 
         """
         if not isinstance(emit, bool):
