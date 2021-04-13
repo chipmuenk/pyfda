@@ -12,8 +12,10 @@ import scipy.signal as sig
 import scipy
 
 from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
-from .compat import (QWidget, QLabel, QComboBox, QLineEdit, QFrame, QFont,
-                         QHBoxLayout, pyqtSignal)
+from .pyfda_lib import to_html
+from pyfda.pyfda_rc import params
+from .compat import (QWidget, QLabel, QComboBox, QLineEdit, QFont,
+                     QHBoxLayout, QVBoxLayout, pyqtSignal)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -462,19 +464,22 @@ class UserWindows(object):
 # February 15, 2002 
 # https://holometer.fnal.gov/GH_FFT.pdf
 
+# =============================================================================
+
 class QFFTWinSelection(QWidget):
 
     # incoming
     #sig_rx = pyqtSignal(object)
     # outgoing
     #sig_tx = pyqtSignal(object)
-    win_changed = pyqtSignal(object)
+    win_changed = pyqtSignal()
 
     def __init__(self, parent, win_dict):
         super(QFFTWinSelection, self).__init__(parent)
 
         self.win_dict = win_dict
         self._construct_UI()
+        self.update_win()
 
     def _construct_UI(self):
         """
@@ -511,19 +516,16 @@ class QFFTWinSelection(QWidget):
         self.led_win_par_2.setObjectName("ledWinPar2")
         # self.cmb_win_par_2 = QComboBox(self)
 
-        layH_win_select = QHBoxLayout()
-        layH_win_select.addWidget(self.lbl_win_fft)
-        layH_win_select.addWidget(self.cmb_win_fft)
-        layH_win_select.addWidget(self.cmb_win_fft_variant)
-        layH_win_select.addWidget(self.lbl_win_par_1)
-        layH_win_select.addWidget(self.led_win_par_1)
-        layH_win_select.addWidget(self.lbl_win_par_2)
-        layH_win_select.addWidget(self.led_win_par_2)
+        layH_main = QHBoxLayout(self)
+        layH_main.addWidget(self.lbl_win_fft)
+        layH_main.addWidget(self.cmb_win_fft)
+        layH_main.addWidget(self.cmb_win_fft_variant)
+        layH_main.addWidget(self.lbl_win_par_1)
+        layH_main.addWidget(self.led_win_par_1)
+        layH_main.addWidget(self.lbl_win_par_2)
+        layH_main.addWidget(self.led_win_par_2)
 
-        self.frm_fft_widgets = QFrame(self)
-        self.frm_fft_widgets.setObjectName("frm_fft_widgets")
-        self.frm_fft_widgets.setLayout(layH_win_select)
-
+        layH_main.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         # careful! currentIndexChanged passes the current index to update_win
         self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
@@ -568,8 +570,7 @@ class QFFTWinSelection(QWidget):
 
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        #self.win_dict['name'] = self.window_name
-        #self.calc_win()
+        self.win_dict['name'] = self.window_name
 
         n_par = self.win_dict['n_par']
 
@@ -587,7 +588,5 @@ class QFFTWinSelection(QWidget):
             self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
             self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
             self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
-
-        #self.update_view()
 
         self.win_changed.emit()
