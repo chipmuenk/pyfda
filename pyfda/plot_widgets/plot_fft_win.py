@@ -89,10 +89,11 @@ class Plot_FFT_win(QDialog):
     def closeEvent(self, event):
         """
         Catch `closeEvent` (user has tried to close the FFT window) and send a
-        signal to parent to just hide the FFT window.
+        signal to parent to decide how to proceed.
         """
-        event.ignore()
-        self.sig_tx.emit({'sender' : __name__, 'closeEvent': ''})
+        if not self.main:
+            event.ignore()
+            self.sig_tx.emit({'sender': __name__, 'closeEvent': ''})
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -703,7 +704,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = Plot_FFT_win(None)
+    mainw = Plot_FFT_win(None, main=True)
 
     app.setActiveWindow(mainw)
     mainw.show()
