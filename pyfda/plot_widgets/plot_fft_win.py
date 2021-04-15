@@ -104,7 +104,6 @@ class Plot_FFT_win(QDialog):
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
-#        self.update_win()
         self.draw()
 
 # ------------------------------------------------------------------------------
@@ -162,28 +161,6 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        # self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
-        # self.cmb_win_fft = QComboBox(self)
-        # self.cmb_win_fft.addItems(get_window_names())
-        # self.cmb_win_fft.setToolTip("FFT window type.")
-        # qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
-
-        # self.cmb_win_fft_variant = QComboBox(self)
-        # self.cmb_win_fft_variant.setToolTip("FFT window variant.")
-        # self.cmb_win_fft_variant.setVisible(False)
-
-        # self.lbl_win_par_1 = QLabel("Param1")
-        # self.led_win_par_1 = QLineEdit(self)
-        # self.led_win_par_1.setText("1")
-        # self.led_win_par_1.setObjectName("ledWinPar1")
-        # # self.cmb_win_par_1 = QComboBox(self)
-
-        # self.lbl_win_par_2 = QLabel("Param2")
-        # self.led_win_par_2 = QLineEdit(self)
-        # self.led_win_par_2.setText("2")
-        # self.led_win_par_2.setObjectName("ledWinPar2")
-        # # self.cmb_win_par_2 = QComboBox(self)
-
         self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
 
         self.chk_auto_N = QCheckBox(self)
@@ -233,13 +210,6 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
         layH_win_select = QHBoxLayout()
-        # layH_win_select.addWidget(self.lbl_win_fft)
-        # layH_win_select.addWidget(self.cmb_win_fft)
-        # layH_win_select.addWidget(self.cmb_win_fft_variant)
-        # layH_win_select.addWidget(self.lbl_win_par_1)
-        # layH_win_select.addWidget(self.led_win_par_1)
-        # layH_win_select.addWidget(self.lbl_win_par_2)
-        # layH_win_select.addWidget(self.led_win_par_2)
         layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.addStretch(1)
 
