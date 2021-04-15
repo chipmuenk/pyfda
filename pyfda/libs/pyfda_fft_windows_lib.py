@@ -541,6 +541,37 @@ class QFFTWinSelection(QWidget):
 
 # ------------------------------------------------------------------------------
 
+    def update_widgets(self):
+        """
+        Update widgets with data from win_dict
+        """
+        self.window_name = self.win_dict['name']
+        qset_cmb_box(self.cmb_win_fft, self.window_name, data=False)
+        self.update_param_widgets()
+
+    def update_param_widgets(self):
+        """
+        Update parameter widgets (if enabled) with data from win_dict
+        """
+        n_par = self.win_dict['n_par']
+
+        self.lbl_win_par_1.setVisible(n_par > 0)
+        self.led_win_par_1.setVisible(n_par > 0)
+        self.lbl_win_par_2.setVisible(n_par > 1)
+        self.led_win_par_2.setVisible(n_par > 1)
+
+        if n_par > 0:
+            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
+            self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
+
+        if n_par > 1:
+            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
+            self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
+
+# ------------------------------------------------------------------------------
+
     def update_win_params(self):
         """
         Read out parameter lineedits when editing is finished and
@@ -569,31 +600,17 @@ class QFFTWinSelection(QWidget):
 
     def update_win(self, arg=None):
         """
-        Update FFT window when window or parameters have changed.
+        - update `self.window_name` and  `self.win_dict['name']` from 
+          selected FFT combobox entry
 
-        Depending on the way the function is called, different things happen:
+        - determine number of parameter lineedits that are needed and 
+          make them visible
 
-        Update the plot and emit 'ui_changed'
+        - emit 'win_changed'
 
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win_dict['name'] = self.window_name
-
-        n_par = self.win_dict['n_par']
-
-        self.lbl_win_par_1.setVisible(n_par > 0)
-        self.led_win_par_1.setVisible(n_par > 0)
-        self.lbl_win_par_2.setVisible(n_par > 1)
-        self.led_win_par_2.setVisible(n_par > 1)
-
-        if n_par > 0:
-            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-            self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
-            self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
-
-        if n_par > 1:
-            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-            self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
-            self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
+        self.update_param_widgets()
 
         self.win_changed.emit()
