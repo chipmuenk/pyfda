@@ -22,7 +22,7 @@ import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
-                                     qstyle_widget, qled_set_max_width, QVLine)
+                                     qstyle_widget, qled_set_max_width, QVLine, QLabelVert, )
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -109,7 +109,6 @@ class PlotImpz_UI(QWidget):
         self.win_dict = fb.fil[0]['win_fft']
         self.fft_window = None # handle for FFT window pop-up widget
         self.window_name = "Rectangular"
-
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
@@ -232,7 +231,6 @@ class PlotImpz_UI(QWidget):
                  ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>")
                 ]
 
-
         self._construct_UI()
         self._enable_stim_widgets()
         self.update_N(emit=False) # also updates window function
@@ -255,7 +253,6 @@ class PlotImpz_UI(QWidget):
         self.but_run.setText("RUN")
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.but_auto_run.isChecked())
-        logger.warning(self.but_run.contentsMargins().left())
 
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float","Fixpoint"])
@@ -612,7 +609,8 @@ class PlotImpz_UI(QWidget):
         # Controls for stimuli
         # =====================================================================
         # Create combo box with stimulus categories
-        self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
+        #self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
+        self.lblStimulus = QLabelVert("Stim", self)
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
@@ -658,14 +656,7 @@ class PlotImpz_UI(QWidget):
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
-
-
-        self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
-        self.ledDC = QLineEdit(self)
-        self.ledDC.setText(str(self.DC))
-        self.ledDC.setToolTip("DC Level")
-        self.ledDC.setObjectName("stimDC")
-
+        
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.cmbImpulseType)
@@ -676,8 +667,18 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.chk_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
-
         layHCmbStim.addWidget(self.chk_step_err)
+
+        self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
+        self.ledDC = QLineEdit(self)
+        self.ledDC.setText(str(self.DC))
+        self.ledDC.setToolTip("DC Level")
+        self.ledDC.setObjectName("stimDC")
+
+        layHStimDC = QHBoxLayout()
+        layHStimDC.addWidget(self.lblDC)
+        layHStimDC.addWidget(self.ledDC)
+
         #======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -781,11 +782,12 @@ class PlotImpz_UI(QWidget):
 
         layGStim = QGridLayout()
 
-        layGStim.addWidget(self.lblStimulus, 0, 0)
-        layGStim.addWidget(self.lblDC, 1, 0)
+        layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
+        #layGStim.addWidget(self.lblDC, 1, 0)
 
         layGStim.addLayout(layHCmbStim, 0, 1)
-        layGStim.addWidget(self.ledDC,  1, 1)
+        layGStim.addLayout(layHStimDC, 1, 1) 
+        #layGStim.addWidget(self.ledDC,  1, 1)
 
         layGStim.addWidget(self.lblAmp1, 0, 2)
         layGStim.addWidget(self.lblAmp2, 1, 2)
