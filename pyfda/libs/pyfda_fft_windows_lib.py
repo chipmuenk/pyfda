@@ -269,25 +269,20 @@ def get_window_names():
     return sorted(win_name_list, key=lambda v: (v.lower(), v)) # always sort lower cased names
 
 
-def calc_window_function(win_dict, win_name, N=32, sym=True):
+def set_window_function(win_dict, win_name):
     """
-    Generate a window function.
+    Select and set a window function from its name
 
     Parameters
     ----------
     win_dict : dict
-        The dict where the window functions are stored.
+        The dict where the window functions are stored (modified in place).
     win_name : str
         Name of the window, this will be looked for in scipy.signal.windows.
-    N : int, optional
-        Number of data points. The default is 32.
-    sym : bool, optional
-        When True (default), generates a symmetric window, for use in filter design.
-        When False, generates a periodic window, for use in spectral analysis.
+
     Returns
     -------
-    win_fnct : ndarray
-        The window function
+    win_fnct : fnct
     """
 
     par = []
@@ -310,7 +305,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     if 'info' in d:
         info = d['info']
 
-    #--------------------------------------
+    # --------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
     mod_fnct = fn_name.split('.') # try to split fully qualified name
@@ -327,12 +322,42 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     if not win_fnct:
         logger.error('No window function "{0}" in scipy.signal.windows, '
                      'using rectangular window instead!'.format(fn_name))
-        fn_name  = "boxcar"
+        fn_name = "boxcar"
         n_par = 0
         win_fnct = getattr(scipy.signal.windows, fn_name, None)
 
-    win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info,
-                     'par':par, 'n_par':n_par, 'win_len':N})
+    win_dict.update({'name': win_name, 'fnct': fn_name, 'info': info,
+                     'par': par, 'n_par': n_par,
+                     'win_fnct': win_fnct})
+
+    return win_fnct
+
+# ----------------------------------------------------------------------------
+def calc_window_function(win_dict, win_name, N=32, sym=True):
+    """
+    Generate a window function.
+
+    Parameters
+    ----------
+    win_dict : dict
+        The dict where the window functions are stored.
+    win_name : str
+        Name of the window, this will be looked for in scipy.signal.windows.
+    N : int, optional
+        Number of data points. The default is 32.
+    sym : bool, optional
+        When True (default), generates a symmetric window, for use in filter design.
+        When False, generates a periodic window, for use in spectral analysis.
+    Returns
+    -------
+    win_fnct : ndarray
+        The window function
+    """
+    win_dict.update({'win_len': N})
+    win_fnct = set_window_function(win_dict, win_name)
+    fn_name = win_dict['fnct']
+    n_par = win_dict['n_par']
+    par = win_dict['par']
 
     try:
         if fn_name == 'dpss':
@@ -631,6 +656,7 @@ class QFFTWinSelection(QWidget):
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win_dict['name'] = self.window_name
+        set_window_function(self.win_dict, self.window_name)
         self.update_param_widgets()
 
         self.win_changed.emit()
