@@ -580,9 +580,10 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addSpacing(5)
         layH_ctrl_freq.addWidget(self.chk_Hf)
         layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(self.chk_log_freq)
+        #
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
+        layH_ctrl_freq.addWidget(self.chk_log_freq)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.cmb_freq_display)
         layH_ctrl_freq.addStretch(2)
