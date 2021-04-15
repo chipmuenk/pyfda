@@ -362,6 +362,8 @@ class Plot_FFT_win(QDialog):
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
+        self.qfft_win_select.win_changed.connect(self.update_view)
+
 # ------------------------------------------------------------------------------
 
     def _construct_table(self, rows, cols, val):
