@@ -469,40 +469,6 @@ class Plot_FFT_win(QDialog):
 #        self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'win'})
 
 # ------------------------------------------------------------------------------
-    def _set_table_item(self, row, col, val, font=None, sel=None):
-        """
-        Set the table item with the index `row, col` and the value val
-        """
-        item = self.tbl_win_properties.item(row, col)
-        item.setText(str(val))
-
-        if font:
-            self.tbl_win_properties.item(row, col).setFont(font)
-
-        if sel is True:
-            item.setCheckState(Qt.Checked)
-        if sel is False:
-            item.setCheckState(Qt.Unchecked)
-        # when sel is not specified, don't change anything
-
-# ------------------------------------------------------------------------------
-    def _handle_item_clicked(self, item):
-        if item.column() % 3 == 0:  # clicked on checkbox
-            num = item.row() * 2 + item.column() // 3
-            if item.checkState() == Qt.Checked:
-                self.tbl_sel[num] = True
-                logger.debug('"{0}:{1}" Checked'.format(item.text(), num))
-            else:
-                self.tbl_sel[num] = False
-                logger.debug('"{0}:{1}" Unchecked'.format(item.text(), num))
-
-        elif item.column() % 3 == 1:  # clicked on value field
-            logger.info("{0:s} copied to clipboard.".format(item.text()))
-            fb.clipboard.setText(item.text())
-
-        self.update_view()
-
-# ------------------------------------------------------------------------------
     def update_bottom(self):
         """
         Update log bottom settings
@@ -592,6 +558,40 @@ class Plot_FFT_win(QDialog):
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
+
+# ------------------------------------------------------------------------------
+    def _set_table_item(self, row, col, val, font=None, sel=None):
+        """
+        Set the table item with the index `row, col` and the value val
+        """
+        item = self.tbl_win_properties.item(row, col)
+        item.setText(str(val))
+
+        if font:
+            self.tbl_win_properties.item(row, col).setFont(font)
+
+        if sel is True:
+            item.setCheckState(Qt.Checked)
+        if sel is False:
+            item.setCheckState(Qt.Unchecked)
+        # when sel is not specified, don't change anything
+
+# ------------------------------------------------------------------------------
+    def _handle_item_clicked(self, item):
+        if item.column() % 3 == 0:  # clicked on checkbox
+            num = item.row() * 2 + item.column() // 3
+            if item.checkState() == Qt.Checked:
+                self.tbl_sel[num] = True
+                logger.debug('"{0}:{1}" Checked'.format(item.text(), num))
+            else:
+                self.tbl_sel[num] = False
+                logger.debug('"{0}:{1}" Unchecked'.format(item.text(), num))
+
+        elif item.column() % 3 == 1:  # clicked on value field
+            logger.info("{0:s} copied to clipboard.".format(item.text()))
+            fb.clipboard.setText(item.text())
+
+        self.update_view()
 
 # ------------------------------------------------------------------------------
     def update_view(self):
