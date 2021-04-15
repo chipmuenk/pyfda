@@ -470,20 +470,6 @@ class Plot_FFT_win(QDialog):
 #        # ... but always notify the FFT widget via sig_tx_fft
 #        self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'win'})
 
-# ------------------------------------------------------------------------------
-    def update_bottom(self):
-        """
-        Update log bottom settings
-        """
-        self.bottom_t = safe_eval(self.led_log_bottom_t.text(), self.bottom_t,
-                                  sign='neg', return_type='float')
-        self.led_log_bottom_t.setText(str(self.bottom_t))
-
-        self.bottom_f = safe_eval(self.led_log_bottom_f.text(), self.bottom_f,
-                                  sign='neg', return_type='float')
-        self.led_log_bottom_f.setText(str(self.bottom_f))
-
-        self.update_view()
 
 # ------------------------------------------------------------------------------
     def calc_N(self):
@@ -595,6 +581,20 @@ class Plot_FFT_win(QDialog):
 
         self.update_view()
 
+# ------------------------------------------------------------------------------
+    def update_bottom(self):
+        """
+        Update log bottom settings
+        """
+        self.bottom_t = safe_eval(self.led_log_bottom_t.text(), self.bottom_t,
+                                  sign='neg', return_type='float')
+        self.led_log_bottom_t.setText(str(self.bottom_t))
+
+        self.bottom_f = safe_eval(self.led_log_bottom_f.text(), self.bottom_f,
+                                  sign='neg', return_type='float')
+        self.led_log_bottom_f.setText(str(self.bottom_f))
+
+        self.update_view()
 # ------------------------------------------------------------------------------
     def update_view(self):
         """
