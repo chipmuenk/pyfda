@@ -87,9 +87,7 @@ class Plot_Impz(QWidget):
 
         # instantiate FFT window with dictionary for window settings
         self.win_dict = fb.fil[0]['win_fft']
-        # self.fft_window = None # handle for FFT window pop-up widget
-        # self.window_name = "Rectangular"
-
+        # self.window_name = "Rectangular" # set initial window some way?
         self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
                                         title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
