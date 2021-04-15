@@ -364,7 +364,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
             logger.info("dpss!")
             w = scipy.signal.windows.dpss(N, par[0]['val'], sym=sym)
         elif n_par == 0:
-            w = win_fnct(N,sym=sym)
+            w = win_fnct(N, sym=sym)
         elif n_par == 1:
             w = win_fnct(N, par[0]['val'], sym=sym)
         elif n_par == 2:
@@ -534,9 +534,6 @@ class QFFTWinSelection(QWidget):
         - combobox for windows
         - 0, 1 or 2 parameter fields
         """
-        self.bfont = QFont()
-        self.bfont.setBold(True)
-
         # FFT window type
         self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
@@ -579,12 +576,16 @@ class QFFTWinSelection(QWidget):
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
 
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # careful! currentIndexChanged passes an integer (the current index)
+        # to update_win
         self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type)
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
 # ------------------------------------------------------------------------------
-
     def update_widgets(self):
         """
         Update widgets with data from win_dict
@@ -593,6 +594,7 @@ class QFFTWinSelection(QWidget):
         qset_cmb_box(self.cmb_win_fft, self.window_name, data=False)
         self.update_param_widgets()
 
+# ------------------------------------------------------------------------------
     def update_param_widgets(self):
         """
         Update parameter widgets (if enabled) with data from win_dict
@@ -645,18 +647,20 @@ class QFFTWinSelection(QWidget):
 # ------------------------------------------------------------------------------
     def update_win_type(self, arg=None):
         """
-        - update `self.window_name` and  `self.win_dict['name']` from 
+        - update `self.window_name` and  `self.win_dict['name']` from
           selected FFT combobox entry
 
-        - determine number of parameter lineedits that are needed and 
-          make them visible
+        - update win_dict using `set_window_function()`
+
+        - determine number of parameter lineedits that are needed, 
+          make them visible and update parameter values from dict
 
         - emit 'win_changed'
-
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win_dict['name'] = self.window_name
         set_window_function(self.win_dict, self.window_name)
+        # update visibility and values of parameter widgets
         self.update_param_widgets()
 
         self.win_changed.emit()
