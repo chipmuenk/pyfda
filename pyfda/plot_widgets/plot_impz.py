@@ -1241,15 +1241,6 @@ class Plot_Impz(QWidget):
             if mode == "psd":
                 spgr_symb = r"$S_{{{0}}}$".format(sig_lbl.lower()+sig_lbl.lower())
                 dB_scale = 10  # log scale for PSD
-                # Power Spectral Density
-                if self.ui.chk_byfs_spgr_time.isChecked():
-                    # scale result by f_S
-                    spgr_unit = r" in {0}W / Hz".format(dB_unit)
-                    scaling="density"
-                else:
-                    spgr_unit = r" in {0}W".format(dB_unit)
-                    scaling="spectrum"
-
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
@@ -1267,6 +1258,17 @@ class Plot_Impz(QWidget):
             else:
                 logger.warning("Unknown spectrogram mode {0}".format(mode))
                 mode = None
+
+            # Only valid and visible for Power Spectral Density 
+            # but needs to be set anyway:
+            if self.ui.chk_byfs_spgr_time.isChecked():
+                # scale result by f_S
+                spgr_unit = r" in {0}W / Hz".format(dB_unit)
+                scaling="density"
+            else:
+                # display result in W / bin
+                spgr_unit = r" in {0}W".format(dB_unit)
+                scaling="spectrum"
 
             # ------- lin / log ----------------------
             if self.ui.chk_log_spgr_time.isChecked():
