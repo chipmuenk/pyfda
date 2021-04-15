@@ -476,9 +476,8 @@ class UserWindows(object):
 class QFFTWinSelection(QWidget):
 
     # incoming
-    #sig_rx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object)
     # outgoing
-    #sig_tx = pyqtSignal(object)
     win_changed = pyqtSignal()
 
     def __init__(self, parent, win_dict):
@@ -487,6 +486,22 @@ class QFFTWinSelection(QWidget):
         self.win_dict = win_dict
         self._construct_UI()
         self.update_win_type()
+
+# ------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from the widget one hierarchy higher to update
+        the widgets from the dictionary
+
+        This can also be achieved by calling `self.update_widgets()` directly
+
+        """
+#        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+#                     .format(self.isVisible(), pprint_log(dict_sig)))
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win'):
+            pass
+
+        self.update_widgets()
 
     def _construct_UI(self):
         """
@@ -534,8 +549,11 @@ class QFFTWinSelection(QWidget):
 
         layH_main.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
-        # careful! currentIndexChanged passes the current index to update_win
-        self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
         self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type)
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
