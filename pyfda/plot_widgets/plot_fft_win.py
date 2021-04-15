@@ -104,7 +104,7 @@ class Plot_FFT_win(QDialog):
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
-        self.update_win()
+#        self.update_win()
         self.draw()
 
 # ------------------------------------------------------------------------------
@@ -162,27 +162,27 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
-        self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(get_window_names())
-        self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
+        # self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
+        # self.cmb_win_fft = QComboBox(self)
+        # self.cmb_win_fft.addItems(get_window_names())
+        # self.cmb_win_fft.setToolTip("FFT window type.")
+        # qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
 
-        self.cmb_win_fft_variant = QComboBox(self)
-        self.cmb_win_fft_variant.setToolTip("FFT window variant.")
-        self.cmb_win_fft_variant.setVisible(False)
+        # self.cmb_win_fft_variant = QComboBox(self)
+        # self.cmb_win_fft_variant.setToolTip("FFT window variant.")
+        # self.cmb_win_fft_variant.setVisible(False)
 
-        self.lbl_win_par_1 = QLabel("Param1")
-        self.led_win_par_1 = QLineEdit(self)
-        self.led_win_par_1.setText("1")
-        self.led_win_par_1.setObjectName("ledWinPar1")
-        # self.cmb_win_par_1 = QComboBox(self)
+        # self.lbl_win_par_1 = QLabel("Param1")
+        # self.led_win_par_1 = QLineEdit(self)
+        # self.led_win_par_1.setText("1")
+        # self.led_win_par_1.setObjectName("ledWinPar1")
+        # # self.cmb_win_par_1 = QComboBox(self)
 
-        self.lbl_win_par_2 = QLabel("Param2")
-        self.led_win_par_2 = QLineEdit(self)
-        self.led_win_par_2.setText("2")
-        self.led_win_par_2.setObjectName("ledWinPar2")
-        # self.cmb_win_par_2 = QComboBox(self)
+        # self.lbl_win_par_2 = QLabel("Param2")
+        # self.led_win_par_2 = QLineEdit(self)
+        # self.led_win_par_2.setText("2")
+        # self.led_win_par_2.setObjectName("ledWinPar2")
+        # # self.cmb_win_par_2 = QComboBox(self)
 
         self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
 
@@ -233,13 +233,13 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
         layH_win_select = QHBoxLayout()
-        layH_win_select.addWidget(self.lbl_win_fft)
-        layH_win_select.addWidget(self.cmb_win_fft)
-        layH_win_select.addWidget(self.cmb_win_fft_variant)
-        layH_win_select.addWidget(self.lbl_win_par_1)
-        layH_win_select.addWidget(self.led_win_par_1)
-        layH_win_select.addWidget(self.lbl_win_par_2)
-        layH_win_select.addWidget(self.led_win_par_2)
+        # layH_win_select.addWidget(self.lbl_win_fft)
+        # layH_win_select.addWidget(self.cmb_win_fft)
+        # layH_win_select.addWidget(self.cmb_win_fft_variant)
+        # layH_win_select.addWidget(self.lbl_win_par_1)
+        # layH_win_select.addWidget(self.led_win_par_1)
+        # layH_win_select.addWidget(self.lbl_win_par_2)
+        # layH_win_select.addWidget(self.led_win_par_2)
         layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.addStretch(1)
 
@@ -357,12 +357,12 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.tbl_win_properties.itemClicked.connect(self._handle_item_clicked)
 
-        # careful! currentIndexChanged passes the current index to update_win
-        self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
-        self.led_win_par_1.editingFinished.connect(self.update_win_params)
-        self.led_win_par_2.editingFinished.connect(self.update_win_params)
+        # # careful! currentIndexChanged passes the current index to update_win
+        # self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
+        # self.led_win_par_1.editingFinished.connect(self.update_win_params)
+        # self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
-        self.qfft_win_select.win_changed.connect(self.update_view)
+        self.qfft_win_select.win_changed.connect(self.update_fft_win)
 
 # ------------------------------------------------------------------------------
 
@@ -402,64 +402,73 @@ class Plot_FFT_win(QDialog):
 
 # ------------------------------------------------------------------------------
 
-    def update_win_params(self):
+    # def update_win_params(self):
+    #     """
+    #     Read out parameter lineedits when editing is finished and
+    #     update dict and fft window
+    #     """
+    #     if self.win_dict['n_par'] > 1:
+    #         param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
+    #                         return_type='float')
+    #         if param < self.win_dict['par'][1]['min']:
+    #             param = self.win_dict['par'][1]['min']
+    #         elif param > self.win_dict['par'][1]['max']:
+    #             param = self.win_dict['par'][1]['max']
+    #         self.led_win_par_2.setText(str(param))
+    #         self.win_dict['par'][1]['val'] = param
+
+    #     if self.win_dict['n_par'] > 0:
+    #         param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
+    #                         return_type='float')
+    #         if param < self.win_dict['par'][0]['min']:
+    #             param = self.win_dict['par'][0]['min']
+    #         elif param > self.win_dict['par'][0]['max']:
+    #             param = self.win_dict['par'][0]['max']
+    #         self.led_win_par_1.setText(str(param))
+    #         self.win_dict['par'][0]['val'] = param
+    #         self.update_win()
+
+    # def update_win(self, arg=None):
+    #     """
+    #     Update FFT window when window or parameters have changed.
+
+    #     Depending on the way the function is called, different things happen:
+
+    #     Update the plot and emit 'ui_changed'
+
+    #     """
+    #     self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+    #     self.win_dict['name'] = self.window_name
+    #     self.calc_win()
+
+    #     n_par = self.win_dict['n_par']
+
+    #     self.lbl_win_par_1.setVisible(n_par > 0)
+    #     self.led_win_par_1.setVisible(n_par > 0)
+    #     self.lbl_win_par_2.setVisible(n_par > 1)
+    #     self.led_win_par_2.setVisible(n_par > 1)
+
+    #     if n_par > 0:
+    #         self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+    #         self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
+    #         self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
+
+    #     if n_par > 1:
+    #         self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+    #         self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
+    #         self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
+
+    #     self.update_view()
+
+    #     self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
+
+    def update_fft_win(self, arg=None):
         """
-        Read out parameter lineedits when editing is finished and
-        update dict and fft window
+        Update FFT window when window or parameters have changed and
+        emit 'ui_changed':'win'
         """
-        if self.win_dict['n_par'] > 1:
-            param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
-                            return_type='float')
-            if param < self.win_dict['par'][1]['min']:
-                param = self.win_dict['par'][1]['min']
-            elif param > self.win_dict['par'][1]['max']:
-                param = self.win_dict['par'][1]['max']
-            self.led_win_par_2.setText(str(param))
-            self.win_dict['par'][1]['val'] = param
-
-        if self.win_dict['n_par'] > 0:
-            param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
-                            return_type='float')
-            if param < self.win_dict['par'][0]['min']:
-                param = self.win_dict['par'][0]['min']
-            elif param > self.win_dict['par'][0]['max']:
-                param = self.win_dict['par'][0]['max']
-            self.led_win_par_1.setText(str(param))
-            self.win_dict['par'][0]['val'] = param
-            self.update_win()
-
-    def update_win(self, arg=None):
-        """
-        Update FFT window when window or parameters have changed.
-
-        Depending on the way the function is called, different things happen:
-
-        Update the plot and emit 'ui_changed'
-
-        """
-        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win_dict['name'] = self.window_name
         self.calc_win()
-
-        n_par = self.win_dict['n_par']
-
-        self.lbl_win_par_1.setVisible(n_par > 0)
-        self.led_win_par_1.setVisible(n_par > 0)
-        self.lbl_win_par_2.setVisible(n_par > 1)
-        self.led_win_par_2.setVisible(n_par > 1)
-
-        if n_par > 0:
-            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-            self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
-            self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
-
-        if n_par > 1:
-            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-            self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
-            self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
-
         self.update_view()
-
         self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
 
 # ------------------------------------------------------------------------------
@@ -605,6 +614,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setText(str(self.bottom_f))
 
         self.update_view()
+
 # ------------------------------------------------------------------------------
     def update_view(self):
         """
