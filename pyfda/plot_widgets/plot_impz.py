@@ -733,15 +733,17 @@ class Plot_Impz(QWidget):
                 logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                                .format(len(self.x), self.ui.N_end))
         else:
+            # TODO: This must be replaced by `self.fft_window.get_win()`
+            win = self.ui.win # self.fft_window(self.ui.N)
             # multiply the  time signal with window function
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * win
             # calculate absolute value and scale by N_FFT
             self.X = np.fft.fft(x_win) / self.ui.N
             #self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
                 # same for fixpoint simulation
-                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.ui.win
+                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * win
                 self.X_q = np.fft.fft(x_q_win) / self.ui.N
                 #self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
@@ -753,7 +755,7 @@ class Plot_Impz(QWidget):
                 logger.warning("Length of transient response is {0} < N = {1}, FFT cannot be calculated."
                                .format(len(self.y), self.ui.N_end))
         else:
-            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
+            y_win = self.y[self.ui.N_start:self.ui.N_end] * win
             self.Y = np.fft.fft(y_win) / self.ui.N
             #self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
