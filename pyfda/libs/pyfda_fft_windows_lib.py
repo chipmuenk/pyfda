@@ -486,7 +486,7 @@ class QFFTWinSelection(QWidget):
 
         self.win_dict = win_dict
         self._construct_UI()
-        self.update_win()
+        self.update_win_type()
 
     def _construct_UI(self):
         """
@@ -536,6 +536,7 @@ class QFFTWinSelection(QWidget):
 
         # careful! currentIndexChanged passes the current index to update_win
         self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
+        self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type)
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
@@ -571,7 +572,6 @@ class QFFTWinSelection(QWidget):
             self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
 # ------------------------------------------------------------------------------
-
     def update_win_params(self):
         """
         Read out parameter lineedits when editing is finished and
@@ -596,9 +596,11 @@ class QFFTWinSelection(QWidget):
                 param = self.win_dict['par'][0]['max']
             self.led_win_par_1.setText(str(param))
             self.win_dict['par'][0]['val'] = param
-            self.update_win()
 
-    def update_win(self, arg=None):
+        self.win_changed.emit()
+
+# ------------------------------------------------------------------------------
+    def update_win_type(self, arg=None):
         """
         - update `self.window_name` and  `self.win_dict['name']` from 
           selected FFT combobox entry
