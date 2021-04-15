@@ -38,7 +38,7 @@ class Plot_FFT_win(QDialog):
     Create a pop-up widget for displaying time and frequency view of an FFT
     window.
 
-    Data is passed via the dictionary `win_dict` that is specified during 
+    Data is passed via the dictionary `win_dict` that is specified during
     construction. Available windows, parameters, tooltipps etc are imported
     from `pyfda_fft_windows_lib.get_window_names`
 
@@ -52,8 +52,8 @@ class Plot_FFT_win(QDialog):
         store current settings, intialized e.g. from `fb.fil[0]['win_fft']`
 
     sym : bool
-        Passed to `calc_window_function()`: 
-        When True, generate a symmetric window, for use in filter design. 
+        Passed to `calc_window_function()`:
+        When True, generate a symmetric window, for use in filter design.
         When False (default), generate a periodic window, for use in spectral analysis.
 
     title : str
@@ -64,9 +64,9 @@ class Plot_FFT_win(QDialog):
 
     Methods
     -------
-    
+
     - `self.calc_N()`
-    - `self.update_view()`: 
+    - `self.update_view()`:
     - `self.draw()`: calculate window and FFT and draw both
     - `get_win(N)` : Get the window array
 """
@@ -113,7 +113,7 @@ class Plot_FFT_win(QDialog):
         Catch `closeEvent` (user has tried to close the FFT window) and send a
         signal to parent to decide how to proceed.
 
-        This can be disabled by setting `self.ignore_close_event = False` e.g. 
+        This can be disabled by setting `self.ignore_close_event = False` e.g.
         for instantiating the widget as a standalone window.
         """
         if self.ignore_close_event:
@@ -126,7 +126,7 @@ class Plot_FFT_win(QDialog):
         Process signals coming from the navigation toolbar and from sig_rx:
 
         - `self.calc_N`
-        - `self.update_view`: 
+        - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
@@ -487,7 +487,7 @@ class Plot_FFT_win(QDialog):
 # ------------------------------------------------------------------------------
     def calc_win(self):
         """
-        (Re-)Calculate the window, its FFT and some characteristic values when the 
+        (Re-)Calculate the window, its FFT and some characteristic values when the
         window type or length or a parameters has been changed.
 
         Returns

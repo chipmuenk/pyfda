@@ -265,9 +265,9 @@ def get_window_names():
     win_name_list = []
     for d in windows:
         win_name_list.append(d)
-    
+
     return sorted(win_name_list, key=lambda v: (v.lower(), v)) # always sort lower cased names
-        
+
 
 def calc_window_function(win_dict, win_name, N=32, sym=True):
     """
@@ -282,17 +282,17 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     N : int, optional
         Number of data points. The default is 32.
     sym : bool, optional
-        When True (default), generates a symmetric window, for use in filter design. 
+        When True (default), generates a symmetric window, for use in filter design.
         When False, generates a periodic window, for use in spectral analysis.
     Returns
     -------
     win_fnct : ndarray
-        The window function 
+        The window function
     """
-    
+
     par = []
     info = ""
-    
+
     if win_name not in windows:
         logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
         win_name = "Boxcar"
@@ -306,32 +306,32 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     else:
         par = []
         n_par = 0
-        
+
     if 'info' in d:
         info = d['info']
-        
+
     #--------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
     mod_fnct = fn_name.split('.') # try to split fully qualified name
     fnct = mod_fnct[-1]
-    if len(mod_fnct) == 1: 
+    if len(mod_fnct) == 1:
         # only one element, no module given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
     else:
         # remove the leftmost part starting with the last '.'
-        mod_name = fn_name[:fn_name.rfind(".")] 
-        mod = importlib.import_module(mod_name)  
+        mod_name = fn_name[:fn_name.rfind(".")]
+        mod = importlib.import_module(mod_name)
         win_fnct = getattr(mod, fnct, None)
-    
+
     if not win_fnct:
         logger.error('No window function "{0}" in scipy.signal.windows, '
                      'using rectangular window instead!'.format(fn_name))
         fn_name  = "boxcar"
         n_par = 0
         win_fnct = getattr(scipy.signal.windows, fn_name, None)
-        
-    win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info, 
+
+    win_dict.update({'name':win_name, 'fnct':fn_name, 'info':info,
                      'par':par, 'n_par':n_par, 'win_len':N})
 
     try:
@@ -367,7 +367,7 @@ def blackmanharris5(N, sym):
 
 
 def blackmanharris7(N, sym):
-    """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""    
+    """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""
     a = [2.712203605850388e-001,
          -4.334446123274422e-001,
          2.180041228929303e-001,
@@ -393,14 +393,14 @@ def blackmanharris9(N, sym):
 
 
 def calc_cosine_window(N, sym, a):
-    """ 
+    """
     Return window based on cosine functions with amplitudes specified
     by the list `a`.
     """
     if sym:
         L = N-1
     else:
-        L = N  
+        L = N
     x = np.arange(N) * 2 * np.pi / L
     win = a[0]
     for k in range(1,len(a)):
@@ -413,9 +413,9 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
     if sym:
         L = N-1
     else:
-        L = N  
+        L = N
     #x = np.arange(N) * np.pi / (N)
-    
+
     geg_ev = scipy.special.eval_gegenbauer
     w0= geg_ev(N, alpha, x_0)
     w=np.zeros(N)
@@ -425,13 +425,13 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
     #     y = eval_gegenbauer(n, a, x)
     #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
     #     plt.ylim((-10,10))
-    
+
     for n in range(0,N):
         w[n] = w0
         for k in range(1,N//2+1):
             w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(2*n*np.pi*k/(N+1))
     #     rtn +=  np.cos(x*k)
-    
+
     #w = geg_ev(N-1, alpha, x_0 * np.cos(x))
     #logger.error(W[0].dtype, len(W))
     #W = np.abs(fft.ifft(w))
@@ -442,11 +442,11 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
 class UserWindows(object):
     def __init__(self, parent):
         super(UserWindows, self).__init__(parent)
- 
-        
+
+
 # =======
 # see also:
-# https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs 
+# https://www.electronicdesign.com/technologies/analog/article/21798689/choose-the-right-fft-window-function-when-evaluating-precision-adcs
 # https://github.com/capitanov/blackman_harris_win
 # https://en.m.wikipedia.org/wiki/Window_function
 # https://www.dsprelated.com/freebooks/sasp/Blackman_Harris_Window_Family.html
@@ -462,13 +462,13 @@ class UserWindows(object):
 
 # "Tailoring of Minimum Sidelobe Cosine-Sum Windows for High-Resolution Measurements"
 #   Hans-Helge Albrecht
-#   Physikalisch-Technische Bundesanstalt (PTB), Berlin, Germany        
-#   The Open Signal Processing Journal, 2010, 3, pp. 20-29 
+#   Physikalisch-Technische Bundesanstalt (PTB), Berlin, Germany
+#   The Open Signal Processing Journal, 2010, 3, pp. 20-29
 
-# Heinzel G. et al., 
-# "Spectrum and spectral density estimation by the Discrete Fourier transform (DFT), 
-# including a comprehensive list of window functions and some new flat-top windows", 
-# February 15, 2002 
+# Heinzel G. et al.,
+# "Spectrum and spectral density estimation by the Discrete Fourier transform (DFT),
+# including a comprehensive list of window functions and some new flat-top windows",
+# February 15, 2002
 # https://holometer.fnal.gov/GH_FFT.pdf
 
 # =============================================================================
