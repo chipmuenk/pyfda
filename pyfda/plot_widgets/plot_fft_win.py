@@ -42,6 +42,26 @@ class Plot_FFT_win(QDialog):
     construction. Available windows, parameters, tooltipps etc are imported
     from `pyfda_fft_windows_lib.get_window_names`
 
+    Parameters
+    ----------
+
+    parent : class instance
+        reference to parent
+
+    win_dict : dict
+        store current settings, intialized e.g. from `fb.fil[0]['win_fft']`
+
+    sym : bool
+        Passed to `calc_window_function()`: 
+        When True, generate a symmetric window, for use in filter design. 
+        When False (default), generate a periodic window, for use in spectral analysis.
+
+    title : str
+        Title text for Qt Window
+
+    ignore_close_event : bool
+        Disable close event when True (Default)
+
     Methods
     -------
     
@@ -55,13 +75,14 @@ class Plot_FFT_win(QDialog):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=True,
-                title='pyFDA Window Viewer', main=False):
+    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=False,
+                title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
-    
+
+    #  dict with current settings, initialized e.g. from fb.fil[0]['win_fft']
         self.win_dict = win_dict
         self.sym = sym
-        self.main = main
+        self.ignore_close_event = ignore_close_event
         self.setWindowTitle(title)
 
         self.needs_calc = True
@@ -91,8 +112,11 @@ class Plot_FFT_win(QDialog):
         """
         Catch `closeEvent` (user has tried to close the FFT window) and send a
         signal to parent to decide how to proceed.
+
+        This can be disabled by setting `self.ignore_close_event = False` e.g. 
+        for instantiating the widget as a standalone window.
         """
-        if not self.main:
+        if self.ignore_close_event:
             event.ignore()
             self.sig_tx.emit({'sender': __name__, 'closeEvent': ''})
 
@@ -704,7 +728,7 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = Plot_FFT_win(None, main=True)
+    mainw = Plot_FFT_win(None, ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()
