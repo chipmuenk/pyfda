@@ -271,7 +271,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
             # Parameters for spectral analysis window function
             'win_fft':
                 {'name':'Kaiser', # Window name
-                 'fnct':'kaiser', # function name or array with values
+                 'fn_name':'kaiser', # function name or array with values
                  'par':[{'name':'&beta;',
                           'name_tex':r'$\beta$',
                           'val':10,
@@ -288,7 +288,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
             # Parameters for filter design window function
             'win_fir':
                 {'name':'Hann', # Window name
-                 'fnct':'hann', # function name or array with values
+                 'fn_name':'hann', # function name or array with values
                  'par':[],      # set of list of window parameters
                  'n_par' : 0,   # number of window parameters
                  'info':"",     # Docstring for the window

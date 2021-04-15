@@ -326,7 +326,7 @@ def set_window_function(win_dict, win_name):
         n_par = 0
         win_fnct = getattr(scipy.signal.windows, fn_name, None)
 
-    win_dict.update({'name': win_name, 'fnct': fn_name, 'info': info,
+    win_dict.update({'name': win_name, 'fn_name': fn_name, 'info': info,
                      'par': par, 'n_par': n_par,
                      'win_fnct': win_fnct})
 
@@ -355,7 +355,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     """
     win_dict.update({'win_len': N})
     win_fnct = set_window_function(win_dict, win_name)
-    fn_name = win_dict['fnct']
+    fn_name = win_dict['fn_name']
     n_par = win_dict['n_par']
     par = win_dict['par']
 
