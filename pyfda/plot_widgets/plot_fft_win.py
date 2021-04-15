@@ -537,7 +537,26 @@ class Plot_FFT_win(QDialog):
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
+# ------------------------------------------------------------------------------
+    def get_win(self, N):
+        """
+        Get window function
 
+        Attributes
+        ----------
+        N : int
+            number of data points
+
+        Returns
+        -------
+
+        self.win : array-like
+                        Window function with `N` data points
+        """
+        if N == len(self.win):
+            return self.win
+        else:
+            logger.error("unequal")
 # ------------------------------------------------------------------------------
     def _set_table_item(self, row, col, val, font=None, sel=None):
         """
