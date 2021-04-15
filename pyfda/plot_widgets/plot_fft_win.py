@@ -407,14 +407,14 @@ class Plot_FFT_win(QDialog):
         Read out parameter lineedits when editing is finished and
         update dict and fft window
         """
-        if self.win_dict['n_par'] > 1:        
-            param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
+        if self.win_dict['n_par'] > 1:
+            param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
                             return_type='float')
             if param < self.win_dict['par'][1]['min']:
                 param = self.win_dict['par'][1]['min']
             elif param > self.win_dict['par'][1]['max']:
                 param = self.win_dict['par'][1]['max']
-            self.ledWinPar2.setText(str(param))
+            self.led_win_par_2.setText(str(param))
             self.win_dict['par'][1]['val'] = param
 
         if self.win_dict['n_par'] > 0:
