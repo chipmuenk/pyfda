@@ -428,7 +428,7 @@ class Plot_FFT_win(QDialog):
             self.win_dict['par'][0]['val'] = param
             self.update_win()
 
-    def update_win(self, arg=None, emit=True):
+    def update_win(self, arg=None):
         """
         Update FFT window when window or parameters have changed.
 
@@ -437,8 +437,6 @@ class Plot_FFT_win(QDialog):
         Update the plot and emit 'ui_changed'
 
         """
-        if not isinstance(emit, bool):
-            logger.error("update win: emit={0}".format(emit))
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win_dict['name'] = self.window_name
         self.calc_win()
@@ -462,14 +460,7 @@ class Plot_FFT_win(QDialog):
 
         self.update_view()
 
-        # only emit a signal for local triggers to prevent infinite loop:
-        # - signal-slot connection passes a bool or an integer
-        # - local function calls don't pass anything
-        if emit is True:
-            self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
-#        # ... but always notify the FFT widget via sig_tx_fft
-#        self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'win'})
-
+        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
 
 # ------------------------------------------------------------------------------
     def calc_N(self):
