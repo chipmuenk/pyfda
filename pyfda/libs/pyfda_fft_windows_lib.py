@@ -12,10 +12,10 @@ import scipy.signal as sig
 import scipy
 
 from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
-from .pyfda_lib import to_html, safe_eval
+from .pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.pyfda_rc import params
-from .compat import (QWidget, QLabel, QComboBox, QLineEdit, QFont,
-                     QHBoxLayout, QVBoxLayout, pyqtSignal)
+from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
+                     QHBoxLayout, pyqtSignal)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -39,58 +39,60 @@ windows = {
             'bw': 1
             }
          },
-    'Rectangular':
-        {'fn_name': 'boxcar',
-         'info':
-             ('<span>Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals, i.e. '
-              'where the window length is an integer number of the signal period. '
-              'It also works great when the signal length is shorter than the window '
-              'length (e.g. for the impulse response of a FIR filter). For other signals, '
-              'it has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />'
-              'This window also has the best SNR of all windows.</span>')
+    'Rectangular': {
+        'fn_name': 'boxcar',
+        'info':
+            '<span>Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals, i.e. '
+            'where the window length is an integer number of the signal period. '
+            'It also works great when the signal length is shorter than the window '
+            'length (e.g. for the impulse response of a FIR filter). For other signals, '
+            'it has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />'
+            'This window also has the best SNR of all windows.</span>'
         },
-    'Barthann':
-        {'fn_name': 'barthann',
-         'info':
-             ('<span>A modified Bartlett-Hann Window.'
-              '</span>')},
-    'Bartlett':
-        {'fn_name': 'bartlett',
-         'info':
+    'Barthann': {
+        'fn_name': 'barthann',
+        'info':
+            '<span>A modified Bartlett-Hann Window.'
+            '</span>'
+            },
+    'Bartlett': {
+        'fn_name': 'bartlett',
+        'info':
             '<span>The Bartlett window is very similar to a triangular window, '
             'except that the end point(s) are at zero. Its side lobes fall off with '
             '12 dB/oct., the side lobe suppression is 26 dB.'
             '<br />&nbsp;<br />'
             'It can be constructed as the convolution of two rectangular windows, '
             'hence, its Fourier transform is the product of two (periodic) sinc '
-            'functions.<span>'},
+            'functions.<span>'
+            },
     'Blackman':
         {'fn_name': 'blackman'},
-    'Blackmanharris':
-        {'fn_name': 'blackmanharris',
-         'info':
-             ('<span>The minimum 4-term Blackman-Harris window gives an excellent '
-              'constant side-lobe suppression of more than 90 dB while keeping a '
-              'reasonably narrow main lobe.</span>')
-             },
-    'Blackmanharris_5':
-        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
-         'info':
-             ('<span>The 5-term Blackman-Harris window with a side-'
-              'lobe suppression of up to 125 dB.</span>')
-             },
-    'Blackmanharris_7':
-        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
-         'info':
-             ('<span>The 7-term Blackman-Harris window with a side-'
-              'lobe suppression of up to 180 dB.</span>')
-             },
-    'Blackmanharris_9':
-        {'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
-         'info':
-             ('<span>The 9-term Blackman-Harris window with a side-'
-              'lobe suppression of up to 230 dB.</span>')
-             },
+    'Blackmanharris': {
+        'fn_name': 'blackmanharris',
+        'info':
+            '<span>The minimum 4-term Blackman-Harris window gives an excellent '
+            'constant side-lobe suppression of more than 90 dB while keeping a '
+            'reasonably narrow main lobe.</span>'
+        },
+    'Blackmanharris_5': {
+        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
+        'info':
+            '<span>The 5-term Blackman-Harris window with a side-'
+            'lobe suppression of up to 125 dB.</span>'
+        },
+    'Blackmanharris_7': {
+        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
+        'info':
+            '<span>The 7-term Blackman-Harris window with a side-'
+            'lobe suppression of up to 180 dB.</span>'
+        },
+    'Blackmanharris_9': {
+        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
+        'info':
+            '<span>The 9-term Blackman-Harris window with a side-'
+            'lobe suppression of up to 230 dB.</span>'
+        },
     'Bohman': {
         'fn_name': 'bohman'
         },
@@ -98,8 +100,8 @@ windows = {
     'Cosine': {
         'fn_name': 'cosine',
         'info':
-             ('<span>The window is half a cosine period, shifted by pi/2. '
-              'For that reason it is also known as "half-cosine" or "sine" window.</span>'),
+            '<span>The window is half a cosine period, shifted by pi/2. '
+            'For that reason it is also known as "half-cosine" or "sine" window.</span>',
         },
         #
     'Dolph-Chebyshev': {
@@ -108,9 +110,9 @@ windows = {
             'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
             'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
         'info':
-             ('<span>This window optimizes for the narrowest main lobe width for '
-              'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
-              'using Chebyshev polynomials.</span>'),
+            '<span>This window optimizes for the narrowest main lobe width for '
+            'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
+            'using Chebyshev polynomials.</span>',
         },
         #
     'DPSS': {
@@ -137,23 +139,23 @@ windows = {
     'General Gaussian': {
         'fn_name': 'general_gaussian',
         'par': [{
-            'name': 'p','name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
+            'name': 'p', 'name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
             'tooltip': '<span>Shape parameter p</span>'
             },
             {
-            'name': '&sigma;','name_tex': r'$\sigma$', 'val': 5, 'min': 0, 'max': 100,
-            'tooltip': '<span>Standard deviation &sigma;</span>'
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
             }],
         'info':
-             ('<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, '
-              '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
-              '</span>'),
+            '<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, '
+            '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
+            '</span>'
         },
     'Gauss': {
         'fn_name': 'gaussian',
-         'par': [{
-             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5,'min': 0, 'max': 100,
-             'tooltip': '<span>Standard deviation &sigma;</span>'}],
+        'par': [{
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         'info':
              ('<span>Gaussian window '
               '</span>')
@@ -161,13 +163,13 @@ windows = {
     'Hamming': {
         'fn_name': 'hamming',
         'info':
-             '''<span>
-             The Hamming Window has been optimized for suppression of
-             the first side lobe. Compared to the Hann window, this comes at
-             the cost of a worse (constant) level of higher side lobes.
-             <br />&nbsp;<br />Mathematically, it is a two-term raised cosine window with
-             non-zero endpoints (DC-offset).
-             </span>'''
+            '''<span>
+            The Hamming Window has been optimized for suppression of
+            the first side lobe. Compared to the Hann window, this comes at
+            the cost of a worse (constant) level of higher side lobes.
+            <br />&nbsp;<br />Mathematically, it is a two-term raised cosine
+            window with non-zero endpoints (DC-offset).
+            </span>'''
          },
     'Hann': {
         'fn_name': 'hann',
@@ -183,17 +185,17 @@ windows = {
     'Kaiser': {
         'fn_name': 'kaiser',
         'par': [{
-                'name': '&beta;', 'name_tex': r'$\beta$',
-                'val': 10, 'min': 0, 'max': 30,
-                'tooltip':
-                    ('<span>Shape parameter; lower values reduce  main lobe width, '
-                     'higher values reduce side lobe level, typ. in the range '
-                     '5 ... 20.</span>')}],
+            'name': '&beta;', 'name_tex': r'$\beta$',
+            'val': 10, 'min': 0, 'max': 30,
+            'tooltip':
+                '<span>Shape parameter; lower values reduce  main lobe width, '
+                'higher values reduce side lobe level, typ. in the range '
+                '5 ... 20.</span>'}],
         'info':
-             '<span>The Kaiser window is a very good approximation to the '
-             'Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, '
-             'which maximizes the energy in the main lobe of the window relative '
-             'to the total energy.</span>'
+            '<span>The Kaiser window is a very good approximation to the '
+            'Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, '
+            'which maximizes the energy in the main lobe of the window relative '
+            'to the total energy.</span>'
         },
     'Nuttall': {
         'fn_name': 'nuttall'
@@ -222,7 +224,7 @@ windows = {
              'See also: Kaiser window.'
              '</span>'
         },
-    'Triangular': {'fn_name':'triang'},
+    'Triangular': {'fn_name': 'triang'},
     # 'Ultraspherical':
     #     {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
     #      'par':[{
@@ -245,14 +247,15 @@ windows = {
         'par': [{
             'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
-        'info':'''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
-                    whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
-                    of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
-                    &alpha; = 1 a Hann window.
-                    <br />&nbsp;<br />
-                    Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
-                    window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
-                    to be altered by this window than e.g. by a Hann window.</span>'''
+        'info':
+            '''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
+            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
+            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
+            &alpha; = 1 a Hann window.
+            <br />&nbsp;<br />
+            Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
+            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
+            to be altered by this window than e.g. by a Hann window.</span>'''
         }
     }
 
@@ -283,6 +286,7 @@ def set_window_function(win_dict, win_name):
     Returns
     -------
     win_fnct : fnct
+        The window function
     """
 
     par = []
@@ -291,7 +295,9 @@ def set_window_function(win_dict, win_name):
     if win_name not in windows:
         logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
         win_name = "Boxcar"
-    d = windows[win_name] # get sub-dictionary for `win_name` from `windows` dictionary
+    # operate with the window specific  sub-dictionary `windows[`win_name]`
+    # dictionary in the following
+    d = windows[win_name]
 
     fn_name = d['fn_name']
 
@@ -308,7 +314,7 @@ def set_window_function(win_dict, win_name):
     # --------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
-    mod_fnct = fn_name.split('.') # try to split fully qualified name
+    mod_fnct = fn_name.split('.')  # try to split fully qualified name
     fnct = mod_fnct[-1]
     if len(mod_fnct) == 1:
         # only one element, no module given -> use scipy.signal.windows
@@ -327,10 +333,10 @@ def set_window_function(win_dict, win_name):
         win_fnct = getattr(scipy.signal.windows, fn_name, None)
 
     win_dict.update({'name': win_name, 'fn_name': fn_name, 'info': info,
-                     'par': par, 'n_par': n_par,
-                     'win_fnct': win_fnct})
+                     'par': par, 'n_par': n_par})
 
     return win_fnct
+
 
 # ----------------------------------------------------------------------------
 def calc_window_function(win_dict, win_name, N=32, sym=True):
@@ -346,7 +352,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     N : int, optional
         Number of data points. The default is 32.
     sym : bool, optional
-        When True (default), generates a symmetric window, for use in filter design.
+        When True (default), generate a symmetric window, for use in filter design.
         When False, generates a periodic window, for use in spectral analysis.
     Returns
     -------
@@ -379,6 +385,7 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         logger.warning('Falling back to rectangular window.')
         w = np.ones(N)
     return w
+
 
 # -------------------------------------------------------------------------------------
 def blackmanharris5(N, sym):
@@ -433,17 +440,17 @@ def calc_cosine_window(N, sym, a):
     return win
 
 
-def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
+def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
 
     if sym:
         L = N-1
     else:
         L = N
-    #x = np.arange(N) * np.pi / (N)
+    # x = np.arange(N) * np.pi / (N)
 
     geg_ev = scipy.special.eval_gegenbauer
-    w0= geg_ev(N, alpha, x_0)
-    w=np.zeros(N)
+    w0 = geg_ev(N, alpha, x_0)
+    w = np.zeros(N)
     # a = 2
     # for n in range(5 + 1):
     #     x = np.linspace(-1.1, 1.1, 5001)
@@ -451,16 +458,16 @@ def ultraspherical(N, alpha = 0.5, x_0 = 1, sym=True):
     #     plt.plot(x, y, label=r'$C_{%i}^{(2)}$' % n, zorder=-n)
     #     plt.ylim((-10,10))
 
-    for n in range(0,N):
+    for n in range(0, N):
         w[n] = w0
-        for k in range(1,N//2+1):
+        for k in range(1, N//2+1):
             w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(2*n*np.pi*k/(N+1))
     #     rtn +=  np.cos(x*k)
 
-    #w = geg_ev(N-1, alpha, x_0 * np.cos(x))
-    #logger.error(W[0].dtype, len(W))
-    #W = np.abs(fft.ifft(w))
-    #logger.error(type(w[0].dtype), len(w))
+    # w = geg_ev(N-1, alpha, x_0 * np.cos(x))
+    # logger.error(W[0].dtype, len(W))
+    # W = np.abs(fft.ifft(w))
+    # logger.error(type(w[0].dtype), len(w))
     return w
 
 
@@ -521,8 +528,8 @@ class QFFTWinSelection(QWidget):
         This can also be achieved by calling `self.update_widgets()` directly
 
         """
-#        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-#                     .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning("PROCESS_SIG_RX: {0}"
+                     .format(pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win'):
             pass
 
@@ -652,7 +659,7 @@ class QFFTWinSelection(QWidget):
 
         - update win_dict using `set_window_function()`
 
-        - determine number of parameter lineedits that are needed, 
+        - determine number of parameter lineedits that are needed,
           make them visible and update parameter values from dict
 
         - emit 'win_changed'
