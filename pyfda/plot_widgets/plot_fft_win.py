@@ -70,7 +70,7 @@ class Plot_FFT_win(QDialog):
     - `self.update_view()`:
     - `self.draw()`: calculate window and FFT and draw both
     - `get_win(N)` : Get the window array
-"""
+    """
     # incoming
     sig_rx = pyqtSignal(object)
     # outgoing

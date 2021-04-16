@@ -528,8 +528,7 @@ class QFFTWinSelection(QWidget):
         This can also be achieved by calling `self.update_widgets()` directly
 
         """
-        logger.warning("PROCESS_SIG_RX: {0}"
-                     .format(pprint_log(dict_sig)))
+        logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win'):
             pass
 
