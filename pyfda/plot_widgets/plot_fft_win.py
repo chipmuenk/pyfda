@@ -9,8 +9,6 @@
 """
 Create a popup window with FFT window information
 """
-import logging
-logger = logging.getLogger(__name__)
 
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
@@ -19,18 +17,21 @@ from scipy.signal import argrelextrema
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import (calc_window_function, get_window_names,
-        QFFTWinSelection)
+from pyfda.libs.pyfda_fft_windows_lib import (calc_window_function,
+                                              QFFTWinSelection)
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
-import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+# importing filterbroker initializes all its globals:
+import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
                      QDialog, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
-                     QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
-                     QComboBox)
+                     QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem)
+import logging
+logger = logging.getLogger(__name__)
+
 
 # ------------------------------------------------------------------------------
 class Plot_FFT_win(QDialog):
@@ -39,8 +40,8 @@ class Plot_FFT_win(QDialog):
     window.
 
     Data is passed via the dictionary `win_dict` that is specified during
-    construction. Available windows, parameters, tooltipps etc are imported
-    from `pyfda_fft_windows_lib.get_window_names`
+    construction. Available windows, parameters, tooltipps etc are provided
+    by the widget `pyfda_fft_windows_lib.QFFTWinSelection`
 
     Parameters
     ----------
@@ -76,7 +77,7 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=False,
-                title='pyFDA Window Viewer', ignore_close_event=True):
+                 title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
 
     #  dict with current settings, initialized e.g. from fb.fil[0]['win_fft']
@@ -133,7 +134,8 @@ class Plot_FFT_win(QDialog):
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
-            # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto, self.win_dict['win_len']))
+            # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
+            # self.win_dict['win_len']))
             self.N_auto = self.win_dict['win_len']
             self.calc_N()
 
@@ -166,7 +168,7 @@ class Plot_FFT_win(QDialog):
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)
         self.chk_auto_N.setToolTip("<span>Use number of points from main widget "
-                                    "for displaying the FFT window.</span>")
+                                   "for displaying the FFT window.</span>")
 
         self.lbl_auto_N = QLabel("Auto " + to_html("N", frmt='i'))
 
@@ -371,67 +373,6 @@ class Plot_FFT_win(QDialog):
     # https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
 # ------------------------------------------------------------------------------
-
-    # def update_win_params(self):
-    #     """
-    #     Read out parameter lineedits when editing is finished and
-    #     update dict and fft window
-    #     """
-    #     if self.win_dict['n_par'] > 1:
-    #         param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
-    #                         return_type='float')
-    #         if param < self.win_dict['par'][1]['min']:
-    #             param = self.win_dict['par'][1]['min']
-    #         elif param > self.win_dict['par'][1]['max']:
-    #             param = self.win_dict['par'][1]['max']
-    #         self.led_win_par_2.setText(str(param))
-    #         self.win_dict['par'][1]['val'] = param
-
-    #     if self.win_dict['n_par'] > 0:
-    #         param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
-    #                         return_type='float')
-    #         if param < self.win_dict['par'][0]['min']:
-    #             param = self.win_dict['par'][0]['min']
-    #         elif param > self.win_dict['par'][0]['max']:
-    #             param = self.win_dict['par'][0]['max']
-    #         self.led_win_par_1.setText(str(param))
-    #         self.win_dict['par'][0]['val'] = param
-    #         self.update_win()
-
-    # def update_win(self, arg=None):
-    #     """
-    #     Update FFT window when window or parameters have changed.
-
-    #     Depending on the way the function is called, different things happen:
-
-    #     Update the plot and emit 'ui_changed'
-
-    #     """
-    #     self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-    #     self.win_dict['name'] = self.window_name
-    #     self.calc_win()
-
-    #     n_par = self.win_dict['n_par']
-
-    #     self.lbl_win_par_1.setVisible(n_par > 0)
-    #     self.led_win_par_1.setVisible(n_par > 0)
-    #     self.lbl_win_par_2.setVisible(n_par > 1)
-    #     self.led_win_par_2.setVisible(n_par > 1)
-
-    #     if n_par > 0:
-    #         self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-    #         self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
-    #         self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
-
-    #     if n_par > 1:
-    #         self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-    #         self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
-    #         self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
-
-    #     self.update_view()
-
-    #     self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
-
     def update_fft_win(self, arg=None):
         """
         Update FFT window when window or parameters have changed and
@@ -484,8 +425,8 @@ class Plot_FFT_win(QDialog):
         if not self.chk_auto_N.isChecked():
             self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
                                     return_type='int')
-       # else:
-            #self.N_view = self.win_dict['win_len']
+        # else:
+            # self.N_view = self.win_dict['win_len']
 
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
@@ -498,16 +439,19 @@ class Plot_FFT_win(QDialog):
                                                  self.N_view, sym=self.sym)
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
-                                            / np.square(np.sum(self.win_view))
+                      / np.square(np.sum(self.win_view))
         self.cgain = np.sum(self.win_view) / self.N_view  # coherent gain
 
-        self.F = fftfreq(self.N_view * self.pad, d=1. / fb.fil[0]['f_S'])  # use zero padding
+        # calculate the FFT of the window with a zero padding factor
+        # of `self.pad`
+        self.F = fftfreq(self.N_view * self.pad, d=1. / fb.fil[0]['f_S'])
         self.Win = np.abs(fft(self.win_view, self.N_view * self.pad))
 
         # Correct gain for periodic signals (coherent gain)
         if self.chk_norm_f.isChecked():
             self.Win /= (self.N_view * self.cgain)
 
+        # calculate frequency of first zero and maximum sidelobe level
         first_zero = argrelextrema(self.Win[:(self.N_view*self.pad)//2], np.less)
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
@@ -516,6 +460,7 @@ class Plot_FFT_win(QDialog):
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
+
 # ------------------------------------------------------------------------------
     def get_win(self, N):
         """
@@ -536,6 +481,7 @@ class Plot_FFT_win(QDialog):
             return self.win
         else:
             logger.error("unequal")
+
 # ------------------------------------------------------------------------------
     def _set_table_item(self, row, col, val, font=None, sel=None):
         """
@@ -605,7 +551,8 @@ class Plot_FFT_win(QDialog):
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
         if self.chk_log_t.isChecked():
-            self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win_view)), self.bottom_t))
+            self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win_view)),
+                                              self.bottom_t))
         else:
             self.ax_t.plot(self.n, self.win_view)
 
@@ -639,10 +586,12 @@ class Plot_FFT_win(QDialog):
         window_name = self.win_dict['name']
         param_txt = ""
         if self.win_dict['n_par'] > 0:
-            param_txt = " (" + self.win_dict['par'][0]['name_tex'] + " = {0:.3g})".format(self.win_dict['par'][0]['val'])
+            param_txt = " (" + self.win_dict['par'][0]['name_tex'] + " = {0:.3g})"\
+                .format(self.win_dict['par'][0]['val'])
         if self.win_dict['n_par'] > 1:
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1]['name_tex'], self.win_dict['par'][1]['val'])
+                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1]['name_tex'],
+                                              self.win_dict['par'][1]['val'])
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) + param_txt)
 
@@ -650,30 +599,33 @@ class Plot_FFT_win(QDialog):
         if self.tbl_sel[3]:
             self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
 
-        patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white", lw=0, alpha=0)
+        patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white",
+                                      lw=0, alpha=0)
         # Info legend for time domain window
         labels_t = []
         labels_t.append("$N$ = {0:d}".format(self.N_view))
         self.ax_t.legend([patch], labels_t, loc='best', fontsize='small',
-                              fancybox=True, framealpha=0.7,
-                              handlelength=0, handletextpad=0)
+                         fancybox=True, framealpha=0.7,
+                         handlelength=0, handletextpad=0)
 
         # Info legend for frequency domain window
         labels_f = []
         N_patches = 0
         if self.tbl_sel[0]:
-            labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp, self.unit_nenbw))
+            labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp,
+                                                           self.unit_nenbw))
             N_patches += 1
         if self.tbl_sel[1]:
-            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.cgain_disp, self.unit_scale))
+            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.cgain_disp,
+                                                           self.unit_scale))
             N_patches += 1
         if self.tbl_sel[2]:
             labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))
             N_patches += 1
         if N_patches > 0:
-            self.ax_f.legend([patch] * N_patches, labels_f, loc='best', fontsize='small',
-                                   fancybox=True, framealpha=0.7,
-                                   handlelength=0, handletextpad=0)
+            self.ax_f.legend([patch] * N_patches, labels_f, loc='best',
+                             fontsize='small', fancybox=True, framealpha=0.7,
+                             handlelength=0, handletextpad=0)
         np.seterr(**old_settings_seterr)
 
         self.update_info()
@@ -687,18 +639,18 @@ class Plot_FFT_win(QDialog):
         if 'info' in self.win_dict:
             self.txtInfoBox.setText(self.win_dict['info'])
 
-        self._set_table_item(0, 0, "ENBW", font=self.bfont)#, sel=True)
+        self._set_table_item(0, 0, "ENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0, 2, self.unit_nenbw)
-        self._set_table_item(0, 3, "Scale", font=self.bfont)#, sel=True)
+        self._set_table_item(0, 3, "Scale", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 4, "{0:.5g}".format(self.cgain_disp))
         self._set_table_item(0, 5, self.unit_scale)
 
-        self._set_table_item(1, 0, "1st Zero", font=self.bfont)#, sel=True)
+        self._set_table_item(1, 0, "1st Zero", font=self.bfont)  # , sel=True)
         self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_f))
         self._set_table_item(1, 2, "f_S")
 
-        self._set_table_item(1, 3, "Sidelobes", font=self.bfont)#, sel=True)
+        self._set_table_item(1, 3, "Sidelobes", font=self.bfont)  # , sel=True)
         self._set_table_item(1, 4, "{0:.5g}".format(self.sidelobe_level_disp))
         self._set_table_item(1, 5, self.unit_scale)
 
@@ -713,8 +665,8 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.redraw()
         self.needs_redraw = False
 
-# ==============================================================================
 
+# ==============================================================================
 if __name__ == '__main__':
     import sys
     from pyfda.libs.compat import QApplication
