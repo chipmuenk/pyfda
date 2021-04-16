@@ -1422,12 +1422,13 @@ class PlotImpz_UI(QWidget):
         self.cgain = np.sum(self.win) / self.N  # coherent gain
         self.win /= self.cgain  # correct gain for periodic signals
 
+        self.fft_window.qfft_win_select.update_widgets()
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
 
     # ------------------------------------------------------------------------------
     def show_fft_win(self):
         """
-        Show / hide FFT window depending on the correspondin button
+        Show / hide FFT window depending on the corresponding button
         """
         logger.warning(self.but_fft_win.isChecked())
         if self.but_fft_win.isChecked():
@@ -1443,7 +1444,6 @@ class PlotImpz_UI(QWidget):
         """
         self.but_fft_win.setChecked(False)
         self.fft_window.hide()
-
 
     # ------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
