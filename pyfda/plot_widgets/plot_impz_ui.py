@@ -9,24 +9,23 @@
 """
 Create the UI for the PlotImz class
 """
-import logging
-logger = logging.getLogger(__name__)
-
 import collections
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
                                QPushButton, QPushButtonRT, QFontMetrics, QIcon, pyqtSignal,
-                               QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout,
-                               QSizePolicy)
+                               QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
+from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box,
                                      qstyle_widget, qled_set_max_width, QVLine, QLabelVert, )
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class PlotImpz_UI(QWidget):
@@ -55,7 +54,7 @@ class PlotImpz_UI(QWidget):
 
         # --- signals coming from the FFT window widget -----------------------
         if 'fft' in dict_sig['sender']:
-            logger.warning(dict_sig['sender'])# == 'fft':
+            logger.warning(dict_sig['sender'])
             if 'closeEvent' in dict_sig:
                 self.hide_fft_win()
                 return
@@ -90,9 +89,9 @@ class PlotImpz_UI(QWidget):
         self.plt_time_stmq = "none"
         self.plt_time_spgr = "none"
 
-        self.bottom_t = -80 # initial value for log. scale (time)
-        self.time_nfft_spgr = 256 # number of fft points per spectrogram segment
-        self.time_ovlp_spgr = 128 # number of overlap points between spectrogram segments
+        self.bottom_t = -80  # initial value for log. scale (time)
+        self.time_nfft_spgr = 256  # number of fft points per spectrogram segment
+        self.time_ovlp_spgr = 128  # number of overlap points between spectrogram segments
         self.mode_spgr_time = "magnitude"
 
         # stimuli
@@ -126,7 +125,7 @@ class PlotImpz_UI(QWidget):
         self.plt_freq_stim = "none"
         self.plt_freq_stmq = "none"
 
-        self.bottom_f = -120 # initial value for log. scale
+        self.bottom_f = -120  # initial value for log. scale
         self.param = None
 
         self.f_scale = fb.fil[0]['f_S']
@@ -137,143 +136,144 @@ class PlotImpz_UI(QWidget):
         self.win_dict = fb.fil[0]['win_fft']
         # self.window_name = "Rectangular" # set initial window some way?
         self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
-                                        title="pyFDA Spectral Window Viewer")
+                                       title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_window.hide()
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
-        self.stim_wdg_dict.update(
-        {"none":    {"dc", "noise"},
-         "dirac":   {"dc", "a1", "T1", "norm", "noise"},
-         "sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
-         "gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2", "norm", "noise"},
-         "rect":    {"dc", "a1", "T1", "TW1", "norm", "noise"},
-         "step":    {"a1", "T1", "noise"},
-         "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "diric":   {"dc", "a1", "phi1", "T1", "TW1", "f1", "noise"},
+        self.stim_wdg_dict.update({
+            "none":    {"dc", "noise"},
+            "dirac":   {"dc", "a1", "T1", "norm", "noise"},
+            "sinc":    {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "norm", "noise"},
+            "gauss":   {"dc", "a1", "a2", "T1", "T2", "f1", "f2", "BW1", "BW2",
+                        "norm", "noise"},
+            "rect":    {"dc", "a1", "T1", "TW1", "norm", "noise"},
+            "step":    {"a1", "T1", "noise"},
+            "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "diric":   {"dc", "a1", "phi1", "T1", "TW1", "f1", "noise"},
 
-         "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
-         "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
-         "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
-         "square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
-         "comb":    {"dc", "a1", "phi1", "f1", "noise"},
-         "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-         "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1", "BW2", "noise"}
+            "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
+            "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
+            "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
+            "square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+            "comb":    {"dc", "a1", "phi1", "f1", "noise"},
+            "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1",
+                        "BW2", "noise"}
          })
 
         # data / icon / tooltipp (none) for plotting styles
-        self.plot_styles_list =\
-                [("Plot style"),
-                 ("none", QIcon(":/plot_style-none"), ""),
-                 ("dots*", QIcon(":/plot_style-mkr"), ""),
-                 ("line", QIcon(":/plot_style-line"), ""),
-                 ("line*", QIcon(":/plot_style-line-mkr"), ""),
-                 ("stem", QIcon(":/plot_style-stem"), ""),
-                 ("stem*", QIcon(":/plot_style-stem-mkr"), ""),
-                 ("steps", QIcon(":/plot_style-steps"),""),
-                 ("steps*", QIcon(":/plot_style-steps-mkr"), "")
-                 ]
+        self.plot_styles_list = [
+            ("Plot style"),
+            ("none", QIcon(":/plot_style-none"), ""),
+            ("dots*", QIcon(":/plot_style-mkr"), ""),
+            ("line", QIcon(":/plot_style-line"), ""),
+            ("line*", QIcon(":/plot_style-line-mkr"), ""),
+            ("stem", QIcon(":/plot_style-stem"), ""),
+            ("stem*", QIcon(":/plot_style-stem-mkr"), ""),
+            ("steps", QIcon(":/plot_style-steps"), ""),
+            ("steps*", QIcon(":/plot_style-steps-mkr"), "")
+            ]
 
-    # data / text / tooltip for stimulus categoies combobox. 
-        self.cmb_stim_items =\
-                [("<span>Stimulus category.</span>"),
-                 ("none", "None", "<span>Only noise and DC can be selected.</span>"),
-                 ("impulse", "Impulse", "<span>Different impulses</span>"),
-                 ("step", "Step", "<span>Calculate step response and its error.</span>"),
-                 ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
-                 ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
-                 ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
-                                          "band-limited or with aliasing.</span>"),
-                 ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
-                 ("formula", "Formula", "<span>Formula defined stimulus.</span>")
-                ]
+        # data / text / tooltip for stimulus categoies combobox.
+        self.cmb_stim_items = [
+            ("<span>Stimulus category.</span>"),
+            ("none", "None", "<span>Only noise and DC can be selected.</span>"),
+            ("impulse", "Impulse", "<span>Different impulses</span>"),
+            ("step", "Step", "<span>Calculate step response and its error.</span>"),
+            ("sinusoid", "Sinusoid", "<span>Sinusoidal waveforms</span>"),
+            ("chirp", "Chirp", "<span>Different frequency sweeps.</span>"),
+            ("periodic", "Periodic", "<span>Periodic functions with discontinuities, "
+                                    "band-limited or with aliasing.</span>"),
+            ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
+            ("formula", "Formula", "<span>Formula defined stimulus.</span>")
+            ]
 
-        # data / text / tooltip for periodic signals' combobox. 
-        self.cmb_stim_periodic_items =\
-                ["<span>Periodic functions with discontinuities.</span>",
-                 ("square","Square", "<span>Square signal with duty cycle &alpha;.</span>"),
-                 ("saw","Saw", "Sawtooth signal."),
-                 ("triang", "Triang","Triangular signal."), 
-                 ("comb", "Comb","Comb signal.")
-                ]
+        # data / text / tooltip for periodic signals' combobox.
+        self.cmb_stim_periodic_items = [
+            "<span>Periodic functions with discontinuities.</span>",
+            ("square", "Square", "<span>Square signal with duty cycle &alpha;.</span>"),
+            ("saw", "Saw", "Sawtooth signal."),
+            ("triang", "Triang", "Triangular signal."),
+            ("comb", "Comb", "Comb signal.")
+            ]
 
         # data / text / tooltip for chirp signals' combobox.
-        self.cmb_stim_chirp_items =\
-                [ "<span>Type of frequency sweep from <i>f</i><sub>1</sub> to "
-                  "<i>f</i><sub>1</sub></span>",
-                 ("linear", "Lin", "Linear frequency sweep"),
-                 ("quadratic", "Square","Quadratic frequency sweep"),
-                 ("logarithmic", "Log", "Logarithmic frequency sweep"),
-                 ("hyperbolic", "Hyper",  "Hyperbolic frequency sweep")
-                ]
+        self.cmb_stim_chirp_items = [
+            "<span>Type of frequency sweep from <i>f</i><sub>1</sub> to "
+            "<i>f</i><sub>1</sub></span>",
+            ("linear", "Lin", "Linear frequency sweep"),
+            ("quadratic", "Square", "Quadratic frequency sweep"),
+            ("logarithmic", "Log", "Logarithmic frequency sweep"),
+            ("hyperbolic", "Hyper",  "Hyperbolic frequency sweep")
+            ]
 
-        self.cmb_stim_impulse_items=\
-                [ "<span>Different aperiodic impulse forms</span>",
-                 ("dirac","Dirac","<span>Discrete-time dirac impulse for simulating "
-                                  "impulse and frequency response.</span>"),
-                 ("gauss","Gauss", "<span>Gaussian pulse with bandpass spectrum and "
-                                   "controllable relative -6 dB bandwidth.</span>"),
-                 ("sinc", "Sinc", "<span>Sinc pulse with rectangular baseband spectrum</span>"),
-                 ("rect", "Rect", "<span>Rectangular pulse with sinc-shaped spectrum</span>")
-                ]
+        self.cmb_stim_impulse_items = [
+            "<span>Different aperiodic impulse forms</span>",
+            ("dirac", "Dirac", "<span>Discrete-time dirac impulse for simulating "
+                                "impulse and frequency response.</span>"),
+            ("gauss", "Gauss", "<span>Gaussian pulse with bandpass spectrum and "
+                                "controllable relative -6 dB bandwidth.</span>"),
+            ("sinc", "Sinc", "<span>Sinc pulse with rectangular baseband spectrum</span>"),
+            ("rect", "Rect", "<span>Rectangular pulse with sinc-shaped spectrum</span>")
+            ]
 
-        self.cmb_stim_sinusoid_items=\
-                ["Sinusoidal or similar signals",
-                 ("sine","Sine", "Sine signal"),
-                 ("cos","Cos", "Cosine signal"),
-                 ("exp", "Exp", "Complex exponential"),
-                 ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
-                ]
+        self.cmb_stim_sinusoid_items = [
+            "Sinusoidal or similar signals",
+            ("sine", "Sine", "Sine signal"),
+            ("cos", "Cos", "Cosine signal"),
+            ("exp", "Exp", "Complex exponential"),
+            ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
+            ]
 
-        self.cmb_time_spgr_items=\
-                ["<span>Show Spectrogram for selected signal.</span>",
-                 ("none","None",""),
-                 ("xn","x[n]",""),
-                 ("xqn","x_q[n]",""),
-                 ("yn","y[n]","")
-                 ]
+        self.cmb_time_spgr_items = [
+            "<span>Show Spectrogram for selected signal.</span>",
+            ("none", "None", ""),
+            ("xn", "x[n]", ""),
+            ("xqn", "x_q[n]", ""),
+            ("yn", "y[n]", "")
+            ]
 
         # data / text / tooltip for noise stimulus combobox.
-        self.cmb_stim_noise_items =\
-                [ "Type of additive noise.",
-                 ("none", "None", ""),
-                 ("gauss", "Gauss", "<span>Normal- or Gauss-distributed process with "
-                                    "std. deviation &sigma;.</span>"),
-                 ("uniform", "Uniform", "<span>Uniformly distributed process in the "
-                                        "range &plusmn; &Delta;/2.</span>"),
-                 ("prbs", "PRBS", "<span>Pseudo-Random Binary Sequence with values "
-                                      "&plusmn; A.</span>"),
-                 ("mls", "MLS", "<span>Maximum Length Sequence with values &plusmn; A. "
-                                 "The sequence is always the same as the state is not "
-                                 "stored for the next sequence start.</span>"),
-                 ("brownian", "Brownian", "<span>Brownian (cumulated sum) process based "
-                                      " on Gaussian noise with std. deviation &sigma;.</span>")
-                 ]
+        self.cmb_stim_noise_items = [
+            "Type of additive noise.",
+            ("none", "None", ""),
+            ("gauss", "Gauss", "<span>Normal- or Gauss-distributed process with "
+                                "std. deviation &sigma;.</span>"),
+            ("uniform", "Uniform", "<span>Uniformly distributed process in the "
+                                    "range &plusmn; &Delta;/2.</span>"),
+            ("prbs", "PRBS",
+             "<span>Pseudo-Random Binary Sequence with values &plusmn; A.</span>"),
+            ("mls", "MLS", "<span>Maximum Length Sequence with values &plusmn; A. "
+                            "The sequence is always the same as the state is not "
+                            "stored for the next sequence start.</span>"),
+            ("brownian", "Brownian", "<span>Brownian (cumulated sum) process based "
+                                    " on Gaussian noise with std. deviation &sigma;.</span>")
+            ]
 
-        # data / text / tooltip for spectrum display combobox.                
-        self.cmb_freq_display_items =\
-                ["<span>Select how to display the spectrum.</span>",
-                 ("mag","Magnitude", "<span>Spectral magnitude</span>"),
-                 ("mag_phi","Mag. / Phase", "<span>Magnitude and phase.</span>"),
-                 ("re_im", "Re. / Imag.","<span>Real and imaginary part of spectrum.</span>")
-                ]
+        # data / text / tooltip for spectrum display combobox.
+        self.cmb_freq_display_items = [
+            "<span>Select how to display the spectrum.</span>",
+            ("mag", "Magnitude", "<span>Spectral magnitude</span>"),
+            ("mag_phi", "Mag. / Phase", "<span>Magnitude and phase.</span>"),
+            ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
+            ]
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self.update_N(emit=False) # also updates window function
+        self.update_N(emit=False)  # also updates window function
         self._update_noi()
-
 
     def _construct_UI(self):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
         self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=10)
-        #self.but_auto_run.setText("Auto")
+        # self.but_auto_run.setText("Auto")
         self.but_auto_run.setObjectName("but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
@@ -286,26 +286,28 @@ class PlotImpz_UI(QWidget):
         self.but_run.setEnabled(not self.but_auto_run.isChecked())
 
         self.cmb_sim_select = QComboBox(self)
-        self.cmb_sim_select.addItems(["Float","Fixpoint"])
+        self.cmb_sim_select.addItems(["Float", "Fixpoint"])
         qset_cmb_box(self.cmb_sim_select, "Float")
-        self.cmb_sim_select.setToolTip("<span>Simulate floating-point or fixpoint response."
-                                 "</span>")
+        self.cmb_sim_select.setToolTip("<span>Simulate floating-point or "
+                                       "fixpoint response.</span>")
 
-        self.lbl_N_points = QLabel(to_html("N", frmt='bi')  + " =", self)
+        self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N))
-        self.led_N_points.setToolTip("<span>Number of displayed data points. "
-                                   "<i>N</i> = 0 tries to choose for you.</span>")
-        qled_set_max_width(self.led_N_points, N_x = 8)
+        self.led_N_points.setToolTip(
+            "<span>Number of displayed data points. "
+            "<i>N</i> = 0 tries to choose for you.</span>")
+        qled_set_max_width(self.led_N_points, N_x=8)
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
-        qled_set_max_width(self.led_N_start, N_x = 8)
+        qled_set_max_width(self.led_N_start, N_x=8)
 
         self.but_fx_scale = QPushButton("FX Int")
         self.but_fx_scale.setObjectName("but_fx_scale")
-        self.but_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
+        self.but_fx_scale.setToolTip(
+            "<span>Display data with integer (fixpoint) scale.</span>")
         self.but_fx_scale.setCheckable(True)
         self.but_fx_scale.setChecked(False)
 
@@ -317,8 +319,9 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
-        self.lbl_stim_cmplx_warn.setToolTip('<span>Signal is complex valued, '
-                                    'single-sided and H<sub>id</sub> spectra may be wrong.</span>')
+        self.lbl_stim_cmplx_warn.setToolTip(
+            '<span>Signal is complex valued, '
+            'single-sided and H<sub>id</sub> spectra may be wrong.</span>')
         self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
                                                "border : 1px solid grey")
 
@@ -331,7 +334,7 @@ class PlotImpz_UI(QWidget):
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_run)
-        #layH_ctrl_run.addWidget(self.lbl_sim_select)
+        # layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
         layH_ctrl_run.addWidget(self.but_auto_run)
         layH_ctrl_run.addWidget(self.lbl_N_start)
@@ -341,7 +344,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.but_fx_scale)
         layH_ctrl_run.addStretch(2)
-        #layH_ctrl_run.addWidget(lbl_stim_options)
+        # layH_ctrl_run.addWidget(lbl_stim_options)
         layH_ctrl_run.addWidget(self.but_stim_options)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
@@ -349,7 +352,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_fft_win)
         layH_ctrl_run.addStretch(10)
 
-        #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
+        # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
 
         self.wdg_ctrl_run = QWidget(self)
         self.wdg_ctrl_run.setLayout(layH_ctrl_run)
@@ -375,17 +378,18 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
         self.chk_win_time = QPushButton("FFT Window")
-        self.chk_win_time.resize(self.chk_win_time.sizeHint().width(), 
+        self.chk_win_time.resize(self.chk_win_time.sizeHint().width(),
                                  self.chk_win_time.sizeHint().height())
         self.chk_win_time.setObjectName("chk_win_time")
-        self.chk_win_time.setToolTip('<span>Show FFT windowing function (can be '
-                                     'modified in the "Frequency" tab).</span>')
+        self.chk_win_time.setToolTip(
+            '<span>Show FFT windowing function (can be '
+            'modified in the "Frequency" tab).</span>')
         self.chk_win_time.setCheckable(True)
         self.chk_win_time.setChecked(False)
-        
+
         line1 = QVLine()
         line2 = QVLine(width=5)
-        
+
         self.chk_log_time = QPushButton("dB")
         self.chk_log_time.setMaximumWidth(self.mSize * 4)
         self.chk_log_time.setObjectName("chk_log_time")
@@ -425,8 +429,8 @@ class PlotImpz_UI(QWidget):
         self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
         self.lbl_mode_spgr_time.setVisible(spgr_en)
         self.cmb_mode_spgr_time = QComboBox(self)
-        spgr_modes = [("PSD","psd"), ("Mag.","magnitude"),\
-                      ("Angle","angle"), ("Phase","phase")]
+        spgr_modes = [("PSD", "psd"), ("Mag.", "magnitude"),
+                      ("Angle", "angle"), ("Phase", "phase")]
         for i in spgr_modes:
             self.cmb_mode_spgr_time.addItem(*i)
         qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
@@ -437,8 +441,8 @@ class PlotImpz_UI(QWidget):
         self.lbl_byfs_spgr_time.setVisible(spgr_en)
         self.chk_byfs_spgr_time = QCheckBox(self)
         self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
-        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density i.e. "
-                                           "scale by f_S</span>")
+        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
+                                           "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
@@ -448,11 +452,10 @@ class PlotImpz_UI(QWidget):
         qled_set_max_width(self.led_log_bottom_time, str="xxxxxxxx")
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for time "
                                             "and spectrogram plots with log. scale.</span>")
-        self.lbl_log_bottom_time.setVisible(self.chk_log_time.isChecked() or\
-                                        (spgr_en and self.chk_log_spgr_time.isChecked()))
+        self.lbl_log_bottom_time.setVisible(
+            self.chk_log_time.isChecked() or
+            (spgr_en and self.chk_log_spgr_time.isChecked()))
         self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
-
-
 
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
         # self.lbl_colorbar_time.setVisible(spgr_en)
@@ -519,7 +522,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(self.cmb_plt_freq_stim, self.plot_styles_list, self.plt_freq_stim)
-        #self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
+        # self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel(to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
@@ -583,11 +586,12 @@ class PlotImpz_UI(QWidget):
         self.chk_Hf.setCheckable(True)
 
         self.chk_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
-        self.chk_freq_norm_impz.setToolTip("<span>Normalize the FFT of the stimulus "
-                            "impulse with <i>N<sub>FFT</sub></i> to achieve "
-                            "|<i>X(f)</i>| &le; 1. For the dirac pulse, this yields "
-                            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
-                            "turned off.</span>")
+        self.chk_freq_norm_impz.setToolTip(
+            "<span>Normalize the FFT of the stimulus "
+            "impulse with <i>N<sub>FFT</sub></i> to achieve "
+            "|<i>X(f)</i>| &le; 1. For the dirac pulse, this yields "
+            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
+            "turned off.</span>")
         self.chk_freq_norm_impz.setCheckable(True)
         self.chk_freq_norm_impz.setChecked(True)
         self.chk_freq_norm_impz.setObjectName("freq_norm_impz")
@@ -631,7 +635,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
         layH_ctrl_freq.addStretch(10)
 
-        #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
+        # layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
 
         self.wdg_ctrl_freq = QWidget(self)
         self.wdg_ctrl_freq.setLayout(layH_ctrl_freq)
@@ -641,7 +645,7 @@ class PlotImpz_UI(QWidget):
         # Controls for stimuli
         # =====================================================================
         # Create combo box with stimulus categories
-        #self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
+        # self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
         self.lblStimulus = QLabelVert("Stim", self)
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
@@ -654,41 +658,42 @@ class PlotImpz_UI(QWidget):
 
         self.chk_stim_bl = QPushButton(self)
         self.chk_stim_bl.setText("BL")
-        self.chk_stim_bl.setToolTip("<span>Bandlimit the signal to the Nyquist "
-                            "frequency to avoid aliasing. However, this is much slower "
-                            "to calculate especially for a large number of points.</span>")
+        self.chk_stim_bl.setToolTip(
+            "<span>Bandlimit the signal to the Nyquist "
+            "frequency to avoid aliasing. However, this is much slower "
+            "to calculate especially for a large number of points.</span>")
         self.chk_stim_bl.setMaximumWidth(self.mSize * 4)
         self.chk_stim_bl.setCheckable(True)
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
 
-        #-------------------------------------
+        # -------------------------------------
         self.cmbChirpType = QComboBox(self)
         qcmb_box_populate(self.cmbChirpType, self.cmb_stim_chirp_items, self.chirp_type)
 
         self.cmbImpulseType = QComboBox(self)
         qcmb_box_populate(self.cmbImpulseType, self.cmb_stim_impulse_items, self.impulse_type)
-        
+
         self.cmbSinusoidType = QComboBox(self)
         qcmb_box_populate(self.cmbSinusoidType, self.cmb_stim_sinusoid_items, self.sinusoid_type)
 
         self.cmbPeriodicType = QComboBox(self)
-        qcmb_box_populate(self.cmbPeriodicType, self.cmb_stim_periodic_items, 
+        qcmb_box_populate(self.cmbPeriodicType, self.cmb_stim_periodic_items,
                           self.cmb_stim_periodic_item)
 
         self.cmbModulationType = QComboBox(self)
-        for t in [("AM", "am"), ("PM / FM", "pmfm")]: # text, data
+        for t in [("AM", "am"), ("PM / FM", "pmfm")]:  # text, data
             self.cmbModulationType.addItem(*t)
         qset_cmb_box(self.cmbModulationType, self.modulation_type, data=True)
 
-        #-------------------------------------
+        # -------------------------------------
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
         self.chk_step_err.setMaximumWidth(7*self.mSize)
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
-        
+
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
         layHCmbStim.addWidget(self.cmbImpulseType)
@@ -711,7 +716,7 @@ class PlotImpz_UI(QWidget):
         layHStimDC.addWidget(self.lblDC)
         layHStimDC.addWidget(self.ledDC)
 
-        #======================================================================
+        # ======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
@@ -724,7 +729,7 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setToolTip("Stimulus amplitude 2, complex values like 3j - 1 are allowed")
         self.ledAmp2.setObjectName("stimAmp2")
 
-        #----------------------------------------------
+        # ----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
         self.ledPhi1 = QLineEdit(self)
         self.ledPhi1.setText(str(self.phi1))
@@ -739,7 +744,7 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
 
-        #----------------------------------------------
+        # ----------------------------------------------
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
         self.led_T1.setText(str(self.T1))
@@ -753,8 +758,8 @@ class PlotImpz_UI(QWidget):
         self.led_T2.setToolTip("Time shift 2")
         self.led_T2.setObjectName("stimT2")
         self.lbl_TU2 = QLabel(to_html("T_S", frmt='b'), self)
-        
-        #----------------------------------------------
+
+        # ---------------------------------------------
         self.lbl_TW1 = QLabel(to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
         self.led_TW1 = QLineEdit(self)
         self.led_TW1.setText(str(self.TW1))
@@ -769,7 +774,7 @@ class PlotImpz_UI(QWidget):
         self.led_TW2.setObjectName("stimTW2")
         self.lbl_TWU2 = QLabel(to_html("T_S", frmt='b'), self)
 
-        #----------------------------------------------
+        # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
         self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
         self.lblFreq1 = QLabel(self.txtFreq1_f, self)
@@ -787,8 +792,8 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
-        
-        #----------------------------------------------
+
+        # ----------------------------------------------
         self.lbl_BW1 = QLabel(to_html(self.tr("&nbsp;BW_1"), frmt='bi') + " =", self)
         self.led_BW1 = QLineEdit(self)
         self.led_BW1.setText(str(self.BW1))
@@ -801,7 +806,7 @@ class PlotImpz_UI(QWidget):
         self.led_BW2.setToolTip(self.tr("Relative bandwidth 2"))
         self.led_BW2.setObjectName("stimBW2")
 
-        #----------------------------------------------
+        # ----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         qcmb_box_populate(self.cmbNoise, self.cmb_stim_noise_items, self.noise)
@@ -815,11 +820,11 @@ class PlotImpz_UI(QWidget):
         layGStim = QGridLayout()
 
         layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
-        #layGStim.addWidget(self.lblDC, 1, 0)
+        # layGStim.addWidget(self.lblDC, 1, 0)
 
         layGStim.addLayout(layHCmbStim, 0, 1)
-        layGStim.addLayout(layHStimDC, 1, 1) 
-        #layGStim.addWidget(self.ledDC,  1, 1)
+        layGStim.addLayout(layHStimDC, 1, 1)
+        # layGStim.addWidget(self.ledDC,  1, 1)
 
         layGStim.addWidget(self.lblAmp1, 0, 2)
         layGStim.addWidget(self.lblAmp2, 1, 2)
@@ -862,13 +867,12 @@ class PlotImpz_UI(QWidget):
 
         layGStim.addWidget(self.lblFreqUnit1, 0, 15)
         layGStim.addWidget(self.lblFreqUnit2, 1, 15)
-        
+
         layGStim.addWidget(self.lbl_BW1, 0, 16)
         layGStim.addWidget(self.lbl_BW2, 1, 16)
 
         layGStim.addWidget(self.led_BW1, 0, 17)
         layGStim.addWidget(self.led_BW2, 1, 17)
-
 
         layGStim.addWidget(self.lblNoise, 0, 18)
         layGStim.addWidget(self.lblNoi, 1, 18)
@@ -876,19 +880,19 @@ class PlotImpz_UI(QWidget):
         layGStim.addWidget(self.cmbNoise, 0, 19)
         layGStim.addWidget(self.ledNoi, 1, 19)
 
-        #----------------------------------------------
+        # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
         self.ledStimFormula = QLineEdit(self)
         self.ledStimFormula.setText(str(self.stim_formula))
-        self.ledStimFormula.setToolTip("<span>Enter formula for stimulus in numexpr syntax."
-                                  "</span>")
+        self.ledStimFormula.setToolTip(
+            "<span>Enter formula for stimulus in numexpr syntax.</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
         layH_ctrl_stim_formula = QHBoxLayout()
         layH_ctrl_stim_formula.addWidget(self.lblStimFormula)
-        layH_ctrl_stim_formula.addWidget(self.ledStimFormula,10)
+        layH_ctrl_stim_formula.addWidget(self.ledStimFormula, 10)
 
-        #----------------------------------------------
+        # ----------------------------------------------
         layH_ctrl_stim_par = QHBoxLayout()
 
         layH_ctrl_stim_par.addLayout(layGStim)
@@ -903,7 +907,7 @@ class PlotImpz_UI(QWidget):
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
 
-        # frequency related widgets require special handling as they are scaled with f_s
+        # frequency related widgets are scaled with f_s, requiring special handling
         self.ledFreq1.installEventFilter(self)
         self.ledFreq2.installEventFilter(self)
         self.led_T1.installEventFilter(self)
@@ -916,18 +920,18 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # connect FFT window to widgets and signals upstream:
         self.fft_window.sig_tx.connect(self.process_sig_rx)
-        #self.sig_rx.connect(self.qfft_win_select.sig_rx)
+        # self.sig_rx.connect(self.qfft_win_select.sig_rx)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
         self.but_fft_win.clicked.connect(self.show_fft_win)
 
         # --- frequency control ---
-        # careful! currentIndexChanged passes the current index to _update_win_fft
+        # careful! currentIndexChanged passes the current index
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._read_param1)
         self.ledWinPar2.editingFinished.connect(self._read_param2)
@@ -953,12 +957,12 @@ class PlotImpz_UI(QWidget):
         self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
         self.cmbPeriodicType.currentIndexChanged.connect(self._update_periodic_type)
         self.cmbModulationType.currentIndexChanged.connect(self._update_modulation_type)
-        
+
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
         Filter all events generated by the monitored widgets (ledFreq1 and 2 and T1 / T2).
@@ -1048,8 +1052,7 @@ class PlotImpz_UI(QWidget):
         # Call base class method to continue normal event processing:
         return super(PlotImpz_UI, self).eventFilter(source, event)
 
-
-#-------------------------------------------------------------
+    # -------------------------------------------------------------
     def recalc_freqs(self):
         """
         Update normalized frequencies if required. This is called by via signal
@@ -1065,9 +1068,9 @@ class PlotImpz_UI(QWidget):
 
         self.update_freqs()
 
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'f1_f2'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'f1_f2'})
 
-#-------------------------------------------------------------
+    # -------------------------------------------------------------
     def update_freqs(self):
         """
         `update_freqs()` is called:
@@ -1124,7 +1127,7 @@ class PlotImpz_UI(QWidget):
             self.led_TW1.setText(str(params['FMT'].format(self.TW1 * self.t_scale)))
             self.led_TW2.setText(str(params['FMT'].format(self.TW2 * self.t_scale)))
 
-#-------------------------------------------------------------
+    # -------------------------------------------------------------
     def _show_stim_options(self):
         """
         Hide / show panel with stimulus options
@@ -1201,14 +1204,13 @@ class PlotImpz_UI(QWidget):
 
         self.cmbImpulseType.setVisible(self.cmb_stim == 'impulse')
         self.cmbSinusoidType.setVisible(self.cmb_stim == 'sinusoid')
-        self.cmbChirpType.setVisible(self.cmb_stim == 'chirp')        
+        self.cmbChirpType.setVisible(self.cmb_stim == 'chirp')
         self.cmbPeriodicType.setVisible(self.cmb_stim == 'periodic')
         self.cmbModulationType.setVisible(self.cmb_stim == 'modulation')
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim'})
 
-#-------------------------------------------------------------
-
+    # -------------------------------------------------------------
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='cmplx')
@@ -1226,7 +1228,7 @@ class PlotImpz_UI(QWidget):
         self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'phi1'})
-        
+
     def _update_BW1(self):
         """ Update value for self.BW1 from QLineEditWidget"""
         self.BW1 = safe_eval(self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
@@ -1264,13 +1266,13 @@ class PlotImpz_UI(QWidget):
         """ Update value for self.periodic_type from the QLineEditWidget"""
         self.periodic_type = qget_cmb_box(self.cmbPeriodicType) # read current data string
         self._enable_stim_widgets()
-        
+
     def _update_modulation_type(self):
         """ Update value for self.modulation_type from the QLineEditWidget"""
         self.modulation_type = qget_cmb_box(self.cmbModulationType) # read current data string
         self._enable_stim_widgets()
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
         self.noise = qget_cmb_box(self.cmbNoise)
@@ -1325,7 +1327,6 @@ class PlotImpz_UI(QWidget):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'stim_par1'})
 
     # -------------------------------------------------------------------------
-
     def update_N(self, emit=True):
         # called directly from impz or locally
         # between local triggering and updates upstream
@@ -1384,7 +1385,7 @@ class PlotImpz_UI(QWidget):
         self.win_dict['par'][1]['val'] = param
         self._update_win_fft()
 
-#------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _update_win_fft(self, arg=None):
         """
         Update window type for FFT  with different arguments:
@@ -1418,11 +1419,11 @@ class PlotImpz_UI(QWidget):
         # referenced by plot_impz() line 1505
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
-        self.cgain = np.sum(self.win) / self.N # coherent gain
-        self.win /= self.cgain # correct gain for periodic signals
+        self.cgain = np.sum(self.win) / self.N  # coherent gain
+        self.win /= self.cgain  # correct gain for periodic signals
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
-        
+
     # ------------------------------------------------------------------------------
     def show_fft_win(self):
         """
@@ -1444,7 +1445,7 @@ class PlotImpz_UI(QWidget):
         self.fft_window.hide()
 
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
         """
         Calculate number of points to be displayed, depending on type of filter
@@ -1464,8 +1465,7 @@ class PlotImpz_UI(QWidget):
 
         return N
 
-#------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
 def main():
     import sys
     from pyfda.libs.compat import QApplication
@@ -1478,7 +1478,7 @@ def main():
     layVMain.addWidget(mainw.wdg_ctrl_freq)
     layVMain.addWidget(mainw.wdg_ctrl_stim)
     layVMain.addWidget(mainw.wdg_ctrl_run)
-    layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+    layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
     mainw.setLayout(layVMain)
 
