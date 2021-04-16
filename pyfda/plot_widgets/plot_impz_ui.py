@@ -13,18 +13,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 import collections
-from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QTabWidget,
-                               QPushButton, QPushButtonRT, QFontMetrics, QIcon, pyqtSignal, 
+from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
+                               QPushButton, QPushButtonRT, QFontMetrics, QIcon, pyqtSignal,
                                QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout,
                                QSizePolicy)
 
 import numpy as np
-from pyfda.libs.pyfda_lib import to_html, safe_eval
+from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (qcmb_box_populate, qget_cmb_box, qset_cmb_box, 
                                      qstyle_widget, qled_set_max_width, QVLine, QLabelVert, )
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
-from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
+from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+
+from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
+
 
 class PlotImpz_UI(QWidget):
     """
@@ -36,7 +39,31 @@ class PlotImpz_UI(QWidget):
     # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
 
+# ------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from
+        - the FFT window widget
+        """
 
+        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+
+        if dict_sig['sender'] == __name__:
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            return
+
+        # --- signals coming from the FFT window widget -----------------------
+        if 'fft' in dict_sig['sender']:
+            logger.warning(dict_sig['sender'])# == 'fft':
+            if 'closeEvent' in dict_sig:
+                self.hide_fft_win()
+                return
+            else:
+                if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'win':
+                    logger.warning(dict_sig)
+
+# ------------------------------------------------------------------------------
     def __init__(self, parent):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
@@ -105,10 +132,14 @@ class PlotImpz_UI(QWidget):
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        # TODO:
-        self.win_dict = fb.fil[0]['win_fft']
-        self.fft_window = None # handle for FFT window pop-up widget
         self.window_name = "Rectangular"
+        # instantiate FFT window with dictionary for window settings
+        self.win_dict = fb.fil[0]['win_fft']
+        # self.window_name = "Rectangular" # set initial window some way?
+        self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
+                                        title="pyFDA Spectral Window Viewer")
+        # hide window initially, this is modeless i.e. a non-blocking popup window
+        self.fft_window.hide()
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
@@ -880,12 +911,20 @@ class PlotImpz_UI(QWidget):
         self.led_TW1.installEventFilter(self)
         self.led_TW2.installEventFilter(self)
 
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect FFT window to widgets and signals upstream:
+        self.fft_window.sig_tx.connect(self.process_sig_rx)
+        #self.sig_rx.connect(self.qfft_win_select.sig_rx)
+
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
+        self.but_fft_win.clicked.connect(self.show_fft_win)
 
         # --- frequency control ---
         # careful! currentIndexChanged passes the current index to _update_win_fft
@@ -1231,9 +1270,7 @@ class PlotImpz_UI(QWidget):
         self.modulation_type = qget_cmb_box(self.cmbModulationType) # read current data string
         self._enable_stim_widgets()
 
-
-#-------------------------------------------------------------
-
+    #-------------------------------------------------------------
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
         self.noise = qget_cmb_box(self.cmbNoise)
@@ -1385,6 +1422,27 @@ class PlotImpz_UI(QWidget):
         self.win /= self.cgain # correct gain for periodic signals
 
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
+        
+    # ------------------------------------------------------------------------------
+    def show_fft_win(self):
+        """
+        Show / hide FFT window depending on the correspondin button
+        """
+        logger.warning(self.but_fft_win.isChecked())
+        if self.but_fft_win.isChecked():
+            self.fft_window.show()
+        else:
+            self.fft_window.hide()
+
+    # --------------------------------------------------------------------------
+    def hide_fft_win(self):
+        """
+        The closeEvent caused by clicking the "x" in the FFT window is caught
+        there and routed here to only hide the window
+        """
+        self.but_fft_win.setChecked(False)
+        self.fft_window.hide()
+
 
 # ------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):

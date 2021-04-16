@@ -9,9 +9,6 @@
 """
 Widget for plotting impulse and general transient responses
 """
-import logging
-logger = logging.getLogger(__name__)
-
 import time
 from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QSizePolicy
 
@@ -20,7 +17,7 @@ from numpy import pi
 import scipy.signal as sig
 from scipy.special import sinc, diric
 import matplotlib.patches as mpl_patches
-import matplotlib.lines as lines
+# import matplotlib.lines as lines
 from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
@@ -30,17 +27,20 @@ from pyfda.libs.pyfda_lib import (to_html, safe_eval, pprint_log, np_type, calc_
         rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
                                      qcmb_box_add_item, qcmb_box_del_item)
-from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter, no_plot
+from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
-from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
+
+import logging
+logger = logging.getLogger(__name__)
 
 # TODO: "Home" calls redraw for botb mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 # TODO: Single-sided and double-sided spectra of pulses are identical - ok?
 
-classes = {'Plot_Impz':'y[n] / Y(f)'}  #: Dict containing class name : display name
+classes = {'Plot_Impz': 'y[n] / Y(f)'}  #: Dict containing class name : display name
+
 
 class Plot_Impz(QWidget):
     """
@@ -51,7 +51,7 @@ class Plot_Impz(QWidget):
     # outgoing, e.g. when stimulus has been calculated
     sig_tx = pyqtSignal(object)
     # outgoing to local fft window
-    sig_tx_fft = pyqtSignal(object)
+    # sig_tx_fft = pyqtSignal(object)
 
 
     def __init__(self, parent):
@@ -84,14 +84,6 @@ class Plot_Impz(QWidget):
                              'ms':self.fmt_mkr_size}
 
         # self.fmt_stem_stim = params['mpl_stimuli']
-
-        # instantiate FFT window with dictionary for window settings
-        self.win_dict = fb.fil[0]['win_fft']
-        # self.window_name = "Rectangular" # set initial window some way?
-        self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
-                                        title="pyFDA Spectral Window Viewer")
-        # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_window.hide()
 
         self._construct_UI()
 
@@ -145,15 +137,22 @@ class Plot_Impz(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])  #(left, top, right, bottom)
 
         self.setLayout(layVMain)
+
         # ----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        # connect UI to widgets and signals upstream:
+        self.ui.sig_tx.connect(self.process_sig_rx)
+
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
-        self.ui.but_fft_win.clicked.connect(self.show_fft_win)
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -186,12 +185,6 @@ class Plot_Impz(QWidget):
 
         # When user has selected a different tab, trigger a recalculation of current tab
         self.tabWidget.currentChanged.connect(self.draw)  # passes number of active tab
-
-        self.sig_rx.connect(self.process_sig_rx)
-        # connect UI to widgets and signals upstream:
-        self.ui.sig_tx.connect(self.process_sig_rx)
-        # connect FFT window to widgets and signals upstream:
-        self.fft_window.sig_tx.connect(self.process_sig_rx)#(self.hide_fft_win)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -319,26 +312,6 @@ class Plot_Impz(QWidget):
 #                    self.needs_calc = True # always require recalculation when triggered externally
 #                    qstyle_widget(self.ui.but_run, "changed")
 #                    self.fx_select("Fixpoint")
-
-    # ------------------------------------------------------------------------------
-    def show_fft_win(self):
-        """
-        Show / hide FFT window depending on the correspondin button
-        """
-        logger.warning(self.ui.but_fft_win.isChecked())
-        if self.ui.but_fft_win.isChecked():
-            self.fft_window.show()
-        else:
-            self.fft_window.hide()
-
-    # --------------------------------------------------------------------------
-    def hide_fft_win(self):
-        """
-        The closeEvent caused by clicking the "x" in the FFT window is caught
-        there and routed here to only hide the window
-        """
-        self.ui.but_fft_win.setChecked(False)
-        self.fft_window.hide()
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -836,9 +809,6 @@ class Plot_Impz(QWidget):
             self.draw_time()
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
-
-        # TODO: is this needed? to update frequency units?
-        self.show_fft_win()
 
 #------------------------------------------------------------------------------
     def _spgr_ui2params(self):
