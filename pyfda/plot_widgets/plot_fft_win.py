@@ -129,7 +129,7 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+        logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
@@ -311,6 +311,7 @@ class Plot_FFT_win(QDialog):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
+        self.sig_rx.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
