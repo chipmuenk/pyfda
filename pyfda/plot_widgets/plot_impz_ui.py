@@ -1318,7 +1318,7 @@ class PlotImpz_UI(QWidget):
             self.update_freqs()
 
         # FFT window needs to be updated due to changed number of data points
-        self._update_win_fft(emit=False) # don't emit anything here
+        self._update_win_fft()
         if emit:
             self.sig_tx.emit({'sender':__name__, 'ui_changed':'N'})
 
@@ -1348,18 +1348,15 @@ class PlotImpz_UI(QWidget):
         self._update_win_fft()
 
 #------------------------------------------------------------------------------
-    def _update_win_fft(self, arg=None, emit=True):
+    def _update_win_fft(self, arg=None):
         """
         Update window type for FFT  with different arguments:
 
         - signal-slot connection to combo-box -> index (int), absorbed by `arg`
-                                                 emit is not set -> emit=True
-        - called by _read_param() -> empty -> emit=True
-        - called by update_N(emit=False)
+        - called by _read_param()
+        - called by update_N()
 
         """
-        if not isinstance(emit, bool):
-            logger.error("update win: emit={0}".format(emit))
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict, self.window_name,
                                         N=self.N, sym=False)
@@ -1381,20 +1378,11 @@ class PlotImpz_UI(QWidget):
             self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
             self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
-
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
         self.cgain = np.sum(self.win) / self.N # coherent gain
         self.win /= self.cgain # correct gain for periodic signals
 
-        # only emit a signal for local triggers to prevent infinite loop:
-        # - signal-slot connection passes a bool or an integer
-        # - local function calls don't pass anything
-        # TODO:
-        if emit is True:
-            self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
-        # ... but always notify the FFT widget via sig_tx_fft
-        #self.sig_tx_fft.emit({'sender':__name__, 'view_changed':'win'})
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'win'})
 
 # ------------------------------------------------------------------------------
