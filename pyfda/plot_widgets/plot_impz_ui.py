@@ -1378,6 +1378,7 @@ class PlotImpz_UI(QWidget):
             self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
             self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
+        # referenced by plot_impz() line 1505
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
 
         self.cgain = np.sum(self.win) / self.N # coherent gain
