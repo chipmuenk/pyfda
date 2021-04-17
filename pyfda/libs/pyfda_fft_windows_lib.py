@@ -27,12 +27,12 @@ windows = {
     'Boxcar': {
         'fn_name': 'boxcar',
         'info':
-             ('<span>Rectangular (a.k.a. "Boxcar") window, best suited for coherent signals, i.e. '
-              'where the window length is an integer number of the signal period. '
-              'It also works great when the signal length is shorter than the window '
-              'length (e.g. for the impulse response of a FIR filter). For other signals, '
-              'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
-              'This window also has the best SNR of all windows.</span>'),
+            '<span>Rectangular (a.k.a. "Boxcar") window, best suited for coherent signals'
+            'i.e. where the window length is an integer number of the signal period. '
+            'It also works great when the signal length is shorter than the window '
+            'length (e.g. for the impulse response of a FIR filter). For other signals, '
+            'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
+            'This window also has the best SNR of all windows.</span>',
         'props': {
             'enbw': 1,
             'cgain': 1,
@@ -42,12 +42,14 @@ windows = {
     'Rectangular': {
         'fn_name': 'boxcar',
         'info':
-            '<span>Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals, i.e. '
-            'where the window length is an integer number of the signal period. '
-            'It also works great when the signal length is shorter than the window '
-            'length (e.g. for the impulse response of a FIR filter). For other signals, '
-            'it has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />'
-            'This window also has the best SNR of all windows.</span>'
+            '''<span>
+            Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals,
+            i.e. where the window length is an integer number of the signal period.
+            It also works great when the signal length is shorter than the window
+            length (e.g. for the impulse response of a FIR filter). For other signals, it
+            has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />
+            This window also has the best SNR of all windows.
+            </span>'''
         },
     'Barthann': {
         'fn_name': 'barthann',
@@ -58,13 +60,15 @@ windows = {
     'Bartlett': {
         'fn_name': 'bartlett',
         'info':
-            '<span>The Bartlett window is very similar to a triangular window, '
-            'except that the end point(s) are at zero. Its side lobes fall off with '
-            '12 dB/oct., the side lobe suppression is 26 dB.'
-            '<br />&nbsp;<br />'
-            'It can be constructed as the convolution of two rectangular windows, '
-            'hence, its Fourier transform is the product of two (periodic) sinc '
-            'functions.<span>'
+            '''<span>
+            The Bartlett window is very similar to a triangular window,
+            except that the end point(s) are at zero. Its side lobes fall off with
+            12 dB/oct., the side lobe suppression is 26 dB.
+            <br />&nbsp;<br />'
+            It can be constructed as the convolution of two rectangular windows,
+            hence, its Fourier transform is the product of two (periodic) sinc
+            functions.
+            <span>'''
             },
     'Blackman':
         {'fn_name': 'blackman'},
@@ -120,17 +124,18 @@ windows = {
         'par': [{
              'name': 'NW', 'name_tex': r'$NW$',
              'val': 3, 'min': 0, 'max': 100,
-             'tooltip': '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
+             'tooltip':
+                 '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
         'info':
-             '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
-             sequences) are often used in multitaper power spectral density
-             estimation. The first window in the sequence can be used to maximize
-             the energy concentration in the main lobe, and is also called the
-             Slepian window.
-             <br />&nbsp;<br />
-             The Kaiser window is an easier to calculate approximation for the
-             Slepian window with &beta; = &pi; <i>NW</i> .
-             </span>'''
+            '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
+            sequences) are often used in multitaper power spectral density
+            estimation. The first window in the sequence can be used to maximize
+            the energy concentration in the main lobe, and is also called the
+            Slepian window.
+            <br />&nbsp;<br />
+            The Kaiser window is an easier to calculate approximation for the
+            Slepian window with &beta; = &pi; <i>NW</i> .
+            </span>'''
         },
     #
     'Flattop': {
@@ -248,14 +253,16 @@ windows = {
             'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
         'info':
-            '''<span>Also known as "tapered cosine window", this window is constructed from a rectangular window
+            '''<span>
+            Also known as "tapered cosine window", this window is constructed from a rectangular window
             whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
             of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
             &alpha; = 1 a Hann window.
             <br />&nbsp;<br />
             Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
             window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
-            to be altered by this window than e.g. by a Hann window.</span>'''
+            to be altered by this window than e.g. by a Hann window.
+            </span>'''
         }
     }
 
@@ -263,13 +270,14 @@ windows = {
 def get_window_names():
     """
     Extract window names (= keys) from the windows dict and return and a list
-    with all the names (strings).
+    with all the names (strings) for initialization e.g. of a combo box.
     """
     win_name_list = []
     for d in windows:
         win_name_list.append(d)
 
-    return sorted(win_name_list, key=lambda v: (v.lower(), v)) # always sort lower cased names
+    # return list sorted by lower case names
+    return sorted(win_name_list, key=lambda v: (v.lower(), v))
 
 
 def set_window_function(win_dict, win_name):
@@ -630,7 +638,7 @@ class QFFTWinSelection(QWidget):
         """
         if self.win_dict['n_par'] > 1:
             param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
-                            return_type='float')
+                              return_type='float')
             if param < self.win_dict['par'][1]['min']:
                 param = self.win_dict['par'][1]['min']
             elif param > self.win_dict['par'][1]['max']:
@@ -640,7 +648,7 @@ class QFFTWinSelection(QWidget):
 
         if self.win_dict['n_par'] > 0:
             param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
-                            return_type='float')
+                              return_type='float')
             if param < self.win_dict['par'][0]['min']:
                 param = self.win_dict['par'][0]['min']
             elif param > self.win_dict['par'][0]['max']:
