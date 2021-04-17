@@ -26,9 +26,9 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 # importing filterbroker initializes all its globals:
 import pyfda.filterbroker as fb
 
-from pyfda.libs.compat import (Qt, pyqtSignal, QHBoxLayout, QVBoxLayout,
-                     QDialog, QCheckBox, QLabel, QLineEdit, QFrame, QFont,
-                     QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem)
+from pyfda.libs.compat import (
+    Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QCheckBox, QLabel, QLineEdit,
+    QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -130,7 +130,7 @@ class Plot_FFT_win(QDialog):
         - `self.draw`: calculate window and FFT and draw both
         """
         logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+                       .format(self.isVisible(), pprint_log(dict_sig)))
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
@@ -185,7 +185,8 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.setText(str(self.bottom_t))
         self.led_log_bottom_t.setMaximumWidth(50)
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
-        self.led_log_bottom_t.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.led_log_bottom_t.setToolTip(
+            "<span>Minimum display value for log. scale.</span>")
 
         self.lbl_log_bottom_t = QLabel("dB", self)
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
@@ -206,7 +207,8 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setText(str(self.bottom_f))
         self.led_log_bottom_f.setMaximumWidth(50)
         self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
-        self.led_log_bottom_f.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.led_log_bottom_f.setToolTip(
+            "<span>Minimum display value for log. scale.</span>")
 
         self.lbl_log_bottom_f = QLabel("dB", self)
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
