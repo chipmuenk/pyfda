@@ -20,7 +20,8 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qled_set_max_width,
     QVLine, QLabelVert)
-from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
+from pyfda.libs.pyfda_fft_windows_lib import (
+    get_window_names, calc_window_function, QFFTWinSelection)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -38,6 +39,7 @@ class PlotImpz_UI(QWidget):
     # sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
+    sig_tx_fft = pyqtSignal(object)
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -60,8 +62,9 @@ class PlotImpz_UI(QWidget):
                 self.hide_fft_win()
                 return
             else:
-                if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'win':
+                if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
                     logger.warning(dict_sig)
+                    self.sig_tx_fft.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
     def __init__(self, parent):
@@ -340,6 +343,8 @@ class PlotImpz_UI(QWidget):
         self.but_fft_win.setCheckable(True)
         self.but_fft_win.setChecked(False)
 
+        self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
+
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_run)
         # layH_ctrl_run.addWidget(self.lbl_sim_select)
@@ -358,6 +363,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addStretch(2)
         layH_ctrl_run.addWidget(self.but_fft_win)
+        layH_ctrl_run.addWidget(self.qfft_win_select)
         layH_ctrl_run.addStretch(10)
 
         # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -943,7 +949,8 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # connect FFT window to widgets and signals upstream:
         self.fft_window.sig_tx.connect(self.process_sig_rx)
-        # self.sig_rx.connect(self.qfft_win_select.sig_rx)
+        self.sig_tx_fft.connect(self.fft_window.sig_rx)
+        self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -952,6 +959,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
         self.but_fft_win.clicked.connect(self.show_fft_win)
+        self.qfft_win_select.win_changed.connect(self.process_sig_rx)
 
         # --- frequency control ---
         # careful! currentIndexChanged passes the current index

@@ -131,7 +131,7 @@ class Plot_FFT_win(QDialog):
         """
         logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
                        .format(self.isVisible(), pprint_log(dict_sig)))
-        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win')\
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
             # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
@@ -379,11 +379,11 @@ class Plot_FFT_win(QDialog):
     def update_fft_win(self, arg=None):
         """
         Update FFT window when window or parameters have changed and
-        emit 'ui_changed':'win'
+        emit 'view_changed':'fft_win'
         """
         self.calc_win()
         self.update_view()
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
 # ------------------------------------------------------------------------------
     def calc_N(self):
