@@ -623,15 +623,19 @@ class Plot_Impz(QWidget):
 
         if self.fx_sim:
             self.title_str = r'$Fixpoint$ ' + self.title_str
-            self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])  # setup quantizer for input quantization
+            # setup quantizer for input quantization:
+            self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
             self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
             if np.any(np.iscomplex(self.x)):
-                logger.warning("Complex stimulus: Only its real part will be processed by the fixpoint filter!")
+                logger.warning(
+                    "Complex stimulus: Only its real part will be processed by the "
+                    "fixpoint filter!")
 
             self.x_q = self.q_i.fixp(self.x.real)
 
-            self.sig_tx.emit({'sender': __name__, 'fx_sim': 'send_stimulus',
-                    'fx_stimulus': np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+            self.sig_tx.emit(
+                {'sender': __name__, 'fx_sim': 'send_stimulus',
+                 'fx_stimulus': np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
             logger.debug("fx stimulus sent")
 
         self.needs_redraw[:] = [True] * 2
@@ -733,8 +737,9 @@ class Plot_Impz(QWidget):
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
-                logger.warning("Length of transient response is {0} < N = {1}, FFT cannot be calculated."
-                               .format(len(self.y), self.ui.N_end))
+                logger.warning(
+                    "Length of transient response is {0} < N = {1}, FFT cannot be "
+                    "calculated.".format(len(self.y), self.ui.N_end))
         else:
             y_win = self.y[self.ui.N_start:self.ui.N_end] * win
             self.Y = np.fft.fft(y_win) / self.ui.N
@@ -1010,7 +1015,8 @@ class Plot_Impz(QWidget):
         self._init_axes_time()
         self._log_mode_time()
 
-        if not self.H_str or self.H_str[1] != 'h':  # '$h... = some impulse response, don't change
+        # '$h... = some impulse response, don't change
+        if not self.H_str or self.H_str[1] != 'h':
             self.H_str = ''
             if qget_cmb_box(self.ui.cmb_plt_time_stim) != "none":
                 self.H_str += r'$x$, '
@@ -1780,17 +1786,19 @@ class Plot_Impz(QWidget):
                                 mf.append(m[cols*i+j])
                         return mf
 
-                    self.ax_f1.legend(flip_rc(h_r, 3), flip_rc(l_r, 3), loc='best', fontsize='small',
-                            fancybox=True, framealpha=0.7, ncol=3, handletextpad=-2, columnspacing=1,
-                            labelspacing=1, handleheight=2, handlelength=1.5)
+                    self.ax_f1.legend(
+                        flip_rc(h_r, 3), flip_rc(l_r, 3), loc='best', fontsize='small',
+                        fancybox=True, framealpha=0.7, ncol=3, handletextpad=-2,
+                        columnspacing=1, labelspacing=1, handleheight=2, handlelength=1.5)
 
                 else:
                     self.ax_f1.legend(h_r, l_r, loc='best', fontsize='small',
-                            fancybox=True, framealpha=0.7)
+                                      fancybox=True, framealpha=0.7)
 
             # --------------- LEGEND and YLABEL (2nd plot) -------------------
             if (self.en_re_im_f or self.en_mag_phi_f) and self.plt_freq_enabled:
-                self.ax_f2.legend(h_i, l_i, loc='best', fontsize='small', fancybox=True, framealpha=0.7)
+                self.ax_f2.legend(h_i, l_i, loc='best', fontsize='small', fancybox=True,
+                                  framealpha=0.7)
                 self.ax_f2.set_ylabel(H_Fi_str)
 
             self.axes_f[-1].set_xlabel(fb.fil[0]['plt_fLabel'])
