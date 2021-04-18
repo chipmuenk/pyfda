@@ -534,10 +534,11 @@ class QFFTWinSelection(QWidget):
     # outgoing
     win_changed = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict):
+    def __init__(self, parent, win_dict, win_name="Rectangular"):
         super(QFFTWinSelection, self).__init__(parent)
 
         self.win_dict = win_dict
+        self.win_name = win_name
         self._construct_UI()
         self.update_win_type()
 
