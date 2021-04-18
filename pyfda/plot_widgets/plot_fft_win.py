@@ -54,8 +54,8 @@ class Plot_FFT_win(QDialog):
 
     sym : bool
         Passed to `calc_window_function()`:
-        When True, generate a symmetric window, for use in filter design.
-        When False (default), generate a periodic window, for use in spectral analysis.
+        When True, generate a symmetric window for use in filter design.
+        When False (default), generate a periodic window for use in spectral analysis.
 
     title : str
         Title text for Qt Window

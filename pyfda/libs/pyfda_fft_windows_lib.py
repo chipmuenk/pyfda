@@ -357,7 +357,7 @@ def set_window_function(win_dict, win_name):
 
 
 # ----------------------------------------------------------------------------
-def calc_window_function(win_dict, win_name, N=32, sym=True):
+def calc_window_function(win_dict, win_name, N=32, sym=False):
     """
     Generate a window function.
 
@@ -370,8 +370,8 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
     N : int, optional
         Number of data points. The default is 32.
     sym : bool, optional
-        When True (default), generate a symmetric window, for use in filter design.
-        When False, generates a periodic window, for use in spectral analysis.
+        When True, generate a symmetric window, for filter design.
+        When False (default), generate a periodic window, for spectral analysis.
     Returns
     -------
     win_fnct : ndarray
