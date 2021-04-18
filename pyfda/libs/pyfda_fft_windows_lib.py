@@ -21,7 +21,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
-Dictionary with available fft windows and their properties
+Dictionary with available fft windows, their function name and their properties.
+
+when the function name `fn_name` is just a string, it is taken from
+`scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
 windows = {
     'Boxcar': {
@@ -125,7 +128,8 @@ windows = {
              'name': 'NW', 'name_tex': r'$NW$',
              'val': 3, 'min': 0, 'max': 100,
              'tooltip':
-                 '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'}],
+                '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
+                }],
         'info':
             '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
             sequences) are often used in multitaper power spectral density
@@ -162,8 +166,8 @@ windows = {
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         'info':
-             ('<span>Gaussian window '
-              '</span>')
+            '<span>Gaussian window '
+            '</span>'
         },
     'Hamming': {
         'fn_name': 'hamming',
@@ -223,11 +227,11 @@ windows = {
              'val': 0.3, 'min': 0, 'max': 100,
              'tooltip': '<span>Bandwidth</span>'}],
         'info':
-             '<span>Used to maximize the energy concentration in the main lobe. '
-             ' Also called the digital prolate spheroidal sequence (DPSS).'
-             '<br />&nbsp;<br />'
-             'See also: Kaiser window.'
-             '</span>'
+            '<span>Used to maximize the energy concentration in the main lobe. '
+            ' Also called the digital prolate spheroidal sequence (DPSS).'
+            '<br />&nbsp;<br />'
+            'See also: Kaiser window.'
+            '</span>'
         },
     'Triangular': {'fn_name': 'triang'},
     # 'Ultraspherical':
@@ -243,9 +247,10 @@ windows = {
     #          'tooltip':'<span>Amplitude</span>'}
     #          ],
     #      'info':
-    #          ('<span>Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian window, '
-    #           '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
-    #           '</span>'),
+    #          ('''<span>
+    #           Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
+    #            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+    #           </span>'''),
     #        }
     'Tukey': {
         'fn_name': 'tukey',
@@ -254,14 +259,16 @@ windows = {
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
         'info':
             '''<span>
-            Also known as "tapered cosine window", this window is constructed from a rectangular window
-            whose edges are tapered with cosine functions. The shape factor &alpha; defines the fraction
-            of the window inside the cosine tapered region. Hence, &alpha; = 0 returns a rectangular window,
-            &alpha; = 1 a Hann window.
+            Also known as "tapered cosine window", this window is constructed from a
+            rectangular window whose edges are tapered with cosine functions. The shape
+            factor &alpha; defines the fraction of the window inside the cosine tapered
+            region. Hence, &alpha; = 0 returns a rectangular window, &alpha; = 1 a
+            Hann window.
             <br />&nbsp;<br />
-            Tukey windows are used a.o. for analyzing transient data containing short bursts. It is the default
-            window for scipy.signal.spectrogram (&alpha; = 0.25). Amplitudes of transient events are less likely
-            to be altered by this window than e.g. by a Hann window.
+            Tukey windows are used a.o. for analyzing transient data containing short
+            bursts. It is the default window for scipy.signal.spectrogram with
+            &alpha; = 0.25). Amplitudes of transient events are less likely to be
+            altered by this window than e.g. by a Hann window.
             </span>'''
         }
     }
@@ -269,7 +276,7 @@ windows = {
 
 def get_window_names():
     """
-    Extract window names (= keys) from the windows dict and return and a list
+    Extract window names (= keys) from the windows dict and return a list
     with all the names (strings) for initialization e.g. of a combo box.
     """
     win_name_list = []
@@ -282,14 +289,15 @@ def get_window_names():
 
 def set_window_function(win_dict, win_name):
     """
-    Select and set a window function from its name
+    Select and set a window function from its name, update the win_dict
+    dictionary correspondingly with
 
     Parameters
     ----------
     win_dict : dict
         The dict where the window functions are stored (modified in place).
     win_name : str
-        Name of the window, this will be looked for in scipy.signal.windows.
+        Name of the window, which will be looked up in the `windows`dict.
 
     Returns
     -------
@@ -301,7 +309,9 @@ def set_window_function(win_dict, win_name):
     info = ""
 
     if win_name not in windows:
-        logger.warning("Unknown window name {}, using rectangular window instead.".format(win_name))
+        logger.warning(
+            "Unknown window name {}, using rectangular window instead."
+            .format(win_name))
         win_name = "Boxcar"
     # operate with the window specific  sub-dictionary `windows[`win_name]`
     # dictionary in the following
@@ -384,10 +394,13 @@ def calc_window_function(win_dict, win_name, N=32, sym=True):
         elif n_par == 2:
             w = win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)
         else:
-            logger.error("{0:d} parameters are not supported for windows at the moment!".format(n_par))
+            logger.error(
+                "{0:d} parameters are not supported for windows at the moment!"
+                .format(n_par))
             w = None
     except Exception as e:
-        logger.error('An error occurred calculating the window function "{0}"\n{1}'.format(fn_name, e))
+        logger.error('An error occurred calculating the window function "{0}"\n{1}'
+                     .format(fn_name, e))
         w = None
     if w is None:
         logger.warning('Falling back to rectangular window.')
@@ -443,7 +456,7 @@ def calc_cosine_window(N, sym, a):
         L = N
     x = np.arange(N) * 2 * np.pi / L
     win = a[0]
-    for k in range(1,len(a)):
+    for k in range(1, len(a)):
         win += a[k] * np.cos(k*x)
     return win
 
@@ -469,7 +482,8 @@ def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
     for n in range(0, N):
         w[n] = w0
         for k in range(1, N//2+1):
-            w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1))) * np.cos(2*n*np.pi*k/(N+1))
+            w[n] += geg_ev(N, alpha, x_0 * np.cos(k*np.pi/(N+1)))\
+                    * np.cos(2*n*np.pi*k/(N+1))
     #     rtn +=  np.cos(x*k)
 
     # w = geg_ev(N-1, alpha, x_0 * np.cos(x))
@@ -583,7 +597,7 @@ class QFFTWinSelection(QWidget):
         layH_main.addWidget(self.lbl_win_par_2)
         layH_main.addWidget(self.led_win_par_2)
 
-        layH_main.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+        layH_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -621,12 +635,14 @@ class QFFTWinSelection(QWidget):
         self.led_win_par_2.setVisible(n_par > 1)
 
         if n_par > 0:
-            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =",
+                                               frmt='bi'))
             self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
             self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
 
         if n_par > 1:
-            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =",
+                                               frmt='bi'))
             self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
             self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
@@ -635,8 +651,8 @@ class QFFTWinSelection(QWidget):
         """
         Read out parameter lineedits when editing is finished and
         update win_dict.
-        
-        Emit 'view_changed': 'fft_params'
+
+        Emit 'view_changed': 'fft_win'
         """
         if self.win_dict['n_par'] > 1:
             param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
