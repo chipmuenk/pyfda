@@ -140,7 +140,7 @@ class PlotImpz_UI(QWidget):
         self.win_dict = {}
         self.fft_window = Plot_FFT_win(
             self, win_dict=self.win_dict, win_name=self.win_name, sym=False,
-                                       title="pyFDA Spectral Window Viewer")
+            title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_window.hide()
 
@@ -183,7 +183,7 @@ class PlotImpz_UI(QWidget):
             ("steps*", QIcon(":/plot_style-steps-mkr"), "")
             ]
 
-        # data / text / tooltip for stimulus categoies combobox.
+        # combobox tooltip + data / text / tooltip for stimulus category items
         self.cmb_stim_items = [
             ("<span>Stimulus category.</span>"),
             ("none", "None", "<span>Only noise and DC can be selected.</span>"),
@@ -197,19 +197,19 @@ class PlotImpz_UI(QWidget):
             ("formula", "Formula", "<span>Formula defined stimulus.</span>")
             ]
 
-        # data / text / tooltip for periodic signals' combobox.
+        # combobox tooltip + data / text / tooltip for periodic signals items
         self.cmb_stim_periodic_items = [
             "<span>Periodic functions with discontinuities.</span>",
-            ("square", "Square", "<span>Square signal with duty cycle &alpha;.</span>"),
-            ("saw", "Saw", "Sawtooth signal."),
-            ("triang", "Triang", "Triangular signal."),
-            ("comb", "Comb", "Comb signal.")
+            ("square", "Square", "<span>Square signal with duty cycle &alpha;</span>"),
+            ("saw", "Saw", "Sawtooth signal"),
+            ("triang", "Triang", "Triangular signal"),
+            ("comb", "Comb", "Comb signal")
             ]
 
-        # data / text / tooltip for chirp signals' combobox.
+        # combobox tooltip + data / text / tooltip for chirp signals items
         self.cmb_stim_chirp_items = [
             "<span>Type of frequency sweep from <i>f</i><sub>1</sub> to "
-            "<i>f</i><sub>1</sub></span>",
+            "<i>f</i><sub>2</sub></span>",
             ("linear", "Lin", "Linear frequency sweep"),
             ("quadratic", "Square", "Quadratic frequency sweep"),
             ("logarithmic", "Log", "Logarithmic frequency sweep"),
