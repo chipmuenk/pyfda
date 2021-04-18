@@ -19,8 +19,8 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import (calc_window_function,
-                                              QFFTWinSelection)
+from pyfda.libs.pyfda_fft_windows_lib import (
+    set_window_function, calc_window_function, QFFTWinSelection)
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:
@@ -52,6 +52,9 @@ class Plot_FFT_win(QDialog):
     win_dict : dict
         store current settings, intialized e.g. from `fb.fil[0]['win_fft']`
 
+    win_name : str
+        Name for initial window type (default: 'rectangular')
+
     sym : bool
         Passed to `calc_window_function()`:
         When True, generate a symmetric window for use in filter design.
@@ -77,11 +80,13 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=False,
-                 title='pyFDA Window Viewer', ignore_close_event=True):
+                 win_name='Rectangular', title='pyFDA Window Viewer',
+                 ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
 
     #  dict with current settings, initialized e.g. from fb.fil[0]['win_fft']
         self.win_dict = win_dict
+        self.win_name = win_name
         self.sym = sym
         self.ignore_close_event = ignore_close_event
         self.setWindowTitle(title)
@@ -102,6 +107,9 @@ class Plot_FFT_win(QDialog):
         self.tbl_cols = 6
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False]
+
+        if win_dict == {}:
+            set_window_function(self.win_dict, self.win_name)
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)

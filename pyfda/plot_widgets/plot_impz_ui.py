@@ -135,11 +135,11 @@ class PlotImpz_UI(QWidget):
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        self.window_name = "Rectangular"
-        # instantiate FFT window with dictionary for window settings
-        self.win_dict = fb.fil[0]['win_fft']
-        # self.window_name = "Rectangular" # set initial window some way?
-        self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=False,
+        self.win_name = "Rectangular"  # set initial window type
+        # instantiate FFT window with empty dictionary for window settings
+        self.win_dict = {}
+        self.fft_window = Plot_FFT_win(
+            self, win_dict=self.win_dict, win_name=self.win_name, sym=False,
                                        title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_window.hide()
@@ -587,7 +587,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.window_name)
+        qset_cmb_box(self.cmb_win_fft, self.win_name)
 
         self.cmb_win_fft_variant = QComboBox(self)
         self.cmb_win_fft_variant.setToolTip("FFT window variant.")
@@ -1440,7 +1440,7 @@ class PlotImpz_UI(QWidget):
 
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win = calc_window_function(self.win_dict, self.window_name,
+        self.win = calc_window_function(self.win_dict, self.win_name,
                                         N=self.N, sym=False)
 
         n_par = self.win_dict['n_par']
