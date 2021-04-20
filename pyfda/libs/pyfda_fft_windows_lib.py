@@ -26,7 +26,7 @@ Dictionary with available fft windows, their function name and their properties.
 when the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
-windows = {
+windows_dict = {
     'Boxcar': {
         'fn_name': 'boxcar',
         'info':
@@ -276,12 +276,15 @@ windows = {
 
 def get_window_names():
     """
-    Extract window names (= keys) from the windows dict and return a list
+    Extract window names (= keys) from the `windows_dict` and return a list
     with all the names (strings) for initialization e.g. of a combo box.
     """
     win_name_list = []
-    for d in windows:
+    for d in windows_dict:
         win_name_list.append(d)
+    
+    if 'cur_win_name' in win_name_list:
+        win_name_list.remove('cur_win_name')
 
     # return list sorted by lower case names
     return sorted(win_name_list, key=lambda v: (v.lower(), v))
@@ -297,7 +300,7 @@ def set_window_function(win_dict, win_name):
     win_dict : dict
         The dict where the window functions are stored (modified in place).
     win_name : str
-        Name of the window, which will be looked up in the `windows`dict.
+        Name of the window, which will be looked up in `windows_dict`.
 
     Returns
     -------
@@ -305,29 +308,22 @@ def set_window_function(win_dict, win_name):
         The window function
     """
 
-    par = []
-    info = ""
-
-    if win_name not in windows:
+    if win_name not in windows_dict:
         logger.warning(
             "Unknown window name {}, using rectangular window instead."
             .format(win_name))
         win_name = "Boxcar"
-    # operate with the window specific  sub-dictionary `windows[`win_name]`
+    # operate with the window specific sub-dictionary `win_dict[`win_name]`
     # dictionary in the following
-    d = windows[win_name]
+    win_dict.update({'cur_win_name': win_name})
+    d = win_dict[win_name]
 
     fn_name = d['fn_name']
 
     if 'par' in d:
-        par = d['par']
-        n_par = len(par)
+        n_par = len(d['par'])
     else:
-        par = []
         n_par = 0
-
-    if 'info' in d:
-        info = d['info']
 
     # --------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
@@ -347,11 +343,9 @@ def set_window_function(win_dict, win_name):
         logger.error('No window function "{0}" in scipy.signal.windows, '
                      'using rectangular window instead!'.format(fn_name))
         fn_name = "boxcar"
-        n_par = 0
         win_fnct = getattr(scipy.signal.windows, fn_name, None)
 
-    win_dict.update({'name': win_name, 'fn_name': fn_name, 'info': info,
-                     'par': par, 'n_par': n_par})
+    d.update({'win_fnct': win_fnct, 'n_par': n_par})
 
     return win_fnct
 
@@ -379,23 +373,25 @@ def calc_window_function(win_dict, N=32, win_name=None, sym=False):
     win_fnct : ndarray
         The window function
     """
+    if win_name is None:
+        win_name = win_dict['cur_win_name']
+    win_fnct = set_window_function(win_dict, win_name)
     win_dict.update({'win_len': N})
-    if win_name is not None:
-        win_fnct = set_window_function(win_dict, win_name)
-    fn_name = win_dict['fn_name']
-    n_par = win_dict['n_par']
-    par = win_dict['par']
+
+    fn_name = win_dict[win_name]['fn_name']
+    n_par = win_dict[win_name]['n_par']
 
     try:
         if fn_name == 'dpss':
             logger.info("dpss!")
-            w = scipy.signal.windows.dpss(N, par[0]['val'], sym=sym)
+            w = scipy.signal.windows.dpss(N, win_dict[win_name]['par'][0]['val'], sym=sym)
         elif n_par == 0:
             w = win_fnct(N, sym=sym)
         elif n_par == 1:
-            w = win_fnct(N, par[0]['val'], sym=sym)
+            w = win_fnct(N, win_dict[win_name]['par'][0]['val'], sym=sym)
         elif n_par == 2:
-            w = win_fnct(N, par[0]['val'], par[1]['val'], sym=sym)
+            w = win_fnct(N, win_dict[win_name]['par'][0]['val'],
+                         win_dict[win_name]['par'][1]['val'], sym=sym)
         else:
             logger.error(
                 "{0:d} parameters are not supported for windows at the moment!"
@@ -408,10 +404,10 @@ def calc_window_function(win_dict, N=32, win_name=None, sym=False):
     if w is None:
         logger.warning('Falling back to rectangular window.')
         w = np.ones(N)
-        
+
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
     cgain = np.sum(w) / N  # coherent gain
-    win_dict.update({'nenbw': nenbw, 'cgain': cgain})
+    win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
     # /= cgain  # correct gain for periodic signals
 
     return w
@@ -543,11 +539,10 @@ class QFFTWinSelection(QWidget):
     # outgoing
     win_changed = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict, win_name="Rectangular"):
+    def __init__(self, parent, win_dict):
         super(QFFTWinSelection, self).__init__(parent)
 
         self.win_dict = win_dict
-        self.win_name = win_name
         self._construct_UI()
         self.update_win_type()
 
@@ -577,7 +572,7 @@ class QFFTWinSelection(QWidget):
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.win_dict['name'])
+        qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'])
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
@@ -628,8 +623,7 @@ class QFFTWinSelection(QWidget):
         """
         Update widgets with data from win_dict
         """
-        self.window_name = self.win_dict['name']
-        qset_cmb_box(self.cmb_win_fft, self.window_name, data=False)
+        qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
         self.update_param_widgets()
 
 # ------------------------------------------------------------------------------
@@ -637,7 +631,8 @@ class QFFTWinSelection(QWidget):
         """
         Update parameter widgets (if enabled) with data from win_dict
         """
-        n_par = self.win_dict['n_par']
+        cur = self.win_dict['cur_win_name']  # current window name / key
+        n_par = self.win_dict[cur]['n_par']
 
         self.lbl_win_par_1.setVisible(n_par > 0)
         self.led_win_par_1.setVisible(n_par > 0)
@@ -645,16 +640,16 @@ class QFFTWinSelection(QWidget):
         self.led_win_par_2.setVisible(n_par > 1)
 
         if n_par > 0:
-            self.lbl_win_par_1.setText(to_html(self.win_dict['par'][0]['name'] + " =",
-                                               frmt='bi'))
-            self.led_win_par_1.setText(str(self.win_dict['par'][0]['val']))
-            self.led_win_par_1.setToolTip(self.win_dict['par'][0]['tooltip'])
+            self.lbl_win_par_1.setText(
+                to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
+            self.led_win_par_1.setText(str(self.win_dict[cur]['par'][0]['val']))
+            self.led_win_par_1.setToolTip(self.win_dict[cur]['par'][0]['tooltip'])
 
         if n_par > 1:
-            self.lbl_win_par_2.setText(to_html(self.win_dict['par'][1]['name'] + " =",
-                                               frmt='bi'))
-            self.led_win_par_2.setText(str(self.win_dict['par'][1]['val']))
-            self.led_win_par_2.setToolTip(self.win_dict['par'][1]['tooltip'])
+            self.lbl_win_par_2.setText(
+                to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
+            self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
+            self.led_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
 
 # ------------------------------------------------------------------------------
     def update_win_params(self):
@@ -664,32 +659,33 @@ class QFFTWinSelection(QWidget):
 
         Emit 'view_changed': 'fft_win'
         """
-        if self.win_dict['n_par'] > 1:
-            param = safe_eval(self.led_win_par_2.text(), self.win_dict['par'][1]['val'],
-                              return_type='float')
-            if param < self.win_dict['par'][1]['min']:
-                param = self.win_dict['par'][1]['min']
-            elif param > self.win_dict['par'][1]['max']:
-                param = self.win_dict['par'][1]['max']
+        cur = self.win_dict['cur_win_name']  # current window name / key
+        if self.win_dict[cur]['n_par'] > 1:
+            param = safe_eval(self.led_win_par_2.text(),
+                              self.win_dict[cur]['par'][1]['val'], return_type='float')
+            if param < self.win_dict[cur]['par'][1]['min']:
+                param = self.win_dict[cur]['par'][1]['min']
+            elif param > self.win_dict[cur]['par'][1]['max']:
+                param = self.win_dict[cur]['par'][1]['max']
             self.led_win_par_2.setText(str(param))
-            self.win_dict['par'][1]['val'] = param
+            self.win_dict[cur]['par'][1]['val'] = param
 
-        if self.win_dict['n_par'] > 0:
-            param = safe_eval(self.led_win_par_1.text(), self.win_dict['par'][0]['val'],
-                              return_type='float')
-            if param < self.win_dict['par'][0]['min']:
-                param = self.win_dict['par'][0]['min']
-            elif param > self.win_dict['par'][0]['max']:
-                param = self.win_dict['par'][0]['max']
+        if self.win_dict[cur]['n_par'] > 0:
+            param = safe_eval(self.led_win_par_1.text(), 
+                              self.win_dict[cur]['par'][0]['val'], return_type='float')
+            if param < self.win_dict[cur]['par'][0]['min']:
+                param = self.win_dict[cur]['par'][0]['min']
+            elif param > self.win_dict[cur]['par'][0]['max']:
+                param = self.win_dict[cur]['par'][0]['max']
             self.led_win_par_1.setText(str(param))
-            self.win_dict['par'][0]['val'] = param
+            self.win_dict[cur]['par'][0]['val'] = param
 
         self.win_changed.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
 # ------------------------------------------------------------------------------
     def update_win_type(self, arg=None):
         """
-        - update `self.window_name` and  `self.win_dict['name']` from
+        - update `self.win_dict['cur_win_name']` from
           selected FFT combobox entry
 
         - update win_dict using `set_window_function()`
@@ -699,10 +695,12 @@ class QFFTWinSelection(QWidget):
 
         - emit 'win_changed'
         """
-        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win_dict['name'] = self.window_name
-        set_window_function(self.win_dict, self.window_name)
+        cur = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.win_dict['cur_win_name'] = cur
+        logger.warning(cur)
+        set_window_function(self.win_dict, cur)
         # update visibility and values of parameter widgets
         self.update_param_widgets()
+        logger.warning(pprint_log(windows_dict[cur]))
 
         self.win_changed.emit({'sender': __name__, 'view_changed': 'fft_win'})

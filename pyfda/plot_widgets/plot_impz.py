@@ -710,14 +710,14 @@ class Plot_Impz(QWidget):
         and response `self.Y` using the window function `self.ui.win`.
         """
         # calculate FFT of stimulus / response
-        if self.x is None or len(self.x) < self.ui.N_end:
+        if self.x is None:
             self.X = np.zeros(self.ui.N_end-self.ui.N_start)  # dummy result
-            if self.x is None:
-                logger.warning("Stimulus is 'None', FFT cannot be calculated.")
-            else:
-                logger.warning(
-                    "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
-                    .format(len(self.x), self.ui.N_end))
+            logger.warning("Stimulus is 'None', FFT cannot be calculated.")
+        elif len(self.x) < self.ui.N_end:
+            self.X = np.zeros(self.ui.N_end-self.ui.N_start)  # dummy result
+            logger.warning(
+                "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
+                .format(len(self.x), self.ui.N_end))
         else:
             # TODO: This must be replaced by `self.fft_window.get_win()`
             win = self.ui.win  # self.fft_window(self.ui.N)
@@ -1134,8 +1134,9 @@ class Plot_Impz(QWidget):
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
-                self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_name)[0])
-            l_r += [self.ui.window_name]
+                self.t[self.ui.N_start:], win, c="gray",
+                label=self.ui.win_dict['cur_win_name'])[0])
+            l_r += [self.ui.win_dict['cur_win_name']]
         # --------------- LEGEND (real part) ----------------------------------
         if self.plt_time_enabled:
             self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True,

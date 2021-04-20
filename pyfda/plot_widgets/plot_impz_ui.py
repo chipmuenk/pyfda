@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qled_set_max_width,
     QVLine, QLabelVert)
 from pyfda.libs.pyfda_fft_windows_lib import (
-    get_window_names, calc_window_function, QFFTWinSelection)
+    windows_dict, calc_window_function, QFFTWinSelection)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -135,12 +135,13 @@ class PlotImpz_UI(QWidget):
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        self.win_name = "Rectangular"  # set initial window type
-        # instantiate FFT window with empty dictionary for window settings
-        self.win_dict = {}
+        self.cur_win_name = "Hann"  # set initial window type
+        # instantiate FFT window with default windows dict
+        # TODO: Does this need a deep copy?
+        self.win_dict = windows_dict
+        self.win_dict.update({'cur_win_name': self.cur_win_name})
         self.fft_window = Plot_FFT_win(
-            self, win_dict=self.win_dict, win_name=self.win_name, sym=False,
-            title="pyFDA Spectral Window Viewer")
+            self, win_dict=self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_window.hide()
 
@@ -583,25 +584,25 @@ class PlotImpz_UI(QWidget):
                           self.cmb_freq_display_item)
         self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
-        self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
-        self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(get_window_names())
-        self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.win_name)
+        # self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
+        # self.cmb_win_fft = QComboBox(self)
+        # self.cmb_win_fft.addItems(get_window_names())
+        # self.cmb_win_fft.setToolTip("FFT window type.")
+        # qset_cmb_box(self.cmb_win_fft, self.win_name)
 
-        self.cmb_win_fft_variant = QComboBox(self)
-        self.cmb_win_fft_variant.setToolTip("FFT window variant.")
-        self.cmb_win_fft_variant.setVisible(False)
+        # self.cmb_win_fft_variant = QComboBox(self)
+        # self.cmb_win_fft_variant.setToolTip("FFT window variant.")
+        # self.cmb_win_fft_variant.setVisible(False)
 
-        self.lblWinPar1 = QLabel("Param1")
-        self.ledWinPar1 = QLineEdit(self)
-        self.ledWinPar1.setText("1")
-        self.ledWinPar1.setObjectName("ledWinPar1")
+        # self.lblWinPar1 = QLabel("Param1")
+        # self.ledWinPar1 = QLineEdit(self)
+        # self.ledWinPar1.setText("1")
+        # self.ledWinPar1.setObjectName("ledWinPar1")
 
-        self.lblWinPar2 = QLabel("Param2")
-        self.ledWinPar2 = QLineEdit(self)
-        self.ledWinPar2.setText("2")
-        self.ledWinPar2.setObjectName("ledWinPar2")
+        # self.lblWinPar2 = QLabel("Param2")
+        # self.ledWinPar2 = QLineEdit(self)
+        # self.ledWinPar2.setText("2")
+        # self.ledWinPar2.setObjectName("ledWinPar2")
 
         self.chk_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
         self.chk_Hf.setObjectName("chk_Hf")
@@ -646,15 +647,15 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_log_freq)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.cmb_freq_display)
-        layH_ctrl_freq.addStretch(2)
-        layH_ctrl_freq.addWidget(self.lbl_win_fft)
-        layH_ctrl_freq.addWidget(self.cmb_win_fft)
-        layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)
-        layH_ctrl_freq.addWidget(self.lblWinPar1)
-        layH_ctrl_freq.addWidget(self.ledWinPar1)
-        layH_ctrl_freq.addWidget(self.lblWinPar2)
-        layH_ctrl_freq.addWidget(self.ledWinPar2)
         layH_ctrl_freq.addStretch(1)
+        # layH_ctrl_freq.addWidget(self.lbl_win_fft)
+        # layH_ctrl_freq.addWidget(self.cmb_win_fft)
+        # layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)
+        # layH_ctrl_freq.addWidget(self.lblWinPar1)
+        # layH_ctrl_freq.addWidget(self.ledWinPar1)
+        # layH_ctrl_freq.addWidget(self.lblWinPar2)
+        # layH_ctrl_freq.addWidget(self.ledWinPar2)
+        # layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_freq_norm_impz)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
@@ -963,9 +964,9 @@ class PlotImpz_UI(QWidget):
 
         # --- frequency control ---
         # careful! currentIndexChanged passes the current index
-        self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
-        self.ledWinPar1.editingFinished.connect(self._read_param1)
-        self.ledWinPar2.editingFinished.connect(self._read_param2)
+        # self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
+        # self.ledWinPar1.editingFinished.connect(self._read_param1)
+        # self.ledWinPar2.editingFinished.connect(self._read_param2)
 
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
@@ -1405,29 +1406,29 @@ class PlotImpz_UI(QWidget):
         if emit:
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
 
-    def _read_param1(self):
-        """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
-                          return_type='float')
-        if param < self.win_dict['par'][0]['min']:
-            param = self.win_dict['par'][0]['min']
-        elif param > self.win_dict['par'][0]['max']:
-            param = self.win_dict['par'][0]['max']
-        self.ledWinPar1.setText(str(param))
-        self.win_dict['par'][0]['val'] = param
-        self._update_win_fft()
+    # def _read_param1(self):
+    #     """Read out textbox when editing is finished and update dict and fft window"""
+    #     param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
+    #                       return_type='float')
+    #     if param < self.win_dict['par'][0]['min']:
+    #         param = self.win_dict['par'][0]['min']
+    #     elif param > self.win_dict['par'][0]['max']:
+    #         param = self.win_dict['par'][0]['max']
+    #     self.ledWinPar1.setText(str(param))
+    #     self.win_dict['par'][0]['val'] = param
+    #     self._update_win_fft()
 
-    def _read_param2(self):
-        """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
-                          return_type='float')
-        if param < self.win_dict['par'][1]['min']:
-            param = self.win_dict['par'][1]['min']
-        elif param > self.win_dict['par'][1]['max']:
-            param = self.win_dict['par'][1]['max']
-        self.ledWinPar2.setText(str(param))
-        self.win_dict['par'][1]['val'] = param
-        self._update_win_fft()
+    # def _read_param2(self):
+    #     """Read out textbox when editing is finished and update dict and fft window"""
+    #     param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
+    #                       return_type='float')
+    #     if param < self.win_dict['par'][1]['min']:
+    #         param = self.win_dict['par'][1]['min']
+    #     elif param > self.win_dict['par'][1]['max']:
+    #         param = self.win_dict['par'][1]['max']
+    #     self.ledWinPar2.setText(str(param))
+    #     self.win_dict['par'][1]['val'] = param
+    #     self._update_win_fft()
 
     # ------------------------------------------------------------------------------
     def _update_win_fft(self, arg=None):
@@ -1439,28 +1440,28 @@ class PlotImpz_UI(QWidget):
         - called by update_N()
 
         """
-        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win = calc_window_function(self.win_dict, win_name=self.win_name,
+#        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
+        self.win = calc_window_function(self.win_dict,
                                         N=self.N, sym=False)
 
-        n_par = self.win_dict['n_par']
+        # n_par = self.win_dict['n_par']
 
-        self.lblWinPar1.setVisible(n_par > 0)
-        self.ledWinPar1.setVisible(n_par > 0)
-        self.lblWinPar2.setVisible(n_par > 1)
-        self.ledWinPar2.setVisible(n_par > 1)
+        # self.lblWinPar1.setVisible(n_par > 0)
+        # self.ledWinPar1.setVisible(n_par > 0)
+        # self.lblWinPar2.setVisible(n_par > 1)
+        # self.ledWinPar2.setVisible(n_par > 1)
 
-        if n_par > 0:
-            self.lblWinPar1.setText(to_html(
-                self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
-            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
+        # if n_par > 0:
+        #     self.lblWinPar1.setText(to_html(
+        #         self.win_dict['par'][0]['name'] + " =", frmt='bi'))
+        #     self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+        #     self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
 
-        if n_par > 1:
-            self.lblWinPar2.setText(to_html(
-                self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
-            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
+        # if n_par > 1:
+        #     self.lblWinPar2.setText(to_html(
+        #         self.win_dict['par'][1]['name'] + " =", frmt='bi'))
+        #     self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+        #     self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
         # referenced by plot_impz() line 1505
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))

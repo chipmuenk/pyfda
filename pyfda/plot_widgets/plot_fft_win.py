@@ -50,10 +50,8 @@ class Plot_FFT_win(QDialog):
         reference to parent
 
     win_dict : dict
-        store current settings, intialized e.g. from `fb.fil[0]['win_fft']`
-
-    win_name : str
-        Name for initial window type (default: 'rectangular')
+        dictionary initialized from `pyfda_fft_windows_lib.windows_dict`
+        to store current settings
 
     sym : bool
         Passed to `calc_window_function()`:
@@ -80,13 +78,11 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=False,
-                 win_name='Rectangular', title='pyFDA Window Viewer',
-                 ignore_close_event=True):
+                 title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
 
     #  dict with current settings, initialized e.g. from fb.fil[0]['win_fft']
         self.win_dict = win_dict
-        self.win_name = win_name
         self.sym = sym
         self.ignore_close_event = ignore_close_event
         self.setWindowTitle(title)
@@ -107,9 +103,6 @@ class Plot_FFT_win(QDialog):
         self.tbl_cols = 6
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False]
-
-        if win_dict == {}:
-            set_window_function(self.win_dict, self.win_name)
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
@@ -441,13 +434,12 @@ class Plot_FFT_win(QDialog):
 
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
-        self.win = calc_window_function(self.win_dict, win_name=self.win_dict['name'],
-                                        N=self.N, sym=self.sym)
+        self.win = calc_window_function(self.win_dict, N=self.N, sym=self.sym)
         if self.N == self.N_view:
             self.win_view = self.win
         else:
-            self.win_view = calc_window_function(self.win_dict, self.win_dict['name'],
-                                                 self.N_view, sym=self.sym)
+            self.win_view = calc_window_function(self.win_dict, N=self.N_view,
+                                                 sym=self.sym)
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
                       / np.square(np.sum(self.win_view))
@@ -594,17 +586,17 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
-        window_name = self.win_dict['name']
+        cur = self.win_dict['cur_win_name']
         param_txt = ""
-        if self.win_dict['n_par'] > 0:
-            param_txt = " (" + self.win_dict['par'][0]['name_tex'] + " = {0:.3g})"\
-                .format(self.win_dict['par'][0]['val'])
-        if self.win_dict['n_par'] > 1:
+        if self.win_dict[cur]['n_par'] > 0:
+            param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + " = {0:.3g})"\
+                .format(self.win_dict[cur]['par'][0]['val'])
+        if self.win_dict[cur]['n_par'] > 1:
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(self.win_dict['par'][1]['name_tex'],
-                                              self.win_dict['par'][1]['val'])
+                + ", {0:s} = {1:.3g})".format(self.win_dict[cur]['par'][1]['name_tex'],
+                                              self.win_dict[cur]['par'][1]['val'])
 
-        self.mplwidget.fig.suptitle(r'{0} Window'.format(window_name) + param_txt)
+        self.mplwidget.fig.suptitle(r'{0} Window'.format(cur) + param_txt)
 
         # plot a line at the max. sidelobe level
         if self.tbl_sel[3]:
