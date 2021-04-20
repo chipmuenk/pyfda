@@ -1440,7 +1440,7 @@ class PlotImpz_UI(QWidget):
 
         """
         self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win = calc_window_function(self.win_dict, self.win_name,
+        self.win = calc_window_function(self.win_dict, win_name=self.win_name,
                                         N=self.N, sym=False)
 
         n_par = self.win_dict['n_par']

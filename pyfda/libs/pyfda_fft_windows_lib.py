@@ -289,7 +289,7 @@ def get_window_names():
 
 def set_window_function(win_dict, win_name):
     """
-    Select and set a window function from its name, update the win_dict
+    Select and set a window function from its name, update the `win_dict`
     dictionary correspondingly with
 
     Parameters
@@ -357,16 +357,18 @@ def set_window_function(win_dict, win_name):
 
 
 # ----------------------------------------------------------------------------
-def calc_window_function(win_dict, win_name, N=32, sym=False):
+def calc_window_function(win_dict, N=32, win_name=None, sym=False):
     """
-    Generate a window function.
+    Generate a window function with `N` data points.
 
     Parameters
     ----------
     win_dict : dict
         The dict where the window functions are stored.
     win_name : str
-        Name of the window, this will be looked for in scipy.signal.windows.
+        Name of the window. If specified (default is None), this will be used to obtain
+        the window function, its parameters and tool tipps etc. via
+        `set_window_function()`
     N : int, optional
         Number of data points. The default is 32.
     sym : bool, optional
@@ -378,7 +380,8 @@ def calc_window_function(win_dict, win_name, N=32, sym=False):
         The window function
     """
     win_dict.update({'win_len': N})
-    win_fnct = set_window_function(win_dict, win_name)
+    if win_name is not None:
+        win_fnct = set_window_function(win_dict, win_name)
     fn_name = win_dict['fn_name']
     n_par = win_dict['n_par']
     par = win_dict['par']
