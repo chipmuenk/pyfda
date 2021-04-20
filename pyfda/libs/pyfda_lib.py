@@ -57,7 +57,7 @@ __all__ = ['cmp_version', 'mod_version',
            'dB', 'lin2unit', 'unit2lin',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
-           'round_odd', 'round_even', 'ceil_odd', 'floor_odd','ceil_even', 'floor_even',
+           'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html', 'calc_Hcomplex']
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
@@ -65,59 +65,59 @@ PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit 
 V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
 
 # ================ Required Modules ============================
-MODULES = {'python':       {'V_PY':V_PY},
-           'matplotlib':   {'V_MPL':V_MPL},
-           'Qt5':          {'V_QT':V_QT},
-           'pyqt':         {'V_PYQT':V_PYQT},
-           'numpy':        {'V_NP':V_NP},
-           'numexpr':      {'V_NUM':V_NUM},
-           'scipy':        {'V_SCI':V_SCI + MKL},
-           'markdown':     {'V_MD':V_MD}
+MODULES = {'python':       {'V_PY': V_PY},
+           'matplotlib':   {'V_MPL': V_MPL},
+           'Qt5':          {'V_QT': V_QT},
+           'pyqt':         {'V_PYQT': V_PYQT},
+           'numpy':        {'V_NP': V_NP},
+           'numexpr':      {'V_NUM': V_NUM},
+           'scipy':        {'V_SCI': V_SCI + MKL},
+           'markdown':     {'V_MD': V_MD}
            }
 
 # ================ Optional Modules ============================
 
 try:
     from pyfixp import __version__ as V_FX
-    MODULES.update({'pyfixp' : {'V_FX':V_FX}})
+    MODULES.update({'pyfixp': {'V_FX': V_FX}})
 except ImportError:
-    MODULES.update({'pyfixp': {'V_FX':None}})
+    MODULES.update({'pyfixp': {'V_FX': None}})
 
 try:
     import migen
-    MODULES.update({'migen': {'V_MG':'installed'}})
+    MODULES.update({'migen': {'V_MG': 'installed'}})
 except (ImportError,SyntaxError):
-    MODULES.update({'migen':{'V_MG':None}})
+    MODULES.update({'migen': {'V_MG': None}})
 
 try:
     from nmigen import __version__ as V_NMG
-    MODULES.update({'nMigen': {'V_NMG':V_NMG}})
+    MODULES.update({'nMigen': {'V_NMG': V_NMG}})
 except ImportError:
     pass
 
-MODULES.update({'yosys':{'V_YO':dirs.YOSYS_VER}})
+MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
 try:
     from docutils import __version__ as V_DOC
-    MODULES.update({'docutils': {'V_DOC':V_DOC}})
+    MODULES.update({'docutils': {'V_DOC': V_DOC}})
 except ImportError:
     pass
 
 try:
     from mplcursors import __version__ as V_CUR
-    MODULES.update({'mplcursors': {'V_CUR':V_CUR}})
+    MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
 except ImportError:
     pass
 
 try:
     from xlwt import __version__ as V_XLWT
-    MODULES.update({'xlwt': {'V_XLWT':V_XLWT}})
+    MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
 except ImportError:
     pass
 
 try:
     from xlsxwriter import __version__ as V_XLSX
-    MODULES.update({'xlsx': {'V_XLSX':V_XLSX}})
+    MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
 except ImportError:
     pass
 
@@ -127,7 +127,8 @@ MOD_VERSIONS = {}
 for k in MODULES.keys():
     MOD_VERSIONS.update(MODULES[k])
 
-CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
+CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
+
 
 def cmp_version(mod, version):
     """
@@ -167,17 +168,18 @@ def cmp_version(mod, version):
 
         if LooseVersion(inst_ver) > LooseVersion(version):
             return 1
-        elif  LooseVersion(inst_ver) == LooseVersion(version):
+        elif LooseVersion(inst_ver) == LooseVersion(version):
             return 0
         else:
             return -1
     except (TypeError, KeyError) as e:
         logger.warning("Version number of {0} could not be determined.\n"
-                       "({1})".format(mod,e))
+                       "({1})".format(mod, e))
         return -1
 
 
-def mod_version(mod = None):
+# ------------------------------------------------------------------------------
+def mod_version(mod=None):
     """
     Return the version of the module 'mod'. If the module is not found, return
     None. When no module is specified, return a string with all modules and
@@ -196,9 +198,9 @@ def mod_version(mod = None):
 
         for l in v:
             try:
-                v_md += l.format(**MOD_VERSIONS) # evaluate {V_...} from MOD_VERSIONS entries
+                v_md += l.format(**MOD_VERSIONS)  # evaluate {V_...} from MOD_VERSIONS entries
             except (KeyError) as e: # encountered undefined {V_...}
-                logger.warning("KeyError: {0}".format(e)) # simply drop the line
+                logger.warning("KeyError: {0}".format(e))  # simply drop the line
 
         v_html = markdown.markdown(v_md, output_format='html5',
                                    extensions=['markdown.extensions.tables'])
@@ -206,7 +208,7 @@ def mod_version(mod = None):
 
         return v_html
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 logger.info(mod_version())
 
 # Amplitude max, min values to prevent scipy aborts
@@ -232,10 +234,10 @@ class ANSIcolors:
     CBOLD     = '\33[1m'
     CFAINT    = '\33[2m'
     CITALIC   = '\33[3m'
-    CURL      = '\33[4m' # underlined
-    CBLINK    = '\33[5m' # slow blink
-    CBLINK2   = '\33[6m' # fast blink
-    CSELECTED = '\33[7m' # reverse video
+    CURL      = '\33[4m'  # underlined
+    CBLINK    = '\33[5m'  # slow blink
+    CBLINK2   = '\33[6m'  # fast blink
+    CSELECTED = '\33[7m'  # reverse video
 
     # Foreground colors
     BLACK  = '\33[30m'
@@ -295,11 +297,12 @@ def clean_ascii(arg):
 
     """
     if isinstance(arg, str):
-        return re.sub(r'[^\x00-\x7f]',r'', arg)
+        return re.sub(r'[^\x00-\x7f]', r'', arg)
     else:
         return arg
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def qstr(text):
     """
     Convert text (QVariant, QString, string) or numeric object to plain string.
@@ -328,25 +331,25 @@ def qstr(text):
 
     if "qstring" in text_type:
         # Python 3: convert QString -> str
-        #string = str(text)
+        # string = str(text)
         # Convert QString -> Utf8
         string = text.toUtf8()
     elif "qvariant" in text_type:
         # Python 2: convert QVariant -> QString
         string = text.toString()
-        #string = QVariant(text).toString()
-        #string = str(text.toString())
+        # string = QVariant(text).toString()
+        # string = str(text.toString())
     elif "unicode" in text_type:
         return text
     else:
         # `text` is numeric or of type str
         string = str(text)
 
-    return str(string) # convert QString -> str
+    return str(string)  # convert QString -> str
 
 
 ###############################################################################
-#### General functions ########################################################
+# General functions ###########################################################
 ###############################################################################
 
 def np_type(a):
@@ -372,8 +375,7 @@ def np_type(a):
 
     return a_type
 
-#-----------------------------------------------------------------------------
-
+# -----------------------------------------------------------------------------
 def set_dict_defaults(d, default_dict):
     """
     Add the key:value pairs of `default_dict` to dictionary `d` for all missing
@@ -382,12 +384,11 @@ def set_dict_defaults(d, default_dict):
     if d is None or d == {}:
         d = default_dict
     else:
-        for k,v in default_dict.items():
+        for k, v in default_dict.items():
             if not k in d:
                 d[k] = v
 
-#------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
 def pprint_log(d, N=10, tab="\t"):
     """
     Provide pretty printed logging messages for dicts or lists.
@@ -408,7 +409,7 @@ def pprint_log(d, N=10, tab="\t"):
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
     elif type(d) in {list, np.ndarray}:
-        #if type(d) == np.ndarray:
+        # if type(d) == np.ndarray:
         #    d = d.tolist()
         if np.ndim(d) == 1:
             s += ('Type: {0} -> {1}, Shape =  ({2} x 1)\n' + tab).format(type(d), type(d[0]), len(d))
@@ -434,7 +435,7 @@ def pprint_log(d, N=10, tab="\t"):
 
     return s
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def safe_numexpr_eval(expr, fallback=None, local_dict={}):
     """
     Evaluate `numexpr.evaluate(expr)` and catch various errors.
@@ -458,10 +459,10 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
 
     """
     if type(fallback) == tuple:
-        np_expr = np.zeros(fallback) # fallback defines the shape
+        np_expr = np.zeros(fallback)  # fallback defines the shape
         fallback_shape = fallback
     else:
-        np_expr = fallback # fallback is the default numpy return value or None
+        np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
 
     try:
@@ -480,20 +481,22 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
         logger.warning("Zero division error in formula.")
 
     if np_expr is None:
-        return None # no fallback, no error checking!
+        return None  # no fallback, no error checking!
     # check if dimensions of converted string agree with expected dimensions
     elif np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
-        # np_expr is scalar, return array with shape of fallback of constant values
+            # np_expr is scalar, return array with shape of fallback of constant values
             np_expr = np.ones(fallback_shape) * np_expr
         else:
-        # return array of zeros in the shape of the fallback
-            logger.warning("Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
+            # return array of zeros in the shape of the fallback
+            logger.warning(
+                "Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
             np_expr = np.zeros(fallback_shape)
 
     if np.shape(np_expr) != fallback_shape:
-            logger.warning("Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
-            np_expr = np.zeros(fallback_shape)
+        logger.warning(
+            "Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+        np_expr = np.zeros(fallback_shape)
     if not type(np_expr.item(0)) in {float, complex}:
         np_expr = np_expr.astype(float)
 
@@ -569,7 +572,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = int(result.real) # convert to standard int type, not np.int64
 
         if result is not None:
-            break # break out of for loop when evaluation has succeeded
+            break  # break out of for loop when evaluation has succeeded
         fallback = "Fallback: "
         safe_eval.err += 1
 

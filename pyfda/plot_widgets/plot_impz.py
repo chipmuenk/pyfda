@@ -267,7 +267,8 @@ class Plot_Impz(QWidget):
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():  # all signals except 'fx_sim'
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
+                    or self.needs_calc:
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has changed. Don't emit a signal.
                 self.ui.update_N(emit=False)
@@ -347,7 +348,7 @@ class Plot_Impz(QWidget):
         # allow scaling the frequency response from pure impulse (no DC, no noise)
         self.ui.chk_freq_norm_impz.setEnabled(
             (self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')
-             and self.ui.DC == 0)
+            and self.ui.DC == 0)
 
         self.fx_select()  # check for fixpoint setting and update if needed
         if type(arg) == bool:  # but_run has been pressed
@@ -1301,7 +1302,7 @@ class Plot_Impz(QWidget):
                 # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
     #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-    #                                 np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
+    #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
                 # self.ax_s.colorbar(col_mesh)
 
                 if self.ui.chk_log_spgr_time.isChecked():
@@ -1352,8 +1353,9 @@ class Plot_Impz(QWidget):
         self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim).replace("*", "")
         self.plt_freq_stmq = qget_cmb_box(self.ui.cmb_plt_freq_stmq).replace("*", "")
 
-        self.plt_freq_enabled = self.plt_freq_stim != "none" or self.plt_freq_stmq != "none"\
-                                    or self.plt_freq_resp != "none"
+        self.plt_freq_enabled = self.plt_freq_stim != "none"\
+            or self.plt_freq_stmq != "none"\
+            or self.plt_freq_resp != "none"
 
         # if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
         #    self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
