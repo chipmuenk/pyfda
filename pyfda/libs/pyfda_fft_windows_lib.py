@@ -405,6 +405,12 @@ def calc_window_function(win_dict, win_name, N=32, sym=False):
     if w is None:
         logger.warning('Falling back to rectangular window.')
         w = np.ones(N)
+        
+    nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
+    cgain = np.sum(w) / N  # coherent gain
+    win_dict.update({'nenbw': nenbw, 'cgain': cgain})
+    # /= cgain  # correct gain for periodic signals
+
     return w
 
 
