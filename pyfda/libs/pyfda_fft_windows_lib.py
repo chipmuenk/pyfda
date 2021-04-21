@@ -288,17 +288,17 @@ windows_dict = {
 
 def get_window_names():
     """
-    Extract window names (= keys) from the `windows_dict` and return a list
-    with all the names (strings) for initialization e.g. of a combo box.
+    Extract keys from the `windows_dict` if they are the name of a window. This
+    is verified by looking for a contained dict with the key "fn_name" defining
+    the window function. Return an alphabetically sorted list with the window
+    names (strings), sorting is performed on the lower-cased names.
+
+    This list can be used e.g. for initialization e.g. of a combo box.
     """
-    win_name_list = []
-    for d in windows_dict:
-        win_name_list.append(d)
 
-    if 'cur_win_name' in win_name_list:
-        win_name_list.remove('cur_win_name')
+    win_name_list = [k for k in windows_dict
+                     if type(windows_dict[k]) == dict and "fn_name" in windows_dict[k]]
 
-    # return list sorted by lower case names
     return sorted(win_name_list, key=lambda v: (v.lower(), v))
 
 
