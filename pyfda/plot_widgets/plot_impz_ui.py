@@ -584,26 +584,6 @@ class PlotImpz_UI(QWidget):
                           self.cmb_freq_display_item)
         self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
-        # self.lbl_win_fft = QLabel(to_html("Window", frmt='bi'), self)
-        # self.cmb_win_fft = QComboBox(self)
-        # self.cmb_win_fft.addItems(get_window_names())
-        # self.cmb_win_fft.setToolTip("FFT window type.")
-        # qset_cmb_box(self.cmb_win_fft, self.win_name)
-
-        # self.cmb_win_fft_variant = QComboBox(self)
-        # self.cmb_win_fft_variant.setToolTip("FFT window variant.")
-        # self.cmb_win_fft_variant.setVisible(False)
-
-        # self.lblWinPar1 = QLabel("Param1")
-        # self.ledWinPar1 = QLineEdit(self)
-        # self.ledWinPar1.setText("1")
-        # self.ledWinPar1.setObjectName("ledWinPar1")
-
-        # self.lblWinPar2 = QLabel("Param2")
-        # self.ledWinPar2 = QLineEdit(self)
-        # self.ledWinPar2.setText("2")
-        # self.ledWinPar2.setObjectName("ledWinPar2")
-
         self.chk_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
         self.chk_Hf.setObjectName("chk_Hf")
         self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
@@ -648,14 +628,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.cmb_freq_display)
         layH_ctrl_freq.addStretch(1)
-        # layH_ctrl_freq.addWidget(self.lbl_win_fft)
-        # layH_ctrl_freq.addWidget(self.cmb_win_fft)
-        # layH_ctrl_freq.addWidget(self.cmb_win_fft_variant)
-        # layH_ctrl_freq.addWidget(self.lblWinPar1)
-        # layH_ctrl_freq.addWidget(self.ledWinPar1)
-        # layH_ctrl_freq.addWidget(self.lblWinPar2)
-        # layH_ctrl_freq.addWidget(self.ledWinPar2)
-        # layH_ctrl_freq.addStretch(1)
+
         layH_ctrl_freq.addWidget(self.chk_freq_norm_impz)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
@@ -1406,30 +1379,6 @@ class PlotImpz_UI(QWidget):
         if emit:
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
 
-    # def _read_param1(self):
-    #     """Read out textbox when editing is finished and update dict and fft window"""
-    #     param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
-    #                       return_type='float')
-    #     if param < self.win_dict['par'][0]['min']:
-    #         param = self.win_dict['par'][0]['min']
-    #     elif param > self.win_dict['par'][0]['max']:
-    #         param = self.win_dict['par'][0]['max']
-    #     self.ledWinPar1.setText(str(param))
-    #     self.win_dict['par'][0]['val'] = param
-    #     self._update_win_fft()
-
-    # def _read_param2(self):
-    #     """Read out textbox when editing is finished and update dict and fft window"""
-    #     param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
-    #                       return_type='float')
-    #     if param < self.win_dict['par'][1]['min']:
-    #         param = self.win_dict['par'][1]['min']
-    #     elif param > self.win_dict['par'][1]['max']:
-    #         param = self.win_dict['par'][1]['max']
-    #     self.ledWinPar2.setText(str(param))
-    #     self.win_dict['par'][1]['val'] = param
-    #     self._update_win_fft()
-
     # ------------------------------------------------------------------------------
     def _update_win_fft(self, arg=None):
         """
@@ -1440,28 +1389,8 @@ class PlotImpz_UI(QWidget):
         - called by update_N()
 
         """
-#        self.window_name = qget_cmb_box(self.cmb_win_fft, data=False)
         self.win = calc_window_function(self.win_dict,
                                         N=self.N, sym=False)
-
-        # n_par = self.win_dict['n_par']
-
-        # self.lblWinPar1.setVisible(n_par > 0)
-        # self.ledWinPar1.setVisible(n_par > 0)
-        # self.lblWinPar2.setVisible(n_par > 1)
-        # self.ledWinPar2.setVisible(n_par > 1)
-
-        # if n_par > 0:
-        #     self.lblWinPar1.setText(to_html(
-        #         self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-        #     self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
-        #     self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
-
-        # if n_par > 1:
-        #     self.lblWinPar2.setText(to_html(
-        #         self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-        #     self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
-        #     self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
         self.cgain = np.sum(self.win) / self.N  # coherent gain
         self.win /= self.cgain  # correct gain for periodic signals
