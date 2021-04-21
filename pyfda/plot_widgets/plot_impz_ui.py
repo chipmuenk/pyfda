@@ -545,7 +545,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_stim, self.plot_styles_list, self.plt_freq_stim)
-        # self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
+        self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel(to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
