@@ -1704,11 +1704,13 @@ class Plot_Impz(QWidget):
                         plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                     l_i.append(label_im)
 
-                h_r.append(self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r,
-                    label=label_re, bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
-                    mkr_fmt=fmt_mkr_stim))
+                h_r.append(
+                    self.draw_data(self.plt_freq_stim, self.ax_f1, F, X_r, label=label_re,
+                                   bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stim,
+                                   mkr_fmt=fmt_mkr_stim))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_X$ = {0:.3g} {1}".format(Px, unit_P)])
+                    l_r.extend([lbl_empty, label_re, "$P_X$ = {0:.3g} {1}"
+                                .format(Px, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1736,7 +1738,8 @@ class Plot_Impz(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_stmq,
                     mkr_fmt=fmt_mkr_stmq))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_{{Q}}$ = {0:.3g} {1}".format(Pxq, unit_P)])
+                    l_r.extend([lbl_empty, label_re, "$P_{{Q}}$ = {0:.3g} {1}"
+                                .format(Pxq, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1764,7 +1767,8 @@ class Plot_Impz(QWidget):
                     bottom=self.ui.bottom_f, plt_fmt=self.fmt_plot_resp,
                     mkr_fmt=fmt_mkr_resp))
                 if show_info:
-                    l_r.extend([lbl_empty, label_re, "$P_Y$ = {0:.3g} {1}".format(Py, unit_P)])
+                    l_r.extend([lbl_empty, label_re, "$P_Y$ = {0:.3g} {1}"
+                                .format(Py, unit_P)])
                     h_r.extend([patch_trans, patch_trans])
                 else:
                     l_r.append(label_re)
@@ -1773,8 +1777,9 @@ class Plot_Impz(QWidget):
             # The legend will fill the first column, then the next from top to bottom etc.
             if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
 
-                    # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}".format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw, unit_nenbw)]])
-                    # see https://stackoverflow.com/questions/25830780/tabular-legend-layout-for-matplotlib
+                # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}"\
+                # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw, unit_nenbw)]])
+                # see https://stackoverflow.com/questions/25830780/tabular-legend-layout-for-matplotlib
 
                 if show_info:
                     # Reorder columns / rows to f
