@@ -1401,6 +1401,9 @@ class Plot_Impz(QWidget):
         self._init_axes_freq()
         self._log_mode_freq()
 
+        nenbw = self.ui.win_dict[self.ui.win_dict['cur_win_name']]['nenbw']
+        cgain = self.ui.win_dict[self.ui.win_dict['cur_win_name']]['cgain']
+
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
         plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
@@ -1476,24 +1479,25 @@ class Plot_Impz(QWidget):
                 freq_resp = False
                 scale_impz = 1.
 
+            # scale with window NENBW for correct power calculation
+            P_scale = scale_impz / nenbw
             if plt_stimulus:
                 # scale display of frequency response
-                Px = np.sum(np.square(np.abs(self.X))) * scale_impz / self.ui.nenbw
+                Px = np.sum(np.square(np.abs(self.X))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     X = calc_ssb_spectrum(self.X) * self.scale_i * scale_impz
                 else:
                     X = self.X * self.scale_i * scale_impz
 
             if plt_stimulus_q:
-                Pxq = np.sum(np.square(np.abs(self.X_q))) * scale_impz / self.ui.nenbw
+                Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     X_q = calc_ssb_spectrum(self.X_q) * self.scale_i * scale_impz
                 else:
                     X_q = self.X_q * self.scale_i * scale_impz
 
             if plt_response:
-                Py = np.sum(np.square(np.abs(self.Y * self.scale_o)))\
-                    * scale_impz / self.ui.nenbw
+                Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
                     Y = calc_ssb_spectrum(self.Y) * self.scale_o * scale_impz
                 else:
@@ -1549,8 +1553,8 @@ class Plot_Impz(QWidget):
                 H_F_pre = "|"
                 H_F_post = "|"
 
-                nenbw = 10 * np.log10(self.ui.nenbw)
-                cgain = 20 * np.log10(self.ui.cgain)
+                nenbw = 10 * np.log10(nenbw)
+                cgain = 20 * np.log10(cgain)
 
                 if plt_stimulus:
                     Px = 10*np.log10(Px)
@@ -1659,7 +1663,7 @@ class Plot_Impz(QWidget):
             l_r = []  # labels (real / mag. part)
             l_i = []  # labels (imag. / phase part)
             patch_trans = mpl_patches.Rectangle((0, 0), 1, 1, fc="w", fill=False,
-                                                ec=None, lw=0) # ec = None, lw=0
+                                                ec=None, lw=0)  # ec = None, lw=0
             # patch_trans = lines.Line2D([], [], linestyle='-')#markersize=15, label='Blue stars'
             # patch_filled = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="blue", lw=0.5, alpha=0.5) # ec=white, lw=0,  alpha =0
             lbl_empty = "        "
@@ -1805,7 +1809,7 @@ class Plot_Impz(QWidget):
 
             if self.ui.chk_log_freq.isChecked():
                 # scale second axis for noise power
-                corr = 10*np.log10(self.ui.N / self.ui.nenbw)
+                corr = 10*np.log10(self.ui.N) - nenbw  # nenbw is in dB
                 mn, mx = self.ax_f1.get_ylim()
                 self.ax_f1_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_f1_noise.set_ylabel(r'$P_N$ in dBW')
