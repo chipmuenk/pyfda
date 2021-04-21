@@ -467,8 +467,8 @@ class Plot_Impz(QWidget):
 
         elif self.ui.stim == "sinc":
             self.x =\
-                self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T1) * self.ui.f1) +\
-                self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T2) * self.ui.f2)
+                self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T1) * self.ui.f1)\
+                + self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T2) * self.ui.f2)
             self.title_str += r'Sinc Impulse '
 
         elif self.ui.stim == "gauss":
@@ -1143,8 +1143,7 @@ class Plot_Impz(QWidget):
                              framealpha=0.7)
 
         # --------------- Complex response ----------------------------------
-        if self.cmplx:  # and (self.plt_time_resp != "none" or self.plt_time_stim != "none"):
-
+        if self.cmplx:
             if self.plt_time_stim != "none":
                 # --- imag. part of stimulus -----
                 h_i.append(self.draw_data(
@@ -1547,8 +1546,6 @@ class Plot_Impz(QWidget):
             if self.ui.chk_log_freq.isChecked():
                 unit = " in dBV"
                 unit_P = "dBW"
-                unit_nenbw = "dB"
-                unit_cgain = "dB"
                 H_F_pre = "|"
                 H_F_post = "|"
 
@@ -1637,10 +1634,6 @@ class Plot_Impz(QWidget):
 
                 unit = " in V"
                 unit_P = "W"
-                unit_nenbw = "bins"
-                unit_cgain = ""
-                nenbw = self.ui.nenbw
-                cgain = self.ui.cgain
 
             if self.en_re_im_f:
                 H_Fi_str = H_F_pre + r'$\Im\{$' + H_F_str + r'$\}$' + H_F_post\

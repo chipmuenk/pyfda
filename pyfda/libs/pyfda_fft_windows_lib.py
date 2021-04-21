@@ -27,6 +27,7 @@ when the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
 windows_dict = {
+    'cur_win_name': 'Rectangular',  # name of current window
     'Boxcar': {
         'fn_name': 'boxcar',
         'info':
@@ -71,10 +72,24 @@ windows_dict = {
             It can be constructed as the convolution of two rectangular windows,
             hence, its Fourier transform is the product of two (periodic) sinc
             functions.
-            <span>'''
+            </span>'''
             },
-    'Blackman':
-        {'fn_name': 'blackman'},
+    'Blackman': {
+        'fn_name': 'blackman',
+        'info':
+            '''<span>
+            The Blackman window is used for both FIR filter design and spectral analysis.
+            Compared to Hann and Hamming window, it has a wider main lobe (less sharp
+            transition between pass and stop band / worse frequency resolution)
+            and lower sidelobe levels (improved stopband rejection / less leakage of
+            high-frequency interferers).
+
+            The Blackman window is a three term cosine window with coefficients of
+            a0 = 0.42, a1 = 0.5, a2 = 0.08. The maximum sidelobe level is -57 dB,
+            sidelobes have a fall-off rate of -18 dB/dec.
+            Its main lobe width is 12 &pi; / <i>N</i>.
+            </span>'''
+        },
     'Blackmanharris': {
         'fn_name': 'blackmanharris',
         'info':
@@ -103,14 +118,12 @@ windows_dict = {
     'Bohman': {
         'fn_name': 'bohman'
         },
-        #
     'Cosine': {
         'fn_name': 'cosine',
         'info':
             '<span>The window is half a cosine period, shifted by pi/2. '
             'For that reason it is also known as "half-cosine" or "sine" window.</span>',
         },
-        #
     'Dolph-Chebyshev': {
         'fn_name': 'chebwin',
         'par': [{
@@ -121,7 +134,6 @@ windows_dict = {
             'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
             'using Chebyshev polynomials.</span>',
         },
-        #
     'DPSS': {
         'fn_name': 'dpss',
         'par': [{
@@ -282,7 +294,7 @@ def get_window_names():
     win_name_list = []
     for d in windows_dict:
         win_name_list.append(d)
-    
+
     if 'cur_win_name' in win_name_list:
         win_name_list.remove('cur_win_name')
 
@@ -671,7 +683,7 @@ class QFFTWinSelection(QWidget):
             self.win_dict[cur]['par'][1]['val'] = param
 
         if self.win_dict[cur]['n_par'] > 0:
-            param = safe_eval(self.led_win_par_1.text(), 
+            param = safe_eval(self.led_win_par_1.text(),
                               self.win_dict[cur]['par'][0]['val'], return_type='float')
             if param < self.win_dict[cur]['par'][0]['min']:
                 param = self.win_dict[cur]['par'][0]['min']
