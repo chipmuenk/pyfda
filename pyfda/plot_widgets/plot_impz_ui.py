@@ -316,13 +316,6 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         qled_set_max_width(self.led_N_start, N_x=8)
 
-        self.but_fx_scale = QPushButton("FX Int")
-        self.but_fx_scale.setObjectName("but_fx_scale")
-        self.but_fx_scale.setToolTip(
-            "<span>Display data with integer (fixpoint) scale.</span>")
-        self.but_fx_scale.setCheckable(True)
-        self.but_fx_scale.setChecked(False)
-
         self.but_stim_options = QPushButton("Stimuli")
         self.but_stim_options.setObjectName("but_stim_options")
         self.but_stim_options.setToolTip("<span>Show stimulus options.</span>")
@@ -346,25 +339,32 @@ class PlotImpz_UI(QWidget):
 
         self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
 
+        self.but_fx_scale = QPushButton("FX Int")
+        self.but_fx_scale.setObjectName("but_fx_scale")
+        self.but_fx_scale.setToolTip(
+            "<span>Display data with integer (fixpoint) scale.</span>")
+        self.but_fx_scale.setCheckable(True)
+        self.but_fx_scale.setChecked(False)
+
         layH_ctrl_run = QHBoxLayout()
-        layH_ctrl_run.addWidget(self.but_run)
-        # layH_ctrl_run.addWidget(self.lbl_sim_select)
-        layH_ctrl_run.addWidget(self.cmb_sim_select)
         layH_ctrl_run.addWidget(self.but_auto_run)
+        layH_ctrl_run.addWidget(self.but_run)
+        layH_ctrl_run.addWidget(self.cmb_sim_select)
+        layH_ctrl_run.addSpacing(10)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
-        layH_ctrl_run.addStretch(2)
-        layH_ctrl_run.addWidget(self.but_fx_scale)
-        layH_ctrl_run.addStretch(2)
-        # layH_ctrl_run.addWidget(lbl_stim_options)
+
+        layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_stim_options)
-        layH_ctrl_run.addStretch(2)
+        layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
-        layH_ctrl_run.addStretch(2)
+        layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_fft_win)
         layH_ctrl_run.addWidget(self.qfft_win_select)
+        layH_ctrl_run.addSpacing(20)
+        layH_ctrl_run.addWidget(self.but_fx_scale)
         layH_ctrl_run.addStretch(10)
 
         # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -422,6 +422,24 @@ class PlotImpz_UI(QWidget):
             self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
         spgr_en = self.plt_time_spgr != "none"
 
+        self.cmb_mode_spgr_time = QComboBox(self)
+        spgr_modes = [("PSD", "psd"), ("Mag.", "magnitude"),
+                      ("Angle", "angle"), ("Phase", "phase")]
+        for i in spgr_modes:
+            self.cmb_mode_spgr_time.addItem(*i)
+        qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
+        self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
+        self.cmb_mode_spgr_time.setVisible(spgr_en)
+
+        self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
+        self.lbl_byfs_spgr_time.setVisible(spgr_en)
+        self.chk_byfs_spgr_time = QCheckBox(self)
+        self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
+        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
+                                           "i.e. scale by f_S</span>")
+        self.chk_byfs_spgr_time.setChecked(True)
+        self.chk_byfs_spgr_time.setVisible(spgr_en)
+
         self.chk_log_spgr_time = QPushButton("dB")
         self.chk_log_spgr_time.setMaximumWidth(self.mSize * 4)
         self.chk_log_spgr_time.setObjectName("chk_log_spgr")
@@ -446,26 +464,6 @@ class PlotImpz_UI(QWidget):
         self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
                                            "between spectrogram segments.</span>")
         self.led_time_ovlp_spgr.setVisible(spgr_en)
-
-        self.lbl_mode_spgr_time = QLabel(to_html("&nbsp;Mode", frmt='bi'), self)
-        self.lbl_mode_spgr_time.setVisible(spgr_en)
-        self.cmb_mode_spgr_time = QComboBox(self)
-        spgr_modes = [("PSD", "psd"), ("Mag.", "magnitude"),
-                      ("Angle", "angle"), ("Phase", "phase")]
-        for i in spgr_modes:
-            self.cmb_mode_spgr_time.addItem(*i)
-        qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
-        self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
-        self.cmb_mode_spgr_time.setVisible(spgr_en)
-
-        self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
-        self.lbl_byfs_spgr_time.setVisible(spgr_en)
-        self.chk_byfs_spgr_time = QCheckBox(self)
-        self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
-        self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
-                                           "i.e. scale by f_S</span>")
-        self.chk_byfs_spgr_time.setChecked(True)
-        self.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
@@ -518,17 +516,16 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_time.addWidget(lbl_plt_time_spgr)
         layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
+        layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
+        layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
+        layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
         layH_ctrl_time.addWidget(self.chk_log_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_time_nfft_spgr)
         layH_ctrl_time.addWidget(self.led_time_nfft_spgr)
         layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
         layH_ctrl_time.addWidget(self.led_time_ovlp_spgr)
-        layH_ctrl_time.addWidget(self.lbl_mode_spgr_time)
-        layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
-        layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
 
-        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addSpacing(20)
         layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
 
@@ -646,6 +643,7 @@ class PlotImpz_UI(QWidget):
         # Create combo box with stimulus categories
         # self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
         self.lblStimulus = QLabelVert("Stim", self)
+
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
@@ -823,11 +821,11 @@ class PlotImpz_UI(QWidget):
         layGStim = QGridLayout()
 
         layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
-        # layGStim.addWidget(self.lblDC, 1, 0)
+        # layGStim.setColumnStretch(0, 10)  # doesnt work
+        # QSpacerItem
 
         layGStim.addLayout(layHCmbStim, 0, 1)
         layGStim.addLayout(layHStimDC, 1, 1)
-        # layGStim.addWidget(self.ledDC,  1, 1)
 
         layGStim.addWidget(self.lblAmp1, 0, 2)
         layGStim.addWidget(self.lblAmp2, 1, 2)
