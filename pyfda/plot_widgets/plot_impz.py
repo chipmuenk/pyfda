@@ -766,7 +766,7 @@ class Plot_Impz(QWidget):
             self.ui.lblFreq2.setText(self.ui.txtFreq2_k)
         else:
             f_unit = fb.fil[0]['plt_fUnit']
-            t_unit = fb.fil[0]['plt_tUnit'].replace("$\mu$", "&mu;")
+            t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
             self.ui.lblFreq1.setText(self.ui.txtFreq1_f)
             self.ui.lblFreq2.setText(self.ui.txtFreq2_f)
 
