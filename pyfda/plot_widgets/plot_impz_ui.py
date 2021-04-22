@@ -1387,8 +1387,8 @@ class PlotImpz_UI(QWidget):
         - signal-slot connection to combo-box -> index (int), absorbed by `arg`
         - called by _read_param()
         - called by update_N()
-
         """
+        # TODO: should window be calculated here?!
         self.win = calc_window_function(self.win_dict,
                                         N=self.N, sym=False)
 
