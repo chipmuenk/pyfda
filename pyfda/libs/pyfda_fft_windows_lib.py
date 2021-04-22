@@ -581,7 +581,6 @@ class QFFTWinSelection(QWidget):
         - 0, 1 or 2 parameter fields
         """
         # FFT window type
-        self.lbl_win_fft = QLabel(to_html("Window:", frmt='bi'), self)
         self.cmb_win_fft = QComboBox(self)
         self.cmb_win_fft.addItems(get_window_names())
         self.cmb_win_fft.setToolTip("FFT window type.")
@@ -607,7 +606,6 @@ class QFFTWinSelection(QWidget):
         # self.cmb_win_par_2 = QComboBox(self)
 
         layH_main = QHBoxLayout(self)
-        layH_main.addWidget(self.lbl_win_fft)
         layH_main.addWidget(self.cmb_win_fft)
         layH_main.addWidget(self.cmb_win_fft_variant)
         layH_main.addWidget(self.lbl_win_par_1)
