@@ -28,6 +28,7 @@ when the function name `fn_name` is just a string, it is taken from
 """
 windows_dict = {
     'cur_win_name': 'Rectangular',  # name of current window
+    #
     'Boxcar': {
         'fn_name': 'boxcar',
         'info':
@@ -363,7 +364,7 @@ def set_window_function(win_dict, win_name):
 
 
 # ----------------------------------------------------------------------------
-def calc_window_function(win_dict, N=32, win_name=None, sym=False):
+def calc_window_function(win_dict, N, win_name=None, sym=False):
     """
     Generate a window function with `N` data points.
 
