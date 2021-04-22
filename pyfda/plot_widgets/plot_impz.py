@@ -205,16 +205,6 @@ class Plot_Impz(QWidget):
 
         self.error = False
 
-        # --- signals coming from the FFT window widget -----------------------
-        if 'fft' in dict_sig['sender']:
-            logger.warning(dict_sig['sender'])  # == 'fft':
-            if 'closeEvent' in dict_sig:
-                self.hide_fft_win()
-                return
-            else:
-                if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'win':
-                    logger.warning(dict_sig)
-        # --- signals for fixpoint simulation ---------------------------------
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
                 self.needs_calc = True
@@ -1663,9 +1653,7 @@ class Plot_Impz(QWidget):
             l_r = []  # labels (real / mag. part)
             l_i = []  # labels (imag. / phase part)
             patch_trans = mpl_patches.Rectangle((0, 0), 1, 1, fc="w", fill=False,
-                                                ec=None, lw=0)  # ec = None, lw=0
-            # patch_trans = lines.Line2D([], [], linestyle='-')#markersize=15, label='Blue stars'
-            # patch_filled = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="blue", lw=0.5, alpha=0.5) # ec=white, lw=0,  alpha =0
+                                                ec=None, lw=0)  # ec = 'blue', alpha=0.5
             lbl_empty = "        "
 
             # -------------------- Plot H_id ----------------------------------
