@@ -324,7 +324,7 @@ def set_window_function(win_dict, win_name):
         logger.warning(
             "Unknown window name {}, using rectangular window instead."
             .format(win_name))
-        win_name = "Boxcar"
+        win_name = "Rectangular"
     # operate with the window specific sub-dictionary `win_dict[`win_name]`
     # dictionary in the following
     win_dict.update({'cur_win_name': win_name})
