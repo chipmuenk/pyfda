@@ -137,7 +137,7 @@ class Plot_FFT_win(QDialog):
             or self.needs_calc:
             # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
             # self.win_dict['win_len']))
-            self.N_auto = self.win_dict['win_len']
+            # self.N_auto = self.win_dict['win_len']
             self.calc_N()
 
             if self.isVisible():

@@ -388,7 +388,7 @@ def calc_window_function(win_dict, N=32, win_name=None, sym=False):
     if win_name is None:
         win_name = win_dict['cur_win_name']
     win_fnct = set_window_function(win_dict, win_name)
-    win_dict.update({'win_len': N})
+    # win_dict.update({'win_len': N})
 
     fn_name = win_dict[win_name]['fn_name']
     n_par = win_dict[win_name]['n_par']
