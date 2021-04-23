@@ -1291,7 +1291,7 @@ class Plot_Impz(QWidget):
                 # mode: 'psd', 'complex','magnitude','angle', 'phase' (no unwrapping)
 
     #            col_mesh = self.ax_s.pcolormesh(t, np.fft.fftshift(f),
-    #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud') # *fb.fil[0]['f_S']
+    #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
                 # self.ax_s.colorbar(col_mesh)
 
                 if self.ui.chk_log_spgr_time.isChecked():

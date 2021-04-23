@@ -59,7 +59,7 @@ class PlotImpz_UI(QWidget):
         if 'fft' in dict_sig['sender']:
             logger.warning(dict_sig['sender'])
             if 'closeEvent' in dict_sig:
-                self.hide_fft_win()
+                self.hide_fft_wdg()
                 return
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
@@ -140,10 +140,10 @@ class PlotImpz_UI(QWidget):
         # TODO: Does this need a deep copy?
         self.win_dict = windows_dict
         self.win_dict.update({'cur_win_name': self.cur_win_name})
-        self.fft_window = Plot_FFT_win(
+        self.fft_widget = Plot_FFT_win(
             self, win_dict=self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_window.hide()
+        self.fft_widget.hide()
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
@@ -330,12 +330,12 @@ class PlotImpz_UI(QWidget):
         self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
                                                "border : 1px solid grey")
 
-        self.but_fft_win = QPushButton(self)
-        self.but_fft_win.setText("WIN FFT")
-        self.but_fft_win.setToolTip('<span> time and frequency response of FFT Window '
-                                    '(can be modified in the "Frequency" tab)</span>')
-        self.but_fft_win.setCheckable(True)
-        self.but_fft_win.setChecked(False)
+        self.but_fft_wdg = QPushButton(self)
+        self.but_fft_wdg.setText("FFT Wdg")
+        self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
+                                    ' and display its properties).</span>')
+        self.but_fft_wdg.setCheckable(True)
+        self.but_fft_wdg.setChecked(False)
 
         self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
 
@@ -361,7 +361,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addSpacing(20)
-        layH_ctrl_run.addWidget(self.but_fft_win)
+        layH_ctrl_run.addWidget(self.but_fft_wdg)
         layH_ctrl_run.addWidget(self.qfft_win_select)
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_fx_scale)
@@ -401,8 +401,7 @@ class PlotImpz_UI(QWidget):
                                  self.chk_win_time.sizeHint().height())
         self.chk_win_time.setObjectName("chk_win_time")
         self.chk_win_time.setToolTip(
-            '<span>Show FFT windowing function (can be '
-            'modified in the "Frequency" tab).</span>')
+            '<span>Plot FFT windowing function.</span>')
         self.chk_win_time.setCheckable(True)
         self.chk_win_time.setChecked(False)
 
@@ -919,9 +918,10 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # connect FFT window to widgets and signals upstream:
-        self.fft_window.sig_tx.connect(self.process_sig_rx)
-        self.sig_tx_fft.connect(self.fft_window.sig_rx)
+        # connect FFT widget to widgets and signals upstream:
+        self.fft_widget.sig_tx.connect(self.process_sig_rx)
+        #
+        self.sig_tx_fft.connect(self.fft_widget.sig_rx)
         self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
@@ -930,7 +930,7 @@ class PlotImpz_UI(QWidget):
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
-        self.but_fft_win.clicked.connect(self.show_fft_win)
+        self.but_fft_wdg.clicked.connect(self.show_fft_wdg)
         self.qfft_win_select.win_changed.connect(self.process_sig_rx)
 
         # --- frequency control ---
@@ -1393,28 +1393,27 @@ class PlotImpz_UI(QWidget):
         self.cgain = np.sum(self.win) / self.N  # coherent gain
         self.win /= self.cgain  # correct gain for periodic signals
 
-        self.fft_window.qfft_win_select.update_widgets()
+        self.fft_widget.qfft_win_select.update_widgets()
         self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
 
     # ------------------------------------------------------------------------------
-    def show_fft_win(self):
+    def show_fft_wdg(self):
         """
-        Show / hide FFT window depending on the corresponding button
+        Show / hide FFT widget depending on the corresponding button
         """
-        logger.warning(self.but_fft_win.isChecked())
-        if self.but_fft_win.isChecked():
-            self.fft_window.show()
+        if self.but_fft_wdg.isChecked():
+            self.fft_widget.show()
         else:
-            self.fft_window.hide()
+            self.fft_widget.hide()
 
     # --------------------------------------------------------------------------
-    def hide_fft_win(self):
+    def hide_fft_wdg(self):
         """
-        The closeEvent caused by clicking the "x" in the FFT window is caught
+        The closeEvent caused by clicking the "x" in the FFT widget is caught
         there and routed here to only hide the window
         """
-        self.but_fft_win.setChecked(False)
-        self.fft_window.hide()
+        self.but_fft_wdg.setChecked(False)
+        self.fft_widget.hide()
 
     # ------------------------------------------------------------------------------
     def calc_n_points(self, N_user=0):
