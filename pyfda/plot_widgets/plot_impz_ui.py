@@ -927,12 +927,6 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.clicked.connect(self.show_fft_wdg)
         self.qfft_win_select.win_changed.connect(self.process_sig_rx)
 
-        # --- frequency control ---
-        # careful! currentIndexChanged passes the current index
-        # self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
-        # self.ledWinPar1.editingFinished.connect(self._read_param1)
-        # self.ledWinPar2.editingFinished.connect(self._read_param2)
-
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
 
@@ -1377,17 +1371,18 @@ class PlotImpz_UI(QWidget):
     # ------------------------------------------------------------------------------
     def _update_win_fft(self, arg=None):
         """
-        Update window type for FFT  with different arguments:
+        Update window type for FFT
 
-        - signal-slot connection to combo-box -> index (int), absorbed by `arg`
         """
         # TODO: self.win should not be used, only pass information via the dict
         # TODO: new window function must be passed in calc_window_function
+        # TODO: This isn't called any longer?
         self.win = calc_window_function(self.win_dict, N=self.N, sym=False)
 
         # cgain = np.sum(self.win) / self.N  # coherent gain
         # self.win /= cgain  # correct gain for periodic signals
 
+        # this is needed only when window types changes, not N
         self.fft_widget.qfft_win_select.update_widgets()
         self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
 
