@@ -314,10 +314,16 @@ def get_window_names(sel_list=[]):
     return sorted(win_name_list, key=lambda v: (v.lower(), v))
 
 
+# ----------------------------------------------------------------------------
 def set_window_function(win_dict, win_name):
     """
-    Select and set a window function from its name, update the `win_dict`
-    dictionary correspondingly with
+    Select and set a window function from its name `win_name` and update the `win_dict`
+    dictionary correspondingly with:
+
+    win_dict['cur_win_name'] : <win_name>  # new current window name (str)
+    win_dict['win']: []                    # clear the window function array (empty list)
+    win_dict[win_name]['win_fnct']: fnct   # fully qualified function name (function)
+    win_dict[win_name]['win_fnct']: npar   # number of parameters (int)
 
     Parameters
     ----------
@@ -337,9 +343,10 @@ def set_window_function(win_dict, win_name):
             "Unknown window name {}, using rectangular window instead."
             .format(win_name))
         win_name = "Rectangular"
-    # operate with the window specific sub-dictionary `win_dict[`win_name]`
+    win_dict.update({'cur_win_name': win_name, 'win': []})
+
+    # operate with the window specific sub-dictionary `win_dict[win_name]`
     # dictionary in the following
-    win_dict.update({'cur_win_name': win_name})
     d = win_dict[win_name]
 
     fn_name = d['fn_name']
@@ -386,7 +393,7 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
     win_name : str
         Name of the window. If specified (default is None), this will be used to obtain
         the window function, its parameters and tool tipps etc. via
-        `set_window_function()`
+        `set_window_function()`. If not, the previous setting are used.
     N : int, optional
         Number of data points. The default is 32.
     sym : bool, optional
@@ -399,7 +406,7 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
     """
     if win_name is None:
         win_name = win_dict['cur_win_name']
-    win_fnct = set_window_function(win_dict, win_name)
+        win_fnct = set_window_function(win_dict, win_name)
     # win_dict.update({'win_len': N})
 
     fn_name = win_dict[win_name]['fn_name']
@@ -432,7 +439,8 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
     cgain = np.sum(w) / N  # coherent gain
     win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
-    # /= cgain  # correct gain for periodic signals
+    w /= cgain  # correct gain for periodic signals
+    win_dict.update({'win': w})
 
     return w
 
