@@ -14,7 +14,6 @@ from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
     QFontMetrics, QIcon, pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
-import numpy as np
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
@@ -39,6 +38,7 @@ class PlotImpz_UI(QWidget):
     # sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
+    # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
 
 # ------------------------------------------------------------------------------
@@ -55,9 +55,10 @@ class PlotImpz_UI(QWidget):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        # --- signals coming from the FFT window widget -----------------------
+        # --- signals coming from the FFT window widget, the qfft_win_select or 
+        # the UI (?) -----------------------
         if 'fft' in dict_sig['sender']:
-            logger.warning(dict_sig['sender'])
+            logger.warning(pprint_log(dict_sig))
             if 'closeEvent' in dict_sig:
                 self.hide_fft_wdg()
                 return
@@ -639,7 +640,6 @@ class PlotImpz_UI(QWidget):
         # =====================================================================
         # Controls for stimuli
         # =====================================================================
-        # Create combo box with stimulus categories
         # self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
         self.lblStimulus = QLabelVert("Stim", self)
 
@@ -728,7 +728,6 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setToolTip(
             "Stimulus amplitude 2, complex values like 3j - 1 are allowed")
         self.ledAmp2.setObjectName("stimAmp2")
-
         # ----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
         self.ledPhi1 = QLineEdit(self)
@@ -743,7 +742,6 @@ class PlotImpz_UI(QWidget):
         self.ledPhi2.setToolTip("Stimulus phase 2")
         self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
-
         # ----------------------------------------------
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
@@ -773,7 +771,6 @@ class PlotImpz_UI(QWidget):
         self.led_TW2.setToolTip("Time width 2")
         self.led_TW2.setObjectName("stimTW2")
         self.lbl_TWU2 = QLabel(to_html("T_S", frmt='b'), self)
-
         # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
         self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
@@ -792,7 +789,6 @@ class PlotImpz_UI(QWidget):
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
         self.lblFreqUnit2 = QLabel("f_S", self)
-
         # ----------------------------------------------
         self.lbl_BW1 = QLabel(to_html(self.tr("&nbsp;BW_1"), frmt='bi') + " =", self)
         self.led_BW1 = QLineEdit(self)
@@ -805,7 +801,6 @@ class PlotImpz_UI(QWidget):
         self.led_BW2.setText(str(self.BW2))
         self.led_BW2.setToolTip(self.tr("Relative bandwidth 2"))
         self.led_BW2.setObjectName("stimBW2")
-
         # ----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
@@ -818,7 +813,6 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setObjectName("stimNoi")
 
         layGStim = QGridLayout()
-
         layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
         # layGStim.setColumnStretch(0, 10)  # doesnt work
         # QSpacerItem
@@ -1344,12 +1338,15 @@ class PlotImpz_UI(QWidget):
 
     # -------------------------------------------------------------------------
     def update_N(self, emit=True):
-        # called directly from impz or locally
-        # between local triggering and updates upstream
         """
         Update values for self.N and self.N_start from the QLineEditWidget,
         update the window and fire "ui_changed"
+        - called by _construct_ui with mit=False
+        - called by plot_impz() with emit=False when the automatic calculation
+                of N has to be updated (e.g. order of FIR Filter has changed
+        - called from the ui when N_start or N_end have been changed (emit=True)
         """
+
         if not isinstance(emit, bool):
             logger.error("update N: emit={0}".format(emit))
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
@@ -1383,15 +1380,13 @@ class PlotImpz_UI(QWidget):
         Update window type for FFT  with different arguments:
 
         - signal-slot connection to combo-box -> index (int), absorbed by `arg`
-        - called by _read_param()
-        - called by update_N()
         """
-        # TODO: should window be calculated here?!
-        self.win = calc_window_function(self.win_dict,
-                                        N=self.N, sym=False)
+        # TODO: self.win should not be used, only pass information via the dict
+        # TODO: new window function must be passed in calc_window_function
+        self.win = calc_window_function(self.win_dict, N=self.N, sym=False)
 
-        self.cgain = np.sum(self.win) / self.N  # coherent gain
-        self.win /= self.cgain  # correct gain for periodic signals
+        # cgain = np.sum(self.win) / self.N  # coherent gain
+        # self.win /= cgain  # correct gain for periodic signals
 
         self.fft_widget.qfft_win_select.update_widgets()
         self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
