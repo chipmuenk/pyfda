@@ -1370,7 +1370,7 @@ class PlotImpz_UI(QWidget):
             self.update_freqs()
 
         # FFT window needs to be updated due to changed number of data points
-        self._update_win_fft()
+        self.win = calc_window_function(self.win_dict, N=self.N, sym=False)
         if emit:
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
 
