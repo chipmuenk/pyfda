@@ -260,7 +260,8 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc:
                 # update number of data points in impz_ui and FFT window
-                # needed when e.g. FIR filter order has changed. Don't emit a signal.
+                # needed when e.g. FIR filter order has been changed, requiring 
+                # a different number of data points for simulation. Don't emit a signal.
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
                 qstyle_widget(self.ui.but_run, "changed")
@@ -275,11 +276,11 @@ class Plot_Impz(QWidget):
 
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
+                # of stimulus and response
                 if dict_sig['ui_changed'] in {'win'}:
                     self.draw()
                 elif dict_sig['ui_changed'] in {'resized', 'tab'}:
                     pass
-
                 else:  # all the other ui elements are treated here
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
@@ -697,7 +698,7 @@ class Plot_Impz(QWidget):
     def calc_fft(self):
         """
         (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q`
-        and response `self.Y` using the window function `self.ui.win`.
+        and response `self.Y` using the window function from `self.ui.win_dict['win']`.
         """
         # calculate FFT of stimulus / response
         if self.x is None:
@@ -710,7 +711,7 @@ class Plot_Impz(QWidget):
                 .format(len(self.x), self.ui.N_end))
         else:
             # TODO: This must be replaced by `self.fft_window.get_win()`
-            win = self.ui.win  # self.fft_window(self.ui.N)
+            win = self.ui.win
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * win
             # calculate absolute value and scale by N_FFT
@@ -737,7 +738,7 @@ class Plot_Impz(QWidget):
             # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
 #        if self.ui.chk_win_freq.isChecked():
-#            self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
+#            self.Win = np.abs(np.fft.fft(win)) / self.ui.N
 
         self.needs_redraw[1] = True   # redraw of frequency widget needed
 
