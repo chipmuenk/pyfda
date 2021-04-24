@@ -781,9 +781,6 @@ class Plot_Impz(QWidget):
         self.ui.lbl_TU1.setText(to_html(t_unit, frmt=unit_frmt))
         self.ui.lbl_TU2.setText(to_html(t_unit, frmt=unit_frmt))
 
-        self.t = self.n * fb.fil[0]['T_S']
-#        self.ui.load_fs()
-
         self.scale_i = self.scale_o = 1
         self.fx_min = -1.
         self.fx_max = 1.
@@ -955,6 +952,8 @@ class Plot_Impz(QWidget):
         """
         Clear and initialize the axes of the time domain matplotlib widgets
         """
+        self.t = self.n * fb.fil[0]['T_S']
+        
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
