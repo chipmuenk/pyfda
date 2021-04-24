@@ -287,18 +287,29 @@ windows_dict = {
     }
 
 
-def get_window_names():
+def get_window_names(sel_list=[]):
     """
     Extract keys from the `windows_dict` if they are the name of a window. This
     is verified by looking for a contained dict with the key "fn_name" defining
     the window function. Return an alphabetically sorted list with the window
     names (strings), sorting is performed on the lower-cased names.
 
+    When a list of strings `sel_list` is passed, all window names not on this list
+    are deleted.
+
     This list can be used e.g. for initialization e.g. of a combo box.
     """
-
     win_name_list = [k for k in windows_dict
                      if type(windows_dict[k]) == dict and "fn_name" in windows_dict[k]]
+    if sel_list:
+        for wn in win_name_list:
+            if wn not in sel_list:
+                win_name_list.delete(wn)
+
+        for sn in sel_list:
+            if sn not in win_name_list:
+                logger.warning(
+                    'Ignoring window name "{}", not found in "windows_dict.'.format(sn))
 
     return sorted(win_name_list, key=lambda v: (v.lower(), v))
 
