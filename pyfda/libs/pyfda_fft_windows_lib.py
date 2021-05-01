@@ -21,9 +21,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
-Dictionary with available fft windows, their function name and their properties.
+Dictionary with available FFT windows, their function names and their properties.
 
-when the function name `fn_name` is just a string, it is taken from
+When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
 windows_dict = {
@@ -335,7 +335,7 @@ def set_window_function(win_dict, win_name):
     Returns
     -------
     win_fnct : fnct
-        The window function
+        The window function object (not the array)
     """
 
     if win_name not in windows_dict:
@@ -365,7 +365,7 @@ def set_window_function(win_dict, win_name):
         # only one element, no module given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
     else:
-        # remove the leftmost part starting with the last '.'
+        # extract module name from the beginning to the last '.'
         mod_name = fn_name[:fn_name.rfind(".")]
         mod = importlib.import_module(mod_name)
         win_fnct = getattr(mod, fnct, None)
@@ -384,25 +384,31 @@ def set_window_function(win_dict, win_name):
 # ----------------------------------------------------------------------------
 def calc_window_function(win_dict, N, win_name=None, sym=False):
     """
-    Generate a window function with `N` data points.
+    Generate the requested window function with `N` data points.
 
     Parameters
     ----------
     win_dict : dict
         The dict where the window functions are stored.
-    win_name : str
-        Name of the window. If specified (default is None), this will be used to obtain
-        the window function, its parameters and tool tipps etc. via
-        `set_window_function()`. If not, the previous setting are used.
-    N : int, optional
-        Number of data points. The default is 32.
+
+    N : int
+        Number of data points
+
+    win_name : str, optional
+        Name of the window. If specified (default is None), this will be used to
+        obtain the window function, its parameters and tool tipps etc. via
+        `set_window_name()`. If not, the previous setting are used. If window
+        and number of data points are unchanged, the window is retrieved from
+        `win_dict['win']` instead of recalculating it.
+
     sym : bool, optional
-        When True, generate a symmetric window, for filter design.
-        When False (default), generate a periodic window, for spectral analysis.
+        When True, generate a symmetric window for filter design.
+        When False (default), generate a periodic window for spectral analysis.
+
     Returns
     -------
     win_fnct : ndarray
-        The window function
+        The window function. This is also stored in win_dict['win']
     """
     if win_name is None:
         win_name = win_dict['cur_win_name']
@@ -415,7 +421,8 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
     try:
         if fn_name == 'dpss':
             logger.info("dpss!")
-            w = scipy.signal.windows.dpss(N, win_dict[win_name]['par'][0]['val'], sym=sym)
+            w = scipy.signal.windows.dpss(N, win_dict[win_name]['par'][0]['val'],
+                                          sym=sym)
         elif n_par == 0:
             w = win_fnct(N, sym=sym)
         elif n_par == 1:
@@ -437,7 +444,7 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
         w = np.ones(N)
 
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
-    cgain = np.sum(w) / N  # coherent gain
+    cgain = np.sum(w) / N  # coherent gain / DC average
     win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
     w /= cgain  # correct gain for periodic signals
     win_dict.update({'win': w})
@@ -562,23 +569,22 @@ class UserWindows(object):
 # February 15, 2002
 # https://holometer.fnal.gov/GH_FFT.pdf
 
+
 # =============================================================================
-
-class QFFTWinSelection(QWidget):
-
+class QFFTWinSelector(QWidget):
     # incoming
     sig_rx = pyqtSignal(object)
     # outgoing
     win_changed = pyqtSignal(object)
 
     def __init__(self, parent, win_dict):
-        super(QFFTWinSelection, self).__init__(parent)
+        super(QFFTWinSelector, self).__init__(parent)
 
         self.win_dict = win_dict
         self._construct_UI()
         self.update_win_type()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the widget one hierarchy higher to update
@@ -597,7 +603,7 @@ class QFFTWinSelection(QWidget):
         """
         Create the FFT window selection widget, consisting of:
         - combobox for windows
-        - 0, 1 or 2 parameter fields
+        - 0 or more parameter fields
         """
         # FFT window type
         self.cmb_win_fft = QComboBox(self)
@@ -731,6 +737,5 @@ class QFFTWinSelection(QWidget):
         set_window_function(self.win_dict, cur)
         # update visibility and values of parameter widgets
         self.update_param_widgets()
-        logger.warning(pprint_log(windows_dict[cur]))
 
         self.win_changed.emit({'sender': __name__, 'view_changed': 'fft_win'})

@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import (
-    set_window_function, calc_window_function, QFFTWinSelection)
+    get_window, QFFTWinSelector)
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:
@@ -50,11 +50,10 @@ class Plot_FFT_win(QDialog):
         reference to parent
 
     win_dict : dict
-        dictionary initialized from `pyfda_fft_windows_lib.windows_dict`
-        to store current settings
+        dictionary derived from `pyfda_fft_windows_lib.all_windows_dict`
+        with valid and available windows and their current settings (if applicable)
 
     sym : bool
-        Passed to `calc_window_function()`:
         When True, generate a symmetric window for use in filter design.
         When False (default), generate a periodic window for use in spectral analysis.
 
@@ -81,7 +80,6 @@ class Plot_FFT_win(QDialog):
                  title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
 
-    #  dict with current settings, initialized e.g. from fb.fil[0]['win_fft']
         self.win_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -164,7 +162,7 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
         self.chk_auto_N = QCheckBox(self)
         self.chk_auto_N.setChecked(False)

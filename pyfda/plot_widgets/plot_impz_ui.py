@@ -19,8 +19,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qled_set_max_width,
     QVLine, QLabelVert)
-from pyfda.libs.pyfda_fft_windows_lib import (
-    windows_dict, calc_window_function, QFFTWinSelection)
+from pyfda.libs.pyfda_fft_windows_lib import (get_windows_dict, QFFTWinSelector)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -55,7 +54,7 @@ class PlotImpz_UI(QWidget):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        # --- signals coming from the FFT window widget, the qfft_win_select or 
+        # --- signals coming from the FFT window widget, the qfft_win_select or
         # the UI (?) -----------------------
         if 'fft' in dict_sig['sender']:
             logger.warning(pprint_log(dict_sig))
@@ -338,7 +337,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelection(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
         self.but_fx_scale = QPushButton("FX Int")
         self.but_fx_scale.setObjectName("but_fx_scale")
@@ -912,9 +911,10 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # connect FFT widget to widgets and signals upstream:
+        # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
         self.fft_widget.sig_tx.connect(self.process_sig_rx)
-        #
+        self.qfft_win_select.win_changed.connect(self.process_sig_rx)
+        # 
         self.sig_tx_fft.connect(self.fft_widget.sig_rx)
         self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
 
@@ -925,7 +925,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
         self.but_fft_wdg.clicked.connect(self.show_fft_wdg)
-        self.qfft_win_select.win_changed.connect(self.process_sig_rx)
+
 
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
@@ -1363,28 +1363,9 @@ class PlotImpz_UI(QWidget):
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.update_freqs()
 
-        # FFT window needs to be updated due to changed number of data points
-        self.win = calc_window_function(self.win_dict, N=self.N, sym=False)
-        if emit:
+        if emit:  # TODO: ???
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
-
-    # ------------------------------------------------------------------------------
-    def _update_win_fft(self, arg=None):
-        """
-        Update window type for FFT
-
-        """
-        # TODO: self.win should not be used, only pass information via the dict
-        # TODO: new window function must be passed in calc_window_function
-        # TODO: This isn't called any longer?
-        self.win = calc_window_function(self.win_dict, N=self.N, sym=False)
-
-        # cgain = np.sum(self.win) / self.N  # coherent gain
-        # self.win /= cgain  # correct gain for periodic signals
-
-        # this is needed only when window types changes, not N
-        self.fft_widget.qfft_win_select.update_widgets()
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'win'})
+            # self.sig_tx.emit({'sender': __name__, 'data_changed': 'win'}) ?
 
     # ------------------------------------------------------------------------------
     def show_fft_wdg(self):
