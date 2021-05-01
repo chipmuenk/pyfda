@@ -652,9 +652,8 @@ class Plot_Impz(QWidget):
 
         sos = np.asarray(fb.fil[0]['sos'])
         antiCausal = 'zpkA' in fb.fil[0]
-        causal     = not antiCausal
 
-        if len(sos) > 0 and causal:  # has second order sections and is causal
+        if len(sos) > 0 and not antiCausal:  # has second order sections and is causal
             y = sig.sosfilt(sos, self.x)
         elif antiCausal:
             y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
