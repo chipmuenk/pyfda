@@ -671,7 +671,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw[:] = [True] * 2
 
         # Calculate imag. and real components from response
-        self.cmplx = np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
+        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
     # ------------------------------------------------------------------------------
