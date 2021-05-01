@@ -196,7 +196,7 @@ class Plot_Impz(QWidget):
         - plot_tab_widgets() (global signals)
         """
 
-        logger.debug("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+        logger.warning("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
                      .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['sender'] == __name__:
