@@ -129,8 +129,11 @@ class Plot_FFT_win(QDialog):
         - `self.draw`: calculate window and FFT and draw both
         """
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-                       .format(self.isVisible(), pprint_log(dict_sig)))
-        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+        if dict_sig['sender'] == __name__:
+            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            return
+        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
             or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
             or self.needs_calc:
             # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
