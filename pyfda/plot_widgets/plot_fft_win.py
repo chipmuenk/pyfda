@@ -104,7 +104,7 @@ class Plot_FFT_win(QDialog):
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
-        self.draw()
+        self.calc_draw_win()
 
 # ------------------------------------------------------------------------------
     def closeEvent(self, event):
@@ -139,10 +139,9 @@ class Plot_FFT_win(QDialog):
             # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
             # self.win_dict['win_len']))
             # self.N_auto = self.win_dict['win_len']
-            self.calc_N()
 
             if self.isVisible():
-                self.draw()
+                self.calc_draw_win()
                 self.needs_calc = False
                 self.needs_draw = False
             else:
@@ -309,7 +308,7 @@ class Plot_FFT_win(QDialog):
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
 
-        self.draw()  # initial drawing
+        self.calc_draw_win()  # initial drawing
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -325,10 +324,10 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.chk_auto_N.clicked.connect(self.calc_N)
-        self.led_N.editingFinished.connect(self.draw)
+        self.chk_auto_N.clicked.connect(self.calc_draw_win)
+        self.led_N.editingFinished.connect(self.calc_draw_win)
 
-        self.chk_norm_f.clicked.connect(self.draw)
+        self.chk_norm_f.clicked.connect(self.calc_draw_win)
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -383,36 +382,14 @@ class Plot_FFT_win(QDialog):
         Update FFT window when window or parameters have changed and
         emit 'view_changed':'fft_win'
         """
-        self.calc_win()
-        self.update_view()
+        self.calc_draw_win()
         self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
 # ------------------------------------------------------------------------------
-    def calc_N(self):
+    def calc_draw_win(self):
         """
-        (Re-)Calculate the number of data points when Auto N chkbox has been
-        clicked or when the number of data points has been updated outside this
-        class, recalculate window and update plot
-        """
-        if self.chk_auto_N.isChecked():
-            self.N_view = self.N
-
-        self.calc_win()
-        self.update_view()
-
-# ------------------------------------------------------------------------------
-    def draw(self):
-        """
-        Main entry point:
-        Re-calculate window and update the plot
-        """
-        self.calc_win()
-        self.update_view()
-
-# ------------------------------------------------------------------------------
-    def calc_win(self):
-        """
-        (Re-)Calculate the window, its FFT and some characteristic values when the
+        (Re-)Calculate the window, its FFT and some characteristic values and draw
+        the window and its FFT. This should be triggered when the
         window type or length or a parameters has been changed.
 
         Returns
@@ -461,26 +438,7 @@ class Plot_FFT_win(QDialog):
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
 
-# ------------------------------------------------------------------------------
-    def get_win(self, N):
-        """
-        Get window function
-
-        Attributes
-        ----------
-        N : int
-            number of data points
-
-        Returns
-        -------
-
-        self.win : array-like
-                        Window function with `N` data points
-        """
-        if N == len(self.win):
-            return self.win
-        else:
-            logger.error("unequal")
+        self.update_view()
 
 # ------------------------------------------------------------------------------
     def _set_table_item(self, row, col, val, font=None, sel=None):
