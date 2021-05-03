@@ -934,7 +934,7 @@ class PlotImpz_UI(QWidget):
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
-        self.but_fft_wdg.clicked.connect(self.show_fft_wdg)
+        self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
@@ -1377,9 +1377,9 @@ class PlotImpz_UI(QWidget):
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
 
     # ------------------------------------------------------------------------------
-    def show_fft_wdg(self):
+    def toggle_fft_wdg(self):
         """
-        Show / hide FFT widget depending on the corresponding button
+        Show / hide FFT widget depending on the state of the corresponding button
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
