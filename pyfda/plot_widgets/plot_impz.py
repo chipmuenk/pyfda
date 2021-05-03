@@ -32,6 +32,7 @@ from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
+from pyfda.libs.pyfda_fft_windows_lib import get_window
 
 import logging
 logger = logging.getLogger(__name__)
@@ -90,6 +91,8 @@ class Plot_Impz(QWidget):
         # --------------------------------------------
         # initialize routines and settings
         self.fx_select()    # initialize fixpoint or float simulation
+        # initiialize window fnct.
+        self.win = get_window(self.ui.win_dict, self.ui.N, sym=False)
         self.impz()  # initial calculation of stimulus and response and drawing
 
     def _construct_UI(self):

@@ -134,12 +134,21 @@ class PlotImpz_UI(QWidget):
 
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
-
+        # list of windows that are available for FFT analysis
+        win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
+                          "Blackmanharris", "Blackmanharris_5", "Blackmanharris_7",
+                          "Blackmanharris_9", "Bohman", "Cosine", "Dolph-Chebyshev",
+                          "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
+                          "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
         self.cur_win_name = "Hann"  # set initial window type
+
+        # initialize windows dict with the list above
+        self.win_dict = get_windows_dict(
+            win_names_list=win_names_list,
+            cur_win_name=self.cur_win_name)
+        # logger.warning(get_window(self.win_dict, 4))
+
         # instantiate FFT window with default windows dict
-        # TODO: Does this need a deep copy?
-        self.win_dict = windows_dict
-        self.win_dict.update({'cur_win_name': self.cur_win_name})
         self.fft_widget = Plot_FFT_win(
             self, win_dict=self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window

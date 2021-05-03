@@ -432,12 +432,8 @@ class Plot_FFT_win(QDialog):
 
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
-        self.win = calc_window_function(self.win_dict, N=self.N, sym=self.sym)
-        if self.N == self.N_view:
-            self.win_view = self.win
-        else:
-            self.win_view = calc_window_function(self.win_dict, N=self.N_view,
-                                                 sym=self.sym)
+
+        self.win_view = get_window(self.win_dict, self.N_view, sym=self.sym)
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
                       / np.square(np.sum(self.win_view))

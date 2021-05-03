@@ -13,6 +13,7 @@ import scipy
 
 from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
 from .pyfda_lib import to_html, safe_eval, pprint_log
+from .frozendict import FrozenDict
 from pyfda.pyfda_rc import params
 from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
                      QHBoxLayout, pyqtSignal)
@@ -26,18 +27,25 @@ Dictionary with available FFT windows, their function names and their properties
 When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
-windows_dict = {
+all_windows_dict = FrozenDict({
     'cur_win_name': 'Rectangular',  # name of current window
     #
     'Boxcar': {
         'fn_name': 'boxcar',
         'info':
-            '<span>Rectangular (a.k.a. "Boxcar") window, best suited for coherent signals'
-            'i.e. where the window length is an integer number of the signal period. '
-            'It also works great when the signal length is shorter than the window '
-            'length (e.g. for the impulse response of a FIR filter). For other signals, '
-            'it has the worst sidelobe performance of all windows.<br />&nbsp;<br />'
-            'This window also has the best SNR of all windows.</span>',
+            '''<span>
+            Boxcar or Rectangular window, best suited for analyzing coherent signals,
+            i.e. where the window length is an integer number of the signal period.
+            It also works great when the signal length is shorter than the window
+            length (e.g. for the impulse response of a FIR filter). For other signals, it
+            has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />
+            This window also has the best SNR of all windows.
+
+            When used for FIR filter design, a filter with the least square error
+            is returned, created by truncating the sinc-law frequency response after
+            N terms and transforming back to the time domain. It has the sharpest
+            transition of all windowed FIR filters but the worst stop band attenuation.
+            </span>''',
         'props': {
             'enbw': 1,
             'cgain': 1,
@@ -48,19 +56,29 @@ windows_dict = {
         'fn_name': 'boxcar',
         'info':
             '''<span>
-            Boxcar (a.k.a. "Rectangular") window, best suited for coherent signals,
+            Boxcar or Rectangular window, best suited for analyzing coherent signals,
             i.e. where the window length is an integer number of the signal period.
             It also works great when the signal length is shorter than the window
             length (e.g. for the impulse response of a FIR filter). For other signals, it
             has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />
             This window also has the best SNR of all windows.
+
+            When used for FIR filter design, a filter with the least square error
+            is returned, created by truncating the sinc-law frequency response after
+            N terms and transforming back to the time domain. It has the sharpest
+            transition of all windowed FIR filters but the worst stop band attenuation.
             </span>'''
         },
     'Barthann': {
         'fn_name': 'barthann',
         'info':
-            '<span>A modified Bartlett-Hann Window.'
-            '</span>'
+            '''<span>
+            THe modified Bartlett-Hann window is a weighted combination of Bartlett
+            (triangular) and Hann window and has a similar mainlobe width as those two.
+            Sidelobes are asymptotically decaying, near sidelobes have a lower level
+            than Bartlett and Hann windows, far sidelobes have lower levels than
+            Bartlett and Hamming windows.
+            </span>'''
             },
     'Bartlett': {
         'fn_name': 'bartlett',
@@ -68,7 +86,7 @@ windows_dict = {
             '''<span>
             The Bartlett window is very similar to a triangular window,
             except that the end point(s) are at zero. Its side lobes fall off with
-            12 dB/oct., the side lobe suppression is 26 dB.
+            12 dB/oct., the min. side lobe suppression is 26 dB.
             <br />&nbsp;<br />'
             It can be constructed as the convolution of two rectangular windows,
             hence, its Fourier transform is the product of two (periodic) sinc
@@ -117,7 +135,10 @@ windows_dict = {
             'lobe suppression of up to 230 dB.</span>'
         },
     'Bohman': {
-        'fn_name': 'bohman'
+        'fn_name': 'bohman',
+        'info':
+            '''<span>Sidelobes of the Bohman window drop with 24 dB/oct.
+            </span>'''
         },
     'Cosine': {
         'fn_name': 'cosine',
@@ -179,8 +200,10 @@ windows_dict = {
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         'info':
-            '<span>Gaussian window '
-            '</span>'
+            '''<span>The higher the standard deviation of Gaussian window is set,
+            the lower the max. sidelobe level becomes. At the same time, the width
+            of the main lobe increases.
+            </span>'''
         },
     'Hamming': {
         'fn_name': 'hamming',
@@ -284,53 +307,108 @@ windows_dict = {
             altered by this window than e.g. by a Hann window.
             </span>'''
         }
-    }
+    })
 
 
-def get_window_names(sel_list=[]):
+# ------------------------------------------------------------------------------
+def get_valid_windows_list(win_names_list=[], win_dict={}):
     """
-    Extract keys from the `windows_dict` if they are the name of a window. This
-    is verified by looking for a contained dict with the key "fn_name" defining
-    the window function. Return an alphabetically sorted list with the window
-    names (strings), sorting is performed on the lower-cased names.
+    Extract the list of all the keys from `win_dict` that define a
+    window and are contained in the list of window names 'win_names_list'.
+    This is verified by checking whether the key in `win_dict` has a dict
+    as a value with the key `fn_name` and the window function as a value.
+    When `win_dict` is empty, use the global `all_windows_dict`.
 
-    When a list of strings `sel_list` is passed, all window names not on this list
-    are deleted.
+    When `win_names_list` is empty, return all valid window names from `all_windows_dict`.
 
-    This list can be used e.g. for initialization e.g. of a combo box.
+    All window names in 'win_names_list' without a corresponding key in `all_windows_dict`
+    raise a warning.
+
+    The result is a alphabetically sorted (on the lower-cased names)
+    list containing the valid window names (strings).
+
+    This list can be used e.g. for initialization of a combo box.
+
+    Parameter
+    ---------
+    win_names_list: list of str
+        A list of window names defining the windows available in the constructed
+        instance, a subset of all the windows defined in `all_windows_dict`
+       
+    win_dict: dict
+
+    Returns
+    -------
+    A validated list of window names
+
     """
-    win_name_list = [k for k in windows_dict
-                     if type(windows_dict[k]) == dict and "fn_name" in windows_dict[k]]
-    if sel_list:
-        for wn in win_name_list:
-            if wn not in sel_list:
-                win_name_list.delete(wn)
+    if not win_dict:  # empty dictionary, use global one
+        win_dict = all_windows_dict
 
-        for sn in sel_list:
-            if sn not in win_name_list:
+    if not win_names_list:  # empty list, extract all valid keys
+        wl = [k for k in win_dict
+              if type(win_dict[k]) == dict
+              and "fn_name" in win_dict[k]]
+    else:
+        wl = [k for k in win_dict
+              if k in win_names_list
+              and type(win_dict[k]) == dict
+              and "fn_name" in win_dict[k]]
+
+        for wn in win_names_list:
+            if wn not in wl:
                 logger.warning(
-                    'Ignoring window name "{}", not found in "windows_dict.'.format(sn))
+                    'Ignoring window name "{}", not found in "all_windows_dict".'
+                    .format(wn))
 
-    return sorted(win_name_list, key=lambda v: (v.lower(), v))
+    return sorted(wl, key=lambda v: (v.lower(), v))
 
 
-# ----------------------------------------------------------------------------
-def set_window_function(win_dict, win_name):
+# ------------------------------------------------------------------------------
+def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
-    Select and set a window function from its name `win_name` and update the `win_dict`
-    dictionary correspondingly with:
+    Return a subdictionary of `all_windows_dict` containing all valid windows for the
+    names passed in `win_names_list`. When the latter is empty, put all valid windows
+    into the returned subdictionary (which should be more or less a mutable copy of
+    `all_windows_dict` in this case.).
 
-    win_dict['cur_win_name'] : <win_name>  # new current window name (str)
-    win_dict['win']: []                    # clear the window function array (empty list)
-    win_dict[win_name]['win_fnct']: fnct   # fully qualified function name (function)
-    win_dict[win_name]['win_fnct']: npar   # number of parameters (int)
+    `cur_win_name` determines the initial value of the `cur_win_name` key.
+
+    Parameters
+    ----------
+    win_names_list : list of window names (str), optional
+
+    cur_win_name : str, optional
+        Name of initial setting for `cur_win_name` value (current window name),
+        default: "Rectangular"
+
+    Returns
+    -------
+    dict
+      A dictionary with windows, window functions, docstrings etc
+    """
+    d = {k: all_windows_dict[k] for k in get_valid_windows_list(win_names_list)}
+    set_window_name(d, cur_win_name)
+    return d
+
+
+# ------------------------------------------------------------------------------
+def set_window_name(win_dict, win_name):
+    """
+    Select and set a window function object from its name `win_name` and update the
+    `win_dict` dictionary correspondingly with:
+
+    win_dict['cur_win_name']        # win_name: new current window name (str)
+    win_dict['win']                 # []: clear window function array (empty list)
+    win_dict[win_name]['win_fnct']  # function object
+    win_dict[win_name]['n_par']     # number of parameters (int)
 
     Parameters
     ----------
     win_dict : dict
         The dict where the window functions are stored (modified in place).
     win_name : str
-        Name of the window, which will be looked up in `windows_dict`.
+        Name of the window, which will be looked up in `all_windows_dict`.
 
     Returns
     -------
@@ -338,12 +416,11 @@ def set_window_function(win_dict, win_name):
         The window function object (not the array)
     """
 
-    if win_name not in windows_dict:
+    if win_name not in win_dict:
         logger.warning(
             "Unknown window name {}, using rectangular window instead."
             .format(win_name))
         win_name = "Rectangular"
-    win_dict.update({'cur_win_name': win_name, 'win': []})
 
     # operate with the window specific sub-dictionary `win_dict[win_name]`
     # dictionary in the following
@@ -360,29 +437,36 @@ def set_window_function(win_dict, win_name):
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
     mod_fnct = fn_name.split('.')  # try to split fully qualified name
-    fnct = mod_fnct[-1]
+    fnct = mod_fnct[-1]  # last / rightmost part = function name
     if len(mod_fnct) == 1:
         # only one element, no module given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
+        if not win_fnct:
+            logger.error('No window function "{0}" in scipy.signal.windows, '
+                         'using rectangular window instead!'.format(fn_name))
+            win_fnct = getattr(sig.windows, 'boxcar', None)
+            win_name = "Rectangular"
+            n_par = 0
     else:
         # extract module name from the beginning to the last '.'
         mod_name = fn_name[:fn_name.rfind(".")]
         mod = importlib.import_module(mod_name)
         win_fnct = getattr(mod, fnct, None)
+        if not win_fnct:
+            logger.error('Found no valid window function "{0}", '
+                         'using rectangular window instead!'.format(fn_name))
+            win_fnct = getattr(sig.windows, 'boxcar', None)
+            win_name = "Rectangular"
+            n_par = 0
 
-    if not win_fnct:
-        logger.error('No window function "{0}" in scipy.signal.windows, '
-                     'using rectangular window instead!'.format(fn_name))
-        fn_name = "boxcar"
-        win_fnct = getattr(scipy.signal.windows, fn_name, None)
+    win_dict.update({'cur_win_name': win_name, 'win': []})
+    win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
-    d.update({'win_fnct': win_fnct, 'n_par': n_par})
-
-    return win_fnct
+    return win_fnct  # window function object
 
 
 # ----------------------------------------------------------------------------
-def calc_window_function(win_dict, N, win_name=None, sym=False):
+def get_window(win_dict, N, win_name=None, sym=False):
     """
     Generate the requested window function with `N` data points.
 
@@ -410,10 +494,12 @@ def calc_window_function(win_dict, N, win_name=None, sym=False):
     win_fnct : ndarray
         The window function. This is also stored in win_dict['win']
     """
-    if win_name is None:
+    if win_name is None or win_name == win_dict['cur_win_name']:
         win_name = win_dict['cur_win_name']
-        win_fnct = set_window_function(win_dict, win_name)
-    # win_dict.update({'win_len': N})
+        if len(win_dict['win']) == N:  # return unchanged window function
+            return win_dict['win']
+
+    win_fnct = win_dict[win_name]['win_fnct']
 
     fn_name = win_dict[win_name]['fn_name']
     n_par = win_dict[win_name]['n_par']
@@ -594,10 +680,11 @@ class QFFTWinSelector(QWidget):
 
         """
         logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
-        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'win'):
-            pass
-
-        self.update_widgets()
+        if dict_sig['sender'] == __name__:
+            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            return
+        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
+            self.update_widgets()
 
     def _construct_UI(self):
         """
@@ -607,7 +694,7 @@ class QFFTWinSelector(QWidget):
         """
         # FFT window type
         self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(get_window_names())
+        self.cmb_win_fft.addItems(get_valid_windows_list(win_dict=self.win_dict))
         self.cmb_win_fft.setToolTip("FFT window type.")
         qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'])
 
@@ -696,6 +783,8 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
+        set_window_name(self.win_dict, cur)  # this resets the window cache
+
         if self.win_dict[cur]['n_par'] > 1:
             param = safe_eval(self.led_win_par_2.text(),
                               self.win_dict[cur]['par'][1]['val'], return_type='float')
@@ -732,9 +821,8 @@ class QFFTWinSelector(QWidget):
         - emit 'win_changed'
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        self.win_dict['cur_win_name'] = cur
         logger.warning(cur)
-        set_window_function(self.win_dict, cur)
+        set_window_name(self.win_dict, cur)
         # update visibility and values of parameter widgets
         self.update_param_widgets()
 
