@@ -680,12 +680,11 @@ class QFFTWinSelector(QWidget):
 
         """
         logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-            return
-        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
+
+        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
             self.update_widgets()
 
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Create the FFT window selection widget, consisting of:
