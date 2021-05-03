@@ -1344,13 +1344,18 @@ class PlotImpz_UI(QWidget):
         """
         Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
-        Fire "ui_changed" to update the FFT window and `plot_impz`
-        - called by _construct_ui with emit=False
-        - called by plot_impz() with emit=False when the automatic calculation
-                of N has to be updated (e.g. order of FIR Filter has changed
-        - called from the ui when N_start or N_end have been changed (emit=True)
-        """
+        When `emit==True`, fire `'ui_changed': 'N'` to update the FFT window and the
+        `plot_impz` widgets. In contrast to `view_changed`, this also forces a
+        recalculation of the transient response.
 
+        This method is called by:
+
+        - `self._construct_ui()` with `emit==False`
+        - `plot_impz()` with `emit==False` when the automatic calculation
+                of N has to be updated (e.g. order of FIR Filter has changed
+        - signal-slot connection when `N_start` or `N_end` QLineEdit widgets have
+                been changed (`emit==True`)
+        """
         if not isinstance(emit, bool):
             logger.error("update N: emit={0}".format(emit))
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
@@ -1373,9 +1378,12 @@ class PlotImpz_UI(QWidget):
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.update_freqs()
 
-        if emit:  # TODO: ???
+        if emit:
+            # use `'ui_changed'` as this triggers recalculation of the transient
+            # response
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
 
+    # --------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):
         """
