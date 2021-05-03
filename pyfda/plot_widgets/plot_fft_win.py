@@ -594,8 +594,11 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        if 'info' in self.win_dict:
-            self.txtInfoBox.setText(self.win_dict['info'])
+        cur = self.win_dict['cur_win_name']
+        if 'info' in self.win_dict[cur]:
+            self.txtInfoBox.setText(self.win_dict[cur]['info'])
+        else:
+            self.txtInfoBox.clear()
 
         self._set_table_item(0, 0, "ENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
