@@ -54,17 +54,19 @@ class PlotImpz_UI(QWidget):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        # --- signals coming from the FFT window widget, the qfft_win_select or
-        # the UI (?) -----------------------
-        if 'fft' in dict_sig['sender']:
+        # --- signals coming from the FFT window widget or the qfft_win_select
+        if 'fft' in dict_sig['sender']:  # hide FFT window windget and return
             logger.warning(pprint_log(dict_sig))
             if 'closeEvent' in dict_sig:
                 self.hide_fft_wdg()
                 return
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
-                    logger.warning(dict_sig)
+                    logger.warning(dict_sig)  # TODO: delete
+                    # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_fft.emit(dict_sig)
+                    # global connection to e.g. plot_impz
+                    self.sig_tx.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
     def __init__(self, parent):
@@ -286,7 +288,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self.update_N(emit=False)  # also updates window function
+        self.update_N(emit=False)  # also updates window function and win_dict
         self._update_noi()
 
     def _construct_UI(self):
@@ -764,7 +766,6 @@ class PlotImpz_UI(QWidget):
         self.led_T2.setToolTip("Time shift 2")
         self.led_T2.setObjectName("stimT2")
         self.lbl_TU2 = QLabel(to_html("T_S", frmt='b'), self)
-
         # ---------------------------------------------
         self.lbl_TW1 = QLabel(to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
         self.led_TW1 = QLineEdit(self)
@@ -923,7 +924,7 @@ class PlotImpz_UI(QWidget):
         # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
         self.fft_widget.sig_tx.connect(self.process_sig_rx)
         self.qfft_win_select.win_changed.connect(self.process_sig_rx)
-        # 
+        # connect process_sig_rx output to both FFT widgets
         self.sig_tx_fft.connect(self.fft_widget.sig_rx)
         self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
 
@@ -934,7 +935,6 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
         self.but_fft_wdg.clicked.connect(self.show_fft_wdg)
-
 
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
@@ -1342,9 +1342,10 @@ class PlotImpz_UI(QWidget):
     # -------------------------------------------------------------------------
     def update_N(self, emit=True):
         """
-        Update values for self.N and self.N_start from the QLineEditWidget,
-        update the window and fire "ui_changed"
-        - called by _construct_ui with mit=False
+        Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
+        `self.N_end` from the corresponding QLineEditWidgets.
+        Fire "ui_changed" to update the FFT window and `plot_impz`
+        - called by _construct_ui with emit=False
         - called by plot_impz() with emit=False when the automatic calculation
                 of N has to be updated (e.g. order of FIR Filter has changed
         - called from the ui when N_start or N_end have been changed (emit=True)
@@ -1374,7 +1375,6 @@ class PlotImpz_UI(QWidget):
 
         if emit:  # TODO: ???
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
-            # self.sig_tx.emit({'sender': __name__, 'data_changed': 'win'}) ?
 
     # ------------------------------------------------------------------------------
     def show_fft_wdg(self):

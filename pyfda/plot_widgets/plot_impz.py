@@ -271,6 +271,8 @@ class Plot_Impz(QWidget):
                 self.impz()
 
             elif 'view_changed' in dict_sig:
+                if dict_sig['view_changed'] == 'fft_win':
+                    self.update_fft_window()
                 if dict_sig['view_changed'] == 'f_S':
                     self.ui.recalc_freqs()
                     self.draw()
@@ -280,11 +282,11 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
                 # of stimulus and response
-                if dict_sig['ui_changed'] in {'win'}:
-                    self.draw()
-                elif dict_sig['ui_changed'] in {'resized', 'tab'}:
+                if dict_sig['ui_changed'] in {'resized', 'tab'}:
                     pass
                 else:  # all the other ui elements are treated here
+                    if dict_sig['ui_changed'] == 'N':
+                        self.update_fft_window()
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
                     self.impz()
@@ -696,6 +698,13 @@ class Plot_Impz(QWidget):
 
                 self.sig_tx.emit({'sender': __name__, 'fx_sim': 'finish'})
 
+    # --------------------------------------------------------------------------
+    def update_fft_window(self):
+        """
+        Update the window function when the window or the number of points has changed
+        """
+        self.win = get_window(self.ui.win_dict, self.ui.N, sym=False)
+
     # ------------------------------------------------------------------------
     def calc_fft(self):
         """
@@ -712,17 +721,17 @@ class Plot_Impz(QWidget):
                 "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                 .format(len(self.x), self.ui.N_end))
         else:
-            # TODO: This must be replaced by `self.fft_window.get_win()`
-            win = self.ui.win
+            logger.warning(self.ui.win_dict['cur_win_name'])
+            logger.warning(len(self.ui.win_dict['win']))
             # multiply the  time signal with window function
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * win
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.win
             # calculate absolute value and scale by N_FFT
             self.X = np.fft.fft(x_win) / self.ui.N
             # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
             if self.fx_sim:
                 # same for fixpoint simulation
-                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * win
+                x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end]) * self.win
                 self.X_q = np.fft.fft(x_q_win) / self.ui.N
                 # self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
@@ -735,7 +744,7 @@ class Plot_Impz(QWidget):
                     "Length of transient response is {0} < N = {1}, FFT cannot be "
                     "calculated.".format(len(self.y), self.ui.N_end))
         else:
-            y_win = self.y[self.ui.N_start:self.ui.N_end] * win
+            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.win
             self.Y = np.fft.fft(y_win) / self.ui.N
             # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
@@ -1066,7 +1075,7 @@ class Plot_Impz(QWidget):
         # log. scale for stimulus / response time domain:
         if self.ui.chk_log_time.isChecked():
             bottom_t = self.ui.bottom_t
-            win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
+            win = np.maximum(20 * np.log10(abs(self.win)), self.ui.bottom_t)
             x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
             y_r = np.maximum(20 * np.log10(abs(y_r)), self.ui.bottom_t)
 
@@ -1084,7 +1093,7 @@ class Plot_Impz(QWidget):
             bottom_t = 0
             fx_max = self.fx_max
             fx_min = self.fx_min
-            win = self.ui.win
+            win = self.win  # TODO: needed?
             if self.cmplx:
                 H_i_str = r'$\Im\{$' + self.H_str + r'$\}$ in V'
                 H_str = r'$\Re\{$' + self.H_str + r'$\}$ in V'
@@ -1125,7 +1134,7 @@ class Plot_Impz(QWidget):
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
-                self.t[self.ui.N_start:], win, c="gray",
+                self.t[self.ui.N_start:], self.win, c="gray",
                 label=self.ui.win_dict['cur_win_name'])[0])
             l_r += [self.ui.win_dict['cur_win_name']]
         # --------------- LEGEND (real part) ----------------------------------

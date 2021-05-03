@@ -54,6 +54,7 @@ class Plot_FFT_win(QDialog):
         with valid and available windows and their current settings (if applicable)
 
     sym : bool
+        Passed to `get_window()`:
         When True, generate a symmetric window for use in filter design.
         When False (default), generate a periodic window for use in spectral analysis.
 
@@ -91,8 +92,7 @@ class Plot_FFT_win(QDialog):
 
         self.bottom_f = -80  # min. value for dB display
         self.bottom_t = -60
-        # initial number of data points for returned window and visualization
-        self.N = 32  # win_dict['win_len']
+        # initial number of data points for visualization
         self.N_view = 32
 
         self.pad = 16  # zero padding factor for smooth FFT plot
@@ -399,16 +399,22 @@ class Plot_FFT_win(QDialog):
         Attributes
         ----------
 
-        self.win : array-like
-                    The window function
         """
+        # Check whether a window with data points has been calculated and is
+        # available in the dictionary:
+        if 'win' in self.win_dict and len(self.win_dict['win']) > 0:
+            self.chk_auto_N.setEnabled(True)
+        else:
+            self.chk_auto_N.setEnabled(False)
+            self.chk_auto_N.setChecked(False)
+
         self.led_N.setEnabled(not self.chk_auto_N.isChecked())
 
         if not self.chk_auto_N.isChecked():
             self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
                                     return_type='int')
-        # else:
-            # self.N_view = self.win_dict['win_len']
+        else:
+            self.N_view = len(self.win_dict['win'])
 
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
@@ -416,7 +422,7 @@ class Plot_FFT_win(QDialog):
         self.win_view = get_window(self.win_dict, self.N_view, sym=self.sym)
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
-                      / np.square(np.sum(self.win_view))
+            / np.square(np.sum(self.win_view))
         self.cgain = np.sum(self.win_view) / self.N_view  # coherent gain
 
         # calculate the FFT of the window with a zero padding factor
