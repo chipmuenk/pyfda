@@ -1398,9 +1398,11 @@ class PlotImpz_UI(QWidget):
     def toggle_fft_wdg(self):
         """
         Show / hide FFT widget depending on the state of the corresponding button
+        When widget is shown, trigger an update of the window function.
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
+            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win'})
         else:
             self.fft_widget.hide()
 
