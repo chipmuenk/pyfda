@@ -923,7 +923,7 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
         self.fft_widget.sig_tx.connect(self.process_sig_rx)
-        self.qfft_win_select.win_changed.connect(self.process_sig_rx)
+        self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
         # connect process_sig_rx output to both FFT widgets
         self.sig_tx_fft.connect(self.fft_widget.sig_rx)
         self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)

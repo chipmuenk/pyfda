@@ -661,7 +661,7 @@ class QFFTWinSelector(QWidget):
     # incoming
     sig_rx = pyqtSignal(object)
     # outgoing
-    win_changed = pyqtSignal(object)
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, win_dict):
         super(QFFTWinSelector, self).__init__(parent)
@@ -805,7 +805,7 @@ class QFFTWinSelector(QWidget):
             self.led_win_par_1.setText(str(param))
             self.win_dict[cur]['par'][0]['val'] = param
 
-        self.win_changed.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
 # ------------------------------------------------------------------------------
     def update_win_type(self, arg=None):
@@ -818,7 +818,7 @@ class QFFTWinSelector(QWidget):
         - determine number of parameter lineedits that are needed,
           make them visible and update parameter values from dict
 
-        - emit 'win_changed'
+        - emit 'sig_tx'
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         logger.warning(cur)
@@ -826,4 +826,4 @@ class QFFTWinSelector(QWidget):
         # update visibility and values of parameter widgets
         self.update_param_widgets()
 
-        self.win_changed.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
