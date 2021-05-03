@@ -263,7 +263,7 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc:
                 # update number of data points in impz_ui and FFT window
-                # needed when e.g. FIR filter order has been changed, requiring 
+                # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
@@ -1093,7 +1093,6 @@ class Plot_Impz(QWidget):
             bottom_t = 0
             fx_max = self.fx_max
             fx_min = self.fx_min
-            win = self.win  # TODO: needed?
             if self.cmplx:
                 H_i_str = r'$\Im\{$' + self.H_str + r'$\}$ in V'
                 H_str = r'$\Re\{$' + self.H_str + r'$\}$ in V'
@@ -1569,8 +1568,10 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     Pxq = 10*np.log10(Pxq)
                     if self.en_re_im_f:
-                        X_q_r = np.maximum(20 * np.log10(np.abs(X_q.real)), self.ui.bottom_f)
-                        X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)), self.ui.bottom_f)
+                        X_q_r = np.maximum(20 * np.log10(np.abs(X_q.real)),
+                                           self.ui.bottom_f)
+                        X_q_i = np.maximum(20 * np.log10(np.abs(X_q.imag)),
+                                           self.ui.bottom_f)
                     else:
                         X_q_r = np.maximum(20 * np.log10(np.abs(X_q)), self.ui.bottom_f)
                         if self.en_mag_phi_f:
