@@ -334,7 +334,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
     win_names_list: list of str
         A list of window names defining the windows available in the constructed
         instance, a subset of all the windows defined in `all_windows_dict`
-       
+
     win_dict: dict
 
     Returns
