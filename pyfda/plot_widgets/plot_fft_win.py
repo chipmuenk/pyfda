@@ -87,8 +87,6 @@ class Plot_FFT_win(QDialog):
         self.setWindowTitle(title)
 
         self.needs_calc = True
-        self.needs_draw = True
-        self.needs_redraw = True
 
         self.bottom_f = -80  # min. value for dB display
         self.bottom_t = -60
@@ -133,20 +131,15 @@ class Plot_FFT_win(QDialog):
         if dict_sig['sender'] == __name__:
             logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
-            or ('filt_changed' in dict_sig and dict_sig['filt_changed'] == 'firwin')\
-            or self.needs_calc:
-            # logger.warning("Auto: {0} - WinLen: {1}".format(self.N_auto,
-            # self.win_dict['win_len']))
-            # self.N_auto = self.win_dict['win_len']
 
-            if self.isVisible():
-                self.calc_draw_win()
-                self.needs_calc = False
-                self.needs_draw = False
-            else:
-                self.needs_calc = True
-                self.needs_draw = True
+        elif not self.isVisible():
+            self.needs_calc = True
+
+        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
+            or dict_sig['sender'] == 'self' or self.needs_calc:
+
+            self.calc_draw_win()
+            self.needs_calc = False
 
         elif 'home' in dict_sig:
             self.update_view()
@@ -630,7 +623,6 @@ class Plot_FFT_win(QDialog):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-        self.needs_redraw = False
 
 
 # ==============================================================================
