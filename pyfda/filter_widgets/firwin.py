@@ -55,12 +55,13 @@ from .common import Common, remezord
 
 __version__ = "2.2"
 
-classes = {'Firwin':'Windowed FIR'} #: Dict containing class name : display name
+classes = {'Firwin': 'Windowed FIR'}  #: Dict containing class name : display name
+
 
 class Firwin(QWidget):
 
-    FRMT = 'ba' # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
-                # currently, only 'ba' is supported for firwin routines
+    FRMT = 'ba'  # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
+                 # currently, only 'ba' is supported for firwin routines
 
     sig_tx = pyqtSignal(object)
 
@@ -76,22 +77,23 @@ class Firwin(QWidget):
         self.rt_dict = c.rt_base_iir
 
         self.rt_dict_add = {
-            'COM':{'min':{'msg':('a',
-                                  r"<br /><b>Note:</b> Filter order is only a rough approximation "
-                                  "and most likely far too low!")},
-                   'man':{'msg':('a',
-                                 r"Enter desired filter order <b><i>N</i></b> and "
-                                  "<b>-6 dB</b> pass band corner "
-                                  "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},
-                                  },
-            'LP': {'man':{}, 'min':{}},
-            'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
-                   'min':{}},
-            'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
-                   'min':{}},
-            'BP': {'man':{}, 'min':{}},
+            'COM': {
+                'min': {
+                    'msg': ('a',
+                            "<br /><b>Note:</b> Filter order is only a rough "
+                            "approximation and most likely far too low!")},
+                'man': {
+                    'msg': ('a', "Enter desired filter order <b><i>N</i></b> and "
+                            "<b>-6 dB</b> pass band corner "
+                            "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},
+                        },
+            'LP': {'man': {}, 'min': {}},
+            'HP': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+                   'min': {}},
+            'BS': {'man': {'msg': ('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+                   'min': {}},
+            'BP': {'man': {}, 'min': {}},
             }
-
 
         self.info = """**Windowed FIR filters**
 
@@ -121,7 +123,7 @@ class Firwin(QWidget):
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.cmb_firwin_alg = QComboBox(self)
         self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
-        self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
+        self.cmb_firwin_alg.addItems(['ichige', 'kaiser', 'herrmann'])
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
@@ -169,7 +171,7 @@ class Firwin(QWidget):
         self.layVWin = QVBoxLayout()
         self.layVWin.addLayout(self.layHWin1)
         self.layVWin.addLayout(self.layHWin2)
-        self.layVWin.setContentsMargins(0,0,0,0)
+        self.layVWin.setContentsMargins(0, 0, 0, 0)
 
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QWidget(self)
@@ -190,9 +192,8 @@ class Firwin(QWidget):
         self._load_dict() # get initial / last setting from dictionary
         self._update_win_fft()
 
-#=============================================================================
+# =============================================================================
 # Copied from impz()
-#==============================================================================
 
     def _read_param1(self):
         """Read out textbox when editing is finished and update dict and fft window"""
@@ -242,9 +243,9 @@ class Firwin(QWidget):
             self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
         # sig_tx -> select_filter -> filter_specs
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
+        self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
 
-#=============================================================================
+# =============================================================================
 
     def _load_dict(self):
         """
@@ -270,30 +271,29 @@ class Firwin(QWidget):
                 # find index for window string
                 win_idx = self.cmb_firwin_win.findText(window,
                                 Qt.MatchFixedString) # case insensitive flag
-                if win_idx == -1: # Key does not exist, use first entry instead
+                if win_idx == -1:  # Key does not exist, use first entry instead
                     win_idx = 0
 
             if 'alg' in wdg_fil_par:
                 alg_idx = self.cmb_firwin_alg.findText(wdg_fil_par['alg'],
                                 Qt.MatchFixedString)
-                if alg_idx == -1: # Key does not exist, use first entry instead
+                if alg_idx == -1:  # Key does not exist, use first entry instead
                     alg_idx = 0
 
-        self.cmb_firwin_win.setCurrentIndex(win_idx) # set index for window and
-        self.cmb_firwin_alg.setCurrentIndex(alg_idx) # and algorithm cmbBox
+        self.cmb_firwin_win.setCurrentIndex(win_idx)  # set index for window and
+        self.cmb_firwin_alg.setCurrentIndex(alg_idx)  # and algorithm cmbBox
 
     def _store_entries(self):
         """
         Store window and alg. selection and parameter settings (part of
         self.firWindow, if any) in filter dictionary.
         """
-        if not 'wdg_fil' in fb.fil[0]:
+        if 'wdg_fil' not in fb.fil[0]:
             fb.fil[0].update({'wdg_fil':{}})
         fb.fil[0]['wdg_fil'].update({'firwin':
-                                        {'win':self.firWindow,
-                                         'alg':self.alg}
-                                 })
-
+                                        {'win': self.firWindow,
+                                         'alg': self.alg}
+                                        })
 
     def _get_params(self, fil_dict):
         """
@@ -327,7 +327,6 @@ class Firwin(QWidget):
         else:
             return True
 
-
     def _save(self, fil_dict, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
@@ -336,8 +335,8 @@ class Firwin(QWidget):
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
-        try: # has the order been calculated by a "min" filter design?
-            fil_dict['N'] = self.N # yes, update filterbroker
+        try:  # has the order been calculated by a "min" filter design?
+            fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
 #        self._store_entries()
@@ -451,7 +450,8 @@ class Firwin(QWidget):
         elif type(window) == np.ndarray:
             win = window
         else:
-            logger.error("The 'window' was neither a string nor a numpy array, it could not be evaluated.")
+            logger.error("The 'window' was neither a string nor a numpy array, "
+                         "it could not be evaluated.")
             return None
         # apply the window function.
         h *= win
@@ -469,13 +469,11 @@ class Firwin(QWidget):
             c = np.cos(np.pi * m * scale_frequency)
             s = np.sum(h * c)
             h /= s
-
         return h
 
-
     def _firwin_ord(self, F, W, A, alg):
-        #http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
-        delta_f = abs(F[1] - F[0]) * 2 # referred to f_Ny
+        # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
+        delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         delta_A = np.sqrt(A[0] * A[1])
         if self.fir_window_name == 'kaiser':
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
@@ -483,21 +481,20 @@ class Firwin(QWidget):
             fb.fil[0]['wdg_fil'][1] = beta
             self._update_UI()
         else:
-            N = remezord(F, W, A, fs = 1, alg = alg)[0]
-
+            N = remezord(F, W, A, fs=1, alg=alg)[0]
         return N
 
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
-                                 [self.A_PB, self.A_SB], alg = self.alg)
+                                 [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_N():
             return -1
         self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
                                         N=self.N, sym=True)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-                                       window = self.fir_window, nyq = 0.5))
+                                         window=self.fir_window, nyq=0.5))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
@@ -506,12 +503,12 @@ class Firwin(QWidget):
         self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
                                         N=self.N, sym=True)
         self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-                                       window = self.fir_window, nyq = 0.5))
+                                         window=self.fir_window, nyq=0.5))
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
-                            [self.A_SB, self.A_PB], alg = self.alg)
+                            [self.A_SB, self.A_PB], alg=self.alg)
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
@@ -535,16 +532,16 @@ class Firwin(QWidget):
     def BPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
-            [self.A_SB, self.A_PB, self.A_SB2], fs = 1, alg = self.alg)[0]
+            [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
 
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
+        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2
         self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                            window = self.fir_window, pass_zero=False, nyq = 0.5))
+                                         window=self.fir_window, pass_zero=False, nyq=0.5))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
@@ -558,7 +555,7 @@ class Firwin(QWidget):
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
-            [self.A_PB, self.A_SB, self.A_PB2], fs = 1, alg = self.alg)[0]
+                     [self.A_PB, self.A_SB, self.A_PB2], fs=1, alg=self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
@@ -567,7 +564,7 @@ class Firwin(QWidget):
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                            window = self.fir_window, pass_zero=True, nyq = 0.5))
+                            window=self.fir_window, pass_zero=True, nyq=0.5))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
@@ -577,7 +574,7 @@ class Firwin(QWidget):
         self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
                                         N=self.N, sym=True)
         self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                            window = self.fir_window, pass_zero=True, nyq = 0.5))
+                                         window=self.fir_window, pass_zero=True, nyq=0.5))
 
     #------------------------------------------------------------------------------
     def show_fft_win(self):
@@ -632,7 +629,7 @@ if __name__ == '__main__':
     print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
-    frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    frmMain.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
     frmMain.setLayout(layVDynWdg)
 
     form = frmMain
