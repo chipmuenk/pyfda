@@ -167,7 +167,6 @@ class Firwin(QWidget):
         These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter object, fb.filObj .
         """
-
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.cmb_firwin_alg = QComboBox(self)
         self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
@@ -239,33 +238,21 @@ class Firwin(QWidget):
         initialization and when the filter is loaded from disk.
         """
         self.N = fb.fil[0]['N']
-        win_idx = 0
-        alg_idx = 0
-        if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']:
-            wdg_fil_par = fb.fil[0]['wdg_fil']['firwin']
+        # alg_idx = 0
+        if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
+                and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
 
-            if 'win' in wdg_fil_par:
-                if np.isscalar(wdg_fil_par['win']):  # true for strings (non-vectors)
-                    window = wdg_fil_par['win']
-                else:
-                    window = wdg_fil_par['win'][0]
-                    self.ledWinPar1.setText(str(wdg_fil_par['win'][1]))
-                    if len(wdg_fil_par['win']) > 2:
-                        self.ledWinPar2.setText(str(wdg_fil_par['win'][2]))
+            self.win_dict = fb.fil[0]['wdg_fil']['firwin']
 
-                # find index for window string (MatchFixedString = case insensitive flag)
-                win_idx = self.cmb_firwin_win.findText(window, Qt.MatchFixedString)
-                if win_idx == -1:  # Key does not exist, use first entry instead
-                    win_idx = 0
+            # wdg_fil_par = fb.fil[0]['wdg_fil']['firwin']
 
-            if 'alg' in wdg_fil_par:
-                alg_idx = self.cmb_firwin_alg.findText(wdg_fil_par['alg'],
-                                Qt.MatchFixedString)
-                if alg_idx == -1:  # Key does not exist, use first entry instead
-                    alg_idx = 0
+            # if 'alg' in wdg_fil_par:
+            #     alg_idx = self.cmb_firwin_alg.findText(wdg_fil_par['alg'],
+            #                                            Qt.MatchFixedString)
+            #     if alg_idx == -1:  # Key does not exist, use first entry instead
+            #         alg_idx = 0
 
-        self.cmb_firwin_win.setCurrentIndex(win_idx)  # set index for window and
-        self.cmb_firwin_alg.setCurrentIndex(alg_idx)  # and algorithm cmbBox
+        # self.cmb_firwin_alg.setCurrentIndex(alg_idx)  # set index for algorithm cmbBox
 
     def _store_entries(self):
         """
@@ -273,11 +260,9 @@ class Firwin(QWidget):
         self.firWindow, if any) in filter dictionary.
         """
         if 'wdg_fil' not in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil':{}})
-        fb.fil[0]['wdg_fil'].update({'firwin':
-                                        {'win': self.firWindow,
-                                         'alg': self.alg}
-                                        })
+            fb.fil[0].update({'wdg_fil': {}})
+        fb.fil[0]['wdg_fil'].update({'firwin': self.win_dict})
+                                #    {'win': self.firWindow, 'alg': self.alg}})
 
     def _get_params(self, fil_dict):
         """
@@ -459,11 +444,10 @@ class Firwin(QWidget):
     def _firwin_ord(self, F, W, A, alg):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
-        delta_A = np.sqrt(A[0] * A[1])
-        if self.fir_window_name == 'kaiser':
+        # delta_A = np.sqrt(A[0] * A[1])
+        if "Kaiser" in self.win_dict and self.win_dict["cur_win_name"] == "Kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
-            self.ledWinPar1.setText(str(beta))
-            fb.fil[0]['wdg_fil'][1] = beta
+            self.win_dict["Kaiser"]["par"]["val"] = beta
             self._update_UI()
         else:
             N = remezord(F, W, A, fs=1, alg=alg)[0]
