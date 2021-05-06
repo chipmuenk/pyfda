@@ -38,6 +38,7 @@ from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComb
                       QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
+from scipy.signal import signaltools
 from scipy.special import sinc
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -107,12 +108,11 @@ class Firwin(QWidget):
         ``scipy.signal.firwin()``
 
         """
-        #self.info_doc = [] is set in self._update_UI()
+        # self.info_doc = [] is set in self._update_UI()
 
-        #------------------- end of static info for filter tree ---------------
+        # ------------------- end of static info for filter tree ---------------
 
-
-        #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design:
@@ -178,9 +178,10 @@ class Firwin(QWidget):
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layVWin)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
         # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.cmb_firwin_alg.activated.connect(self._update_win_fft)
         self.cmb_firwin_win.activated.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._read_param1)
@@ -189,7 +190,7 @@ class Firwin(QWidget):
         self.but_fft_win.clicked.connect(self.show_fft_win)
         #----------------------------------------------------------------------
 
-        self._load_dict() # get initial / last setting from dictionary
+        self._load_dict()  # get initial / last setting from dictionary
         self._update_win_fft()
 
 # =============================================================================
@@ -392,6 +393,7 @@ class Firwin(QWidget):
         nyq : float, optional
             Nyquist frequency.  Each frequency in `cutoff` must be between 0
             and `nyq`.
+
         Returns
         -------
         h : (numtaps,) ndarray
@@ -445,8 +447,8 @@ class Firwin(QWidget):
 
         if type(window) == str:
             # Get and apply the window function.
-            from scipy.signal.signaltools import get_window
-            win = get_window(window, numtaps, fftbins=False)
+            #from scipy.signal.signaltools import get_window
+            win = signaltools.get_window(window, numtaps, fftbins=False)
         elif type(window) == np.ndarray:
             win = window
         else:
