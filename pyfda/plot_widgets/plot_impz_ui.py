@@ -154,7 +154,7 @@ class PlotImpz_UI(QWidget):
 
         # instantiate FFT window with default windows dict
         self.fft_widget = Plot_FFT_win(
-            self, win_dict=self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
+            self, self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
 

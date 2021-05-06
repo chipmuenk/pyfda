@@ -77,7 +77,7 @@ class Plot_FFT_win(QDialog):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict=fb.fil[0]['win_fft'], sym=False,
+    def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
 
@@ -629,9 +629,21 @@ class Plot_FFT_win(QDialog):
 if __name__ == '__main__':
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict
 
     app = QApplication(sys.argv)
-    mainw = Plot_FFT_win(None, ignore_close_event=False)
+    win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
+                      "Blackmanharris", "Blackmanharris_5", "Blackmanharris_7",
+                      "Blackmanharris_9", "Bohman", "Cosine", "Dolph-Chebyshev",
+                      "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
+                      "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
+
+    # initialize windows dict with the list above and an initial window
+    win_dict = get_windows_dict(
+            win_names_list=win_names_list,
+            cur_win_name="Hann")
+
+    mainw = Plot_FFT_win(None, win_dict, ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()
