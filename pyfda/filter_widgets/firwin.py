@@ -476,43 +476,41 @@ class Firwin(QWidget):
                                   [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
+        logger.warning(self.win_dict["cur_win_name"])
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-                                         window=self.fir_window, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-                                         window=self.fir_window, nyq=0.5))
+        logger.warning(self.win_dict["cur_win_name"])
+        self._save(fil_dict,
+                   self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
-                            [self.A_SB, self.A_PB], alg=self.alg)
+                             [self.A_SB, self.A_PB], alg=self.alg)
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], window=self.fir_window,
-                                         pass_zero=False, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], window=self.fir_window,
-                                         pass_zero=False, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
@@ -521,13 +519,13 @@ class Firwin(QWidget):
                           [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
 
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2
-        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                                         window=self.fir_window, pass_zero=False, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
+                               pass_zero=False,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
@@ -536,8 +534,9 @@ class Firwin(QWidget):
         self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
                                      sym=True)
         self._save(fil_dict,
-                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                               window=self.fir_window, pass_zero=False, nyq=0.5))
+                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
+                               pass_zero=False,
+                               window=get_window(self.win_dict, self.N, sym=True)))
 
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
@@ -550,8 +549,9 @@ class Firwin(QWidget):
                                      sym=True)
         fil_dict['F_C'] = (self.F_SB + self.F_PB) / 2  # average calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
-        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                            window=self.fir_window, pass_zero=True, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+                               window=self.fir_window, pass_zero=True, nyq=0.5))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
