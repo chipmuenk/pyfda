@@ -41,7 +41,8 @@ from scipy.special import sinc
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
-from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
+from pyfda.libs.pyfda_fft_windows_lib import (QFFTWinSelector,
+    get_valid_windows_list, get_windows_dict, get_window)
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
@@ -70,9 +71,25 @@ class Firwin(QWidget):
         QWidget.__init__(self)
 
         self.ft = 'FIR'
-        self.fft_window = None
-        # dictionary for firwin window settings
-        self.win_dict = fb.fil[0]['win_fir']
+
+        win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
+                          "Blackmanharris", "Blackmanharris_5", "Blackmanharris_7",
+                          "Blackmanharris_9", "Bohman", "Cosine", "Dolph-Chebyshev",
+                          "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
+                          "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
+        self.cur_win_name = "Kaiser"  # set initial window type
+
+        # initialize windows dict with the list above for firwin window settings
+        self.win_dict = get_windows_dict(
+            win_names_list=win_names_list,
+            cur_win_name=self.cur_win_name)
+
+        logger.warning(self.win_dict["cur_win_name"])
+        # instantiate FFT window with windows dict
+        self.fft_widget = Plot_FFT_win(
+            self, win_dict=self.win_dict, sym=True, title="pyFDA FIR Window Viewer")
+        # hide window initially, this is modeless i.e. a non-blocking popup window
+        self.fft_widget.hide()
 
         c = Common()
         self.rt_dict = c.rt_base_iir
@@ -128,45 +145,51 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
-        # Combobox for selecting the window used for filter design
-        self.cmb_firwin_win = QComboBox(self)
-        self.cmb_firwin_win.addItems(get_window_names())
-        self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
+        # # Combobox for selecting the window used for filter design
+        # self.cmb_firwin_win = QComboBox(self)
+        # self.cmb_firwin_win.addItems(get_valid_windows_list())
+        # self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
 
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        # self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_fft_win = QPushButton(self)
-        self.but_fft_win.setText("WIN FFT")
-        self.but_fft_win.setToolTip("Show time and frequency response of FFT Window")
-        self.but_fft_win.setCheckable(True)
-        self.but_fft_win.setChecked(False)
+        self.but_fft_wdg = QPushButton(self)
+        self.but_fft_wdg.setText("FFT WDG")
+        self.but_fft_wdg.setToolTip("Show time and frequency response of FFT Window")
+        self.but_fft_wdg.setCheckable(True)
+        self.but_fft_wdg.setChecked(False)
+        
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        # Minimum size, can be changed in the upper hierarchy levels using layouts:
+        # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblWinPar1 = QLabel("a", self)
-        self.lblWinPar1.setObjectName('wdg_lbl_firwin_1')
-        self.ledWinPar1 = QLineEdit(self)
-        self.ledWinPar1.setText("0.5")
-        self.ledWinPar1.setObjectName('wdg_led_firwin_1')
-        self.lblWinPar1.setVisible(False)
-        self.ledWinPar1.setVisible(False)
 
-        self.lblWinPar2 = QLabel("b", self)
-        self.lblWinPar2.setObjectName('wdg_lbl_firwin_2')
-        self.ledWinPar2 = QLineEdit(self)
-        self.ledWinPar2.setText("0.5")
-        self.ledWinPar2.setObjectName('wdg_led_firwin_2')
-        self.ledWinPar2.setVisible(False)
-        self.lblWinPar2.setVisible(False)
+        # self.lblWinPar1 = QLabel("a", self)
+        # self.lblWinPar1.setObjectName('wdg_lbl_firwin_1')
+        # self.ledWinPar1 = QLineEdit(self)
+        # self.ledWinPar1.setText("0.5")
+        # self.ledWinPar1.setObjectName('wdg_led_firwin_1')
+        # self.lblWinPar1.setVisible(False)
+        # self.ledWinPar1.setVisible(False)
+
+        # self.lblWinPar2 = QLabel("b", self)
+        # self.lblWinPar2.setObjectName('wdg_lbl_firwin_2')
+        # self.ledWinPar2 = QLineEdit(self)
+        # self.ledWinPar2.setText("0.5")
+        # self.ledWinPar2.setObjectName('wdg_led_firwin_2')
+        # self.ledWinPar2.setVisible(False)
+        # self.lblWinPar2.setVisible(False)
 
         self.layHWin1 = QHBoxLayout()
-        self.layHWin1.addWidget(self.cmb_firwin_win)
-        self.layHWin1.addWidget(self.but_fft_win)
+        # self.layHWin1.addWidget(self.cmb_firwin_win)
+        self.layHWin1.addWidget(self.but_fft_wdg)
         self.layHWin1.addWidget(self.cmb_firwin_alg)
         self.layHWin2 = QHBoxLayout()
-        self.layHWin2.addWidget(self.lblWinPar1)
-        self.layHWin2.addWidget(self.ledWinPar1)
-        self.layHWin2.addWidget(self.lblWinPar2)
-        self.layHWin2.addWidget(self.ledWinPar2)
+        self.layHWin2.addWidget(self.qfft_win_select)
+        # self.layHWin2.addWidget(self.lblWinPar1)
+        # self.layHWin2.addWidget(self.ledWinPar1)
+        # self.layHWin2.addWidget(self.lblWinPar2)
+        # self.layHWin2.addWidget(self.ledWinPar2)
 
         self.layVWin = QVBoxLayout()
         self.layVWin.addLayout(self.layHWin1)
@@ -180,68 +203,80 @@ class Firwin(QWidget):
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
+        self.fft_widget.sig_tx.connect(self.process_sig_rx)
+        self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
+        # connect process_sig_rx output to both FFT widgets
+        self.sig_tx_fft.connect(self.fft_widget.sig_rx)
+        self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
+
+        # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.cmb_firwin_alg.activated.connect(self._update_win_fft)
-        self.cmb_firwin_win.activated.connect(self._update_win_fft)
-        self.ledWinPar1.editingFinished.connect(self._read_param1)
-        self.ledWinPar2.editingFinished.connect(self._read_param2)
+        # self.cmb_firwin_win.activated.connect(self._update_win_fft)
+        # self.ledWinPar1.editingFinished.connect(self._read_param1)
+        # self.ledWinPar2.editingFinished.connect(self._read_param2)
 
-        self.but_fft_win.clicked.connect(self.show_fft_win)
-        #----------------------------------------------------------------------
+        self.but_fft_wdg.clicked.connect(self.toggle_fft_win)
+        # ----------------------------------------------------------------------
 
         self._load_dict()  # get initial / last setting from dictionary
         self._update_win_fft()
 
 # =============================================================================
 # Copied from impz()
+# ==============================================================================
 
-    def _read_param1(self):
-        """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
-                          sign='pos', return_type='float')
-        if param < self.win_dict['par'][0]['min']:
-            param = self.win_dict['par'][0]['min']
-        elif param > self.win_dict['par'][0]['max']:
-            param = self.win_dict['par'][0]['max']
-        self.ledWinPar1.setText(str(param))
-        self.win_dict['par'][0]['val'] = param
-        self._update_win_fft()
+    # def _read_param1(self):
+    #     """Read out textbox when editing is finished and update dict and fft window"""
+    #     param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
+    #                       sign='pos', return_type='float')
+    #     if param < self.win_dict['par'][0]['min']:
+    #         param = self.win_dict['par'][0]['min']
+    #     elif param > self.win_dict['par'][0]['max']:
+    #         param = self.win_dict['par'][0]['max']
+    #     self.ledWinPar1.setText(str(param))
+    #     self.win_dict['par'][0]['val'] = param
+    #     self._update_win_fft()
 
-    def _read_param2(self):
-        """Read out textbox when editing is finished and update dict and fft window"""
-        param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
-                          return_type='float')
-        if param < self.win_dict['par'][1]['min']:
-            param = self.win_dict['par'][1]['min']
-        elif param > self.win_dict['par'][1]['max']:
-            param = self.win_dict['par'][1]['max']
-        self.ledWinPar2.setText(str(param))
-        self.win_dict['par'][1]['val'] = param
-        self._update_win_fft()
+    # def _read_param2(self):
+    #     """Read out textbox when editing is finished and update dict and fft window"""
+    #     param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
+    #                       return_type='float')
+    #     if param < self.win_dict['par'][1]['min']:
+    #         param = self.win_dict['par'][1]['min']
+    #     elif param > self.win_dict['par'][1]['max']:
+    #         param = self.win_dict['par'][1]['max']
+    #     self.ledWinPar2.setText(str(param))
+    #     self.win_dict['par'][1]['val'] = param
+    #     self._update_win_fft()
 
     def _update_win_fft(self):
         """ Update window type for FirWin """
         self.alg = str(self.cmb_firwin_alg.currentText())
-        self.fir_window_name = qget_cmb_box(self.cmb_firwin_win, data=False)
-        self.win = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        n_par = self.win_dict['n_par']
+#        self.fir_window_name = qget_cmb_box(self.cmb_firwin_win, data=False)
+        # self.win = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+        #                      sym=True)
+        # n_par = self.win_dict['n_par']
 
-        self.lblWinPar1.setVisible(n_par > 0)
-        self.ledWinPar1.setVisible(n_par > 0)
-        self.lblWinPar2.setVisible(n_par > 1)
-        self.ledWinPar2.setVisible(n_par > 1)
+        # self.lblWinPar1.setVisible(n_par > 0)
+        # self.ledWinPar1.setVisible(n_par > 0)
+        # self.lblWinPar2.setVisible(n_par > 1)
+        # self.ledWinPar2.setVisible(n_par > 1)
 
-        if n_par > 0:
-            self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =", frmt='bi'))
-            self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
-            self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
+        # if n_par > 0:
+        #     self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =",
+        #                                     frmt='bi'))
+        #     self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
+        #     self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
 
-        if n_par > 1:
-            self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =", frmt='bi'))
-            self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
-            self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
+        # if n_par > 1:
+        #     self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =",
+        #                                     frmt='bi'))
+        #     self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
+        #     self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
 
         # sig_tx -> select_filter -> filter_specs
         self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
@@ -492,9 +527,9 @@ class Firwin(QWidget):
                                  [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
                                          window=self.fir_window, nyq=0.5))
 
@@ -502,8 +537,8 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
         self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
                                          window=self.fir_window, nyq=0.5))
 
@@ -514,21 +549,21 @@ class Firwin(QWidget):
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-                    window = self.fir_window, pass_zero=False, nyq = 0.5))
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], window=self.fir_window,
+                                         pass_zero=False, nyq=0.5))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'],
-            window = self.fir_window, pass_zero=False, nyq = 0.5))
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
+        self._save(fil_dict, self.firwin(self.N, fil_dict['F_C'], window=self.fir_window,
+                                         pass_zero=False, nyq=0.5))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
@@ -549,10 +584,11 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                            window = self.fir_window, pass_zero=False, nyq = 0.5))
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
+        self._save(fil_dict,
+                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+                               window=self.fir_window, pass_zero=False, nyq=0.5))
 
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
@@ -561,10 +597,10 @@ class Firwin(QWidget):
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
+        fil_dict['F_C'] = (self.F_SB + self.F_PB) / 2  # average calculated F_PB and F_SB
+        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
         self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window=self.fir_window, pass_zero=True, nyq=0.5))
 
@@ -573,43 +609,22 @@ class Firwin(QWidget):
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = calc_window_function(self.win_dict, self.fir_window_name,
-                                        N=self.N, sym=True)
+        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
+                                     sym=True)
         self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                                          window=self.fir_window, pass_zero=True, nyq=0.5))
 
-    #------------------------------------------------------------------------------
-    def show_fft_win(self):
+    # ------------------------------------------------------------------------------
+    def toggle_fft_wdg(self):
         """
-        Pop-up FFT window
+        Show / hide FFT widget depending on the state of the corresponding button
+        When widget is shown, trigger an update of the window function.
         """
-        if self.but_fft_win.isChecked():
-            qstyle_widget(self.but_fft_win, "changed")
+        if self.but_fft_wdg.isChecked():
+            self.fft_widget.show()
+            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win'})
         else:
-            qstyle_widget(self.but_fft_win, "normal")
-
-        if self.fft_window is None: # no handle to the window? Create a new instance
-            if self.but_fft_win.isChecked():
-                # important: Handle to window must be class attribute
-                # pass the name of the dictionary where parameters are stored and
-                # whether a symmetric window or one that can be continued periodically
-                # will be constructed
-                self.fft_window = Plot_FFT_win(self, win_dict=self.win_dict, sym=True,
-                                               title="pyFDA FIR Window Viewer")
-                self.sig_tx.connect(self.fft_window.sig_rx)
-                self.fft_window.sig_tx.connect(self.close_fft_win)
-                self.fft_window.show() # modeless i.e. non-blocking popup window
-        else:
-            if not self.but_fft_win.isChecked():
-                if self.fft_window is None:
-                    logger.warning("FFT window is already closed!")
-                else:
-                    self.fft_window.close()
-
-    def close_fft_win(self):
-        self.fft_window = None
-        self.but_fft_win.setChecked(False)
-        qstyle_widget(self.but_fft_win, "normal")
+            self.fft_widget.hide()
 
 
 # ------------------------------------------------------------------------------
