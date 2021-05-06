@@ -611,9 +611,9 @@ class Firwin(QWidget):
         self.but_fft_win.setChecked(False)
         qstyle_widget(self.but_fft_win, "normal")
 
-#------------------------------------------------------------------------------
 
-if __name__ == '__main__':
+# ------------------------------------------------------------------------------
+def main():
     import sys
     from pyfda.libs.compat import QApplication, QFrame
 
@@ -634,11 +634,12 @@ if __name__ == '__main__':
     frmMain.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
     frmMain.setLayout(layVDynWdg)
 
-    form = frmMain
-
-    form.show()
+    mainw = frmMain
+    mainw.show()
 
     app.exec_()
 
-# test using "python -m pyfda.filter_widgets.firwin"
+if __name__ == "__main__":
+    main()
 
+    # test using "python -m pyfda.filter_widgets.firwin"
