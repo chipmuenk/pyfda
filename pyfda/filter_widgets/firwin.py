@@ -31,7 +31,7 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, 
+from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
                                QPushButton, QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
@@ -62,8 +62,8 @@ classes = {'Firwin': 'Windowed FIR'}  #: Dict containing class name : display na
 
 class Firwin(QWidget):
 
-    FRMT = 'ba'  # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
-                 # currently, only 'ba' is supported for firwin routines
+    FRMT = 'ba'     # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
+                    # currently, only 'ba' is supported for firwin routines
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)
@@ -133,7 +133,7 @@ class Firwin(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        Process signals coming from
+        Process local signals from / for
         - FFT window widget
         - qfft_win_select
         """
@@ -146,9 +146,9 @@ class Firwin(QWidget):
             return
 
         # --- signals coming from the FFT window widget or the qfft_win_select
-        if 'fft' in dict_sig['sender']:  # hide FFT window windget and return
+        if 'fft' in dict_sig['sender']:
             logger.warning(pprint_log(dict_sig))
-            if 'closeEvent' in dict_sig:
+            if 'closeEvent' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
             else:
@@ -176,39 +176,15 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
-        # # Combobox for selecting the window used for filter design
-        # self.cmb_firwin_win = QComboBox(self)
-        # self.cmb_firwin_win.addItems(get_valid_windows_list())
-        # self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
-
-        # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        # self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setText("FFT WDG")
         self.but_fft_wdg.setToolTip("Show time and frequency response of FFT Window")
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
-        
+
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        # self.lblWinPar1 = QLabel("a", self)
-        # self.lblWinPar1.setObjectName('wdg_lbl_firwin_1')
-        # self.ledWinPar1 = QLineEdit(self)
-        # self.ledWinPar1.setText("0.5")
-        # self.ledWinPar1.setObjectName('wdg_led_firwin_1')
-        # self.lblWinPar1.setVisible(False)
-        # self.ledWinPar1.setVisible(False)
-
-        # self.lblWinPar2 = QLabel("b", self)
-        # self.lblWinPar2.setObjectName('wdg_lbl_firwin_2')
-        # self.ledWinPar2 = QLineEdit(self)
-        # self.ledWinPar2.setText("0.5")
-        # self.ledWinPar2.setObjectName('wdg_led_firwin_2')
-        # self.ledWinPar2.setVisible(False)
-        # self.lblWinPar2.setVisible(False)
 
         self.layHWin1 = QHBoxLayout()
         # self.layHWin1.addWidget(self.cmb_firwin_win)
@@ -216,10 +192,6 @@ class Firwin(QWidget):
         self.layHWin1.addWidget(self.cmb_firwin_alg)
         self.layHWin2 = QHBoxLayout()
         self.layHWin2.addWidget(self.qfft_win_select)
-        # self.layHWin2.addWidget(self.lblWinPar1)
-        # self.layHWin2.addWidget(self.ledWinPar1)
-        # self.layHWin2.addWidget(self.lblWinPar2)
-        # self.layHWin2.addWidget(self.ledWinPar2)
 
         self.layVWin = QVBoxLayout()
         self.layVWin.addLayout(self.layHWin1)
@@ -255,60 +227,10 @@ class Firwin(QWidget):
         self._load_dict()  # get initial / last setting from dictionary
         self._update_win_fft()
 
-# =============================================================================
-# Copied from impz()
-# ==============================================================================
-
-    # def _read_param1(self):
-    #     """Read out textbox when editing is finished and update dict and fft window"""
-    #     param = safe_eval(self.ledWinPar1.text(), self.win_dict['par'][0]['val'],
-    #                       sign='pos', return_type='float')
-    #     if param < self.win_dict['par'][0]['min']:
-    #         param = self.win_dict['par'][0]['min']
-    #     elif param > self.win_dict['par'][0]['max']:
-    #         param = self.win_dict['par'][0]['max']
-    #     self.ledWinPar1.setText(str(param))
-    #     self.win_dict['par'][0]['val'] = param
-    #     self._update_win_fft()
-
-    # def _read_param2(self):
-    #     """Read out textbox when editing is finished and update dict and fft window"""
-    #     param = safe_eval(self.ledWinPar2.text(), self.win_dict['par'][1]['val'],
-    #                       return_type='float')
-    #     if param < self.win_dict['par'][1]['min']:
-    #         param = self.win_dict['par'][1]['min']
-    #     elif param > self.win_dict['par'][1]['max']:
-    #         param = self.win_dict['par'][1]['max']
-    #     self.ledWinPar2.setText(str(param))
-    #     self.win_dict['par'][1]['val'] = param
-    #     self._update_win_fft()
 
     def _update_win_fft(self):
         """ Update window type for FirWin """
         self.alg = str(self.cmb_firwin_alg.currentText())
-#        self.fir_window_name = qget_cmb_box(self.cmb_firwin_win, data=False)
-        # self.win = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-        #                      sym=True)
-        # n_par = self.win_dict['n_par']
-
-        # self.lblWinPar1.setVisible(n_par > 0)
-        # self.ledWinPar1.setVisible(n_par > 0)
-        # self.lblWinPar2.setVisible(n_par > 1)
-        # self.ledWinPar2.setVisible(n_par > 1)
-
-        # if n_par > 0:
-        #     self.lblWinPar1.setText(to_html(self.win_dict['par'][0]['name'] + " =",
-        #                                     frmt='bi'))
-        #     self.ledWinPar1.setText(str(self.win_dict['par'][0]['val']))
-        #     self.ledWinPar1.setToolTip(self.win_dict['par'][0]['tooltip'])
-
-        # if n_par > 1:
-        #     self.lblWinPar2.setText(to_html(self.win_dict['par'][1]['name'] + " =",
-        #                                     frmt='bi'))
-        #     self.ledWinPar2.setText(str(self.win_dict['par'][1]['val']))
-        #     self.ledWinPar2.setToolTip(self.win_dict['par'][1]['tooltip'])
-
-        # sig_tx -> select_filter -> filter_specs
         self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
 
 # =============================================================================
@@ -554,7 +476,7 @@ class Firwin(QWidget):
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
-                                 [self.A_PB, self.A_SB], alg=self.alg)
+                                  [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_N():
             return -1
         self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
@@ -599,7 +521,7 @@ class Firwin(QWidget):
     def BPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
-            [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
+                          [self.A_SB, self.A_PB, self.A_SB2], fs=1, alg=self.alg)[0]
         if not self._test_N():
             return -1
         self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
@@ -679,10 +601,10 @@ def main():
     wdg_firwin = getattr(filt, 'wdg_fil')
 
     layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_firwin, stretch = 1)
+    layVDynWdg.addWidget(wdg_firwin, stretch=1)
 
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][filt.FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT])  # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
@@ -693,7 +615,7 @@ def main():
 
     app.exec_()
 
-if __name__ == "__main__":
-    main()
 
-    # test using "python -m pyfda.filter_widgets.firwin"
+if __name__ == "__main__":
+    '''test using "python -m pyfda.filter_widgets.firwin" '''
+    main()
