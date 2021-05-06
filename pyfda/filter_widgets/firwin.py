@@ -39,7 +39,7 @@ from scipy.signal import signaltools
 from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
+from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
 from pyfda.libs.pyfda_fft_windows_lib import (QFFTWinSelector,
     get_valid_windows_list, get_windows_dict, get_window)
@@ -65,7 +65,8 @@ class Firwin(QWidget):
     FRMT = 'ba'  # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
                  # currently, only 'ba' is supported for firwin routines
 
-    sig_tx = pyqtSignal(object)
+    sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
+    sig_tx_fft = pyqtSignal(object)
 
     def __init__(self):
         QWidget.__init__(self)
@@ -129,7 +130,37 @@ class Firwin(QWidget):
 
         # ------------------- end of static info for filter tree ---------------
 
-    # ----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from
+        - FFT window widget
+        - qfft_win_select
+        """
+
+        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+
+        if dict_sig['sender'] == __name__:
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            return
+
+        # --- signals coming from the FFT window widget or the qfft_win_select
+        if 'fft' in dict_sig['sender']:  # hide FFT window windget and return
+            logger.warning(pprint_log(dict_sig))
+            if 'closeEvent' in dict_sig:
+                self.hide_fft_wdg()
+                return
+            else:
+                if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
+                    logger.warning(dict_sig)  # TODO: delete
+                    self.update_fft_window()
+                    # local connection to FFT window widget and qfft_win_select
+                    self.sig_tx_fft.emit(dict_sig)
+                    # global connection to e.g. plot_impz
+                    self.sig_tx.emit(dict_sig)
+
+    # --------------------------------------------------------------------------
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design:
@@ -162,7 +193,6 @@ class Firwin(QWidget):
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
 
         # self.lblWinPar1 = QLabel("a", self)
         # self.lblWinPar1.setObjectName('wdg_lbl_firwin_1')
@@ -219,7 +249,7 @@ class Firwin(QWidget):
         # self.ledWinPar1.editingFinished.connect(self._read_param1)
         # self.ledWinPar2.editingFinished.connect(self._read_param2)
 
-        self.but_fft_wdg.clicked.connect(self.toggle_fft_win)
+        self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
 
         self._load_dict()  # get initial / last setting from dictionary
@@ -296,7 +326,7 @@ class Firwin(QWidget):
             wdg_fil_par = fb.fil[0]['wdg_fil']['firwin']
 
             if 'win' in wdg_fil_par:
-                if np.isscalar(wdg_fil_par['win']): # true for strings (non-vectors)
+                if np.isscalar(wdg_fil_par['win']):  # true for strings (non-vectors)
                     window = wdg_fil_par['win']
                 else:
                     window = wdg_fil_par['win'][0]
@@ -304,9 +334,8 @@ class Firwin(QWidget):
                     if len(wdg_fil_par['win']) > 2:
                         self.ledWinPar2.setText(str(wdg_fil_par['win'][2]))
 
-                # find index for window string
-                win_idx = self.cmb_firwin_win.findText(window,
-                                Qt.MatchFixedString) # case insensitive flag
+                # find index for window string (MatchFixedString = case insensitive flag)
+                win_idx = self.cmb_firwin_win.findText(window, Qt.MatchFixedString)
                 if win_idx == -1:  # Key does not exist, use first entry instead
                     win_idx = 0
 
@@ -377,7 +406,7 @@ class Firwin(QWidget):
             pass
 #        self._store_entries()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
                scale=True, nyq=1.0, fs=None):
 
@@ -482,7 +511,7 @@ class Firwin(QWidget):
 
         if type(window) == str:
             # Get and apply the window function.
-            #from scipy.signal.signaltools import get_window
+            # from scipy.signal.signaltools import get_window
             win = signaltools.get_window(window, numtaps, fftbins=False)
         elif type(window) == np.ndarray:
             win = window
@@ -625,6 +654,15 @@ class Firwin(QWidget):
             self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win'})
         else:
             self.fft_widget.hide()
+
+    # --------------------------------------------------------------------------
+    def hide_fft_wdg(self):
+        """
+        The closeEvent caused by clicking the "x" in the FFT widget is caught
+        there and routed here to only hide the window
+        """
+        self.but_fft_wdg.setChecked(False)
+        self.fft_widget.hide()
 
 
 # ------------------------------------------------------------------------------
