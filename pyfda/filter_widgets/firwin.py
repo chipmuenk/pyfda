@@ -39,10 +39,10 @@ from scipy.signal import signaltools
 from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html, pprint_log
+from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
 from pyfda.libs.pyfda_fft_windows_lib import (QFFTWinSelector,
-    get_valid_windows_list, get_windows_dict, get_window)
+                                              get_windows_dict, get_window)
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
