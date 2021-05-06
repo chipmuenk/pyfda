@@ -216,21 +216,18 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmb_firwin_alg.activated.connect(self._update_win_fft)
-        # self.cmb_firwin_win.activated.connect(self._update_win_fft)
-        # self.ledWinPar1.editingFinished.connect(self._read_param1)
-        # self.ledWinPar2.editingFinished.connect(self._read_param2)
+        self.cmb_firwin_alg.activated.connect(self._update_fft_window)
 
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
 
         self._load_dict()  # get initial / last setting from dictionary
-        self._update_win_fft()
+        self._update_fft_window()
 
-
-    def _update_win_fft(self):
+    def _update_fft_window(self):
         """ Update window type for FirWin """
         self.alg = str(self.cmb_firwin_alg.currentText())
+
         self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
 
 # =============================================================================
