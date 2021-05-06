@@ -31,22 +31,22 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-import logging
-logger = logging.getLogger(__name__)
-
-from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, QPushButton,
-                      QHBoxLayout, QVBoxLayout)
+from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox, 
+                               QPushButton, QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
 from scipy.signal import signaltools
 from scipy.special import sinc
 
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
 from pyfda.libs.pyfda_fft_windows_lib import get_window_names, calc_window_function
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
+
+import logging
+logger = logging.getLogger(__name__)
 
 # TODO: Hilbert, differentiator, multiband are missing
 # TODO: Improve calculation of F_C and F_C2 using the weights
