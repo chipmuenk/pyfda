@@ -66,7 +66,7 @@ class Firwin(QWidget):
                  # currently, only 'ba' is supported for firwin routines
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
-    sig_tx_fft = pyqtSignal(object)
+    sig_tx_local = pyqtSignal(object)
 
     def __init__(self):
         QWidget.__init__(self)
@@ -154,11 +154,11 @@ class Firwin(QWidget):
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
                     logger.warning(dict_sig)  # TODO: delete
-                    self.update_fft_window()
+                    self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
-                    self.sig_tx_fft.emit(dict_sig)
-                    # global connection to e.g. plot_impz
-                    self.sig_tx.emit(dict_sig)
+                    self.sig_tx_local.emit(dict_sig)
+                    # global connection to upper hierachies
+                    # self.sig_tx.emit(dict_sig)
 
     # --------------------------------------------------------------------------
     def construct_UI(self):
@@ -238,8 +238,8 @@ class Firwin(QWidget):
         self.fft_widget.sig_tx.connect(self.process_sig_rx)
         self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
         # connect process_sig_rx output to both FFT widgets
-        self.sig_tx_fft.connect(self.fft_widget.sig_rx)
-        self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
+        self.sig_tx_local.connect(self.fft_widget.sig_rx)
+        self.sig_tx_local.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -548,6 +548,7 @@ class Firwin(QWidget):
             self._update_UI()
         else:
             N = remezord(F, W, A, fs=1, alg=alg)[0]
+        self.sig_tx_local.emit({"sender": __name__, "view_changed": "fft_win"})
         return N
 
     def LPmin(self, fil_dict):
@@ -651,7 +652,7 @@ class Firwin(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win'})
+            self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
         else:
             self.fft_widget.hide()
 
