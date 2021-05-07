@@ -7,13 +7,13 @@
 # (see file LICENSE in root directory for details)
 
 import importlib
+import copy
 import numpy as np
 import scipy.signal as sig
 import scipy
 
 from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
 from .pyfda_lib import to_html, safe_eval, pprint_log
-from .frozendict import FrozenDict
 from pyfda.pyfda_rc import params
 from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
                      QHBoxLayout, pyqtSignal)
@@ -27,7 +27,7 @@ Dictionary with available FFT windows, their function names and their properties
 When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
-all_windows_dict = FrozenDict({
+all_windows_dict = {
     'cur_win_name': 'Rectangular',  # name of current window
     #
     'Boxcar': {
@@ -307,7 +307,7 @@ all_windows_dict = FrozenDict({
             altered by this window than e.g. by a Hann window.
             </span>'''
         }
-    })
+    }
 
 
 # ------------------------------------------------------------------------------
@@ -367,10 +367,10 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 # ------------------------------------------------------------------------------
 def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
-    Return a subdictionary of `all_windows_dict` containing all valid windows for the
-    names passed in `win_names_list`. When the latter is empty, put all valid windows
-    into the returned subdictionary (which should be more or less a mutable copy of
-    `all_windows_dict` in this case.).
+    Return a subdictionary of a deep copy of `all_windows_dict` containing all valid
+    windows for the names passed in `win_names_list`. When the latter is empty, put all
+    valid windows into the returned subdictionary (which should be more or less a mutable
+    deep copy of `all_windows_dict` in this case.).
 
     `cur_win_name` determines the initial value of the `cur_win_name` key.
 
@@ -387,7 +387,8 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     dict
       A dictionary with windows, window functions, docstrings etc
     """
-    d = {k: all_windows_dict[k] for k in get_valid_windows_list(win_names_list)}
+    awd = copy.deepcopy(all_windows_dict)
+    d = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
     set_window_name(d, cur_win_name)
     return d
 
