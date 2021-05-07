@@ -80,6 +80,7 @@ class Plot_FFT_win(QDialog):
     def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
+        # Qt.WindowStaysOnTopHint | Qt.Popup)  # no difference to qwindow_stay_on_top
 
         self.win_dict = win_dict
         self.sym = sym
