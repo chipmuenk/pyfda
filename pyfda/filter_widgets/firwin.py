@@ -243,26 +243,16 @@ class Firwin(QWidget):
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
 
             self.win_dict = fb.fil[0]['wdg_fil']['firwin']
-
-            # wdg_fil_par = fb.fil[0]['wdg_fil']['firwin']
-
-            # if 'alg' in wdg_fil_par:
-            #     alg_idx = self.cmb_firwin_alg.findText(wdg_fil_par['alg'],
-            #                                            Qt.MatchFixedString)
-            #     if alg_idx == -1:  # Key does not exist, use first entry instead
-            #         alg_idx = 0
-
-        # self.cmb_firwin_alg.setCurrentIndex(alg_idx)  # set index for algorithm cmbBox
+            logger.error(self.win_dict["cur_win_name"])
+        self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
     def _store_entries(self):
         """
-        Store window and alg. selection and parameter settings (part of
-        self.firWindow, if any) in filter dictionary.
+        Store window and parameter settings using `self.win_dict` in filter dictionary.
         """
         if 'wdg_fil' not in fb.fil[0]:
             fb.fil[0].update({'wdg_fil': {}})
         fb.fil[0]['wdg_fil'].update({'firwin': self.win_dict})
-                                #    {'win': self.firWindow, 'alg': self.alg}})
 
     def _get_params(self, fil_dict):
         """
@@ -308,7 +298,7 @@ class Firwin(QWidget):
             fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
-#        self._store_entries()
+        self._store_entries()
 
 # ------------------------------------------------------------------------------
     def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
