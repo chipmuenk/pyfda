@@ -45,7 +45,8 @@ class PlotImpz_UI(QWidget):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
-        - the FFT window widget
+        - FFT window widget
+        - qfft_win_select
         """
 
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
