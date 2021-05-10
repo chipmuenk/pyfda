@@ -241,7 +241,8 @@ class Firwin(QWidget):
 
         self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
-    def _store_entries(self):
+    # --------------------------------------------------------------------------
+    def _store_dict(self):
         """
         Store window and parameter settings using `self.win_dict` in filter dictionary.
         """
@@ -249,6 +250,7 @@ class Firwin(QWidget):
             fb.fil[0].update({'wdg_fil': {}})
         fb.fil[0]['wdg_fil'].update({'firwin': self.win_dict})
 
+    # --------------------------------------------------------------------------
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -293,7 +295,7 @@ class Firwin(QWidget):
             fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
-        self._store_entries()
+        self._store_dict()
 
 # ------------------------------------------------------------------------------
     def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
