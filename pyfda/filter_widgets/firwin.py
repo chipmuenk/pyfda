@@ -85,6 +85,9 @@ class Firwin(QWidget):
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
 
+        # get initial / last setting from dictionary, updating self.win_dict
+        self._load_dict()  
+
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(
             self, win_dict=self.win_dict, sym=True, title="pyFDA FIR Window Viewer")
@@ -216,9 +219,6 @@ class Firwin(QWidget):
 
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
-
-        self._load_dict()  # get initial / last setting from dictionary
-        self._update_fft_window()
 
     def _update_fft_window(self):
         """ Update window type for FirWin """
