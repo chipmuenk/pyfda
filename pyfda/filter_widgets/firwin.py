@@ -154,11 +154,12 @@ class Firwin(QWidget):
                 return
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
-                    self._update_fft_window()  # TODO: needed?
+                    # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_local.emit(dict_sig)
-                    # global connection to upper hierachies
-                    # self.sig_tx.emit(dict_sig)
+                    # global connection to upper hierachies - not needed at the moment
+                    # send notification that filter design has changed
+                    self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
     def construct_UI(self):
@@ -215,19 +216,17 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmb_firwin_alg.activated.connect(self._update_fft_window)
-
+        # self.cmb_firwin_alg.activated.connect(self._update_fft_window) - not available
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
 
-    def _update_fft_window(self):
-        """ Update window type for FirWin """
-        self.alg = str(self.cmb_firwin_alg.currentText())
+# ==============================================================================
+    # def _update_fft_window(self):
+    #     """ Update window type for FirWin - unneeded at the moment """
+    #     self.alg = str(self.cmb_firwin_alg.currentText())
+    #     self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
 
-        self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
-
-# =============================================================================
-
+    # --------------------------------------------------------------------------
     def _load_dict(self):
         """
         Reload window selection and parameters from filter dictionary
