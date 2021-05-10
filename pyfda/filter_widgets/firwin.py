@@ -85,7 +85,6 @@ class Firwin(QWidget):
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
 
-        logger.warning(self.win_dict["cur_win_name"])
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(
             self, win_dict=self.win_dict, sym=True, title="pyFDA FIR Window Viewer")
@@ -147,13 +146,11 @@ class Firwin(QWidget):
 
         # --- signals coming from the FFT window widget or the qfft_win_select
         if 'fft' in dict_sig['sender']:
-            logger.warning(pprint_log(dict_sig))
             if 'closeEvent' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
-                    logger.warning(dict_sig)  # TODO: delete
                     self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_local.emit(dict_sig)
@@ -205,7 +202,7 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
+        # connect FFT widget to qfft_selector and vice versa and to signals upstream:
         self.fft_widget.sig_tx.connect(self.process_sig_rx)
         self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
         # connect process_sig_rx output to both FFT widgets
@@ -241,9 +238,8 @@ class Firwin(QWidget):
         # alg_idx = 0
         if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
-
             self.win_dict = fb.fil[0]['wdg_fil']['firwin']
-            logger.error(self.win_dict["cur_win_name"])
+
         self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
     def _store_entries(self):

@@ -679,7 +679,7 @@ class QFFTWinSelector(QWidget):
         This can also be achieved by calling `self.update_widgets()` directly
 
         """
-        logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
+        logger.debug("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
 
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
             self.update_widgets()
@@ -820,7 +820,6 @@ class QFFTWinSelector(QWidget):
         - emit 'sig_tx'
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        logger.warning(cur)
         set_window_name(self.win_dict, cur)
         # update visibility and values of parameter widgets
         self.update_param_widgets()
