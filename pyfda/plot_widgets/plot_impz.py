@@ -556,7 +556,8 @@ class Plot_Impz(QWidget):
                                 \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
         elif self.ui.stim == "pmfm":
             self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +
-                                         self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2))
+                                         self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2
+                                                             + phi2))
             self.title_str += r'PM / FM Signal $A_1 \sin(2 \pi n f_1 +\
                             \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
         elif self.ui.stim == "formula":
@@ -709,8 +710,6 @@ class Plot_Impz(QWidget):
                 "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                 .format(len(self.x), self.ui.N_end))
         else:
-            logger.warning(self.ui.win_dict['cur_win_name'])
-            logger.warning(len(self.ui.win_dict['win']))
             # multiply the  time signal with window function
             x_win = self.x[self.ui.N_start:self.ui.N_end] * win
             # calculate absolute value and scale by N_FFT
@@ -953,7 +952,7 @@ class Plot_Impz(QWidget):
         Clear and initialize the axes of the time domain matplotlib widgets
         """
         self.t = self.n * fb.fil[0]['T_S']
-        
+
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
@@ -1064,7 +1063,8 @@ class Plot_Impz(QWidget):
         # log. scale for stimulus / response time domain:
         if self.ui.chk_log_time.isChecked():
             bottom_t = self.ui.bottom_t
-            win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
+            win = np.maximum(20 * np.log10(
+                abs(self.ui.qfft_win_select.get_window(self.ui.N))), self.ui.bottom_t)
             x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
             y_r = np.maximum(20 * np.log10(abs(y_r)), self.ui.bottom_t)
 
@@ -1166,7 +1166,8 @@ class Plot_Impz(QWidget):
             if 2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr > self.ui.N:
                 logger.warning(
                     "Only one segment is calculated since 2 NFFT - N_OVLP = {0} > N = {1}"
-                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr, self.ui.N))
+                    .format(2 * self.ui.time_nfft_spgr - self.ui.time_ovlp_spgr,
+                            self.ui.N))
             if self.ui.time_nfft_spgr > self.ui.N:
                 logger.warning(
                     "NFFT per segment = {0} is larger than number N of data points {1}, "
@@ -1346,8 +1347,10 @@ class Plot_Impz(QWidget):
             or self.plt_freq_stmq != "none"\
             or self.plt_freq_resp != "none"
 
-        # if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
-        #    self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
+        # if not self.ui.chk_log_freq.isChecked() \
+        # and len(self.mplwidget_f.fig.get_axes()) == 2:
+        # get rid of second axis when returning from log mode by clearing all
+        #    self.mplwidget_f.fig.clear()
 
         self.mplwidget_f.fig.clf()  # clear figure with axes
 
@@ -1363,7 +1366,8 @@ class Plot_Impz(QWidget):
         # for ax in self.axes_f:
         #    ax.cla()
 
-        if self.ui.chk_log_freq.isChecked():  # and len(self.mplwidget_f.fig.get_axes()) == 1:
+        if self.ui.chk_log_freq.isChecked():
+            # and len(self.mplwidget_f.fig.get_axes()) == 1:??
             # create second axis scaled for noise power scale if it doesn't exist yet
             self.ax_f1_noise = self.ax_f1.twinx()
             self.ax_f1_noise.is_twin = True
@@ -1635,7 +1639,8 @@ class Plot_Impz(QWidget):
                     + unit + r" $\rightarrow$"
                 H_Fr_str = r'$\Re\{$' + H_F_str + r'$\}$'
             elif self.en_mag_phi_f:
-                H_Fi_str = r'$\angle($' + H_F_str + r'$)$' + " in rad " + r" $\rightarrow$"
+                H_Fi_str = r'$\angle($' + H_F_str + r'$)$' + " in rad "\
+                    + r" $\rightarrow$"
                 H_Fr_str = "|" + H_F_str + "|"
             else:
                 H_F_pre = "|"
@@ -1767,8 +1772,10 @@ class Plot_Impz(QWidget):
             if self.plt_freq_enabled or self.ui.chk_Hf.isChecked():
 
                 # labels = np.concatenate([labels, [r"$NENBW$:"], ["{0:.4g} {1}"\
-                # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw, unit_nenbw)]])
-                # see https://stackoverflow.com/questions/25830780/tabular-legend-layout-for-matplotlib
+                # .format(nenbw, unit_nenbw)], [r"$CGAIN$:", "{0:.4g} {1}".format(nenbw,
+                #   unit_nenbw)]])
+                # see https://stackoverflow.com/questions/25830780/
+                #               tabular-legend-layout-for-matplotlib
 
                 if show_info:
                     # Reorder columns / rows to f
