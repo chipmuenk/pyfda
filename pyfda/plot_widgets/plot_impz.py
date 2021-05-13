@@ -698,11 +698,13 @@ class Plot_Impz(QWidget):
         and response `self.Y` using the window function from `self.ui.win_dict['win']`.
         """
         # calculate FFT of stimulus / response
+        N = self.ui.N
+        win = self.ui.qfft_win_select.get_window(N)
         if self.x is None:
-            self.X = np.zeros(self.ui.N_end-self.ui.N_start)  # dummy result
+            self.X = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
         elif len(self.x) < self.ui.N_end:
-            self.X = np.zeros(self.ui.N_end-self.ui.N_start)  # dummy result
+            self.X = np.zeros(N)  # dummy result
             logger.warning(
                 "Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
                 .format(len(self.x), self.ui.N_end))
@@ -710,7 +712,7 @@ class Plot_Impz(QWidget):
             logger.warning(self.ui.win_dict['cur_win_name'])
             logger.warning(len(self.ui.win_dict['win']))
             # multiply the  time signal with window function
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * win
             # calculate absolute value and scale by N_FFT
             self.X = np.fft.fft(x_win) / self.ui.N
             # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
@@ -718,7 +720,7 @@ class Plot_Impz(QWidget):
             if self.fx_sim:
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end])\
-                    * self.ui.win
+                    * win
                 self.X_q = np.fft.fft(x_q_win) / self.ui.N
                 # self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
@@ -731,7 +733,7 @@ class Plot_Impz(QWidget):
                     "Length of transient response is {0} < N = {1}, FFT cannot be "
                     "calculated.".format(len(self.y), self.ui.N_end))
         else:
-            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
+            y_win = self.y[self.ui.N_start:self.ui.N_end] * win
             self.Y = np.fft.fft(y_win) / self.ui.N
             # self.Y[0] = self.Y[0] * np.sqrt(2) # correct value at DC
 
@@ -1041,8 +1043,7 @@ class Plot_Impz(QWidget):
 
         x = self.x * self.scale_i
         y = self.y * self.scale_o
-        win = self.ui.win
-
+        win = self.ui.qfft_win_select.get_window(self.ui.N)
         if self.cmplx:
             x_r = x.real
             x_i = x.imag
@@ -1253,6 +1254,7 @@ class Plot_Impz(QWidget):
             # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
 
 # =============================================================================
+            win = self.ui.qfft_win_select.get_window(self.ui.time_nfft_spgr)
             if False:
                 Sxx, f, t, im = self.ax_s.specgram(
                     s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,
@@ -1273,7 +1275,7 @@ class Plot_Impz(QWidget):
                 self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
             else:
                 f, t, Sxx = sig.spectrogram(
-                    s, fb.fil[0]['f_S'], window=('tukey', 0.25),
+                    s, fb.fil[0]['f_S'], window=win,  # ('tukey', 0.25),
                     nperseg=self.ui.time_nfft_spgr, noverlap=self.ui.time_ovlp_spgr,
                     nfft=None, return_onesided=fb.fil[0]['freqSpecsRangeType'] == 'half',
                     scaling=scaling, mode=mode, detrend='constant')

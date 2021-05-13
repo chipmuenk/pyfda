@@ -741,6 +741,16 @@ class QFFTWinSelector(QWidget):
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
 # ------------------------------------------------------------------------------
+    def get_window(self, N, win_name=None, sym=False):
+        """
+        Wrapper for function `get_window` with the same name
+
+        An array with the window is returned, additionally it is saved in
+        self.win_dict['win']
+        """
+        return get_window(self.win_dict, N, win_name=win_name, sym=sym)
+
+# ------------------------------------------------------------------------------
     def update_widgets(self):
         """
         Update widgets with data from win_dict
