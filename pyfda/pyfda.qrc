@@ -13,6 +13,7 @@
     <file alias="ellipses_h.svg">images/icons/dark/ellipses_h.svg</file>
     <file alias="ellipses_v.svg">images/icons/dark/ellipses_v.svg</file>
     <file alias="file.svg">images/icons/dark/file.svg</file>
+    <file alias="fft.svg">images/icons/fft.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
     <file alias="grid_none.svg">images/icons/grid_none.svg</file>
