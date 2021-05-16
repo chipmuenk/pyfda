@@ -487,7 +487,8 @@ def get_window(win_dict, N, win_name=None, sym=False):
     Returns
     -------
     win_fnct : ndarray
-        The window function. This is also stored in win_dict['win']
+        The window function, normalized with the correlated gain.
+        This is also stored in win_dict['win']
     """
     if win_name is None or win_name == win_dict['cur_win_name']:
         win_name = win_dict['cur_win_name']
@@ -699,22 +700,24 @@ class QFFTWinSelector(QWidget):
         self.led_win_par_1 = QLineEdit(self)
         self.led_win_par_1.setText("1")
         self.led_win_par_1.setObjectName("ledWinPar1")
-        # self.cmb_win_par_1 = QComboBox(self)
+        self.cmb_win_par_1 = QComboBox(self)
 
         # Second numeric parameter for FFT window
         self.lbl_win_par_2 = QLabel("Param2")
         self.led_win_par_2 = QLineEdit(self)
         self.led_win_par_2.setText("2")
         self.led_win_par_2.setObjectName("ledWinPar2")
-        # self.cmb_win_par_2 = QComboBox(self)
+        self.cmb_win_par_2 = QComboBox(self)
 
         layH_main = QHBoxLayout(self)
         layH_main.addWidget(self.cmb_win_fft)
         layH_main.addWidget(self.cmb_win_fft_variant)
         layH_main.addWidget(self.lbl_win_par_1)
         layH_main.addWidget(self.led_win_par_1)
+        layH_main.addWidget(self.cmb_win_par_1)
         layH_main.addWidget(self.lbl_win_par_2)
         layH_main.addWidget(self.led_win_par_2)
+        layH_main.addWidget(self.cmb_win_par_2)
 
         layH_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
@@ -731,6 +734,9 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type)
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
+        self.cmb_win_par_1.currentIndexChanged.connect(self.update_win_params)
+        self.cmb_win_par_2.currentIndexChanged.connect(self.update_win_params)
+
 
 # ------------------------------------------------------------------------------
     def get_window(self, N, win_name=None, sym=False):
