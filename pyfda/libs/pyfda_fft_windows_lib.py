@@ -47,7 +47,7 @@ all_windows_dict = {
             transition of all windowed FIR filters but the worst stop band attenuation.
             </span>''',
         'props': {
-            'enbw': 1,
+            'nenbw': 1,
             'cgain': 1,
             'bw': 1
             }
@@ -67,7 +67,12 @@ all_windows_dict = {
             is returned, created by truncating the sinc-law frequency response after
             N terms and transforming back to the time domain. It has the sharpest
             transition of all windowed FIR filters but the worst stop band attenuation.
-            </span>'''
+            </span>''',
+        'props': {
+            'nenbw': 1,
+            'cgain': 1,
+            'bw': 1
+            }
         },
     'Barthann': {
         'fn_name': 'barthann',
