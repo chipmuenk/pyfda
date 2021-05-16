@@ -700,7 +700,7 @@ class Plot_Impz(QWidget):
         """
         # calculate FFT of stimulus / response
         N = self.ui.N
-        win = self.ui.qfft_win_select.get_window(N)
+        win = self.ui.qfft_win_select.get_window(N) / self.ui.win_dict['cgain']
         if self.x is None:
             self.X = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
@@ -1394,8 +1394,8 @@ class Plot_Impz(QWidget):
         self._init_axes_freq()
         self._log_mode_freq()
 
-        nenbw = self.ui.win_dict[self.ui.win_dict['cur_win_name']]['nenbw']
-        cgain = self.ui.win_dict[self.ui.win_dict['cur_win_name']]['cgain']
+        nenbw = self.ui.win_dict['nenbw']
+        cgain = self.ui.win_dict['cgain']
 
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"

@@ -526,8 +526,8 @@ def get_window(win_dict, N, win_name=None, sym=False):
 
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
     cgain = np.sum(w) / N  # coherent gain / DC average
-    win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
-    win_dict.update({'win': w})
+    # win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
+    win_dict.update({'win': w, 'nenbw': nenbw, 'cgain': cgain})
 
     return w
 
