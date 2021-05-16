@@ -20,8 +20,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qled_set_max_width,
     QVLine, QLabelVert)
-from pyfda.libs.pyfda_fft_windows_lib import (get_windows_dict, get_window,
-                                              QFFTWinSelector)
+from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -65,8 +64,6 @@ class PlotImpz_UI(QWidget):
                 return
             else:
                 if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
-                    logger.warning(dict_sig)  # TODO: delete
-                    self.update_fft_window()
                     # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_fft.emit(dict_sig)
                     # global connection to e.g. plot_impz
@@ -151,7 +148,6 @@ class PlotImpz_UI(QWidget):
         self.win_dict = get_windows_dict(
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
-        # logger.warning(get_window(self.win_dict, 4))
 
         # instantiate FFT window with default windows dict
         self.fft_widget = Plot_FFT_win(
@@ -1384,19 +1380,10 @@ class PlotImpz_UI(QWidget):
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.update_freqs()
 
-        self.update_fft_window()
-
         if emit:
             # use `'ui_changed'` as this triggers recalculation of the transient
             # response
             self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
-
-    # --------------------------------------------------------------------------
-    def update_fft_window(self):
-        """
-        Update the window function when the window or the number of points has changed
-        """
-        self.win = get_window(self.win_dict, self.N, sym=False)
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):
