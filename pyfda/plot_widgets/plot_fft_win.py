@@ -550,13 +550,14 @@ class Plot_FFT_win(QDialog):
             else:
                 p1 = "{0:.3g}".format(cur_win_d['par'][0]['val'])
             param_txt = " ({0:s} = {1:s})".format(cur_win_d['par'][0]['name_tex'], p1)
-            # param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + par_1
-            # param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + " = {0:.3g})"\
-            #     .format(self.win_dict[cur]['par'][0]['val'])
+
         if self.win_dict[cur]['n_par'] > 1:
+            if type(cur_win_d['par'][1]['val']) in {str}:
+                p2 = cur_win_d['par'][1]['val']
+            else:
+                p2 = "{0:.3g}".format(cur_win_d['par'][1]['val'])
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(cur_win_d['par'][1]['name_tex'],
-                                              cur_win_d['par'][1]['val'])
+                + ", {0:s} = {1:.3g})".format(cur_win_d['par'][1]['name_tex'], p2)
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur) + param_txt)
 
