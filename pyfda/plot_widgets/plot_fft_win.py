@@ -542,14 +542,21 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
 
         cur = self.win_dict['cur_win_name']
+        cur_win_d = self.win_dict[cur]
         param_txt = ""
-        if self.win_dict[cur]['n_par'] > 0:
-            param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + " = {0:.3g})"\
-                .format(self.win_dict[cur]['par'][0]['val'])
+        if cur_win_d['n_par'] > 0:
+            if type(cur_win_d['par'][0]['val']) in {str}:
+                p1 = cur_win_d['par'][0]['val']
+            else:
+                p1 = "{0:.3g}".format(cur_win_d['par'][0]['val'])
+            param_txt = " ({0:s} = {1:s})".format(cur_win_d['par'][0]['name_tex'], p1)
+            # param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + par_1
+            # param_txt = " (" + self.win_dict[cur]['par'][0]['name_tex'] + " = {0:.3g})"\
+            #     .format(self.win_dict[cur]['par'][0]['val'])
         if self.win_dict[cur]['n_par'] > 1:
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(self.win_dict[cur]['par'][1]['name_tex'],
-                                              self.win_dict[cur]['par'][1]['val'])
+                + ", {0:s} = {1:.3g})".format(cur_win_d['par'][1]['name_tex'],
+                                              cur_win_d['par'][1]['val'])
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur) + param_txt)
 
@@ -600,7 +607,7 @@ class Plot_FFT_win(QDialog):
         else:
             self.txtInfoBox.clear()
 
-        self._set_table_item(0, 0, "ENBW", font=self.bfont)  # , sel=True)
+        self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0, 2, self.unit_nenbw)
         self._set_table_item(0, 3, "Scale", font=self.bfont)  # , sel=True)

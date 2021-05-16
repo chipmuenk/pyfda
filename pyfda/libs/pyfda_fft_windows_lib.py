@@ -115,29 +115,18 @@ all_windows_dict = {
             </span>'''
         },
     'Blackmanharris': {
-        'fn_name': 'blackmanharris',
+        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
+        'par': [{
+            'name': 'L', 'name_tex': r'$L$', 'val': 4, 'list': ['4', '5', '7', '9'],
+            'tooltip': '<span>Number of cosine terms</span>'}],
         'info':
-            '<span>The minimum 4-term Blackman-Harris window gives an excellent '
-            'constant side-lobe suppression of more than 90 dB while keeping a '
-            'reasonably narrow main lobe.</span>'
-        },
-    'Blackmanharris_5': {
-        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris5',
-        'info':
-            '<span>The 5-term Blackman-Harris window with a side-'
-            'lobe suppression of up to 125 dB.</span>'
-        },
-    'Blackmanharris_7': {
-        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris7',
-        'info':
-            '<span>The 7-term Blackman-Harris window with a side-'
-            'lobe suppression of up to 180 dB.</span>'
-        },
-    'Blackmanharris_9': {
-        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris9',
-        'info':
-            '<span>The 9-term Blackman-Harris window with a side-'
-            'lobe suppression of up to 230 dB.</span>'
+            '''<span>The minimum 4-term Blackman-Harris window gives an excellent
+            constant side-lobe suppression of more than 90 dB while keeping a
+            reasonably narrow main lobe.
+            
+            5-, 7- and 9-term Blackman-Harris windows achieve side-lobe suppressions
+            of up to 125, 180 and 230 dB.
+            </span>'''
         },
     'Bohman': {
         'fn_name': 'bohman',
@@ -544,39 +533,37 @@ def get_window(win_dict, N, win_name=None, sym=False):
 
 
 # -------------------------------------------------------------------------------------
-def blackmanharris5(N, sym):
-    """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
-    a = [3.232153788877343e-001,
-         -4.714921439576260e-001,
-         1.755341299601972e-001,
-         -2.849699010614994e-002,
-         1.261357088292677e-003]
-    return calc_cosine_window(N, sym, a)
+def blackmanharris(N, L, sym):
+    if L == '4':
+        return sig.windows.blackmanharris(N, sym)
+    elif L == '5':
+        """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
+        a = [3.232153788877343e-001,
+             -4.714921439576260e-001,
+             1.755341299601972e-001,
+             -2.849699010614994e-002,
+             1.261357088292677e-003]
+    elif L == '7':
+        """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""
+        a = [2.712203605850388e-001,
+             -4.334446123274422e-001,
+             2.180041228929303e-001,
+             -6.578534329560609e-002,
+             1.076186730534183e-002,
+             -7.700127105808265e-004,
+             1.368088305992921e-005]
+    elif L == '9':
+        """ 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain"""
+        a = [2.384331152777942e-001,
+             -4.005545348643820e-001,
+             2.358242530472107e-001,
+             -9.527918858383112e-002,
+             2.537395516617152e-002,
+             -4.152432907505835e-003,
+             3.685604163298180e-004,
+             -1.384355593917030e-005,
+             1.161808358932861e-007]
 
-
-def blackmanharris7(N, sym):
-    """ 7 Term Cosine, 180.468 dB, NBW 2.63025 bins, 11.33355 dB gain"""
-    a = [2.712203605850388e-001,
-         -4.334446123274422e-001,
-         2.180041228929303e-001,
-         -6.578534329560609e-002,
-         1.076186730534183e-002,
-         -7.700127105808265e-004,
-         1.368088305992921e-005]
-    return calc_cosine_window(N, sym, a)
-
-
-def blackmanharris9(N, sym):
-    """ 9 Term Cosine, 234.734 dB, NBW 2.98588 bins, 12.45267 dB gain"""
-    a = [2.384331152777942e-001,
-         -4.005545348643820e-001,
-         2.358242530472107e-001,
-         -9.527918858383112e-002,
-         2.537395516617152e-002,
-         -4.152432907505835e-003,
-         3.685604163298180e-004,
-         -1.384355593917030e-005,
-         1.161808358932861e-007]
     return calc_cosine_window(N, sym, a)
 
 
@@ -771,18 +758,31 @@ class QFFTWinSelector(QWidget):
         cur = self.win_dict['cur_win_name']  # current window name / key
         n_par = self.win_dict[cur]['n_par']
 
-        self.lbl_win_par_1.setVisible(n_par > 0)
-        self.led_win_par_1.setVisible(n_par > 0)
-        self.lbl_win_par_2.setVisible(n_par > 1)
-        self.led_win_par_2.setVisible(n_par > 1)
+        # self.lbl_win_par_1.setVisible(n_par > 0)
+        # self.led_win_par_1.setVisible(False)
+        # self.cmb_win_par_1.setVisible(False)
+ 
+        # self.lbl_win_par_2.setVisible(n_par > 1)
+        # self.led_win_par_2.setVisible(False)
+        # self.cmb_win_par_2.setVisible(False)
 
         if n_par > 0:
-            self.lbl_win_par_1.setText(
-                to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
-            self.led_win_par_1.setText(str(self.win_dict[cur]['par'][0]['val']))
-            self.led_win_par_1.setToolTip(self.win_dict[cur]['par'][0]['tooltip'])
+    #        self.lbl_win_par_1.setText(
+    #            to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
+            if 'list' in self.win_dict[cur]['par'][0]:
+    #            self.led_win_par_1.setVisible(False)
+    #            self.cmb_win_par_1.setVisible(True)
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
+            else:
+    #            self.led_win_par_1.setVisible(True)
+    #            self.cmb_win_par_1.setVisible(False)
+                self.led_win_par_1.setText(
+                    str(self.win_dict[cur]['par'][0]['val']))
+                self.led_win_par_1.setToolTip(
+                    self.win_dict[cur]['par'][0]['tooltip'])
 
         if n_par > 1:
+            self.led_win_par_2.setVisible(True)
             self.lbl_win_par_2.setText(
                 to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
             self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
@@ -791,7 +791,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def update_win_params(self):
         """
-        Read out parameter lineedits when editing is finished and
+        Read out parameter when editing is finished and
         update win_dict.
 
         Emit 'view_changed': 'fft_win'
@@ -800,23 +800,31 @@ class QFFTWinSelector(QWidget):
         set_window_name(self.win_dict, cur)  # this resets the window cache
 
         if self.win_dict[cur]['n_par'] > 1:
-            param = safe_eval(self.led_win_par_2.text(),
-                              self.win_dict[cur]['par'][1]['val'], return_type='float')
-            if param < self.win_dict[cur]['par'][1]['min']:
-                param = self.win_dict[cur]['par'][1]['min']
-            elif param > self.win_dict[cur]['par'][1]['max']:
-                param = self.win_dict[cur]['par'][1]['max']
-            self.led_win_par_2.setText(str(param))
+            if 'list' in self.win_dict[cur]['par'][1]:
+                param = self.cmb_win_par_2.currentText()
+            else:
+                param = safe_eval(self.led_win_par_2.text(),
+                                  self.win_dict[cur]['par'][1]['val'],
+                                  return_type='float')
+                if param < self.win_dict[cur]['par'][1]['min']:
+                    param = self.win_dict[cur]['par'][1]['min']
+                elif param > self.win_dict[cur]['par'][1]['max']:
+                    param = self.win_dict[cur]['par'][1]['max']
+                self.led_win_par_2.setText(str(param))
             self.win_dict[cur]['par'][1]['val'] = param
 
         if self.win_dict[cur]['n_par'] > 0:
-            param = safe_eval(self.led_win_par_1.text(),
-                              self.win_dict[cur]['par'][0]['val'], return_type='float')
-            if param < self.win_dict[cur]['par'][0]['min']:
-                param = self.win_dict[cur]['par'][0]['min']
-            elif param > self.win_dict[cur]['par'][0]['max']:
-                param = self.win_dict[cur]['par'][0]['max']
-            self.led_win_par_1.setText(str(param))
+            if 'list' in self.win_dict[cur]['par'][0]:
+                param = self.cmb_win_par_1.currentText()
+            else:
+                param = safe_eval(self.led_win_par_1.text(),
+                                  self.win_dict[cur]['par'][0]['val'],
+                                  return_type='float')
+                if param < self.win_dict[cur]['par'][0]['min']:
+                    param = self.win_dict[cur]['par'][0]['min']
+                elif param > self.win_dict[cur]['par'][0]['max']:
+                    param = self.win_dict[cur]['par'][0]['max']
+                self.led_win_par_1.setText(str(param))
             self.win_dict[cur]['par'][0]['val'] = param
 
         self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
@@ -837,6 +845,34 @@ class QFFTWinSelector(QWidget):
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         set_window_name(self.win_dict, cur)
         # update visibility and values of parameter widgets
+    
+        n_par = self.win_dict[cur]['n_par']
+
+        self.lbl_win_par_1.setVisible(n_par > 0)
+        self.led_win_par_1.setVisible(False)
+        self.cmb_win_par_1.setVisible(False)
+ 
+        self.lbl_win_par_2.setVisible(n_par > 1)
+        self.led_win_par_2.setVisible(n_par > 1)
+        self.cmb_win_par_2.setVisible(False)
+
+        if n_par > 0:
+            self.lbl_win_par_1.setText(
+                to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
+            if 'list' in self.win_dict[cur]['par'][0]:
+                self.led_win_par_1.setVisible(False)
+                self.cmb_win_par_1.setVisible(True)
+                self.cmb_win_par_1.clear()
+                self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][0]['list'])
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
+            else:
+                self.led_win_par_1.setVisible(True)
+                self.cmb_win_par_1.setVisible(False)
+                self.led_win_par_1.setText(
+                    str(self.win_dict[cur]['par'][0]['val']))
+                self.led_win_par_1.setToolTip(
+                    self.win_dict[cur]['par'][0]['tooltip'])
+
         self.update_param_widgets()
 
         self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
