@@ -69,20 +69,20 @@
       <g class="Group">
        <g class="com.sun.star.drawing.PolyPolygonShape">
         <g id="id5">
-         <rect class="BoundingBox" stroke="none" fill="none" x="99" y="170" width="189" height="517"/>
-         <path fill="rgb(0,0,0)" stroke="none" d="M 100,686 L 100,171 287,171 287,268 164,268 164,394 280,394 280,490 164,490 164,686 100,686 Z"/>
+         <rect class="BoundingBox" stroke="none" fill="none" x="137" y="187" width="161" height="487"/>
+         <path fill="rgb(0,0,0)" stroke="none" d="M 137,673 L 137,187 296,187 296,279 191,279 191,397 290,397 290,488 191,488 191,673 137,673 Z"/>
         </g>
        </g>
        <g class="com.sun.star.drawing.PolyPolygonShape">
         <g id="id6">
-         <rect class="BoundingBox" stroke="none" fill="none" x="335" y="170" width="189" height="517"/>
-         <path fill="rgb(0,0,0)" stroke="none" d="M 336,686 L 336,171 523,171 523,268 400,268 400,394 516,394 516,490 400,490 400,686 336,686 Z"/>
+         <rect class="BoundingBox" stroke="none" fill="none" x="337" y="187" width="162" height="487"/>
+         <path fill="rgb(0,0,0)" stroke="none" d="M 338,673 L 338,187 497,187 497,279 392,279 392,397 491,397 491,488 392,488 392,673 338,673 Z"/>
         </g>
        </g>
        <g class="com.sun.star.drawing.PolyPolygonShape">
         <g id="id7">
-         <rect class="BoundingBox" stroke="none" fill="none" x="554" y="170" width="219" height="517"/>
-         <path fill="rgb(0,0,0)" stroke="none" d="M 632,686 L 632,268 555,268 555,171 772,171 772,268 695,268 695,686 632,686 Z"/>
+         <rect class="BoundingBox" stroke="none" fill="none" x="524" y="187" width="187" height="487"/>
+         <path fill="rgb(0,0,0)" stroke="none" d="M 590,673 L 590,279 524,279 524,187 709,187 709,279 643,279 643,673 590,673 Z"/>
         </g>
        </g>
       </g>
