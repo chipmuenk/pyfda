@@ -1228,8 +1228,9 @@ class Plot_Impz(QWidget):
                 self.ui.chk_log_spgr_time.setChecked(False)
                 self.ui.chk_log_spgr_time.blockSignals(False)
             else:
-                logger.warning("Unknown spectrogram mode {0}".format(mode))
-                mode = None
+                logger.warning("Unknown spectrogram mode {0}, falling back to 'psd'"
+                               .format(mode))
+                mode = "psd"
 
             # Only valid and visible for Power Spectral Density
             # but needs to be set anyway:
