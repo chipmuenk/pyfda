@@ -31,7 +31,7 @@ API version info:
 
    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility
 """
-from pyfda.libs.compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
+from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QPushButton, QHBoxLayout, QVBoxLayout)
 import numpy as np
 import scipy.signal as sig
@@ -176,8 +176,12 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         self.but_fft_wdg = QPushButton(self)
-        self.but_fft_wdg.setText("FFT WDG")
-        self.but_fft_wdg.setToolTip("Show time and frequency response of FFT Window")
+        self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
+        but_height = self.cmb_firwin_alg.sizeHint().height()
+        self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
+        self.but_fft_wdg.setFixedSize(QSize(but_height, but_height))
+        self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
+                                    ' and display its properties).</span>')
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
@@ -187,9 +191,10 @@ class Firwin(QWidget):
 
         self.layHWin1 = QHBoxLayout()
         # self.layHWin1.addWidget(self.cmb_firwin_win)
-        self.layHWin1.addWidget(self.but_fft_wdg)
+        # self.layHWin1.addWidget(self.but_fft_wdg)
         self.layHWin1.addWidget(self.cmb_firwin_alg)
         self.layHWin2 = QHBoxLayout()
+        self.layHWin2.addWidget(self.but_fft_wdg)
         self.layHWin2.addWidget(self.qfft_win_select)
 
         self.layVWin = QVBoxLayout()
