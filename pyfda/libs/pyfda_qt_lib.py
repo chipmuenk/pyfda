@@ -9,23 +9,25 @@
 """
 Library with various helper functions for Qt widgets
 """
+from .pyfda_lib import qstr
+
+from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel
+from .pyfda_dirs import OS, OS_VER
 
 import logging
 logger = logging.getLogger(__name__)
 
-from .pyfda_lib import qstr
-
-from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QSize, QWidget
-from .pyfda_dirs import OS
 
 # ------------------------------------------------------------------------------
 def qwindow_stay_on_top(win, top):
     """
     Set flags for a window such that it stays on top (True) or not
 
-    On Windows (7) the new window stays on top anyway (check for Win10),
+    On Windows 7 the new window stays on top anyway.
     Additionally setting WindowStaysOnTopHint blocks the message window when
     trying to close pyfda.
+    
+    On Windows 10 and Linux, `WindowStaysOnTopHint` needs to be set.
     """
 
     win_flags = (Qt.CustomizeWindowHint | Qt.Window |  # always needed
@@ -34,10 +36,11 @@ def qwindow_stay_on_top(win, top):
                  Qt.WindowContextHelpButtonHint |  # right Mousebutton context menu
                  Qt.WindowMinMaxButtonsHint)  # show min/max buttons
 
-    if OS == "Windows" or not top:
+    if OS == "Windows" and OS_VER in {'XP', '7', 'Vista', '2008Server'} or not top:
         win.setWindowFlags(win_flags)
     else:
         win.setWindowFlags(win_flags | Qt.WindowStaysOnTopHint)
+
 
 # ------------------------------------------------------------------------------
 def qcmb_box_populate(cmb_box, items_list, item_init):
@@ -85,7 +88,8 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
     size = QSize(10, 10)
     self.combo_box.setIconSize(size)  """
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):
     """
     Get current itemData or Text of comboBox and convert it to string.
@@ -111,7 +115,8 @@ def qget_cmb_box(cmb_box, data=True):
 
     return cmb_str
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
     """
     Set combobox to the index corresponding to `string` in a text field (`data = False`)
