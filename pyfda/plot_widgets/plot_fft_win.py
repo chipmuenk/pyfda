@@ -80,8 +80,8 @@ class Plot_FFT_win(QDialog):
     def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
-        # Qt.WindowStaysOnTopHint | Qt.Popup)  # no difference to qwindow_stay_on_top
-
+        # make window stay on top
+        qwindow_stay_on_top(self, True)
         self.win_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -102,7 +102,6 @@ class Plot_FFT_win(QDialog):
         self.tbl_sel = [True, True, False, False]
 
         self._construct_UI()
-        qwindow_stay_on_top(self, True)
         self.calc_draw_win()
 
 # ------------------------------------------------------------------------------
