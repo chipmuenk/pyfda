@@ -1173,8 +1173,9 @@ class PlotImpz_UI(QWidget):
 
         # This widget is part of the frequency tab!
         self.chk_freq_norm_impz.setVisible("norm" in stim_wdg)
-        self.chk_freq_norm_impz.setEnabled(self.cmb_stim == "impulse" and self.DC == 0
-                        and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
+        self.chk_freq_norm_impz.setEnabled(
+            self.cmb_stim == "impulse" and self.DC == 0
+            and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
 
         self.chk_step_err.setVisible(self.stim == "step")
 
