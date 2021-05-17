@@ -123,7 +123,7 @@ all_windows_dict = {
             '''<span>The minimum 4-term Blackman-Harris window gives an excellent
             constant side-lobe suppression of more than 90 dB while keeping a
             reasonably narrow main lobe.
-            
+
             5-, 7- and 9-term Blackman-Harris windows achieve side-lobe suppressions
             of up to 125, 180 and 230 dB.
             </span>'''
@@ -527,7 +527,6 @@ def get_window(win_dict, N, win_name=None, sym=False):
 
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
     cgain = np.sum(w) / N  # coherent gain / DC average
-    # win_dict[win_name].update({'nenbw': nenbw, 'cgain': cgain})
     win_dict.update({'win': w, 'nenbw': nenbw, 'cgain': cgain})
 
     return w
@@ -731,12 +730,11 @@ class QFFTWinSelector(QWidget):
         # ----------------------------------------------------------------------
         # careful! currentIndexChanged passes an integer (the current index)
         # to update_win
-        self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type)
+        self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type_emit)
         self.led_win_par_1.editingFinished.connect(self.update_win_params)
         self.led_win_par_2.editingFinished.connect(self.update_win_params)
         self.cmb_win_par_1.currentIndexChanged.connect(self.update_win_params)
         self.cmb_win_par_2.currentIndexChanged.connect(self.update_win_params)
-
 
 # ------------------------------------------------------------------------------
     def get_window(self, N, win_name=None, sym=False):
@@ -751,53 +749,17 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def update_widgets(self):
         """
-        Update widgets with data from win_dict
+        - set FFT window type combobox from `win_dict['cur_win_name']`
+        - update parameter widgets for new window type from `win_dict`
+        - don't emit a signal
         """
         qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
-        self.update_param_widgets()
-
-# ------------------------------------------------------------------------------
-    def update_param_widgets(self):
-        """
-        Update parameter widgets (if enabled) with data from win_dict
-        """
-        cur = self.win_dict['cur_win_name']  # current window name / key
-        n_par = self.win_dict[cur]['n_par']
-
-        # self.lbl_win_par_1.setVisible(n_par > 0)
-        # self.led_win_par_1.setVisible(False)
-        # self.cmb_win_par_1.setVisible(False)
- 
-        # self.lbl_win_par_2.setVisible(n_par > 1)
-        # self.led_win_par_2.setVisible(False)
-        # self.cmb_win_par_2.setVisible(False)
-
-        if n_par > 0:
-    #        self.lbl_win_par_1.setText(
-    #            to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
-            if 'list' in self.win_dict[cur]['par'][0]:
-    #            self.led_win_par_1.setVisible(False)
-    #            self.cmb_win_par_1.setVisible(True)
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
-            else:
-    #            self.led_win_par_1.setVisible(True)
-    #            self.cmb_win_par_1.setVisible(False)
-                self.led_win_par_1.setText(
-                    str(self.win_dict[cur]['par'][0]['val']))
-                self.led_win_par_1.setToolTip(
-                    self.win_dict[cur]['par'][0]['tooltip'])
-
-        if n_par > 1:
-            self.led_win_par_2.setVisible(True)
-            self.lbl_win_par_2.setText(
-                to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
-            self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
-            self.led_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+        self.update_win_type()
 
 # ------------------------------------------------------------------------------
     def update_win_params(self):
         """
-        Read out parameter when editing is finished and
+        Read out window parameter widget(s) when editing is finished and
         update win_dict.
 
         Emit 'view_changed': 'fft_win'
@@ -836,30 +798,35 @@ class QFFTWinSelector(QWidget):
         self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
 
 # ------------------------------------------------------------------------------
+    def update_win_type_emit(self, arg=None):
+        """
+        - read FFT window type combo box and update win_dict using `set_window_name()`,
+          update parameter widgets accordingly
+        - emit 'view_changed': 'fft_win'
+        """
+        self.update_win_type(arg=arg)
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
+
+# ------------------------------------------------------------------------------
     def update_win_type(self, arg=None):
         """
-        - update `self.win_dict['cur_win_name']` from
-          selected FFT combobox entry
+        - read FFT window type combo box and update win_dict using `set_window_name()`
+        - determine number of parameters and make lineedit or combobox fields visible
+        - set tooltipps and parameter values from dict
 
-        - update win_dict using `set_window_function()`
-
-        - determine number of parameter lineedits that are needed,
-          make them visible and update parameter values from dict
-
-        - emit 'sig_tx'
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         set_window_name(self.win_dict, cur)
-        # update visibility and values of parameter widgets
-    
+
+        # update visibility and values of parameter widgets:
         n_par = self.win_dict[cur]['n_par']
 
         self.lbl_win_par_1.setVisible(n_par > 0)
         self.led_win_par_1.setVisible(False)
         self.cmb_win_par_1.setVisible(False)
- 
+
         self.lbl_win_par_2.setVisible(n_par > 1)
-        self.led_win_par_2.setVisible(n_par > 1)
+        self.led_win_par_2.setVisible(False)
         self.cmb_win_par_2.setVisible(False)
 
         if n_par > 0:
@@ -871,6 +838,8 @@ class QFFTWinSelector(QWidget):
                 self.cmb_win_par_1.clear()
                 self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][0]['list'])
                 qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
+                self.cmb_win_par_1.setToolTip(
+                    self.win_dict[cur]['par'][0]['tooltip'])
             else:
                 self.led_win_par_1.setVisible(True)
                 self.cmb_win_par_1.setVisible(False)
@@ -879,6 +848,18 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setToolTip(
                     self.win_dict[cur]['par'][0]['tooltip'])
 
-        self.update_param_widgets()
-
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        if n_par > 1:
+            self.lbl_win_par_2.setText(
+                to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
+            if 'list' in self.win_dict[cur]['par'][1]:
+                self.led_win_par_2.setVisible(False)
+                self.cmb_win_par_2.setVisible(True)
+                self.cmb_win_par_2.clear()
+                self.cmb_win_par_2.addItems(self.win_dict[cur]['par'][1]['list'])
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
+                self.cmb_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+            else:
+                self.led_win_par_2.setVisible(True)
+                self.cmb_win_par_2.setVisible(False)
+                self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
+                self.led_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
