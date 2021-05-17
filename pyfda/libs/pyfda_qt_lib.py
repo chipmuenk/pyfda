@@ -162,22 +162,23 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
 
     ret = idx
 
-    if idx == -1: # data does not exist, use first entry instead
+    if idx == -1:  # data does not exist, use first entry instead
         idx = 0
 
     cmb_box.blockSignals(not fireSignals)
-    cmb_box.setCurrentIndex(idx) # set index
+    cmb_box.setCurrentIndex(idx)  # set index
     cmb_box.blockSignals(False)
 
     return ret
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
                       caseSensitive=False):
     """
-    Try to find the entry in combobox corresponding to `string` in a text field (`data = False`)
-    or in a data field (`data=True`) and delete the item. When `string` is not found,
-    do nothing. Signals are blocked during the update of the combobox unless
+    Try to find the entry in combobox corresponding to `string` in a text field
+    (`data = False`) or in a data field (`data=True`) and delete the item. When `string`
+    is not found,do nothing. Signals are blocked during the update of the combobox unless
     `fireSignals` is set `True`. By default, the search is case insensitive, this
     can be changed by passing `caseSensitive=False`.
 
@@ -204,7 +205,7 @@ def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
-        flag = Qt.MatchFixedString # string based matching (case insensitive)
+        flag = Qt.MatchFixedString  # string based matching (case insensitive)
 
     # Other more or less self explanatory flags:
     # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith,
@@ -215,12 +216,13 @@ def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
     else:
         idx = cmb_box.findText(str(string), flags=flag)  # find index for text == string
 
-    if idx > -1: # data  / text exists in combo box, delete it.
+    if idx > -1:  # data  / text exists in combo box, delete it.
         cmb_box.blockSignals(not fireSignals)
         cmb_box.removeItem(idx)  # set index
         cmb_box.blockSignals(False)
 
     return idx
+
 
 # ----------------------------------------------------------------------------
 def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
@@ -266,7 +268,7 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
     else:
         idx = cmb_box.findText(item_list[1], flags=flag)  # find index for text
 
-    if idx == -1: # data  / text doesn't exist in combo box, add it.
+    if idx == -1:  # data  / text doesn't exist in combo box, add it.
         cmb_box.blockSignals(not fireSignals)
         cmb_box.addItem(cmb_box.tr(item_list[1]), item_list[0])  # set index
         idx = cmb_box.findData(item_list[0])
@@ -275,7 +277,8 @@ def qcmb_box_add_item(cmb_box, item_list, data=True, fireSignals=False,
 
     return idx
 
-# ----------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def qstyle_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
@@ -345,6 +348,7 @@ def qget_selected(table, select_all=False, reverse=True):
     cur = (table.currentColumn(), table.currentRow())
     # cur_idx_row = table.currentIndex().row()
     return {'idx': idx, 'sel': sel, 'cur': cur}  # 'rows':rows 'cols':cols, }
+
 
 # ----------------------------------------------------------------------------
 def qfilter_warning(self, N, fil_class):
@@ -426,10 +430,10 @@ class QVLine(QFrame):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Plain)
-        #self.setStyleSheet('border-color: rgb(50,50,50)')
-        #self.setFrameShadow(QFrame.Sunken)
-        #self.setLineWidth(width)
-        #self.setFrameShape(QFrame.StyledPanel);
+        # self.setStyleSheet('border-color: rgb(50,50,50)')
+        # self.setFrameShadow(QFrame.Sunken)
+        # self.setLineWidth(width)
+        # self.setFrameShape(QFrame.StyledPanel);
         self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
 
 
@@ -442,8 +446,8 @@ class RotatedButton(QPushButton):
     https://forum.qt.io/topic/9279/moved-how-to-rotate-qpushbutton-63/7
     """
 
-    def init(self, text, parent, orientation = "west"):
-        super(RotatedButton,self).init(text, parent)
+    def init(self, text, parent, orientation="west"):
+        super(RotatedButton, self).init(text, parent)
         self.orientation = orientation
 
     def paintEvent(self, event):
@@ -468,7 +472,7 @@ class RotatedButton(QPushButton):
         size = options.rect.size()
         size.transpose()
         options.rect.setSize(size)
-        #options.features = QtGui.QStyleOptionButton.None
+        # options.features = QtGui.QStyleOptionButton.None
         if self.isFlat():
             options.features |= QtGui.QStyleOptionButton.Flat
         if self.menu():
@@ -503,9 +507,9 @@ class QLabelVert(QLabel):
 
     def __init__(self, text, orientation='west', forceWidth=True):
         QLabel.__init__(self, text)
-        #self.forceWidth = forceWidth
+        # self.forceWidth = forceWidth
         self.orientation = orientation
-        #self.setOrientation(orientation)
+        # self.setOrientation(orientation)
 
     # def setOrientation(self, o):
     #     self.orientation = o
@@ -517,14 +521,14 @@ class QLabelVert(QLabel):
         # p.setPen(QtCore.Qt.black)
         p.rotate(-90)
         rgn = QtCore.QRect(-self.height(), 0, self.height(), self.width())
-        #align = self.alignment()  # use alignment of original widget
-        align  = QtCore.Qt.AlignVCenter|QtCore.Qt.AlignHCenter
-        #p.translate(0, -1 * self.width())
+        # align = self.alignment()  # use alignment of original widget
+        align = QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter
+        # p.translate(0, -1 * self.width())
 
         # Draw plain text in `rgn` with alignment `align`
         self.hint = p.drawText(rgn, align, self.text())
         p.drawText(rgn, align, self.text())  # returns (height, width)
-        #p.drawControl()
+        # p.drawControl()
         p.end()
 
     def sizeHint(self):
