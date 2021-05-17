@@ -99,7 +99,7 @@ class PlotImpz_UI(QWidget):
         self.bottom_t = -80  # initial value for log. scale (time)
         self.time_nfft_spgr = 256  # number of fft points per spectrogram segment
         self.time_ovlp_spgr = 128  # number of overlap points between spectrogram segments
-        self.mode_spgr_time = "magnitude"
+        self.mode_spgr_time = "psd"
 
         # stimuli
         self.cmb_stim_item = "impulse"
@@ -254,6 +254,16 @@ class PlotImpz_UI(QWidget):
             ("xn", "x[n]", ""),
             ("xqn", "x_q[n]", ""),
             ("yn", "y[n]", "")
+            ]
+
+        self.cmb_mode_spgr_time_items = [
+            "<span>Spectrogram display mode.</span>",
+            ("psd", "PSD",
+             "<span>Power Spectral Density, either per bin or referred to "
+             "<i>f<sub>S</sub></i></span>"),
+            ("magnitude", "Mag.", "Signal magnitude"),
+            ("angle", "Angle", "Phase, wrapped to &pm; &pi;"),
+            ("phase", "Phase", "Phase (unwrapped)")
             ]
 
         # data / text / tooltip for noise stimulus combobox.
@@ -435,12 +445,8 @@ class PlotImpz_UI(QWidget):
         spgr_en = self.plt_time_spgr != "none"
 
         self.cmb_mode_spgr_time = QComboBox(self)
-        spgr_modes = [("PSD", "psd"), ("Mag.", "magnitude"),
-                      ("Angle", "angle"), ("Phase", "phase")]
-        for i in spgr_modes:
-            self.cmb_mode_spgr_time.addItem(*i)
-        qset_cmb_box(self.cmb_mode_spgr_time, self.mode_spgr_time, data=True)
-        self.cmb_mode_spgr_time.setToolTip("<span>Spectrogram display mode.</span>")
+        qcmb_box_populate(
+            self.cmb_mode_spgr_time, self.cmb_mode_spgr_time_items, self.mode_spgr_time)
         self.cmb_mode_spgr_time.setVisible(spgr_en)
 
         self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
