@@ -536,6 +536,7 @@ def get_window(win_dict, N, win_name=None, sym=False):
 def blackmanharris(N, L, sym):
     if L == '4':
         return sig.windows.blackmanharris(N, sym)
+
     elif L == '5':
         """ 5 Term Cosine, 125.427 dB, NBW 2.21535 bins, 9.81016 dB gain """
         a = [3.232153788877343e-001,
@@ -563,6 +564,11 @@ def blackmanharris(N, L, sym):
              3.685604163298180e-004,
              -1.384355593917030e-005,
              1.161808358932861e-007]
+    else:
+        raise Exception(
+            "Undefined parameter '{0}' for order L, falling back to rectangular window"
+            .format(L))
+        return
 
     return calc_cosine_window(N, sym, a)
 
