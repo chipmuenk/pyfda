@@ -525,15 +525,15 @@ class Plot_FFT_win(QDialog):
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.cgain_disp = 20 * np.log10(self.cgain)
             self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
-            self.unit_nenbw = "dB"
-            self.unit_scale = "dB"
+            self.nenbw_unit = "dB"
+            self.cgain_unit = "dB"
         else:
             self.ax_f.plot(F, Win)
             self.nenbw_disp = self.nenbw
             self.cgain_disp = self.cgain
             self.sidelobe_level_disp = self.sidelobe_level
-            self.unit_nenbw = "bins"
-            self.unit_scale = ""
+            self.nenbw_unit = "bins"
+            self.cgain_unit = ""
 
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
@@ -578,11 +578,11 @@ class Plot_FFT_win(QDialog):
         N_patches = 0
         if self.tbl_sel[0]:
             labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp,
-                                                           self.unit_nenbw))
+                                                           self.nenbw_unit))
             N_patches += 1
         if self.tbl_sel[1]:
             labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.cgain_disp,
-                                                           self.unit_scale))
+                                                           self.cgain_unit))
             N_patches += 1
         if self.tbl_sel[2]:
             labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))
@@ -609,10 +609,10 @@ class Plot_FFT_win(QDialog):
 
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
-        self._set_table_item(0, 2, self.unit_nenbw)
+        self._set_table_item(0, 2, self.nenbw_unit)
         self._set_table_item(0, 3, "Scale", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 4, "{0:.5g}".format(self.cgain_disp))
-        self._set_table_item(0, 5, self.unit_scale)
+        self._set_table_item(0, 5, self.cgain_unit)
 
         self._set_table_item(1, 0, "1st Zero", font=self.bfont)  # , sel=True)
         self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_f))
@@ -620,7 +620,7 @@ class Plot_FFT_win(QDialog):
 
         self._set_table_item(1, 3, "Sidelobes", font=self.bfont)  # , sel=True)
         self._set_table_item(1, 4, "{0:.5g}".format(self.sidelobe_level_disp))
-        self._set_table_item(1, 5, self.unit_scale)
+        self._set_table_item(1, 5, self.cgain_unit)
 
         self.tbl_win_properties.resizeColumnsToContents()
         self.tbl_win_properties.resizeRowsToContents()
