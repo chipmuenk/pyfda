@@ -306,7 +306,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=10)
         # self.but_auto_run.setText("Auto")
-        self.but_height = self.but_auto_run.sizeHint().height()
         self.but_auto_run.setObjectName("but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
@@ -353,8 +352,9 @@ class PlotImpz_UI(QWidget):
 
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
-        self.but_fft_wdg.setIconSize(QSize(self.but_height, self.but_height))
-        self.but_fft_wdg.setFixedSize(QSize(self.but_height, self.but_height))
+        but_height = self.but_auto_run.sizeHint().height()
+        self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
+        self.but_fft_wdg.setFixedSize(QSize(but_height, but_height))
         self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
                                     ' and display its properties).</span>')
         self.but_fft_wdg.setCheckable(True)
