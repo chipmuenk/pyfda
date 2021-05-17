@@ -556,7 +556,7 @@ class Plot_FFT_win(QDialog):
             else:
                 p2 = "{0:.3g}".format(cur_win_d['par'][1]['val'])
             param_txt = param_txt[:-1]\
-                + ", {0:s} = {1:.3g})".format(cur_win_d['par'][1]['name_tex'], p2)
+                + ", {0:s} = {1:s})".format(cur_win_d['par'][1]['name_tex'], p2)
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur) + param_txt)
 
