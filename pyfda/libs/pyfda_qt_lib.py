@@ -366,11 +366,21 @@ def qfilter_warning(self, N, fil_class):
     else:
         return False
 
+
 # ----------------------------------------------------------------------------
-def qled_set_max_width(wdg, str = '', N_x = 17):
+def qled_set_max_width(wdg, str='', N_x=17):
     """
-    Calculate width of QLineEdit widgets in points for a given string
-    and set its maximum width correspondingly.
+    Calculate width of QLineEdit widgets in points for a given string `str` or a
+    number `N_x` of characters 'x' and set the maximum width of the widget 
+    correspondingly.
+
+    The minimum width is calculated from:
+    - `textMargins()`, property of QLineEdit, gets margins around the text inside 
+       the frame
+    - `contentsMargins()` is a property of QWidget, gets ???
+    - a constant of 8, including horizontalMargin() (???) and a frame margin (???)
+
+    The actual width of the string or of 'x' is calculated using `fontMetrics()`.
 
     Parameters
     ----------
@@ -390,9 +400,6 @@ def qled_set_max_width(wdg, str = '', N_x = 17):
         The required width in points
 
     """
-    # ----- define measures to define size of LineEditFields
-    #       # contentsMargins() is a property of QWidget, gets
-    #       # textMargins(), property of QLineEdit, gets margins around the text inside the frame
     width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
                 wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
                 8 # 2 * horizontalMargin() + 2 * frame margin.
@@ -406,7 +413,7 @@ def qled_set_max_width(wdg, str = '', N_x = 17):
     wdg.setMaximumWidth(width)
     return width
 
-    #self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
+    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
     # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
 
 
@@ -492,6 +499,7 @@ class RotatedButton(QPushButton):
         options.icon = self.icon()
         options.iconSize = self.iconSize()
         return options
+
 
 class QLabelVert(QLabel):
     """
