@@ -840,9 +840,9 @@ class Plot_Impz(QWidget):
 # ----------------------------------------------------------------------------
     def _spgr_cmb(self):
         """
-        Update spectrogram ui
+        Update spectrogram ui when signal selection combobox has been changed
         """
-        spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != "none"
+        spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none'
 
         self.ui.chk_log_spgr_time.setVisible(spgr_en)
         self.ui.lbl_time_nfft_spgr.setVisible(spgr_en)
@@ -860,6 +860,12 @@ class Plot_Impz(QWidget):
         """
         Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
+        if qget_cmb_box(self.ui.cmb_mode_spgr_time) in {'phase', 'angle'}:
+            # must be linear if mode is 'angle' or 'phase'
+            self.ui.chk_log_spgr_time.setChecked(False)
+            self.ui.chk_log_spgr_time.setEnabled(False)
+        else:
+            self.ui.chk_log_spgr_time.setEnabled(True)
 
         log = self.ui.chk_log_time.isChecked() or\
             (self.ui.chk_log_spgr_time.isChecked() and self.spgr)
@@ -1223,20 +1229,20 @@ class Plot_Impz(QWidget):
                 spgr_unit = r" in rad"
                 spgr_symb = "${0}$".format(sig_lbl)
                 spgr_pre = r"$\angle$"
-                # must be linear if mode is 'angle' or 'phase':
-                self.ui.chk_log_spgr_time.blockSignals(True)
-                self.ui.chk_log_spgr_time.setChecked(False)
-                self.ui.chk_log_spgr_time.blockSignals(False)
             else:
                 logger.warning("Unknown spectrogram mode {0}, falling back to 'psd'"
                                .format(mode))
                 mode = "psd"
 
             # Only valid and visible for Power Spectral Density
-            # but needs to be set anyway:
             if self.ui.chk_byfs_spgr_time.isChecked():
                 # scale result by f_S
-                spgr_unit = r" in {0}W / Hz".format(dB_unit)
+                Hz_unit = fb.fil[0]['plt_fUnit']
+                # special treatment for PSD units needed
+                if self.ui.chk_log_spgr_time.isChecked():
+                    spgr_unit = r" in dB re W / {0}".format(Hz_unit)
+                else:
+                    spgr_unit = r" in W / {0}".format(Hz_unit)
                 scaling = "density"
             else:
                 # display result in W / bin
