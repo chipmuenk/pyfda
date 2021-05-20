@@ -40,7 +40,7 @@ from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
-from pyfda.libs.pyfda_qt_lib import qfilter_warning, qstyle_widget, qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qfilter_warning
 from pyfda.libs.pyfda_fft_windows_lib import (QFFTWinSelector,
                                               get_windows_dict, get_window)
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -85,7 +85,7 @@ class Firwin(QWidget):
             cur_win_name=self.cur_win_name)
 
         # get initial / last setting from dictionary, updating self.win_dict
-        self._load_dict()  
+        self._load_dict()
 
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(

@@ -32,32 +32,31 @@ from cycler import cycler
 #from PyQt4.QtGui import QStyleFactory
 #print(QStyleFactory.keys())
 
-THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
+THEME = 'light'     # select 'dark' or 'light' theme or 'none' or use one of the
                     # system styles like 'windows':
-# QT4 only:         motif, cleanlooks, CDE, plastique
 # QT5 only:         fusion
 # MS Windows only:  windowsxp, windowsvista
 # Mac only:         macintosh
 
-mpl_ms = 8 # base size for matplotlib markers
+mpl_ms = 8  # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}',  # format string for QLineEdit fields
           'CSV':    # format options and parameters for CSV-files and clipboard
-                  {
-                  'delimiter' : ',', # default delimiter
-                  'lineterminator'  : CRLF, # OS-dependend line break from pyfda_lib
-                  'orientation': 'auto', # 'auto', 'vert', 'horiz'# table orientation
-                  'header': 'off', # 'auto', 'on', 'off'
-                  'clipboard': False # source/target is QClipboard or file
-                  }, 
+              {
+                  'delimiter': ',',  # default delimiter
+                  'lineterminator': CRLF,  # OS-dependend line break from pyfda_lib
+                  'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
+                  'header': 'off',  # 'auto', 'on', 'off'
+                  'clipboard': False  # source/target is QClipboard or file
+                  },
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
-          'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
-          'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
-          'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
-          'wdg_margins_spc' : (2,2,2,2),  # R, T, L, B widget margins with more vertical spacing
-          'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
+          'P_Marker': [mpl_ms, 'r'],  # size and color for poles' marker
+          'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
+          'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
+          'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
+          'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}     
           }
 mpl_params_dark = {
             'mpl_hatch': {                          # hatched area for specs
@@ -71,10 +70,11 @@ mpl_params_dark = {
                           'ms': mpl_ms,            # marker size
                           'alpha': 0.25,           # transparency (marker + stem)
                           'markerfmt':'*',         # marker symbol
-                          'lw':'2' }               # stem linewidth
+                          'lw': '2'}               # stem linewidth
                     }
 
-#fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
+# fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'],
+# 'lw':0.0}
 mpl_params_light = {
             'mpl_hatch': {                         # hatched area for specs
                          'facecolor': 'none',
@@ -87,19 +87,19 @@ mpl_params_light = {
                           'ms': mpl_ms,            # marker size
                           'alpha': 0.25,           # transparency (marker + stem)
                           'markerfmt':'*',         # marker symbol 
-                          'lw':'2' }              # stem linewidth
+                          'lw': '2'}              # stem linewidth
                     }
 
 # Dictionary with translations between short method names and long names for
 # response types - the long name can be changed as you like, but don't change 
 # the short name - it is used to construct the filter design method names
-rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
-            "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
-            "HIL":"Hilbert", "DIFF":"Differentiator"}
+rt_names = {"LP": "Lowpass", "HP": "Highpass", "BP": "Bandpass",
+            "BS": "Bandstop", "AP": "Allpass", "MB": "Multiband",
+            "HIL": "Hilbert", "DIFF": "Differentiator"}
             
 # Dictionary with translations between short method names and long names for
 # response types
-ft_names = {"IIR":"IIR", "FIR":"FIR"}
+ft_names = {"IIR": "IIR", "FIR": "FIR"}
 
 # Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
 # in filterbroker.py
@@ -132,15 +132,15 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           #'xtick.top'                 : False, 2.0 only
           'figure.figsize'            : (5,4),
           'figure.dpi'                : 100,
-          'hatch.color'               : '#808080', # since mpl2.0
-          'hatch.linewidth'           : 0.5 # since mpl2.0
+          'hatch.color'               : '#808080',
+          'hatch.linewidth'           : 0.5
           }
 
 mpl_rc_33 = {'mathtext.fallback'      : 'cm'} # new since mpl 3.3
 mpl_rc_32 = {'mathtext.fallback_to_cm': True} # deprecated since mpl 3.3
 
-if cmp_version('matplotlib','3.3') < 0:
-    mpl_rc.update(mpl_rc_32) # lower than matplotlib 3.3
+if cmp_version('matplotlib', '3.3') < 0:
+    mpl_rc.update(mpl_rc_32)  # lower than matplotlib 3.3
 else:
     mpl_rc.update(mpl_rc_33)
 
@@ -151,7 +151,7 @@ mpl_rc_dark = {
             'axes.labelcolor'   : 'white',
             'axes.edgecolor'    : 'white',
             'figure.facecolor'  : '#202020',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
+            'figure.edgecolor'  : '#808080',
             'savefig.facecolor' : 'black',
             'savefig.edgecolor' : 'black', 
             'xtick.color'       : 'white',
@@ -167,7 +167,7 @@ mpl_rc_light = {
             'axes.labelcolor'   : 'black',
             'axes.edgecolor'    : 'black',
             'figure.facecolor'  : 'white',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
+            'figure.edgecolor'  : '#808080',
             'savefig.facecolor' : 'white',
             'savefig.edgecolor' : 'white', 
             'xtick.color'       : 'black',

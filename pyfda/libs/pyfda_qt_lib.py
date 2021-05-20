@@ -26,7 +26,7 @@ def qwindow_stay_on_top(win, top):
     On Windows 7 the new window stays on top anyway.
     Additionally setting WindowStaysOnTopHint blocks the message window when
     trying to close pyfda.
-    
+
     On Windows 10 and Linux, `WindowStaysOnTopHint` needs to be set.
     """
 
@@ -371,11 +371,11 @@ def qfilter_warning(self, N, fil_class):
 def qled_set_max_width(wdg, str='', N_x=17):
     """
     Calculate width of QLineEdit widgets in points for a given string `str` or a
-    number `N_x` of characters 'x' and set the maximum width of the widget 
+    number `N_x` of characters 'x' and set the maximum width of the widget
     correspondingly.
 
     The minimum width is calculated from:
-    - `textMargins()`, property of QLineEdit, gets margins around the text inside 
+    - `textMargins()`, property of QLineEdit, gets margins around the text inside
        the frame
     - `contentsMargins()` is a property of QWidget, gets ???
     - a constant of 8, including horizontalMargin() (???) and a frame margin (???)
@@ -441,7 +441,7 @@ class QVLine(QFrame):
         # self.setFrameShadow(QFrame.Sunken)
         # self.setLineWidth(width)
         # self.setFrameShape(QFrame.StyledPanel);
-        self.setStyleSheet( "border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
+        self.setStyleSheet("border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
 
 
 class RotatedButton(QPushButton):
