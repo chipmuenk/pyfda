@@ -28,6 +28,7 @@ When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
 all_windows_dict = {
+    'win': [],  # array with window values for FFT / filter design
     'cur_win_name': 'Rectangular',  # name of current window
     #
     'Boxcar': {
@@ -388,6 +389,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
     awd = copy.deepcopy(all_windows_dict)
     d = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
+    d.update({'cur_win_name': awd['cur_win_name'], 'win': awd['win']})
     set_window_name(d, cur_win_name)
     return d
 
