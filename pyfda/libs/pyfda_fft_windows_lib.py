@@ -120,7 +120,8 @@ all_windows_dict = {
             'name': 'L', 'name_tex': r'$L$', 'val': 4, 'list': ['4', '5', '7', '9'],
             'tooltip': '<span>Number of cosine terms</span>'}],
         'info':
-            '''<span>The minimum 4-term Blackman-Harris window gives an excellent
+            '''<span>
+            The minimum 4-term Blackman-Harris window gives an excellent
             constant side-lobe suppression of more than 90 dB while keeping a
             reasonably narrow main lobe.
 
@@ -159,7 +160,8 @@ all_windows_dict = {
                 '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
                 }],
         'info':
-            '''<span>Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
+            '''<span>
+            Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
             sequences) are often used in multitaper power spectral density
             estimation. The first window in the sequence can be used to maximize
             the energy concentration in the main lobe, and is also called the
@@ -194,7 +196,8 @@ all_windows_dict = {
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         'info':
-            '''<span>The higher the standard deviation of Gaussian window is set,
+            '''<span>
+            The higher the standard deviation of Gaussian window is set,
             the lower the max. sidelobe level becomes. At the same time, the width
             of the main lobe increases.
             </span>'''
@@ -213,14 +216,16 @@ all_windows_dict = {
     'Hann': {
         'fn_name': 'hann',
         'info':
-            '<span>The Hann (or, falsely, "Hanning") window is smooth at the '
-            'edges. In the frequency domain this corresponds to side-lobes falling '
-            'off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite '
-            'high (-32 dB). It is a good compromise for many applications, especially '
-            'when higher frequency components need to be suppressed.'
-            '<br />&nbsp;<br />'
-            'Mathematically, it is the most simple two-term raised cosine '
-            'or squared sine window.</span>'},
+            '''<span>
+            The Hann (or, falsely, "Hanning") window is smooth at the
+            edges. In the frequency domain this corresponds to side-lobes falling
+            off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite
+            high (-32 dB). It is a good compromise for many applications, especially
+            when higher frequency components need to be suppressed.
+            <br />&nbsp;<br />
+            Mathematically, it is the most simple two-term raised cosine
+            or squared sine window.
+            </span>'''},
     'Kaiser': {
         'fn_name': 'kaiser',
         'par': [{
@@ -431,7 +436,7 @@ def set_window_name(win_dict, win_name):
     # --------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
-    mod_fnct = fn_name.split('.')  # try to split fully qualified name
+    mod_fnct = fn_name.split('.')  # try to split fully qualified name at "."
     fnct = mod_fnct[-1]  # last / rightmost part = function name
     if len(mod_fnct) == 1:
         # only one element, no module given -> use scipy.signal.windows
@@ -443,7 +448,8 @@ def set_window_name(win_dict, win_name):
             win_name = "Rectangular"
             n_par = 0
     else:
-        # extract module name from the beginning to the last '.'
+        # extract module name from fully qualified name, starting with first / 
+        # leftmost part of string to the last '.'
         mod_name = fn_name[:fn_name.rfind(".")]
         mod = importlib.import_module(mod_name)
         win_fnct = getattr(mod, fnct, None)

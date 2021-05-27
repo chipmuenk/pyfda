@@ -1228,6 +1228,7 @@ class Plot_Impz(QWidget):
                 spgr_unit = r" in rad"
                 spgr_symb = "${0}$".format(sig_lbl)
                 spgr_pre = r"$\angle$"
+
             else:
                 logger.warning("Unknown spectrogram mode {0}, falling back to 'psd'"
                                .format(mode))
