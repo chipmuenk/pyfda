@@ -764,11 +764,13 @@ class QFFTWinSelector(QWidget):
     def update_widgets(self):
         """
         - set FFT window type combobox from `win_dict['cur_win_name']`
-        - update parameter widgets for new window type from `win_dict`
-        - don't emit a signal
+        - if entry has changed (returned idx > -2) do:
+            - update parameter widgets for new window type from `win_dict`
+            - don't emit a signal
         """
-        qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
-        self.update_win_type()
+        idx = qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
+        if idx > -2:
+            self.update_win_type()
 
 # ------------------------------------------------------------------------------
     def update_win_params(self):

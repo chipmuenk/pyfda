@@ -144,8 +144,11 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     Returns
     -------
         The index of the string. When the string was not found in the combo box,
-        return index -1.
+        select first entry of combo box and return index -1. When the index hasn't
+        changed, return -2.
     """
+    old_idx = cmb_box.currentIndex()
+
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
@@ -154,15 +157,17 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
     # Other more or less self explanatory flags:
     # MatchExactly (default), MatchContains, MatchStartsWith, MatchEndsWith,
     # MatchRegExp, MatchWildcard, MatchRecursive
-
     if data:
         idx = cmb_box.findData(str(string), flags=flag)  # find index for data == string
     else:
         idx = cmb_box.findText(str(string), flags=flag)  # find index for text == string
 
     ret = idx
+    
+    if idx == old_idx:
+        return -2
 
-    if idx == -1:  # data does not exist, use first entry instead
+    elif idx == -1:  # string hasn't been found, use first entry instead
         idx = 0
 
     cmb_box.blockSignals(not fireSignals)
