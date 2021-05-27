@@ -14,20 +14,19 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 import numpy as np
-from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qcmb_box_populate
+from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
 from pyfda.libs.pyfda_sig_lib import group_delay, group_delayz
-from pyfda.libs.compat import (Qt, QCheckBox, QWidget, QFrame, QComboBox,
-                               QHBoxLayout, pyqtSignal, pyqtSlot)
+from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
+                               QHBoxLayout, pyqtSignal)
 import logging
 logger = logging.getLogger(__name__)
 
-
-#from scipy.signal import group_delay
+# from scipy.signal import group_delay
 
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?
 
-# : Dict containing class name : display name
+# Dict containing class name : display name
 classes = {'Plot_tau_g': 'tau_g'}
 
 
