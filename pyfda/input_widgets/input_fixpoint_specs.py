@@ -17,9 +17,9 @@ import time
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel,
-                      QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
-                      QEvent, QSizePolicy)
+from pyfda.libs.compat import (
+    Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap, 
+    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QEvent, QSizePolicy)
 
 import numpy as np
 
@@ -27,13 +27,13 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_io_lib import extract_file_ext
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
+# from pyfda.libs.pyfda_io_lib import extract_file_ext
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
 # when migen is present, instantiate the fixpoint widget
-if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
+if cmp_version("migen", "0.1") >= -1:  # currently, version cannot be determined
     import migen
     HAS_MIGEN = True
 else:
@@ -45,18 +45,19 @@ try:
     HAS_DS = True
 except ImportError:
     HAS_DS = False
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs':'Fixpoint'} #: Dict containing class name : display name
 
+
 class Input_Fixpoint_Specs(QWidget):
     """
-    Create the widget that holds the dynamically loaded fixpoint filter ui 
+    Create the widget that holds the dynamically loaded fixpoint filter ui
     """
     # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
     # incoming from subwidgets -> process_sig_rx_local
-    sig_rx_local = pyqtSignal(object) 
+    sig_rx_local = pyqtSignal(object)
     # incoming, connected to input_tab_widget.sig_rx
     sig_rx = pyqtSignal(object)
     # outcgoing
@@ -67,17 +68,17 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
-                " simulate it or generate a Verilog netlist.</span>")
+                         " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
         self.fx_path = os.path.realpath(os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
         self.no_fx_filter_img = os.path.join(self.fx_path, "no_fx_filter.png")
         if not os.path.isfile(self.no_fx_filter_img):
             logger.error("Image {0:s} not found!".format(self.no_fx_filter_img))
-            
+
         self.default_fx_img = os.path.join(self.fx_path, "default_fx_img.png")
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
-        
+
         if HAS_MIGEN:
             self._construct_UI()
         else:
@@ -87,18 +88,17 @@ class Input_Fixpoint_Specs(QWidget):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
-		
-		Play PingPong with a stimulus & plot widget:
-        
-		2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
-		
-		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'send_stimulus'
-			and pass it to HDL object for simulation
-		   
-		4. Send back HDL response to widget via 'fx_sim':'set_response'
 
+        Play PingPong with a stimulus & plot widget:
+
+        2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
+
+        3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in
+            'fx_sim':'send_stimulus' and pass it to HDL object for simulation
+
+        4. Send back HDL response to widget via 'fx_sim':'set_response'
         """
-		
+
         logger.debug("process_sig_rx(): vis={0}\n{1}"\
                     .format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['sender'] == __name__:
@@ -109,11 +109,11 @@ class Input_Fixpoint_Specs(QWidget):
             self._update_filter_cmb()
             return
         elif 'data_changed' in dict_sig or\
-            ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
+             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
-            #self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
+            # self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
                 if self.fx_wdg_found:
@@ -121,7 +121,7 @@ class Input_Fixpoint_Specs(QWidget):
                 else:
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimHDL, "error")  
-                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
+                    self.sig_tx.emit({'sender': __name__, 'fx_sim': 'error'})
                     
             elif dict_sig['fx_sim'] == 'send_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
@@ -136,7 +136,8 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
-        # ---- Process local widget signals 
+
+        # ---- Process local widget signals
         elif 'ui' in dict_sig:
             if 'id' in dict_sig and dict_sig['id'] == 'w_input':
                 """

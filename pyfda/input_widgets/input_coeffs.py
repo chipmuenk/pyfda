@@ -395,9 +395,8 @@ class Input_Coeffs(QWidget):
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
-        # =====================================================================
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _filter_type(self, ftype=None):
         """
         Get / set 'FIR' and 'IIR' filter from cmbFilterType combobox and set filter
@@ -408,7 +407,7 @@ class Input_Coeffs(QWidget):
         Reload from filter dict unless ftype is specified [does this make sense?!]
         """
         if ftype in {'FIR', 'IIR'}:
-            ret=qset_cmb_box(self.ui.cmbFilterType, ftype)
+            ret = qset_cmb_box(self.ui.cmbFilterType, ftype)
             if ret == -1:
                 logger.warning("Unknown filter type {0}".format(ftype))
 
@@ -422,14 +421,14 @@ class Input_Coeffs(QWidget):
             self.col = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
-            self.ba[1] = np.zeros_like(self.ba[1]) # enforce FIR filter
+            self.ba[1] = np.zeros_like(self.ba[1])  # enforce FIR filter
             self.ba[1][0] = 1.
 
         self._equalize_ba_length()
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _W_changed(self):
         """
         Set fractional and integer length `WF` and `WI` when wordlength `W` has
@@ -440,7 +439,7 @@ class Input_Coeffs(QWidget):
 
         if W < 2:
             logger.warn("W must be > 1, restoring previous value.")
-            W = self.myQ.W # fall back to previous value
+            W = self.myQ.W  # fall back to previous value
         self.ui.ledW.setText(str(W))
 
         if qget_cmb_box(self.ui.cmbQFrmt) == 'qint': # integer format, preserve WI bits
