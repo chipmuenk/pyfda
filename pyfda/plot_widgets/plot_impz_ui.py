@@ -83,7 +83,7 @@ class PlotImpz_UI(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        self.mSize = QFontMetrics(QPushButton().font()).width("m")
+        self.width_m = QFontMetrics(QPushButton().font()).width("m")
         # row4_height = mSize.lineSpacing() * 4
 
         # initial settings
@@ -433,7 +433,7 @@ class PlotImpz_UI(QWidget):
         line2 = QVLine(width=5)
 
         self.chk_log_time = QPushButton("dB")
-        self.chk_log_time.setMaximumWidth(self.mSize * 4)
+        self.chk_log_time.setMaximumWidth(self.width_m * 4)
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setCheckable(True)
@@ -460,7 +460,7 @@ class PlotImpz_UI(QWidget):
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.chk_log_spgr_time = QPushButton("dB")
-        self.chk_log_spgr_time.setMaximumWidth(self.mSize * 4)
+        self.chk_log_spgr_time.setMaximumWidth(self.width_m * 4)
         self.chk_log_spgr_time.setObjectName("chk_log_spgr")
         self.chk_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
@@ -577,7 +577,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
         self.chk_log_freq = QPushButton("dB")
-        self.chk_log_freq.setMaximumWidth(self.mSize * 4)
+        self.chk_log_freq.setMaximumWidth(self.width_m * 4)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_freq.setCheckable(True)
@@ -677,7 +677,7 @@ class PlotImpz_UI(QWidget):
             "<span>Bandlimit the signal to the Nyquist "
             "frequency to avoid aliasing. However, this is much slower "
             "to calculate especially for a large number of points.</span>")
-        self.chk_stim_bl.setMaximumWidth(self.mSize * 4)
+        self.chk_stim_bl.setMaximumWidth(self.width_m * 4)
         self.chk_stim_bl.setCheckable(True)
         self.chk_stim_bl.setChecked(True)
         self.chk_stim_bl.setObjectName("stim_bl")
@@ -706,7 +706,7 @@ class PlotImpz_UI(QWidget):
         # -------------------------------------
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
-        self.chk_step_err.setMaximumWidth(7*self.mSize)
+        self.chk_step_err.setMaximumWidth(7*self.width_m)
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
