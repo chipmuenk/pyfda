@@ -17,7 +17,7 @@ from scipy.signal import argrelextrema
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
+from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qled_set_max_width, QVLine
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import (
     get_window, QFFTWinSelector)
@@ -28,7 +28,8 @@ import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QCheckBox, QLabel, QLineEdit,
-    QFrame, QFont, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem)
+    QFrame, QFont, QPushButton, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
+    QFontMetrics)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,7 @@ class Plot_FFT_win(QDialog):
         super(Plot_FFT_win, self).__init__(parent)
         # make window stay on top
         qwindow_stay_on_top(self, True)
+        self.width_m = QFontMetrics(QPushButton().font()).width("m")  # width of 'm'
         self.win_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -187,19 +189,22 @@ class Plot_FFT_win(QDialog):
         self.chk_half_f.setChecked(True)
         self.chk_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
 
-        self.chk_log_f = QCheckBox("Log", self)
-        self.chk_log_f.setChecked(True)
-        self.chk_log_f.setToolTip("Display in dB")
+        self.but_log_f = QPushButton("dB")
+        self.but_log_f.setMaximumWidth(self.width_m * 4)
+        self.but_log_f.setObjectName("chk_log_freq")
+        self.but_log_f.setToolTip("<span>Display in dB.</span>")
+        self.but_log_f.setCheckable(True)
+        self.but_log_f.setChecked(True)
 
+        self.lbl_log_bottom_f = QLabel(to_html("min =", frmt='bi'), self)
+        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setText(str(self.bottom_f))
-        self.led_log_bottom_f.setMaximumWidth(50)
-        self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
+        qled_set_max_width(self.led_log_bottom_f, N_x=8)
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-
-        self.lbl_log_bottom_f = QLabel("dB", self)
-        self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
+        self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
+        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
         layH_win_select = QHBoxLayout()
         layH_win_select.addWidget(self.qfft_win_select)
@@ -212,14 +217,16 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.chk_log_t)
         layHControls.addWidget(self.led_log_bottom_t)
         layHControls.addWidget(self.lbl_log_bottom_t)
-        layHControls.addStretch(10)
+        layHControls.addStretch(5)
+        layHControls.addWidget(QVLine(width=2))
+        layHControls.addStretch(5)
         layHControls.addWidget(self.chk_norm_f)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chk_half_f)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chk_log_f)
-        layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.lbl_log_bottom_f)
+        layHControls.addWidget(self.led_log_bottom_f)
+        layHControls.addWidget(self.but_log_f)
 
         layVControls = QVBoxLayout()
         layVControls.addLayout(layH_win_select)
@@ -305,7 +312,7 @@ class Plot_FFT_win(QDialog):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.chk_log_f.clicked.connect(self.update_view)
+        self.but_log_f.clicked.connect(self.update_view)
         self.chk_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
@@ -493,7 +500,7 @@ class Plot_FFT_win(QDialog):
             F = fftshift(self.F)
             Win = fftshift(self.Win)
 
-        if self.chk_log_f.isChecked():
+        if self.but_log_f.isChecked():
             self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.cgain_disp = 20 * np.log10(self.cgain)
@@ -510,8 +517,8 @@ class Plot_FFT_win(QDialog):
 
         self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
         self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
-        self.led_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
-        self.lbl_log_bottom_f.setEnabled(self.chk_log_f.isChecked())
+        self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
+        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
         cur = self.win_dict['cur_win_name']
         cur_win_d = self.win_dict[cur]
