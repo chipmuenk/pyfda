@@ -18,12 +18,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 from pyfda.libs.compat import (
-    Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap, 
+    Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QEvent, QSizePolicy)
 
 import numpy as np
 
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log
 import pyfda.libs.pyfda_fix_lib as fx

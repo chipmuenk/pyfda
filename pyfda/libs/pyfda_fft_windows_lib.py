@@ -450,7 +450,7 @@ def set_window_name(win_dict, win_name):
             win_name = "Rectangular"
             n_par = 0
     else:
-        # extract module name from fully qualified name, starting with first / 
+        # extract module name from fully qualified name, starting with first /
         # leftmost part of string to the last '.'
         mod_name = fn_name[:fn_name.rfind(".")]
         mod = importlib.import_module(mod_name)
@@ -681,8 +681,6 @@ class QFFTWinSelector(QWidget):
         """
         Process signals coming from the widget one hierarchy higher to update
         the widgets from the dictionary
-
-        This can also be achieved by calling `self.update_widgets()` directly
 
         """
         logger.debug("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
