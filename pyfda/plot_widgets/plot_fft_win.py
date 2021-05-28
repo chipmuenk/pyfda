@@ -159,13 +159,7 @@ class Plot_FFT_win(QDialog):
 
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
-        self.chk_auto_N = QCheckBox(self)
-        self.chk_auto_N.setChecked(False)
-        self.chk_auto_N.setToolTip("<span>Use number of points from main widget "
-                                   "for displaying the FFT window.</span>")
-
-        self.lbl_auto_N = QLabel("Auto " + to_html("N", frmt='i'))
-
+        self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N_view))
         self.led_N.setMaximumWidth(70)
@@ -212,8 +206,7 @@ class Plot_FFT_win(QDialog):
         layH_win_select.addStretch(1)
 
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.chk_auto_N)
-        layHControls.addWidget(self.lbl_auto_N)
+        layHControls.addWidget(self.lbl_N)
         layHControls.addWidget(self.led_N)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chk_log_t)
@@ -317,7 +310,6 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.chk_auto_N.clicked.connect(self.calc_draw_win)
         self.led_N.editingFinished.connect(self.calc_draw_win)
 
         self.chk_norm_f.clicked.connect(self.calc_draw_win)
@@ -325,11 +317,6 @@ class Plot_FFT_win(QDialog):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.tbl_win_properties.itemClicked.connect(self._handle_item_clicked)
-
-        # # careful! currentIndexChanged passes the current index to update_win
-        # self.cmb_win_fft.currentIndexChanged.connect(self.update_win)
-        # self.led_win_par_1.editingFinished.connect(self.update_win_params)
-        # self.led_win_par_2.editingFinished.connect(self.update_win_params)
 
         self.qfft_win_select.sig_tx.connect(self.update_fft_win)
 
@@ -393,22 +380,8 @@ class Plot_FFT_win(QDialog):
         ----------
 
         """
-        # Check whether a window with data points has been calculated and is
-        # available in the dictionary:
-        if 'win' in self.win_dict and len(self.win_dict['win']) > 0:
-            self.chk_auto_N.setEnabled(True)
-        else:
-            self.chk_auto_N.setEnabled(False)
-            self.chk_auto_N.setChecked(False)
-
-        self.led_N.setEnabled(not self.chk_auto_N.isChecked())
-
-        if not self.chk_auto_N.isChecked():
-            self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
-                                    return_type='int')
-        else:
-            self.N_view = len(self.win_dict['win'])
-
+        self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
+                                return_type='int')
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
 
