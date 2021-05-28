@@ -417,8 +417,11 @@ def set_window_name(win_dict, win_name):
     win_fnct : fnct
         The window function object (not the array)
     """
+    if win_name == win_dict['cur_win_name']:
+        # same window name as before, return stored `win_fnct`
+        return win_dict[win_name]['win_fnct']
 
-    if win_name not in win_dict:
+    elif win_name not in win_dict:
         logger.warning(
             "Unknown window name {}, using rectangular window instead."
             .format(win_name))
