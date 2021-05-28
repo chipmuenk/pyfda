@@ -185,7 +185,7 @@ class Firwin(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict, id='firwin_qfft')
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 

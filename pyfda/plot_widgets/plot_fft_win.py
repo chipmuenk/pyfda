@@ -157,7 +157,7 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict, id='plot_fft_win_qfft')
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)

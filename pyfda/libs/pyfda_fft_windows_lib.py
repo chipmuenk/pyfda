@@ -669,10 +669,11 @@ class QFFTWinSelector(QWidget):
     # outgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, win_dict):
+    def __init__(self, parent, win_dict, id='qfft'):
         super(QFFTWinSelector, self).__init__(parent)
 
         self.win_dict = win_dict
+        self.id = id  # can be used to identify widget
         self._construct_UI()
         self.update_win_type()
 
@@ -684,6 +685,9 @@ class QFFTWinSelector(QWidget):
 
         """
         logger.debug("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
+
+        if 'id' in dict_sig and dict_sig['id'] == self.id:
+            return
 
         if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
             self.update_widgets()
@@ -809,7 +813,8 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setText(str(param))
             self.win_dict[cur]['par'][0]['val'] = param
 
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win_par',
+                          'id': self.id})
 
 # ------------------------------------------------------------------------------
     def update_win_type_emit(self, arg=None):

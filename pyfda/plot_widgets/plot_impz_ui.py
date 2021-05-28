@@ -360,7 +360,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict, id="plot_impz_ui_qfft")
 
         self.but_fx_scale = QPushButton("FX Int")
         self.but_fx_scale.setObjectName("but_fx_scale")
