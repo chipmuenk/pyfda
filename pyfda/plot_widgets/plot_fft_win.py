@@ -167,19 +167,22 @@ class Plot_FFT_win(QDialog):
         self.led_N.setMaximumWidth(70)
         self.led_N.setToolTip("<span>Number of window data points to display.</span>")
 
-        self.chk_log_t = QCheckBox("Log", self)
-        self.chk_log_t.setChecked(False)
-        self.chk_log_t.setToolTip("Display in dB")
+        self.but_log_t = QPushButton("dB")
+        self.but_log_t.setMaximumWidth(self.width_m * 4)
+        self.but_log_t.setObjectName("chk_log_time")
+        self.but_log_t.setCheckable(True)
+        self.but_log_t.setChecked(False)
+        self.but_log_t.setToolTip("Display in dB")
 
         self.led_log_bottom_t = QLineEdit(self)
+        self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_t.setText(str(self.bottom_t))
-        self.led_log_bottom_t.setMaximumWidth(50)
-        self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
+        qled_set_max_width(self.led_log_bottom_t, N_x=8)
         self.led_log_bottom_t.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
-        self.lbl_log_bottom_t = QLabel("dB", self)
-        self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
+        self.lbl_log_bottom_t = QLabel(to_html("min =", frmt='bi'), self)
+        self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
 
         self.chk_norm_f = QCheckBox("Norm", self)
         self.chk_norm_f.setChecked(True)
@@ -198,13 +201,13 @@ class Plot_FFT_win(QDialog):
 
         self.lbl_log_bottom_f = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
+
         self.led_log_bottom_f = QLineEdit(self)
+        self.led_log_bottom_f.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_f.setText(str(self.bottom_f))
         qled_set_max_width(self.led_log_bottom_f, N_x=8)
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
-        self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
         layH_win_select = QHBoxLayout()
         layH_win_select.addWidget(self.qfft_win_select)
@@ -214,9 +217,9 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.lbl_N)
         layHControls.addWidget(self.led_N)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chk_log_t)
-        layHControls.addWidget(self.led_log_bottom_t)
         layHControls.addWidget(self.lbl_log_bottom_t)
+        layHControls.addWidget(self.led_log_bottom_t)
+        layHControls.addWidget(self.but_log_t)
         layHControls.addStretch(5)
         layHControls.addWidget(QVLine(width=2))
         layHControls.addStretch(5)
@@ -313,7 +316,7 @@ class Plot_FFT_win(QDialog):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.but_log_f.clicked.connect(self.update_view)
-        self.chk_log_t.clicked.connect(self.update_view)
+        self.but_log_t.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
@@ -487,7 +490,7 @@ class Plot_FFT_win(QDialog):
         self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax_f.set_ylabel(r'$W(f) \; \rightarrow$')
 
-        if self.chk_log_t.isChecked():
+        if self.but_log_t.isChecked():
             self.ax_t.plot(self.n, np.maximum(20 * np.log10(np.abs(self.win_view)),
                                               self.bottom_t))
         else:
@@ -515,8 +518,8 @@ class Plot_FFT_win(QDialog):
             self.nenbw_unit = "bins"
             self.cgain_unit = ""
 
-        self.led_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
-        self.lbl_log_bottom_t.setEnabled(self.chk_log_t.isChecked())
+        self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
+        self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
