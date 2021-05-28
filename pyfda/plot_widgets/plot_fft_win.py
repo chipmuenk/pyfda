@@ -135,7 +135,7 @@ class Plot_FFT_win(QDialog):
         elif not self.isVisible():
             self.needs_calc = True
 
-        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win')\
+        elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
             or dict_sig['sender'] == 'self' or self.needs_calc:
 
             self.calc_draw_win()
@@ -357,13 +357,13 @@ class Plot_FFT_win(QDialog):
     # https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
 # ------------------------------------------------------------------------------
-    def update_fft_win(self, arg=None):
+    def update_fft_win(self, dict_sig=None):
         """
         Update FFT window when window or parameters have changed and
-        emit 'view_changed':'fft_win'
+        pass thru 'view_changed':'fft_win_type' or 'fft_win_par'
         """
         self.calc_draw_win()
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.sig_tx.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
     def calc_draw_win(self):

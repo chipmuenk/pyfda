@@ -152,7 +152,7 @@ class Firwin(QWidget):
                 self.hide_fft_wdg()
                 return
             else:
-                if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
+                if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
                     # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_local.emit(dict_sig)
@@ -243,7 +243,7 @@ class Firwin(QWidget):
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
             self.win_dict = fb.fil[0]['wdg_fil']['firwin']
 
-        self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
 
     # --------------------------------------------------------------------------
     def _store_dict(self):
@@ -436,13 +436,13 @@ class Firwin(QWidget):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
-        if "Kaiser" in self.win_dict and self.win_dict["cur_win_name"] == "Kaiser":
+        if "Kaiser" in self.win_dict and self.win_dict['cur_win_name'] == "Kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             self.win_dict["Kaiser"]["par"]["val"] = beta
             self._update_UI()
         else:
             N = remezord(F, W, A, fs=1, alg=alg)[0]
-        self.sig_tx_local.emit({"sender": __name__, "view_changed": "fft_win"})
+        self.sig_tx_local.emit({"sender": __name__, 'view_changed': 'fft_win_type'})
         return N
 
     def LPmin(self, fil_dict):
@@ -546,7 +546,7 @@ class Firwin(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win'})
+            self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
         else:
             self.fft_widget.hide()
 

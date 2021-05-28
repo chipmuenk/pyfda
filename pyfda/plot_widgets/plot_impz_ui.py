@@ -63,7 +63,8 @@ class PlotImpz_UI(QWidget):
                 self.hide_fft_wdg()
                 return
             else:
-                if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win':
+                # check for value 'fft_win*':
+                if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
                     # local connection to FFT window widget and qfft_win_select
                     self.sig_tx_fft.emit(dict_sig)
                     # global connection to e.g. plot_impz
@@ -1400,7 +1401,7 @@ class PlotImpz_UI(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win'})
+            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
         else:
             self.fft_widget.hide()
 

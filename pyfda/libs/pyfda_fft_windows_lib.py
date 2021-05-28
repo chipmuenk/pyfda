@@ -675,7 +675,7 @@ class QFFTWinSelector(QWidget):
         self.win_dict = win_dict
         self.id = id  # can be used to identify widget
         self._construct_UI()
-        self.update_win_type()
+        self.ui2dict_win()
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -689,8 +689,12 @@ class QFFTWinSelector(QWidget):
         if 'id' in dict_sig and dict_sig['id'] == self.id:
             return
 
-        if ('view_changed' in dict_sig and dict_sig['view_changed'] == 'fft_win'):
-            self.update_widgets()
+        elif 'view_changed' in dict_sig:
+            if dict_sig['view_changed'] == 'fft_win_par':
+                self.dict2ui_params()
+            elif dict_sig['view_changed'] == 'fft_win_type':
+                logger.warning("win_type")
+                self.dict2ui()
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):
@@ -746,11 +750,11 @@ class QFFTWinSelector(QWidget):
         # ----------------------------------------------------------------------
         # careful! currentIndexChanged passes an integer (the current index)
         # to update_win
-        self.cmb_win_fft.currentIndexChanged.connect(self.update_win_type_emit)
-        self.led_win_par_1.editingFinished.connect(self.update_win_params)
-        self.led_win_par_2.editingFinished.connect(self.update_win_params)
-        self.cmb_win_par_1.currentIndexChanged.connect(self.update_win_params)
-        self.cmb_win_par_2.currentIndexChanged.connect(self.update_win_params)
+        self.cmb_win_fft.currentIndexChanged.connect(self.ui2dict_win_emit)
+        self.led_win_par_1.editingFinished.connect(self.ui2dict_params)
+        self.led_win_par_2.editingFinished.connect(self.ui2dict_params)
+        self.cmb_win_par_1.currentIndexChanged.connect(self.ui2dict_params)
+        self.cmb_win_par_2.currentIndexChanged.connect(self.ui2dict_params)
 
 # ------------------------------------------------------------------------------
     def get_window(self, N, win_name=None, sym=False):
@@ -773,14 +777,33 @@ class QFFTWinSelector(QWidget):
         idx = qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
         if idx > -2:
             self.update_win_type()
+# ------------------------------------------------------------------------------
+    def dict2ui_params(self, arg=None):
+        """
+        Set parameter values from dict
+        """
+        cur = qget_cmb_box(self.cmb_win_fft, data=False)
+        n_par = self.win_dict[cur]['n_par']
+
+        if n_par > 0:
+            if 'list' in self.win_dict[cur]['par'][0]:
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
+            else:
+                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][0]['val']))
+
+        if n_par > 1:
+            if 'list' in self.win_dict[cur]['par'][1]:
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
+            else:
+                self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
 
 # ------------------------------------------------------------------------------
-    def update_win_params(self):
+    def ui2dict_params(self):
         """
         Read out window parameter widget(s) when editing is finished and
         update win_dict.
 
-        Emit 'view_changed': 'fft_win'
+        Emit 'view_changed': 'fft_win_par'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
         set_window_name(self.win_dict, cur)  # this resets the window cache
@@ -817,17 +840,18 @@ class QFFTWinSelector(QWidget):
                           'id': self.id})
 
 # ------------------------------------------------------------------------------
-    def update_win_type_emit(self, arg=None):
+    def ui2dict_win_emit(self, arg=None):
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`,
           update parameter widgets accordingly
-        - emit 'view_changed': 'fft_win'
+        - emit 'view_changed': 'fft_win_type'
         """
-        self.update_win_type(arg=arg)
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win'})
+        self.ui2dict_win(arg=arg)
+        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win_type',
+                          'id': self.id})
 
 # ------------------------------------------------------------------------------
-    def update_win_type(self, arg=None):
+    def ui2dict_win(self, arg=None):
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
