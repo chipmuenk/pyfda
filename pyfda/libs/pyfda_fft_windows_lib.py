@@ -784,7 +784,7 @@ class QFFTWinSelector(QWidget):
             self.ui2dict_win()
 
 # ------------------------------------------------------------------------------
-    def dict2ui_params(self, arg=None):
+    def dict2ui_params(self):
         """
         Set parameter values from dict
         """
