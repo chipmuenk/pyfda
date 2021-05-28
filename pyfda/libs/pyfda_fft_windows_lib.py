@@ -767,16 +767,22 @@ class QFFTWinSelector(QWidget):
         return get_window(self.win_dict, N, win_name=win_name, sym=sym)
 
 # ------------------------------------------------------------------------------
-    def update_widgets(self):
+    def dict2ui(self):
         """
-        - set FFT window type combobox from `win_dict['cur_win_name']`
-        - if entry has changed (returned idx > -2) do:
-            - update parameter widgets for new window type from `win_dict`
-            - don't emit a signal
+        The dictionary has been updated somewhere else, now update the window
+        selection widget and make corresponding parameter widgets visible if 
+        `self.win_dict['cur_win_name']` is different from current combo box entry:
+
+        - set FFT window type combobox from `self.win_dict['cur_win_name']`
+        - use `ui2dict_win()` to update parameter widgets for new window type 
+          from `self.win_dict` without emitting a signal
         """
-        idx = qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
-        if idx > -2:
-            self.update_win_type()
+        if qget_cmb_box(self.cmb_win_fft, data=False) == self.win_dict['cur_win_name']:
+            return
+        else:
+            qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
+            self.ui2dict_win()
+
 # ------------------------------------------------------------------------------
     def dict2ui_params(self, arg=None):
         """
