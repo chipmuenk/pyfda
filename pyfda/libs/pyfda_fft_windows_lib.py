@@ -405,6 +405,9 @@ def set_window_name(win_dict, win_name):
     win_dict[win_name]['win_fnct']  # function object
     win_dict[win_name]['n_par']     # number of parameters (int)
 
+    The above is only updated when the window type has been changed compared to
+    `win_dict['cur_win_name']` !
+
     Parameters
     ----------
     win_dict : dict
@@ -532,8 +535,10 @@ def get_window(win_dict, N, win_name=None, sym=False):
         logger.error('An error occurred calculating the window function "{0}"\n{1}'
                      .format(fn_name, e))
         w = None
-    if w is None:
+    if w is None:  # Fall back to rectangular window
         logger.warning('Falling back to rectangular window.')
+        set_window_name(win_dict, "Rectangular")
+        # TODO: widget needs to be updated - return None?
         w = np.ones(N)
 
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
@@ -687,7 +692,7 @@ class QFFTWinSelector(QWidget):
         the widgets from the dictionary
 
         """
-        logger.debug("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
+        logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == self.id:
             return
