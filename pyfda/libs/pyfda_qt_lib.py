@@ -11,7 +11,7 @@ Library with various helper functions for Qt widgets
 """
 from .pyfda_lib import qstr
 
-from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QObject
+from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -31,6 +31,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
         dict_sig.update({'id': id(self)})
     if 'sender' not in dict_sig:
         dict_sig.update({'sender': self.__class__.__name__})
+    if 'class' not in dict_sig:
+        dict_sig.update({'class': self.__class__.__name__})
     # Count down time-to-live counter and terminate the signal when ttl < 1
     if 'ttl' in dict_sig:
         if dict_sig['ttl'] < 1:
