@@ -11,11 +11,35 @@ Library with various helper functions for Qt widgets
 """
 from .pyfda_lib import qstr
 
-from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel
+from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QObject
 from .pyfda_dirs import OS, OS_VER
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
+    """
+    Emit a signal `self.<sig_name>` (defined as a class attribute) with a 
+    dict `dict_sig` using Qt's `emit()`.
+    - Add the keys `'id'` and `'class'` with id resp. class name of the calling
+      instance if not contained in the dict
+    - If key 'ttl' is in the dict and its value is less than one, terminate the
+      signal. Otherwise, reduce the value by one.
+    """
+    if 'id' not in dict_sig:
+        dict_sig.update({'id': id(self)})
+    if 'sender' not in dict_sig:
+        dict_sig.update({'sender': self.__class__.__name__})
+    # Count down time-to-live counter and terminate the signal when ttl < 1
+    if 'ttl' in dict_sig:
+        if dict_sig['ttl'] < 1:
+            return
+        else:
+            dict_sig.update({'ttl': dict_sig['ttl'] - 1})
+    # Get signal (default name: `sig_tx`) from calling instance and emit it
+    signal = getattr(self, sig_name)
+    signal.emit(dict_sig)
 
 
 # ------------------------------------------------------------------------------
