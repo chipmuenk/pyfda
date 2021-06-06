@@ -54,14 +54,14 @@ class PlotImpz_UI(QWidget):
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if dict_sig['sender'] == __name__:
+        if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        # --- signals coming from the FFT window widget or the qfft_win_select
-        if 'fft' in dict_sig['sender']:  # hide FFT window windget and return
+        # --- signals coming from the FFT window widget or the FFT window selector
+        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
             logger.warning(pprint_log(dict_sig))
-            if 'closeEvent' in dict_sig:
+            if 'closeEvent' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
             else:
