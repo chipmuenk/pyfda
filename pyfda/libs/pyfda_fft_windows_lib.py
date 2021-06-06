@@ -855,18 +855,18 @@ class QFFTWinSelector(QWidget):
                           'id': id(self)})
 
 # ------------------------------------------------------------------------------
-    def ui2dict_win_emit(self, arg=None):
+    def ui2dict_win_emit(self, arg=None) -> None:
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`,
           update parameter widgets accordingly
         - emit 'view_changed': 'fft_win_type'
         """
-        self.ui2dict_win(arg=arg)
+        self.ui2dict_win()
         self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win_type',
-                          'id': self.id})
+                          'id': id(self)})
 
 # ------------------------------------------------------------------------------
-    def ui2dict_win(self, arg=None):
+    def ui2dict_win(self) -> None:
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
