@@ -677,6 +677,7 @@ class QFFTWinSelector(QWidget):
     # outgoing
     sig_tx = pyqtSignal(object)
 
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent, win_dict):
         super(QFFTWinSelector, self).__init__(parent)
@@ -851,8 +852,7 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setText(str(param))
             self.win_dict[cur]['par'][0]['val'] = param
 
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win_par',
-                          'id': id(self)})
+        self.emit({'view_changed': 'fft_win_par'})
 
 # ------------------------------------------------------------------------------
     def ui2dict_win_emit(self, arg=None) -> None:
@@ -862,8 +862,7 @@ class QFFTWinSelector(QWidget):
         - emit 'view_changed': 'fft_win_type'
         """
         self.ui2dict_win()
-        self.sig_tx.emit({'sender': __name__, 'view_changed': 'fft_win_type',
-                          'id': id(self)})
+        self.emit({'view_changed': 'fft_win_type'})
 
 # ------------------------------------------------------------------------------
     def ui2dict_win(self) -> None:
@@ -871,7 +870,6 @@ class QFFTWinSelector(QWidget):
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
         - set tooltipps and parameter values from dict
-
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         set_window_name(self.win_dict, cur)

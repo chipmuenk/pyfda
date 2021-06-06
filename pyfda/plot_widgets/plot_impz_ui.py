@@ -41,6 +41,8 @@ class PlotImpz_UI(QWidget):
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
 
+    from pyfda.libs.pyfda_qt_lib import emit
+
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -1042,7 +1044,7 @@ class PlotImpz_UI(QWidget):
                     source.setText(str(params['FMT'].format(self.TW2 * self.t_scale)))
 
                 self.spec_edited = False  # reset flag
-                self.sig_tx.emit({'sender': __name__, 'ui_changed': 'stim'})
+                self.emit({'ui_changed': 'stim'})
 
             # nothing has changed, but display frequencies in rounded format anyway
             else:
@@ -1086,7 +1088,7 @@ class PlotImpz_UI(QWidget):
 
         self.update_freqs()
 
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'f1_f2'})
+        self.emit({'ui_changed': 'f1_f2'})
 
     # -------------------------------------------------------------
     def update_freqs(self):
@@ -1227,51 +1229,51 @@ class PlotImpz_UI(QWidget):
         self.cmbPeriodicType.setVisible(self.cmb_stim == 'periodic')
         self.cmbModulationType.setVisible(self.cmb_stim == 'modulation')
 
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'stim'})
+        self.emit({'ui_changed': 'stim'})
 
     # -------------------------------------------------------------
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='cmplx')
         self.ledAmp1.setText(str(self.A1))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'a1'})
+        self.emit({'ui_changed': 'a1'})
 
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='cmplx')
         self.ledAmp2.setText(str(self.A2))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'a2'})
+        self.emit({'ui_changed': 'a2'})
 
     def _update_phi1(self):
         """ Update value for self.phi1 from QLineEditWidget"""
         self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'phi1'})
+        self.emit({'ui_changed': 'phi1'})
 
     def _update_BW1(self):
         """ Update value for self.BW1 from QLineEditWidget"""
         self.BW1 = safe_eval(
             self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
         self.led_BW1.setText(str(self.BW1))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'BW1'})
+        self.emit({'ui_changed': 'BW1'})
 
     def _update_BW2(self):
         """ Update value for self.BW2 from QLineEditWidget"""
         self.BW2 = safe_eval(
             self.led_BW2.text(), self.BW2, return_type='float', sign='pos')
         self.led_BW2.setText(str(self.BW2))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'BW2'})
+        self.emit({'ui_changed': 'BW2'})
 
     def _update_phi2(self):
         """ Update value for self.phi2 from the QLineEditWidget"""
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'phi2'})
+        self.emit({'ui_changed': 'phi2'})
 
     def _update_chirp_type(self):
         """ Update value for self.chirp_type from data field of ComboBox"""
         self.chirp_type = qget_cmb_box(self.cmbChirpType)
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'chirp_type'})
+        self.emit({'ui_changed': 'chirp_type'})
 
     def _update_impulse_type(self):
         """ Update value for self.impulse_type from data field of ComboBox"""
@@ -1328,26 +1330,26 @@ class PlotImpz_UI(QWidget):
                 self.ledNoi.setToolTip("<span>Standard deviation of the Gaussian process "
                                        "that is cumulated.</span>")
 
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'noi'})
+        self.emit({'ui_changed': 'noi'})
 
     def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='cmplx')
         self.ledDC.setText(str(self.DC))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'dc'})
+        self.emit({'ui_changed': 'dc'})
 
     def _update_stim_formula(self):
         """Update string with formula to be evaluated by numexpr"""
         self.stim_formula = self.ledStimFormula.text().strip()
         self.ledStimFormula.setText(str(self.stim_formula))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'stim_formula'})
+        self.emit({'ui_changed': 'stim_formula'})
 
     def _update_stim_par1(self):
         """ Update value for self.par1 from QLineEditWidget"""
         self.stim_par1 = safe_eval(self.ledStimPar1.text(), self.stim_par1,
                                    sign='pos', return_type='float')
         self.ledStimPar1.setText(str(self.stim_par1))
-        self.sig_tx.emit({'sender': __name__, 'ui_changed': 'stim_par1'})
+        self.emit({'ui_changed': 'stim_par1'})
 
     # -------------------------------------------------------------------------
     def update_N(self, emit=True):
@@ -1391,7 +1393,7 @@ class PlotImpz_UI(QWidget):
         if emit:
             # use `'ui_changed'` as this triggers recalculation of the transient
             # response
-            self.sig_tx.emit({'sender': __name__, 'ui_changed': 'N'})
+            self.emit({'ui_changed': 'N'})
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):
@@ -1401,7 +1403,7 @@ class PlotImpz_UI(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.sig_tx_fft.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
+            self.emit({'view_changed': 'fft_win_type'})
         else:
             self.fft_widget.hide()
 

@@ -78,6 +78,8 @@ class Plot_FFT_win(QDialog):
     # outgoing
     sig_tx = pyqtSignal(object)
 
+    from pyfda.libs.pyfda_qt_lib import emit
+
     def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
         super(Plot_FFT_win, self).__init__(parent)
@@ -117,7 +119,7 @@ class Plot_FFT_win(QDialog):
         """
         if self.ignore_close_event:
             event.ignore()
-            self.sig_tx.emit({'sender': __name__, 'closeEvent': ''})
+            self.emit({'closeEvent': ''})
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
