@@ -137,7 +137,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # ---- Process local widget signals
         elif 'ui' in dict_sig:
-            if 'id' in dict_sig and dict_sig['id'] == 'w_input':
+            if 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_input':
                 """
                 Input fixpoint format has been changed or butLock has been clicked.
                 When I/O lock is active, copy input fixpoint word format to output 
@@ -152,7 +152,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
                      
-            elif 'id' in dict_sig and dict_sig['id'] == 'w_output':
+            elif 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_output':
                 """
                 Output fixpoint format has been changed. When I/O lock is active, copy
                 output fixpoint word format to input word format.
@@ -162,16 +162,17 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
                     fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
  
-            elif 'id' in dict_sig and dict_sig['id'] in \
+            elif 'wdg_name' in dict_sig and dict_sig['wdg_name'] in \
                 {'w_coeff', 'q_input', 'q_output', 'w_accu', 'q_accu'}:
                 pass # nothing to do for now
 
             else:
-                if not "id" in dict_sig:
-                    logger.warning("No id in dict_sig:\n{0}".format(pprint_log(dict_sig)))
+                if 'wdg_name' not in dict_sig:
+                    logger.warning("No key 'wdg_name' in dict_sig:\n{0}"
+                                   .format(pprint_log(dict_sig)))
                 else:
-                    logger.warning('Unknown id "{0}" in dict_sig:\n{1}'\
-                                   .format(dict_sig['id'], pprint_log(dict_sig)))
+                    logger.warning("Unknown 'wdg_name = {0}' in dict_sig:\n{1}"\
+                                   .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
                     
             if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
                 logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
@@ -221,35 +222,37 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #       Input and Output Quantizer
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #       - instantiate widgets for input and output quantizer
-#       - pass the quantization (sub-?) dictionary to the constructor     
-#------------------------------------------------------------------------------
+#       - pass the quantization (sub-?) dictionary to the constructor
+# ------------------------------------------------------------------------------
 
-        self.wdg_w_input = UI_W(self, q_dict = fb.fil[0]['fxqc']['QI'],
-                                id='w_input', label='', lock_visible=True)
+        self.wdg_w_input = UI_W(self, q_dict=fb.fil[0]['fxqc']['QI'],
+                                wdg_name='w_input', label='', lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
-        
-        cmb_q = ['round','floor','fix']
 
-        self.wdg_w_output = UI_W(self, q_dict = fb.fil[0]['fxqc']['QO'], id='w_output', 
-                                 label='')
+        cmb_q = ['round', 'floor', 'fix']
+
+        self.wdg_w_output = UI_W(self, q_dict=fb.fil[0]['fxqc']['QO'],
+                                 wdg_name='w_output', label='')
         self.wdg_w_output.sig_tx.connect(self.process_sig_rx)
 
-        self.wdg_q_output = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QO'], id='q_output',
+        self.wdg_q_output = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QO'],
+                                 wdg_name='q_output',
                                  label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
-                                 cmb_q=cmb_q, cmb_ov=['wrap','sat'])
+                                 cmb_q=cmb_q, cmb_ov=['wrap', 'sat'])
         self.wdg_q_output.sig_tx.connect(self.sig_rx)
 
         if HAS_DS:
             cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(self, q_dict = fb.fil[0]['fxqc']['QI'], id='q_input',
+        self.wdg_q_input = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QI'],
+                                wdg_name='q_input',
                                 label='Input Format <i>Q<sub>X&nbsp;</sub></i>:',
                                 cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx)
-        
+
         # Layout and frame for input quantization 
         layVQiWdg = QVBoxLayout()
         layVQiWdg.addWidget(self.wdg_q_input)

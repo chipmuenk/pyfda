@@ -66,31 +66,31 @@ class FIR_DF_wdg(QWidget):
             fb.fil[0]['fxqc']['QA'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QA'], 
                           {'WI':0, 'WF':30, 'W':32, 'ovfl':'wrap', 'quant':'floor'})
-      
-        self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'], id='w_coeff',
-                                        label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
-                                        tip_WI='Number of integer bits - edit in the "b,a" tab',
-                                        tip_WF='Number of fractional bits - edit in the "b,a" tab',
-                                        WI = fb.fil[0]['fxqc']['QCB']['WI'],
-                                        WF = fb.fil[0]['fxqc']['QCB']['WF'])
 
-        
+        self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff',
+                                 label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
+                                 tip_WI='Number of integer bits - edit in the "b,a" tab',
+                                 tip_WF='Number of fractional bits - edit in the "b,a" tab',
+                                 WI=fb.fil[0]['fxqc']['QCB']['WI'],
+                                 WF=fb.fil[0]['fxqc']['QCB']['WF'])
+
+
 #        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
 #                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'], 
 #                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
 #        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
 
         self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
-                               label='', id='w_accu',
+                               label='', wdg_name='w_accu',
                                fractional=True, combo_visible=True)
 
-        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], id='q_accu',
+        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
                                label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
 
-        # initial setting for accumulator        
+        # initial setting for accumulator 
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)        
-        self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
-        self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
+        self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
+        self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -117,19 +117,19 @@ class FIR_DF_wdg(QWidget):
         logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
-        # if not, just pass the dict 
+        # if not, just pass the dict.
         if 'ui' in dict_sig:
-            if dict_sig['id'] == 'w_coeff': # coefficient format updated
+            if dict_sig['wdg_name'] == 'w_coeff':  # coefficient format updated
                 """
                 Update coefficient quantization settings and coefficients.
         
                 The new values are written to the fixpoint coefficient dict as
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
-                """  
+                """
 
                 fb.fil[0]['fxqc'].update(self.ui2dict())
                 
-            elif dict_sig['ui'] == 'cmbW':
+            elif dict_sig['wdg_name'] == 'cmbW':
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW=='man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')

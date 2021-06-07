@@ -185,7 +185,7 @@ class UI_W(QWidget):
     The constructor accepts a dictionary for initial widget settings.
     The following keys are defined; default values are used for missing keys:
 
-    'id'            : 'ui_w'                    # widget id
+    'wdg_name'      : 'ui_w'                    # widget name
     'label'         : 'WI.WF'                   # widget text label
     'visible'       : True                      # Is widget visible?
     'enabled'       : True                      # Is widget enabled?
@@ -224,14 +224,14 @@ class UI_W(QWidget):
         the default dict below """
 
         # default settings
-        dict_ui = {'id':'ui_w', 'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
+        dict_ui = {'wdg_name':'ui_w', 'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True,
                    'combo_visible':False, 'combo_items':['auto', 'full', 'man'],
                    'tip_combo':'Calculate Acc. width.',                  
                    'lock_visible':False, 'tip_lock':'Lock input/output quantization.'
-                   } #: default values
+                   }  #: default values
 
         if self.q_dict:
             dict_ui.update(self.q_dict)
@@ -242,7 +242,7 @@ class UI_W(QWidget):
             else:
                 dict_ui.update({k:v})
 
-        self.id = dict_ui['id']
+        self.wdg_name = dict_ui['wdg_name']
 
         if not dict_ui['fractional']:
             dict_ui['WF'] = 0
@@ -365,8 +365,8 @@ class UI_W(QWidget):
         q_icon_size = self.butLock.iconSize() # <- uncomment this for manual sizing
         self.butLock.setIconSize(q_icon_size)
 
-        dict_sig = {'sender':__name__, 'id':self.id, 'ui':'butLock'}
-        self.sig_tx.emit(dict_sig)
+        dict_sig = {'wdg_name':self.wdg_name, 'ui':'butLock'}
+        self.emit(dict_sig)
         
     #--------------------------------------------------------------------------
     def ui2dict(self, s=None):
@@ -386,10 +386,10 @@ class UI_W(QWidget):
         self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
 
         if self.sender():
-            name = self.sender().objectName()
-            logger.debug("sender: {0}".format(name))
-            dict_sig = {'sender':__name__, 'id':self.id, 'ui':name}
-            self.sig_tx.emit(dict_sig)
+            obj_name = self.sender().objectName()
+            logger.debug("sender: {0}".format(obj_name))
+            dict_sig = {'wdg_name':self.wdg_name, 'ui':obj_name}
+            self.emit(dict_sig)
         elif s=='init':
             logger.debug("called by __init__")
         else:
@@ -432,7 +432,7 @@ class UI_Q(QWidget):
     
     The following keys are defined; default values are used for missing keys:
 
-    'id'        : 'ui_q'                            # widget id
+    'wdg_name'  : 'ui_q'                            # widget name
     'label'     : ''                                # widget text label
     
     'label_q'   : 'Quant.'                          # subwidget text label
@@ -461,7 +461,7 @@ class UI_Q(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
 
-        dict_ui = {'id':'ui_q', 'label':'',
+        dict_ui = {'wdg_name':'ui_q', 'label':'',
                    'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
@@ -478,7 +478,7 @@ class UI_Q(QWidget):
             dict_ui.update({key:val})
         # dict_ui.update(map(kwargs)) # same as above?
             
-        self.id = dict_ui['id']
+        self.wdg_name = dict_ui['wdg_name']
         
         lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
@@ -547,9 +547,9 @@ class UI_Q(QWidget):
                             'quant': self.quant})
         
         if self.sender():
-            name = self.sender().objectName()
-            dict_sig = {'sender':__name__, 'id':self.id, 'ui':name}
-            self.sig_tx.emit(dict_sig)
+            obj_name = self.sender().objectName()
+            dict_sig = {'wdg_name':self.wdg_name, 'ui':obj_name}
+            self.emit(dict_sig)
 
     #--------------------------------------------------------------------------
     def dict2ui(self, q_dict):
