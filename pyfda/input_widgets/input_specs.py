@@ -11,11 +11,9 @@ Widget stacking all subwidgets for filter specification and design. The actual
 filter design is started here as well.
 """
 import sys
-import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
-                      QVBoxLayout, QHBoxLayout)
+from pyfda.libs.compat import (
+    QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QVBoxLayout, QHBoxLayout)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -27,17 +25,22 @@ from pyfda.pyfda_rc import params
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
+import logging
+logger = logging.getLogger(__name__)
+
 classes = {'Input_Specs':'Specs'} #: Dict containing class name : display name
+
 
 class Input_Specs(QWidget):
     """
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    sig_rx_local = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx_local
+    sig_rx_local = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx_local
 
-    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx
-    sig_tx = pyqtSignal(object) # from process_sig_rx: propagate local signals
+    sig_rx = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx
+    sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop  
 
     def __init__(self, parent):
         super(Input_Specs, self).__init__(parent)
@@ -63,10 +66,8 @@ class Input_Specs(QWidget):
         its parent widget (`input_specs`) to prevent infinite loops.
 
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop:\n{0}\tpropagate={1}"\
-                           .format(pprint_log(dict_sig),propagate))
+        logger.debug("Processing {0}".format(pprint_log(dict_sig)))
+        if self.sig_loop(dict_sig, logger, propagate=propagate) > 0:
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
@@ -94,9 +95,8 @@ class Input_Specs(QWidget):
         if propagate:
             # local signals are propagated with the name of this widget,
             # global signals terminate here
-            dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
-
+            dict_sig.update({'class': self.__class__.__name__})
+            self.emit(dict_sig)
 
     def _construct_UI(self):
         """
@@ -189,24 +189,24 @@ class Input_Specs(QWidget):
 
         self.setLayout(layVMain) # main layout of widget
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx_local.connect(self.process_sig_rx_local)
         self.butLoadFilt.clicked.connect(lambda: load_filter(self))
         self.butSaveFilt.clicked.connect(lambda: save_filter(self))
         self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
-        #----------------------------------------------------------------------
+        self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
+        # ----------------------------------------------------------------------
 
-        self.update_UI() # first time initialization
-        self.start_design_filt() # design first filter using default values
+        self.update_UI()  # first time initialization
+        self.start_design_filt()  # design first filter using default values
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def update_UI(self, dict_sig={}):
         """
         update_UI is called every time the filter design method or order
@@ -283,7 +283,7 @@ class Input_Specs(QWidget):
         else:
             self.frmMsg.hide()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def load_dict(self):
         """
         Reload all specs/parameters entries from global dict fb.fil[0],
@@ -346,8 +346,8 @@ class Input_Specs(QWidget):
                 self.f_specs.load_dict()
                 self.color_design_button("ok")
 
-                self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
-                logger.info ('Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
+                self.emit({'data_changed': 'filter_designed'})
+                logger.info('Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
 # =============================================================================
 #                 logger.debug("Results:\n"
 #                     "F_PB = %s, F_SB = %s "
@@ -367,22 +367,19 @@ class Input_Specs(QWidget):
                 logger.warning("{0}".format(e))
             self.color_design_button("error")
 
-
     def color_design_button(self, state):
         fb.design_filt_state = state
         qstyle_widget(self.butDesignFilt, state)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def quit_program(self):
         """
         When <QUIT> button is pressed, send 'quit_program'
         """
-        self.sig_tx.emit({'sender':__name__, 'quit_program':''})
+        self.emit({'quit_program': ''})
 
 
-
-#------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     app = QApplication(sys.argv)

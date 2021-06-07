@@ -42,7 +42,8 @@ from .input_coeffs_ui import Input_Coeffs_UI
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
-classes = {'Input_Coeffs':'b,a'} #: Dict containing class name : display name
+classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
+
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -256,6 +257,7 @@ class ItemDelegate(QStyledItemDelegate):
 
 ###############################################################################
 
+
 class Input_Coeffs(QWidget):
     """
     Create widget with a (sort of) model-view architecture for viewing /
@@ -274,20 +276,21 @@ class Input_Coeffs(QWidget):
 
 
     """
-    sig_tx = pyqtSignal(object) # emitted when filter has been saved
-    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
+    sig_tx = pyqtSignal(object)  # emitted when filter has been saved
+    sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent):
         super(Input_Coeffs, self).__init__(parent)
 
-        self.opt_widget = None # handle for pop-up options widget
+        self.opt_widget = None  # handle for pop-up options widget
         self.tool_tip = "Display and edit filter coefficients."
         self.tab_label = "b,a"
         
-        self.data_changed = True # initialize flag: filter data has been changed
-        self.fx_specs_changed = True # fixpoint specs have been changed outside
+        self.data_changed = True  # initialize flag: filter data has been changed
+        self.fx_specs_changed = True  # fixpoint specs have been changed outside
 
-        self.ui = Input_Coeffs_UI(self) # create the UI part with buttons etc.
+        self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
         self._construct_UI()
 
 #------------------------------------------------------------------------------
@@ -298,11 +301,10 @@ class Input_Coeffs(QWidget):
         logger.debug("process_sig_rx(): vis={0}\n{1}"\
                     .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+        if self.sig_loop(dict_sig, logger) > 0:
             return
 
-        if  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+        if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
 
         elif self.isVisible():
@@ -752,7 +754,7 @@ class Input_Coeffs(QWidget):
 
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB']) # update fixpoint object
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
+        self.emit({'view_changed': 'q_coeff'})
         
         self._update_MSB_LSB()
 
@@ -786,7 +788,7 @@ class Input_Coeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'input_coeffs'})
+        self.emit({'data_changed': 'input_coeffs'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')

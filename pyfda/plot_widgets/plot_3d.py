@@ -58,7 +58,7 @@ class Plot_3D(QWidget):
     - optional display of poles / zeros
     """
 
-    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 

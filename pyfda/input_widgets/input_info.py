@@ -43,8 +43,9 @@ class Input_Info(QWidget):
     """
     Create widget for displaying infos about filter specs and filter design method
     """
-    sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
+    sig_rx = pyqtSignal(object)  # incoming signals from input_tab_widgets
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(Input_Info, self).__init__(parent)
@@ -234,7 +235,7 @@ class Input_Info(QWidget):
         params['N_FFT'] = safe_eval(self.led_settings_NFFT.text(), params['N_FFT'],
                                    sign = 'pos', return_type='int')
         self.led_settings_NFFT.setText(str(params['N_FFT']))
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'n_fft'})
+        self.emit({'data_changed': 'n_fft'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):

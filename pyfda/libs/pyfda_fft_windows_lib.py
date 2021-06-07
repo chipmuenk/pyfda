@@ -672,10 +672,9 @@ class UserWindows(object):
 
 # =============================================================================
 class QFFTWinSelector(QWidget):
-    # incoming
-    sig_rx = pyqtSignal(object)
-    # outgoing
-    sig_tx = pyqtSignal(object)
+    # those signals are class variables, shared between instances if more than one exists
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outgoing
 
     from pyfda.libs.pyfda_qt_lib import emit
 
@@ -780,11 +779,11 @@ class QFFTWinSelector(QWidget):
     def dict2ui(self):
         """
         The dictionary has been updated somewhere else, now update the window
-        selection widget and make corresponding parameter widgets visible if 
+        selection widget and make corresponding parameter widgets visible if
         `self.win_dict['cur_win_name']` is different from current combo box entry:
 
         - set FFT window type combobox from `self.win_dict['cur_win_name']`
-        - use `ui2dict_win()` to update parameter widgets for new window type 
+        - use `ui2dict_win()` to update parameter widgets for new window type
           from `self.win_dict` without emitting a signal
         """
         if qget_cmb_box(self.cmb_win_fft, data=False) == self.win_dict['cur_win_name']:

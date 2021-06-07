@@ -22,32 +22,33 @@ from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
-classes = {'Plot_Phi':'\u03C6(f)'} #: Dict containing class name : display name
+classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display name
+
 
 class Plot_Phi(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
     # outgoing, distributed via plot_tab_widget
     sig_tx = pyqtSignal(object)
-
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent):
         super(Plot_Phi, self).__init__(parent)
-        self.needs_calc = True # recalculation of filter function necessary
-        self.needs_draw = True # plotting neccessary (e.g. log instead of  lin)
+        self.needs_calc = True  # recalculation of filter function necessary
+        self.needs_draw = True  # plotting neccessary (e.g. log instead of  lin)
         self.tool_tip = "Phase frequency response"
-        self.tab_label = "\u03C6(f)" # phi(f)
+        self.tab_label = "\u03C6(f)"  # phi(f)
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
         logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"\
                      .format(dict_sig, self.needs_calc, self.isVisible()))
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+
+        if self.sig_loop(dict_sig, logger) > 0:
             return
 
         if self.isVisible():
@@ -133,26 +134,26 @@ class Plot_Phi(QWidget):
         self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes - this is only called once
         """
-        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
+        if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots()
-        self.ax.xaxis.tick_bottom() # remove axis ticks on top
-        self.ax.yaxis.tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom()  # remove axis ticks on top
+        self.ax.yaxis.tick_left()  # remove axis ticks right
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def unit_changed(self):
         """
         Unit for phase display has been changed, emit a 'view_changed' signal
         and continue with drawing.
         """
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'plot_phi'})
+        self.emit({'view_changed': 'plot_phi'})
         self.draw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def calc_resp(self):
         """
         (Re-)Calculate the complex frequency response H(f)

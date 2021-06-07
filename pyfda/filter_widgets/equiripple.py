@@ -78,6 +78,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
     """
 
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -214,7 +215,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                     })
 
         # sig_tx -> select_filter -> filter_specs
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'equiripple'})
+        self.emit({'filt_changed': 'equiripple'})
 
 
     def _load_dict(self):
@@ -395,7 +396,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
             logger.warning("Bandwidth for pass band ({0}) is too low, inreasing to 0.1".format(self.F_PB))
             self.F_PB = 0.1
             fil_dict['F_PB'] = self.F_PB
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'equiripple'})
+            self.emit({'specs_changed': 'equiripple'})
 
         self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 fs = 1, type = 'differentiator', grid_density = self.grid_density))

@@ -9,7 +9,7 @@
 """
 Library with various helper functions for Qt widgets
 """
-from .pyfda_lib import qstr
+from .pyfda_lib import qstr, pprint_log
 
 from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel
 from .pyfda_dirs import OS, OS_VER
@@ -18,9 +18,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# ------------------------------------------------------------------------------
 def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
     """
-    Emit a signal `self.<sig_name>` (defined as a class attribute) with a 
+    Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
     - Add the keys `'id'` and `'class'` with id resp. class name of the calling
       instance if not contained in the dict
@@ -29,8 +30,6 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
     """
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
-    if 'sender' not in dict_sig:
-        dict_sig.update({'sender': self.__class__.__name__})
     if 'class' not in dict_sig:
         dict_sig.update({'class': self.__class__.__name__})
     # Count down time-to-live counter and terminate the signal when ttl < 1
@@ -42,6 +41,28 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
+
+
+# ------------------------------------------------------------------------------
+def sig_loop(self, dict_sig: dict, logger, **kwargs) -> int:
+    """
+    Test whether the signal has been emitted by self, leading to a possible
+    infinite loop.
+    """
+    opt = ""
+    if 'id' not in dict_sig:
+        if kwargs:
+            opt = pprint_log(kwargs)
+        logger.error("id missing in {0}\n{1}".format(pprint_log(dict_sig), opt))
+        return 0
+    elif dict_sig['id'] == id(self):
+        if kwargs:
+            opt = pprint_log(kwargs)
+        logger.warning("Stopped infinite loop:\n{0}\n{1}"
+                       .format(pprint_log(dict_sig), opt))
+        return 1
+    else:
+        return -1
 
 
 # ------------------------------------------------------------------------------
@@ -102,7 +123,7 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
         if type(items_list[i][1]) == QtGui.QIcon:
             cmb_box.addItem("", items_list[i][0])
             cmb_box.setItemIcon(i-1, items_list[i][1])
-            #cmb_box.setItemData(i-1, items_list[i][0])
+            # cmb_box.setItemData(i-1, items_list[i][0])
         else:
             cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
         cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
@@ -133,7 +154,7 @@ def qget_cmb_box(cmb_box, data=True):
     if data:
         idx = cmb_box.currentIndex()
         cmb_data = cmb_box.itemData(idx)
-        cmb_str = qstr(cmb_data) # convert QVariant, QString, string to plain string
+        cmb_str = qstr(cmb_data)  # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
 
@@ -189,7 +210,7 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
         idx = cmb_box.findText(str(string), flags=flag)  # find index for text == string
 
     ret = idx
-    
+
     if idx == old_idx:
         return -2
 
@@ -386,12 +407,13 @@ def qfilter_warning(self, N, fil_class):
     """
     Pop-up a warning box for very large filter orders
     """
-    reply = QMessageBox.warning(self, 'Warning',
+    reply = QMessageBox.warning(
+        self, 'Warning',
         ("<span><i><b>N = {0}</b></i> &nbsp; is a rather high order for<br />"
          "an {1} filter and may cause large <br />"
          "numerical errors and compute times.<br />"
          "Continue?</span>".format(N, fil_class)),
-         QMessageBox.Yes, QMessageBox.No)
+        QMessageBox.Yes, QMessageBox.No)
     if reply == QMessageBox.Yes:
         return True
     else:
@@ -433,7 +455,7 @@ def qled_set_max_width(wdg, str='', N_x=17):
     """
     width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
                 wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-                8 # 2 * horizontalMargin() + 2 * frame margin.
+                8  # 2 * horizontalMargin() + 2 * frame margin.
     width_x = wdg.fontMetrics().width('x')
     logger.warning("Frm = {0}, FM = {1}".format(width_frm, width_x))
     if str != '':
@@ -444,7 +466,7 @@ def qled_set_max_width(wdg, str='', N_x=17):
     wdg.setMaximumWidth(width)
     return width
 
-    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6 'x'
+    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6'x'
     # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
 
 
@@ -585,6 +607,7 @@ class QLabelVert(QLabel):
         return size
 
 # ==============================================================================
+
 
 if __name__ == '__main__':
     pass

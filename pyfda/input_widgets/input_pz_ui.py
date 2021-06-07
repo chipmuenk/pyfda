@@ -24,11 +24,11 @@ from pyfda.pyfda_rc import params
 
 class Input_PZ_UI(QWidget):
     """
-    Create the UI for the FilterPZ class
+    Create the UI for the InputPZ class
     """
-
-    sig_rx = pyqtSignal(object) # incoming
-    sig_tx = pyqtSignal(object) # outgoing
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         """
@@ -44,17 +44,16 @@ class Input_PZ_UI(QWidget):
         """
         Process signals coming from the CSV pop-up window
         """
-
         logger.debug("PROCESS_SIG_RX\n{0}".format(pprint_log(dict_sig)))
-        
+
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
-            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
-            return # probably not needed
+            self.emit({'ui_changed': 'csv'})
+            return  # probably not needed
         elif 'ui_changed' in dict_sig:
             self._set_load_save_icons() # update icons file <-> clipboard
             # inform e.g. the p/z input widget about changes in CSV options 
-            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+            self.emit({'ui_changed': 'csv'})
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):        
@@ -137,7 +136,7 @@ class Input_PZ_UI(QWidget):
                                 " (only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
-        
+
         layHGain = QHBoxLayout()
         layHGain.addWidget(self.lblNorm)
         layHGain.addWidget(self.cmbNorm)
@@ -184,7 +183,6 @@ class Input_PZ_UI(QWidget):
         self.butClear.setIcon(QIcon(':/trash.svg'))
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all table entries.")
-
 
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIconSize(q_icon_size)
@@ -282,18 +280,16 @@ class Input_PZ_UI(QWidget):
                     logger.warning("CSV options window is already closed!")
                 else:
                     dirs.csv_options_handle.close()
-                    
-        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
 
-    #------------------------------------------------------------------------------
+        self.emit({'ui_changed': 'csv'})
+
+    # ------------------------------------------------------------------------------
     def _close_csv_win(self):
         dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
         qstyle_widget(self.but_csv_options, "normal")
 
-
-        
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _set_load_save_icons(self):
         """
         Set icons / tooltipps for loading and saving data to / from file or

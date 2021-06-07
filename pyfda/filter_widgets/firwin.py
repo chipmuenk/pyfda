@@ -67,6 +67,7 @@ class Firwin(QWidget):
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self):
         QWidget.__init__(self)
@@ -142,12 +143,11 @@ class Firwin(QWidget):
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+        if self.sig_loop(dict_sig, logger) > 0:
             return
 
         # --- signals coming from the FFT window widget or the qfft_win_select
-        if 'fft' in dict_sig['sender']:
+        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
             if 'closeEvent' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
@@ -158,7 +158,7 @@ class Firwin(QWidget):
                     self.sig_tx_local.emit(dict_sig)
                     # global connection to upper hierachies - not needed at the moment
                     # send notification that filter design has changed
-                    self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
+                    self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
     def construct_UI(self):
@@ -228,7 +228,7 @@ class Firwin(QWidget):
     # def _update_fft_window(self):
     #     """ Update window type for FirWin - unneeded at the moment """
     #     self.alg = str(self.cmb_firwin_alg.currentText())
-    #     self.sig_tx.emit({'sender': __name__, 'filt_changed': 'firwin'})
+    #     self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
     def _load_dict(self):
@@ -243,7 +243,7 @@ class Firwin(QWidget):
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
             self.win_dict = fb.fil[0]['wdg_fil']['firwin']
 
-        self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
+        self.emit({'view_changed': 'fft_win_type'}, sig_name="sig_tx_local")
 
     # --------------------------------------------------------------------------
     def _store_dict(self):
@@ -546,7 +546,7 @@ class Firwin(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.sig_tx_local.emit({'sender': __name__, 'view_changed': 'fft_win_type'})
+            self.emit({'view_changed': 'fft_win_type'}, sig_name="sig_tx_local")
         else:
             self.fft_widget.hide()
 

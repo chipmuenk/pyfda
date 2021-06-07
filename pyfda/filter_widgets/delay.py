@@ -48,6 +48,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
     """
 
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -125,7 +126,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 #                                     })
 #         
 #         # sig_tx -> select_filter -> filter_specs   
-#         self.sig_tx.emit({'sender':__name__, 'filt_changed':'delay'})
+#         self.emit({'filt_changed': 'delay'})
 # =============================================================================
 
 

@@ -36,36 +36,40 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFD,
                      QFileDialog, QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal)
-#------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
     """
     Create a pop-up widget for setting CSV options. This is needed when storing /
     reading Comma-Separated Value (CSV) files containing coefficients or poles
     and zeros.
     """
-    sig_tx = pyqtSignal(dict) # outgoing
+    sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def closeEvent(self, event):
         """
         Override closeEvent (user has tried to close the window) and send a
         signal to parent where window closing is registered before actually
         closing the window.
         """
-        self.sig_tx.emit({'sender':__name__, 'closeEvent':''})
+        self.emit({'closeEvent': ''})
         event.accept()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
         lblDelimiter = QLabel("CSV-Delimiter:", self)
-        delim = [('Auto','auto'), ('< , >',','), ('< ; >', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('< | >', '|')]
+        delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
+                 ('<SPACE>', ' '), ('< | >', '|')]
         self.cmbDelimiter = QComboBox(self)
         for d in delim:
             self.cmbDelimiter.addItem(d[0],d[1])
@@ -144,7 +148,7 @@ class CSV_option_box(QDialog):
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
-            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+            self.emit({'ui_changed': 'csv'})
 
         except KeyError as e:
             logger.error(e)
@@ -163,7 +167,9 @@ class CSV_option_box(QDialog):
 
         except KeyError as e:
             logger.error(e)
-#------------------------------------------------------------------------------
+
+
+# ##############################################################################
 def prune_file_ext(file_type):
     """
     Prune file extension, e.g. '(\*.txt)' from file type description returned
@@ -1354,7 +1360,7 @@ def load_filter(self):
 
                     logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                      # emit signal -> InputTabWidgets.load_all:
-                    self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
+                    self.emit({'data_changed': 'filter_loaded'})
                     dirs.save_dir = os.path.dirname(file_name) # update working dir
         except IOError as e:
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))

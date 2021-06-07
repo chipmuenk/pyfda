@@ -73,6 +73,7 @@ near ``f_S/2`` (highpass).
 ``ma.calc_ma()``
     """
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -241,7 +242,7 @@ near ``f_S/2`` (highpass).
                                          'normalize':self.chk_norm.isChecked()}
                                     })
         # sig_tx -> select_filter -> filter_specs
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'ma'})
+        self.emit({'filt_changed': 'ma'})
 
 
     def _get_params(self, fil_dict):

@@ -42,16 +42,17 @@ class SelectFilter(QWidget):
     sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
     where it triggers the recreation of all subwidgets.
     """
-    sig_tx = pyqtSignal(object) # outgoing
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(SelectFilter, self).__init__(parent)
 
-        self.fc_last = '' # previous filter class
+        self.fc_last = ''  # previous filter class
 
         self._construct_UI()
 
-        self._set_response_type() # first time initialization
+        self._set_response_type()  # first time initialization
 
     def _construct_UI(self):
         """
@@ -375,7 +376,7 @@ class SelectFilter(QWidget):
 
         if enb_signal:
             logger.debug("Emit 'filt_changed'")
-            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_type'})
+            self.emit({'filt_changed': 'filter_type'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
@@ -406,11 +407,11 @@ class SelectFilter(QWidget):
         ordn = safe_eval(self.ledOrderN.text(), fb.fil[0]['N'], return_type='int', sign='pos')
         ordn = ordn if ordn > 0 else 1
         self.ledOrderN.setText(str(ordn))
-        fb.fil[0].update({'N' : ordn})
+        fb.fil[0].update({'N': ordn})
 
         if enb_signal:
             logger.debug("Emit 'filt_changed'")
-            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_widget'})
+            self.emit({'filt_changed': 'filter_order_widget'})
 
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):

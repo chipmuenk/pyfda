@@ -33,12 +33,12 @@ class FreqSpecs(QWidget):
     Build and update widget for entering the frequency
     specifications like F_sb, F_pb etc.
     """
-
     # class variables (shared between instances if more than one exists)
-    sig_tx = pyqtSignal(object) # outgoing
-    sig_rx = pyqtSignal(object) # incoming
+    sig_tx = pyqtSignal(object)  # outgoing
+    sig_rx = pyqtSignal(object)  # incoming
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
-    def __init__(self, parent, title = "Frequency Specs"):
+    def __init__(self, parent, title="Frequency Specs"):
 
         super(FreqSpecs, self).__init__(parent)
         self.title = title
@@ -56,8 +56,8 @@ class FreqSpecs(QWidget):
         Process signals coming in via subwidgets and sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected (and interrupted)!")
+        if self.sig_loop(dict_sig, logger) > 0:
+            return
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
@@ -162,10 +162,10 @@ class FreqSpecs(QWidget):
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(event_source.text(), fb.data_old, sign='pos') / fb.fil[0]['f_S']
-            fb.fil[0].update({f_label:f_value})
+            fb.fil[0].update({f_label: f_value})
             self.sort_dict_freqs()
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
-            self.spec_edited = False # reset flag
+            self.emit({'specs_changed': 'f_specs'})
+            self.spec_edited = False  # reset flag
 
         # nothing has changed, but display frequencies in rounded format anyway
         else:
@@ -230,14 +230,14 @@ class FreqSpecs(QWidget):
         """
         if fb.fil[0]['freq_locked']:
             for i in range(len(self.qlineedit)):
-                f_name = str(self.qlineedit[i].objectName()).split(":",1)
+                f_name = str(self.qlineedit[i].objectName()).split(":", 1)
                 f_label = f_name[0]
                 f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
 
-                fb.fil[0].update({f_label:f_value})
+                fb.fil[0].update({f_label: f_value})
                 self.sort_dict_freqs()
 
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
+            self.emit({'specs_changed': 'f_specs'})
 
 #-------------------------------------------------------------
     def update_f_unit(self):

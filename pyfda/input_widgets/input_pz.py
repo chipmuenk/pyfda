@@ -33,7 +33,8 @@ from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
 
-classes = {'Input_PZ':'P/Z'} #: Dict containing class name : display name
+classes = {'Input_PZ': 'P/Z'}  #: Dict containing class name : display name
+
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -178,17 +179,18 @@ class Input_PZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
-    sig_tx = pyqtSignal(object) # emitted when filter has been saved
+    sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
+    sig_tx = pyqtSignal(object)  # emitted when filter has been saved
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent):
         super(Input_PZ, self).__init__(parent)
-        
+
         self.data_changed = True # initialize flag: filter data has been changed
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.angle_char = "\u2220"
-        
+
         self.tab_label = "P/Z"
         self.tool_tip = "Display and edit filter poles and zeros."
 
@@ -201,22 +203,19 @@ class Input_PZ(QWidget):
 
         self.setup_signal_slot() # setup signal-slot connections and eventFilters
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
-
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-            return
-        else:
-            logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
+        logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"\
                      .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
-        
+        if self.sig_loop(dict_sig, logger) > 0:
+            return
+
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
-            #self.sig_tx.emit(dict_sig)
+            # self.emit(dict_sig)
 
         elif self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
@@ -512,7 +511,7 @@ class Input_PZ(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'input_pz'})
+        self.emit({'data_changed': 'input_pz'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')

@@ -46,6 +46,7 @@ poles can be entered manually.
     """
 
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -131,7 +132,7 @@ poles can be entered manually.
                                     })
         
         # sig_tx -> select_filter -> filter_specs   
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'pole_1_2'})
+        self.emit({'filt_changed': 'pole_1_2'})
 
 
     def _load_dict(self):

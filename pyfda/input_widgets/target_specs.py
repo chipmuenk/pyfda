@@ -30,7 +30,8 @@ class TargetSpecs(QWidget):
     # class variables (shared between instances if more than one exists)
     sig_rx = pyqtSignal(object) # incoming
     sig_tx = pyqtSignal(object) # outgoing
-
+    # from pyfda.libs.pyfda_qt_lib import emit
+    
     def __init__(self, parent, title = "Target Specs"):
         super(TargetSpecs, self).__init__(parent)
 
@@ -45,8 +46,7 @@ class TargetSpecs(QWidget):
 #         Process signals coming in via subwidgets and sig_rx
 #         """
 #         logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-#         if dict_sig['sender'] == __name__:
-#             logger.warning("Infinite loop detected")
+#         if sig_loop(dict_sig, logger) > 0:
 #             return
 #         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
 #             # update target frequencies with new f_S
@@ -59,13 +59,10 @@ class TargetSpecs(QWidget):
         Construct user interface
         """
         # subwidget for Frequency Specs
-        self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
-        self.f_specs.sig_tx.connect(self.sig_tx) # pass signal upwards
-        self.sig_rx.connect(self.f_specs.sig_rx) # pass on received signals
+        self.f_specs = freq_specs.FreqSpecs(self, title="Frequency")
         # subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Amplitude")
         self.a_specs.setVisible(True)
-        self.a_specs.sig_tx.connect(self.sig_tx) # pass signal upwards
         """
         LAYOUT
         """
@@ -93,30 +90,32 @@ class TargetSpecs(QWidget):
         frmMain = QFrame(self)
         frmMain.setLayout(layVSpecs)
 
-        self.layVMain = QVBoxLayout() # Widget main layout
+        self.layVMain = QVBoxLayout()  # Widget main layout
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
-        
-        #----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        # self.sig_rx.connect(self.process_sig_rx)
-        
-        self.update_UI() # first time initialization
 
-#------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect f_specs and a_specs subwidget to signalling
+        self.f_specs.sig_tx.connect(self.sig_tx)  # pass signal upwards
+        self.sig_rx.connect(self.f_specs.sig_rx)  # pass on received signals
+        self.a_specs.sig_tx.connect(self.sig_tx)  # pass signal upwards
+
+        self.update_UI()  # first time initialization
+
+# ------------------------------------------------------------------------------
     def update_UI(self, new_labels = ()):
         """
         Called when a new filter design algorithm has been selected
-        Pass frequency and amplitude labels to the amplitude and frequency
-        spec widgets
-        The sigSpecsChanged signal is emitted already by select_filter.py
-        """
+        - Pass new frequency and amplitude labels to the amplitude and frequency
+          spec widgets. The first element of the 'amp' and the 'freq' tuple
+          is the state with 'u' for 'unused' and 'd' for disabled
 
-        # pass new labels to widgets. The first element of the 'amp' and the
-        # 'freq' tuple is the state, 'u' is for 'unused', 'd' is for disabled
+        - The `filt_changed` signal is emitted already by `select_filter.py`
+        """
 
         if ('frq' in new_labels and len(new_labels['frq']) > 1 and
                                               new_labels['frq'][0] != 'i'):
@@ -134,7 +133,7 @@ class TargetSpecs(QWidget):
         else:
             self.a_specs.hide()
 
-        # self.sig_tx.emit({'sender':__name__, 'changed_specs':'target'})
+        # self.emit({'changed_specs':'target'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):

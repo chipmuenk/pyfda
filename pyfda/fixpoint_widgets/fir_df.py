@@ -40,11 +40,9 @@ class FIR_DF_wdg(QWidget):
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
     """
-    # incoming, 
-    sig_rx = pyqtSignal(object)
-    # outcgoing
-    sig_tx = pyqtSignal(object)
-
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outcgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(FIR_DF_wdg, self).__init__(parent)
@@ -137,13 +135,13 @@ class FIR_DF_wdg(QWidget):
                 self.wdg_w_accu.ledWI.setEnabled(cmbW=='man')
                 if cmbW in {'full', 'auto'}:
                     self.dict2ui()
-                    self.sig_tx.emit({'sender':__name__, 'specs_changed':'cmbW'})
+                    self.emit({'specs_changed': 'cmbW'})
                 else:
                     return
 
-            dict_sig.update({'sender':__name__}) # currently only local
+            dict_sig.update({'id': id(self)})  # currently only local
 
-        self.sig_tx.emit(dict_sig)
+        self.emit(dict_sig)
 
 #------------------------------------------------------------------------------        
     def update_q_coeff(self, dict_sig):

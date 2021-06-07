@@ -87,6 +87,7 @@ to be complex (no real values).
 
         """
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -339,7 +340,7 @@ to be complex (no real values).
 #       'rpk' is our signal that this is a non-Causal filter with zero phase
 #       inserted into fil dictionary after fil_save and convert
         # sig_tx -> select_filter -> filter_specs   
-        self.sig_tx.emit({'sender':__name__, 'filt_changed':'ellip_zero'})
+        self.emit({'filt_changed': 'ellip_zero'})
 
 #------------------------------------------------------------------------------
 

@@ -24,38 +24,38 @@ import pyfda.libs.pyfda_dirs as dirs
  
 from pyfda.pyfda_rc import params
 
+
 class Input_Coeffs_UI(QWidget):
     """
     Create the UI for the FilterCoeffs class
     """
-    sig_rx = pyqtSignal(dict) # incoming
-    sig_tx = pyqtSignal(dict) # outgoing
+    sig_rx = pyqtSignal(dict)  # incoming
+    sig_tx = pyqtSignal(dict)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(Input_Coeffs_UI, self).__init__(parent)
-        self.eps = 1.e-6 # initialize tolerance value
+        self.eps = 1.e-6  # initialize tolerance value
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the CSV pop-up window
         """
-
         logger.debug("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
-        
+
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
-            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})            
-            return # probably not needed
+            self.emit({'ui_changed': 'csv'})
+            return
         elif 'ui_changed' in dict_sig:
-            self._set_load_save_icons() # update icons file <-> clipboard
-            # inform e.g. the p/z input widget about changes in CSV options 
-            self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+            self._set_load_save_icons()  # update icons file <-> clipboard
+            # inform e.g. the p/z input widget about changes in CSV options
+            self.emit({'ui_changed': 'csv'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
-
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -446,7 +446,7 @@ class Input_Coeffs_UI(QWidget):
                 else:
                     dirs.csv_options_handle.close()
 
-        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
+        self.emit({'ui_changed': 'csv'})
 
     #------------------------------------------------------------------------------
 

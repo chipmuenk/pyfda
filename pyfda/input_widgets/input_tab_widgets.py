@@ -32,10 +32,9 @@ class InputTabWidgets(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(object)
-
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
-        
         super(InputTabWidgets, self).__init__(parent)
         self._construct_UI()
 
@@ -142,16 +141,16 @@ class InputTabWidgets(QWidget):
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
         if type(dict_sig) == dict:
-            logger.warning("SIG_RX\n{0}"\
-                .format(pprint_log(dict_sig)))
+            logger.warning("SIG_RX\n{0}".format(pprint_log(dict_sig)))
         else:
             logger.warning("empty dict")  
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def current_tab_changed(self):
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'tab'})
+        self.emit({'ui_changed': 'tab'})
 
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+
 
 def main():
     from pyfda import pyfda_rc as rc
@@ -163,6 +162,7 @@ def main():
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()

@@ -73,12 +73,9 @@ class Plot_FFT_win(QDialog):
     - `self.draw()`: calculate window and FFT and draw both
     - `get_win(N)` : Get the window array
     """
-    # incoming
-    sig_rx = pyqtSignal(object)
-    # outgoing
-    sig_tx = pyqtSignal(object)
-
-    from pyfda.libs.pyfda_qt_lib import emit
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
@@ -132,15 +129,19 @@ class Plot_FFT_win(QDialog):
         """
         logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+
+        if self.sig_loop(dict_sig, logger) > 0:
             return
+        # if dict_sig['id'] == id(self):
+        #     logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+        #     return
 
         elif not self.isVisible():
             self.needs_calc = True
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
-            or dict_sig['sender'] == 'self' or self.needs_calc:
+            or dict_sig['id'] == id(self) or self.needs_calc:
+                # TODO: why is self-loop checked here?
 
             self.calc_draw_win()
             self.needs_calc = False
@@ -375,7 +376,7 @@ class Plot_FFT_win(QDialog):
         pass thru 'view_changed':'fft_win_type' or 'fft_win_par'
         """
         self.calc_draw_win()
-        self.sig_tx.emit(dict_sig)
+        self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
     def calc_draw_win(self):

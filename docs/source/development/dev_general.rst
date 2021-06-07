@@ -45,6 +45,7 @@ operations only when the widget is visible and store the need for a redraw in a 
         sig_resize = pyqtSignal()   # emit a local signal upon resize
         sig_rx = pyqtSignal(object) # incoming signal 
         sig_tx = pyqtSignal(object) # outgoing signal
+        from pyfda.libs.pyfda_qt_lib import emit, sig_loop
         
         def __init__(self, parent):
             super(MyWidget, self).__init__(parent)
@@ -58,8 +59,7 @@ operations only when the widget is visible and store the need for a redraw in a 
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        if dict_sig['sender'] == __name__:   # only needed when a ``sig_tx signal`` is fired 
-            logger.debug("Infinite loop detected")
+        if self.sig_loop(dict_sig, logger) > 0:
             return
             
         if self.isVisible():
@@ -80,19 +80,28 @@ operations only when the widget is visible and store the need for a redraw in a 
             if 'filt_changed' in dict_sig:
                 self.filt_changed = True
 
-Information is transmitted via the global ``sig_tx`` signal:
+Information is transmitted via the global ``sig_tx`` signal (referenced by the imported 
+``emit()`` method):
 
 .. code::
 
-        dict_sig = {'sender':__name__, 'fx_sim':'set_results', 'fx_results':self.fx_results}            
-        self.sig_tx.emit(dict_sig)
+        dict_sig = {'fx_sim':'set_results', 'fx_results':self.fx_results}            
+        self.emit(dict_sig)
 
 The following dictionary keys are generally used, individual ones can be created
 as needed.
 
-:'sender': Fully qualified name of the sending widget, usually given as ``__name__``.
-       The sender name is needed a.o. to prevent infinite loops which may occur
-       when the rx event is connected to the tx signal.
+:'id': Python ``id(self)`` reference to the sending widget instance, needed a.o.
+    to prevent infinite loops which may occur when the rx event is connected to 
+    the tx signal. **Automatically added by ``emit()`` if not in ``dict_sig``.**
+
+:'class': Class name of the sending widget, usually given as ``self.__class__.__name__``.
+    This can be used for debugging purposes.
+    **Automatically added by ``emit()`` if not in ``dict_sig``.**
+
+:'ttl': Optional, defines the "time-to-live". The integer value given at definition is
+    decreased every time ``emit()`` is called. When zero is reached, the signal is
+    terminated.
 
 :'filt_changed': A different filter type (response type, algorithm, ...) has been
     selected or loaded, requiring an update of the UI in some widgets.

@@ -11,9 +11,6 @@ Create a tabbed widget for all plot subwidgets in the list ``fb.plot_widgets_lis
 This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
 kept as a module variable in :mod:`pyfda.filterbroker`.
 """
-import logging
-logger = logging.getLogger(__name__)
-
 import importlib
 from pyfda.libs.compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
@@ -21,19 +18,24 @@ from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
-#------------------------------------------------------------------------------
+import logging
+logger = logging.getLogger(__name__)
+
+
+# ------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
 
     # incoming, connected to input_tab_widget.sig_tx in pyfdax
     sig_rx = pyqtSignal(object)
     # outgoing: emitted by process_sig_rx
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
         self._construct_UI()
 
-#---------------------------------------------- --------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets: Instantiate dynamically each widget
@@ -60,20 +62,20 @@ class PlotTabWidgets(QTabWidget):
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
 
-        n_wdg = 0 # number and ...
-        inst_wdg_str = "" # ... full names of successfully instantiated plot widgets
+        n_wdg = 0  # number and ...
+        inst_wdg_str = ""  # ... full names of successfully instantiated plot widgets
         #
         for plot_class in fb.plot_classes:
             try:
-                mod_fq_name = fb.plot_classes[plot_class]['mod'] # fully qualified module name
-                mod = importlib.import_module(mod_fq_name) # import plot widget module
-                wdg_class = getattr(mod, plot_class) # get plot widget class ...
+                mod_fq_name = fb.plot_classes[plot_class]['mod']  # FQN
+                mod = importlib.import_module(mod_fq_name)  # import plot widget module
+                wdg_class = getattr(mod, plot_class)  # get plot widget class ...
                 # and instantiate it
                 inst = wdg_class(self)
             except ImportError as e:
-                    logger.warning('Class "{0}" could not be imported from {1}:\n{2}.'\
+                logger.warning('Class "{0}" could not be imported from {1}:\n{2}.'
                                .format(plot_class, mod_fq_name, e))
-                    continue # unsuccessful, try next widget
+                continue  # unsuccessful, try next widget
 
             if hasattr(inst, 'tab_label'):
                 tabWidget.addTab(inst, inst.tab_label)
@@ -86,33 +88,34 @@ class PlotTabWidgets(QTabWidget):
             if hasattr(inst, 'sig_rx'):
                 self.sig_rx.connect(inst.sig_rx)
 
-            n_wdg += 1 # successfully instantiated one more widget
+            n_wdg += 1  # successfully instantiated one more widget
             inst_wdg_str += '\t' + mod_fq_name + "." + plot_class + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.debug("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
-        #----------------------------------------------------------------------
+            logger.debug(
+                "Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
+        # ----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
-        layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+        layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
         self.setLayout(layVMain)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # self.sig_rx.connect(inst.sig_rx) # this happens in _construct_UI()
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
-        self.sig_tx.connect(self.sig_rx) # loop back to local inputs
+        self.sig_tx.connect(self.sig_rx)  # loop back to local inputs
         # self.sig_rx.connect(self.log_rx) # enable for debugging
 
         # When user has selected a different tab, trigger a redraw of current tab
@@ -152,27 +155,25 @@ class PlotTabWidgets(QTabWidget):
         resizes itself instead.
         """
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def log_rx(self, dict_sig=None):
         """
         Enable `self.sig_rx.connect(self.log_rx)` above for debugging.
         """
         if type(dict_sig) == dict:
-            logger.warning("SIG_RX\n{0}"\
-                .format(pprint_log(dict_sig)))
+            logger.warning("SIG_RX\n{0}".format(pprint_log(dict_sig)))
         else:
             logger.warning("empty dict")
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def current_tab_changed(self):
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'tab'})
+        self.emit({'ui_changed': 'tab'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def current_tab_redraw(self):
-        self.sig_tx.emit({'sender':__name__, 'ui_changed':'resized'})
+        self.emit({'ui_changed': 'resized'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
         Filter all events generated by the QTabWidget. Source and type of all
@@ -191,8 +192,8 @@ class PlotTabWidgets(QTabWidget):
         # Call base class method to continue normal event processing:
         return super(PlotTabWidgets, self).eventFilter(source, event)
 
-#------------------------------------------------------------------------
 
+# ==============================================================================
 def main():
     import sys
     from pyfda import pyfda_rc as rc
@@ -202,12 +203,13 @@ def main():
     app.setStyleSheet(rc.qss_rc)
 
     mainw = PlotTabWidgets(None)
-    mainw.resize(300,400)
+    mainw.resize(300, 400)
 
     app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()

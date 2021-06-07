@@ -28,7 +28,8 @@ class WeightSpecs(QWidget):
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.
     """
-    sig_tx = pyqtSignal(object) # outgoing
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
 
@@ -189,8 +190,7 @@ class WeightSpecs(QWidget):
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(weight_value))
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _store_entry(self, widget):
         """
         When the textfield of `widget` has been edited (`self.spec_edited` =  True),
@@ -203,13 +203,12 @@ class WeightSpecs(QWidget):
                 w_value = 1
             if w_value > 1.e6:
                 w_value = 1.e6
-            fb.fil[0].update({w_label:w_value})
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'w_specs'})
-            self.spec_edited = False # reset flag
+            fb.fil[0].update({w_label: w_value})
+            self.emit({'specs_changed': 'w_specs'})
+            self.spec_edited = False  # reset flag
         self.load_dict()
-        
 
-#-------------------------------------------------------------
+# -------------------------------------------------------------
     def _hide_entries(self, num_new_labels):
         """
         Hide subwidgets so that only `len_new_labels` subwidgets are visible
@@ -251,8 +250,8 @@ class WeightSpecs(QWidget):
             for i in range(self.n_cur_labels, num_new_labels):
                 self.qlabels[i].show()
                 self.qlineedit[i].show()
-                
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
     def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
@@ -264,9 +263,9 @@ class WeightSpecs(QWidget):
             fb.fil[0].update({w_label:1})
 
         self.load_dict()
-        self.sig_tx.emit({'sender':__name__, 'specs_changed':'w_specs'})
+        self.emit({'specs_changed': 'w_specs'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 

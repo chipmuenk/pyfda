@@ -47,12 +47,9 @@ class Plot_Impz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
-    # incoming
-    sig_rx = pyqtSignal(object)
-    # outgoing, e.g. when stimulus has been calculated
-    sig_tx = pyqtSignal(object)
-    # outgoing to local fft window
-    # sig_tx_fft = pyqtSignal(object)
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent):
         super(Plot_Impz, self).__init__(parent)
@@ -197,11 +194,15 @@ class Plot_Impz(QWidget):
         """
 
         logger.warning("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+        if self.sig_loop(dict_sig, logger) > 0:
             return
+        # if 'id' not in dict_sig:
+        #     logger.error("id missing in {0}".format(pprint_log(dict_sig)))
+        # elif dict_sig['id'] == id(self):
+        #     logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+        #     return
 
         self.error = False
 
@@ -253,7 +254,7 @@ class Plot_Impz(QWidget):
             else:
                 logger.error('Unknown value "{0}" for "fx_sim" key\n'
                              '\treceived from "{1}"'.format(dict_sig['fx_sim'],
-                                                            dict_sig['sender']))
+                                                            dict_sig['class']))
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():  # all signals except 'fx_sim'
@@ -348,7 +349,7 @@ class Plot_Impz(QWidget):
         if self.needs_calc:
             logger.debug("Calc impz started!")
             if self.fx_sim:  # start a fixpoint simulation
-                self.sig_tx.emit({'sender': __name__, 'fx_sim': 'init'})
+                self.emit({'fx_sim': 'init'})
                 return
 
             self.calc_stimulus()
@@ -591,7 +592,7 @@ class Plot_Impz(QWidget):
             # max_len_seq returns `sequence, state`. The state is not stored here,
             # hence, an identical sequence is created every time.
             noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(len(self.x)))),
-                                        length=len(self.x), state=None)[0] - 0.5)
+                                     length=len(self.x), state=None)[0] - 0.5)
             self.title_str += r' + max. length sequence'
         elif self.ui.noise == "brownian":
             # brownian noise
@@ -624,8 +625,8 @@ class Plot_Impz(QWidget):
 
             self.x_q = self.q_i.fixp(self.x.real)
 
-            self.sig_tx.emit(
-                {'sender': __name__, 'fx_sim': 'send_stimulus',
+            self.emit(
+                {'fx_sim': 'send_stimulus',
                  'fx_stimulus': np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
             logger.debug("fx stimulus sent")
 
@@ -690,7 +691,7 @@ class Plot_Impz(QWidget):
                 self.draw()
                 qstyle_widget(self.ui.but_run, "normal")
 
-                self.sig_tx.emit({'sender': __name__, 'fx_sim': 'finish'})
+                self.emit({'fx_sim': 'finish'})
 
     # ------------------------------------------------------------------------
     def calc_fft(self):
@@ -1464,7 +1465,7 @@ class Plot_Impz(QWidget):
         # - Scale impulse response with N_FFT to calculate frequency response if requested
             if self.ui.chk_freq_norm_impz.isVisible()\
                 and self.ui.chk_freq_norm_impz.isEnabled()\
-                and self.ui.chk_freq_norm_impz.isChecked():
+                    and self.ui.chk_freq_norm_impz.isChecked():
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N
                 if self.ui.stim == "dirac":

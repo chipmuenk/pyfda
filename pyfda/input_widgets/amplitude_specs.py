@@ -24,9 +24,10 @@ class AmplitudeSpecs(QWidget):
     Build and update widget for entering the amplitude
     specifications like A_SB, A_PB etc.
     """
-    sig_tx = pyqtSignal(object) # emitted when amplitude unit or spec has been changed
+    sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
+    from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, title = "Amplitude Specs"):
+    def __init__(self, parent, title="Amplitude Specs"):
         """
         Initialize
         """
@@ -224,7 +225,7 @@ class AmplitudeSpecs(QWidget):
         fb.fil[0]['amp_specs_unit'] = qget_cmb_box(self.cmbUnitsA, data=False)
         self.load_dict()
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'a_unit'})
+        self.emit({'view_changed': 'a_unit'})
 
 #------------------------------------------------------------------------------
     def _store_entry(self, source):
@@ -242,9 +243,9 @@ class AmplitudeSpecs(QWidget):
             filt_type = fb.fil[0]['ft']
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), fb.data_old, sign='pos')
-            fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'a_specs'})
-            self.spec_edited = False # reset flag
+            fb.fil[0].update({amp_label: unit2lin(amp_value, filt_type, amp_label, unit)})
+            self.emit({'specs_changed': 'a_specs'})
+            self.spec_edited = False  # reset flag
         self.load_dict()
 
 #-------------------------------------------------------------

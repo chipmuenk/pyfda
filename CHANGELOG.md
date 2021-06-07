@@ -31,6 +31,10 @@
 
 
 ### New features
+- Complete make-over of signalling for DRY using new methods
+  * 'pyfda_qt_lib.emit' to generate default dict keys 'id' and 'class' and 
+     providing an time-to-live mechanisms for signals
+  * 'pyfda_qt_lib.sig_loop' to test for infinite loops
 
 - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
     for  impulses

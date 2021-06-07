@@ -208,10 +208,9 @@ class UI_W(QWidget):
     'combo_items'   : ['auto', 'full', 'man']   # Combo selection
     'tip_combo'     : 'Calculate Acc. width.'   # tooltip for combo
     """
-    # incoming, 
-    #sig_rx = pyqtSignal(object)
-    # outcgoing
-    sig_tx = pyqtSignal(object)
+    # sig_rx = pyqtSignal(object)  # incoming, 
+    sig_tx = pyqtSignal(object)  # outcgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent, q_dict, **kwargs):
         super(UI_W, self).__init__(parent)

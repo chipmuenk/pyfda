@@ -299,9 +299,10 @@ class MplToolbar(NavigationToolbar):
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
 
-    sig_tx = pyqtSignal(object) # general signal, containing a dict
+    sig_tx = pyqtSignal(object)  # general signal, containing a dict
+    from pyfda.libs.pyfda_qt_lib import emit
 
-    def _init_toolbar(self): pass # needed for backward compatibility with mpl < 3.3
+    def _init_toolbar(self): pass  # needed for backward compatibility with mpl < 3.3
 
     # disable coordinate display when mplcursors is available
     if MPL_CURS:
@@ -499,7 +500,7 @@ class MplToolbar(NavigationToolbar):
         This method shadows `home()` inherited from NavigationToolbar.
         """
         self.push_current()
-        self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
+        self.emit({'home':''}) # only the key is used by the slot
         self.mpl_widget.redraw()
 
 #------------------------------------------------------------------------------
@@ -594,7 +595,7 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
 
-        self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.zoom_locked})
+        self.emit({'lock_zoom':self.zoom_locked})
 
 #------------------------------------------------------------------------------
 # =============================================================================
@@ -625,7 +626,7 @@ class MplToolbar(NavigationToolbar):
 #         self.a_cb.setEnabled(self.enabled)
 #         self.a_op.setEnabled(self.enabled)
 #
-#         self.sig_tx.emit({'sender':__name__, 'enabled':self.enabled})
+#         self.emit({'enabled':self.enabled})
 #
 # =============================================================================
 #------------------------------------------------------------------------------

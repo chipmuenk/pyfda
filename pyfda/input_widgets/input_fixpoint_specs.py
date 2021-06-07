@@ -54,14 +54,12 @@ class Input_Fixpoint_Specs(QWidget):
     """
     Create the widget that holds the dynamically loaded fixpoint filter ui
     """
-    # emit a signal when the image has been resized
-    sig_resize = pyqtSignal()
-    # incoming from subwidgets -> process_sig_rx_local
-    sig_rx_local = pyqtSignal(object)
-    # incoming, connected to input_tab_widget.sig_rx
-    sig_rx = pyqtSignal(object)
-    # outcgoing
-    sig_tx = pyqtSignal(object)
+
+    sig_resize = pyqtSignal()  # emit a signal when the image has been resized
+    sig_rx_local = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx_local
+    sig_rx = pyqtSignal(object)  # incoming, connected to input_tab_widget.sig_rx
+    sig_tx = pyqtSignal(object)  # outcgoing
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
     def __init__(self, parent):
         super(Input_Fixpoint_Specs, self).__init__(parent)
@@ -99,10 +97,9 @@ class Input_Fixpoint_Specs(QWidget):
         4. Send back HDL response to widget via 'fx_sim':'set_response'
         """
 
-        logger.debug("process_sig_rx(): vis={0}\n{1}"\
-                    .format(self.isVisible(), pprint_log(dict_sig)))
-        if dict_sig['sender'] == __name__:
-            logger.debug("Stopped infinite loop\n{0}".format(pprint_log(dict_sig)))
+        logger.debug("SIG_RX(): vis={0}\n{1}"
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+        if self.sig_loop(dict_sig, logger) > 0:
             return
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
             # New filter has been designed, update list of available filter topologies here
@@ -113,7 +110,7 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
-            # self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
+            # self.emit({'fx_sim':'specs_changed'})
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
                 if self.fx_wdg_found:
@@ -121,8 +118,8 @@ class Input_Fixpoint_Specs(QWidget):
                 else:
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimHDL, "error")  
-                    self.sig_tx.emit({'sender': __name__, 'fx_sim': 'error'})
-                    
+                    self.emit({'fx_sim': 'error'})
+   
             elif dict_sig['fx_sim'] == 'send_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
@@ -135,7 +132,8 @@ class Input_Fixpoint_Specs(QWidget):
                             .format((time.process_time() - self.t_resp)*1000))
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
-                             '\treceived from "{1}".'.format(dict_sig['fx_sim'],dict_sig['sender']))
+                             '\treceived from "{1}".'
+                             .format(dict_sig['fx_sim'], dict_sig['class']))
 
         # ---- Process local widget signals
         elif 'ui' in dict_sig:
@@ -176,9 +174,9 @@ class Input_Fixpoint_Specs(QWidget):
                                    .format(dict_sig['id'], pprint_log(dict_sig)))
                     
             if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-               logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-            self.wdg_dict2ui() # update wordlengths in UI and set RUN button to 'changed'
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
+                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.emit({'fx_sim': 'specs_changed'})
 
             return
 
@@ -566,7 +564,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst, "to_verilog"))
                 self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst, "run_sim"))
                 self.update_fxqc_dict()
-                self.sig_tx.emit({'sender':__name__, 'fx_sim':'specs_changed'})
+                self.emit({'fx_sim': 'specs_changed'})
             else:
                 self.butSimHDL.setEnabled(False)
                 self.butExportHDL.setEnabled(False)
@@ -591,8 +589,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui()
-#            dict_sig = {'sender':__name__, 'fx_sim':'specs_changed'}
-#            self.sig_tx.emit(dict_sig)
+#            dict_sig = {'fx_sim':'specs_changed'}
+#            self.emit(dict_sig)
 
         qstyle_widget(self.butSimHDL, "changed")
 #------------------------------------------------------------------------------
@@ -676,8 +674,8 @@ class Input_Fixpoint_Specs(QWidget):
 #            logger.info("Started python fixpoint simulation")
 #            self.update_fxqc_dict()
 #            self.fxpyfilter.setup(fb.fil[0]['fxqc'])   # setup filter instance         
-#            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
-#            self.sig_tx.emit(dict_sig)
+#            dict_sig = {'fx_sim':'get_stimulus'}
+#            self.emit(dict_sig)
 #                        
 #        except AttributeError as e:
 #            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
@@ -696,7 +694,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
             logger.error('Fixpoint widget has no method "construct_fixp_filter", aborting.')
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
+            self.emit({'fx_sim': 'error'})
             return
 
         try:
@@ -705,8 +703,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
 
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
-            self.sig_tx.emit(dict_sig)
+            dict_sig = {'fx_sim':'get_stimulus'}
+            self.emit(dict_sig)
                         
         except  ValueError as e: # exception
             logger.error('Fixpoint stimulus generation failed during "init" for dict\n{0}'
@@ -726,7 +724,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.debug('Starting fixpoint simulation with stimulus from "{0}":\n\tfx_stimulus:{1}'
                         '\n\tStimuli: Shape {2} of type "{3}"'
                         .format( 
-                            dict_sig['sender'],
+                            dict_sig['class'],
                             pprint_log(dict_sig['fx_stimulus'], tab=" "),
                             np.shape(dict_sig['fx_stimulus']),
                             dict_sig['fx_stimulus'].dtype,
@@ -768,7 +766,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.error("Simulator error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
+            self.emit({'fx_sim': 'error'})
             return
         except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
@@ -783,13 +781,12 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
-            self.sig_tx.emit({'sender':__name__, 'fx_sim':'error'})
+            self.emit({'fx_sim':'error'})
             return
 
         logger.debug("Sending fixpoint results")
-        dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
-                    'fx_results':self.fx_results }            
-        self.sig_tx.emit(dict_sig)
+        dict_sig = {'fx_sim':'set_results', 'fx_results':self.fx_results}            
+        self.emit(dict_sig)
         qstyle_widget(self.butSimHDL, "normal")
         return
 

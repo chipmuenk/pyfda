@@ -45,9 +45,10 @@ class FreqUnits(QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    sig_tx = pyqtSignal(object) # outgoing
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, title = "Frequency Units"):
+    def __init__(self, parent, title="Frequency Units"):
 
         super(FreqUnits, self).__init__(parent)
         self.title = title
@@ -194,7 +195,7 @@ class FreqUnits(QWidget):
             fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
+        self.emit({'view_changed': 'f_S'})
 
 #-------------------------------------------------------------
     def update_UI(self):
@@ -279,7 +280,7 @@ class FreqUnits(QWidget):
 
         self._freq_range(emit=False) # update f_lim setting without emitting signal
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
+        self.emit({'view_changed': 'f_S'})
 
 #------------------------------------------------------------------------------
 
@@ -310,7 +311,7 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'f_max':fb.fil[0]['f_S']})
 
                 self._freq_range(emit = False) # update plotting range
-                self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
+                self.emit({'view_changed': 'f_S'})
                 self.spec_edited = False # reset flag, changed entry has been saved
 
         if source.objectName() == 'f_S':
@@ -358,7 +359,7 @@ class FreqUnits(QWidget):
         fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
 
         if emit:
-            self.sig_tx.emit({'sender':__name__, 'view_changed':'f_range'})
+            self.emit({'view_changed': 'f_range'})
 
     #-------------------------------------------------------------
     def load_dict(self):
@@ -390,7 +391,7 @@ class FreqUnits(QWidget):
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
         if self.butSort.isChecked():
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_sort'})
+            self.emit({'specs_changed': 'f_sort'})
 
 #------------------------------------------------------------------------------
 
