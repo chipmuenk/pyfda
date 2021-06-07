@@ -506,8 +506,6 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
                                pass_zero=False,
@@ -520,23 +518,22 @@ class Firwin(QWidget):
         self.N = round_odd(N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
         fil_dict['F_C'] = (self.F_SB + self.F_PB) / 2  # average calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                               window=self.fir_window, pass_zero=True, nyq=0.5))
+                               window=get_window(self.win_dict, self.N, sym=True),
+                               pass_zero=True, nyq=0.5))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
         if not self._test_N():
             return -1
-        self.fir_window = get_window(self.win_dict, self.N, win_name=self.fir_window_name,
-                                     sym=True)
-        self._save(fil_dict, self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                                         window=self.fir_window, pass_zero=True, nyq=0.5))
+        self._save(fil_dict,
+                   self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+                               window=get_window(self.win_dict, self.N, sym=True),
+                               pass_zero=True, nyq=0.5))
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):
