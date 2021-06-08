@@ -47,6 +47,7 @@ from pyfda import qrc_resources  # contains all icons
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
+
 # ------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     """
@@ -54,23 +55,23 @@ def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     vlines (= LineCollection). LineCollection keywords are supported.
     """
     # create a copy of the kwargs dict without 'bottom' key-value pair, provide
-    # default value = 0:
-    bottom = kwargs.get('bottom', 0)
-    kwargs_cp = {k:v for k,v in kwargs.items() if k not in ['bottom']}
+    # pop bottom from dict (defuault = 0), not compatible with vlines
+    bottom = kwargs.pop('bottom', 0)  
+    ax.axhline(bottom, **kwargs)
     if cmp_version("matplotlib", "3.1.0") >= 0:
-        kwargs_cp = {k:v for k,v in kwargs.items() if k not in ['bottom']}
-        ax.axhline(bottom, **kwargs_cp)
         ml, sl, bl = ax.stem(x, y, use_line_collection=True, bottom=bottom)
         setp(ml, **mkr_fmt)
-        setp(bl, **kwargs_cp)
-        setp(sl, **kwargs_cp)
+        setp(bl, **kwargs)
+        setp(sl, **kwargs)
     else:
-        ax.axhline(bottom, **kwargs_cp)
-        ax.vlines(x, y, bottom, label=label, **kwargs_cp)
+        ax.vlines(x, y, bottom, label=label, **kwargs)
         # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
         scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
- 
-    handle = (lines.Line2D([], [], **kwargs_cp), lines.Line2D([], [], **mkr_fmt))
+
+    if mkr_fmt['marker']:
+        handle = (lines.Line2D([], [], **kwargs), lines.Line2D([], [], **mkr_fmt))
+    else:
+        handle = lines.Line2D([], [], **kwargs)
     return handle
 
 
