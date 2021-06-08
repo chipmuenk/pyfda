@@ -915,20 +915,22 @@ class Plot_Impz(QWidget):
         y : array-like
             y-data
         bottom : float
-            Bottom line for stem plot. The default is 0.
+            Bottom line y-coordinate for stem plot. The default is 0.
         label : str
             Plot label
         plt_fmt : dict
             Line styles (color, linewidth etc.) for plotting (default: None).
         mkr_fmt : dict
             Marker styles
-        args : dictionary with additional keys and values. As they might not be
+        args : dict
+            additional keys and values. As they might not be
             compatible with every plot style, they have to be added individually
 
         Returns
         -------
-        handle : Handle to plot
-
+        handle :  A `lines.Line2D()` objects or tuple with two of them
+            This provides a handle to the properties of line and marker (optionally)
+            which are displayed by legend
         """
         # plot lines
         if plt_fmt is None:
@@ -945,7 +947,7 @@ class Plot_Impz(QWidget):
         else:
             handle = []
 
-        # plot markers (and "dots" as well)
+        # plot markers (except for 'stem' and 'dots' where they have been plotted already)
         if mkr_fmt and plt_style not in {'stem', 'dots'}:
             handle_mkr = scatter(x, y, ax=ax, mkr_fmt=mkr_fmt)
             # join handles to plot them on top of each other in the legend
