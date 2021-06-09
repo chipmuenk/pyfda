@@ -695,14 +695,12 @@ class QFFTWinSelector(QWidget):
         logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("rejected")
             return
 
         elif 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'fft_win_par':
                 self.dict2ui_params()
             elif dict_sig['view_changed'] == 'fft_win_type':
-                logger.warning("win_type")
                 self.dict2ui()
 
     # --------------------------------------------------------------------------
