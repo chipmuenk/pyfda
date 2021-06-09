@@ -243,7 +243,7 @@ class Firwin(QWidget):
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
             self.win_dict = fb.fil[0]['wdg_fil']['firwin']
 
-        self.emit({'view_changed': 'fft_win_type'}, sig_name="sig_tx_local")
+        self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
     def _store_dict(self):
@@ -442,7 +442,7 @@ class Firwin(QWidget):
             self._update_UI()
         else:
             N = remezord(F, W, A, fs=1, alg=alg)[0]
-        self.sig_tx_local.emit({"sender": __name__, 'view_changed': 'fft_win_type'})
+        self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         return N
 
     def LPmin(self, fil_dict):
