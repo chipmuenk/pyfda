@@ -155,7 +155,7 @@ class Firwin(QWidget):
                 if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
                     # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
-                    self.sig_tx_local.emit(dict_sig)
+                    self.emit(dict_sig, sig_name='sig_tx_local')
                     # global connection to upper hierachies - not needed at the moment
                     # send notification that filter design has changed
                     self.emit({'filt_changed': 'firwin'})
@@ -543,7 +543,7 @@ class Firwin(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.emit({'view_changed': 'fft_win_type'}, sig_name="sig_tx_local")
+            self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         else:
             self.fft_widget.hide()
 

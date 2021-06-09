@@ -70,9 +70,9 @@ class PlotImpz_UI(QWidget):
                 # check for value 'fft_win*':
                 if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
                     # local connection to FFT window widget and qfft_win_select
-                    self.sig_tx_fft.emit(dict_sig)
+                    self.emit(dict_sig, sig_name='sig_tx_fft')
                     # global connection to e.g. plot_impz
-                    self.sig_tx.emit(dict_sig)
+                    self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
     def __init__(self, parent):
