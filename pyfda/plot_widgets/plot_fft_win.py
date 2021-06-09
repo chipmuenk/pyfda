@@ -132,16 +132,12 @@ class Plot_FFT_win(QDialog):
 
         if self.sig_loop(dict_sig, logger) > 0:
             return
-        # if dict_sig['id'] == id(self):
-        #     logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-        #     return
 
         elif not self.isVisible():
             self.needs_calc = True
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
-            or dict_sig['id'] == id(self) or self.needs_calc:
-                # TODO: why is self-loop checked here?
+            or self.needs_calc:
 
             self.calc_draw_win()
             self.needs_calc = False
