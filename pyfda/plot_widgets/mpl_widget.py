@@ -10,8 +10,6 @@
 Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
-import logging
-logger = logging.getLogger(__name__)
 import sys
 from pyfda.libs.pyfda_lib import cmp_version
 
@@ -35,13 +33,16 @@ try:
 except ImportError:
     figureoptions = None
 
-from pyfda.libs.compat import (QtCore, QtGui, QWidget, QLabel, pyqtSignal, pyqtSlot,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout, QHBoxLayout,
-                      QInputDialog, FigureCanvas, NavigationToolbar)
+from pyfda.libs.compat import (
+    QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
+    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
 from pyfda import qrc_resources  # contains all icons
+
+import logging
+logger = logging.getLogger(__name__)
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
 for key in pyfda_rc.mpl_rc:
@@ -51,12 +52,12 @@ for key in pyfda_rc.mpl_rc:
 # ------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     """
-    Provide a faster replacement for stem plots under matplotlib < 3.1.0 using 
+    Provide a faster replacement for stem plots under matplotlib < 3.1.0 using
     vlines (= LineCollection). LineCollection keywords are supported.
     """
     # create a copy of the kwargs dict without 'bottom' key-value pair, provide
     # pop bottom from dict (defuault = 0), not compatible with vlines
-    bottom = kwargs.pop('bottom', 0)  
+    bottom = kwargs.pop('bottom', 0)
     ax.axhline(bottom, **kwargs)
     if cmp_version("matplotlib", "3.1.0") >= 0:
         ml, sl, bl = ax.stem(x, y, use_line_collection=True, bottom=bottom)
@@ -65,7 +66,6 @@ def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
         setp(sl, **kwargs)
     else:
         ax.vlines(x, y, bottom, label=label, **kwargs)
-        # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
         scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
 
     if mkr_fmt['marker']:
@@ -85,8 +85,8 @@ def scatter(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     """
     ms = max(mkr_fmt.get('ms', -1), mkr_fmt.get('markersize', -1))
     if ms == -1:
-        ms = 10  
-    mkr_fmt_cp = {k:v for k,v in mkr_fmt.items() if k not in ['ms', 'markersize']}
+        ms = 10
+    mkr_fmt_cp = {k: v for k, v in mkr_fmt.items() if k not in ['ms', 'markersize']}
     return ax.scatter(x, y, s=ms*ms, label=label, **mkr_fmt_cp)
 
 
@@ -95,6 +95,7 @@ def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
     Don't plot anything - needed for plot factory
     """
     pass
+
 
 # ------------------------------------------------------------------------------
 class MplWidget(QWidget):
@@ -107,7 +108,7 @@ class MplWidget(QWidget):
         super(MplWidget, self).__init__(parent)
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure:
-        self.plt_lim = [] # define variable for x,y plot limits
+        self.plt_lim = []  # define variable for x,y plot limits
 
         if cmp_version("matplotlib", "2.2.0") >= 0:
             self.fig = Figure(constrained_layout=True)
@@ -116,13 +117,14 @@ class MplWidget(QWidget):
 
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setSizePolicy(QSizePolicy.Expanding,
-                                   QSizePolicy.Expanding)
+                                  QSizePolicy.Expanding)
 
         # Needed for mouse modifiers (x,y, <CTRL>, ...):
         #    Key press events in general are not processed unless you
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
-        self.canvas.setFocusPolicy( QtCore.Qt.ClickFocus )
+
+        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.canvas.setFocus()
 
         self.canvas.updateGeometry()
@@ -133,22 +135,22 @@ class MplWidget(QWidget):
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.zoom_locked = False
         self.mplToolbar.cursor_enabled = False
-        #self.mplToolbar.enable_plot(state = True)
+        # self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
         layHToolbar = QHBoxLayout()
         layHToolbar.addWidget(self.mplToolbar, 1, QtCore.Qt.AlignLeft)
         layHToolbar.addStretch(1)
 
-        #=============================================
+        # =============================================
         # Main plot widget layout
-        #=============================================
+        # =============================================
         self.layVMainMpl = QVBoxLayout()
         self.layVMainMpl.addLayout(layHToolbar)
         self.layVMainMpl.addWidget(self.canvas)
 
         self.setLayout(self.layVMainMpl)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, dict_sig):
         """
@@ -159,16 +161,16 @@ class MplWidget(QWidget):
 #        else:
         pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def save_limits(self):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
         if not self.mplToolbar.zoom_locked:
             for ax in self.fig.axes:
-                self.limits = ax.axis() # save old limits
+                self.limits = ax.axis()  # save old limits
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the figure with new properties (grid, linewidth)
@@ -179,18 +181,18 @@ class MplWidget(QWidget):
             for ax in self.fig.axes:
 
                 if self.mplToolbar.zoom_locked:
-                    ax.axis(self.limits) # restore old limits
+                    ax.axis(self.limits)  # restore old limits
                 else:
-                    self.limits = ax.axis() # save old limits
+                    self.limits = ax.axis()  # save old limits
 
 #            try:
 #                # tight_layout() crashes with small figure sizes
 #               self.fig.tight_layout(pad = 0.1)
 #            except(ValueError, np.linalg.linalg.LinAlgError):
 #                logger.debug("error in tight_layout")
-        self.canvas.draw() # now (re-)draw the figure
+        self.canvas.draw()  # now (re-)draw the figure
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #    def clear_disabled_figure(self, enabled):
 #        """
 #        Clear the figure when it is disabled in the mplToolbar
@@ -207,21 +209,22 @@ class MplWidget(QWidget):
         Zoom to full extent of data if axes is set to "navigationable"
         by the navigation toolbar
         """
-        #Add current view limits to view history to enable "back to previous view"
+        # Add current view limits to view history to enable "back to previous view"
         self.mplToolbar.push_current()
         for ax in self.fig.axes:
             if ax.get_navigate():
                 ax.autoscale()
         self.redraw()
+
 # ----------------------------------------------------------------------------
     def get_full_extent(self, ax, pad=0.0):
         """
-        Get the full extent of axes system `ax`, including axes labels, tick 
+        Get the full extent of axes system `ax`, including axes labels, tick
         labels and titles.
 
         Needed for inset plot in H(f)
         """
-        #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
+        # http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
         # For text objects, we need to draw the figure first, otherwise the extents
         # are undefined.
         self.canvas.draw()
@@ -238,7 +241,7 @@ class MplWidget(QWidget):
         if MPL_CURS:
             self.mplToolbar.cursor_enabled = not self.mplToolbar.cursor_enabled
             if self.mplToolbar.cursor_enabled:
-                if hasattr(self, "cursors"): # dangling references to old cursors?
+                if hasattr(self, "cursors"):  # dangling references to old cursors?
                     for i in range(len(self.cursors)):
                         self.cursors[i].remove()         # yes, remove them!
                 self.cursors = []
@@ -251,8 +254,8 @@ class MplWidget(QWidget):
 
         # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
 
-###############################################################################
 
+###############################################################################
 class MplToolbar(NavigationToolbar):
     """
     Custom Matplotlib Navigationtoolbar, derived (subclassed) from Qt's
@@ -284,7 +287,7 @@ class MplToolbar(NavigationToolbar):
 
     """
 
-    toolitems = () # remove original icons and actions
+    toolitems = ()  # remove original icons and actions
 #    toolitems = (
 #        ('Home', 'Reset original view', 'home', 'home'),
 #        ('Back', 'Back to  previous view', 'action-undo', 'back'),
@@ -298,7 +301,7 @@ class MplToolbar(NavigationToolbar):
 #      )
 
 # subclass NavigationToolbar, passing through arguments:
-    #def __init__(self, canvas, parent, coordinates=True):
+    # def __init__(self, canvas, parent, coordinates=True):
 
     sig_tx = pyqtSignal(object)  # general signal, containing a dict
     from pyfda.libs.pyfda_qt_lib import emit
@@ -312,81 +315,82 @@ class MplToolbar(NavigationToolbar):
     def __init__(self, canv, mpl_widget, *args, **kwargs):
         NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
 
-        #self.canvas = canv
+        # self.canvas = canv
         self.mpl_widget = mpl_widget
-
 
 # -----------------------------------------------------------------------------
 
-        #---------------- Construct Toolbar using QRC icons -------------------
+        # ---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
 #        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
 #        self.a_en.setToolTip('Enable / disable plot')
 #        self.a_en.setCheckable(True)
 #        self.a_en.setChecked(True)
-##        self.a.setEnabled(False)
+#        self.a.setEnabled(False)
 
- #       self.addSeparator() #---------------------------------------------
+#        self.addSeparator() #---------------------------------------------
 
-
-        #---------------------------------------------
+        # ---------------------------------------------
         # HOME:
-        #---------------------------------------------
+        # ---------------------------------------------
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
         self.a_ho.setToolTip('Reset zoom')
         # BACK:
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous zoom')
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # FORWARD:
-        #---------------------------------------------
+        # ---------------------------------------------
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
         self.a_fw.setToolTip('Forward to next zoom')
 
-        #---------------------------------------------
+        # ---------------------------------------------
         self.addSeparator()
-        #---------------------------------------------
+        # ---------------------------------------------
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # PAN:
-        #---------------------------------------------
+        # ---------------------------------------------
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
-        self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
-        "pressing x / y / CTRL keys constrains to horizontal / vertical / diagonal movements.")
+        self.a_pa.setToolTip(
+            "Pan axes with left mouse button, zoom with right,\npressing x / y / CTRL "
+            "keys constrains to horizontal / vertical / diagonal movements.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # ZOOM RECTANGLE:
-        #---------------------------------------------
+        # ---------------------------------------------
         self.a_zo = self.addAction(QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
-        self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
-        "pressing x / y keys constrains zoom to horizontal / vertical direction.")
+        self.a_zo.setToolTip(
+            "Zoom in / out to rectangle with left / right mouse button,\n"
+            "pressing x / y keys constrains zoom to horizontal / vertical direction.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # FULL VIEW:
-        #---------------------------------------------
-        self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
+        # ---------------------------------------------
+        self.a_fv = self.addAction(
+            QIcon(':/fullscreen-enter.svg'),
             'Zoom full extent', self.mpl_widget.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # LOCK ZOOM:
-        #---------------------------------------------
-        self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'), \
+        # ---------------------------------------------
+        self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'),
                                    'Lock zoom', self.toggle_lock_zoom)
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
         self.a_lk.setToolTip('Lock / unlock current zoom setting')
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # TRACKING CURSOR:
-        #---------------------------------------------
+        # ---------------------------------------------
         if MPL_CURS:
-            self.a_cr = self.addAction(QIcon(':/map-marker.svg'), \
+            self.a_cr = self.addAction(QIcon(':/map-marker.svg'),
                                        'Cursor', self.mpl_widget.toggle_cursor)
             self.a_cr.setCheckable(True)
             self.a_cr.setChecked(False)
@@ -396,18 +400,19 @@ class MplToolbar(NavigationToolbar):
         self.addSeparator()
         # --------------------------------------
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # GRID:
-        #---------------------------------------------
-        self.a_gr = self.addAction(QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
+        # ---------------------------------------------
+        self.a_gr = self.addAction(
+            QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
         self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # REDRAW:
-        #---------------------------------------------
-        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.mpl_widget.redraw)
-        #self.a_rd.setToolTip('Redraw Plot')
+        # ---------------------------------------------
+        # self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.mpl_widget.redraw)
+        # self.a_rd.setToolTip('Redraw Plot')
 
         # --------------------------------------
         # SAVE:
@@ -417,7 +422,8 @@ class MplToolbar(NavigationToolbar):
 
         self.cb = fb.clipboard
 
-        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
+        self.a_cb = self.addAction(
+            QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard in png format.')
         self.a_cb.setShortcut("Ctrl+C")
 
@@ -429,7 +435,8 @@ class MplToolbar(NavigationToolbar):
         # SETTINGS:
         # --------------------------------------
         if figureoptions is not None:
-            self.a_op = self.addAction(QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
+            self.a_op = self.addAction(
+                QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
 #        self.buttons = {}
@@ -448,18 +455,18 @@ class MplToolbar(NavigationToolbar):
                     QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
             self.locLabel.setSizePolicy(
                 QSizePolicy(QSizePolicy.Expanding,
-                                  QSizePolicy.Ignored))
+                            QSizePolicy.Ignored))
             labelAction = self.addWidget(self.locLabel)
             labelAction.setVisible(True)
 
-        #---------------------------------------------
+        # ---------------------------------------------
         # HELP:
-        #---------------------------------------------
+        # ---------------------------------------------
         self.a_he = self.addAction(QIcon(':/help.svg'), 'help', self.help)
         self.a_he.setToolTip('Open help page from https://pyfda.rtfd.org in browser')
         self.a_he.setDisabled(True)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     if figureoptions is not None:
         def edit_parameters(self):
             allaxes = self.canvas.figure.get_axes()
@@ -482,9 +489,9 @@ class MplToolbar(NavigationToolbar):
                         fmt = "%(axes_repr)s (%(label)s)"
                     else:
                         fmt = "%(axes_repr)s"
-                    titles.append(fmt % dict(title=title,
-                                         ylabel=ylabel, label=label,
-                                         axes_repr=repr(axes)))
+                    titles.append(
+                        fmt % dict(title=title, ylabel=ylabel, label=label,
+                                   axes_repr=repr(axes)))
                 item, ok = QInputDialog.getItem(
                     self, 'Customize', 'Select axes:', titles, 0, False)
                 if ok:
@@ -494,17 +501,17 @@ class MplToolbar(NavigationToolbar):
 
             figureoptions.figure_edit(axes, self)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def home(self):
         """
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
         self.push_current()
-        self.emit({'home':''}) # only the key is used by the slot
+        self.emit({'home': ''})  # only the key is used by the slot
         self.mpl_widget.redraw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def help(self):
         """
         Open help page from https://pyfda.rtfd.org in browser
@@ -515,14 +522,13 @@ class MplToolbar(NavigationToolbar):
             logger.warning("Invalid URL\n\t{0}\n\tOpening "
                            "'https://pyfda.readthedocs.io/en/latest/' instead".format(url.toString()))
             url = QtCore.QUrl('https://pyfda.readthedocs.io/en/latest/')
-            #if url.isLocalFile()
+            # if url.isLocalFile()
         QtGui.QDesktopServices.openUrl(url)
 
-        #https://stackoverflow.com/questions/28494571/how-in-qt5-to-check-if-url-is-available
-        #https://stackoverflow.com/questions/16778435/python-check-if-website-exists
+        # https://stackoverflow.com/questions/28494571/how-in-qt5-to-check-if-url-is-available
+        # https://stackoverflow.com/questions/16778435/python-check-if-website-exists
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def cycle_draw_grid(self, cycle=True, axes=None):
         """
         Cycle the grid of all axes through the states 'off', 'coarse' and 'fine'
@@ -549,7 +555,7 @@ class MplToolbar(NavigationToolbar):
             axes = self.mpl_widget.fig.axes
 
         for ax in self.mpl_widget.fig.axes:
-            if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
+            if hasattr(ax, "is_twin"):  # the axis is a twinx() system, suppress the gridlines
                 ax.grid(False)
             else:
                 if self.a_gr_state == 0:
@@ -566,16 +572,16 @@ class MplToolbar(NavigationToolbar):
                     self.a_gr.setIcon(QIcon(':/grid_fine.svg'))
 
         if cycle:
-            self.canvas.draw() # don't use self.draw(), use FigureCanvasQTAgg.draw()
+            self.canvas.draw()  # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
         """
         Toggle the lock zoom settings and save the plot limits in any case:
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.mpl_widget.save_limits() # save limits in any case:
+        self.mpl_widget.save_limits()  # save limits in any case:
         self.zoom_locked = not self.zoom_locked
         if self.zoom_locked:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
@@ -584,7 +590,7 @@ class MplToolbar(NavigationToolbar):
             self.a_zo.setEnabled(False)
 
             if self.a_pa.isChecked():
-                self.a_pa.trigger() # toggle off programmatically
+                self.a_pa.trigger()  # toggle off programmatically
             self.a_pa.setEnabled(False)
 
             self.a_fv.setEnabled(False)
@@ -596,9 +602,9 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
 
-        self.emit({'lock_zoom':self.zoom_locked})
+        self.emit({'lock_zoom': self.zoom_locked})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # =============================================================================
 #     def enable_plot(self, state = None):
 #         """
@@ -630,7 +636,7 @@ class MplToolbar(NavigationToolbar):
 #         self.emit({'enabled':self.enabled})
 #
 # =============================================================================
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
         Save current figure to temporary file and copy it to the clipboard.
@@ -640,5 +646,3 @@ class MplToolbar(NavigationToolbar):
             self.cb.setImage(img)
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
-
-
