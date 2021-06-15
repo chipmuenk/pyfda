@@ -57,20 +57,18 @@ class ItemDelegate(QStyledItemDelegate):
     - `setEditorData()` pass data with full precision and in selected format to editor
 
     - `setModelData()` pass edited data back to model (`self.ba`)
-    
+
     Editing the table triggers `setModelData()` but does not emit a signal outside
     this class, only the `ui.butSave` button is highlighted. When it is pressed, 
     a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
     Additionally, a signal is emitted with `'view_changed':'q_coeff'` by `ui2qdict()`?!
-
-
     """
     def __init__(self, parent):
         """
         Pass instance `parent` of parent class (Input_Coeffs)
         """
         super(ItemDelegate, self).__init__(parent)
-        self.parent = parent # instance of the parent (not the base) class
+        self.parent = parent  # instance of the parent (not the base) class
 
 
 #==============================================================================
@@ -280,7 +278,7 @@ class Input_Coeffs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Input_Coeffs, self).__init__(parent)
 
         self.opt_widget = None  # handle for pop-up options widget
@@ -963,7 +961,7 @@ if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.input_coeffs """
     from pyfda import pyfda_rc as rc
     app = QApplication(sys.argv)
-    mainw = Input_Coeffs(None)
+    mainw = Input_Coeffs()
 
     app.setActiveWindow(mainw)
     app.setStyleSheet(rc.qss_rc)
