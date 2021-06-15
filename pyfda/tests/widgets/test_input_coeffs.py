@@ -43,7 +43,8 @@ class FilterCoeffsTest(unittest.TestCase):
             item.setText(str(val))
         else:  # no, construct it:
             self.form.tblCoeff.setItem(row, col, QTableWidgetItem(str(val)))
-        return self.form.tblCoeff.item(row, col).text()
+        item = self.form.tblCoeff.item(row, col)
+        return item.text()
 
     def get_table_value(self, col, row):
         item = self.form.tblCoeff.item(row, col)
@@ -90,6 +91,8 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
         self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1")
+        
+        #self.initialize_fixpoint_format()
 
 # ------------------------------------------------------------------------------
     def test_cmb_filter_type(self):
@@ -147,13 +150,11 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.form.tblCoeff.columnCount(), 2)
 
 # ------------------------------------------------------------------------------
-    def test_write_table(self):
+    def tst_write_table(self):
         """Test writing to table in various formats"""
         self.init()
         #self.initialize_form()
-        self.initialize_fixpoint_format()
-        return
-
+        #self.initialize_fixpoint_format()
 
         ret = self.set_table_value(1, 1, 25)  # row, col, value
         print("set\n", ret)
