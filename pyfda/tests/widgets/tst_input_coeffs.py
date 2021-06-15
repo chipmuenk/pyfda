@@ -6,7 +6,6 @@ Created on Wed Jun 14 11:57:19 2017
 """
 import sys
 import unittest
-import pytest
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.libs.compat import Qt, QtTest, QApplication, QTableWidgetItem
 from pyfda.input_widgets.input_coeffs import Input_Coeffs
@@ -17,22 +16,19 @@ app = QApplication(sys.argv)
 class FilterCoeffsTest(unittest.TestCase):
     '''Test the FilterCoeffs GUI'''
 
-    def setUp(self):
-        '''Create the GUI'''
-        self.form = Input_Coeffs(None)
-        self.ui = self.form.ui
-    
     def init(self):
         '''Create the GUI'''
-        self.form.__init__(None)
+        self.form = Input_Coeffs()
+        self.form.show()
+        self.ui = self.form.ui
 
     def set_cmb_box(self, cmb_wdg, arg):
         """
         Set combobox `name` to item `arg`. Throw an error if the item
         doesn't exist in the combobox list.
         """
-        # if not cmb_wdg.isVisible():
-        #     self.fail("Widget is not visible.")
+        if not cmb_wdg.isVisible():
+            self.fail("Widget is not visible.")
         if not cmb_wdg.isEnabled():
             self.fail("Widget is not enabled.")
         else:
@@ -63,7 +59,7 @@ class FilterCoeffsTest(unittest.TestCase):
     def initialize_form(self):
         """ utility function for initializing the form """
         self.ui.spnDigits.setValue(4)
-        self.ui.ledScale.setText("1.5")
+        # self.ui.ledScale.setText("1.5")
         self.set_cmb_box(self.ui.cmbFilterType, 'FIR')
         self.set_cmb_box(self.ui.cmbFormat, 'Float')
 
@@ -71,16 +67,15 @@ class FilterCoeffsTest(unittest.TestCase):
         QtTest.QTest.mouseClick(self.form.butClear, Qt.LeftButton)
 
     def initialize_fixpoint_format(self):
-
-        self.set_cmb_box(self.form.cmbFormat, 'Dec')
-#        self.form.ledW.setText("4")
-        self.set_lineedit_value(self.form.ledW, "4")
+        self.set_cmb_box(self.ui.cmbFormat, 'Dec')
+#        self.ui.ledW.setText("4")
+        self.set_lineedit_value(self.ui.ledW, "4")
         # The following triggers recalculation of scale etc.
-        self.set_cmb_box(self.form.cmbQFrmt, 'Integer')
-        self.set_cmb_box(self.form.cmbQOvfl, 'sat')
-        self.set_cmb_box(self.form.cmbQuant, 'round')
+        self.set_cmb_box(self.ui.cmbQFrmt, 'Integer')
+        self.set_cmb_box(self.ui.cmbQOvfl, 'sat')
+        self.set_cmb_box(self.ui.cmbQuant, 'round')
 
-        self.assertEqual(self.form.ledScale.text(), "8")
+        self.assertEqual(self.ui.ledScale.text(), "8")
 
 # ==============================================================================
     def test_defaults(self):
@@ -88,7 +83,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.init()
         self.assertEqual(self.ui.spnDigits.value(), 4)
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "FIR")
-        
+
         self.assertEqual(qget_cmb_box(self.ui.cmbFormat, data=False).lower(), "float")
         self.assertEqual(self.ui.butSetZero.text(), "= 0")
 
@@ -105,7 +100,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.ui.cmbFilterType.currentIndexChanged.emit(1)
         QtTest.QTest.mouseClick(self.ui.cmbFilterType, Qt.LeftButton)
         QtTest.QTest.keyClick(self.ui.cmbFilterType, Qt.Key_PageDown)
-        QtTest.QTest.qWait(500)
+        QtTest.QTest.qWait(100)
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "IIR")
         # https://vicrucann.github.io/tutorials/qttest-signals-qtreewidget/
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
@@ -117,7 +112,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
-        
+
 # ==============================================================================
     def test_fixpoint_defaults(self):
         """Test fixpoint setting in its default state"""
@@ -146,16 +141,19 @@ class FilterCoeffsTest(unittest.TestCase):
 
         # Push <Delete Table> Button with the left mouse button
         QtTest.QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
-        # self.assertEqual(self.form.jiggers, 36.0)
+
         self.assertEqual(float(self.form.tblCoeff.item(1, 0).text()), 0)
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)
         self.assertEqual(self.form.tblCoeff.columnCount(), 2)
 
 # ------------------------------------------------------------------------------
-    def tst_write_table(self):
+    def test_write_table(self):
         """Test writing to table in various formats"""
-        self.initialize_form()
-        # self.initialize_fixpoint_format()
+        self.init()
+        #self.initialize_form()
+        self.initialize_fixpoint_format()
+        return
+
 
         ret = self.set_table_value(1, 1, 25)  # row, col, value
         print("set\n", ret)
@@ -191,6 +189,5 @@ class FilterCoeffsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    """run tests with python -m pyfda.tests.widgets.test_input_coeffs"""
     unittest.main()
-
-# run tests with python -m pyfda.tests.widgets.test_input_coeffs
