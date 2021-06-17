@@ -195,7 +195,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
         The index of the string. When the string was not found in the combo box,
         select first entry of combo box and return index -1.
     """
-    old_idx = cmb_box.currentIndex()
+    sig_blocked_old = cmb_box.signalsBlocked()
 
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
@@ -220,7 +220,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
 
     cmb_box.blockSignals(not fireSignals)
     cmb_box.setCurrentIndex(idx)  # set index
-    cmb_box.blockSignals(False)
+    cmb_box.blockSignals(sig_blocked_old)
 
     return ret
 
@@ -255,6 +255,8 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
         The index of the item with string / data. When not found in the combo box,
         return index -1.
     """
+    sig_blocked_old = cmb_box.signalsBlocked()
+
     if caseSensitive:
         flag = Qt.MatchFixedString | Qt.MatchCaseSensitive
     else:
@@ -272,7 +274,7 @@ def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
     if idx > -1:  # data  / text exists in combo box, delete it.
         cmb_box.blockSignals(not fireSignals)
         cmb_box.removeItem(idx)  # set index
-        cmb_box.blockSignals(False)
+        cmb_box.blockSignals(sig_blocked_old)
 
     return idx
 
