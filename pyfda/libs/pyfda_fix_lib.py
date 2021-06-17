@@ -438,28 +438,28 @@ class Fixed(object):
         Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
-            if key not in ['Q','WF','WI','W','quant','ovfl','frmt','scale']:
-                raise Exception(u'Unknown Key "%s"!'%(key))
+            if key not in ['Q', 'WF', 'WI', 'W','quant', 'ovfl', 'frmt', 'scale']:
+                raise Exception(u'Unknown Key "{0:s}"!'.format(key))
 
-        q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat',
-                         'frmt':'float', 'scale':1}
+        q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
+                         'frmt': 'float', 'scale': 1}
 
         if 'WI' in q_obj and 'WF' in q_obj:
-            pass # everything's defined already
+            pass  # everything's defined already
         elif 'W' in q_obj:
             q_obj['WI'] = int(q_obj['W']) - 1
             q_obj['WF'] = 0
         elif 'Q' in q_obj:
-            Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
+            Q_str = str(q_obj['Q']).split('.', 1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
             q_obj['WF'] = abs(int(Q_str[1]))
 
         # missing key-value pairs are either taken from default dict or from
         # instance attributes
-        for k in q_obj_default.keys(): # loop over all defined keys
+        for k in q_obj_default.keys():  # loop over all defined keys
             if k not in q_obj.keys():  # key is not in passed dict, get key: value pair from ...
                 if hasattr(self, k):
-                    q_obj[k] = getattr(self, k) # ... class attribute
+                    q_obj[k] = getattr(self, k)  # ... class attribute
                 else:
                     q_obj[k] = q_obj_default[k] # ... default dict
 
@@ -511,7 +511,7 @@ class Fixed(object):
             self.places = 4
             self.base = 0
         else:
-            raise Exception(u'Unknown format "%s"!'%(self.frmt))
+            raise Exception(u'Unknown format "{0:s}"!'.format(self.frmt))
 
         self.ovr_flag = 0 # initialize to allow reading when freshly initialized
 
