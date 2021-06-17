@@ -214,12 +214,12 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
 
     # if idx == old_idx:
     #     return -2
-
-    if idx == -1:  # string hasn't been found, use first entry instead
-        idx = 0
-
+    
     cmb_box.blockSignals(not fireSignals)
-    cmb_box.setCurrentIndex(idx)  # set index
+    if idx == -1:  # string hasn't been found
+        cmb_box.setCurrentIndex(0)  # set index to first entry
+    else:
+        cmb_box.setCurrentIndex(idx)  # set index as found in combobox
     cmb_box.blockSignals(sig_blocked_old)
 
     return ret
