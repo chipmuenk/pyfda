@@ -193,8 +193,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
     Returns
     -------
         The index of the string. When the string was not found in the combo box,
-        select first entry of combo box and return index -1. When the index hasn't
-        changed, return -2.
+        select first entry of combo box and return index -1.
     """
     old_idx = cmb_box.currentIndex()
 
@@ -213,10 +212,10 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
 
     ret = idx
 
-    if idx == old_idx:
-        return -2
+    # if idx == old_idx:
+    #     return -2
 
-    elif idx == -1:  # string hasn't been found, use first entry instead
+    if idx == -1:  # string hasn't been found, use first entry instead
         idx = 0
 
     cmb_box.blockSignals(not fireSignals)
