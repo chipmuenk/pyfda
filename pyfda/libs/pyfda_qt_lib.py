@@ -11,7 +11,8 @@ Library with various helper functions for Qt widgets
 """
 from .pyfda_lib import qstr, pprint_log
 
-from .compat import Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel
+from .compat import (
+    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
-def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx'):
+def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
@@ -66,7 +67,7 @@ def sig_loop(self, dict_sig: dict, logger, **kwargs) -> int:
 
 
 # ------------------------------------------------------------------------------
-def qwindow_stay_on_top(win, top):
+def qwindow_stay_on_top(win: QDialog, top: bool) -> None:
     """
     Set flags for a window such that it stays on top (True) or not
 
@@ -90,7 +91,7 @@ def qwindow_stay_on_top(win, top):
 
 
 # ------------------------------------------------------------------------------
-def qcmb_box_populate(cmb_box, items_list, item_init):
+def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> None:
     """
     Clear and populate combo box `cmb_box` with text, data and tooltip from the list
     `items_list` with initial selection of `init_item` (data).
@@ -137,7 +138,7 @@ def qcmb_box_populate(cmb_box, items_list, item_init):
 
 
 # ------------------------------------------------------------------------------
-def qget_cmb_box(cmb_box, data=True):
+def qget_cmb_box(cmb_box: QComboBox, data: bool = True) -> str:
     """
     Get current itemData or Text of comboBox and convert it to string.
 
@@ -164,7 +165,8 @@ def qget_cmb_box(cmb_box, data=True):
 
 
 # ------------------------------------------------------------------------------
-def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=False):
+def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
+                 fireSignals: bool = False, caseSensitive: bool = False) -> int:
     """
     Set combobox to the index corresponding to `string` in a text field (`data = False`)
     or in a data field (`data=True`). When `string` is not found in the combobox entries,
@@ -225,8 +227,8 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False, caseSensitive=F
 
 
 # -----------------------------------------------------------------------------
-def qcmb_box_del_item(cmb_box, string, data=False, fireSignals=False,
-                      caseSensitive=False):
+def qcmb_box_del_item(cmb_box: QComboBox, string: str, data: bool = False,
+                      fireSignals: bool = False, caseSensitive: bool = False) -> int:
     """
     Try to find the entry in combobox corresponding to `string` in a text field
     (`data = False`) or in a data field (`data=True`) and delete the item. When `string`
