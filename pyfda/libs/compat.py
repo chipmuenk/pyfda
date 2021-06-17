@@ -11,13 +11,13 @@ Was: Compatibility wrapper to obtain same syntax for both Qt4 and 5, PyQt4 has
 been removed
 """
 
-import PyQt5
+# import PyQt5
 from PyQt5 import QtGui, QtCore, QtTest
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
-                          QObject, QVariant, pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor, 
-                            QBrush, QPalette, QPixmap, QPainter)
-from PyQt5.QtWidgets import (QAction, QMenu, 
+                          QObject, QVariant, QPoint, pyqtSignal, pyqtSlot)
+from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor,
+                         QBrush, QPalette, QPixmap, QPainter)
+from PyQt5.QtWidgets import (QAction, QMenu,
                              QMainWindow, QTabWidget, QApplication, QRadioButton,
                              QScrollArea, QSplitter, QMessageBox, QDialog,
                              QWidget, QComboBox, QLabel, QLineEdit, QFrame,
@@ -27,10 +27,11 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QSizePolicy, QAbstractItemView,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
                              QStyledItemDelegate, QStyle, QStyleOption)
+from PyQt5.QtTest import QTest, QSignalSpy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-#def windowStaysOnTopHint(self, b=True):
+# def windowStaysOnTopHint(self, b=True):
 #    try:
 #        import win32gui, win32con
 #        flag = win32con.HWND_TOPMOST if b else win32con.HWND_NOTOPMOST
@@ -45,7 +46,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #    self.setWindowFlags(flag)
 #    self.show()
 
-#except ImportError:
+# except ImportError:
 #    import PyQt4
 #
 #    from PyQt4 import QtGui, QtCore, QtTest
@@ -65,9 +66,9 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 #                             QStyledItemDelegate)
 #
 #    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
-    
-#==============================================================================
+#    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar  
+# ==============================================================================
+
 
 class QFD(QFileDialog):
     """
@@ -85,7 +86,8 @@ class QFD(QFileDialog):
 
     def getSaveFileName_(self, **kwarg):
         return self.getSaveFileName(**kwarg)
-    
+
+
 class QPushButtonRT(QPushButton):
     """
     Subclass QPushButton to render rich text
@@ -100,7 +102,7 @@ class QPushButtonRT(QPushButton):
         if text is not None:
             self.__lbl.setText(text)
         self.__lyt = QHBoxLayout()
-        self.__lyt.setContentsMargins(margin, 0, 0, 0) # L, T, R, B
+        self.__lyt.setContentsMargins(margin, 0, 0, 0)  # L, T, R, B
         self.__lyt.setSpacing(0)
         self.setLayout(self.__lyt)
         self.__lbl.setAttribute(Qt.WA_TranslucentBackground)
@@ -122,9 +124,9 @@ class QPushButtonRT(QPushButton):
         s = QPushButton.sizeHint(self)
         w = self.__lbl.sizeHint()
         s.setWidth(w.width() + 2 * self.margin)
-        #s.setHeight(w.height())
+        # s.setHeight(w.height())
         return s
-    
+
     # def clicked(self):
     #     if self.isChecked():
     #         self.__lbl.setText("chk!")
@@ -136,6 +138,7 @@ class QPushButtonRT(QPushButton):
     #     o.initFrom(self)
     #     p = QPainter(self)
     #     self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
+
 
 if __name__ == '__main__':
     pass
