@@ -39,7 +39,7 @@ class FilterCoeffsTest(unittest.TestCase):
             # insure that cmbbox always fires an index changed signal
             cmb_wdg.setCurrentIndex(-1)
             ret = qset_cmb_box(cmb_wdg, arg, fireSignals=True)
-            self.assertIsNot(ret, -1)  # assert that arg exists in combo box
+            self.assertTrue(ret > -1)  # assert that arg exists in combo box
 
     def set_table_value(self, col, row, val):
         item = self.form.tblCoeff.item(row, col)
