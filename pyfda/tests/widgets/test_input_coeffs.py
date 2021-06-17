@@ -6,6 +6,8 @@ Created on Wed Jun 14 11:57:19 2017
 """
 import sys
 import unittest
+import logging
+
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.libs.compat import Qt, QtTest, QApplication, QTableWidgetItem
 from pyfda.input_widgets.input_coeffs import Input_Coeffs
@@ -21,6 +23,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.form = Input_Coeffs()
         self.form.show()
         self.ui = self.form.ui
+        self.log = logging.getLogger("LOG")
 
     def set_cmb_box(self, cmb_wdg, arg):
         """
