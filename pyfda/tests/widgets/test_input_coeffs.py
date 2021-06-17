@@ -9,7 +9,8 @@ import unittest
 import logging
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
-from pyfda.libs.compat import Qt, QtTest, QApplication, QTableWidgetItem
+from pyfda.libs.compat import (
+    Qt, QTest, QSignalSpy, QPoint, QApplication, QTableWidgetItem)
 from pyfda.input_widgets.input_coeffs import Input_Coeffs
 
 app = QApplication(sys.argv)
@@ -55,7 +56,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def set_lineedit_value(self, edit_wdg, arg):
         edit_wdg.clear()
-        QtTest.QTest.keyClicks(edit_wdg, arg)
+        QTest.keyClicks(edit_wdg, arg)
         # name.setText(str(arg))
         # QtTest.QTest.keyPress(name.setText(), Qt.Key_Enter, NULL, 100)
         # QtTest.QTest.keyRelease(name.setText(), Qt.Key_Enter, NULL, 100)
@@ -68,7 +69,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.set_cmb_box(self.ui.cmbFormat, 'Float')
 
         # Push <Delete Table> Button with the left mouse button
-        QtTest.QTest.mouseClick(self.form.butClear, Qt.LeftButton)
+        QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
 
     def initialize_fixpoint_format(self):
         self.set_cmb_box(self.ui.cmbFormat, 'Dec')
@@ -104,9 +105,11 @@ class FilterCoeffsTest(unittest.TestCase):
         self.set_cmb_box(self.ui.cmbFilterType, 'IIR')
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "IIR")
         self.ui.cmbFilterType.currentIndexChanged.emit(1)
-        QtTest.QTest.mouseClick(self.ui.cmbFilterType, Qt.LeftButton)
-        QtTest.QTest.keyClick(self.ui.cmbFilterType, Qt.Key_PageDown)
-        QtTest.QTest.qWait(100)
+        QTest.mouseClick(self.ui.cmbFilterType, Qt.LeftButton)
+        QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_PageDown)
+        QTest.qWait(1000)
+        QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_Return)
+        QTest.qWait(1000)
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "IIR")
         # https://vicrucann.github.io/tutorials/qttest-signals-qtreewidget/
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
@@ -146,7 +149,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(item_10.text(), "1")
 
         # Push <Delete Table> Button with the left mouse button
-        QtTest.QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
+        QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
 
         self.assertEqual(float(self.form.tblCoeff.item(1, 0).text()), 0)
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)
