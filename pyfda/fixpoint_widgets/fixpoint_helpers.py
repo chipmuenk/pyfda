@@ -452,6 +452,7 @@ class UI_Q(QWidget):
     #sig_rx = pyqtSignal(object)
     # outcgoing
     sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent, q_dict, **kwargs):
         super(UI_Q, self).__init__(parent)
