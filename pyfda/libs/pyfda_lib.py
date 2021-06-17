@@ -1379,7 +1379,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
         fil_dict['N'] = len(b) - 1 # correct filter order accordingly
-        fil_dict['ba'] = [np.array(b, dtype=np.complex), np.array(a, dtype=np.complex)]
+        fil_dict['ba'] = [np.array(b, dtype=complex), np.array(a, dtype=complex)]
 
     else:
         raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
@@ -1483,8 +1483,8 @@ def fil_convert(fil_dict, format_in):
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite([b,a])):
             zpk = sig.tf2zpk(b,a)
-            fil_dict['zpk'] = [np.nan_to_num(zpk[0]).astype(np.complex),
-                               np.nan_to_num(zpk[1]).astype(np.complex),
+            fil_dict['zpk'] = [np.nan_to_num(zpk[0]).astype(complex),
+                               np.nan_to_num(zpk[1]).astype(complex),
                                np.nan_to_num(zpk[2])
                                ]
         else:
