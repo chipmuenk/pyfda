@@ -94,8 +94,9 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
         self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1")
-        
-        #self.initialize_fixpoint_format()
+        self.log.warning("test_defaults finished")
+
+        # self.initialize_fixpoint_format()
 
 # ------------------------------------------------------------------------------
     def test_cmb_filter_type(self):
@@ -120,6 +121,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
+        self.log.warning("test_cmb_filter_type finished")
 
 # ==============================================================================
     def test_fixpoint_defaults(self):
@@ -137,6 +139,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
         self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1")
+        self.log.warning("test_fixpoint_defaults finished")
 
 # ------------------------------------------------------------------------------
     def test_but_clear(self):
@@ -153,6 +156,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(float(self.form.tblCoeff.item(1, 0).text()), 0)
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)
         self.assertEqual(self.form.tblCoeff.columnCount(), 2)
+        self.log.warning("test_but_clear finished")
 
 # ------------------------------------------------------------------------------
     def tst_write_table(self):
@@ -174,6 +178,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)
 
+        self.log.warning("test_write_table finished")
 
 #    def test_shuffle(self):
 #        # make sure the shuffled sequence does not lose any elements
