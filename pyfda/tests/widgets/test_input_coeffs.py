@@ -51,8 +51,7 @@ class FilterCoeffsTest(unittest.TestCase):
         return item.text()
 
     def get_table_value(self, col, row):
-        item = self.form.tblCoeff.item(row, col)
-        return str(item.text())
+        return str(self.form.tblCoeff.item(row, col))
 
     def set_lineedit_value(self, edit_wdg, arg):
         edit_wdg.clear()
