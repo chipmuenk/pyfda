@@ -28,7 +28,7 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'Input_Specs':'Specs'} #: Dict containing class name : display name
+classes = {'Input_Specs': 'Specs'}  #: Dict containing class name : display name
 
 
 class Input_Specs(QWidget):
@@ -40,11 +40,11 @@ class Input_Specs(QWidget):
 
     sig_rx = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop  
+    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Input_Specs, self).__init__(parent)
-        self.tab_label =  "Specs"
+        self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
         self._construct_UI()
@@ -88,7 +88,7 @@ class Input_Specs(QWidget):
                 Pass new filter data from the global filter dict by
                 specifically calling SelectFilter.load_dict()
                 """
-                self.sel_fil.load_dict() # update select_filter widget
+                self.sel_fil.load_dict()  # update select_filter widget
             # Pass new filter data from the global filter dict & set button = "ok"
             self.load_dict()
 
@@ -169,9 +169,9 @@ class Input_Specs(QWidget):
         layVFrm.addWidget(self.frmMsg)
         layVFrm.setContentsMargins(*params['wdg_margins'])
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         layVMain = QVBoxLayout(self)
         layVMain.addLayout(layHButtons1)  # <Load> & <Save> buttons
         layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
@@ -187,7 +187,7 @@ class Input_Specs(QWidget):
 
         layVMain.setContentsMargins(*params['wdg_margins'])
 
-        self.setLayout(layVMain) # main layout of widget
+        self.setLayout(layVMain)  # main layout of widget
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -224,10 +224,10 @@ class Input_Specs(QWidget):
 
         Then, the UIs of all subwidgets are updated using their "update_UI" method.
         """
-        rt = fb.fil[0]['rt'] # e.g. 'LP'
-        ft = fb.fil[0]['ft'] # e.g. 'FIR'
-        fc = fb.fil[0]['fc'] # e.g. 'equiripple'
-        fo = fb.fil[0]['fo'] # e.g. 'man'
+        rt = fb.fil[0]['rt']  # e.g. 'LP'
+        ft = fb.fil[0]['ft']  # e.g. 'FIR'
+        fc = fb.fil[0]['fc']  # e.g. 'equiripple'
+        fo = fb.fil[0]['fo']  # e.g. 'man'
 
         # the keys of the all_widgets dict are the names of the subwidgets,
         # the values are a tuple with the corresponding parameters
@@ -236,11 +236,12 @@ class Input_Specs(QWidget):
         # logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
         # logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
-        # self.sel_fil.load_filter_order() # update filter order subwidget, called by select_filter
+        # update filter order subwidget, called by select_filter:
+        # self.sel_fil.load_filter_order()
 
         # TARGET SPECS: is widget in the dict and is it visible (marker != 'i')?
         if ('tspecs' in all_widgets and len(all_widgets['tspecs']) > 1 and
-                                              all_widgets['tspecs'][0] != 'i'):
+                all_widgets['tspecs'][0] != 'i'):
             self.t_specs.setVisible(True)
             # disable all subwidgets with marker 'd':
             self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
@@ -250,7 +251,7 @@ class Input_Specs(QWidget):
 
         # FREQUENCY SPECS
         if ('fspecs' in all_widgets and len(all_widgets['fspecs']) > 1 and
-                                              all_widgets['fspecs'][0] != 'i'):
+                all_widgets['fspecs'][0] != 'i'):
             self.f_specs.setVisible(True)
             self.f_specs.setEnabled(all_widgets['fspecs'][0] != 'd')
             self.f_specs.update_UI(new_labels=all_widgets['fspecs'])
@@ -259,7 +260,7 @@ class Input_Specs(QWidget):
 
         # AMPLITUDE SPECS
         if ('aspecs' in all_widgets and len(all_widgets['aspecs']) > 1 and
-                                              all_widgets['aspecs'][0] != 'i'):
+                all_widgets['aspecs'][0] != 'i'):
             self.a_specs.setVisible(True)
             self.a_specs.setEnabled(all_widgets['aspecs'][0] != 'd')
             self.a_specs.update_UI(new_labels=all_widgets['aspecs'])
@@ -268,15 +269,15 @@ class Input_Specs(QWidget):
 
         # WEIGHT SPECS
         if ('wspecs' in all_widgets and len(all_widgets['wspecs']) > 1 and
-                                              all_widgets['wspecs'][0] != 'i'):
+                all_widgets['wspecs'][0] != 'i'):
             self.w_specs.setVisible(True)
             self.w_specs.setEnabled(all_widgets['wspecs'][0] != 'd')
             self.w_specs.update_UI(new_labels=all_widgets['wspecs'])
         else:
             self.w_specs.hide()
 
-        if ('msg' in all_widgets and len(all_widgets['msg']) > 1  and
-                                              all_widgets['msg'][0] != 'i'):
+        if ('msg' in all_widgets and len(all_widgets['msg']) > 1 and
+                all_widgets['msg'][0] != 'i'):
             self.frmMsg.setVisible(True)
             self.frmMsg.setEnabled(all_widgets['msg'][0] != 'd')
             self.lblMsg.setText(all_widgets['msg'][1:][0])
@@ -289,17 +290,17 @@ class Input_Specs(QWidget):
         Reload all specs/parameters entries from global dict fb.fil[0],
         using the "load_dict" methods of the individual classes
         """
-        self.sel_fil.load_dict() # select filter widget
-        self.f_units.load_dict() # frequency units widget
-        self.f_specs.load_dict() # frequency specification widget
-        self.a_specs.load_dict() # magnitude specs with unit
-        self.w_specs.load_dict() # weight specification
-        self.t_specs.load_dict() # target specs
+        self.sel_fil.load_dict()  # select filter widget
+        self.f_units.load_dict()  # frequency units widget
+        self.f_specs.load_dict()  # frequency specification widget
+        self.a_specs.load_dict()  # magnitude specs with unit
+        self.w_specs.load_dict()  # weight specification
+        self.t_specs.load_dict()  # target specs
 
         fb.design_filt_state = "ok"
         qstyle_widget(self.butDesignFilt, "ok")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def start_design_filt(self):
         """
         Start the actual filter design process:
@@ -313,10 +314,11 @@ class Input_Specs(QWidget):
         """
 
         try:
-            logger.info("Start filter design using method\n\t'{0}.{1}{2}'"\
+            logger.info(
+                "Start filter design using method\n\t'{0}.{1}{2}'"
                 .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
 
-            #----------------------------------------------------------------------
+            # ----------------------------------------------------------------------
             # A globally accessible instance fb.fil_inst of selected filter class fc
             # has been instantiated in InputFilter.set_design_method, now
             # call the method specified in the filter dict fil[0].
@@ -327,16 +329,17 @@ class Input_Specs(QWidget):
             # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
             # P/Z etc. back to fil[0].
 
-            err = ff.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
+            err = ff.fil_factory.call_fil_method(
+                fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
             # this is the same as e.g.
             # from pyfda.filter_design import ellip
             # inst = ellip.ellip()
             # inst.LPmin(fb.fil[0])
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
 
             if err > 0:
                 self.color_design_button("error")
-            elif err == -1: # filter design cancelled by user
+            elif err == -1:  # filter design cancelled by user
                 return
             else:
                 # Update filter order. weights and freq display in case they
@@ -347,7 +350,8 @@ class Input_Specs(QWidget):
                 self.color_design_button("ok")
 
                 self.emit({'data_changed': 'filter_designed'})
-                logger.info('Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
+                logger.info(
+                    'Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
 # =============================================================================
 #                 logger.debug("Results:\n"
 #                     "F_PB = %s, F_SB = %s "
@@ -381,10 +385,13 @@ class Input_Specs(QWidget):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
+    """ Run widget standalone with `python -m pyfda.input_widgets.input_specs` """
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     mainw = Input_Specs(None)
     app.setActiveWindow(mainw)
     mainw.show()
-
     sys.exit(app.exec_())

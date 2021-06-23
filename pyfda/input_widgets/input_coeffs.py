@@ -958,14 +958,12 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.input_coeffs """
+    """ Run widget standalone with `python -m pyfda.input_widgets.input_coeffs` """
     from pyfda import pyfda_rc as rc
-    app = QApplication(sys.argv)
-    mainw = Input_Coeffs()
-
-    app.setActiveWindow(mainw)
-    app.setStyleSheet(rc.qss_rc)
     
+    app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Input_Coeffs()
+    app.setActiveWindow(mainw)
     mainw.show()
-
     sys.exit(app.exec_())

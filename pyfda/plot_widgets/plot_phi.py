@@ -8,19 +8,20 @@
 """
 Widget for plotting phase frequency response phi(f)
 """
-import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal
+from pyfda.libs.compat import (
+    QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
 
 import numpy as np
-
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
-from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
+from pyfda.libs.pyfda_lib import calc_Hcomplex
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+
+import logging
+logger = logging.getLogger(__name__)
 
 classes = {'Plot_Phi': '\u03C6(f)'}  #: Dict containing class name : display name
 
@@ -32,7 +33,7 @@ class Plot_Phi(QWidget):
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_Phi, self).__init__(parent)
         self.needs_calc = True  # recalculation of filter function necessary
         self.needs_draw = True  # plotting neccessary (e.g. log instead of  lin)
@@ -45,7 +46,7 @@ class Plot_Phi(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"\
+        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
                      .format(dict_sig, self.needs_calc, self.isVisible()))
 
         if self.sig_loop(dict_sig, logger) > 0:
@@ -70,7 +71,7 @@ class Plot_Phi(QWidget):
             # elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
             #     self.needs_redraw = True
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -80,7 +81,7 @@ class Plot_Phi(QWidget):
 
         self.cmbUnitsPhi = QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
-        scales = [1.,   1./ np.pi, 180./np.pi]
+        scales = [1.,   1. / np.pi, 180./np.pi]
         for unit, scale in zip(units, scales):
             self.cmbUnitsPhi.addItem(unit, scale)
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
@@ -97,20 +98,20 @@ class Plot_Phi(QWidget):
         layHControls.addWidget(self.chkWrap)
         layHControls.addStretch(10)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### frmControls ###
         #
         # This widget encompasses all control subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # main widget, encompassing the other widgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -120,16 +121,16 @@ class Plot_Phi(QWidget):
 
         self.init_axes()
 
-        self.draw() # initial drawing
+        self.draw()  # initial drawing
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -164,7 +165,7 @@ class Plot_Phi(QWidget):
         # an array full of nans
         self.H_cmplx = np.nan_to_num(self.H_cmplx)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def draw(self):
         """
         Main entry point:
@@ -173,7 +174,7 @@ class Plot_Phi(QWidget):
         self.calc_resp()
         self.update_view()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
@@ -183,8 +184,8 @@ class Plot_Phi(QWidget):
 
         f_max_2 = fb.fil[0]['f_max'] / 2.
 
-        #========= select frequency range to be displayed =====================
-        #=== shift, scale and select: W -> F, H_cplx -> H_c
+        # ========= select frequency range to be displayed =====================
+        # === shift, scale and select: W -> F, H_cplx -> H_c
         F = self.W * f_max_2 / np.pi
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
@@ -195,7 +196,7 @@ class Plot_Phi(QWidget):
             # only use the first half of H and F
             H = self.H_cmplx[0:params['N_FFT']//2]
             F = F[0:params['N_FFT']//2]
-        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+        else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
             # use H and F as calculated
             H = self.H_cmplx
 
@@ -205,7 +206,7 @@ class Plot_Phi(QWidget):
             scale = 1.
         elif self.unitPhi == 'rad/pi':
             y_str += 'rad' + r'$ / \pi \;\rightarrow $'
-            scale = 1./ np.pi
+            scale = 1. / np.pi
         else:
             y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
@@ -217,13 +218,13 @@ class Plot_Phi(QWidget):
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
 
-        #---------------------------------------------------------
-        self.ax.clear() # need to clear, doesn't overwrite
+        # ---------------------------------------------------------
+        self.ax.clear()  # need to clear, doesn't overwrite
         line_phi, = self.ax.plot(F, phi_plt)
-        #---------------------------------------------------------
+        # ---------------------------------------------------------
 
-        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
-        self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(y_str)
@@ -231,25 +232,24 @@ class Plot_Phi(QWidget):
 
         self.redraw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
 
-#------------------------------------------------------------------------------
 
-def main():
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_phi` """
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    mainw = Plot_Phi(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_Phi()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
-   # module test using python -m pyfda.plot_widgets.plot_phi

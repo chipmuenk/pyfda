@@ -38,7 +38,7 @@ class Plot_tau_g(QWidget):
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_tau_g, self).__init__(parent)
         self.verbose = False  # suppress warnings
         self.algorithm = "auto"
@@ -55,7 +55,7 @@ class Plot_tau_g(QWidget):
               "filters.</span>"),
              ("diff", "Diff", "<span>Textbook-style, differentiate the phase."
               "</span>")
-            ]
+             ]
 
         self._construct_UI()
 
@@ -143,13 +143,15 @@ class Plot_tau_g(QWidget):
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
 
         if fb.fil[0]['creator'][0] == 'sos':  # one of 'sos', 'zpk', 'ba'
-            self.W, self.tau_g = group_delay(fb.fil[0]['sos'], nfft=params['N_FFT'], sos=True,
-                                             whole=True, verbose=self.chkWarnings.isChecked(),
+            self.W, self.tau_g = group_delay(fb.fil[0]['sos'], nfft=params['N_FFT'],
+                                             sos=True, whole=True,
+                                             verbose=self.chkWarnings.isChecked(),
                                              alg=self.cmbAlgorithm.currentData())
         else:
             self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole=True,
                                              verbose=self.chkWarnings.isChecked(),
-                                             alg=self.cmbAlgorithm.currentData())  # self.chkWarnings.isChecked())
+                                             alg=self.cmbAlgorithm.currentData())
+                                             # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
@@ -221,16 +223,15 @@ class Plot_tau_g(QWidget):
 # ------------------------------------------------------------------------------
 
 
-def main():
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_tau_g` """
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
-    mainw = Plot_tau_g(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_tau_g()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
-# module test using python -m pyfda.plot_widgets.plot_tau_g

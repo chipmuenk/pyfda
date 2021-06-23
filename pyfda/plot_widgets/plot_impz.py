@@ -51,7 +51,7 @@ class Plot_Impz(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit, sig_loop
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_Impz, self).__init__(parent)
 
         self.ACTIVE_3D = False
@@ -1845,17 +1845,16 @@ class Plot_Impz(QWidget):
 
 
 # ------------------------------------------------------------------------------
-def main():
+
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_impz` """
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    mainw = Plot_Impz(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_Impz()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
-    # module test using python -m pyfda.plot_widgets.plot_impz

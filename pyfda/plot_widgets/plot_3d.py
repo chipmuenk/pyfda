@@ -62,13 +62,13 @@ class Plot_3D(QWidget):
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_3D, self).__init__(parent)
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu'
-        self.data_changed = True # flag whether data has changed
+        self.data_changed = True  # flag whether data has changed
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
 
@@ -657,15 +657,15 @@ class Plot_3D(QWidget):
 
 #------------------------------------------------------------------------------
 
-def main():
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_3d` """
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
-    mainw = Plot_3D(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_3D()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
-# module test using python -m pyfda.plot_widgets.plot_3d

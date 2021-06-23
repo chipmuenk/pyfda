@@ -13,17 +13,18 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 - Filter Class (Butterworth, ...)
 """
 import sys
-import logging
-logger = logging.getLogger(__name__)
-
-from pyfda.libs.compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
+from pyfda.libs.compat import (
+    QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+    QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 from pyfda.libs.pyfda_lib import safe_eval
 import pyfda.pyfda_rc as rc
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class SelectFilter(QWidget):
@@ -45,7 +46,7 @@ class SelectFilter(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(SelectFilter, self).__init__(parent)
 
         self.fc_last = ''  # previous filter class
@@ -70,9 +71,9 @@ class SelectFilter(QWidget):
         See filterbroker.py for structure and content of "filterTree" dict
 
         """
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Combo boxes for filter selection
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.cmbResponseType = QComboBox(self)
         self.cmbResponseType.setObjectName("comboResponseType")
         self.cmbResponseType.setToolTip("Select filter response type.")
@@ -90,9 +91,9 @@ class SelectFilter(QWidget):
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbFilterClass.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Populate combo box with initial settings from fb.fil_tree
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in pyfda_rc.py) and populate rt combo box
         #
@@ -103,53 +104,55 @@ class SelectFilter(QWidget):
                 self.cmbResponseType.addItem(rc.rt_names[rt], rt)
             except KeyError as e:
                 logger.warning(
-                  "KeyError: {0} has no corresponding full name in rc.rt_names.".format(e))
-        idx = self.cmbResponseType.findData('LP') # find index for 'LP'
+                  f"KeyError: {e} has no corresponding full name in rc.rt_names.")
+        idx = self.cmbResponseType.findData('LP')  # find index for 'LP'
 
-        if idx == -1: # Key 'LP' does not exist, use first entry instead
+        if idx == -1:  # Key 'LP' does not exist, use first entry instead
             idx = 0
 
-        self.cmbResponseType.setCurrentIndex(idx) # set initial index
+        self.cmbResponseType.setCurrentIndex(idx)  # set initial index
         rt = qget_cmb_box(self.cmbResponseType)
 
         for ft in fb.fil_tree[rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
-        self.cmbFilterType.setCurrentIndex(0) # set initial index
+        self.cmbFilterType.setCurrentIndex(0)  # set initial index
         ft = qget_cmb_box(self.cmbFilterType)
 
         for fc in fb.fil_tree[rt][ft]:
             self.cmbFilterClass.addItem(fb.filter_classes[fc]['name'], fc)
-        self.cmbFilterClass.setCurrentIndex(0) # set initial index
+        self.cmbFilterClass.setCurrentIndex(0)  # set initial index
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Layout for Filter Type Subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
-        layHFilWdg = QHBoxLayout() # container for filter subwidgets
-        layHFilWdg.addWidget(self.cmbResponseType) #LP, HP, BP, etc.
+        layHFilWdg = QHBoxLayout()  # container for filter subwidgets
+        layHFilWdg.addWidget(self.cmbResponseType)  # LP, HP, BP, etc.
         layHFilWdg.addStretch()
-        layHFilWdg.addWidget(self.cmbFilterType)   #FIR, IIR
+        layHFilWdg.addWidget(self.cmbFilterType)   # FIR, IIR
         layHFilWdg.addStretch()
-        layHFilWdg.addWidget(self.cmbFilterClass)  #bessel, elliptic, etc.
+        layHFilWdg.addWidget(self.cmbFilterClass)  # bessel, elliptic, etc.
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Layout for dynamic filter subwidgets (empty frame)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # see Summerfield p. 278
-        self.layHDynWdg = QHBoxLayout() # for additional dynamic subwidgets
+        self.layHDynWdg = QHBoxLayout()  # for additional dynamic subwidgets
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Filter Order Subwidgets
-        #----------------------------------------------------------------------
-        self.lblOrder =  QLabel("<b>Order:</b>")
+        # ----------------------------------------------------------------------
+        self.lblOrder = QLabel("<b>Order:</b>")
         self.chkMinOrder = QCheckBox("Minimum", self)
-        self.chkMinOrder.setToolTip("<span>Minimum filter order / # of taps is determined automatically.</span>")
+        self.chkMinOrder.setToolTip(
+            "<span>Minimum filter order / # of taps is determined automatically.</span>")
         self.lblOrderN = QLabel("<b><i>N =</i></b>")
-        self.ledOrderN = QLineEdit(str(fb.fil[0]['N']),self)
+        self.ledOrderN = QLineEdit(str(fb.fil[0]['N']), self)
         self.ledOrderN.setToolTip("Filter order (# of taps - 1).")
 
-        #--------------------------------------------------
+        # --------------------------------------------------
         #  Layout for filter order subwidgets
+        # --------------------------------------------------
         layHOrdWdg = QHBoxLayout()
         layHOrdWdg.addWidget(self.lblOrder)
         layHOrdWdg.addWidget(self.chkMinOrder)
@@ -157,15 +160,15 @@ class SelectFilter(QWidget):
         layHOrdWdg.addWidget(self.lblOrderN)
         layHOrdWdg.addWidget(self.ledOrderN)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.layVAllWdg = QVBoxLayout()
         self.layVAllWdg.addLayout(layHFilWdg)
         self.layVAllWdg.addLayout(self.layHDynWdg)
         self.layVAllWdg.addLayout(layHOrdWdg)
 
-#==============================================================================
+# ==============================================================================
         frmMain = QFrame(self)
         frmMain.setLayout(self.layVAllWdg)
 
@@ -175,27 +178,26 @@ class SelectFilter(QWidget):
 
         self.setLayout(layHMain)
 
-#==============================================================================
+# ==============================================================================
 
-        #------------------------------------------------------------
+        # ------------------------------------------------------------
         # SIGNALS & SLOTS
-        #------------------------------------------------------------
+        # ------------------------------------------------------------
         # Connect comboBoxes and setters, propgate change events hierarchically
         #  through all widget methods and emit 'filt_changed' in the end.
         self.cmbResponseType.currentIndexChanged.connect(
-                lambda: self._set_response_type(enb_signal=True))# 'LP'
+                lambda: self._set_response_type(enb_signal=True))  # 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
-                lambda: self._set_filter_type(enb_signal=True))  #'IIR'
+                lambda: self._set_filter_type(enb_signal=True))  # 'IIR'
         self.cmbFilterClass.currentIndexChanged.connect(
-                lambda: self._set_design_method(enb_signal=True))#'cheby1'
+                lambda: self._set_design_method(enb_signal=True))  # 'cheby1'
         self.chkMinOrder.clicked.connect(
-                lambda: self._set_filter_order(enb_signal=True)) # Min. Order
+                lambda: self._set_filter_order(enb_signal=True))  # Min. Order
         self.ledOrderN.editingFinished.connect(
-                lambda:self._set_filter_order(enb_signal=True))  # Manual Order
-        #------------------------------------------------------------
+                lambda: self._set_filter_order(enb_signal=True))  # Manual Order
+        # ------------------------------------------------------------
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def load_dict(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
@@ -204,11 +206,12 @@ class SelectFilter(QWidget):
         of checking whether the previously selected filter design method is
         also available for the new combination.
         """
-        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for response type
+        # find index for response type:
+        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt'])
         self.cmbResponseType.setCurrentIndex(rt_idx)
         self._set_response_type()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _set_response_type(self, enb_signal=False):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
@@ -221,10 +224,10 @@ class SelectFilter(QWidget):
         fb.fil[0]['rt'] = self.rt = qget_cmb_box(self.cmbResponseType)
 
         # Get list of available filter types for new rt
-        ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
-        #---------------------------------------------------------------
+        ft_list = list(fb.fil_tree[self.rt].keys())  # explicit list() needed for Py3
+        # ---------------------------------------------------------------
         # Rebuild filter type combobox entries for new rt setting
-        self.cmbFilterType.blockSignals(True) # don't fire when changed programmatically
+        self.cmbFilterType.blockSignals(True)  # don't fire when changed programmatically
         self.cmbFilterType.clear()
         for ft in fb.fil_tree[self.rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
@@ -232,16 +235,16 @@ class SelectFilter(QWidget):
         # Is current filter type (e.g. IIR) in list for new rt?
         if fb.fil[0]['ft'] in ft_list:
             ft_idx = self.cmbFilterType.findText(fb.fil[0]['ft'])
-            self.cmbFilterType.setCurrentIndex(ft_idx) # yes, set same ft as before
+            self.cmbFilterType.setCurrentIndex(ft_idx)  # yes, set same ft as before
         else:
             self.cmbFilterType.setCurrentIndex(0)     # no, set index 0
 
         self.cmbFilterType.blockSignals(False)
-        #---------------------------------------------------------------
+        # ---------------------------------------------------------------
 
         self._set_filter_type(enb_signal)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _set_filter_type(self, enb_signal=False):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
@@ -254,7 +257,7 @@ class SelectFilter(QWidget):
 #
         logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
 
-        #---------------------------------------------------------------
+        # ---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
         # - Collect them in fc_list
         # - Rebuild design method combobox entries for new ft setting:
@@ -274,7 +277,8 @@ class SelectFilter(QWidget):
         # Has filter been instantiated?
         if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
             # yes, set same fc as before
-            fc_idx = self.cmbFilterClass.findText(fb.filter_classes[fb.fil[0]['fc']]['name'])
+            fc_idx = self.cmbFilterClass.findText(
+                fb.filter_classes[fb.fil[0]['fc']]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:
@@ -284,8 +288,7 @@ class SelectFilter(QWidget):
 
         self._set_design_method(enb_signal)
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _set_design_method(self, enb_signal=False):
         """
         Triggered when cmbFilterClass (cheby1, ...) is changed:
@@ -296,28 +299,27 @@ class SelectFilter(QWidget):
         """
         fb.fil[0]['fc'] = fc = qget_cmb_box(self.cmbFilterClass)
 
-        if fc != self.fc_last: # fc has changed:
+        if fc != self.fc_last:  # fc has changed:
 
             # when filter has been changed, try to destroy dynamic widgets of last fc:
             if self.fc_last:
                 self._destruct_dyn_widgets()
 
-            #==================================================================
+            # ==================================================================
             """
             Create new instance of the selected filter class, accessible via
             its handle fb.fil_inst
             """
             err = ff.fil_factory.create_fil_inst(fc)
-            logger.debug("InputFilter.set_design_method triggered: %s\n"
-                        "Returned error code %d" %(fc, err))
-            #==================================================================
-
+            logger.debug(f"InputFilter.set_design_method triggered: {fc}\n"
+                         f"Returned error code {err}")
+            # ==================================================================
 
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
             # filter order method
             if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][fc].keys():
-                fb.fil[0].update({'fo':{}})
+                fb.fil[0].update({'fo': {}})
                 # explicit list(dict.keys()) needed for Python 3
                 fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][fc].keys())[0]
 
@@ -330,14 +332,15 @@ class SelectFilter(QWidget):
 #                     ))
 #
 # =============================================================================
-            if hasattr(ff.fil_inst, 'construct_UI'): # construct dyn. subwidgets if available
+            # construct dyn. subwidgets if available
+            if hasattr(ff.fil_inst, 'construct_UI'):
                 self._construct_dyn_widgets()
 
             self.fc_last = fb.fil[0]['fc']
 
         self.load_filter_order(enb_signal)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def load_filter_order(self, enb_signal=False):
 
         """
@@ -352,10 +355,10 @@ class SelectFilter(QWidget):
 
         # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in fo_list:
-            self.fo = fb.fil[0]['fo'] # keep current setting
+            self.fo = fb.fil[0]['fo']  # keep current setting
         else:
-            self.fo = fo_list[0] # use first list entry from filterTree
-            fb.fil[0]['fo'] = self.fo # and update fo method
+            self.fo = fo_list[0]  # use first list entry from filterTree
+            fb.fil[0]['fo'] = self.fo  # and update fo method
 
         # check whether fo widget is active, disabled or invisible
         if 'fo' in fo_dict[self.fo] and len(fo_dict[self.fo]['fo']) > 1:
@@ -378,7 +381,7 @@ class SelectFilter(QWidget):
             logger.debug("Emit 'filt_changed'")
             self.emit({'filt_changed': 'filter_type'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
@@ -390,13 +393,13 @@ class SelectFilter(QWidget):
             self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
             self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
 
-            if self.chkMinOrder.isChecked() == True:
+            if self.chkMinOrder.isChecked() is True:
                 # update in case N has been changed outside this class
                 self.ledOrderN.setText(str(fb.fil[0]['N']))
-                fb.fil[0].update({'fo' : 'min'})
+                fb.fil[0].update({'fo': 'min'})
 
             else:
-                fb.fil[0].update({'fo' : 'man'})
+                fb.fil[0].update({'fo': 'man'})
 
         else:
             self.lblOrderN.setEnabled(self.fo == 'man')
@@ -404,7 +407,8 @@ class SelectFilter(QWidget):
 
         # read manual filter order, convert to positive integer and store it
         # in filter dictionary.
-        ordn = safe_eval(self.ledOrderN.text(), fb.fil[0]['N'], return_type='int', sign='pos')
+        ordn = safe_eval(
+            self.ledOrderN.text(), fb.fil[0]['N'], return_type='int', sign='pos')
         ordn = ordn if ordn > 0 else 1
         self.ledOrderN.setText(str(ordn))
         fb.fil[0].update({'N': ordn})
@@ -413,12 +417,13 @@ class SelectFilter(QWidget):
             logger.debug("Emit 'filt_changed'")
             self.emit({'filt_changed': 'filter_order_widget'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
         """
         Delete the dynamically created filter design subwidget (if there is one)
 
-        see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
+        see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-
+        widgets-in-pyqt
 
         This does NOT work when the subwidgets to be deleted and created are
         identical, as the deletion is only performed when the current scope has
@@ -430,16 +435,17 @@ class SelectFilter(QWidget):
             # not needed, connection is destroyed automatically
             # ff.fil_inst.sig_tx.disconnect()
             try:
-                self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
-                self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
+                # remove widget from layout
+                self.layHDynWdg.removeWidget(self.dyn_wdg_fil)
+                # delete UI widget when scope has been left
+                self.dyn_wdg_fil.deleteLater()
 
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
-            ff.fil_inst.deleteLater() # delete QWidget when scope has been left
+            ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
         Create filter widget UI dynamically (if the filter routine has one) and
@@ -456,17 +462,15 @@ class SelectFilter(QWidget):
         if hasattr(ff.fil_inst, 'sig_tx'):
             ff.fil_inst.sig_tx.connect(self.sig_tx)
 
-#------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
+    """ Run widget standalone with `python -m pyfda.input_widgets.select_filter` """
     from pyfda.libs.compat import QApplication
+
     app = QApplication(sys.argv)
-
-    mainw = SelectFilter(None)
-
+    app.setStyleSheet(rc.qss_rc)
+    mainw = SelectFilter()
     app.setActiveWindow(mainw)
     mainw.show()
-
-
     sys.exit(app.exec_())
-

@@ -75,7 +75,7 @@ class PlotImpz_UI(QWidget):
                     self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
@@ -1464,6 +1464,21 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_impz_ui` """
+    import sys
+    from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
-    # module test using python -m pyfda.plot_widgets.plot_impz_ui
+    app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = PlotImpz_UI()
+
+    layVMain = QVBoxLayout()
+    layVMain.addWidget(mainw.wdg_ctrl_time)
+    layVMain.addWidget(mainw.wdg_ctrl_freq)
+    layVMain.addWidget(mainw.wdg_ctrl_stim)
+    layVMain.addWidget(mainw.wdg_ctrl_run)
+    mainw.setLayout(layVMain)
+    app.setActiveWindow(mainw)
+    mainw.show()
+    sys.exit(app.exec_())
