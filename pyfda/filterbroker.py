@@ -220,92 +220,92 @@ fil_tree = freeze_hierarchical({
 # Dictionary containing current filter type, specifications, design and some
 # auxiliary information, the initial definition here is overwritten by
 # input widgets and design routines:
-#------------------------------------------------------------------------------
-fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'Equiripple', 'fo':'man', # filter type
-            'N':10, # filter order
-            'f_S':1, 'T_S':1, # current sampling frequency and period
-            'f_S_prev': 1, # previous sampling frequency
-            'freq_locked': False, # don't update absolute frequencies when f_S is changed
-            'f_S_scale':1, #
-            'f_max':1,
-            'freqSpecsRangeType':'Half',
+# ------------------------------------------------------------------------------
+fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
+            'N': 10,  # filter order
+            'f_S': 1, 'T_S': 1,  # current sampling frequency and period
+            'f_S_prev': 1,  # previous sampling frequency
+            'freq_locked': False,  # don't update absolute frequencies when f_S is changed
+            'f_S_scale': 1,  #
+            'f_max': 1,
+            'freqSpecsRangeType': 'Half',
             'freqSpecsRange': [0, 0.5],
-            'freq_specs_sort' : True, # sort freq. specs in ascending order
-            'freq_specs_unit' : 'f_S',
-            'plt_fLabel':r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
-            'plt_fUnit':'f_S',
-            'plt_tLabel':r'$n \; \rightarrow$',
-            'plt_tUnit':'s',
-            'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
-            'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
-            'W_PB':1, 'W_PB2':1, 'W_SB':1, 'W_SB2':1,
+            'freq_specs_sort': True,  # sort freq. specs in ascending order
+            'freq_specs_unit': 'f_S',
+            'plt_fLabel': r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
+            'plt_fUnit': 'f_S',
+            'plt_tLabel': r'$n \; \rightarrow$',
+            'plt_tUnit': 's',
+            'A_PB': 0.02, 'A_PB2': 0.01, 'F_PB': 0.1, 'F_PB2': 0.4, 'F_C': 0.2, 'F_N': 0.2,
+            'A_SB': 0.001, 'A_SB2': 0.0001, 'F_SB': 0.2, 'F_SB2': 0.3, 'F_C2': 0.4, 'F_N2': 0.4,
+            'W_PB': 1, 'W_PB2': 1, 'W_SB': 1, 'W_SB2': 1,
             #
-            'ba':([1, 1, 1], [1, 0.1, 0.5]), # tuple of bb, aa coefficient lists
+            'ba': ([1, 1, 1], [1, 0.1, 0.5]),  # (bb, aa) tuple coefficient lists
             # causal zeros/poles/gain
-            'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+            'zpk': ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
             #
             'sos': [],
             # input, output, accu, coeffs, ... fixpoint word formats and quantizer
             # settings as well as coefficients in integer format (scaled with W):
             'fxqc':
-                {'QI':{'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
-                 'QO':{'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
-                 'QA':{'WI':0, 'WF':31, 'W':32, 'ovfl':'wrap', 'quant':'floor'},
-                 'QCB':{'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor',
-                        'scale':2, 'frmt':'float'},
-                 'QCA':{'WI':2, 'WF':13, 'W':16, 'ovfl':'wrap', 'quant':'floor',
-                        'scale':4, 'frmt':'float'},
+                {'QI': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round'},
+                 'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor'},
+                 'QA': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'},
+                 'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                         'scale': 2, 'frmt': 'float'},
+                 'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                         'scale': 4, 'frmt': 'float'},
                  'b': [32768, 32768, 32768],
                  'a': [65536, 6553, 0]
                  },
 
-            'creator':('ba', 'filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
-            'amp_specs_unit':'dB',
+            'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
+            'amp_specs_unit': 'dB',
 
             'plt_phiUnit': 'rad',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
                     + r'$\rightarrow $',
-            'time_designed' : -1,
-            'wdg_dyn':{'win':'hann'},
+            'time_designed': -1,
+            'wdg_dyn': {'win': 'hann'},
             # Parameters for spectral analysis window function
             'win_fft':
-                {'name':'Kaiser', # Window name
-                 'fn_name':'kaiser', # function name or array with values
-                 'par':[{'name':'&beta;',
-                          'name_tex':r'$\beta$',
-                          'val':10,
-                          'min':0,
-                          'max':30,
+                {'name': 'Kaiser',  # Window name
+                 'fn_name': 'kaiser',  # function name or array with values
+                 'par': [{'name': '&beta;',
+                          'name_tex': r'$\beta$',
+                          'val': 10,
+                          'min': 0,
+                          'max': 30,
                           'tooltip':
                               ("<span>Shape parameter; lower values reduce main lobe width, "
                               "higher values reduce side lobe level, typ. in the range "
                               "5 ... 20.</span>")}],
-                 'n_par' : 1,   # number of window parameters
-                 'info':"",     # Docstring for the window
-                 'win_len':1024,
+                 'n_par': 1,   # number of window parameters
+                 'info': "",     # Docstring for the window
+                 'win_len': 1024,
                  },
             # Parameters for filter design window function
             'win_fir':
-                {'name':'Hann', # Window name
-                 'fn_name':'hann', # function name or array with values
-                 'par':[],      # set of list of window parameters
-                 'n_par' : 0,   # number of window parameters
-                 'info':"",     # Docstring for the window
-                 'win_len':1024
+                {'name': 'Hann',  # Window name
+                 'fn_name': 'hann',  # function name or array with values
+                 'par': [],    # set of list of window parameters
+                 'n_par': 0,   # number of window parameters
+                 'info': "",   # Docstring for the window
+                 'win_len': 1024
                  }
             }
 
-fil = [None] * 10 # create empty list with length 10 for multiple filter designs
+fil = [None] * 10  # create empty list with length 10 for multiple filter designs
 # This functionality is not implemented yet, currently only fil[0] is used
 
 # define fil[0] as a dict with "built-in" default. The argument defines the default
 # factory that is called when a key is missing. Here, lambda simply returns a float.
 # When e.g. list is given as the default_factory, an empty list is returned.
-#fil[0] = defaultdict(lambda: 0.123)
+# fil[0] = defaultdict(lambda: 0.123)
 fil[0] = {}
 # Now, copy each key-value pair into the defaultdict
 for k in fil_init:
-    fil[0].update({k:fil_init[k]})
+    fil[0].update({k: fil_init[k]})
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
