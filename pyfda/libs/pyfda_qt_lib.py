@@ -214,7 +214,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
 
     # if idx == old_idx:
     #     return -2
-    
+
     cmb_box.blockSignals(not fireSignals)
     if idx == -1:  # string hasn't been found
         cmb_box.setCurrentIndex(0)  # set index to first entry
@@ -470,7 +470,8 @@ def qled_set_max_width(wdg, str='', N_x=17):
     return width
 
     # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6'x'
-    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-qlineedit-to-display-at-most-four-characters/47307180#47307180
+    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
+    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
 
 
 # ----------------------------------------------------------------------------
