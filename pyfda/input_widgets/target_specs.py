@@ -11,15 +11,16 @@ Widget collecting subwidgets for the target filter specifications (currently
 only amplitude and frequency specs.)
 """
 import sys
-import logging
-logger = logging.getLogger(__name__)
 
-from pyfda.libs.compat import (QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt,
-                      QHBoxLayout, QVBoxLayout)
+from pyfda.libs.compat import (
+    QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class TargetSpecs(QWidget):
@@ -28,15 +29,15 @@ class TargetSpecs(QWidget):
     and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
     # class variables (shared between instances if more than one exists)
-    sig_rx = pyqtSignal(object) # incoming
-    sig_tx = pyqtSignal(object) # outgoing
+    sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outgoing
     # from pyfda.libs.pyfda_qt_lib import emit
-    
-    def __init__(self, parent, title = "Target Specs"):
+
+    def __init__(self, parent=None, title="Target Specs"):
         super(TargetSpecs, self).__init__(parent)
 
         self.title = title
-        
+
         self._construct_UI()
 
 # =============================================================================
@@ -51,7 +52,7 @@ class TargetSpecs(QWidget):
 #         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
 #             # update target frequencies with new f_S
 #             self.f_specs.recalc_freqs()
-# 
+#
 # =============================================================================
 
     def _construct_UI(self):
@@ -68,25 +69,25 @@ class TargetSpecs(QWidget):
         """
         bfont = QFont()
         bfont.setBold(True)
-        lblTitle = QLabel(self) # field for widget title
+        lblTitle = QLabel(self)  # field for widget title
         lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
 #        lblTitle.setContentsMargins(2,2,2,2)
-        
+
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
         layHTitle.setAlignment(Qt.AlignHCenter)
         layHSpecs = QHBoxLayout()
         layHSpecs.setAlignment(Qt.AlignTop)
-        layHSpecs.addWidget(self.f_specs) # frequency specs
-        layHSpecs.addWidget(self.a_specs) # ampltitude specs
+        layHSpecs.addWidget(self.f_specs)  # frequency specs
+        layHSpecs.addWidget(self.a_specs)  # ampltitude specs
 
         layVSpecs = QVBoxLayout()
         layVSpecs.addLayout(layHTitle)
         layVSpecs.addLayout(layHSpecs)
-        layVSpecs.setContentsMargins(0,6,0,0) # (left, top, right, bottom)
+        layVSpecs.setContentsMargins(0, 6, 0, 0)  # (left, top, right, bottom)
 
-        # This is the top level widget, encompassing the other widgets        
+        # This is the top level widget, encompassing the other widgets
         frmMain = QFrame(self)
         frmMain.setLayout(layVSpecs)
 
@@ -107,7 +108,7 @@ class TargetSpecs(QWidget):
         self.update_UI()  # first time initialization
 
 # ------------------------------------------------------------------------------
-    def update_UI(self, new_labels = ()):
+    def update_UI(self, new_labels=()):
         """
         Called when a new filter design algorithm has been selected
         - Pass new frequency and amplitude labels to the amplitude and frequency
@@ -118,15 +119,15 @@ class TargetSpecs(QWidget):
         """
 
         if ('frq' in new_labels and len(new_labels['frq']) > 1 and
-                                              new_labels['frq'][0] != 'i'):
+                new_labels['frq'][0] != 'i'):
             self.f_specs.show()
             self.f_specs.setEnabled(new_labels['frq'][0] != 'd')
             self.f_specs.update_UI(new_labels=new_labels['frq'])
         else:
             self.f_specs.hide()
-            
+
         if ('amp' in new_labels and len(new_labels['amp']) > 1 and
-                                              new_labels['amp'][0] != 'i'):
+                new_labels['amp'][0] != 'i'):
             self.a_specs.show()
             self.a_specs.setEnabled(new_labels['amp'][0] != 'd')
             self.a_specs.update_UI(new_labels=new_labels['amp'])
@@ -135,21 +136,24 @@ class TargetSpecs(QWidget):
 
         # self.emit({'changed_specs':'target'})
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def load_dict(self):
         """
         Update entries from global dict fb.fil[0]
         parameters, using the "load_dict" methods of the classes
         """
-        self.a_specs.load_dict() # magnitude specs with unit
-        self.f_specs.load_dict() # weight specification
+        self.a_specs.load_dict()  # magnitude specs with unit
+        self.f_specs.load_dict()  # weight specification
 
-#------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
-
+    """ Run widget standalone with `python -m pyfda.input_widgets.target_specs` """
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
 
     # Read freq / amp / weight labels for current filter design
     rt = fb.fil[0]['rt']
@@ -157,17 +161,15 @@ if __name__ == '__main__':
     fc = fb.fil[0]['fc']
 
     if 'min' in fb.fil_tree[rt][ft][fc]:
-        my_params = fb.fil_tree[rt][ft][fc]['min']['par']
+        # extract target parameters from filter tree
+        print(fb.fil_tree[rt][ft][fc]['min']['tspecs'])
+        target_params = fb.fil_tree[rt][ft][fc]['min']['tspecs'][1]
     else:
-        my_params = {}
+        target_params = {}
 
-    # build separate parameter lists according to the first letter
-    freq_params = [l for l in my_params if l[0] == 'F']
-    amp_params = [l for l in my_params if l[0] == 'A']
+    mainw = TargetSpecs(title="Test Specs")
+    mainw.update_UI(target_params)
 
-    mainw = TargetSpecs(None, title = "Test Specs")
-    mainw.update_UI(freq_params, amp_params)
-    
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

@@ -10,11 +10,9 @@
 """
 Create the UI for the FilterPZ class
 """
-import logging
-logger = logging.getLogger(__name__)
-
-from pyfda.libs.compat import (pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
-                      QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
+from pyfda.libs.compat import (
+    pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
+    QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget
 from pyfda.libs.pyfda_io_lib import CSV_option_box
@@ -22,6 +20,11 @@ from pyfda.libs.pyfda_lib import to_html, pprint_log
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 
+import logging
+logger = logging.getLogger(__name__)
+
+
+# ------------------------------------------------------------------------------
 class Input_PZ_UI(QWidget):
     """
     Create the UI for the InputPZ class
@@ -30,16 +33,16 @@ class Input_PZ_UI(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
         super(Input_PZ_UI, self).__init__(parent)
 #        self.parent = parent # instance of the parent (not the base) class
-        self.eps = 1.e-4 # # tolerance value for e.g. setting P/Z to zero
+        self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the CSV pop-up window
@@ -51,19 +54,18 @@ class Input_PZ_UI(QWidget):
             self.emit({'ui_changed': 'csv'})
             return  # probably not needed
         elif 'ui_changed' in dict_sig:
-            self._set_load_save_icons() # update icons file <-> clipboard
-            # inform e.g. the p/z input widget about changes in CSV options 
+            self._set_load_save_icons()  # update icons file <-> clipboard
+            # inform e.g. the p/z input widget about changes in CSV options
             self.emit({'ui_changed': 'csv'})
 
-#------------------------------------------------------------------------------
-    def _construct_UI(self):        
+# ------------------------------------------------------------------------------
+    def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
         - top chkbox row
         - coefficient table
         - two bottom rows with action buttons
         """
-        
         self.bfont = QFont()
         self.bfont.setBold(True)
         self.bifont = QFont()
@@ -74,44 +76,48 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-        
+
         self.butEnable = QPushButton(self)
         self.butEnable.setIcon(QIcon(':/circle-x.svg'))
-        q_icon_size = self.butEnable.iconSize() # <- set this for manual icon sizing
+        q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
-        self.butEnable.setToolTip("<span>Show / hide poles and zeros in an editable table."
-                " For high order systems, the table display might be slow.</span>")
+        self.butEnable.setToolTip(
+            "<span>Show / hide poles and zeros in an editable table."
+            " For high order systems, the table display might be slow.</span>")
 
         self.cmbPZFrmt = QComboBox(self)
+        # (display text, data):
         pz_formats = [('Cartesian', 'cartesian'), ('Polar (rad)', 'polar_rad'),
-                      ('Polar (pi)', 'polar_pi'), ('Polar (°)', 'polar_deg')] # display text, data
+                      ('Polar (pi)', 'polar_pi'), ('Polar (°)', 'polar_deg')]
         # π: u'3C0, °: u'B0, ∠: u'2220
         for pz in pz_formats:
             self.cmbPZFrmt.addItem(*pz)
         self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         # self.cmbPZFrmt.setEnabled(False)
-        self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros to"
-                                  " either cartesian (x + jy) or polar (r * &ang; &Omega;)."
-                                  " Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>")
+        self.cmbPZFrmt.setToolTip(
+            "<span>Set display format for poles and zeros to"
+            " either cartesian (x + jy) or polar (r * &ang; &Omega;)."
+            " Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>")
 
         self.spnDigits = QSpinBox(self)
-        self.spnDigits.setRange(0,16)
+        self.spnDigits.setRange(0, 16)
         self.spnDigits.setToolTip("Number of digits to display.")
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
-        
+
         self.cmbCausal = QComboBox(self)
         causal_types = ['Causal', 'Acausal', 'Anticausal']
         for cs in causal_types:
             self.cmbCausal.addItem(cs)
 
         qset_cmb_box(self.cmbCausal, 'Causal')
-        self.cmbCausal.setToolTip('<span>Set the system type. Not implemented yet.</span>')
+        self.cmbCausal.setToolTip(
+            '<span>Set the system type. Not implemented yet.</span>')
         self.cmbCausal.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbCausal.setEnabled(False)
-            
+
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
@@ -127,13 +133,15 @@ class Input_PZ_UI(QWidget):
         self.lblNorm = QLabel(to_html("Normalize:", frmt='bi'), self)
         self.cmbNorm = QComboBox(self)
         self.cmbNorm.addItems(["None", "1", "Max"])
-        self.cmbNorm.setToolTip("<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
-                                "either 1 or the max. of the previous system.</span>")
+        self.cmbNorm.setToolTip(
+            "<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
+            "either 1 or the max. of the previous system.</span>")
 
         self.lblGain = QLabel(to_html("k =", frmt='bi'), self)
         self.ledGain = QLineEdit(self)
-        self.ledGain.setToolTip("<span>Specify gain factor <i>k</i>"
-                                " (only possible for Normalize = 'None').</span>")
+        self.ledGain.setToolTip(
+            "<span>Specify gain factor <i>k</i>"
+            " (only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
 
@@ -154,25 +162,28 @@ class Input_PZ_UI(QWidget):
 #        self.cmbFilterType.addItems(["FIR","IIR"])
 #        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-
         self.butAddCells = QPushButton(self)
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         self.butAddCells.setIconSize(q_icon_size)
-        self.butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
-                                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                                "When nothing is selected, add a row at the end.</SPAN>")
+        self.butAddCells.setToolTip(
+            "<span>Select cells to insert a new cell above each selected cell. "
+            "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
+            "When nothing is selected, add a row at the end.</span>")
 
         self.butDelCells = QPushButton(self)
         self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
         self.butDelCells.setIconSize(q_icon_size)
-        self.butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
-                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                "When nothing is selected, delete the last row.</SPAN>")
+        self.butDelCells.setToolTip(
+            "<span>Delete selected cell(s) from the table. "
+            "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
+            "When nothing is selected, delete the last row.</span>")
 
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip("<span>Copy P/Z table to filter dict and update all plots and widgets.</span>")
+        self.butSave.setToolTip(
+            "<span>Copy P/Z table to filter dict and update all plots and widgets."
+            "</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
@@ -186,19 +197,20 @@ class Input_PZ_UI(QWidget):
 
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIconSize(q_icon_size)
-        
+
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
 
         self.but_csv_options = QPushButton(self)
         self.but_csv_options.setIcon(QIcon(':/settings.svg'))
         self.but_csv_options.setIconSize(q_icon_size)
-        self.but_csv_options.setToolTip("<span>Select CSV format and whether "
-                                "to copy to/from clipboard or file.</span>")
+        self.but_csv_options.setToolTip(
+            "<span>Select CSV format and whether "
+            "to copy to/from clipboard or file.</span>")
         self.but_csv_options.setCheckable(True)
         self.but_csv_options.setChecked(False)
-        
-        self._set_load_save_icons() # initialize icon / button settings
+
+        self._set_load_save_icons()  # initialize icon / button settings
 
         layHButtonsCoeffs1 = QHBoxLayout()
 #        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
@@ -212,12 +224,13 @@ class Input_PZ_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.but_csv_options)
         layHButtonsCoeffs1.addStretch()
 
-        #-------------------------------------------------------------------
+        # -------------------------------------------------------------------
         #   Eps / set zero settings
         # ---------------------------------------------------------------------
         self.butSetZero = QPushButton("= 0", self)
-        self.butSetZero.setToolTip("<span>Set selected poles / zeros = 0 with a magnitude &lt; &epsilon;. "
-        "When nothing is selected, test the whole table.</span>")
+        self.butSetZero.setToolTip(
+            "<span>Set selected poles / zeros = 0 with a magnitude &lt; &epsilon;. "
+            "When nothing is selected, test the whole table.</span>")
         self.butSetZero.setIconSize(q_icon_size)
 
         lblEps = QLabel(self)
@@ -244,38 +257,39 @@ class Input_PZ_UI(QWidget):
         frmMain.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
-        layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
+        layVMain.setAlignment(Qt.AlignTop)  # affects only the first widget (intended)
         layVMain.addWidget(frmMain)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
-        
-        #--- set initial values from dict ------------
+
+        # --- set initial values from dict ------------
         self.spnDigits.setValue(params['FMT_pz'])
         self.ledEps.setText(str(self.eps))
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------        
+        # ----------------------------------------------------------------------
         self.but_csv_options.clicked.connect(self._open_csv_win)
-                
-    #------------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
     def _open_csv_win(self):
         """
         Pop-up window for CSV options
-        """        
+        """
         if self.but_csv_options.isChecked():
             qstyle_widget(self.but_csv_options, "changed")
         else:
             qstyle_widget(self.but_csv_options, "normal")
 
-        if dirs.csv_options_handle is None: # no handle to the window? Create a new instance
+        if dirs.csv_options_handle is None:
+            # no handle to the window? Create a new instance!
             if self.but_csv_options.isChecked():
-                # Important: Handle to window must be class attribute otherwise it
-                # (and the attached window) is deleted immediately when it goes out of scope
+                # Important: Handle to window must be class attribute otherwise it (and
+                # the attached window) is deleted immediately when it goes out of scope
                 dirs.csv_options_handle = CSV_option_box(self)
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
-                dirs.csv_options_handle.show() # modeless i.e. non-blocking popup window
+                dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
         else:
-            if not self.but_csv_options.isChecked(): # this should not happen
+            if not self.but_csv_options.isChecked():  # this should not happen
                 if dirs.csv_options_handle is None:
                     logger.warning("CSV options window is already closed!")
                 else:
@@ -312,7 +326,7 @@ class Input_PZ_UI(QWidget):
                     "is copied with full precision in decimal format.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
-            self.butToTable.setToolTip("<span>Load table from file.</span>")            
+            self.butToTable.setToolTip("<span>Load table from file.</span>")
 
         if dirs.csv_options_handle is None:
             qstyle_widget(self.but_csv_options, "normal")
@@ -321,16 +335,18 @@ class Input_PZ_UI(QWidget):
             qstyle_widget(self.but_csv_options, "changed")
             self.but_csv_options.setChecked(True)
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.input_pz_ui """
+    """ Run widget standalone with `python -m pyfda.input_widgets.input_pz_ui` """
+
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    mainw = Input_PZ_UI(None)
-
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Input_PZ_UI()
     app.setActiveWindow(mainw)
     mainw.show()
-
     sys.exit(app.exec_())

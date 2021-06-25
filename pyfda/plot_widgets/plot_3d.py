@@ -662,9 +662,10 @@ if __name__ == "__main__":
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
+
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     mainw = Plot_3D()
     app.setActiveWindow(mainw)
-    app.setStyleSheet(rc.qss_rc)
     mainw.show()
     sys.exit(app.exec_())

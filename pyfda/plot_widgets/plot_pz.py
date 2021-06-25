@@ -26,17 +26,18 @@ from matplotlib.ticker import AutoMinorLocator
 
 from  matplotlib import patches
 
-classes = {'Plot_PZ':'P / Z'} #: Dict containing class name : display name
+classes = {'Plot_PZ': 'P / Z'}  #: Dict containing class name : display name
+
 
 class Plot_PZ(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_PZ, self).__init__(parent)
-        self.needs_calc = True    # flag whether filter data has been changed
-        self.needs_draw = False   # flag whether whether figure needs to be drawn
-                                    # with new limits etc. (not implemented yet)
+        self.needs_calc = True   # flag whether filter data has been changed
+        self.needs_draw = False  # flag whether whether figure needs to be drawn
+                                 # with new limits etc. (not implemented yet)
         self.tool_tip = "Pole / zero plan"
         self.tab_label = "P / Z"
 
@@ -93,7 +94,6 @@ class Plot_PZ(QWidget):
         self.chkFIR_P.setToolTip("<span>Show FIR poles at the origin.</span>")
         self.chkFIR_P.setChecked(True)
 
-
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chkHf)
         layHControls.addWidget(self.chkHfLog)
@@ -102,20 +102,20 @@ class Plot_PZ(QWidget):
         layHControls.addStretch(10)
         layHControls.addWidget(self.chkFIR_P)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### frmControls ###
         #
         # This widget encompasses all control subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # main widget, encompassing the other widgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -125,32 +125,32 @@ class Plot_PZ(QWidget):
 
         self.init_axes()
 
-        self.draw() # calculate and draw poles and zeros
+        self.draw()  # calculate and draw poles and zeros
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.chkHf.clicked.connect(self.draw)
         self.chkHfLog.clicked.connect(self.draw)
         self.diaRad_Hf.valueChanged.connect(self.draw)
         self.chkFIR_P.clicked.connect(self.draw)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes (this is only run once)
         """
-        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots() #.add_subplot(111)
-        self.ax.xaxis.tick_bottom() # remove axis ticks on top
-        self.ax.yaxis.tick_left() # remove axis ticks right
+        if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
+            self.ax = self.mplwidget.fig.subplots()  #.add_subplot(111)
+        self.ax.xaxis.tick_bottom()  # remove axis ticks on top
+        self.ax.yaxis.tick_left()  # remove axis ticks right
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etcs without recalculating H(f)
@@ -158,12 +158,12 @@ class Plot_PZ(QWidget):
         """
         self.draw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def draw(self):
-        self.chkFIR_P.setVisible(fb.fil[0]['ft']=='FIR')
+        self.chkFIR_P.setVisible(fb.fil[0]['ft'] == 'FIR')
         self.draw_pz()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def draw_pz(self):
         """
         (re)draw P/Z plot
@@ -179,38 +179,39 @@ class Plot_PZ(QWidget):
             zA = np.conj(1./zA)
             pA = fb.fil[0]['zpk'][1]
             pA = np.conj(1./pA)
-            zC = np.append(zpk[0],zA)
-            pC = np.append(zpk[1],pA)
+            zC = np.append(zpk[0], zA)
+            pC = np.append(zpk[1], pA)
             zpk[0] = zC
             zpk[1] = pC
 
         self.ax.clear()
 
-        [z,p,k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax,
+        [z, p, k] = self.zplane(
+            z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
             plt_poles=self.chkFIR_P.isChecked() or fb.fil[0]['ft'] == 'IIR',
-            mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
+            mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
-        self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
-        self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
 
-        self.draw_Hf(r = self.diaRad_Hf.value())
+        self.draw_Hf(r=self.diaRad_Hf.value())
 
         self.redraw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
-              plt_ax = None, plt_poles=True, style='square', anaCircleRad=0, lw=2,
-              mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):
+               plt_ax=None, plt_poles=True, style='square', anaCircleRad=0, lw=2,
+               mps=10, mzs=10, mpc='r', mzc='b', plabel='', zlabel=''):
         """
         Plot the poles and zeros in the complex z-plane either from the
         coefficients (`b,`a) of a discrete transfer function `H`(`z`) (zpk = False)
@@ -293,7 +294,7 @@ class Plot_PZ(QWidget):
         z = np.atleast_1d(z) # make sure that p, z  are arrays
         p = np.atleast_1d(p)
 
-        if b.any(): # coefficients were specified
+        if b.any():  # coefficients were specified
             if len(b) < 2 and len(a) < 2:
                 logger.error('No proper filter coefficients: both b and a are scalars!')
                 return z, p, k
@@ -337,15 +338,15 @@ class Plot_PZ(QWidget):
         else:
             num_z = []
 
-        ax = plt_ax#.subplot(111)
-        if analog == False:
+        ax = plt_ax  #.subplot(111)
+        if analog is False:
             # create the unit circle for the z-plane
             uc = patches.Circle((0,0), radius=1, fill=False,
                                 color='grey', ls='solid', zorder=1)
             ax.add_patch(uc)
             if style == 'square':
-                #r = 1.1
-                #ax.axis([-r, r, -r, r]) # overridden by next option
+                # r = 1.1
+                # ax.axis([-r, r, -r, r]) # overridden by next option
                 ax.axis('equal')
         #    ax.spines['left'].set_position('center')
         #    ax.spines['bottom'].set_position('center')
@@ -440,18 +441,18 @@ class Plot_PZ(QWidget):
         self.ax.set_ylim((-ymax, ymax))
 
         np.seterr(**old_settings_seterr)
-#------------------------------------------------------------------------------
 
-def main():
+
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_pz` """
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    mainw = Plot_PZ(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_PZ()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
-   # module test using python -m pyfda.plot_widgets.plot_pz

@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
-                       QFrame, QHBoxLayout, pyqtSlot, pyqtSignal)
+                               QFrame, QHBoxLayout, pyqtSlot, pyqtSignal)
 import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
@@ -28,7 +28,8 @@ from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval
 
-classes = {'Plot_Hf':'|H(f)|'} #: Dict containing class name : display name
+classes = {'Plot_Hf': '|H(f)|'}  #: Dict containing class name : display name
+
 
 class Plot_Hf(QWidget):
     """
@@ -37,10 +38,10 @@ class Plot_Hf(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Plot_Hf, self).__init__(parent)
-        self.needs_calc = True   # flag whether plot needs to be updated
-        self.needs_draw = True # flag whether plot needs to be redrawn
+        self.needs_calc = True  # flag whether plot needs to be updated
+        self.needs_draw = True  # flag whether plot needs to be redrawn
         self.tool_tip = "Magnitude and phase frequency response"
         self.tab_label = "|H(f)|"
 
@@ -49,7 +50,7 @@ class Plot_Hf(QWidget):
 
         self._construct_ui()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -72,7 +73,6 @@ class Plot_Hf(QWidget):
             if 'view_changed' in dict_sig:
                 self.needs_draw = True
 
-
     def _construct_ui(self):
         """
         Define and construct the subwidgets
@@ -82,7 +82,7 @@ class Plot_Hf(QWidget):
         self.cmbShowH.addItems(modes)
         self.cmbShowH.setObjectName("cmbUnitsH")
         self.cmbShowH.setToolTip("Show magnitude, real / imag. part of H or H \n"
-        "without linear phase (acausal system).")
+                                 "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
         self.lblIn = QLabel("in", self)
@@ -91,22 +91,25 @@ class Plot_Hf(QWidget):
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
-        self.cmbUnitsA.setToolTip("<span>Set unit for y-axis:\n"
-        "dB is attenuation (positive values), V and W are gain (less than 1).</span>")
+        self.cmbUnitsA.setToolTip(
+            "<span>Set unit for y-axis:\ndB is attenuation (positive values), "
+            "V and W are gain (less than 1).</span>")
         self.cmbUnitsA.setCurrentIndex(0)
 
         self.lbl_log_bottom = QLabel("Bottom", self)
         self.led_log_bottom = QLineEdit(self)
         self.led_log_bottom.setText(str(self.log_bottom))
-        self.led_log_bottom.setToolTip("<span>Minimum display value for dB. scale.</span>")
+        self.led_log_bottom.setToolTip(
+            "<span>Minimum display value for dB. scale.</span>")
         self.lbl_log_unit = QLabel("dB", self)
 
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.chkZerophase = QCheckBox("Zero phase", self)
-        self.chkZerophase.setToolTip("<span>Remove linear phase calculated from filter order.\n"
-           "Attention: This makes no sense for a non-linear phase system!</span>")
+        self.chkZerophase.setToolTip(
+            "<span>Remove linear phase calculated from filter order.\n"
+            "Attention: This makes no sense for a non-linear phase system!</span>")
 
         self.lblInset = QLabel("Inset", self)
         self.cmbInset = QComboBox(self)
@@ -114,7 +117,7 @@ class Plot_Hf(QWidget):
         self.cmbInset.setObjectName("cmbInset")
         self.cmbInset.setToolTip("Display/edit second inset plot")
         self.cmbInset.setCurrentIndex(0)
-        self.inset_idx = 0 # store previous index for comparison
+        self.inset_idx = 0  # store previous index for comparison
 
         self.chkSpecs = QCheckBox("Specs", self)
         self.chkSpecs.setChecked(False)
@@ -123,18 +126,19 @@ class Plot_Hf(QWidget):
         self.chkPhase = QCheckBox("Phase", self)
         self.chkPhase.setToolTip("Overlay phase")
         self.chkPhase.setChecked(False)
-        
+
         self.chkAlign = QCheckBox("Align", self)
-        self.chkAlign.setToolTip("<span>Try to align grids for magnitude and phase " 
-                                 "(doesn't work in all cases).</span>")
+        self.chkAlign.setToolTip(
+            "<span>Try to align grids for magnitude and phase "
+            "(doesn't work in all cases).</span>")
         self.chkAlign.setChecked(True)
         self.chkAlign.setVisible(self.chkPhase.isChecked())
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### frmControls ###
         #
         # This widget encompasses all control subwidgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         layHControls = QHBoxLayout()
         layHControls.addStretch(10)
         layHControls.addWidget(self.cmbShowH)
@@ -160,11 +164,11 @@ class Plot_Hf(QWidget):
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # main widget, encompassing the other widgets
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -174,15 +178,15 @@ class Plot_Hf(QWidget):
 
         self.init_axes()
 
-        self.draw() # calculate and draw |H(f)|
+        self.draw()  # calculate and draw |H(f)|
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.draw)
         self.led_log_bottom.editingFinished.connect(self.update_view)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
@@ -193,31 +197,30 @@ class Plot_Hf(QWidget):
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
         self.chkAlign.clicked.connect(self.draw)
-        
+
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes (this is run only once)
         """
-        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
+        if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots()
-        self.ax.xaxis.tick_bottom() # remove axis ticks on top
-        self.ax.yaxis.tick_left() # remove axis ticks right
+        self.ax.xaxis.tick_bottom()  # remove axis ticks on top
+        self.ax.yaxis.tick_left()  # remove axis ticks right
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def align_y_axes(self, ax1, ax2):
         """ Sets tick marks of twinx axes to line up with total number of
             ax1 tick marks
             """
-
         ax1_ylims = ax1.get_ybound()
         # collect only visible ticks
         ax1_yticks = [t for t in ax1.get_yticks() if t >= ax1_ylims[0] and t <= ax1_ylims[1]]
         ax1_nticks = len(ax1_yticks)
-        ax1_ydelta_lim = ax1_ylims[1] - ax1_ylims[0] # span of limits
-        ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0] # delta of max. and min tick
+        ax1_ydelta_lim = ax1_ylims[1] - ax1_ylims[0]  # span of limits
+        ax1_ydelta_vis = ax1_yticks[-1] - ax1_yticks[0]  # delta of max. and min tick
         ax1_yoffset = ax1_yticks[0]-ax1_ylims[0] # offset between lower limit and first tick
 
         # calculate scale of Delta Limits / Delta Ticks
@@ -233,14 +236,14 @@ class Plot_Hf(QWidget):
         # calculate new offset between lower limit and first tick
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
         logger.warning("ax2: delta_vis: {0}, scale: {1}, offset: {2}"
-                       .format(ax2_ydelta_vis,ax2_scale,ax2_yoffset))
+                       .format(ax2_ydelta_vis, ax2_scale, ax2_yoffset))
         logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
 
         ax2.set_yticks(np.linspace(ax2_yticks[0],
                                    (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
         logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
-                                   ax2_yticks[1],ax2_yticks[-1]))
+                                   ax2_yticks[1], ax2_yticks[-1]))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 
@@ -361,13 +364,13 @@ class Plot_Hf(QWidget):
         F_SB2 = fb.fil[0]['F_SB2'] * self.f_max
         F_PB2 = fb.fil[0]['F_PB2'] * self.f_max
 
-        F_lim_upl = F_lim_lol = [] # left side limits, lower and upper
+        F_lim_upl = F_lim_lol = []  # left side limits, lower and upper
         A_lim_upl = A_lim_lol = []
 
-        F_lim_upc = F_lim_loc = [] # center limits, lower and upper
+        F_lim_upc = F_lim_loc = []  # center limits, lower and upper
         A_lim_upc = A_lim_loc = []
 
-        F_lim_upr = F_lim_lor = [] # right side limits, lower and upper
+        F_lim_upr = F_lim_lor = []  # right side limits, lower and upper
         A_lim_upr = A_lim_lor = []
 
         if fb.fil[0]['rt'] == 'LP':
@@ -428,11 +431,11 @@ class Plot_Hf(QWidget):
         F_lim_upc = np.array(F_lim_upc)
         F_lim_loc = np.array(F_lim_loc)
 
-        _plot_specs() # plot specs in the range 0 ... f_S/2
+        _plot_specs()  # plot specs in the range 0 ... f_S/2
 
         if fb.fil[0]['freqSpecsRangeType'] != 'half':
             # add plot limits for other half of the spectrum
-            if fb.fil[0]['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
+            if fb.fil[0]['freqSpecsRangeType'] == 'sym':  # frequency axis +/- f_S/2
                 F_lim_upl = -F_lim_upl
                 F_lim_lol = -F_lim_lol
                 F_lim_upc = -F_lim_upc
@@ -469,12 +472,12 @@ class Plot_Hf(QWidget):
                 # Inset was turned off before, create a new one
                 #  Add an axes at position rect [left, bottom, width, height]:
                 self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
-                self.ax_i.clear() # clear old plot and specs
+                self.ax_i.clear()  # clear old plot and specs
 
                 # draw an opaque background with the extent of the inset plot:
 #                self.ax_i.patch.set_facecolor('green') # without label area
 #                self.mplwidget.fig.patch.set_facecolor('green') # whole figure
-                extent = self.mplwidget.get_full_extent(self.ax_i, pad = 0.0)
+                extent = self.mplwidget.get_full_extent(self.ax_i, pad=0.0)
                 # Transform this back to figure coordinates - otherwise, it
                 #  won't behave correctly when the size of the plot is changed:
                 extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
@@ -502,11 +505,10 @@ class Plot_Hf(QWidget):
             except AttributeError:
                 pass
 
-        self.inset_idx = self.cmbInset.currentIndex() # update index
+        self.inset_idx = self.cmbInset.currentIndex()  # update index
         self.draw()
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def draw_phase(self, ax):
         """
         Draw phase on second y-axis in the axes system passed as the argument
@@ -520,8 +522,8 @@ class Plot_Hf(QWidget):
         #     pass
 
         if self.chkPhase.isChecked():
-            self.ax_p = ax.twinx() # second axes system with same x-axis for phase
-            self.ax_p.is_twin = True # mark this as 'twin' to suppress second grid in mpl_widget
+            self.ax_p = ax.twinx()  # second axes system with same x-axis for phase
+            self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
             if fb.fil[0]['plt_phiUnit'] == 'rad':
@@ -537,19 +539,18 @@ class Plot_Hf(QWidget):
             # replace nan and inf by finite values, otherwise np.unwrap yields
             # an array full of nans
             phi = np.angle(np.nan_to_num(self.H_c))
-        #-----------------------------------------------------------
-            self.ax_p.plot(self.F,np.unwrap(phi)*scale,
-                               'g-.', label = "Phase")
-        #-----------------------------------------------------------
+        # -----------------------------------------------------------
+            self.ax_p.plot(self.F, np.unwrap(phi)*scale,
+                           'g-.', label="Phase")
+        # -----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
 
 #------------------------------------------------------------------------------
     def calc_hf(self):
         """
-        (Re-)Calculate the complex frequency response H(f)
+        (Re-)Calculate the complex frequency response H_cmplx(W) (complex)
+        for W = 0 ... 2 pi:
         """
-
-        # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
@@ -591,7 +592,7 @@ class Plot_Hf(QWidget):
         else:
             A_max = 1
 
-        if np.all(self.W) is None: # H(f) has not been calculated yet
+        if np.all(self.W) is None:  # H(f) has not been calculated yet
             self.calc_hf()
 
         if self.cmbUnitsA.currentText() == 'Auto':
@@ -611,7 +612,7 @@ class Plot_Hf(QWidget):
 
         self.specs = self.chkSpecs.isChecked()
 
-        self.f_max  = fb.fil[0]['f_max']
+        self.f_max = fb.fil[0]['f_max']
 
         self.F_PB = fb.fil[0]['F_PB'] * self.f_max
         self.f_maxB = fb.fil[0]['F_SB'] * self.f_max
@@ -623,8 +624,8 @@ class Plot_Hf(QWidget):
 
         f_lim = fb.fil[0]['freqSpecsRange']
 
-        #========= select frequency range to be displayed =====================
-        #=== shift, scale and select: W -> F, H_cplx -> H_c
+        # ========= select frequency range to be displayed =====================
+        # === shift, scale and select: W -> F, H_cplx -> H_c
         self.F = self.W / (2 * np.pi) * self.f_max
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
@@ -724,16 +725,15 @@ class Plot_Hf(QWidget):
 
 #------------------------------------------------------------------------------
 
-def main():
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_hf`"""
     import sys
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
-    mainw = Plot_Hf(None)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = Plot_Hf()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
-   # module test using python -m pyfda.plot_widgets.plot_hf

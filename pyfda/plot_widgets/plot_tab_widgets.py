@@ -31,7 +31,7 @@ class PlotTabWidgets(QTabWidget):
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(PlotTabWidgets, self).__init__(parent)
         self._construct_UI()
 
@@ -189,28 +189,21 @@ class PlotTabWidgets(QTabWidget):
                 self.timer_id.stop()
                 self.timer_id.start(500)
 
-        # Call base class method to continue normal event processing:
+        # Call base class method to continue with normal event processing:
         return super(PlotTabWidgets, self).eventFilter(source, event)
 
 
 # ==============================================================================
-def main():
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.plot_widgets.plot_tab_widgets` """
     import sys
-    from pyfda import pyfda_rc as rc
     from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-
-    mainw = PlotTabWidgets(None)
+    mainw = PlotTabWidgets()
     mainw.resize(300, 400)
-
     app.setActiveWindow(mainw)
     mainw.show()
-
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
-# test with: python -m  pyfda.plot_widgets.plot_tab_widgets

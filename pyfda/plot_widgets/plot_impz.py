@@ -1853,8 +1853,8 @@ if __name__ == "__main__":
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     mainw = Plot_Impz()
     app.setActiveWindow(mainw)
-    app.setStyleSheet(rc.qss_rc)
     mainw.show()
     sys.exit(app.exec_())
