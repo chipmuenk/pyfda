@@ -127,8 +127,8 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("PROCESS_SIG_RX - vis={0}, needs_calc={1}\n{2}"
+                     .format(self.isVisible(), self.needs_calc, pprint_log(dict_sig)))
 
         if self.sig_loop(dict_sig, logger) > 0:
             return
