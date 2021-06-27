@@ -624,6 +624,7 @@ if __name__ == '__main__':
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
                       "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
                       "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
@@ -640,5 +641,3 @@ if __name__ == '__main__':
     mainw.show()
 
     sys.exit(app.exec_())
-
-    # module test using python -m pyfda.plot_widgets.plot_fft_win
