@@ -103,7 +103,7 @@ class Plot_FFT_win(QDialog):
         self.tbl_sel = [True, True, False, False]
 
         self._construct_UI()
-        self.calc_draw_win()
+        self.calc_win_draw()
 
 # ------------------------------------------------------------------------------
     def closeEvent(self, event):
@@ -137,9 +137,9 @@ class Plot_FFT_win(QDialog):
             self.needs_calc = True
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
-            or self.needs_calc:
+                or self.needs_calc:
 
-            self.calc_draw_win()
+            self.calc_win_draw()
             self.needs_calc = False
 
         elif 'home' in dict_sig:
@@ -303,7 +303,7 @@ class Plot_FFT_win(QDialog):
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
 
-        self.calc_draw_win()  # initial drawing
+        self.calc_win_draw()  # initial calculation and drawing
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -319,9 +319,9 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.led_N.editingFinished.connect(self.calc_draw_win)
+        self.led_N.editingFinished.connect(self.calc_win_draw)
 
-        self.chk_norm_f.clicked.connect(self.calc_draw_win)
+        self.chk_norm_f.clicked.connect(self.calc_win_draw)
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -371,14 +371,14 @@ class Plot_FFT_win(QDialog):
         Update FFT window when window or parameters have changed and
         pass thru 'view_changed':'fft_win_type' or 'fft_win_par'
         """
-        self.calc_draw_win()
+        self.calc_win_draw()
         self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
-    def calc_draw_win(self):
+    def calc_win_draw(self):
         """
-        (Re-)Calculate the window, its FFT and some characteristic values and draw
-        the window and its FFT. This should be triggered when the
+        (Re-)Calculate the window, its FFT and some characteristic values and update
+        the plot of the window and its FFT. This should be triggered when the
         window type or length or a parameters has been changed.
 
         Returns
