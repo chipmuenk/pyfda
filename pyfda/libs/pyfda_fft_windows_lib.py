@@ -629,6 +629,10 @@ def calc_cosine_window(N, sym, a):
 
 
 def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
+    """ The window does not work yet!
+        More info: https://www.recordingblogs.com/wiki/ultraspherical-window
+        and https://www.ece.uvic.ca/~andreas/RLectures/UltraSpherWinJASP.pdf
+    """
 
     if sym:
         L = N-1
