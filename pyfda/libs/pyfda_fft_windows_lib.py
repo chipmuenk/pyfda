@@ -27,26 +27,37 @@ Dictionary with available FFT windows, their function names and their properties
 When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
 """
+bartlett_info =\
+    '''<span>
+    The Bartlett and triangular windows are similar, except that the end 
+    point(s) of the Bartlett window are at zero. Its side lobes fall off with
+    12 dB/oct., the min. side lobe suppression is 26 dB.<br /><br />
+
+    It can be constructed as the convolution of two rectangular windows,
+    hence, its Fourier transform is the product of two (periodic) sinc
+    functions, decaying twice as fast as the spectrum of a rectangular window.
+    </span>'''
+rectangular_info =\
+    '''<span>
+    Boxcar or Rectangular window, best suited for analyzing coherent signals,
+    i.e. where the window length is an integer number of the signal period.
+    It also works great when the signal length is shorter than the window
+    length (e.g. for the impulse response of a FIR filter). For other signals, it
+    has the worst sidelobe suppression (13 dB) of all windows.
+    This window also has the best SNR of all windows.<br /><br />
+
+    When used for FIR filter design, a filter with the least square error
+    is returned, created by truncating the sinc-law frequency response after
+    N terms and transforming back to the time domain. It has the sharpest
+    transition of all windowed FIR filters but the worst stop band attenuation.
+    </span>'''
 all_windows_dict = {
     'win': [],  # array with window values for FFT / filter design
     'cur_win_name': 'Rectangular',  # name of current window
     #
     'Boxcar': {
         'fn_name': 'boxcar',
-        'info':
-            '''<span>
-            Boxcar or Rectangular window, best suited for analyzing coherent signals,
-            i.e. where the window length is an integer number of the signal period.
-            It also works great when the signal length is shorter than the window
-            length (e.g. for the impulse response of a FIR filter). For other signals, it
-            has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />
-            This window also has the best SNR of all windows.
-
-            When used for FIR filter design, a filter with the least square error
-            is returned, created by truncating the sinc-law frequency response after
-            N terms and transforming back to the time domain. It has the sharpest
-            transition of all windowed FIR filters but the worst stop band attenuation.
-            </span>''',
+        'info': rectangular_info,
         'props': {
             'nenbw': 1,
             'cgain': 1,
@@ -55,20 +66,7 @@ all_windows_dict = {
          },
     'Rectangular': {
         'fn_name': 'boxcar',
-        'info':
-            '''<span>
-            Boxcar or Rectangular window, best suited for analyzing coherent signals,
-            i.e. where the window length is an integer number of the signal period.
-            It also works great when the signal length is shorter than the window
-            length (e.g. for the impulse response of a FIR filter). For other signals, it
-            has the worst sidelobe suppression (13 dB) of all windows.<br />&nbsp;<br />
-            This window also has the best SNR of all windows.
-
-            When used for FIR filter design, a filter with the least square error
-            is returned, created by truncating the sinc-law frequency response after
-            N terms and transforming back to the time domain. It has the sharpest
-            transition of all windowed FIR filters but the worst stop band attenuation.
-            </span>''',
+        'info': rectangular_info,
         'props': {
             'nenbw': 1,
             'cgain': 1,
@@ -79,7 +77,7 @@ all_windows_dict = {
         'fn_name': 'barthann',
         'info':
             '''<span>
-            THe modified Bartlett-Hann window is a weighted combination of Bartlett
+            The modified Bartlett-Hann window is a weighted combination of Bartlett
             (triangular) and Hann window and has a similar mainlobe width as those two.
             Sidelobes are asymptotically decaying, near sidelobes have a lower level
             than Bartlett and Hann windows, far sidelobes have lower levels than
@@ -88,16 +86,7 @@ all_windows_dict = {
             },
     'Bartlett': {
         'fn_name': 'bartlett',
-        'info':
-            '''<span>
-            The Bartlett window is very similar to a triangular window,
-            except that the end point(s) are at zero. Its side lobes fall off with
-            12 dB/oct., the min. side lobe suppression is 26 dB.
-            <br />&nbsp;<br />'
-            It can be constructed as the convolution of two rectangular windows,
-            hence, its Fourier transform is the product of two (periodic) sinc
-            functions.
-            </span>'''
+        'info': bartlett_info,
             },
     'Blackman': {
         'fn_name': 'blackman',
@@ -107,10 +96,10 @@ all_windows_dict = {
             Compared to Hann and Hamming window, it has a wider main lobe (less sharp
             transition between pass and stop band / worse frequency resolution)
             and lower sidelobe levels (improved stopband rejection / less leakage of
-            high-frequency interferers).
+            high-frequency interferers).<br /><br />
 
             The Blackman window is a three term cosine window with coefficients of
-            a0 = 0.42, a1 = 0.5, a2 = 0.08. The maximum sidelobe level is -57 dB,
+            a_0 = 0.42, a1 = 0.5, a2 = 0.08. The maximum sidelobe level is -57 dB,
             sidelobes have a fall-off rate of -18 dB/dec.
             Its main lobe width is 12 &pi; / <i>N</i>.
             </span>'''
@@ -124,7 +113,7 @@ all_windows_dict = {
             '''<span>
             The minimum 4-term Blackman-Harris window gives an excellent
             constant side-lobe suppression of more than 90 dB while keeping a
-            reasonably narrow main lobe.
+            reasonably narrow main lobe.<br /><br />
 
             5-, 7- and 9-term Blackman-Harris windows achieve side-lobe suppressions
             of up to 125, 180 and 230 dB.
@@ -139,8 +128,10 @@ all_windows_dict = {
     'Cosine': {
         'fn_name': 'cosine',
         'info':
-            '<span>The window is half a cosine period, shifted by pi/2. '
-            'For that reason it is also known as "half-cosine" or "sine" window.</span>',
+            '''<span>
+            The window is half a cosine period, shifted by &pi;/2.
+            For that reason it is also known as "half-cosine" or "sine" window.
+            </span>''',
         },
     'Dolph-Chebyshev': {
         'fn_name': 'chebwin',
@@ -148,9 +139,11 @@ all_windows_dict = {
             'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
             'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
         'info':
-            '<span>This window optimizes for the narrowest main lobe width for '
-            'a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>, '
-            'using Chebyshev polynomials.</span>',
+            '''<span>
+            This window gives the narrowest main lobe width for
+            a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>,
+            using Chebyshev polynomials.
+            </span>''',
         },
     'DPSS': {
         'fn_name': 'dpss',
@@ -166,15 +159,22 @@ all_windows_dict = {
             sequences) are often used in multitaper power spectral density
             estimation. The first window in the sequence can be used to maximize
             the energy concentration in the main lobe, and is also called the
-            Slepian window.
-            <br />&nbsp;<br />
+            Slepian window. <br /><br />
+            
             The Kaiser window is an easier to calculate approximation for the
             Slepian window with &beta; = &pi; <i>NW</i> .
             </span>'''
         },
     #
     'Flattop': {
-        'fn_name': 'flattop'
+        'fn_name': 'flattop',
+        'info':
+            '''<span>
+            Flattop windows give a very low amplitude error, that's why they are 
+            used frequently in spectrum analyzers and other measurement equipment.
+            They are rarely used for FIR filter design.
+            </span>'''
+
         },
     'General Gaussian': {
         'fn_name': 'general_gaussian',
@@ -187,9 +187,10 @@ all_windows_dict = {
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
             }],
         'info':
-            '<span>General Gaussian window, <i>p</i> = 1 yields a Gaussian window, '
-            '<i>p</i> = 0.5 yields the shape of a Laplace distribution.'
-            '</span>'
+            '''<span>
+            General Gaussian window, <i>p</i> = 1 yields a Gaussian window,
+            <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+            </span>'''
         },
     'Gauss': {
         'fn_name': 'gaussian',
@@ -207,10 +208,12 @@ all_windows_dict = {
         'fn_name': 'hamming',
         'info':
             '''<span>
-            The Hamming Window has been optimized for suppression of
+            The Hamming Window is used for both FIR filter design and spectral analysis.
+            It has been optimized for suppression of
             the first side lobe. Compared to the Hann window, this comes at
-            the cost of a worse (constant) level of higher side lobes.
-            <br />&nbsp;<br />Mathematically, it is a two-term raised cosine
+            the cost of a worse (constant) level of higher side lobes.<br /><br />
+            
+            Mathematically, it is a two-term raised cosine
             window with non-zero endpoints (DC-offset).
             </span>'''
          },
@@ -223,10 +226,12 @@ all_windows_dict = {
             off with a rate of 18 dB/oct or 30 dB/dec. The first sidelobe is quite
             high (-32 dB). It is a good compromise for many applications, especially
             when higher frequency components need to be suppressed.
-            <br />&nbsp;<br />
+            <br /><br />
+            
             Mathematically, it is the most simple two-term raised cosine
             or squared sine window.
-            </span>'''},
+            </span>'''
+            },
     'Kaiser': {
         'fn_name': 'kaiser',
         'par': [{
@@ -237,10 +242,12 @@ all_windows_dict = {
                 'higher values reduce side lobe level, typ. in the range '
                 '5 ... 20.</span>'}],
         'info':
-            '<span>The Kaiser window is a very good approximation to the '
-            'Digital Prolate Spheroidal Sequence (DPSS), or Slepian window, '
-            'which maximizes the energy in the main lobe of the window relative '
-            'to the total energy.</span>'
+            '''<span>
+            The Kaiser window is a very good approximation to the
+            Digital Prolate Spheroidal Sequence (DPSS), or Slepian window,
+            which maximizes the energy in the main lobe of the window relative
+            to the total energy.
+            </span>'''
         },
     'Nuttall': {
         'fn_name': 'nuttall'
@@ -248,14 +255,18 @@ all_windows_dict = {
     'Parzen': {
         'fn_name': 'parzen',
         'info':
-            '<span>The Parzen window is a 4th order B-spline window whose side-'
-            'lobes fall off with -24 dB/oct.'
-            '<br/ >&nbsp;<br />'
-            'It can be constructed by convolving '
-            'a rectangular window four times (or multiplying its frequency response '
-            'four times).'
-            '<br />&nbsp;<br />'
-            'See also: Boxcar and Triangular / Bartlett windows.</span>'},
+            '''<span>
+            The Parzen window is a 4th order B-spline window whose sidelobes
+            fall off with -24 dB/oct.
+            <br/ ><br />
+            
+            It can be constructed by convolving a rectangular window four times
+            (or multiplying its frequency response four times).
+            <br /><br />
+            
+            See also: Boxcar and Triangular / Bartlett windows.
+            </span>'''
+            },
     'Slepian': {
         'fn_name': 'slepian',
         'par': [{
@@ -263,31 +274,18 @@ all_windows_dict = {
              'val': 0.3, 'min': 0, 'max': 100,
              'tooltip': '<span>Bandwidth</span>'}],
         'info':
-            '<span>Used to maximize the energy concentration in the main lobe. '
-            ' Also called the digital prolate spheroidal sequence (DPSS).'
-            '<br />&nbsp;<br />'
-            'See also: Kaiser window.'
-            '</span>'
+            '''<span>
+            Used to maximize the energy concentration in the main lobe.
+            Also called the digital prolate spheroidal sequence (DPSS).
+            <br /><br />
+            
+            See also: Kaiser window.
+            </span>'''
         },
-    'Triangular': {'fn_name': 'triang'},
-    # 'Ultraspherical':
-    #     {'fn_name':'pyfda.pyfda_fft_windows.ultraspherical',
-    #      'par':[{
-    #         'name':'&alpha;','name_tex':r'$\alpha$',
-    #         'val':0.5, 'min':-0.5, 'max':10,
-    #          'tooltip':'<span>Shape parameter &alpha; or &mu;</span>'
-    #          },
-    #          {
-    #         'name':'x0','name_tex':r'$x_0$',
-    #         'val':1, 'min':-10, 'max':10,
-    #          'tooltip':'<span>Amplitude</span>'}
-    #          ],
-    #      'info':
-    #          ('''<span>
-    #           Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
-    #            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
-    #           </span>'''),
-    #        }
+    'Triangular': {
+        'fn_name': 'triang',
+        'info': bartlett_info
+        },
     'Tukey': {
         'fn_name': 'tukey',
         'par': [{
@@ -300,15 +298,35 @@ all_windows_dict = {
             factor &alpha; defines the fraction of the window inside the cosine tapered
             region. Hence, &alpha; = 0 returns a rectangular window, &alpha; = 1 a
             Hann window.
-            <br />&nbsp;<br />
+            <br /><br />
+            
             Tukey windows are used a.o. for analyzing transient data containing short
             bursts. It is the default window for scipy.signal.spectrogram with
             &alpha; = 0.25). Amplitudes of transient events are less likely to be
             altered by this window than e.g. by a Hann window.
             </span>'''
+        },
+        'Ultraspherical': {
+        'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
+        'par': [{
+            'name': '&mu;','name_tex': r'$\mu',
+            'val': 0.5, 'min': -0.5, 'max': 10,
+            'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
+            },
+            {
+            'name': 'x0','name_tex': r'$x_0$',
+            'val': 1, 'min': -10, 'max': 10,
+            'tooltip': '<span>Amplitude</span>'}
+             ],
+        'info':
+            '''<span>
+            Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
+            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+            
+            As this is a three-parameter window (<i>N</i>, &mu;,)
+            </span>''',
         }
     }
-
 
 # ------------------------------------------------------------------------------
 def get_valid_windows_list(win_names_list=[], win_dict={}):
