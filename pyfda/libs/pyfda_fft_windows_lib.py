@@ -450,7 +450,6 @@ def set_window_name(win_dict, win_name):
     # operate with the window specific sub-dictionary `win_dict[win_name]`
     # dictionary in the following
     d = win_dict[win_name]
-
     fn_name = d['fn_name']
 
     if 'par' in d:
@@ -830,7 +829,7 @@ class QFFTWinSelector(QWidget):
 
         if n_par > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
+                qset_cmb_box(self.cmb_win_par_2, str(self.win_dict[cur]['par'][1]['val']))
             else:
                 self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
 
