@@ -435,8 +435,8 @@ def set_window_name(win_dict, win_name):
 
     Returns
     -------
-    win_fnct : fnct
-        The window function object (not the array)
+    win_err : bool
+        Error flag, True when `win_name` could not be resolved
     """
     if win_name == win_dict['cur_win_name']:
         # same window name as before, return stored `win_fnct`
@@ -444,8 +444,7 @@ def set_window_name(win_dict, win_name):
 
     elif win_name not in win_dict:
         logger.warning(
-            "Unknown window name {}, using rectangular window instead."
-            .format(win_name))
+            f'Unknown window name "{win_name}", using rectangular window instead.')
         win_name = "Rectangular"
 
     # operate with the window specific sub-dictionary `win_dict[win_name]`
@@ -462,34 +461,41 @@ def set_window_name(win_dict, win_name):
     # --------------------------------------
     # get attribute fn_name from submodule (default: sig.windows) and
     # return the desired window function:
+    win_err = False
     mod_fnct = fn_name.split('.')  # try to split fully qualified name at "."
     fnct = mod_fnct[-1]  # last / rightmost part = function name
     if len(mod_fnct) == 1:
         # only one element, no module given -> use scipy.signal.windows
         win_fnct = getattr(sig.windows, fnct, None)
         if not win_fnct:
-            logger.error('No window function "{0}" in scipy.signal.windows, '
-                         'using rectangular window instead!'.format(fn_name))
-            win_fnct = getattr(sig.windows, 'boxcar', None)
-            win_name = "Rectangular"
-            n_par = 0
+            logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
+                         'using rectangular window instead!')
+            win_err = True
     else:
         # extract module name from fully qualified name, starting with first /
         # leftmost part of string to the last '.'
         mod_name = fn_name[:fn_name.rfind(".")]
-        mod = importlib.import_module(mod_name)
-        win_fnct = getattr(mod, fnct, None)
-        if not win_fnct:
-            logger.error('Found no valid window function "{0}", '
-                         'using rectangular window instead!'.format(fn_name))
-            win_fnct = getattr(sig.windows, 'boxcar', None)
-            win_name = "Rectangular"
-            n_par = 0
+        try:
+            mod = importlib.import_module(mod_name)
+            win_fnct = getattr(mod, fnct, None)
+        except ImportError: # no valid module
+            logger.error(f'Found no valid module "{mod_name}", '
+                         'using rectangular window instead!')
+            win_err = True
+        except NameError:
+            logger.error(f'Found no valid window function "{fn_name}", '
+                         'using rectangular window instead!')
+            win_err = True
+
+    if win_err:
+        win_fnct = getattr(sig.windows, 'boxcar', None)
+        win_name = "Rectangular"
+        n_par = 0
 
     win_dict.update({'cur_win_name': win_name, 'win': []})
     win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
-    return win_fnct  # window function object
+    return win_err  # error flag, ui (window combo box) needs to be updated 
 
 
 # ----------------------------------------------------------------------------
@@ -837,7 +843,7 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win_par'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
-        set_window_name(self.win_dict, cur)  # this resets the window cache
+        set_window_name(self.win_dict, cur)  # this resets the window cache 
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
@@ -872,6 +878,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def ui2dict_win_emit(self, arg=None) -> None:
         """
+        - triggered by the window type combo box
         - read FFT window type combo box and update win_dict using `set_window_name()`,
           update parameter widgets accordingly
         - emit 'view_changed': 'fft_win_type'
@@ -887,8 +894,12 @@ class QFFTWinSelector(QWidget):
         - set tooltipps and parameter values from dict
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        set_window_name(self.win_dict, cur)
-
+        err = set_window_name(self.win_dict, cur)
+        # if selected window does not exist (`err = True`), fall back to 'cur_win_name',
+        # which has been set by `set_window_name()`. 
+        if err:
+            qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
+            cur = qget_cmb_box(self.cmb_win_fft, data=False)
         # update visibility and values of parameter widgets:
         n_par = self.win_dict[cur]['n_par']
 
