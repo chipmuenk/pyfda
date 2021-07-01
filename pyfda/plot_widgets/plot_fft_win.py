@@ -623,8 +623,10 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict
     from pyfda import pyfda_rc as rc
+    import pyfda.filterbroker as fb
 
     app = QApplication(sys.argv)
+    fb.clipboard = QApplication.clipboard() # create clipboard instance
     win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
                       "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
                       "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
