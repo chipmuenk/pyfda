@@ -1405,7 +1405,7 @@ class PlotImpz_UI(QWidget):
         """
         if self.but_fft_wdg.isChecked():
             self.fft_widget.show()
-            self.emit({'view_changed': 'fft_win_type'})
+            self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_fft')
         else:
             self.fft_widget.hide()
 

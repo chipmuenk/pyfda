@@ -103,7 +103,7 @@ class Plot_FFT_win(QDialog):
         self.tbl_sel = [True, True, False, False]
 
         self._construct_UI()
-        self.calc_draw_win()
+        self.calc_win_draw()
 
 # ------------------------------------------------------------------------------
     def closeEvent(self, event):
@@ -127,8 +127,8 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("PROCESS_SIG_RX - vis={0}, needs_calc={1}\n{2}"
+                     .format(self.isVisible(), self.needs_calc, pprint_log(dict_sig)))
 
         if self.sig_loop(dict_sig, logger) > 0:
             return
@@ -137,9 +137,9 @@ class Plot_FFT_win(QDialog):
             self.needs_calc = True
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
-            or self.needs_calc:
+                or self.needs_calc:
 
-            self.calc_draw_win()
+            self.calc_win_draw()
             self.needs_calc = False
 
         elif 'home' in dict_sig:
@@ -165,7 +165,8 @@ class Plot_FFT_win(QDialog):
         self.led_N.setText(str(self.N_view))
         self.led_N.setMaximumWidth(70)
         self.led_N.setToolTip("<span>Number of window data points to display.</span>")
-        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+
+	# prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
         self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_t.setMaximumWidth(self.width_m * 4)
         self.but_log_t.setObjectName("chk_log_time")
@@ -304,7 +305,7 @@ class Plot_FFT_win(QDialog):
         self.ax_t = self.ax[0]
         self.ax_f = self.ax[1]
 
-        self.calc_draw_win()  # initial drawing
+        self.calc_win_draw()  # initial calculation and drawing
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -320,9 +321,9 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
-        self.led_N.editingFinished.connect(self.calc_draw_win)
+        self.led_N.editingFinished.connect(self.calc_win_draw)
 
-        self.chk_norm_f.clicked.connect(self.calc_draw_win)
+        self.chk_norm_f.clicked.connect(self.calc_win_draw)
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -372,14 +373,14 @@ class Plot_FFT_win(QDialog):
         Update FFT window when window or parameters have changed and
         pass thru 'view_changed':'fft_win_type' or 'fft_win_par'
         """
-        self.calc_draw_win()
+        self.calc_win_draw()
         self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
-    def calc_draw_win(self):
+    def calc_win_draw(self):
         """
-        (Re-)Calculate the window, its FFT and some characteristic values and draw
-        the window and its FFT. This should be triggered when the
+        (Re-)Calculate the window, its FFT and some characteristic values and update
+        the plot of the window and its FFT. This should be triggered when the
         window type or length or a parameters has been changed.
 
         Returns
@@ -626,6 +627,7 @@ if __name__ == '__main__':
     import pyfda.filterbroker as fb
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
     fb.clipboard = QApplication.clipboard() # create clipboard instance
     win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
                       "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
@@ -643,5 +645,3 @@ if __name__ == '__main__':
     mainw.show()
 
     sys.exit(app.exec_())
-
-    # module test using python -m pyfda.plot_widgets.plot_fft_win
