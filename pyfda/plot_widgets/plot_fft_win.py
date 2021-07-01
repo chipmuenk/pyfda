@@ -165,8 +165,8 @@ class Plot_FFT_win(QDialog):
         self.led_N.setText(str(self.N_view))
         self.led_N.setMaximumWidth(70)
         self.led_N.setToolTip("<span>Number of window data points to display.</span>")
-
-        self.but_log_t = QPushButton("dB")
+        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+        self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_t.setMaximumWidth(self.width_m * 4)
         self.but_log_t.setObjectName("chk_log_time")
         self.but_log_t.setCheckable(True)
@@ -191,7 +191,8 @@ class Plot_FFT_win(QDialog):
         self.chk_half_f.setChecked(True)
         self.chk_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
 
-        self.but_log_f = QPushButton("dB")
+        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+        self.but_log_f = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_f.setMaximumWidth(self.width_m * 4)
         self.but_log_f.setObjectName("chk_log_freq")
         self.but_log_f.setToolTip("<span>Display in dB.</span>")
