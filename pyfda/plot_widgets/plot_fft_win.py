@@ -167,7 +167,8 @@ class Plot_FFT_win(QDialog):
         self.led_N.setToolTip(
             "<span>Number of window data points to display.</span>")
 
-        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+        # By default, the enter key triggers the default 'dialog action' in QDialog
+        # widgets. This activates one of the pushbuttons.
         self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_t.setMaximumWidth(self.width_m * 4)
         self.but_log_t.setObjectName("chk_log_time")
@@ -195,7 +196,8 @@ class Plot_FFT_win(QDialog):
         self.chk_half_f.setToolTip(
             "Display window spectrum in the range 0 ... 0.5 f_S.")
 
-        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+        # By default, the enter key triggers the default 'dialog action' in QDialog
+        # widgets. This activates one of the pushbuttons.
         self.but_log_f = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_f.setMaximumWidth(self.width_m * 4)
         self.but_log_f.setObjectName("chk_log_freq")
@@ -634,7 +636,6 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict
     from pyfda import pyfda_rc as rc
-    import pyfda.filterbroker as fb
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)

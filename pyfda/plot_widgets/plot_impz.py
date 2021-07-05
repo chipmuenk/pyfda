@@ -193,8 +193,8 @@ class Plot_Impz(QWidget):
         - plot_tab_widgets() (global signals)
         """
 
-        logger.warning("PROCESS_SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if self.sig_loop(dict_sig, logger) > 0:
             return
@@ -1520,7 +1520,7 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     X_q = np.fft.fftshift(X_q)
 
-                F    = np.fft.fftshift(F)
+                F = np.fft.fftshift(F)
 
                 # shift H_id and F_id by f_S/2
                 F_id -= f_max/2
@@ -1537,13 +1537,13 @@ class Plot_Impz(QWidget):
                 if plt_stimulus_q:
                     X_q = X_q[0:self.ui.N//2]
 
-                F    = F[0:self.ui.N//2]
+                F = F[0:self.ui.N//2]
                 F_id = F_id[0:params['N_FFT']//2]
                 H_id = H_id[0:params['N_FFT']//2]
 
             else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # display 0 ... f_S -> shift frequency axis
-                F    = np.fft.fftshift(F) + f_max/2.
+                F = np.fft.fftshift(F) + f_max/2.
                 if not freq_resp:
                     H_id /= 2
 

@@ -306,15 +306,15 @@ all_windows_dict = {
             altered by this window than e.g. by a Hann window.
             </span>'''
         },
-        'Ultraspherical': {
+    'Ultraspherical': {
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'par': [{
-            'name': '&mu;','name_tex': r'$\mu',
+            'name': '&mu;', 'name_tex': r'$\mu',
             'val': 0.5, 'min': -0.5, 'max': 10,
             'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
             },
             {
-            'name': 'x0','name_tex': r'$x_0$',
+            'name': 'x0', 'name_tex': r'$x_0$',
             'val': 1, 'min': -10, 'max': 10,
             'tooltip': '<span>Amplitude</span>'}
              ],
@@ -327,6 +327,7 @@ all_windows_dict = {
             </span>''',
         }
     }
+
 
 # ------------------------------------------------------------------------------
 def get_valid_windows_list(win_names_list=[], win_dict={}):
@@ -477,7 +478,7 @@ def set_window_name(win_dict, win_name):
         try:
             mod = importlib.import_module(mod_name)
             win_fnct = getattr(mod, fnct, None)
-        except ImportError: # no valid module
+        except ImportError:  # no valid module
             logger.error(f'Found no valid module "{mod_name}", '
                          'using rectangular window instead!')
             win_err = True
@@ -726,10 +727,10 @@ class QFFTWinSelector(QWidget):
         the widgets from the dictionary
 
         """
-        logger.warning("PROCESS_SIG_RX: {0}".format(pprint_log(dict_sig)))
+        logger.debug("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            return
+            return  # signal has been emitted from this widget
 
         elif 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'fft_win_par':
@@ -833,9 +834,9 @@ class QFFTWinSelector(QWidget):
         -------
         win_fnct : ndarray
             The window function with `N` data points, normalized with the correlated gain.
-            This is also stored in `win_dict['win']`. Additionally, the normalized equivalent
-            noise bandwidth is calculated and stored as `win_dict['nenbw']` as well as the
-            correlated gain `win_dict['cgain']`.
+            This is also stored in `win_dict['win']`. Additionally, the normalized
+            equivalent noise bandwidth is calculated and stored as `win_dict['nenbw']`
+            as well as thecorrelated gain `win_dict['cgain']`.
         """
         w = calc_window(self.win_dict, N, win_name=win_name, sym=sym)
 
@@ -871,7 +872,6 @@ class QFFTWinSelector(QWidget):
         if n_par > 0:
             if 'list' in self.win_dict[cur]['par'][0]:
                 qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val']))
-                logger.error(f"par={str(self.win_dict[cur]['par'][0]['val'])}")
             else:
                 self.led_win_par_0.setText(str(self.win_dict[cur]['par'][0]['val']))
 
@@ -909,7 +909,6 @@ class QFFTWinSelector(QWidget):
         if self.win_dict[cur]['n_par'] > 0:
             if 'list' in self.win_dict[cur]['par'][0]:
                 param = qget_cmb_box(self.cmb_win_par_0, data=False)
-                logger.error(f"Param = {param}")
             else:
                 param = safe_eval(self.led_win_par_0.text(),
                                   self.win_dict[cur]['par'][0]['val'],

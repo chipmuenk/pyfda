@@ -457,8 +457,8 @@ def qled_set_max_width(wdg, str='', N_x=17):
 
     """
     width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
-                wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-                8  # 2 * horizontalMargin() + 2 * frame margin.
+        wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
+        8  # 2 * horizontalMargin() + 2 * frame margin.
     width_x = wdg.fontMetrics().width('x')
     logger.warning("Frm = {0}, FM = {1}".format(width_frm, width_x))
     if str != '':
