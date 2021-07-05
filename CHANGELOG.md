@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.5.4](https://github.com/chipmuenk/pyfda/tree/v0.5.4) (2020-12-xx)
+### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-07-xx)
 
 ### Bug fixes
 
@@ -15,8 +15,8 @@
 - Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
   angle character
   
-- It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab
-  (didn't work before). Changing the filter type now highlights the save button.
+- It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab.
+  Changing the filter type now highlights the save button.
   
 - Improve group delay algorithms for IIR, allow selection between algorithms
 
@@ -26,47 +26,53 @@
 - Improved legend in the y[n] / Y(f) tab (markers were missing, tab alignment didn't
   work)
 
-- Equalize length of f and tau_g in differentiation algorithm (crashed before) for
-  the calculation of group delay (selecting 'Diff' crashed pyfda for dual sided spectra)
+- Equalize length of f and tau_g in differentiation algorithm for the calculation 
+  of group delay (selecting 'Diff' crashed pyfda for dual sided spectra)
 
 
 ### New features
+- New FFT window widget for displaying the window in time and frequency domain, it
+  can be invoked from the `y[n]` tab and the Firwin filter design subwidget
+  - much improved selection of window function for spectral analysis (`y[n]` tab)
+    and Firwin filter design ()
 - Complete make-over of signalling for DRY using new methods
-  * 'pyfda_qt_lib.emit' to generate default dict keys 'id' and 'class' and 
+  * 'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
      providing an time-to-live mechanisms for signals
-  * 'pyfda_qt_lib.sig_loop' to test for infinite loops
+  * 'pyfda_qt_lib.sig_loop()' to test for infinite loops
 
-- Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
-    for  impulses
+- Lots of improvements in `y[n]` tab: 
 
-- New stimuli 'Gauss' and 'Rect impulse'
+  - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
+      for  impulses
 
-- New stimulus 'Exp' (complex exponentials)
+  - New stimuli 'Gauss' and 'Rect impulse'
 
-- New noise types "Maximum Length Sequence" and "Brownian"
+  - New stimulus 'Exp' (complex exponentials)
 
-- Tooltips for combo box items
+  - New noise types "Maximum Length Sequence" and "Brownian"
 
-- Replace some check boxes by checkable push bottons for a cleaner UI
+  - Tooltips for combo box items
 
-- Group stimuli in `y[n]` for a better overview
+  - Replace some check boxes by checkable push bottons for a cleaner UI
 
-- Allow changing the number of FFT data points via `Info -> Settings`
+  - Group stimuli in for a better overview
 
-- Display magnitude and phase in y[n] tab
+  - Allow changing the number of FFT data points via `Info -> Settings`
+
+  - Display magnitude and phase in frequency tab
 
 - Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
   and `dirs.YOSYS_VER`
   
 - Allow turning off automatic grid alignment between mag. and phase in the 
-  H(f) tab
+  `H(f)` tab
   
 - Started preparation of code for i18n
 
-- Renamed subdirectory "filter_widgets" to "filter_widgets" for consistency with
+- Renamed subdirectory "filter_designs" to "filter_widgets" for consistency with
   other widgets and updated required config file version from 3 to 4
 
-- Provide  a simple IIR allpass design as an template for a simple filter
+- Provide a simple IIR allpass design as an template for a simple filter
   widget
 
 - New command options when starting pyfda: -h for help, -i for infos on 
@@ -140,7 +146,7 @@
 - Complex stimuli are now plotted as real and imaginary parts just like the response
   (a.o. ID: 5b20228c93a98a8c601b8ef172f0162dc97d52c1)
   
-- Fix scaling for spectra of complex-valued time signals (ID:8664401933c7b8e5e3137a1d255d0b6f2494450f), 
+- Fix scaling for spectra of complex-valued time signals (ID:8664401933c7b8e5e3137a1d255d0b6f2494450f)
   
 - Allow for complex amplitudes in the impz UI (ID 8664401933c7b8e5e3137a1d255d0b6f2494450f)
   
