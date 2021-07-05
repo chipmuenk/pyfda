@@ -959,19 +959,20 @@ class QFFTWinSelector(QWidget):
         self.lbl_win_par_1.setVisible(n_par > 1)
         self.led_win_par_1.setVisible(False)
         self.cmb_win_par_1.setVisible(False)
-        logger.error(self.win_dict["Blackmanharris"])
+
         if n_par > 0:
             self.lbl_win_par_0.setText(
                 to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
             if 'list' in self.win_dict[cur]['par'][0]:
                 self.led_win_par_0.setVisible(False)
                 self.cmb_win_par_0.setVisible(True)
+                self.cmb_win_par_0.blockSignals(True)
                 self.cmb_win_par_0.clear()
                 self.cmb_win_par_0.addItems(self.win_dict[cur]['par'][0]['list'])
-                logger.error(self.win_dict[cur])
-                logger.error(qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val'])))
+                qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val']))
                 self.cmb_win_par_0.setToolTip(
                     self.win_dict[cur]['par'][0]['tooltip'])
+                self.cmb_win_par_0.blockSignals(False)
             else:
                 self.led_win_par_0.setVisible(True)
                 self.cmb_win_par_0.setVisible(False)
@@ -986,10 +987,12 @@ class QFFTWinSelector(QWidget):
             if 'list' in self.win_dict[cur]['par'][1]:
                 self.led_win_par_1.setVisible(False)
                 self.cmb_win_par_1.setVisible(True)
+                self.cmb_win_par_1.blockSignals(True)
                 self.cmb_win_par_1.clear()
                 self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][1]['list'])
                 qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
                 self.cmb_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+                self.cmb_win_par_1.blockSignals(False)
             else:
                 self.led_win_par_1.setVisible(True)
                 self.cmb_win_par_1.setVisible(False)
