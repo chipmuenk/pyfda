@@ -81,7 +81,8 @@ class Plot_FFT_win(QDialog):
         super(Plot_FFT_win, self).__init__(parent)
         # make window stay on top
         qwindow_stay_on_top(self, True)
-        self.width_m = QFontMetrics(QPushButton().font()).width("m")  # width of 'm'
+        self.width_m = QFontMetrics(
+            QPushButton().font()).width("m")  # width of 'm'
         self.win_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -163,9 +164,10 @@ class Plot_FFT_win(QDialog):
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N_view))
         self.led_N.setMaximumWidth(70)
-        self.led_N.setToolTip("<span>Number of window data points to display.</span>")
+        self.led_N.setToolTip(
+            "<span>Number of window data points to display.</span>")
 
-	# prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
+        # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
         self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
         self.but_log_t.setMaximumWidth(self.width_m * 4)
         self.but_log_t.setObjectName("chk_log_time")
@@ -185,11 +187,13 @@ class Plot_FFT_win(QDialog):
 
         self.chk_norm_f = QCheckBox("Norm", self)
         self.chk_norm_f.setChecked(True)
-        self.chk_norm_f.setToolTip("Normalize window spectrum for a maximum of 1.")
+        self.chk_norm_f.setToolTip(
+            "Normalize window spectrum for a maximum of 1.")
 
         self.chk_half_f = QCheckBox("Half", self)
         self.chk_half_f.setChecked(True)
-        self.chk_half_f.setToolTip("Display window spectrum in the range 0 ... 0.5 f_S.")
+        self.chk_half_f.setToolTip(
+            "Display window spectrum in the range 0 ... 0.5 f_S.")
 
         # prevent QDialog's special handling of the enter key to trigger the default 'dialog action'
         self.but_log_f = QPushButton("dB", default=False, autoDefault=False)
@@ -235,7 +239,8 @@ class Plot_FFT_win(QDialog):
         layVControls.addLayout(layH_win_select)
         layVControls.addLayout(layHControls)
 
-        self.tbl_win_properties = QTableWidget(self.tbl_rows, self.tbl_cols, self)
+        self.tbl_win_properties = QTableWidget(
+            self.tbl_rows, self.tbl_cols, self)
         self.tbl_win_properties.setAlternatingRowColors(True)
         self.tbl_win_properties.verticalHeader().setVisible(False)
         self.tbl_win_properties.horizontalHeader().setVisible(False)
@@ -413,11 +418,13 @@ class Plot_FFT_win(QDialog):
             self.Win /= (self.N_view * self.cgain)
 
         # calculate frequency of first zero and maximum sidelobe level
-        first_zero = argrelextrema(self.Win[:(self.N_view*self.pad)//2], np.less)
+        first_zero = argrelextrema(
+            self.Win[:(self.N_view*self.pad)//2], np.less)
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
             self.first_zero_f = self.F[first_zero]
-            self.sidelobe_level = np.max(self.Win[first_zero:(self.N_view*self.pad)//2])
+            self.sidelobe_level = np.max(
+                self.Win[first_zero:(self.N_view*self.pad)//2])
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
@@ -506,7 +513,8 @@ class Plot_FFT_win(QDialog):
             Win = fftshift(self.Win)
 
         if self.but_log_f.isChecked():
-            self.ax_f.plot(F, np.maximum(20 * np.log10(np.abs(Win)), self.bottom_f))
+            self.ax_f.plot(F, np.maximum(
+                20 * np.log10(np.abs(Win)), self.bottom_f))
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.cgain_disp = 20 * np.log10(self.cgain)
             self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
@@ -533,7 +541,8 @@ class Plot_FFT_win(QDialog):
                 p1 = cur_win_d['par'][0]['val']
             else:
                 p1 = "{0:.3g}".format(cur_win_d['par'][0]['val'])
-            param_txt = " ({0:s} = {1:s})".format(cur_win_d['par'][0]['name_tex'], p1)
+            param_txt = " ({0:s} = {1:s})".format(
+                cur_win_d['par'][0]['name_tex'], p1)
 
         if self.win_dict[cur]['n_par'] > 1:
             if type(cur_win_d['par'][1]['val']) in {str}:
@@ -629,7 +638,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    fb.clipboard = QApplication.clipboard() # create clipboard instance
+    fb.clipboard = QApplication.clipboard()  # create clipboard instance
     win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
                       "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
                       "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
@@ -637,8 +646,8 @@ if __name__ == '__main__':
 
     # initialize windows dict with the list above and an initial window
     win_dict = get_windows_dict(
-            win_names_list=win_names_list,
-            cur_win_name="Hann")
+        win_names_list=win_names_list,
+        cur_win_name="Hann")
 
     mainw = Plot_FFT_win(None, win_dict, ignore_close_event=False)
 

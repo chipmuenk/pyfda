@@ -29,7 +29,7 @@ When the function name `fn_name` is just a string, it is taken from
 """
 bartlett_info =\
     '''<span>
-    The Bartlett and triangular windows are similar, except that the end 
+    The Bartlett and triangular windows are similar, except that the end
     point(s) of the Bartlett window are at zero. Its side lobes fall off with
     12 dB/oct., the min. side lobe suppression is 26 dB.<br /><br />
 
@@ -107,7 +107,7 @@ all_windows_dict = {
     'Blackmanharris': {
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
         'par': [{
-            'name': 'L', 'name_tex': r'$L$', 'val': 4, 'list': ['4', '5', '7', '9'],
+            'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
             'tooltip': '<span>Number of cosine terms</span>'}],
         'info':
             '''<span>
@@ -160,7 +160,7 @@ all_windows_dict = {
             estimation. The first window in the sequence can be used to maximize
             the energy concentration in the main lobe, and is also called the
             Slepian window. <br /><br />
-            
+
             The Kaiser window is an easier to calculate approximation for the
             Slepian window with &beta; = &pi; <i>NW</i> .
             </span>'''
@@ -170,7 +170,7 @@ all_windows_dict = {
         'fn_name': 'flattop',
         'info':
             '''<span>
-            Flattop windows give a very low amplitude error, that's why they are 
+            Flattop windows give a very low amplitude error, that's why they are
             used frequently in spectrum analyzers and other measurement equipment.
             They are rarely used for FIR filter design.
             </span>'''
@@ -212,7 +212,7 @@ all_windows_dict = {
             It has been optimized for suppression of
             the first side lobe. Compared to the Hann window, this comes at
             the cost of a worse (constant) level of higher side lobes.<br /><br />
-            
+
             Mathematically, it is a two-term raised cosine
             window with non-zero endpoints (DC-offset).
             </span>'''
@@ -227,7 +227,7 @@ all_windows_dict = {
             high (-32 dB). It is a good compromise for many applications, especially
             when higher frequency components need to be suppressed.
             <br /><br />
-            
+
             Mathematically, it is the most simple two-term raised cosine
             or squared sine window.
             </span>'''
@@ -259,11 +259,11 @@ all_windows_dict = {
             The Parzen window is a 4th order B-spline window whose sidelobes
             fall off with -24 dB/oct.
             <br/ ><br />
-            
+
             It can be constructed by convolving a rectangular window four times
             (or multiplying its frequency response four times).
             <br /><br />
-            
+
             See also: Boxcar and Triangular / Bartlett windows.
             </span>'''
             },
@@ -278,7 +278,7 @@ all_windows_dict = {
             Used to maximize the energy concentration in the main lobe.
             Also called the digital prolate spheroidal sequence (DPSS).
             <br /><br />
-            
+
             See also: Kaiser window.
             </span>'''
         },
@@ -299,7 +299,7 @@ all_windows_dict = {
             region. Hence, &alpha; = 0 returns a rectangular window, &alpha; = 1 a
             Hann window.
             <br /><br />
-            
+
             Tukey windows are used a.o. for analyzing transient data containing short
             bursts. It is the default window for scipy.signal.spectrogram with
             &alpha; = 0.25). Amplitudes of transient events are less likely to be
@@ -322,7 +322,7 @@ all_windows_dict = {
             '''<span>
             Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
             window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
-            
+
             As this is a three-parameter window (<i>N</i>, &mu;,)
             </span>''',
         }
@@ -494,7 +494,7 @@ def set_window_name(win_dict, win_name):
     win_dict.update({'cur_win_name': win_name, 'win': []})
     win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
-    return win_err  # error flag, ui (window combo box) needs to be updated 
+    return win_err  # error flag, ui (window combo box) needs to be updated
 
 
 # ----------------------------------------------------------------------------
@@ -611,7 +611,7 @@ def blackmanharris(N, L, sym):
              1.161808358932861e-007]
     else:
         raise Exception(
-            "Undefined parameter '{0}' for order L, falling back to rectangular window"
+            "Undefined parameter '{0}' for order L!"
             .format(L))
         return
 
@@ -846,7 +846,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def dict2ui(self):
         """
-        The dictionary has been updated somewhere else, now update the window
+        The `win_dict` dictionary has been updated somewhere else, now update the window
         selection widget and make corresponding parameter widgets visible if
         `self.win_dict['cur_win_name']` is different from current combo box entry:
 
@@ -863,7 +863,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def dict2ui_params(self):
         """
-        Set parameter values from dict
+        Set parameter values from `win_dict`
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         n_par = self.win_dict[cur]['n_par']
@@ -889,7 +889,7 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win_par'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
-        set_window_name(self.win_dict, cur)  # this resets the window cache 
+        set_window_name(self.win_dict, cur)  # this resets the window cache
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
@@ -942,10 +942,11 @@ class QFFTWinSelector(QWidget):
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         err = set_window_name(self.win_dict, cur)
         # if selected window does not exist (`err = True`), fall back to 'cur_win_name',
-        # which has been set by `set_window_name()`. 
+        # which has been set by `set_window_name()`.
         if err:
-            qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
-            cur = qget_cmb_box(self.cmb_win_fft, data=False)
+            cur = self.win_dict['cur_win_name']
+            qset_cmb_box(self.cmb_win_fft, cur, data=False)
+
         # update visibility and values of parameter widgets:
         n_par = self.win_dict[cur]['n_par']
 
