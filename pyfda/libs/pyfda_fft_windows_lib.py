@@ -756,28 +756,28 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_fft_variant.setVisible(False)
 
         # First numeric parameter for FFT window
-        self.lbl_win_par_1 = QLabel("Param1")
-        self.led_win_par_1 = QLineEdit(self)
-        self.led_win_par_1.setText("1")
-        self.led_win_par_1.setObjectName("ledWinPar1")
-        self.cmb_win_par_1 = QComboBox(self)
+        self.lbl_win_par_0 = QLabel("Param1")
+        self.led_win_par_0 = QLineEdit(self)
+        self.led_win_par_0.setText("1")
+        self.led_win_par_0.setObjectName("ledWinPar1")
+        self.cmb_win_par_0 = QComboBox(self)
 
         # Second numeric parameter for FFT window
-        self.lbl_win_par_2 = QLabel("Param2")
-        self.led_win_par_2 = QLineEdit(self)
-        self.led_win_par_2.setText("2")
-        self.led_win_par_2.setObjectName("ledWinPar2")
-        self.cmb_win_par_2 = QComboBox(self)
+        self.lbl_win_par_1 = QLabel("Param2")
+        self.led_win_par_1 = QLineEdit(self)
+        self.led_win_par_1.setText("2")
+        self.led_win_par_1.setObjectName("ledWinPar2")
+        self.cmb_win_par_1 = QComboBox(self)
 
         layH_main = QHBoxLayout(self)
         layH_main.addWidget(self.cmb_win_fft)
         layH_main.addWidget(self.cmb_win_fft_variant)
+        layH_main.addWidget(self.lbl_win_par_0)
+        layH_main.addWidget(self.led_win_par_0)
+        layH_main.addWidget(self.cmb_win_par_0)
         layH_main.addWidget(self.lbl_win_par_1)
         layH_main.addWidget(self.led_win_par_1)
         layH_main.addWidget(self.cmb_win_par_1)
-        layH_main.addWidget(self.lbl_win_par_2)
-        layH_main.addWidget(self.led_win_par_2)
-        layH_main.addWidget(self.cmb_win_par_2)
 
         layH_main.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
@@ -792,10 +792,10 @@ class QFFTWinSelector(QWidget):
         # careful! currentIndexChanged passes an integer (the current index)
         # to update_win
         self.cmb_win_fft.currentIndexChanged.connect(self.ui2dict_win_emit)
+        self.led_win_par_0.editingFinished.connect(self.ui2dict_params)
         self.led_win_par_1.editingFinished.connect(self.ui2dict_params)
-        self.led_win_par_2.editingFinished.connect(self.ui2dict_params)
+        self.cmb_win_par_0.currentIndexChanged.connect(self.ui2dict_params)
         self.cmb_win_par_1.currentIndexChanged.connect(self.ui2dict_params)
-        self.cmb_win_par_2.currentIndexChanged.connect(self.ui2dict_params)
 
 # ------------------------------------------------------------------------------
     def get_window(self, N, win_name=None, sym=False):
@@ -870,15 +870,16 @@ class QFFTWinSelector(QWidget):
 
         if n_par > 0:
             if 'list' in self.win_dict[cur]['par'][0]:
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
+                qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val']))
+                logger.error(f"par={str(self.win_dict[cur]['par'][0]['val'])}")
             else:
-                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][0]['val']))
+                self.led_win_par_0.setText(str(self.win_dict[cur]['par'][0]['val']))
 
         if n_par > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
-                qset_cmb_box(self.cmb_win_par_2, str(self.win_dict[cur]['par'][1]['val']))
+                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
             else:
-                self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
+                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][1]['val']))
 
 # ------------------------------------------------------------------------------
     def ui2dict_params(self):
@@ -893,30 +894,31 @@ class QFFTWinSelector(QWidget):
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
-                param = self.cmb_win_par_2.currentText()
+                param = qget_cmb_box(self.cmb_win_par_1, data=False)
             else:
-                param = safe_eval(self.led_win_par_2.text(),
+                param = safe_eval(self.led_win_par_1.text(),
                                   self.win_dict[cur]['par'][1]['val'],
                                   return_type='float')
                 if param < self.win_dict[cur]['par'][1]['min']:
                     param = self.win_dict[cur]['par'][1]['min']
                 elif param > self.win_dict[cur]['par'][1]['max']:
                     param = self.win_dict[cur]['par'][1]['max']
-                self.led_win_par_2.setText(str(param))
+                self.led_win_par_1.setText(str(param))
             self.win_dict[cur]['par'][1]['val'] = param
 
         if self.win_dict[cur]['n_par'] > 0:
             if 'list' in self.win_dict[cur]['par'][0]:
-                param = self.cmb_win_par_1.currentText()
+                param = qget_cmb_box(self.cmb_win_par_0, data=False)
+                logger.error(f"Param = {param}")
             else:
-                param = safe_eval(self.led_win_par_1.text(),
+                param = safe_eval(self.led_win_par_0.text(),
                                   self.win_dict[cur]['par'][0]['val'],
                                   return_type='float')
                 if param < self.win_dict[cur]['par'][0]['min']:
                     param = self.win_dict[cur]['par'][0]['min']
                 elif param > self.win_dict[cur]['par'][0]['max']:
                     param = self.win_dict[cur]['par'][0]['max']
-                self.led_win_par_1.setText(str(param))
+                self.led_win_par_0.setText(str(param))
             self.win_dict[cur]['par'][0]['val'] = param
 
         self.emit({'view_changed': 'fft_win_par'})
@@ -950,45 +952,46 @@ class QFFTWinSelector(QWidget):
         # update visibility and values of parameter widgets:
         n_par = self.win_dict[cur]['n_par']
 
-        self.lbl_win_par_1.setVisible(n_par > 0)
+        self.lbl_win_par_0.setVisible(n_par > 0)
+        self.led_win_par_0.setVisible(False)
+        self.cmb_win_par_0.setVisible(False)
+
+        self.lbl_win_par_1.setVisible(n_par > 1)
         self.led_win_par_1.setVisible(False)
         self.cmb_win_par_1.setVisible(False)
-
-        self.lbl_win_par_2.setVisible(n_par > 1)
-        self.led_win_par_2.setVisible(False)
-        self.cmb_win_par_2.setVisible(False)
-
+        logger.error(self.win_dict["Blackmanharris"])
         if n_par > 0:
-            self.lbl_win_par_1.setText(
+            self.lbl_win_par_0.setText(
                 to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
             if 'list' in self.win_dict[cur]['par'][0]:
-                self.led_win_par_1.setVisible(False)
-                self.cmb_win_par_1.setVisible(True)
-                self.cmb_win_par_1.clear()
-                self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][0]['list'])
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][0]['val']))
-                self.cmb_win_par_1.setToolTip(
+                self.led_win_par_0.setVisible(False)
+                self.cmb_win_par_0.setVisible(True)
+                self.cmb_win_par_0.clear()
+                self.cmb_win_par_0.addItems(self.win_dict[cur]['par'][0]['list'])
+                logger.error(self.win_dict[cur])
+                logger.error(qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val'])))
+                self.cmb_win_par_0.setToolTip(
                     self.win_dict[cur]['par'][0]['tooltip'])
             else:
-                self.led_win_par_1.setVisible(True)
-                self.cmb_win_par_1.setVisible(False)
-                self.led_win_par_1.setText(
+                self.led_win_par_0.setVisible(True)
+                self.cmb_win_par_0.setVisible(False)
+                self.led_win_par_0.setText(
                     str(self.win_dict[cur]['par'][0]['val']))
-                self.led_win_par_1.setToolTip(
+                self.led_win_par_0.setToolTip(
                     self.win_dict[cur]['par'][0]['tooltip'])
 
         if n_par > 1:
-            self.lbl_win_par_2.setText(
+            self.lbl_win_par_1.setText(
                 to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
             if 'list' in self.win_dict[cur]['par'][1]:
-                self.led_win_par_2.setVisible(False)
-                self.cmb_win_par_2.setVisible(True)
-                self.cmb_win_par_2.clear()
-                self.cmb_win_par_2.addItems(self.win_dict[cur]['par'][1]['list'])
+                self.led_win_par_1.setVisible(False)
+                self.cmb_win_par_1.setVisible(True)
+                self.cmb_win_par_1.clear()
+                self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][1]['list'])
                 qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
-                self.cmb_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+                self.cmb_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
             else:
-                self.led_win_par_2.setVisible(True)
-                self.cmb_win_par_2.setVisible(False)
-                self.led_win_par_2.setText(str(self.win_dict[cur]['par'][1]['val']))
-                self.led_win_par_2.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+                self.led_win_par_1.setVisible(True)
+                self.cmb_win_par_1.setVisible(False)
+                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][1]['val']))
+                self.led_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
