@@ -19,8 +19,7 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qled_set_max_width, QVLine
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import (
-    get_window, QFFTWinSelector)
+from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:
@@ -395,8 +394,10 @@ class Plot_FFT_win(QDialog):
                                 return_type='int')
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
+        self.win_view = self.qfft_win_select.get_window(self.N_view, sym=self.sym)
 
-        self.win_view = get_window(self.win_dict, self.N_view, sym=self.sym)
+        if self.qfft_win_select.err:
+            self.qfft_win_select.dict2ui()
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
             / np.square(np.sum(self.win_view))

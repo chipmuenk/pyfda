@@ -498,9 +498,9 @@ def set_window_name(win_dict, win_name):
 
 
 # ----------------------------------------------------------------------------
-def get_window(win_dict, N, win_name=None, sym=False):
+def calc_window(win_dict, N, win_name=None, sym=False):
     """
-    Generate the requested window function with `N` data points.
+    Calculate the requested window function with `N` data points.
 
     Parameters
     ----------
@@ -517,6 +517,10 @@ def get_window(win_dict, N, win_name=None, sym=False):
         and number of data points are unchanged, the window is retrieved from
         `win_dict['win']` instead of recalculating it.
 
+        If some kind of error occurs during calculation of the window, a rectangular
+        window is used as a fallback and the function attribute `calc_window.err` is
+        set to `True`.
+
     sym : bool, optional
         When True, generate a symmetric window for filter design.
         When False (default), generate a periodic window for spectral analysis.
@@ -524,16 +528,18 @@ def get_window(win_dict, N, win_name=None, sym=False):
     Returns
     -------
     win_fnct : ndarray
-        The window function, normalized with the correlated gain.
-        This is also stored in win_dict['win']
+        The window function with `N` data points, normalized with the correlated gain.
+        This is also stored in `win_dict['win']`. Additionally, the normalized equivalent
+        noise bandwidth is calculated and stored as `win_dict['nenbw']` as well as the
+        correlated gain `win_dict['cgain']`.
     """
+    calc_window.err = False
     if win_name is None or win_name == win_dict['cur_win_name']:
         win_name = win_dict['cur_win_name']
         if len(win_dict['win']) == N:  # return unchanged window function
             return win_dict['win']
 
     win_fnct = win_dict[win_name]['win_fnct']
-
     fn_name = win_dict[win_name]['fn_name']
     n_par = win_dict[win_name]['n_par']
 
@@ -555,13 +561,13 @@ def get_window(win_dict, N, win_name=None, sym=False):
                 .format(n_par))
             w = None
     except Exception as e:
-        logger.error('An error occurred calculating the window function "{0}"\n{1}'
+        logger.error('An error occurred calculating the window function "{0}":\n{1}'
                      .format(fn_name, e))
         w = None
     if w is None:  # Fall back to rectangular window
+        calc_window.err = True
         logger.warning('Falling back to rectangular window.')
         set_window_name(win_dict, "Rectangular")
-        # TODO: widget needs to be updated - return None?
         w = np.ones(N)
 
     nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
@@ -709,6 +715,7 @@ class QFFTWinSelector(QWidget):
         super(QFFTWinSelector, self).__init__(parent)
 
         self.win_dict = win_dict
+        self.err = False  # error flag for window calculation
         self._construct_UI()
         self.ui2dict_win()
 
@@ -793,12 +800,48 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def get_window(self, N, win_name=None, sym=False):
         """
-        Wrapper for function `get_window` with the same name
+        Wrapper method for function `:func:calc_window()` with very similar
+        functionality. The only differences are:
 
-        An array with the window is returned, additionally it is saved in
-        self.win_dict['win']
+        - the dict with the window function doesn't have to be specified, the
+          dict `self.win_dict` is used
+
+        - the function attribute `calc_window.err` is copied to a proper class attribute
+          `self.err` as the function `calc_window()` is called from different places.
+
+        Parameters
+        ----------
+        N : int
+            Number of data points
+
+        win_name : str, optional
+            Name of the window. If specified (default is None), this will be used to
+            obtain the window function, its parameters and tool tipps etc. via
+            `set_window_name()`. If not, the previous setting are used. If window
+            and number of data points are unchanged, the window is retrieved from
+            `win_dict['win']` instead of recalculating it.
+
+            If some kind of error occurs during calculation of the window, a rectangular
+            window is used as a fallback and the class attribute `self.err` is
+            set to `True`.
+
+        sym : bool, optional
+            When True, generate a symmetric window for filter design.
+            When False (default), generate a periodic window for spectral analysis.
+
+        Returns
+        -------
+        win_fnct : ndarray
+            The window function with `N` data points, normalized with the correlated gain.
+            This is also stored in `win_dict['win']`. Additionally, the normalized equivalent
+            noise bandwidth is calculated and stored as `win_dict['nenbw']` as well as the
+            correlated gain `win_dict['cgain']`.
         """
-        return get_window(self.win_dict, N, win_name=win_name, sym=sym)
+        w = calc_window(self.win_dict, N, win_name=win_name, sym=sym)
+
+        self.err = calc_window.err
+
+        return w
 
 # ------------------------------------------------------------------------------
     def dict2ui(self):
