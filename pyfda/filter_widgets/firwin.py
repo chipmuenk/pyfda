@@ -66,7 +66,7 @@ class Firwin(QWidget):
 
     sig_tx = pyqtSignal(object)  # local signal between FFT widget and FFTWin_Selector
     sig_tx_local = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
         QWidget.__init__(self)
@@ -78,6 +78,7 @@ class Firwin(QWidget):
                           "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
                           "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
         self.cur_win_name = "Kaiser"  # set initial window type
+        self.alg = "ichige"
 
         # initialize windows dict with the list above for firwin window settings
         self.win_dict = get_windows_dict(
@@ -139,11 +140,11 @@ class Firwin(QWidget):
         - qfft_win_select
         """
 
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+        logger.debug("SIG_RX - vis: {0}\n{1}"
                      .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if self.sig_loop(dict_sig, logger) > 0:
-            return
+        if dict_sig['id'] == id(self):
+            logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
 
         # --- signals coming from the FFT window widget or the qfft_win_select
         if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
@@ -155,7 +156,7 @@ class Firwin(QWidget):
                     # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.emit(dict_sig, sig_name='sig_tx_local')
-                    # global connection to upper hierachies - not needed at the moment
+                    # global connection to upper hierachies
                     # send notification that filter design has changed
                     self.emit({'filt_changed': 'firwin'})
 
@@ -451,7 +452,7 @@ class Firwin(QWidget):
                                   [self.A_PB, self.A_SB], alg=self.alg)
         if not self._test_N():
             return -1
-        logger.warning(self.win_dict["cur_win_name"])
+
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
