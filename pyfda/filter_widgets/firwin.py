@@ -220,15 +220,15 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # self.cmb_firwin_alg.activated.connect(self._update_fft_window) - not available
+        self.cmb_firwin_alg.currentIndexChanged.connect(self._update_fft_window)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
 
 # ==============================================================================
-    # def _update_fft_window(self):
-    #     """ Update window type for FirWin - unneeded at the moment """
-    #     self.alg = str(self.cmb_firwin_alg.currentText())
-    #     self.emit({'filt_changed': 'firwin'})
+    def _update_fft_window(self):
+        """ Update window type for FirWin - unneeded at the moment """
+        self.alg = str(self.cmb_firwin_alg.currentText())
+        self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
     def _load_dict(self):
@@ -436,9 +436,11 @@ class Firwin(QWidget):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
+        logger.warning(self.win_dict["cur_win_name"])
         if "Kaiser" in self.win_dict and self.win_dict['cur_win_name'] == "Kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             self.win_dict["Kaiser"]["par"]["val"] = beta
+            logger.warning(N)
             self._update_UI()
         else:
             N = remezord(
