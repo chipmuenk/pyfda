@@ -409,173 +409,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     awd = copy.deepcopy(all_windows_dict)
     d = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
     d.update({'cur_win_name': awd['cur_win_name'], 'win': awd['win']})
-    set_window_name(d, cur_win_name)
     return d
-
-
-# ------------------------------------------------------------------------------
-def set_window_name(win_dict, win_name):
-    """
-    Select and set a window function object from its name `win_name` and update the
-    `win_dict` dictionary correspondingly with:
-
-    win_dict['cur_win_name']        # win_name: new current window name (str)
-    win_dict['win']                 # []: clear window function array (empty list)
-    win_dict[win_name]['win_fnct']  # function object
-    win_dict[win_name]['n_par']     # number of parameters (int)
-
-    The above is only updated when the window type has been changed compared to
-    `win_dict['cur_win_name']` !
-
-    Parameters
-    ----------
-    win_dict : dict
-        The dict where the window functions are stored (modified in place).
-    win_name : str
-        Name of the window, which will be looked up in `all_windows_dict`.
-
-    Returns
-    -------
-    win_err : bool
-        Error flag, True when `win_name` could not be resolved
-    """
-    if win_name == win_dict['cur_win_name']:
-        # same window name as before, return stored `win_fnct`
-        return win_dict[win_name]['win_fnct']
-
-    elif win_name not in win_dict:
-        logger.warning(
-            f'Unknown window name "{win_name}", using rectangular window instead.')
-        win_name = "Rectangular"
-
-    # operate with the window specific sub-dictionary `win_dict[win_name]`
-    # dictionary in the following
-    d = win_dict[win_name]
-    fn_name = d['fn_name']
-
-    if 'par' in d:
-        n_par = len(d['par'])
-    else:
-        n_par = 0
-
-    # --------------------------------------
-    # get attribute fn_name from submodule (default: sig.windows) and
-    # return the desired window function:
-    win_err = False
-    mod_fnct = fn_name.split('.')  # try to split fully qualified name at "."
-    fnct = mod_fnct[-1]  # last / rightmost part = function name
-    if len(mod_fnct) == 1:
-        # only one element, no module given -> use scipy.signal.windows
-        win_fnct = getattr(sig.windows, fnct, None)
-        if not win_fnct:
-            logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
-                         'using rectangular window instead!')
-            win_err = True
-    else:
-        # extract module name from fully qualified name, starting with first /
-        # leftmost part of string to the last '.'
-        mod_name = fn_name[:fn_name.rfind(".")]
-        try:
-            mod = importlib.import_module(mod_name)
-            win_fnct = getattr(mod, fnct, None)
-        except ImportError:  # no valid module
-            logger.error(f'Found no valid module "{mod_name}", '
-                         'using rectangular window instead!')
-            win_err = True
-        except NameError:
-            logger.error(f'Found no valid window function "{fn_name}", '
-                         'using rectangular window instead!')
-            win_err = True
-
-    if win_err:
-        win_fnct = getattr(sig.windows, 'boxcar', None)
-        win_name = "Rectangular"
-        n_par = 0
-
-    win_dict.update({'cur_win_name': win_name, 'win': []})
-    win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
-
-    return win_err  # error flag, ui (window combo box) needs to be updated
-
-
-# ----------------------------------------------------------------------------
-def calc_window(win_dict, N, win_name=None, sym=False):
-    """
-    Calculate the requested window function with `N` data points.
-
-    Parameters
-    ----------
-    win_dict : dict
-        The dict where the window functions are stored.
-
-    N : int
-        Number of data points
-
-    win_name : str, optional
-        Name of the window. If specified (default is None), this will be used to
-        obtain the window function, its parameters and tool tipps etc. via
-        `set_window_name()`. If not, the previous setting are used. If window
-        and number of data points are unchanged, the window is retrieved from
-        `win_dict['win']` instead of recalculating it.
-
-        If some kind of error occurs during calculation of the window, a rectangular
-        window is used as a fallback and the function attribute `calc_window.err` is
-        set to `True`.
-
-    sym : bool, optional
-        When True, generate a symmetric window for filter design.
-        When False (default), generate a periodic window for spectral analysis.
-
-    Returns
-    -------
-    win_fnct : ndarray
-        The window function with `N` data points, normalized with the correlated gain.
-        This is also stored in `win_dict['win']`. Additionally, the normalized equivalent
-        noise bandwidth is calculated and stored as `win_dict['nenbw']` as well as the
-        correlated gain `win_dict['cgain']`.
-    """
-    calc_window.err = False
-    if win_name is None or win_name == win_dict['cur_win_name']:
-        win_name = win_dict['cur_win_name']
-        if len(win_dict['win']) == N:  # return unchanged window function
-            return win_dict['win']
-
-    win_fnct = win_dict[win_name]['win_fnct']
-    fn_name = win_dict[win_name]['fn_name']
-    n_par = win_dict[win_name]['n_par']
-
-    try:
-        if fn_name == 'dpss':
-            logger.info("dpss!")
-            w = scipy.signal.windows.dpss(N, win_dict[win_name]['par'][0]['val'],
-                                          sym=sym)
-        elif n_par == 0:
-            w = win_fnct(N, sym=sym)
-        elif n_par == 1:
-            w = win_fnct(N, win_dict[win_name]['par'][0]['val'], sym=sym)
-        elif n_par == 2:
-            w = win_fnct(N, win_dict[win_name]['par'][0]['val'],
-                         win_dict[win_name]['par'][1]['val'], sym=sym)
-        else:
-            logger.error(
-                "{0:d} parameters are not supported for windows at the moment!"
-                .format(n_par))
-            w = None
-    except Exception as e:
-        logger.error('An error occurred calculating the window function "{0}":\n{1}'
-                     .format(fn_name, e))
-        w = None
-    if w is None:  # Fall back to rectangular window
-        calc_window.err = True
-        logger.warning('Falling back to rectangular window.')
-        set_window_name(win_dict, "Rectangular")
-        w = np.ones(N)
-
-    nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
-    cgain = np.sum(w) / N  # coherent gain / DC average
-    win_dict.update({'win': w, 'nenbw': nenbw, 'cgain': cgain})
-
-    return w
 
 
 # -------------------------------------------------------------------------------------
@@ -718,6 +552,7 @@ class QFFTWinSelector(QWidget):
         self.win_dict = win_dict
         self.err = False  # error flag for window calculation
         self._construct_UI()
+        self.set_window_name()  # initialize win_dict
         self.ui2dict_win()
 
     # --------------------------------------------------------------------------
@@ -799,16 +634,92 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_par_1.currentIndexChanged.connect(self.ui2dict_params)
 
 # ------------------------------------------------------------------------------
-    def get_window(self, N, win_name=None, sym=False):
+    def set_window_name(self, win_name: str = ""):
         """
-        Wrapper method for function `:func:calc_window()` with very similar
-        functionality. The only differences are:
+        Select and set a window function object from its name `win_name` and update the
+        `win_dict` dictionary correspondingly with:
 
-        - the dict with the window function doesn't have to be specified, the
-          dict `self.win_dict` is used
+        win_dict['cur_win_name']        # win_name: new current window name (str)
+        win_dict['win']                 # []: clear window function array (empty list)
+        win_dict[win_name]['win_fnct']  # function object
+        win_dict[win_name]['n_par']     # number of parameters (int)
 
-        - the function attribute `calc_window.err` is copied to a proper class attribute
-          `self.err` as the function `calc_window()` is called from different places.
+        The above is only updated when the window type has been changed compared to
+        `win_dict['cur_win_name']` !
+
+        Parameters
+        ----------
+        win_name : str
+            Name of the window, which will be looked up in `all_windows_dict`. If it is
+            "", use `self.win_dict['cur_win_name']` instead
+
+        Returns
+        -------
+        win_err : bool
+            Error flag; `True` when `win_name` could not be resolved
+        """
+        if win_name == "":
+            win_name = self.win_dict['cur_win_name']
+
+        elif win_name not in self.win_dict:
+            logger.warning(
+                f'Unknown window name "{win_name}", using rectangular window instead.')
+            win_name = "Rectangular"
+
+        # operate with the window specific sub-dictionary `win_dict[win_name]`
+        # dictionary in the following
+        d = self.win_dict[win_name]
+        fn_name = d['fn_name']
+
+        if 'par' in d:
+            n_par = len(d['par'])
+        else:
+            n_par = 0
+
+        # --------------------------------------
+        # get attribute fn_name from submodule (default: sig.windows) and
+        # return the desired window function:
+        win_err = False
+        mod_fnct = fn_name.split('.')  # try to split fully qualified name at "."
+        fnct = mod_fnct[-1]  # last / rightmost part = function name
+        if len(mod_fnct) == 1:
+            # only one element, no module given -> use scipy.signal.windows
+            win_fnct = getattr(sig.windows, fnct, None)
+            if not win_fnct:
+                logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
+                            'using rectangular window instead!')
+                win_err = True
+        else:
+            # extract module name from fully qualified name, starting with first /
+            # leftmost part of string to the last '.'
+            mod_name = fn_name[:fn_name.rfind(".")]
+            try:
+                mod = importlib.import_module(mod_name)
+                win_fnct = getattr(mod, fnct, None)
+            except ImportError:  # no valid module
+                logger.error(f'Found no valid module "{mod_name}", '
+                            'using rectangular window instead!')
+                win_err = True
+            except NameError:
+                logger.error(f'Found no valid window function "{fn_name}", '
+                            'using rectangular window instead!')
+                win_err = True
+
+        if win_err:
+            win_fnct = getattr(sig.windows, 'boxcar', None)
+            win_name = "Rectangular"
+            n_par = 0
+
+        self.win_dict.update({'cur_win_name': win_name, 'win': []})
+        self.win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
+
+        return win_err  # error flag, ui (window combo box) needs to be updated
+
+# ------------------------------------------------------------------------------
+    def get_window(self, N: int, win_name: str = None, sym: bool = False,
+                   clear_cache: bool = False) -> np.array:
+        """
+        Calculate or retrieve from cache the selected window function with `N` points.
 
         Parameters
         ----------
@@ -820,7 +731,7 @@ class QFFTWinSelector(QWidget):
             obtain the window function, its parameters and tool tipps etc. via
             `set_window_name()`. If not, the previous setting are used. If window
             and number of data points are unchanged, the window is retrieved from
-            `win_dict['win']` instead of recalculating it.
+            `self.win_dict['win']` instead of recalculating it.
 
             If some kind of error occurs during calculation of the window, a rectangular
             window is used as a fallback and the class attribute `self.err` is
@@ -830,17 +741,62 @@ class QFFTWinSelector(QWidget):
             When True, generate a symmetric window for filter design.
             When False (default), generate a periodic window for spectral analysis.
 
+        clear_cache : bool, optional
+            Clear the window cache
+
         Returns
         -------
         win_fnct : ndarray
             The window function with `N` data points, normalized with the correlated gain.
-            This is also stored in `win_dict['win']`. Additionally, the normalized
-            equivalent noise bandwidth is calculated and stored as `win_dict['nenbw']`
-            as well as thecorrelated gain `win_dict['cgain']`.
+            This is also stored in `self.win_dict['win']`. Additionally, the normalized
+            equivalent noise bandwidth is calculated and stored as
+            `self.win_dict['nenbw']` as well as the correlated gain
+            `self.win_dict['cgain']`.
         """
-        w = calc_window(self.win_dict, N, win_name=win_name, sym=sym)
+        logger.warning(f"get_window, N={N}")
+        self.err = False
 
-        self.err = calc_window.err
+        if clear_cache:
+            self.win_dict['win'] = []  # clear the cache
+        if win_name is None or win_name == self.win_dict['cur_win_name']:
+            win_name = self.win_dict['cur_win_name']
+            if len(self.win_dict['win']) == N:  # return unchanged window function
+                return self.win_dict['win']
+
+        win_fnct = self.win_dict[win_name]['win_fnct']
+        fn_name = self.win_dict[win_name]['fn_name']
+        n_par = self.win_dict[win_name]['n_par']
+
+        try:
+            if fn_name == 'dpss':
+                logger.info("dpss!")
+                w = scipy.signal.windows.dpss(N, self.in_dict[win_name]['par'][0]['val'],
+                                              sym=sym)
+            elif n_par == 0:
+                w = win_fnct(N, sym=sym)
+            elif n_par == 1:
+                w = win_fnct(N, self.win_dict[win_name]['par'][0]['val'], sym=sym)
+            elif n_par == 2:
+                w = win_fnct(N, self.win_dict[win_name]['par'][0]['val'],
+                             self.win_dict[win_name]['par'][1]['val'], sym=sym)
+            else:
+                logger.error(
+                    "{0:d} parameters are not supported for windows at the moment!"
+                    .format(n_par))
+                w = None
+        except Exception as e:
+            logger.error('An error occurred calculating the window function "{0}":\n{1}'
+                         .format(fn_name, e))
+            w = None
+        if w is None:  # Fall back to rectangular window
+            self.err = True
+            logger.warning('Falling back to rectangular window.')
+            self.set_window_name("Rectangular")
+            w = np.ones(N)
+
+        nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
+        cgain = np.sum(w) / N  # coherent gain / DC average
+        self.win_dict.update({'win': w, 'nenbw': nenbw, 'cgain': cgain})
 
         return w
 
@@ -890,7 +846,7 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win_par'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
-        set_window_name(self.win_dict, cur)  # this resets the window cache
+        self.win_dict['win'] = []  # reset the window cache
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
@@ -941,9 +897,9 @@ class QFFTWinSelector(QWidget):
         - set tooltipps and parameter values from dict
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        err = set_window_name(self.win_dict, cur)
-        # if selected window does not exist (`err = True`), fall back to 'cur_win_name',
-        # which has been set by `set_window_name()`.
+        err = self.set_window_name(cur)
+        # if selected window does not exist (`err = True`) or produces errors, fall back
+        # to 'cur_win_name'
         if err:
             cur = self.win_dict['cur_win_name']
             qset_cmb_box(self.cmb_win_fft, cur, data=False)
