@@ -31,10 +31,16 @@
 
 
 ### New features
-- New FFT window widget for displaying the window in time and frequency domain, it
-  can be invoked from the `y[n]` tab and the Firwin filter design subwidget
-  - much improved selection of window function for spectral analysis (`y[n]` tab)
-    and Firwin filter design ()
+- Improved FFT window widget for displaying the window in time and frequency domain, it
+  can be invoked from the `y[n]` tab and the Firwin filter design subwidget with
+  much improved selection of window function for spectral analysis (`y[n]` tab)
+  and Firwin filter design
+
+  * Window function can be changed from combo boxes in the main widget and in 
+    the FFT widget
+  * improved tooltipps
+  * optional combobox for window parameters (used e.g. for Blackmanharris window)
+
 - Complete make-over of signalling for DRY using new methods
   * 'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
      providing an time-to-live mechanisms for signals
@@ -55,7 +61,7 @@
 
   - Replace some check boxes by checkable push bottons for a cleaner UI
 
-  - Group stimuli in for a better overview
+  - Group stimuli for a better overview
 
   - Allow changing the number of FFT data points via `Info -> Settings`
 
