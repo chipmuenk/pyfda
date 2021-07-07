@@ -391,7 +391,8 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     valid windows into the returned subdictionary (which should be more or less a mutable
     deep copy of `all_windows_dict` in this case.).
 
-    `cur_win_name` determines the initial value of the `cur_win_name` key.
+    `cur_win_name` determines the initial value of the `cur_win_name` key in the
+    returned dictionary.
 
     Parameters
     ----------
@@ -540,7 +541,9 @@ class UserWindows(object):
 
 # =============================================================================
 class QFFTWinSelector(QWidget):
-    # those signals are class variables, shared between instances if more than one exists
+    # those signals are class variables, shared between instances for more than one
+    # instance. This is not a problem as signals are distinguished by the attached
+    # dict with the payload
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
@@ -564,8 +567,8 @@ class QFFTWinSelector(QWidget):
         """
         logger.debug("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
-        if 'id' in dict_sig and dict_sig['id'] == id(self):
-            return  # signal has been emitted from this widget
+        if dict_sig['id'] == id(self):
+            return  # signal has been emitted from same instance
 
         elif 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'fft_win_par':
