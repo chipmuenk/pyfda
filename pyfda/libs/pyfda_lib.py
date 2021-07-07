@@ -14,8 +14,6 @@ import os, re, io
 import sys, time
 import struct
 from contextlib import redirect_stdout
-import logging
-logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, sin, cos
 import numexpr
@@ -26,17 +24,21 @@ import scipy.signal as sig
 from distutils.version import LooseVersion
 import pyfda.libs.pyfda_dirs as dirs
 
-####### VERSIONS and related stuff ############################################
+# ###### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
 # ==
 # == When one of the following imports fails, terminate the program
-V_NP = np.__version__
-V_NUM = numexpr.__version__
 from scipy import __version__ as V_SCI
 from matplotlib import __version__ as V_MPL
 from .compat import QT_VERSION_STR as V_QT
 from .compat import PYQT_VERSION_STR as V_PYQT
 from markdown import __version__ as V_MD
+
+import logging
+logger = logging.getLogger(__name__)
+
+V_NP = np.__version__
+V_NUM = numexpr.__version__
 
 # redirect stdio output of show_config to string
 f = io.StringIO()
@@ -60,7 +62,7 @@ __all__ = ['cmp_version', 'mod_version',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
            'to_html', 'calc_Hcomplex']
 
-PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
+PY32_64 = struct.calcsize("P") * 8  # yields 32 or 64, depending on 32 or 64 bit Python
 
 V_PY = ".".join(map(str, sys.version_info[:3])) + " (" + str(PY32_64) + " Bit)"
 
@@ -199,7 +201,7 @@ def mod_version(mod=None):
         for l in v:
             try:
                 v_md += l.format(**MOD_VERSIONS)  # evaluate {V_...} from MOD_VERSIONS entries
-            except (KeyError) as e: # encountered undefined {V_...}
+            except (KeyError) as e:  # encountered undefined {V_...}
                 logger.warning("KeyError: {0}".format(e))  # simply drop the line
 
         v_html = markdown.markdown(v_md, output_format='html5',
@@ -207,6 +209,7 @@ def mod_version(mod=None):
         # pyinstaller needs explicit definition of extensions path
 
         return v_html
+
 
 # ------------------------------------------------------------------------------
 logger.info(mod_version())
@@ -411,7 +414,6 @@ def pprint_log(d, N=10, tab="\t"):
             else:
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
-        s.rstrip(tab+'\n')  # remove last tab and CR
     elif type(d) in {list, np.ndarray}:
         # if type(d) == np.ndarray:
         #    d = d.tolist()
@@ -435,10 +437,10 @@ def pprint_log(d, N=10, tab="\t"):
                     s += ' ...' + '\n' + tab
                 else:
                     s += '\n' + tab
-            s.rstrip(tab+'\n')  # remove last tab and CR
     else:
         s = d
 
+    s.rstrip()  # remove tab and CR at the end
     return s
 
 
