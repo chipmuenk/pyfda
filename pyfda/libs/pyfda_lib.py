@@ -411,6 +411,7 @@ def pprint_log(d, N=10, tab="\t"):
             else:
                 s += k + ' : ' + str(d[k])
             s += '\n' + tab
+        s.rstrip(tab+'\n')  # remove last tab and CR
     elif type(d) in {list, np.ndarray}:
         # if type(d) == np.ndarray:
         #    d = d.tolist()
@@ -434,6 +435,7 @@ def pprint_log(d, N=10, tab="\t"):
                     s += ' ...' + '\n' + tab
                 else:
                     s += '\n' + tab
+            s.rstrip(tab+'\n')  # remove last tab and CR
     else:
         s = d
 
