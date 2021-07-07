@@ -440,7 +440,8 @@ class Firwin(QWidget):
             self.win_dict["Kaiser"]["par"]["val"] = beta
             self._update_UI()
         else:
-            N = remezord(F, W, A, fs=1, alg=alg)[0]
+            N = remezord(
+                F, W, A, fs=1, alg=alg)[0]
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         return N
 
