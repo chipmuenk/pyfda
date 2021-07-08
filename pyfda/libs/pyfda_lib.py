@@ -404,43 +404,46 @@ def pprint_log(d, N=10, tab="\t"):
     If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
     truncate it to `N` items.
     """
+    cr = os.linesep
     s = tab
+    first = True
     # logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
     if type(d) == dict:
         for k in d:
+            if not first:
+                s += cr + tab
             if type(d[k]) in {list, np.ndarray}:
                 s += k + ' (L=' + str(len(d[k])) + ') :'\
                                 + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
             else:
                 s += k + ' : ' + str(d[k])
-            s += '\n' + tab
+            first = False
     elif type(d) in {list, np.ndarray}:
         # if type(d) == np.ndarray:
         #    d = d.tolist()
         if np.ndim(d) == 1:
-            s += ('Type: {0} -> {1}, Shape =  ({2} x 1)\n' + tab)\
+            s += ('Type: {0} -> {1}, Shape =  ({2} x 1)' + cr + tab)\
                 .format(type(d), type(d[0]), len(d))
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
-            s += ('Type: {0} of {1}({2}), Shape = ({3} x {4})\n' + tab)\
+            s += ('Type: {0} of {1}({2}), Shape = ({3} x {4})' + cr + tab)\
                 .format(type(d).__name__, type(d[0][0]).__name__, d[0][0].dtype, rows, cols)
             #  use x.dtype.kind for general kind of numpy data
             logger.debug(s)
             for c in range(min(N-1, cols)):
-                logger.debug('rows={0}; min(N-1, rows)={1}\nd={2}'\
-                               .format(rows, min(N, rows), d[c][:min(N, rows)]))
+                if not first:
+                    s += cr + tab
+                logger.debug('rows={0}; min(N-1, rows)={1}\nd={2}'
+                             .format(rows, min(N, rows), d[c][:min(N, rows)]))
                 s += str(d[c][: min(N, rows)])
                 if rows > N-1:
-                    s += ' ...' + '\n' + tab
-                else:
-                    s += '\n' + tab
-    else:
+                    s += ' ...'
+                first = False
         s = d
 
-    s.rstrip()  # remove tab and CR at the end
     return s
 
 
