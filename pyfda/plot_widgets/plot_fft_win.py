@@ -17,7 +17,8 @@ from scipy.signal import argrelextrema
 import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
-from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top, qled_set_max_width, QVLine
+from pyfda.libs.pyfda_qt_lib import (
+    qwindow_stay_on_top, qled_set_max_width, QVLine, QHLine)
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -28,7 +29,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QCheckBox, QLabel, QLineEdit,
     QFrame, QFont, QPushButton, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
-    QFontMetrics)
+    QFontMetrics, QSizePolicy, QHeaderView)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -97,10 +98,11 @@ class Plot_FFT_win(QDialog):
 
         self.pad = 16  # zero padding factor for smooth FFT plot
 
-        self.tbl_rows = 2
-        self.tbl_cols = 6
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False]
+        #    False, False, False, False]
+        self.tbl_cols = 6
+        self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
 
         self._construct_UI()
         self.calc_win_draw()
@@ -215,9 +217,20 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
+        # ----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        # ----------------------------------------------------------------------
         layH_win_select = QHBoxLayout()
         layH_win_select.addWidget(self.qfft_win_select)
+        layH_win_select.setContentsMargins(0,0,0,0)
         layH_win_select.addStretch(1)
+        frmQFFT = QFrame(self)
+        frmQFFT.setObjectName("frmQFFT")
+        frmQFFT.setLayout(layH_win_select)
+
+        hline = QHLine()
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.lbl_N)
@@ -238,37 +251,24 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.but_log_f)
 
         layVControls = QVBoxLayout()
-        layVControls.addLayout(layH_win_select)
+        layVControls.addWidget(frmQFFT)
+        layVControls.addWidget(hline)        
         layVControls.addLayout(layHControls)
-
-        self.tbl_win_properties = QTableWidget(
-            self.tbl_rows, self.tbl_cols, self)
-        self.tbl_win_properties.setAlternatingRowColors(True)
-        self.tbl_win_properties.verticalHeader().setVisible(False)
-        self.tbl_win_properties.horizontalHeader().setVisible(False)
-        self._construct_table(self.tbl_rows, self.tbl_cols, " ")
-
-        self.txtInfoBox = QTextBrowser(self)
-
-        # ----------------------------------------------------------------------
-        #               ### frmControls ###
-        #
-        # This widget encompasses all control subwidgets
-        # ----------------------------------------------------------------------
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
-        self.frmControls.setLayout(layVControls)
+        
+        frmControls = QFrame(self)
+        frmControls.setObjectName("frmControls")
+        frmControls.setLayout(layVControls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # main widget: Layout layVMainMpl (VBox) is defined with MplWidget,
-        #              additional widgets can be added (like self.frmControls)
-        #              The widget encompasses all other widgets.
+        # Layout layVMainMpl (VBox) is defined within MplWidget, additional
+        # widgets can be added below the matplotlib widget (here: frmControls)
+        # 
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
-        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget.layVMainMpl.addWidget(frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(0,0,0,0)
 
         # ----------------------------------------------------------------------
         #               ### frmInfo ###
@@ -276,29 +276,52 @@ class Plot_FFT_win(QDialog):
         # This widget encompasses the text info box and the table with window
         # parameters.
         # ----------------------------------------------------------------------
+        self.tbl_win_props = QTableWidget(self.tbl_rows, self.tbl_cols, self)
+        self.tbl_win_props.setAlternatingRowColors(True)
+        # Auto-resize of table can be set using the header (although it is invisible)
+        self.tbl_win_props.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Only the columns with data are stretched, the others are minimum size
+        self.tbl_win_props.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.tbl_win_props.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
+        self.tbl_win_props.verticalHeader().setVisible(False)
+        self.tbl_win_props.horizontalHeader().setVisible(False)
+        self.tbl_win_props.setSizePolicy(
+            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.tbl_win_props.setFixedHeight(
+            self.tbl_win_props.rowHeight(0) * self.tbl_rows
+            + self.tbl_win_props.frameWidth() * 2)
+        # self.tbl_win_props.setVerticalScrollBarPolicy(
+        #     Qt.ScrollBarAlwaysOff)
+        # self.tbl_win_props.setHorizontalScrollBarPolicy(
+        #     Qt.ScrollBarAlwaysOff)
+      
+        self._construct_table(self.tbl_rows, self.tbl_cols, " ")
+
+        self.txtInfoBox = QTextBrowser(self)
+
         layVInfo = QVBoxLayout(self)
-        layVInfo.addWidget(self.tbl_win_properties)
+        layVInfo.addWidget(self.tbl_win_props)
         layVInfo.addWidget(self.txtInfoBox)
 
-        self.frmInfo = QFrame(self)
-        self.frmInfo.setObjectName("frmInfo")
-        self.frmInfo.setLayout(layVInfo)
+        frmInfo = QFrame(self)
+        frmInfo.setObjectName("frmInfo")
+        frmInfo.setLayout(layVInfo)
 
         # ----------------------------------------------------------------------
         #               ### splitter ###
         #
-        # This widget encompasses all control subwidgets
+        # This widget encompasses all subwidgets
         # ----------------------------------------------------------------------
 
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.mplwidget)
-        splitter.addWidget(self.frmInfo)
+        splitter.addWidget(frmInfo)
 
         # setSizes uses absolute pixel values, but can be "misused" by
         # specifying values that are way too large: in this case, the space
         # is distributed according to the _ratio_ of the values:
-        splitter.setSizes([3000, 1000])
+        splitter.setSizes([3000, 800])
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(splitter)
@@ -333,7 +356,7 @@ class Plot_FFT_win(QDialog):
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        self.tbl_win_properties.itemClicked.connect(self._handle_item_clicked)
+        self.tbl_win_props.itemClicked.connect(self._handle_item_clicked)
 
         self.qfft_win_select.sig_tx.connect(self.update_fft_win)
 
@@ -370,7 +393,7 @@ class Plot_FFT_win(QDialog):
                         item.setCheckState(Qt.Checked)
                     else:
                         item.setCheckState(Qt.Unchecked)
-                self.tbl_win_properties.setItem(r, c, item)
+                self.tbl_win_props.setItem(r, c, item)
     # https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
 # ------------------------------------------------------------------------------
@@ -438,11 +461,11 @@ class Plot_FFT_win(QDialog):
         """
         Set the table item with the index `row, col` and the value val
         """
-        item = self.tbl_win_properties.item(row, col)
+        item = self.tbl_win_props.item(row, col)
         item.setText(str(val))
 
         if font:
-            self.tbl_win_properties.item(row, col).setFont(font)
+            self.tbl_win_props.item(row, col).setFont(font)
 
         if sel is True:
             item.setCheckState(Qt.Checked)
@@ -618,8 +641,8 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(1, 4, "{0:.5g}".format(self.sidelobe_level_disp))
         self._set_table_item(1, 5, self.cgain_unit)
 
-        self.tbl_win_properties.resizeColumnsToContents()
-        self.tbl_win_properties.resizeRowsToContents()
+        self.tbl_win_props.resizeColumnsToContents()
+        self.tbl_win_props.resizeRowsToContents()
 
 # -----------------------------------------------------------------------------
     def redraw(self):
