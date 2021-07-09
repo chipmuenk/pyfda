@@ -637,7 +637,7 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_par_1.currentIndexChanged.connect(self.ui2dict_params)
 
 # ------------------------------------------------------------------------------
-    def set_window_name(self, win_name: str = ""):
+    def set_window_name(self, win_name: str = "") -> bool:
         """
         Select and set a window function object from its name `win_name` and update the
         `win_dict` dictionary correspondingly with:
@@ -750,7 +750,7 @@ class QFFTWinSelector(QWidget):
         Returns
         -------
         win_fnct : ndarray
-            The window function with `N` data points, normalized with the correlated gain.
+            The window function with `N` data points (should be normalized to 1)
             This is also stored in `self.win_dict['win']`. Additionally, the normalized
             equivalent noise bandwidth is calculated and stored as
             `self.win_dict['nenbw']` as well as the correlated gain
