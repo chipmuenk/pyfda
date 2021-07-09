@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QWidget, QComboBox, QLabel, QLineEdit, QFrame,
                              QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,
                              QFileDialog, QInputDialog, QPlainTextEdit,
-                             QTableWidget, QTableWidgetItem, QTextBrowser,
+                             QTableWidget, QTableWidgetItem, QHeaderView, QTextBrowser,
                              QSizePolicy, QAbstractItemView,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
                              QStyledItemDelegate, QStyle, QStyleOption)
