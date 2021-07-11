@@ -565,7 +565,7 @@ class QFFTWinSelector(QWidget):
         the widgets from the dictionary
 
         """
-        logger.debug("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
@@ -714,6 +714,7 @@ class QFFTWinSelector(QWidget):
             n_par = 0
 
         self.win_dict.update({'cur_win_name': win_name, 'win': []})
+        logger.error('update win in set_window_name()\n')
         self.win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
         return win_err  # error flag, ui (window combo box) needs to be updated
@@ -756,15 +757,21 @@ class QFFTWinSelector(QWidget):
             `self.win_dict['nenbw']` as well as the correlated gain
             `self.win_dict['cgain']`.
         """
-        logger.warning(f"get_window, N={N}")
+        N_cache = 6  # number of windows that can be cached
+        win = self.win_dict['win']
         self.err = False
 
         if clear_cache:
             self.win_dict['win'] = []  # clear the cache
+            self.win_idx = 0
         if win_name is None or win_name == self.win_dict['cur_win_name']:
             win_name = self.win_dict['cur_win_name']
-            if len(self.win_dict['win']) == N:  # return unchanged window function
-                return self.win_dict['win']
+            if win == []: # cache has been cleared, reset index
+                self.win_idx = 0
+            else:
+                for i in range(len(win)):
+                    if len(win[i]) == N:
+                        return win[i] # return unchanged window function
 
         win_fnct = self.win_dict[win_name]['win_fnct']
         fn_name = self.win_dict[win_name]['fn_name']
@@ -799,7 +806,16 @@ class QFFTWinSelector(QWidget):
 
         nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
         cgain = np.sum(w) / N  # coherent gain / DC average
-        self.win_dict.update({'win': w, 'nenbw': nenbw, 'cgain': cgain})
+        if len(win) < N_cache:
+            win.append(w)
+        else:
+            win[self.win_idx] = w
+            self.win_idx = (self.win_idx + 1) % N_cache
+
+        self.win_dict.update({'win': win, 'nenbw': nenbw, 'cgain': cgain})
+
+        logger.warning(f"get_window: N={N}, len (win) = {len(win)},\
+                       {self.win_idx}\n{pprint_log(win)}")
 
         return w
 
@@ -850,6 +866,7 @@ class QFFTWinSelector(QWidget):
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
         self.win_dict['win'] = []  # reset the window cache
+        logger.error("Reset ui2dict_params\n")
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
