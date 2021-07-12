@@ -868,7 +868,6 @@ class QFFTWinSelector(QWidget):
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
         self.win_dict['win'] = []  # reset the window cache
-        logger.error("Reset ui2dict_params\n")
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
