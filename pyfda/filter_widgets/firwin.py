@@ -436,12 +436,12 @@ class Firwin(QWidget):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
-        logger.warning(self.win_dict["cur_win_name"])
         if "Kaiser" in self.win_dict and self.win_dict['cur_win_name'] == "Kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
-            self.win_dict["Kaiser"]["par"]["val"] = beta
-            logger.warning(N)
-            self._update_UI()
+            # logger.warning(f"N={N}, beta={beta}, A_SB={fb.fil[0]['A_SB']}")
+            self.win_dict["Kaiser"]["par"][0]["val"] = beta
+            self.qfft_win_select.led_win_par_0.setText(str(beta))
+            self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
         else:
             N = remezord(
                 F, W, A, fs=1, alg=alg)[0]
