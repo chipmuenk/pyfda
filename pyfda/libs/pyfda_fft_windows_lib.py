@@ -52,8 +52,10 @@ rectangular_info =\
     transition of all windowed FIR filters but the worst stop band attenuation.
     </span>'''
 all_windows_dict = {
-    'win': [],  # array with window values for FFT / filter design
-    'cur_win_name': 'Rectangular',  # name of current window
+    # array for caching window values, dtype=object because subarrays
+    # differ in length
+    'win': np.array([], dtype=object),
+    'cur_win_name': 'Hamming',  # name of current window
     #
     'Boxcar': {
         'fn_name': 'boxcar',
@@ -409,7 +411,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
     awd = copy.deepcopy(all_windows_dict)
     d = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
-    d.update({'cur_win_name': awd['cur_win_name'], 'win': awd['win']})
+    d.update({'cur_win_name': cur_win_name, 'win': awd['win']})
     return d
 
 
@@ -565,7 +567,7 @@ class QFFTWinSelector(QWidget):
         the widgets from the dictionary
 
         """
-        logger.warning("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        # logger.debug("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
@@ -714,7 +716,6 @@ class QFFTWinSelector(QWidget):
             n_par = 0
 
         self.win_dict.update({'cur_win_name': win_name, 'win': []})
-        logger.error('update win in set_window_name()\n')
         self.win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
         return win_err  # error flag, ui (window combo box) needs to be updated
@@ -771,6 +772,7 @@ class QFFTWinSelector(QWidget):
             else:
                 for i in range(len(win)):
                     if len(win[i]) == N:
+                        # logger.warning(f"cache win {i} / {self.win_idx} (N = {N})")
                         return win[i] # return unchanged window function
 
         win_fnct = self.win_dict[win_name]['win_fnct']
@@ -806,6 +808,9 @@ class QFFTWinSelector(QWidget):
 
         nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
         cgain = np.sum(w) / N  # coherent gain / DC average
+
+        # build a cache with window values and keep an index to replace
+        # oldest entry first
         if len(win) < N_cache:
             win.append(w)
         else:
@@ -813,9 +818,6 @@ class QFFTWinSelector(QWidget):
             self.win_idx = (self.win_idx + 1) % N_cache
 
         self.win_dict.update({'win': win, 'nenbw': nenbw, 'cgain': cgain})
-
-        logger.warning(f"get_window: N={N}, len (win) = {len(win)},\
-                       {self.win_idx}\n{pprint_log(win)}")
 
         return w
 

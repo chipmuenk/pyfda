@@ -44,7 +44,6 @@
 - Complete make-over of signalling for DRY using new methods
   * 'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
      providing an time-to-live mechanisms for signals
-  * 'pyfda_qt_lib.sig_loop()' to test for infinite loops
 
 - Lots of improvements in `y[n]` tab: 
 

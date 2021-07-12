@@ -49,7 +49,7 @@ class Plot_Impz(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Plot_Impz, self).__init__(parent)
@@ -193,16 +193,12 @@ class Plot_Impz(QWidget):
         - plot_tab_widgets() (global signals)
         """
 
-        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        # logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+        #              .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
-        if self.sig_loop(dict_sig, logger) > 0:
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-        # if 'id' not in dict_sig:
-        #     logger.error("id missing in {0}".format(pprint_log(dict_sig)))
-        # elif dict_sig['id'] == id(self):
-        #     logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-        #     return
 
         self.error = False
 

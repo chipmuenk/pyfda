@@ -79,8 +79,8 @@ class Plot_3D(QWidget):
         """
         Process signals coming from the navigation toolbar and from ``sig_rx``
         """
-        logger.debug("Processing {0} | data_changed = {1}, visible = {2}"\
-                     .format(dict_sig, self.data_changed, self.isVisible()))
+        # logger.debug("Processing {0} | data_changed = {1}, visible = {2}"\
+        #              .format(dict_sig, self.data_changed, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
                 self.draw()

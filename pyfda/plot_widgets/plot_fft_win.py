@@ -75,7 +75,7 @@ class Plot_FFT_win(QDialog):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
@@ -129,10 +129,11 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        logger.debug("PROCESS_SIG_RX - vis={0}, needs_calc={1}\n{2}"
-                     .format(self.isVisible(), self.needs_calc, pprint_log(dict_sig)))
+        # logger.debug("PROCESS_SIG_RX - vis={0}, needs_calc={1}\n{2}"
+        #              .format(self.isVisible(), self.needs_calc, pprint_log(dict_sig)))
 
-        if self.sig_loop(dict_sig, logger) > 0:
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         elif not self.isVisible():

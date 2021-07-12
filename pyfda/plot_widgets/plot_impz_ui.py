@@ -41,7 +41,7 @@ class PlotImpz_UI(QWidget):
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
 
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -51,13 +51,11 @@ class PlotImpz_UI(QWidget):
         - qfft_win_select
         """
 
-        logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
+        #              .format(self.isVisible(), pprint_log(dict_sig)))
 
-        # if 'id' in dict_sig and dict_sig['id'] == id(self):
-        #     logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-        #     return
-        if self.sig_loop(dict_sig, logger) > 0:
+        if 'id' in dict_sig and dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         # --- signals coming from the FFT window widget or the FFT window selector

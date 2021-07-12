@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, unique_roots
-from pyfda.libs.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, pprint_log
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -35,7 +35,7 @@ class FreqSpecs(QWidget):
     # class variables (shared between instances if more than one exists)
     sig_tx = pyqtSignal(object)  # outgoing
     sig_rx = pyqtSignal(object)  # incoming
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, title="Frequency Specs"):
 
@@ -54,8 +54,9 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if self.sig_loop(dict_sig, logger) > 0:
+        # logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()

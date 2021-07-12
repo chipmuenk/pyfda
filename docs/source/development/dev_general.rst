@@ -10,13 +10,13 @@ The software is organized as shown in the following figure
 
    pyfda Organization
 
-**Communication:** 
+**Communication:**
     The modules communicate via Qt's signal-slot mechanism (see: :ref:`dev_signalling`).
 
-**Data Persistence:** 
+**Data Persistence:**
     Common data is stored in dicts that can be accessed globally (see: :ref:`dev_persistence`).
 
-**Customization:** 
+**Customization:**
     The software can be customized a.o. via the file ``conf.py`` (see: :ref:`man_customization`).
 
 .. _dev_signalling:
@@ -28,25 +28,25 @@ The figure above shows the general pyfda hierarchy. When parameters or settings 
 changed in a widget, a Qt signal is emitted that can be processed by other widgets
 with a ``sig_rx`` slot for receiving information. The dict ``dict_sig`` is attached
 to the signal as a "payload", providing information about the sender and the type
-of event . ``sig_rx`` is connected to the 
+of event . ``sig_rx`` is connected to the
 ``process_sig_rx()`` method that processes the dict.
 
-Many Qt signals can be connected to one Qt slot and one signal to many slots, 
-so signals of input and plot widgets are collected in 
+Many Qt signals can be connected to one Qt slot and one signal to many slots,
+so signals of input and plot widgets are collected in
 :mod:`pyfda.input_widgets.input_tab_widgets`
 and :mod:`pyfda.plot_widgets.plot_tab_widgets` respectively and connected collectively.
 
 When a redraw / calculations can take a long time, it makes sense to perform these
-operations only when the widget is visible and store the need for a redraw in a flag.    
+operations only when the widget is visible and store the need for a redraw in a flag.
 
 .. code::
 
-    class MyWidget(QWidget):       
+    class MyWidget(QWidget):
         sig_resize = pyqtSignal()   # emit a local signal upon resize
-        sig_rx = pyqtSignal(object) # incoming signal 
+        sig_rx = pyqtSignal(object) # incoming signal
         sig_tx = pyqtSignal(object) # outgoing signal
-        from pyfda.libs.pyfda_qt_lib import emit, sig_loop
-        
+        from pyfda.libs.pyfda_qt_lib import emit
+
         def __init__(self, parent):
             super(MyWidget, self).__init__(parent)
             self.data_changed = True # initialize flags
@@ -54,14 +54,14 @@ operations only when the widget is visible and store the need for a redraw in a 
             self.filt_changed = True
             self.sig_rx.connect(self.process_sig_rx)
             # usually done in method ``_construct_UI()``
-            
+
         def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        if self.sig_loop(dict_sig, logger) > 0:
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-            
         if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
                 self.recalculate_some_data() # this may take time ...
@@ -80,19 +80,19 @@ operations only when the widget is visible and store the need for a redraw in a 
             if 'filt_changed' in dict_sig:
                 self.filt_changed = True
 
-Information is transmitted via the global ``sig_tx`` signal (referenced by the imported 
+Information is transmitted via the global ``sig_tx`` signal (referenced by the imported
 ``emit()`` method):
 
 .. code::
 
-        dict_sig = {'fx_sim':'set_results', 'fx_results':self.fx_results}            
+        dict_sig = {'fx_sim':'set_results', 'fx_results':self.fx_results}
         self.emit(dict_sig)
 
 The following dictionary keys are generally used, individual ones can be created
 as needed.
 
 :'id': Python ``id(self)`` reference to the sending widget instance, needed a.o.
-    to prevent infinite loops which may occur when the rx event is connected to 
+    to prevent infinite loops which may occur when the rx event is connected to
     the tx signal. **Automatically added by ``emit()`` if not in ``dict_sig``.**
 
 :'class': Class name of the sending widget, usually given as ``self.__class__.__name__``.
@@ -106,7 +106,7 @@ as needed.
 :'filt_changed': A different filter type (response type, algorithm, ...) has been
     selected or loaded, requiring an update of the UI in some widgets.
 
-:'data_changed': A filter has been designed and the actual data (e.g. coefficients) 
+:'data_changed': A filter has been designed and the actual data (e.g. coefficients)
     has changed, you can add the (short) name or a data description as the dict value.
     When this key is sent, most widgets have to be updated.
 
@@ -115,16 +115,16 @@ as needed.
     as an overlay or the :ref:`dev_input_info` widget that compares filter performance
     to filter specifications.
 
-:'view_changed': When e.g. the range of the frequency axis is changed from 
-    :math:`0 \ldots f_S/2` to :math:`-f_S/2 \ldots f_S/2`, this information can 
+:'view_changed': When e.g. the range of the frequency axis is changed from
+    :math:`0 \ldots f_S/2` to :math:`-f_S/2 \ldots f_S/2`, this information can
     be propagated with the ``'view_changed'`` key.
 
 :'ui_changed': Propagate a change of the UI to other widgets, examples are:
 
      - ``'ui_changed':'csv'`` for a change of CSV import / export options
-     
+
      - ``'ui_changed':'resize'`` when the parent window has been resized
-    
+
      - ``'ui_changed':'tab'`` when a different tab has been selected
 
 :'fx_sim': Signal the phase / status of a fixpoint simulation ('finished', 'error')
@@ -135,6 +135,6 @@ as needed.
 Persistence: Where's the data?
 ------------------------------
 
-At startup, a dictionary is constructed with information about the filter 
+At startup, a dictionary is constructed with information about the filter
 classes and their methods. The central dictionary ``fb.dict`` is initialized.
 

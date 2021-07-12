@@ -60,7 +60,7 @@ class Input_Fixpoint_Specs(QWidget):
     sig_rx_local = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx_local
     sig_rx = pyqtSignal(object)  # incoming, connected to input_tab_widget.sig_rx
     sig_tx = pyqtSignal(object)  # outcgoing
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Input_Fixpoint_Specs, self).__init__(parent)
@@ -99,10 +99,12 @@ class Input_Fixpoint_Specs(QWidget):
         4. Send back HDL response to widget via 'fx_sim':'set_response'
         """
 
-        logger.debug("SIG_RX(): vis={0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
-        if self.sig_loop(dict_sig, logger) > 0:
+        # logger.debug("SIG_RX(): vis={0}\n{1}"
+        #              .format(self.isVisible(), pprint_log(dict_sig)))
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
+
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
             # New filter has been designed, update list of available filter topologies
             self._update_filter_cmb()

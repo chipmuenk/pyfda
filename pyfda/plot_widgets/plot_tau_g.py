@@ -109,8 +109,8 @@ class Plot_tau_g(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
-                     .format(dict_sig, self.needs_calc, self.isVisible()))
+        # logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
+        #              .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()

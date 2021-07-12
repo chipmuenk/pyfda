@@ -42,7 +42,7 @@ class Input_Coeffs_UI(QWidget):
         """
         Process signals coming from the CSV pop-up window
         """
-        logger.debug("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        # logger.debug("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
         if 'closeEvent' in dict_sig:
             self._close_csv_win()

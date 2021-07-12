@@ -66,7 +66,7 @@ class Input_Info(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        # logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if 'data_changed' in dict_sig or 'view_changed' in dict_sig\
                 or 'specs_changed' in dict_sig:
             self.load_dict()

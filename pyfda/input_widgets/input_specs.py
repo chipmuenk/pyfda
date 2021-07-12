@@ -40,7 +40,7 @@ class Input_Specs(QWidget):
 
     sig_rx = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Input_Specs, self).__init__(parent)
@@ -66,8 +66,10 @@ class Input_Specs(QWidget):
         its parent widget (`input_specs`) to prevent infinite loops.
 
         """
-        logger.debug("Processing {0}".format(pprint_log(dict_sig)))
-        if self.sig_loop(dict_sig, logger, propagate=propagate) > 0:
+        # logger.debug(f"SIG_RX: {pprint_log(dict_sig)}")
+        if dict_sig['id'] == id(self):
+            logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
+                           \n{pprint_log(dict_sig)}")
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()

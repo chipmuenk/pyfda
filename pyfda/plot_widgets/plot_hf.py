@@ -55,8 +55,8 @@ class Plot_Hf(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("SIG_RX - needs_calc = {0}, vis = {1}\n{2}"\
-                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        # logger.debug("SIG_RX - needs_calc = {0}, vis = {1}\n{2}"\
+        #              .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\

@@ -47,8 +47,9 @@ class TargetSpecs(QWidget):
 #         Process signals coming in via subwidgets and sig_rx
 #         """
 #         logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-#         if sig_loop(dict_sig, logger) > 0:
-#             return
+#         if dict_sig['id'] == id(self):
+#           logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+#           return
 #         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
 #             # update target frequencies with new f_S
 #             self.f_specs.recalc_freqs()

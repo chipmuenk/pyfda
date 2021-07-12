@@ -276,7 +276,7 @@ class Input_Coeffs(QWidget):
     """
     sig_tx = pyqtSignal(object)  # emitted when filter has been saved
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Input_Coeffs, self).__init__(parent)
@@ -296,10 +296,11 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("process_sig_rx(): vis={0}\n{1}"\
-                    .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.debug("process_sig_rx(): vis={0}\n{1}"\
+        #             .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if self.sig_loop(dict_sig, logger) > 0:
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':

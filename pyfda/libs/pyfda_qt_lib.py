@@ -44,29 +44,29 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     signal.emit(dict_sig)
 
 
-# ------------------------------------------------------------------------------
-def sig_loop(self, dict_sig: dict, logger, **kwargs) -> int:
-    """
-    Test whether the signal has been emitted by self, leading to a possible
-    infinite loop.
-    """
-    # if 'id' not in dict_sig:
-    #     if kwargs:
-    #         logger.error("id missing in {0}\n{1}"
-    #                      .format(pprint_log(dict_sig), pprint_log(kwargs)))
-    #     else:
-    #         logger.error(f"id missing in {pprint_log(dict_sig)}")           
-    #     return 0
+# # ------------------------------------------------------------------------------
+# def sig_loop(self, dict_sig: dict, logger, **kwargs) -> int:
+#     """
+#     Test whether the signal has been emitted by self, leading to a possible
+#     infinite loop.
+#     """
+#     # if 'id' not in dict_sig:
+#     #     if kwargs:
+#     #         logger.error("id missing in {0}\n{1}"
+#     #                      .format(pprint_log(dict_sig), pprint_log(kwargs)))
+#     #     else:
+#     #         logger.error(f"id missing in {pprint_log(dict_sig)}")           
+#     #     return 0
 
-    if dict_sig['id'] == id(self):
-        if kwargs:
-            logger.warning("Stopped infinite loop:\n{0}\n{1}"
-                           .format(pprint_log(dict_sig), pprint_log(kwargs)))
-        else:
-            logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
-        return 1
-    else:
-        return -1
+#     if dict_sig['id'] == id(self):
+#         if kwargs:
+#             logger.warning("Stopped infinite loop:\n{0}\n{1}"
+#                            .format(pprint_log(dict_sig), pprint_log(kwargs)))
+#         else:
+#             logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
+#         return 1
+#     else:
+#         return -1
 
 
 # ------------------------------------------------------------------------------

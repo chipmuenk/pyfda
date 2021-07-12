@@ -17,7 +17,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
-from pyfda.libs.pyfda_lib import calc_Hcomplex
+from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 import logging
@@ -31,7 +31,7 @@ class Plot_Phi(QWidget):
     sig_rx = pyqtSignal(object)
     # outgoing, distributed via plot_tab_widget
     sig_tx = pyqtSignal(object)
-    from pyfda.libs.pyfda_qt_lib import emit, sig_loop
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None):
         super(Plot_Phi, self).__init__(parent)
@@ -46,10 +46,11 @@ class Plot_Phi(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
-                     .format(dict_sig, self.needs_calc, self.isVisible()))
+        # logger.debug("Processing {0} | needs_calc = {1}, visible = {2}"
+        #              .format(dict_sig, self.needs_calc, self.isVisible()))
 
-        if self.sig_loop(dict_sig, logger) > 0:
+        if dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         if self.isVisible():
