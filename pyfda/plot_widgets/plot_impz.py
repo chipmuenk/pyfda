@@ -1187,7 +1187,7 @@ class Plot_Impz(QWidget):
             if self.plt_time_spgr == "xn":
                 s = x[self.ui.N_start:]
                 sig_lbl = 'X'
-            elif self.plt_time_spgr == "xqn":
+            elif self.plt_time_spgr == "xqn" and hasattr(self, "x_q"):
                 s = self.x_q[self.ui.N_start:]
                 sig_lbl = 'X_Q'
             elif self.plt_time_spgr == "yn":
