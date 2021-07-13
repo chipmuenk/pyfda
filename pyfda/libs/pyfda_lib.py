@@ -15,7 +15,7 @@ import sys, time
 import struct
 from contextlib import redirect_stdout
 import numpy as np
-from numpy import pi, log10, sin, cos
+from numpy import ndarray, pi, log10, sin, cos
 import numexpr
 import markdown
 
@@ -166,7 +166,8 @@ def cmp_version(mod, version):
         if mod not in MODULES or not MODULES[mod].values():
             return -2
         else:
-            inst_ver = list(MODULES[mod].values())[0] # get dict value without knowing the key
+            # get dict value without knowing the key:
+            inst_ver = list(MODULES[mod].values())[0]
 
         if LooseVersion(inst_ver) > LooseVersion(version):
             return 1
@@ -198,9 +199,10 @@ def mod_version(mod=None):
             # return a list, split at linebreaks while keeping linebreaks
             v = f.read().splitlines(True)
 
-        for l in v:
+        for k in v:
             try:
-                v_md += l.format(**MOD_VERSIONS)  # evaluate {V_...} from MOD_VERSIONS entries
+                # evaluate {V_...} from MOD_VERSIONS entries:
+                v_md += k.format(**MOD_VERSIONS)
             except (KeyError) as e:  # encountered undefined {V_...}
                 logger.warning("KeyError: {0}".format(e))  # simply drop the line
 
@@ -232,7 +234,7 @@ class ANSIcolors:
         https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
     """
     if dirs.OS.lower() == "windows":
-        os.system('color') # needed to activate colored terminal in Windows
+        os.system('color')  # needed to activate colored terminal in Windows
 
     CEND      = '\33[0m'
     CBOLD     = '\33[1m'
@@ -381,7 +383,7 @@ def np_type(a):
 
 
 # -----------------------------------------------------------------------------
-def set_dict_defaults(d, default_dict):
+def set_dict_defaults(d: dict, default_dict: dict) -> None:
     """
     Add the key:value pairs of `default_dict` to dictionary `d` for all missing
     keys
@@ -395,7 +397,7 @@ def set_dict_defaults(d, default_dict):
 
 
 # ------------------------------------------------------------------------------
-def pprint_log(d, N=10, tab="\t"):
+def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
     """
     Provide pretty printed logging messages for dicts or lists.
 
@@ -430,7 +432,8 @@ def pprint_log(d, N=10, tab="\t"):
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
             s += ('Type: {0} of {1}({2}), Shape = ({3} x {4})' + cr + tab)\
-                .format(type(d).__name__, type(d[0][0]).__name__, d[0][0].dtype, rows, cols)
+                .format(type(d).__name__, type(d[0][0])
+                        .__name__, d[0][0].dtype, rows, cols)
             #  use x.dtype.kind for general kind of numpy data
             logger.debug(s)
             for c in range(min(N-1, cols)):
@@ -448,7 +451,8 @@ def pprint_log(d, N=10, tab="\t"):
 
 
 # ------------------------------------------------------------------------------
-def safe_numexpr_eval(expr, fallback=None, local_dict={}):
+def safe_numexpr_eval(expr: str, fallback=None,
+                      local_dict: dict = {}) -> ndarray:
     """
     Evaluate `numexpr.evaluate(expr)` and catch various errors.
 
@@ -456,11 +460,14 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
     ----------
     expr : str
         String to be evaluated and converted to a numpy array
+
     fallback : array-like or tuple
         numpy array or scalar as a fallback when errors occur during evaluation,
         this also defines the expected shape of the returned numpy expression
 
-        When fallback is a tuple (e.g. '(11,)'), provide an array of zeros with the passed shape.
+        When fallback is a tuple (e.g. '(11,)'), provide an array of zeros with
+        the passed shape.
+
     local_dict : dict
         dict with variables passed to `numexpr.evaluate`
 
@@ -515,11 +522,12 @@ def safe_numexpr_eval(expr, fallback=None, local_dict={}):
     return np_expr
 
 
+# ------------------------------------------------------------------------------
 def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
     Try ... except wrapper around numexpr to catch various errors
-    When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
-    return 0 to avoid errors further downstream.
+    When evaluation fails or returns `None`, try evaluating `alt_expr`.
+    When this also fails, return 0 to avoid errors further downstream.
 
     Parameters
     ----------
@@ -551,7 +559,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     result = None
     fallback = ""
-    safe_eval.err = 0 # initialize function attribute
+    safe_eval.err = 0  # initialize function attribute
 
     for ex in [expr, alt_expr]:
         if ex == "":
@@ -567,9 +575,9 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
                 if return_type == 'cmplx':
                     result = ex_num.item()
-                elif return_type == '' or return_type =='auto':
+                elif return_type == '' or return_type == 'auto':
                     result = np.real_if_close(ex_num).item()
-                else: # return_type == 'float' or 'int'
+                else:  # return_type == 'float' or 'int'
                     result = ex_num.real.item()
 
                 if sign in {'pos', 'poszero'}:
@@ -582,7 +590,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = None
 
                 if return_type == 'int' and result is not None:
-                    result = int(result.real) # convert to standard int type, not np.int64
+                    # convert to standard int type, not np.int64
+                    result = int(result.real)
 
         if result is not None:
             break  # break out of for loop when evaluation has succeeded
@@ -595,7 +604,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
 
 # ------------------------------------------------------------------------------
-def to_html(text, frmt=None):
+def to_html(text: str, frmt: str = None) -> str:
     """
     Convert text to HTML format:
         - pretty-print logger messages
@@ -610,10 +619,10 @@ def to_html(text, frmt=None):
     Parameters
     ----------
 
-    text: string
+    text: str
         Text to be converted
 
-    frmt: string
+    frmt: str
         define text style
 
         - 'b' : bold text
@@ -623,7 +632,7 @@ def to_html(text, frmt=None):
     Returns
     -------
 
-    string
+    str
         HTML - formatted text
 
     Examples
@@ -653,45 +662,45 @@ def to_html(text, frmt=None):
     if frmt == 'log':
         # only in logging messages replace e.g. in <class> the angled brackets
         # by HTML code
-        mapping = [ ('<','&lt;'), ('>','&gt;')]
-        for k,v in mapping:
-            text = text.replace(k,v)
+        mapping = [('<', '&lt;'), ('>', '&gt;')]
+        for k, v in mapping:
+            text = text.replace(k, v)
 
-    mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
-                ('\t','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
-                ('[  DEBUG]','<b>[  DEBUG]</b>'),
-                ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
-                ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
-                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
-              ]
+    mapping = [('< ', '&lt;'), ('> ', '&gt;'), ('\n', '<br />'),
+               ('\t', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
+               ('[  DEBUG]', '<b>[  DEBUG]</b>'),
+               ('[   INFO]', '<b style="color:darkgreen;">[   INFO]</b>'),
+               ('[WARNING]', '<b style="color:orange;">[WARNING]</b>'),
+               ('[  ERROR]', '<b style="color:red">[  ERROR]</b>')
+               ]
 
     for k, v in mapping:
-         text = text.replace(k, v)
+        text = text.replace(k, v)
     html = text
     if frmt in {'i', 'bi', 'ib'}:
         html = "<i>" + html + "</i>"
     if frmt in {'b', 'bi', 'ib'}:
         html = "<b>" + html + "</b>"
-    if frmt == None:
+    if frmt is None:
         html = "<span>" + html + "</span>"
 
-    if frmt != 'log': # this is a label, not a logger message
+    if frmt != 'log':  # this is a label, not a logger message
         # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
         html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
         # don't render numbers as italic
 #        if "<i>" in html:
 #            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)', r'\1<span class="font-style:normal">\2</span>', html)
 
-    #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
+    # (^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
     # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
     return html
 
-###############################################################################
-####     Scipy-like    ########################################################
-###############################################################################
 
-def dB(lin, power = False):
+# ##############################################################################
+# ###     Scipy-like    ########################################################
+# ##############################################################################
+def dB(lin: float, power: bool = False) -> float:
     """
     Calculate dB from linear value. If power = True, calculate 10 log ...,
     else calculate 20 log ...
@@ -701,7 +710,10 @@ def dB(lin, power = False):
     else:
         return 20 * np.log10(lin)
 
-def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
+
+# ------------------------------------------------------------------------------
+def lin2unit(lin_value: float, filt_type: str, amp_label: str,
+             unit: str = 'dB') -> float:
     """
     Convert linear amplitude specification to dB or W, depending on filter
     type ('FIR' or 'IIR') and whether the specifications belong to passband
@@ -723,12 +735,12 @@ def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
     Returns the result as a float.
     """
     if unit == 'dB':
-        if "PB" in amp_label: # passband
+        if "PB" in amp_label:  # passband
             if filt_type == 'IIR':
                 unit_value = -20 * log10(1. - lin_value)
             else:
                 unit_value = 20 * log10((1. + lin_value)/(1 - lin_value))
-        else: # stopband
+        else:  # stopband
             unit_value = -20 * log10(lin_value)
     elif unit == 'W':
         unit_value = lin_value * lin_value
@@ -738,7 +750,9 @@ def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
     return unit_value
 
 
-def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
+# ------------------------------------------------------------------------------
+def unit2lin(unit_value: float, filt_type: str, amp_label: str,
+             unit: str = 'dB') -> float:
     """
     Convert amplitude specification in dB or W to linear specs:
 
@@ -755,24 +769,25 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
 
     Returns the result as a float.
     """
-    msg = "" # string for error message
+    msg = ""  # string for error message
     if np.iscomplex(unit_value) or unit_value < 0:
         unit_value = abs(unit_value)
         msg = "negative or complex, "
 
     if unit == 'dB':
         try:
-            if "PB" in amp_label: # passband
+            if "PB" in amp_label:  # passband
                 if filt_type == 'IIR':
                     lin_value = 1. - 10.**(-unit_value / 20.)
                 else:
-                    lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
-            else: # stopband
+                    lin_value = (10.**(unit_value / 20.) - 1)\
+                        / (10.**(unit_value / 20.) + 1)
+            else:  # stopband
                 lin_value = 10.**(-unit_value / 20)
 
         except OverflowError:
             msg += "way "
-            lin_value = 10 # definitely too large, will be limited in next section
+            lin_value = 10  # definitely too large, will be limited in next section
 
     elif unit == 'W':
         lin_value = np.sqrt(unit_value)
@@ -780,7 +795,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
         lin_value = unit_value
 
     # check limits to avoid errors during filter design
-    if "PB" in amp_label: # passband
+    if "PB" in amp_label:  # passband
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
             msg += "too small, "
@@ -793,7 +808,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
                 lin_value = MAX_FPB_AMP
                 msg += "too large, "
 
-    else: # stopband
+    else:  # stopband
         if lin_value < MIN_SB_AMP:
             lin_value = MIN_SB_AMP
             msg += "too small, "
@@ -807,14 +822,18 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
                 msg += "too large, "
 
     if msg:
-        logger.warning("Amplitude spec for {0} is ".format(amp_label) + msg + "using {0:.4g} {1} instead."\
-                       .format(lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label,unit=unit),
-                               unit))
+        logger.warning(
+            "Amplitude spec for {0} is ".format(amp_label) + msg
+            + "using {0:.4g} {1} instead."
+            .format(
+                lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label, unit=unit),
+                unit))
 
     return lin_value
 
 
-def cround(x, n_dig = 0):
+# ------------------------------------------------------------------------------
+def cround(x, n_dig=0):
     """
     Round complex number to n_dig digits. If n_dig == 0, don't round at all,
     just convert complex numbers with an imaginary part very close to zero to
@@ -828,17 +847,15 @@ def cround(x, n_dig = 0):
             x = np.around(x, n_dig)
     return x
 
-#------------------------------------------------------------------------------
-    """
-    Bandlimited periodic functions written by Endolith,
-    https://gist.github.com/endolith/407991
-    """
 
+# ------------------------------------------------------------------------------
 def sawtooth_bl(t):
     """
     Bandlimited sawtooth function as a direct replacement for
     `scipy.signal.sawtooth`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
+
+    By Endolith, https://gist.github.com/endolith/407991
     """
     if t.dtype.char in ['fFdD']:
         ytype = t.dtype.char
@@ -846,17 +863,21 @@ def sawtooth_bl(t):
         ytype = 'd'
     y = np.zeros(t.shape, ytype)
     # Get sampling frequency from timebase
-    fs =  1 / (t[1] - t[0])
+    fs = 1 / (t[1] - t[0])
     # Sum all multiple sine waves up to the Nyquist frequency:
     for h in range(1, int(fs*pi)+1):
         y += 2 / pi * -sin(h * t) / h
     return y
 
+
+# ------------------------------------------------------------------------------
 def triang_bl(t):
     """
     Bandlimited triangle function as a direct replacement for
     `scipy.signal.sawtooth(width=0.5)`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
+
+    By Endolith, https://gist.github.com/endolith/407991
     """
     if t.dtype.char in ['fFdD']:
         ytype = t.dtype.char
@@ -864,17 +885,21 @@ def triang_bl(t):
         ytype = 'd'
     y = np.zeros(t.shape, ytype)
     # Get sampling frequency from timebase
-    fs =  1 / (t[1] - t[0])
+    fs = 1 / (t[1] - t[0])
     # Sum all multiple sine waves up to the Nyquist frequency:
     for h in range(1, int(fs * pi) + 1, 2):
         y += 8 / pi**2 * -cos(h * t) / h**2
     return y
 
+
+# ------------------------------------------------------------------------------
 def rect_bl(t, duty=0.5):
     """
     Bandlimited rectangular function as a direct replacement for
     `scipy.signal.square`. It is calculated by Fourier synthesis, i.e.
     by summing up all sine wave components up to the Nyquist frequency.
+
+    By Endolith, https://gist.github.com/endolith/407991
     """
     if t.dtype.char in ['fFdD']:
         ytype = t.dtype.char
@@ -886,10 +911,14 @@ def rect_bl(t, duty=0.5):
     y = sawtooth_bl(t - duty*2*pi) - sawtooth_bl(t) + 2*duty-1
     return y
 
+
+# ------------------------------------------------------------------------------
 def comb_bl(t):
     """
     Bandlimited comb function. It is calculated by Fourier synthesis, i.e.
     by summing up all cosine components up to the Nyquist frequency.
+
+    By Endolith, https://gist.github.com/endolith/407991
     """
     if t.dtype.char in ['fFdD']:
         ytype = t.dtype.char
@@ -898,15 +927,16 @@ def comb_bl(t):
     y = np.zeros(t.shape, ytype)
     # Get sampling frequency from timebase
     # Sum all multiple sine waves up to the Nyquist frequency:
-    fs =  1 / (t[1] - t[0])
+    fs = 1 / (t[1] - t[0])
     N = int(fs * pi) + 1
     for h in range(1, N):
         y += cos(h * t)
     y /= N
     return y
-#------------------------------------------------------------------------------
 
-def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
+
+# ------------------------------------------------------------------------------
+def H_mag(num, den, z, H_max, H_min=None, log=False, div_by_0='ignore'):
     """
     Calculate `\|H(z)\|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
@@ -942,32 +972,34 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
         The magnitude `\|H(z)\|` for each value of `z`.
     """
 
-    try: len(num)
+    try:
+        len(num)
     except TypeError:
-        num_val = abs(num) # numerator is a scalar
+        num_val = abs(num)  # numerator is a scalar
     else:
-        num_val = abs(np.polyval(num, z)) # evaluate numerator at z
-    try: len(den)
+        num_val = abs(np.polyval(num, z))  # evaluate numerator at z
+    try:
+        len(den)
     except TypeError:
-        den_val = abs(den) # denominator is a scalar
+        den_val = abs(den)  # denominator is a scalar
     else:
-        den_val = abs(np.polyval(den, z)) # evaluate denominator at z
+        den_val = abs(np.polyval(den, z))  # evaluate denominator at z
 
     olderr = np.geterr()  # store current floating point error behaviour
     # turn off divide by zero warnings, just return 'inf':
-    np.seterr(divide = 'ignore')
+    np.seterr(divide='ignore')
 
-    H_val = np.nan_to_num(num_val / den_val) # remove nan and inf
+    H_val = np.nan_to_num(num_val / den_val)  # remove nan and inf
     if log:
         H_val = 20 * np.log10(H_val)
 
-
-    np.seterr(**olderr) # restore previous floating point error behaviour
+    np.seterr(**olderr)  # restore previous floating point error behaviour
 
     # clip result to H_min / H_max
     return np.clip(H_val, H_min, H_max)
 
-#----------------------------------------------
+
+# ------------------------------------------------------------------------------
 # from scipy.sig.signaltools.py:
 def cmplx_sort(p):
     "sort roots based on magnitude."
@@ -978,10 +1010,13 @@ def cmplx_sort(p):
         indx = np.argsort(p)
     return np.take(p, indx, 0), indx
 
+
+# ------------------------------------------------------------------------------
 # adapted from scipy.signal.signaltools.py:
 # TODO:  comparison of real values has several problems (5 * tol ???)
 # TODO: speed improvements
-def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
+def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
+                 rtype: str = 'min', rdist: str = 'euclidian'):
     """
     Determine unique roots and their multiplicities from a list of roots.
 
@@ -1037,13 +1072,13 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
 
     """
 
-    def manhattan(a,b):
+    def manhattan(a, b):
         """
         Manhattan distance between a and b
         """
         return np.abs(a.real - b.real) + np.abs(a.imag - b.imag)
 
-    def euclid(a,b):
+    def euclid(a, b):
         """
         Euclidian distance between a and b
         """
@@ -1067,11 +1102,11 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     else:
         raise TypeError(rdist)
 
-    mult = [] # initialize list for multiplicities
-    pout = [] # initialize list for reduced output list of roots
+    mult = []  # initialize list for multiplicities
+    pout = []  # initialize list for reduced output list of roots
 
     tol = abs(tol)
-    p = np.atleast_1d(p) # convert p to at least 1D array
+    p = np.atleast_1d(p)  # convert p to at least 1D array
     if len(p) == 0:
         return pout, mult
 
@@ -1081,9 +1116,9 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
         return pout, mult
 
     else:
-        pout = p[np.isnan(p)].tolist() # copy nan elements to pout, convert to list
-        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan
-        p = p[~np.isnan(p)]    # delete nan elements from p, convert to list
+        pout = p[np.isnan(p)].tolist()  # copy nan elements to pout, convert to list
+        mult = len(pout) * [1]  # generate an (empty) list with a "1" for each nan
+        p = p[~np.isnan(p)]     # delete nan elements from p, convert to list
 
         if len(p) == 0:
             pass
@@ -1092,17 +1127,16 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
             while len(p):
                 # calculate distance of first root against all others and itself
                 # -> multiplicity is at least 1, first root is always deleted
-                tolarr = np.less(dist_roots(p[0], p), tol)                               # assure multiplicity is at least one
-                mult.append(np.sum(tolarr)) # multiplicity = number of "hits"
-                pout.append(comproot(p[tolarr])) # pick the roots within the tolerance
+                tolarr = np.less(dist_roots(p[0], p), tol)
+                mult.append(np.sum(tolarr))  # multiplicity = number of "hits"
+                pout.append(comproot(p[tolarr]))  # pick the roots within the tolerance
 
                 p = p[~tolarr]  # and delete them
-
         else:
-            sameroots = [] # temporary list for roots within the tolerance
-            p,indx = cmplx_sort(p)
+            sameroots = []  # temporary list for roots within the tolerance
+            p, indx = cmplx_sort(p)
             indx = len(mult)-1
-            curp = p[0] + 5 * tol # needed to avoid "self-detection" ?
+            curp = p[0] + 5 * tol  # needed to avoid "self-detection" ?
             for k in range(len(p)):
                 tr = p[k]
                 if abs(tr - curp) < tol:
@@ -1120,7 +1154,7 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
 
         return np.array(pout), np.array(mult)
 
-##### original code ####
+# #### original code ####
 #    p = asarray(p) * 1.0
 #    tol = abs(tol)
 #    p, indx = cmplx_sort(p)
@@ -1144,15 +1178,16 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
 #            mult.append(1)
 #    return array(pout), array(mult)
 
-#==================================================================
-def calc_ssb_spectrum(A):
+
+# ------------------------------------------------------------------------------
+def calc_ssb_spectrum(A: ndarray) -> ndarray:
     """
     Calculate the single-sideband spectrum from a double-sideband
     spectrum by doubling the spectrum below fS/2 (leaving the DC-value
     untouched). This approach is wrong when the spectrum is not symmetric.
-    
+
     The alternative approach of  adding the mirrored conjugate complex of the
-    second half of the spectrum to the first doesn't work, spectra of either 
+    second half of the spectrum to the first doesn't work, spectra of either
     sine-like or cosine-like signals are cancelled out.
 
     When len(A) is even, A[N//2] represents half the sampling frequencvy
@@ -1172,18 +1207,16 @@ def calc_ssb_spectrum(A):
 
     """
     N = len(A)
-    
+
     A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
     # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
 
     return A_SSB
 
 
-#==============================================================================
+# ------------------------------------------------------------------------------
+def expand_lim(ax, eps_x: float, eps_y: float = None) -> None:
 
-#==================================================================
-def expand_lim(ax, eps_x, eps_y = None):
-#==================================================================
     """
     Expand the xlim and ylim-values of passed axis by eps
 
@@ -1202,19 +1235,19 @@ def expand_lim(ax, eps_x, eps_y = None):
 
     Returns
     -------
-    nothing
+    None
     """
 
     if not eps_y:
         eps_y = eps_x
-    xmin,xmax,ymin,ymax = ax.axis()
+    xmin, xmax, ymin, ymax = ax.axis()
     dx = (xmax - xmin) * eps_x
     dy = (ymax - ymin) * eps_y
-    ax.axis((xmin-dx,xmax+dx,ymin-dy,ymax+dy))
+    ax.axis((xmin-dx, xmax+dx, ymin-dy, ymax+dy))
 
-#==================================================================
-def format_ticks(ax, xy, scale=1., format="%.1f"):
-#==================================================================
+
+# ------------------------------------------------------------------------------
+def format_ticks(ax, xy: str, scale: float = 1., format: str = "%.1f") -> None:
     """
     Reformat numbers at x or y - axis. The scale can be changed to display
     e.g. MHz instead of Hz. The number format can be changed as well.
@@ -1227,7 +1260,7 @@ def format_ticks(ax, xy, scale=1., format="%.1f"):
     xy : string, either 'x', 'y' or 'xy'
          select corresponding axis (axes) for reformatting
 
-    scale : real (default: 1.)
+    scale : float (default: 1.)
             rescaling factor for the axes
 
     format : string (default: %.1f)
@@ -1235,7 +1268,7 @@ def format_ticks(ax, xy, scale=1., format="%.1f"):
 
     Returns
     -------
-    nothing
+    None
 
 
     Examples
@@ -1250,16 +1283,18 @@ def format_ticks(ax, xy, scale=1., format="%.1f"):
 
     """
     if xy == 'x' or xy == 'xy':
-#        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
+        # get location and content of xticks
+        # locx,labelx = ax.get_xticks(), ax.get_xticklabels()
         locx = ax.get_xticks()
         ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
     if xy == 'y' or xy == 'xy':
-        locy = ax.get_yticks() # get location and content of xticks
+        locy = ax.get_yticks()  # get location and content of xticks
         ax.set_yticks(locy, map(lambda y: format % y, locy*scale))
 
-#==============================================================================
 
-def fil_save(fil_dict, arg, format_in, sender, convert = True):
+# ------------------------------------------------------------------------------
+def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
+             convert: bool = True) -> None:
     """
     Save filter design ``arg`` given in the format specified as ``format_in`` in
     the dictionary ``fil_dict``. The format can be either poles / zeros / gain,
@@ -1293,34 +1328,37 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
     convert : boolean
         When ``convert = True``, convert arg to the other formats.
+
+    Returns
+    -------
+    None
     """
 
     if format_in == 'sos':
-            fil_dict['sos'] = arg
-            fil_dict['ft'] = 'IIR'
+        fil_dict['sos'] = arg
+        fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
         if any(isinstance(el, list) for el in arg):
-            frmt = "lol" # list or ndarray or tuple of lists
+            frmt = "lol"  # list or ndarray or tuple of lists
         elif any(isinstance(el, np.ndarray) for el in arg):
-            frmt = "lon" # list or ndarray or tuple of ndarrays
+            frmt = "lon"  # list or ndarray or tuple of ndarrays
         elif isinstance(arg, list):
             frmt = "lst"
         elif isinstance(arg, np.ndarray):
             frmt = "nd"
         format_error = False
-        #logger.error(arg)
-        #logger.error(frmt)
-        if frmt in {'lst', 'nd'}: # list / array with z only -> FIR
+
+        if frmt in {'lst', 'nd'}:  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
             k = 1
             fil_dict['zpk'] = [z, p, k]
             fil_dict['ft'] = 'FIR'
-        elif frmt in {'lol', 'lon'}: # list of lists
+        elif frmt in {'lol', 'lon'}:  # list of lists
             if len(arg) == 3:
                 fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
-                if np.any(arg[1]): # non-zero poles -> IIR
+                if np.any(arg[1]):  # non-zero poles -> IIR
                     fil_dict['ft'] = 'IIR'
                 else:
                     fil_dict['ft'] = 'FIR'
@@ -1328,7 +1366,6 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
                 format_error = True
         else:
             format_error = True
-
 
 # =============================================================================
 #         if np.ndim(arg) == 1:
@@ -1356,24 +1393,23 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         if format_error:
             raise ValueError("\t'fil_save()': Unknown 'zpk' format {0}".format(arg))
 
-
     elif format_in == 'ba':
-        if np.ndim(arg) == 1: # arg = [b] -> FIR
+        if np.ndim(arg) == 1:  # arg = [b] -> FIR
             # convert to type array, trim trailing zeros which correspond to
             # (superfluous) highest order polynomial with coefficient 0 as they
             # cause trouble when converting to zpk format
             b = np.trim_zeros(np.asarray(arg))
             a = np.zeros(len(b))
-        else: # arg = [b,a]
+        else:  # arg = [b,a]
             b = arg[0]
             a = arg[1]
 
-        if len(b) < 2: # no proper coefficients, initialize with a default
-            b = np.asarray([1,0])
-        if len(a) < 2: # no proper coefficients, initialize with a default
-            a = np.asarray([1,0])
+        if len(b) < 2:  # no proper coefficients, initialize with a default
+            b = np.asarray([1, 0])
+        if len(a) < 2:  # no proper coefficients, initialize with a default
+            a = np.asarray([1, 0])
 
-        a[0] = 1 # first coefficient of recursive filter parts always = 1
+        a[0] = 1  # first coefficient of recursive filter parts always = 1
 
         # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
         # Test whether all elements except the first one are zero
@@ -1384,15 +1420,15 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
         # equalize if b and a subarrays have different lengths:
         D = len(b) - len(a)
-        if D > 0: # b is longer than a -> fill up a with zeros
+        if D > 0:  # b is longer than a -> fill up a with zeros
             a = np.append(a, np.zeros(D))
-        elif D < 0: # a is longer than b -> fill up b with zeros
+        elif D < 0:  # a is longer than b -> fill up b with zeros
             if fil_dict['ft'] == 'IIR':
-                b = np.append(b, np.zeros(-D)) # make filter causal, fill up b with zeros
+                b = np.append(b, np.zeros(-D))  # make filter causal, fill up b with zeros
             else:
-                a = a[:D] # discard last D elements of a (only zeros anyway)
+                a = a[:D]  # discard last D elements of a (only zeros anyway)
 
-        fil_dict['N'] = len(b) - 1 # correct filter order accordingly
+        fil_dict['N'] = len(b) - 1  # correct filter order accordingly
         fil_dict['ba'] = [np.array(b, dtype=complex), np.array(a, dtype=complex)]
 
     else:
@@ -1402,15 +1438,19 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     fil_dict['timestamp'] = time.time()
 
     # Remove any antiCausal zero/poles
-    if 'zpkA' in fil_dict: fil_dict.pop('zpkA')
-    if 'baA' in fil_dict: fil_dict.pop('baA')
-    if 'rpk' in fil_dict: fil_dict.pop('rpk')
+    if 'zpkA' in fil_dict:
+        fil_dict.pop('zpkA')
+    if 'baA' in fil_dict:
+        fil_dict.pop('baA')
+    if 'rpk' in fil_dict:
+        fil_dict.pop('rpk')
 
     if convert:
         fil_convert(fil_dict, format_in)
 
-#==============================================================================
-def fil_convert(fil_dict, format_in):
+
+# ------------------------------------------------------------------------------
+def fil_convert(fil_dict: dict, format_in) -> None:
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all formats not generated by the filter
@@ -1452,7 +1492,8 @@ def fil_convert(fil_dict, format_in):
                 b1 = chk[section, :3]
                 a1 = chk[section, 3:]
                 if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
-                    raise ValueError("\t'fil_convert()': Bad coefficients, Order N is too high!")
+                    raise ValueError(
+                        "\t'fil_convert()': Bad coefficients, Order N is too high!")
 
         if 'zpk' not in format_in:
             try:
@@ -1463,9 +1504,9 @@ def fil_convert(fil_dict, format_in):
             # pole and zero at the origin and delete them:
             z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
             p_0 = np.where(fil_dict['zpk'][1] == 0)[0]
-            if p_0 and z_0: # eliminate z = 0 and p = 0 from list:
-                fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0],z_0)
-                fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
+            if p_0 and z_0:  # eliminate z = 0 and p = 0 from list:
+                fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0], z_0)
+                fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1], p_0)
 
         if 'ba' not in format_in:
             try:
@@ -1475,10 +1516,10 @@ def fil_convert(fil_dict, format_in):
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
-                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0],-1)
-                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1],-1)
+                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0], -1)
+                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1], -1)
 
-    elif 'zpk' in format_in: # z, p, k have been generated,convert to other formats
+    elif 'zpk' in format_in:  # z, p, k have been generated,convert to other formats
         zpk = fil_dict['zpk']
         if 'ba' not in format_in:
             try:
@@ -1486,25 +1527,27 @@ def fil_convert(fil_dict, format_in):
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
-            fil_dict['sos'] = [] # don't convert zpk -> SOS due to numerical inaccuracies
+            fil_dict['sos'] = []  # don't convert zpk -> SOS due to numerical inaccuracies
 #            try:
 #                fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
 #            except ValueError:
 #                fil_dict['sos'] = []
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
-    elif 'ba' in format_in: # arg = [b,a]
+    elif 'ba' in format_in:  # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
-        if np.all(np.isfinite([b,a])):
-            zpk = sig.tf2zpk(b,a)
+        if np.all(np.isfinite([b, a])):
+            zpk = sig.tf2zpk(b, a)
             fil_dict['zpk'] = [np.nan_to_num(zpk[0]).astype(complex),
                                np.nan_to_num(zpk[1]).astype(complex),
                                np.nan_to_num(zpk[2])
                                ]
         else:
-            raise ValueError("\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements to zpk format!")
+            raise ValueError(
+                "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
+                "to zpk format!")
             zpk = None
-        fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
+        fil_dict['sos'] = []  # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
 #                fil_dict['sos'] = sig.tf2sos(b,a)
@@ -1516,8 +1559,11 @@ def fil_convert(fil_dict, format_in):
         raise ValueError("\t'fil_convert()': Unknown input format {0:s}".format(format_in))
 
     # eliminate complex coefficients created by numerical inaccuracies
-    fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100) # tol specified in multiples of machine eps
+    # `tol` is specified in multiples of machine eps
+    fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100)
 
+
+# ------------------------------------------------------------------------------
 def sos2zpk(sos):
     """
     Taken from scipy/signal/filter_design.py - edit to eliminate first
@@ -1561,47 +1607,52 @@ def sos2zpk(sos):
     return z, p, k
 
 
-#------------------------------------------------------------------------------
-
-def round_odd(x):
+# ------------------------------------------------------------------------------
+def round_odd(x) -> int:
     """Return the nearest odd integer from x. x can be integer or float."""
-    return int(x-np.mod(x,2)+1)
+    return int(x-np.mod(x, 2)+1)
 
 
-def round_even(x):
+# ------------------------------------------------------------------------------
+def round_even(x) -> int:
     """Return the nearest even integer from x. x can be integer or float."""
-    return int(x-np.mod(x,2))
+    return int(x-np.mod(x, 2))
 
 
-def ceil_odd(x):
+# ------------------------------------------------------------------------------
+def ceil_odd(x) -> int:
     """
     Return the smallest odd integer not less than x. x can be integer or float.
     """
     return round_odd(x+1)
 
-def floor_odd(x):
+
+# ------------------------------------------------------------------------------
+def floor_odd(x) -> int:
     """
     Return the largest odd integer not larger than x. x can be integer or float.
     """
     return round_odd(x-1)
 
 
-def ceil_even(x):
+# ------------------------------------------------------------------------------
+def ceil_even(x) -> int:
     """
     Return the smallest even integer not less than x. x can be integer or float.
     """
     return round_even(x+1)
 
-def floor_even(x):
+
+# ------------------------------------------------------------------------------
+def floor_even(x) -> int:
     """
     Return the largest even integer not larger than x. x can be integer or float.
     """
     return round_even(x-1)
 
 
-#------------------------------------------------------------------------------
-
-def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
+# ------------------------------------------------------------------------------
+def calc_Hcomplex(fil_dict, worN, wholeF, fs=2*np.pi):
     """
     A wrapper around `signal.freqz()` for calculating the complex frequency
     response H(f) for antiCausal systems as well. The filter coefficients are
@@ -1628,7 +1679,8 @@ def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
     -------
 
     w: ndarray
-        The frequencies at which h was computed, in the same units as fs. By default, w is normalized to the range [0, pi) (radians/sample).
+        The frequencies at which h was computed, in the same units as fs.
+        By default, w is normalized to the range [0, pi) (radians/sample).
 
     h: ndarray
         The frequency response, as complex numbers.
@@ -1637,38 +1689,35 @@ def calc_Hcomplex(fil_dict, worN, wholeF, fs = 2*np.pi):
     --------
 
     """
-
     # causal poles/zeros
-    bc  = fil_dict['ba'][0]
-    ac  = fil_dict['ba'][1]
+    bc = fil_dict['ba'][0]
+    ac = fil_dict['ba'][1]
 
     # standard call to signal freqz
-    W, H = sig.freqz(bc, ac, worN = worN, whole = wholeF, fs=fs)
+    W, H = sig.freqz(bc, ac, worN=worN, whole=wholeF, fs=fs)
 
     # test for NonCausal filter
     if ('rpk' in fil_dict):
+        # Grab causal, anticausal ba's from dictionary
+        ba = fil_dict['baA'][0]
+        aa = fil_dict['baA'][1]
+        ba = ba.conjugate()
+        aa = aa.conjugate()
 
-       # Grab causal, anticausal ba's from dictionary
+        # Evaluate transfer function of anticausal half on the same freq grid.
+        # This is done by conjugating a and b prior to the call, and conjugating
+        # h after the call.
 
-       ba  = fil_dict['baA'][0]
-       aa  = fil_dict['baA'][1]
-       ba  = ba.conjugate()
-       aa  = aa.conjugate()
+        wa, ha = sig.freqz(ba, aa, worN=worN, whole=True, fs=fs)
+        ha = ha.conjugate()
 
-       # Evaluate transfer function of anticausal half on the same freq grid.
-       # This is done by conjugating a and b prior to the call, and conjugating
-       # h after the call.
-
-       wa, ha = sig.freqz(ba, aa, worN = worN, whole=True, fs=fs)
-       ha = ha.conjugate()
-
-       # Total transfer function is the product of causal response and antiCausal response
-
-       H = H*ha
+        # Total transfer function is the product of causal response and antiCausal
+        # response
+        H = H * ha
 
     return (W, H)
 
-#------------------------------------------------------------------------------
 
-if __name__=='__main__':
+# ------------------------------------------------------------------------------
+if __name__ == '__main__':
     pass
