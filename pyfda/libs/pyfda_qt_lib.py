@@ -459,6 +459,11 @@ def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) ->
     width: int
         The required width in points
 
+    Notes
+    -----
+    This is based on
+    https://stackoverflow.com/questions/27433165/how-to-reimplement-sizehint-for-bold-text-in-a-delegate-qt
+
     """
     font = QFont()
     font.setBold(bold)
@@ -508,6 +513,9 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
 
     N_x: int
         When `text == ''`, calculate the width from `N_x * width('x')`
+
+    bold: bool (Defaut: True)
+        When `True`, determine width based on bold font
 
     Returns
     -------
