@@ -417,13 +417,13 @@ class PlotImpz_UI(QWidget):
             self.cmb_plt_time_resp, self.plot_styles_list, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_win_time = QPushButton("FFT Win")
-        self.chk_win_time.setMaximumWidth(qtext_width(text="FFT Win "))
-        self.chk_win_time.setObjectName("chk_win_time")
-        self.chk_win_time.setToolTip(
+        self.but_win_time = QPushButton("FFT Win")
+        self.but_win_time.setMaximumWidth(qtext_width(text="FFT Win "))
+        self.but_win_time.setObjectName("chk_win_time")
+        self.but_win_time.setToolTip(
             '<span>Plot FFT windowing function.</span>')
-        self.chk_win_time.setCheckable(True)
-        self.chk_win_time.setChecked(False)
+        self.but_win_time.setCheckable(True)
+        self.but_win_time.setChecked(False)
 
         line1 = QVLine()
         line2 = QVLine(width=5)
@@ -516,7 +516,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         #
         layH_ctrl_time.addSpacing(5)
-        layH_ctrl_time.addWidget(self.chk_win_time)
+        layH_ctrl_time.addWidget(self.but_win_time)
         layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(line1)
         layH_ctrl_time.addSpacing(5)
