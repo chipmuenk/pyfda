@@ -12,7 +12,8 @@ Library with various helper functions for Qt widgets
 from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
-    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog)
+    Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
+    QFont, QSize)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -55,7 +56,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
 #     #         logger.error("id missing in {0}\n{1}"
 #     #                      .format(pprint_log(dict_sig), pprint_log(kwargs)))
 #     #     else:
-#     #         logger.error(f"id missing in {pprint_log(dict_sig)}")           
+#     #         logger.error(f"id missing in {pprint_log(dict_sig)}")
 #     #     return 0
 
 #     if dict_sig['id'] == id(self):
@@ -427,7 +428,7 @@ def qfilter_warning(self, N, fil_class):
 
 
 # ----------------------------------------------------------------------------
-def qled_set_max_width(wdg, str='', N_x=17):
+def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) -> int:
     """
     Calculate width of QLineEdit widgets in points for a given string `str` or a
     number `N_x` of characters 'x' and set the maximum width of the widget
@@ -446,11 +447,11 @@ def qled_set_max_width(wdg, str='', N_x=17):
 
     wdg: instance of QLineEdit widget
 
-    str: str
+    test: str
         string for calculating the width of QLineEdit widget
 
     N_x: int
-        When `str == ''`, calculate the width from `N_x * width('x')`
+        When `text == ''`, calculate the width from `N_x * width('x')`
 
     Returns
     -------
@@ -459,16 +460,26 @@ def qled_set_max_width(wdg, str='', N_x=17):
         The required width in points
 
     """
-    width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
-        wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-        8  # 2 * horizontalMargin() + 2 * frame margin.
+    font = QFont()
+    font.setBold(bold)
+    document = QtGui.QTextDocument(text)
+    document.setDefaultFont(font)
+    #size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
+    logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
+    # option.font.setWeight(QtGui.QFont.Bold)  # new line
+    # document.setDefaultFont(option.font)
+
+    # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
+    #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
+    #     8  # 2 * horizontalMargin() + 2 * frame margin.
     width_x = wdg.fontMetrics().width('x')
-    logger.warning("Frm = {0}, FM = {1}".format(width_frm, width_x))
-    if str != '':
-        width = width_frm + wdg.fontMetrics().width(str)
+    width_frm = 8
+    if text != '':
+        width = width_frm + wdg.fontMetrics().width(text)
+        width = document.idealWidth()
     else:
         width = width_frm + N_x * width_x
-
+    logger.warning(f"Frm_Width = {width_frm}, width_x = {width_x}, Width = {width}")
     wdg.setMaximumWidth(width)
     return width
 
