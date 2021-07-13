@@ -713,7 +713,7 @@ class Plot_Impz(QWidget):
             self.X = np.fft.fft(x_win) / self.ui.N
             # self.X[0] = self.X[0] * np.sqrt(2) # correct value at DC
 
-            if self.fx_sim:
+            if self.fx_sim and hasattr(self, "q_i"):
                 # same for fixpoint simulation
                 x_q_win = self.q_i.fixp(self.x[self.ui.N_start:self.ui.N_end])\
                     * win
