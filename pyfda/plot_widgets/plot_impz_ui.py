@@ -428,12 +428,12 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.chk_log_time = QPushButton("dB")
-        self.chk_log_time.setMaximumWidth(qtext_width(text=" dB"))
-        self.chk_log_time.setObjectName("chk_log_time")
-        self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chk_log_time.setCheckable(True)
-        self.chk_log_time.setChecked(False)
+        self.but_log_time = QPushButton("dB")
+        self.but_log_time.setMaximumWidth(qtext_width(text=" dB"))
+        self.but_log_time.setObjectName("chk_log_time")
+        self.but_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.but_log_time.setCheckable(True)
+        self.but_log_time.setChecked(False)
 
         lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
@@ -488,7 +488,7 @@ class PlotImpz_UI(QWidget):
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
         self.lbl_log_bottom_time.setVisible(
-            self.chk_log_time.isChecked() or
+            self.but_log_time.isChecked() or
             (spgr_en and self.but_log_spgr_time.isChecked()))
         self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
 
@@ -523,7 +523,7 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
-        layH_ctrl_time.addWidget(self.chk_log_time)
+        layH_ctrl_time.addWidget(self.but_log_time)
 
         layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(line2)

@@ -157,7 +157,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
-        self.ui.chk_log_time.clicked.connect(self.draw)
+        self.ui.but_log_time.clicked.connect(self.draw)
         self.ui.led_log_bottom_time.editingFinished.connect(self.draw)
         self.ui.but_log_spgr_time.clicked.connect(self.draw)
         self.ui.led_time_nfft_spgr.editingFinished.connect(self._spgr_ui2params)
@@ -864,7 +864,7 @@ class Plot_Impz(QWidget):
         else:
             self.ui.but_log_spgr_time.setEnabled(True)
 
-        log = self.ui.chk_log_time.isChecked() or\
+        log = self.ui.but_log_time.isChecked() or\
             (self.ui.but_log_spgr_time.isChecked() and self.spgr)
         self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
@@ -1037,7 +1037,7 @@ class Plot_Impz(QWidget):
         # fixpoint simulation enabled -> scale stimulus and response
         if self.fx_sim:
             x_q = self.x_q * self.scale_i
-            if self.ui.chk_log_time.isChecked():
+            if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
             logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
@@ -1065,7 +1065,7 @@ class Plot_Impz(QWidget):
             lbl_y_r = "$y[n]$"
 
         # log. scale for stimulus / response time domain:
-        if self.ui.chk_log_time.isChecked():
+        if self.ui.but_log_time.isChecked():
             bottom_t = self.ui.bottom_t
             win = np.maximum(20 * np.log10(
                 abs(self.ui.qfft_win_select.get_window(self.ui.N))), self.ui.bottom_t)
