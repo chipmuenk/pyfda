@@ -302,16 +302,18 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=10)
-        # self.but_auto_run.setText("Auto")
+        # self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=0)
+        self.but_auto_run = QPushButton("Auto", self)
         self.but_auto_run.setObjectName("but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
+        self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
         self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
         self.but_run = QPushButton(self)
         self.but_run.setText("RUN")
+        self.but_run.setMaximumWidth(qtext_width(text=" RUN "))
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.but_auto_run.isChecked())
 
@@ -336,6 +338,7 @@ class PlotImpz_UI(QWidget):
 
         self.but_stim_options = QPushButton("Stimuli")
         self.but_stim_options.setObjectName("but_stim_options")
+        self.but_stim_options.setMaximumWidth(qtext_width(text=" Stimuli "))
         self.but_stim_options.setToolTip("<span>Show stimulus options.</span>")
         self.but_stim_options.setCheckable(True)
         self.but_stim_options.setChecked(True)
@@ -360,8 +363,9 @@ class PlotImpz_UI(QWidget):
 
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
-        self.but_fx_scale = QPushButton("FX Int")
+        self.but_fx_scale = QPushButton("FX:Int")
         self.but_fx_scale.setObjectName("but_fx_scale")
+        self.but_fx_scale.setMaximumWidth(qtext_width(text=" FX:Int "))
         self.but_fx_scale.setToolTip(
             "<span>Display data with integer (fixpoint) scale.</span>")
         self.but_fx_scale.setCheckable(True)
@@ -595,26 +599,28 @@ class PlotImpz_UI(QWidget):
                           self.cmb_freq_display_item)
         self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
-        self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
+        self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"), margin=5)
         self.but_Hf.setObjectName("chk_Hf")
         self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
         self.but_Hf.setChecked(False)
         self.but_Hf.setCheckable(True)
 
-        self.but_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
+        self.but_freq_norm_impz = QPushButtonRT(text=to_html("P_X = 1", frmt="b"),
+                                                margin=5)
         self.but_freq_norm_impz.setToolTip(
-            "<span>Normalize the FFT of the stimulus "
-            "impulse with <i>N<sub>FFT</sub></i> to achieve "
-            "|<i>X(f)</i>| &le; 1. For the dirac pulse, this yields "
-            "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
-            "turned off.</span>")
+            "<span>Normalize the FFT of the stimulus with <i>N<sub>FFT</sub></i> for "
+            "<i>P<sub>X</sub></i> = 1. For a dirac pulse, this yields "
+            "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC and Noise need to be "
+            "turned off, window should be Rectangular.</span>")
         self.but_freq_norm_impz.setCheckable(True)
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=10)
-        self.chk_show_info_freq.setObjectName("chk_show_info_freq")
+        # self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=10)
+        self.chk_show_info_freq = QPushButton("Info", self)
+        self.chk_show_info_freq.setMaximumWidth(qtext_width(" Info "))
+        self.chk_show_info_freq.setObjectName("but_show_info_freq")
         self.chk_show_info_freq.setToolTip("<span>Show signal power in legend.</span>")
         self.chk_show_info_freq.setCheckable(True)
         self.chk_show_info_freq.setChecked(False)
