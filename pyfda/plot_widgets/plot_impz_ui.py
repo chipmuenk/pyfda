@@ -430,7 +430,7 @@ class PlotImpz_UI(QWidget):
 
         self.but_log_time = QPushButton("dB")
         self.but_log_time.setMaximumWidth(qtext_width(text=" dB"))
-        self.but_log_time.setObjectName("chk_log_time")
+        self.but_log_time.setObjectName("but_log_time")
         self.but_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.but_log_time.setCheckable(True)
         self.but_log_time.setChecked(False)
@@ -596,12 +596,12 @@ class PlotImpz_UI(QWidget):
                           self.cmb_freq_display_item)
         self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
-        self.chk_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
-        self.chk_Hf.setObjectName("chk_Hf")
-        self.chk_Hf.setToolTip("<span>Show ideal frequency response, calculated "
+        self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"))
+        self.but_Hf.setObjectName("chk_Hf")
+        self.but_Hf.setToolTip("<span>Show ideal frequency response, calculated "
                                "from the filter coefficients.</span>")
-        self.chk_Hf.setChecked(False)
-        self.chk_Hf.setCheckable(True)
+        self.but_Hf.setChecked(False)
+        self.but_Hf.setCheckable(True)
 
         self.chk_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
         self.chk_freq_norm_impz.setToolTip(
@@ -631,7 +631,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
         #
         layH_ctrl_freq.addSpacing(5)
-        layH_ctrl_freq.addWidget(self.chk_Hf)
+        layH_ctrl_freq.addWidget(self.but_Hf)
         layH_ctrl_freq.addStretch(1)
         #
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
