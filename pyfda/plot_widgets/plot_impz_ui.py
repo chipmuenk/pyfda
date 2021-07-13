@@ -363,13 +363,20 @@ class PlotImpz_UI(QWidget):
 
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
-        self.but_fx_scale = QPushButton("FX:Int")
+        self.but_fx_scale = QPushButton("FX:Int", self)
         self.but_fx_scale.setObjectName("but_fx_scale")
         self.but_fx_scale.setMaximumWidth(qtext_width(text=" FX:Int "))
         self.but_fx_scale.setToolTip(
             "<span>Display data with integer (fixpoint) scale.</span>")
         self.but_fx_scale.setCheckable(True)
         self.but_fx_scale.setChecked(False)
+
+        self.but_fx_range = QPushButton("FX:Range", self)
+        self.but_fx_range.setMaximumWidth(qtext_width(text=" FX:Range "))
+        self.but_fx_range.setObjectName("but_fx_limits")
+        self.but_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
+        self.but_fx_range.setCheckable(True)
+        self.but_fx_range.setChecked(False)
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_auto_run)
@@ -390,6 +397,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.qfft_win_select)
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_fx_scale)
+        layH_ctrl_run.addWidget(self.but_fx_range)
         layH_ctrl_run.addStretch(10)
 
         # layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -503,11 +511,6 @@ class PlotImpz_UI(QWidget):
         # self.chk_colorbar_time.setChecked(True)
         # self.chk_colorbar_time.setVisible(spgr_en)
 
-        self.chk_fx_limits = QCheckBox("Min/max.", self)
-        self.chk_fx_limits.setObjectName("chk_fx_limits")
-        self.chk_fx_limits.setToolTip("<span>Display limits of fixpoint range.</span>")
-        self.chk_fx_limits.setChecked(False)
-
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
@@ -543,8 +546,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
         layH_ctrl_time.addWidget(self.led_time_ovlp_spgr)
 
-        layH_ctrl_time.addSpacing(20)
-        layH_ctrl_time.addWidget(self.chk_fx_limits)
         layH_ctrl_time.addStretch(10)
 
         # layH_ctrl_time.setContentsMargins(*params['wdg_margins'])

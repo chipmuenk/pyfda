@@ -164,7 +164,7 @@ class Plot_Impz(QWidget):
         self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
-        self.ui.chk_fx_limits.clicked.connect(self.draw)
+        self.ui.but_fx_range.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
@@ -404,7 +404,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
         self.ui.but_fx_scale.setVisible(self.fx_sim)
-        self.ui.chk_fx_limits.setVisible(self.fx_sim)
+        self.ui.but_fx_range.setVisible(self.fx_sim)
 
         if self.fx_sim:
             qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
@@ -1092,7 +1092,7 @@ class Plot_Impz(QWidget):
             else:
                 H_str = self.H_str + ' in V'
 
-        if self.ui.chk_fx_limits.isChecked() and self.fx_sim:
+        if self.ui.but_fx_range.isChecked() and self.fx_sim:
             self.ax_r.axhline(fx_max, 0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min, 0, 1, color='k', linestyle='--')
 
