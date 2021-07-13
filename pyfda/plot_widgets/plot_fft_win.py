@@ -195,9 +195,11 @@ class Plot_FFT_win(QDialog):
         self.but_norm_f.setToolTip(
             "Normalize window spectrum for a maximum of 1.")
 
-        self.chk_half_f = QCheckBox("Half", self)
-        self.chk_half_f.setChecked(True)
-        self.chk_half_f.setToolTip(
+        self.but_half_f = QPushButton("0...½", default=False, autoDefault=False)
+        self.but_half_f.setCheckable(True)
+        self.but_half_f.setChecked(True)
+        self.but_half_f.setMaximumWidth(qtext_width(text=" 0...½ "))
+        self.but_half_f.setToolTip(
             "Display window spectrum in the range 0 ... 0.5 f_S.")
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
@@ -246,7 +248,7 @@ class Plot_FFT_win(QDialog):
         layHControls.addStretch(5)
         layHControls.addWidget(self.but_norm_f)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chk_half_f)
+        layHControls.addWidget(self.but_half_f)
         layHControls.addStretch(1)
         layHControls.addWidget(self.lbl_log_bottom_f)
         layHControls.addWidget(self.led_log_bottom_f)
@@ -355,7 +357,7 @@ class Plot_FFT_win(QDialog):
         self.led_N.editingFinished.connect(self.calc_win_draw)
 
         self.but_norm_f.clicked.connect(self.calc_win_draw)
-        self.chk_half_f.clicked.connect(self.update_view)
+        self.but_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.tbl_win_props.itemClicked.connect(self._handle_item_clicked)
@@ -532,7 +534,7 @@ class Plot_FFT_win(QDialog):
         else:
             self.ax_t.plot(self.n, self.win_view)
 
-        if self.chk_half_f.isChecked():
+        if self.but_half_f.isChecked():
             F = self.F[:len(self.F*self.pad)//2]
             Win = self.Win[:len(self.F*self.pad)//2]
         else:
