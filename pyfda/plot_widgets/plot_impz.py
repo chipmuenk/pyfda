@@ -1035,7 +1035,7 @@ class Plot_Impz(QWidget):
             fmt_mkr_resp = {'marker': ''}
 
         # fixpoint simulation enabled -> scale stimulus and response
-        if self.fx_sim:
+        if self.fx_sim and hasattr(self, 'x_q'):
             x_q = self.x_q * self.scale_i
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
