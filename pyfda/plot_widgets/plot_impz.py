@@ -159,7 +159,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
         self.ui.chk_log_time.clicked.connect(self.draw)
         self.ui.led_log_bottom_time.editingFinished.connect(self.draw)
-        self.ui.chk_log_spgr_time.clicked.connect(self.draw)
+        self.ui.but_log_spgr_time.clicked.connect(self.draw)
         self.ui.led_time_nfft_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
@@ -841,7 +841,7 @@ class Plot_Impz(QWidget):
         """
         spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none'
 
-        self.ui.chk_log_spgr_time.setVisible(spgr_en)
+        self.ui.but_log_spgr_time.setVisible(spgr_en)
         self.ui.lbl_time_nfft_spgr.setVisible(spgr_en)
         self.ui.led_time_nfft_spgr.setVisible(spgr_en)
         self.ui.lbl_time_ovlp_spgr.setVisible(spgr_en)
@@ -859,13 +859,13 @@ class Plot_Impz(QWidget):
         """
         if qget_cmb_box(self.ui.cmb_mode_spgr_time) in {'phase', 'angle'}:
             # must be linear if mode is 'angle' or 'phase'
-            self.ui.chk_log_spgr_time.setChecked(False)
-            self.ui.chk_log_spgr_time.setEnabled(False)
+            self.ui.but_log_spgr_time.setChecked(False)
+            self.ui.but_log_spgr_time.setEnabled(False)
         else:
-            self.ui.chk_log_spgr_time.setEnabled(True)
+            self.ui.but_log_spgr_time.setEnabled(True)
 
         log = self.ui.chk_log_time.isChecked() or\
-            (self.ui.chk_log_spgr_time.isChecked() and self.spgr)
+            (self.ui.but_log_spgr_time.isChecked() and self.spgr)
         self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
         if log:
@@ -1210,7 +1210,7 @@ class Plot_Impz(QWidget):
             self.ui.chk_byfs_spgr_time.setVisible(mode == 'psd')
             spgr_pre = ""
             dB_scale = 20  # default log scale for magnitude in dB
-            if self.ui.chk_log_spgr_time.isChecked():
+            if self.ui.but_log_spgr_time.isChecked():
                 dB_unit = "dB"
             else:
                 dB_unit = ""
@@ -1238,7 +1238,7 @@ class Plot_Impz(QWidget):
                 # scale result by f_S
                 Hz_unit = fb.fil[0]['plt_fUnit']
                 # special treatment for PSD units needed
-                if self.ui.chk_log_spgr_time.isChecked():
+                if self.ui.but_log_spgr_time.isChecked():
                     spgr_unit = r" in dB re W / {0}".format(Hz_unit)
                 else:
                     spgr_unit = r" in W / {0}".format(Hz_unit)
@@ -1249,7 +1249,7 @@ class Plot_Impz(QWidget):
                 scaling = "spectrum"
 
             # ------- lin / log ----------------------
-            if self.ui.chk_log_spgr_time.isChecked():
+            if self.ui.but_log_spgr_time.isChecked():
                 scale = 'dB'
                 # 10 log10 for 'psd', otherwise 20 log10
                 bottom_spgr = self.ui.bottom_t
@@ -1301,7 +1301,7 @@ class Plot_Impz(QWidget):
     #                           np.fft.fftshift(Sxx, axes=0), shading='gouraud')
                 # self.ax_s.colorbar(col_mesh)
 
-                if self.ui.chk_log_spgr_time.isChecked():
+                if self.ui.but_log_spgr_time.isChecked():
                     Sxx = np.maximum(dB_scale * np.log10(np.abs(Sxx)), self.ui.bottom_t)
                 # shading: 'auto', 'gouraud', 'nearest'
                 col_mesh = self.ax_s.pcolormesh(t, f, Sxx, shading='auto')

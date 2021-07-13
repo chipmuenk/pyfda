@@ -460,14 +460,14 @@ class PlotImpz_UI(QWidget):
         self.chk_byfs_spgr_time.setChecked(True)
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
-        self.chk_log_spgr_time = QPushButton("dB")
-        self.chk_log_spgr_time.setMaximumWidth(self.width_m * 4)
-        self.chk_log_spgr_time.setObjectName("chk_log_spgr")
-        self.chk_log_spgr_time.setToolTip(
+        self.but_log_spgr_time = QPushButton("dB")
+        self.but_log_spgr_time.setMaximumWidth(self.width_m * 4)
+        self.but_log_spgr_time.setObjectName("but_log_spgr")
+        self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
-        self.chk_log_spgr_time.setCheckable(True)
-        self.chk_log_spgr_time.setChecked(True)
-        self.chk_log_spgr_time.setVisible(spgr_en)
+        self.but_log_spgr_time.setCheckable(True)
+        self.but_log_spgr_time.setChecked(True)
+        self.but_log_spgr_time.setVisible(spgr_en)
 
         self.lbl_time_nfft_spgr = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
         self.lbl_time_nfft_spgr.setVisible(spgr_en)
@@ -494,7 +494,7 @@ class PlotImpz_UI(QWidget):
             "</span>")
         self.lbl_log_bottom_time.setVisible(
             self.chk_log_time.isChecked() or
-            (spgr_en and self.chk_log_spgr_time.isChecked()))
+            (spgr_en and self.but_log_spgr_time.isChecked()))
         self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
 
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
@@ -539,7 +539,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
         layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
-        layH_ctrl_time.addWidget(self.chk_log_spgr_time)
+        layH_ctrl_time.addWidget(self.but_log_spgr_time)
         layH_ctrl_time.addWidget(self.lbl_time_nfft_spgr)
         layH_ctrl_time.addWidget(self.led_time_nfft_spgr)
         layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
