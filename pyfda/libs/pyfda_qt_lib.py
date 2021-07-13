@@ -13,7 +13,7 @@ from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont, QSize)
+    QFont)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -428,75 +428,6 @@ def qfilter_warning(self, N, fil_class):
 
 
 # ----------------------------------------------------------------------------
-def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) -> int:
-    """
-    Calculate width of QLineEdit widgets in points for a given string `str` or a
-    number `N_x` of characters 'x' and set the maximum width of the widget
-    correspondingly.
-
-    The minimum width is calculated from:
-    - `textMargins()`, property of QLineEdit, gets margins around the text inside
-       the frame
-    - `contentsMargins()` is a property of QWidget, gets ???
-    - a constant of 8, including horizontalMargin() (???) and a frame margin (???)
-
-    The actual width of the string or of 'x' is calculated using `fontMetrics()`.
-
-    Parameters
-    ----------
-
-    wdg: instance of QLineEdit widget
-
-    test: str
-        string for calculating the width of QLineEdit widget
-
-    N_x: int
-        When `text == ''`, calculate the width from `N_x * width('x')`
-
-    Returns
-    -------
-
-    width: int
-        The required width in points
-
-    Notes
-    -----
-    This is based on
-    https://stackoverflow.com/questions/27433165/how-to-reimplement-sizehint-for-bold-text-in-a-delegate-qt
-
-    """
-    font = QFont()
-    font.setBold(bold)
-    document = QtGui.QTextDocument(text)
-    document.setDefaultFont(font)
-    # size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
-    logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
-    # option.font.setWeight(QtGui.QFont.Bold)  # new line
-    # document.setDefaultFont(option.font)
-
-    # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
-    #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
-    #     8  # 2 * horizontalMargin() + 2 * frame margin.
-
-    # row4_height = mSize.lineSpacing() * 4
-
-    width_x = wdg.fontMetrics().width('x')
-    width_frm = 8
-    if text != '':
-        width = width_frm + wdg.fontMetrics().width(text)
-        width = document.idealWidth()
-    else:
-        width = width_frm + N_x * width_x
-    logger.warning(f"Frm_Width = {width_frm}, width_x = {width_x}, Width = {width}")
-    wdg.setMaximumWidth(width)
-    return width
-
-    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6'x'
-    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
-    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
-
-
-# ----------------------------------------------------------------------------
 def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
     """
     Calculate width of `text` in points`. When `text=``, calculate the width
@@ -523,6 +454,16 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
     width: int
         The width of the text in points
 
+    Notes
+    -----
+    This is based on
+    https://stackoverflow.com/questions/27433165/how-to-reimplement-sizehint-for-bold-text-in-a-delegate-qt
+
+    and
+
+    https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
+    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
+
     """
     if text == '':
         text = "x" * N_x
@@ -533,16 +474,18 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
     document.setDefaultFont(font)
     width = document.idealWidth()
 
-    #size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
     logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
-    # option.font.setWeight(QtGui.QFont.Bold)  # new line
-    # document.setDefaultFont(option.font)
 
     return width
 
-    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6'x'
-    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
-    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
+    # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
+    #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
+    #     8  # 2 * horizontalMargin() + 2 * frame margin.
+
+    # row4_height = mSize.lineSpacing() * 4
+
+    # size = QSize(document.idealWidth(), something.fontMetrics().height())
+
 
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):
