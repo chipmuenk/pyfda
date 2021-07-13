@@ -417,9 +417,8 @@ class PlotImpz_UI(QWidget):
             self.cmb_plt_time_resp, self.plot_styles_list, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_win_time = QPushButton("FFT Window")
-        self.chk_win_time.resize(self.chk_win_time.sizeHint().width(),
-                                 self.chk_win_time.sizeHint().height())
+        self.chk_win_time = QPushButton("FFT Win")
+        self.chk_win_time.setMaximumWidth(qtext_width(text="FFT Win "))
         self.chk_win_time.setObjectName("chk_win_time")
         self.chk_win_time.setToolTip(
             '<span>Plot FFT windowing function.</span>')
@@ -430,7 +429,7 @@ class PlotImpz_UI(QWidget):
         line2 = QVLine(width=5)
 
         self.chk_log_time = QPushButton("dB")
-        self.chk_log_time.setMaximumWidth(qtext_width(text=" dB "))
+        self.chk_log_time.setMaximumWidth(qtext_width(text=" dB"))
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setCheckable(True)
@@ -457,7 +456,7 @@ class PlotImpz_UI(QWidget):
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.but_log_spgr_time = QPushButton("dB")
-        self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB "))
+        self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
         self.but_log_spgr_time.setObjectName("but_log_spgr")
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
@@ -574,7 +573,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
         self.but_log_freq = QPushButton("dB")
-        self.but_log_freq.setMaximumWidth(qtext_width(" dB "))
+        self.but_log_freq.setMaximumWidth(qtext_width(" dB"))
         self.but_log_freq.setObjectName(".but_log_freq")
         self.but_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.but_log_freq.setCheckable(True)
