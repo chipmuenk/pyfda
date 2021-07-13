@@ -603,16 +603,16 @@ class PlotImpz_UI(QWidget):
         self.but_Hf.setChecked(False)
         self.but_Hf.setCheckable(True)
 
-        self.chk_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
-        self.chk_freq_norm_impz.setToolTip(
+        self.but_freq_norm_impz = QPushButtonRT(text=to_html("Norm", frmt="b"), margin=10)
+        self.but_freq_norm_impz.setToolTip(
             "<span>Normalize the FFT of the stimulus "
             "impulse with <i>N<sub>FFT</sub></i> to achieve "
             "|<i>X(f)</i>| &le; 1. For the dirac pulse, this yields "
             "|<i>Y(f)</i>|= |<i>H(f)</i>|. DC and Noise need to be "
             "turned off.</span>")
-        self.chk_freq_norm_impz.setCheckable(True)
-        self.chk_freq_norm_impz.setChecked(True)
-        self.chk_freq_norm_impz.setObjectName("freq_norm_impz")
+        self.but_freq_norm_impz.setCheckable(True)
+        self.but_freq_norm_impz.setChecked(True)
+        self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
         self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=10)
         self.chk_show_info_freq.setObjectName("chk_show_info_freq")
@@ -641,7 +641,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_freq_display)
         layH_ctrl_freq.addStretch(1)
 
-        layH_ctrl_freq.addWidget(self.chk_freq_norm_impz)
+        layH_ctrl_freq.addWidget(self.but_freq_norm_impz)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.chk_show_info_freq)
         layH_ctrl_freq.addStretch(10)
@@ -1169,8 +1169,8 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setVisible("dc" in stim_wdg)
 
         # This widget is part of the frequency tab!
-        self.chk_freq_norm_impz.setVisible("norm" in stim_wdg)
-        self.chk_freq_norm_impz.setEnabled(
+        self.but_freq_norm_impz.setVisible("norm" in stim_wdg)
+        self.but_freq_norm_impz.setEnabled(
             self.cmb_stim == "impulse" and self.DC == 0
             and (self.noi == 0 or self.cmbNoise.currentText() == 'None'))
 

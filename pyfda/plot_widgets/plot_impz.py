@@ -174,7 +174,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_freq_display.currentIndexChanged.connect(self.draw)
         self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
-        self.ui.chk_freq_norm_impz.clicked.connect(self.draw)
+        self.ui.but_freq_norm_impz.clicked.connect(self.draw)
         self.ui.chk_show_info_freq.clicked.connect(self.draw)
         # self.ui.chk_win_freq.clicked.connect(self.draw)
 
@@ -332,7 +332,7 @@ class Plot_Impz(QWidget):
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
         # allow scaling the frequency response from pure impulse (no DC, no noise)
-        self.ui.chk_freq_norm_impz.setEnabled(
+        self.ui.but_freq_norm_impz.setEnabled(
             (self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')
             and self.ui.DC == 0)
 
@@ -1461,9 +1461,9 @@ class Plot_Impz(QWidget):
         #   bandwidth and fixpoint scaling (scale_i / scale_o)
         # - Correct scale for single-sided spectrum
         # - Scale impulse response with N_FFT to calculate frequency response if requested
-            if self.ui.chk_freq_norm_impz.isVisible()\
-                and self.ui.chk_freq_norm_impz.isEnabled()\
-                    and self.ui.chk_freq_norm_impz.isChecked():
+            if self.ui.but_freq_norm_impz.isVisible()\
+                and self.ui.but_freq_norm_impz.isEnabled()\
+                    and self.ui.but_freq_norm_impz.isChecked():
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.win_dict['cgain']
                 if self.ui.stim == "dirac":
