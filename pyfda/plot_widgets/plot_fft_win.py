@@ -188,9 +188,11 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_t = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
 
-        self.chk_norm_f = QCheckBox("Norm", self)
-        self.chk_norm_f.setChecked(True)
-        self.chk_norm_f.setToolTip(
+        self.but_norm_f = QPushButton("Max=1", default=False, autoDefault=False)
+        self.but_norm_f.setCheckable(True)
+        self.but_norm_f.setChecked(True)
+        self.but_norm_f.setMaximumWidth(qtext_width(text=" Max=1 "))
+        self.but_norm_f.setToolTip(
             "Normalize window spectrum for a maximum of 1.")
 
         self.chk_half_f = QCheckBox("Half", self)
@@ -242,7 +244,7 @@ class Plot_FFT_win(QDialog):
         layHControls.addStretch(5)
         layHControls.addWidget(QVLine(width=2))
         layHControls.addStretch(5)
-        layHControls.addWidget(self.chk_norm_f)
+        layHControls.addWidget(self.but_norm_f)
         layHControls.addStretch(1)
         layHControls.addWidget(self.chk_half_f)
         layHControls.addStretch(1)
@@ -352,7 +354,7 @@ class Plot_FFT_win(QDialog):
 
         self.led_N.editingFinished.connect(self.calc_win_draw)
 
-        self.chk_norm_f.clicked.connect(self.calc_win_draw)
+        self.but_norm_f.clicked.connect(self.calc_win_draw)
         self.chk_half_f.clicked.connect(self.update_view)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -439,7 +441,7 @@ class Plot_FFT_win(QDialog):
         self.Win = np.abs(fft(self.win_view, self.N_view * self.pad))
 
         # Correct gain for periodic signals (coherent gain)
-        if self.chk_norm_f.isChecked():
+        if self.but_norm_f.isChecked():
             self.Win /= (self.N_view * self.cgain)
 
         # calculate frequency of first zero and maximum sidelobe level
@@ -606,6 +608,7 @@ class Plot_FFT_win(QDialog):
         if self.tbl_sel[2]:
             labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))
             N_patches += 1
+
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best',
                              fontsize='small', fancybox=True, framealpha=0.7,
