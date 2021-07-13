@@ -175,7 +175,7 @@ class Plot_Impz(QWidget):
         self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
         self.ui.but_freq_norm_impz.clicked.connect(self.draw)
-        self.ui.chk_show_info_freq.clicked.connect(self.draw)
+        self.ui.but_freq_show_info.clicked.connect(self.draw)
         # self.ui.chk_win_freq.clicked.connect(self.draw)
 
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -1659,7 +1659,7 @@ class Plot_Impz(QWidget):
             # -----------------------------------------------------------------
             # --------------- Plot stimuli and response -----------------------
             # -----------------------------------------------------------------
-            show_info = self.ui.chk_show_info_freq.isChecked()
+            show_info = self.ui.but_freq_show_info.isChecked()
             h_r = []  # plot handles (real / mag. part)
             h_i = []  # plot handles (imag. / phase part)
             l_r = []  # labels (real / mag. part)

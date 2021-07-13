@@ -617,13 +617,12 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        # self.chk_show_info_freq = QPushButtonRT(text=to_html("Info", frmt="b"), margin=10)
-        self.chk_show_info_freq = QPushButton("Info", self)
-        self.chk_show_info_freq.setMaximumWidth(qtext_width(" Info "))
-        self.chk_show_info_freq.setObjectName("but_show_info_freq")
-        self.chk_show_info_freq.setToolTip("<span>Show signal power in legend.</span>")
-        self.chk_show_info_freq.setCheckable(True)
-        self.chk_show_info_freq.setChecked(False)
+        self.but_freq_show_info = QPushButton("Info", self)
+        self.but_freq_show_info.setMaximumWidth(qtext_width(" Info "))
+        self.but_freq_show_info.setObjectName("but_show_info_freq")
+        self.but_freq_show_info.setToolTip("<span>Show signal power in legend.</span>")
+        self.but_freq_show_info.setCheckable(True)
+        self.but_freq_show_info.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
@@ -648,7 +647,7 @@ class PlotImpz_UI(QWidget):
 
         layH_ctrl_freq.addWidget(self.but_freq_norm_impz)
         layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(self.chk_show_info_freq)
+        layH_ctrl_freq.addWidget(self.but_freq_show_info)
         layH_ctrl_freq.addStretch(10)
 
         # layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
