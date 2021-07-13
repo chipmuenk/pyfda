@@ -165,7 +165,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
         self.ui.chk_fx_limits.clicked.connect(self.draw)
-        self.ui.but_win_time.clicked.connect(self.draw)
+        self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw)
@@ -1124,7 +1124,7 @@ class Plot_Impz(QWidget):
                 plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
             l_r += [lbl_y_r]
         # --------------- Window plot ----------------------------------
-        if self.ui.but_win_time.isChecked():
+        if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
                 self.t[self.ui.N_start:], win, c="gray",
                 label=self.ui.win_dict['cur_win_name'])[0])

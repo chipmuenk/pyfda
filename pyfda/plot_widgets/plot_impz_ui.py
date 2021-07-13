@@ -397,7 +397,7 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lbl_plt_time_stim = QLabel(to_html("Stimulus x", frmt='bi'), self)
+        self.lbl_plt_time_stim = QLabel(to_html("Stim. x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_stim, self.plot_styles_list, self.plt_time_stim)
@@ -411,19 +411,18 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
                                           "(quantized) stimulus.</span>")
 
-        lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Response y", frmt='bi'), self)
+        lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Resp. y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_resp, self.plot_styles_list, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.but_win_time = QPushButton("FFT Win")
-        self.but_win_time.setMaximumWidth(qtext_width(text="FFT Win "))
-        self.but_win_time.setObjectName("chk_win_time")
-        self.but_win_time.setToolTip(
+        self.lbl_win_time = QLabel(to_html("&nbsp;&nbsp;Win", frmt='bi'), self)
+        self.chk_win_time = QCheckBox(self)
+        self.chk_win_time.setObjectName("chk_win_time")
+        self.chk_win_time.setToolTip(
             '<span>Plot FFT windowing function.</span>')
-        self.but_win_time.setCheckable(True)
-        self.but_win_time.setChecked(False)
+        self.chk_win_time.setChecked(False)
 
         line1 = QVLine()
         line2 = QVLine(width=5)
@@ -515,8 +514,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         #
-        layH_ctrl_time.addSpacing(5)
-        layH_ctrl_time.addWidget(self.but_win_time)
+        layH_ctrl_time.addWidget(self.lbl_win_time)
+        layH_ctrl_time.addWidget(self.chk_win_time)
         layH_ctrl_time.addSpacing(5)
         layH_ctrl_time.addWidget(line1)
         layH_ctrl_time.addSpacing(5)
