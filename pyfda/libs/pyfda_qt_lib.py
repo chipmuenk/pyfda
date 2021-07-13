@@ -474,7 +474,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
     document.setDefaultFont(font)
     width = document.idealWidth()
 
-    logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
+    # logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
 
     return width
 
