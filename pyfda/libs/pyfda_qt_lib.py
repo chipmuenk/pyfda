@@ -464,7 +464,7 @@ def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) ->
     font.setBold(bold)
     document = QtGui.QTextDocument(text)
     document.setDefaultFont(font)
-    #size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
+    # size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
     logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
     # option.font.setWeight(QtGui.QFont.Bold)  # new line
     # document.setDefaultFont(option.font)
@@ -472,6 +472,9 @@ def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) ->
     # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
     #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
     #     8  # 2 * horizontalMargin() + 2 * frame margin.
+
+    # row4_height = mSize.lineSpacing() * 4
+
     width_x = wdg.fontMetrics().width('x')
     width_frm = 8
     if text != '':
@@ -487,6 +490,51 @@ def qled_set_max_width(wdg, text: str = '', N_x: int = 17, bold: bool = True) ->
     # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
     #    qlineedit-to-display-at-most-four-characters/47307180#47307180
 
+
+# ----------------------------------------------------------------------------
+def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
+    """
+    Calculate width of `text` in points`. When `text=``, calculate the width
+    of number `N_x` of characters 'x'.
+
+    The actual width of the string is calculated by creating a
+    QTextDocument with the passed text and retrieving its `idealWidth()`
+
+    Parameters
+    ----------
+
+    test: str
+        string to calculate the width for
+
+    N_x: int
+        When `text == ''`, calculate the width from `N_x * width('x')`
+
+    Returns
+    -------
+
+    width: int
+        The width of the text in points
+
+    """
+    if text == '':
+        text = "x" * N_x
+    document = QtGui.QTextDocument(text)
+
+    font = QFont()
+    font.setBold(bold)
+    document.setDefaultFont(font)
+    width = document.idealWidth()
+
+    #size = QSize(document.idealWidth(), document.lin.fontMetrics().height())
+    logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
+    # option.font.setWeight(QtGui.QFont.Bold)  # new line
+    # document.setDefaultFont(option.font)
+
+    return width
+
+    # self.led_N_points.setMaximumWidth(self.led_frm + 6 * self.led_fm) # max width = 6'x'
+    # see https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
+    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
 
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):

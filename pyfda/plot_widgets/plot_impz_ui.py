@@ -12,13 +12,12 @@ Create the UI for the PlotImz class
 import collections
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QFontMetrics, QIcon, pyqtSignal, QEvent, Qt, QSize,
-    QHBoxLayout, QVBoxLayout, QGridLayout)
+    QIcon, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qled_set_max_width,
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
     QVLine, QLabelVert)
 from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -84,9 +83,6 @@ class PlotImpz_UI(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        self.width_m = QFontMetrics(QPushButton().font()).width("m")
-        # row4_height = mSize.lineSpacing() * 4
-
         # initial settings
         self.N_start = 0
         self.N_user = 0
@@ -331,12 +327,12 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.setToolTip(
             "<span>Number of displayed data points. "
             "<i>N</i> = 0 tries to choose for you.</span>")
-        qled_set_max_width(self.led_N_points, N_x=8)
+        self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
-        qled_set_max_width(self.led_N_start, N_x=8)
+        self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
         self.but_stim_options = QPushButton("Stimuli")
         self.but_stim_options.setObjectName("but_stim_options")
@@ -434,7 +430,7 @@ class PlotImpz_UI(QWidget):
         line2 = QVLine(width=5)
 
         self.chk_log_time = QPushButton("dB")
-        self.chk_log_time.setMaximumWidth(self.width_m * 4)
+        self.chk_log_time.setMaximumWidth(qtext_width(text=" dB "))
         self.chk_log_time.setObjectName("chk_log_time")
         self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log_time.setCheckable(True)
@@ -461,9 +457,7 @@ class PlotImpz_UI(QWidget):
         self.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.but_log_spgr_time = QPushButton("dB")
-        self.but_log_spgr_time.setMaximumWidth(self.width_m * 4)
-        self.but_log_spgr_time.setMaximumWidth(
-            qled_set_max_width(self.but_log_spgr_time, text=" dB "))
+        self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB "))
         self.but_log_spgr_time.setObjectName("but_log_spgr")
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
@@ -490,7 +484,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
         self.led_log_bottom_time.setText(str(self.bottom_t))
-        qled_set_max_width(self.led_log_bottom_time, text="xxxxxxxx")
+        self.led_log_bottom_time.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom_time.setToolTip(
             "<span>Minimum display value for time and spectrogram plots with log. scale."
             "</span>")
@@ -579,23 +573,23 @@ class PlotImpz_UI(QWidget):
             self.cmb_plt_freq_resp, self.plot_styles_list, self.plt_freq_resp)
         self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
 
-        self.chk_log_freq = QPushButton("dB")
-        self.chk_log_freq.setMaximumWidth(self.width_m * 4)
-        self.chk_log_freq.setObjectName("chk_log_freq")
-        self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chk_log_freq.setCheckable(True)
-        self.chk_log_freq.setChecked(True)
+        self.but_log_freq = QPushButton("dB")
+        self.but_log_freq.setMaximumWidth(qtext_width(" dB "))
+        self.but_log_freq.setObjectName(".but_log_freq")
+        self.but_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.but_log_freq.setCheckable(True)
+        self.but_log_freq.setChecked(True)
 
         self.lbl_log_bottom_freq = QLabel(to_html("min =", frmt='bi'), self)
-        self.lbl_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
+        self.lbl_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
         self.led_log_bottom_freq = QLineEdit(self)
         self.led_log_bottom_freq.setText(str(self.bottom_f))
-        qled_set_max_width(self.led_log_bottom_freq, N_x=8)
+        self.led_log_bottom_freq.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom_freq.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
-        self.led_log_bottom_freq.setVisible(self.chk_log_freq.isChecked())
+        self.led_log_bottom_freq.setVisible(self.but_log_freq.isChecked())
 
-        if not self.chk_log_freq.isChecked():
+        if not self.but_log_freq.isChecked():
             self.bottom_f = 0
 
         self.cmb_freq_display = QComboBox(self)
@@ -643,7 +637,7 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
-        layH_ctrl_freq.addWidget(self.chk_log_freq)
+        layH_ctrl_freq.addWidget(self.but_log_freq)
         layH_ctrl_freq.addStretch(1)
         layH_ctrl_freq.addWidget(self.cmb_freq_display)
         layH_ctrl_freq.addStretch(1)
@@ -674,16 +668,16 @@ class PlotImpz_UI(QWidget):
         self.ledStimPar1.setToolTip("Duty Cycle, 0 ... 1")
         self.ledStimPar1.setObjectName("ledStimPar1")
 
-        self.chk_stim_bl = QPushButton(self)
-        self.chk_stim_bl.setText("BL")
-        self.chk_stim_bl.setToolTip(
+        self.but_stim_bl = QPushButton(self)
+        self.but_stim_bl.setText("BL")
+        self.but_stim_bl.setToolTip(
             "<span>Bandlimit the signal to the Nyquist "
             "frequency to avoid aliasing. However, this is much slower "
             "to calculate especially for a large number of points.</span>")
-        self.chk_stim_bl.setMaximumWidth(self.width_m * 4)
-        self.chk_stim_bl.setCheckable(True)
-        self.chk_stim_bl.setChecked(True)
-        self.chk_stim_bl.setObjectName("stim_bl")
+        self.but_stim_bl.setMaximumWidth(qtext_width(text="BL "))
+        self.but_stim_bl.setCheckable(True)
+        self.but_stim_bl.setChecked(True)
+        self.but_stim_bl.setObjectName("stim_bl")
 
         # -------------------------------------
         self.cmbChirpType = QComboBox(self)
@@ -709,7 +703,7 @@ class PlotImpz_UI(QWidget):
         # -------------------------------------
         self.chk_step_err = QPushButton("Error", self)
         self.chk_step_err.setToolTip("<span>Display the step response error.</span>")
-        self.chk_step_err.setMaximumWidth(7*self.width_m)
+        self.chk_step_err.setMaximumWidth(qtext_width(text="Error "))
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
@@ -721,7 +715,7 @@ class PlotImpz_UI(QWidget):
         layHCmbStim.addWidget(self.cmbChirpType)
         layHCmbStim.addWidget(self.cmbPeriodicType)
         layHCmbStim.addWidget(self.cmbModulationType)
-        layHCmbStim.addWidget(self.chk_stim_bl)
+        layHCmbStim.addWidget(self.but_stim_bl)
         layHCmbStim.addWidget(self.lblStimPar1)
         layHCmbStim.addWidget(self.ledStimPar1)
         layHCmbStim.addWidget(self.chk_step_err)
@@ -951,7 +945,7 @@ class PlotImpz_UI(QWidget):
         # --- stimulus control ---
         self.but_stim_options.clicked.connect(self._show_stim_options)
 
-        self.chk_stim_bl.clicked.connect(self._enable_stim_widgets)
+        self.but_stim_bl.clicked.connect(self._enable_stim_widgets)
         self.chk_step_err.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
 
@@ -1186,7 +1180,7 @@ class PlotImpz_UI(QWidget):
         self.lblStimPar1.setVisible("par1" in stim_wdg)
         self.ledStimPar1.setVisible("par1" in stim_wdg)
 
-        self.chk_stim_bl.setVisible("bl" in stim_wdg)
+        self.but_stim_bl.setVisible("bl" in stim_wdg)
 
         self.lblAmp1.setVisible("a1" in stim_wdg)
         self.ledAmp1.setVisible("a1" in stim_wdg)

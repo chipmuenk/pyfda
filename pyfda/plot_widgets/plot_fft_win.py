@@ -18,7 +18,7 @@ import matplotlib.patches as mpl_patches
 
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
-    qwindow_stay_on_top, qled_set_max_width, QVLine, QHLine)
+    qwindow_stay_on_top, qtext_width, QVLine, QHLine)
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
@@ -29,7 +29,7 @@ import pyfda.filterbroker as fb
 from pyfda.libs.compat import (
     Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QCheckBox, QLabel, QLineEdit,
     QFrame, QFont, QPushButton, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
-    QFontMetrics, QSizePolicy, QHeaderView)
+    QSizePolicy, QHeaderView)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -82,8 +82,7 @@ class Plot_FFT_win(QDialog):
         super(Plot_FFT_win, self).__init__(parent)
         # make window stay on top
         qwindow_stay_on_top(self, True)
-        self.width_m = QFontMetrics(
-            QPushButton().font()).width("m")  # width of 'm'
+
         self.win_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -166,14 +165,14 @@ class Plot_FFT_win(QDialog):
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)
         self.led_N.setText(str(self.N_view))
-        self.led_N.setMaximumWidth(70)
+        self.led_N.setMaximumWidth(qtext_width(N_x=8))
         self.led_N.setToolTip(
             "<span>Number of window data points to display.</span>")
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
         self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
-        self.but_log_t.setMaximumWidth(self.width_m * 4)
+        self.but_log_t.setMaximumWidth(qtext_width(" dB "))
         self.but_log_t.setObjectName("chk_log_time")
         self.but_log_t.setCheckable(True)
         self.but_log_t.setChecked(False)
@@ -182,7 +181,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_t = QLineEdit(self)
         self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_t.setText(str(self.bottom_t))
-        qled_set_max_width(self.led_log_bottom_t, N_x=8)
+        self.led_log_bottom_t.setMaximumWidth(qtext_width(N_x=6))
         self.led_log_bottom_t.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
@@ -202,7 +201,7 @@ class Plot_FFT_win(QDialog):
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
         self.but_log_f = QPushButton("dB", default=False, autoDefault=False)
-        self.but_log_f.setMaximumWidth(self.width_m * 4)
+        self.but_log_f.setMaximumWidth(qtext_width(" dB "))
         self.but_log_f.setObjectName("chk_log_freq")
         self.but_log_f.setToolTip("<span>Display in dB.</span>")
         self.but_log_f.setCheckable(True)
@@ -214,7 +213,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f = QLineEdit(self)
         self.led_log_bottom_f.setVisible(self.but_log_t.isChecked())
         self.led_log_bottom_f.setText(str(self.bottom_f))
-        qled_set_max_width(self.led_log_bottom_f, N_x=8)
+        self.led_log_bottom_f.setMaximumWidth(qtext_width(N_x=6))
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
@@ -225,7 +224,7 @@ class Plot_FFT_win(QDialog):
         # ----------------------------------------------------------------------
         layH_win_select = QHBoxLayout()
         layH_win_select.addWidget(self.qfft_win_select)
-        layH_win_select.setContentsMargins(0,0,0,0)
+        layH_win_select.setContentsMargins(0, 0, 0, 0)
         layH_win_select.addStretch(1)
         frmQFFT = QFrame(self)
         frmQFFT.setObjectName("frmQFFT")
@@ -253,9 +252,9 @@ class Plot_FFT_win(QDialog):
 
         layVControls = QVBoxLayout()
         layVControls.addWidget(frmQFFT)
-        layVControls.addWidget(hline)        
+        layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
-        
+
         frmControls = QFrame(self)
         frmControls.setObjectName("frmControls")
         frmControls.setLayout(layVControls)
@@ -265,11 +264,11 @@ class Plot_FFT_win(QDialog):
         #
         # Layout layVMainMpl (VBox) is defined within MplWidget, additional
         # widgets can be added below the matplotlib widget (here: frmControls)
-        # 
+        #
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(frmControls)
-        self.mplwidget.layVMainMpl.setContentsMargins(0,0,0,0)
+        self.mplwidget.layVMainMpl.setContentsMargins(0, 0, 0, 0)
 
         # ----------------------------------------------------------------------
         #               ### frmInfo ###
@@ -295,7 +294,7 @@ class Plot_FFT_win(QDialog):
         #     Qt.ScrollBarAlwaysOff)
         # self.tbl_win_props.setHorizontalScrollBarPolicy(
         #     Qt.ScrollBarAlwaysOff)
-      
+
         self._construct_table(self.tbl_rows, self.tbl_cols, " ")
 
         self.txtInfoBox = QTextBrowser(self)

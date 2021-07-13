@@ -172,7 +172,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_stmq.currentIndexChanged.connect(self.draw)
         self.ui.chk_Hf.clicked.connect(self.draw)
         self.ui.cmb_freq_display.currentIndexChanged.connect(self.draw)
-        self.ui.chk_log_freq.clicked.connect(self.draw)
+        self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
         self.ui.chk_freq_norm_impz.clicked.connect(self.draw)
         self.ui.chk_show_info_freq.clicked.connect(self.draw)
@@ -515,7 +515,7 @@ class Plot_Impz(QWidget):
 
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
-            if self.ui.chk_stim_bl.isChecked():
+            if self.ui.but_stim_bl.isChecked():
                 self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Bandlim. Triangular Signal'
             else:
@@ -524,7 +524,7 @@ class Plot_Impz(QWidget):
                 self.title_str += r'Triangular Signal'
 
         elif self.ui.stim == "saw":
-            if self.ui.chk_stim_bl.isChecked():
+            if self.ui.but_stim_bl.isChecked():
                 self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
                 self.title_str += r'Bandlim. Sawtooth Signal'
             else:
@@ -532,7 +532,7 @@ class Plot_Impz(QWidget):
                 self.title_str += r'Sawtooth Signal'
 
         elif self.ui.stim == "square":
-            if self.ui.chk_stim_bl.isChecked():
+            if self.ui.but_stim_bl.isChecked():
                 self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1,
                                               duty=self.ui.stim_par1)
                 self.title_str += r'Bandlimited Rect. Signal'
@@ -882,7 +882,7 @@ class Plot_Impz(QWidget):
         self.ui.bottom_f
         """
 
-        log = self.ui.chk_log_freq.isChecked()
+        log = self.ui.but_log_freq.isChecked()
         self.ui.lbl_log_bottom_freq.setVisible(log)
         self.ui.led_log_bottom_freq.setVisible(log)
         if log:
@@ -1353,7 +1353,7 @@ class Plot_Impz(QWidget):
             or self.plt_freq_stmq != "none"\
             or self.plt_freq_resp != "none"
 
-        # if not self.ui.chk_log_freq.isChecked() \
+        # if not self.ui.but_log_freq.isChecked() \
         # and len(self.mplwidget_f.fig.get_axes()) == 2:
         # get rid of second axis when returning from log mode by clearing all
         #    self.mplwidget_f.fig.clear()
@@ -1372,7 +1372,7 @@ class Plot_Impz(QWidget):
         # for ax in self.axes_f:
         #    ax.cla()
 
-        if self.ui.chk_log_freq.isChecked():
+        if self.ui.but_log_freq.isChecked():
             # and len(self.mplwidget_f.fig.get_axes()) == 1:??
             # create second axis scaled for noise power scale if it doesn't exist yet
             self.ax_f1_noise = self.ax_f1.twinx()
@@ -1546,7 +1546,7 @@ class Plot_Impz(QWidget):
             # -----------------------------------------------------------------
             # Calculate log FFT and power if selected, set units
             # -----------------------------------------------------------------
-            if self.ui.chk_log_freq.isChecked():
+            if self.ui.but_log_freq.isChecked():
                 unit = " in dBV"
                 unit_P = "dBW"
                 H_F_pre = "|"
@@ -1814,7 +1814,7 @@ class Plot_Impz(QWidget):
             self.ax_f1.set_xlim(F_range)
             self.ax_f1.set_title("Spectrum of " + self.title_str)
 
-            if self.ui.chk_log_freq.isChecked():
+            if self.ui.but_log_freq.isChecked():
                 # scale second axis for noise power
                 corr = 10*np.log10(self.ui.N) - nenbw  # nenbw is in dB
                 mn, mx = self.ax_f1.get_ylim()
