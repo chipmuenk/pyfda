@@ -428,7 +428,7 @@ def qfilter_warning(self, N, fil_class):
 
 
 # ----------------------------------------------------------------------------
-def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
+def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> int:
     """
     Calculate width of `text` in points`. When `text=``, calculate the width
     of number `N_x` of characters 'x'.
@@ -467,14 +467,14 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True) -> int:
     """
     if text == '':
         text = "x" * N_x
-    document = QtGui.QTextDocument(text)
 
-    font = QFont()
-    font.setBold(bold)
+    if font is None:
+        font = QFont()
+    font.setBold(True)
+
+    document = QtGui.QTextDocument(text)
     document.setDefaultFont(font)
     width = document.idealWidth()
-
-    # logger.warning(f"Text: {text}, Size: {document.idealWidth()}")
 
     return width
 
