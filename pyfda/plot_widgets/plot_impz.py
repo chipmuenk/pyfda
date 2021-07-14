@@ -1405,7 +1405,8 @@ class Plot_Impz(QWidget):
 
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
-        plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim
+        plt_stimulus_q = self.plt_freq_stmq != "none" and self.fx_sim\
+            and hasattr(self, "X_q")
 
         if "*" in qget_cmb_box(self.ui.cmb_plt_freq_stim):
             fmt_mkr_stim = self.fmt_mkr_stim
