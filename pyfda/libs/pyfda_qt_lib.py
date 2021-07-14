@@ -13,7 +13,7 @@ from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont)
+    QFont, QSize)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -512,6 +512,23 @@ class QVLine(QFrame):
         # self.setLineWidth(width)
         # self.setFrameShape(QFrame.StyledPanel);
         self.setStyleSheet("border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
+
+
+class PushButton(QPushButton):
+    def __init__(self, txt: str, checkable: bool = True, checked: bool = False):
+        super(PushButton, self).__init__()
+
+        self.setCheckable(checkable)
+        self.setChecked(checked)
+        self.w = qtext_width(text=txt, font=self.font())
+        self.h = super(PushButton, self).sizeHint().height()
+        self.setText(txt.strip())
+
+    def sizeHint(self) -> QtCore.QSize:
+        return QSize(self.w, self.h)
+
+    def minimumSizeHint(self) -> QtCore.QSize:
+        return QSize(self.w, self.h)
 
 
 class RotatedButton(QPushButton):
