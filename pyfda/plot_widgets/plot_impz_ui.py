@@ -10,6 +10,8 @@
 Create the UI for the PlotImz class
 """
 import collections
+
+from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
     QIcon, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout, QGridLayout)
@@ -18,7 +20,7 @@ from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
-    QVLine, QLabelVert)
+    QVLine, QLabelVert, PushButton)
 from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -363,20 +365,14 @@ class PlotImpz_UI(QWidget):
 
         self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
 
-        self.but_fx_scale = QPushButton("FX:Int", self)
+        self.but_fx_scale = PushButton(" FX:Int ")
         self.but_fx_scale.setObjectName("but_fx_scale")
-        self.but_fx_scale.setMaximumWidth(qtext_width(text=" FX:Int "))
         self.but_fx_scale.setToolTip(
             "<span>Display data with integer (fixpoint) scale.</span>")
-        self.but_fx_scale.setCheckable(True)
-        self.but_fx_scale.setChecked(False)
 
-        self.but_fx_range = QPushButton("FX:Range", self)
-        self.but_fx_range.setMaximumWidth(qtext_width(text=" FX:Range "))
+        self.but_fx_range = PushButton(" FX:Range ")
         self.but_fx_range.setObjectName("but_fx_limits")
         self.but_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
-        self.but_fx_range.setCheckable(True)
-        self.but_fx_range.setChecked(False)
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_auto_run)
