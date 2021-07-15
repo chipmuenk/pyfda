@@ -338,17 +338,14 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_stim_options = QPushButton("Stimuli")
+        self.but_stim_options = PushButton("Stimuli ", checked=True)
         self.but_stim_options.setObjectName("but_stim_options")
-        self.but_stim_options.setMaximumWidth(qtext_width(text=" Stimuli "))
         self.but_stim_options.setToolTip("<span>Show stimulus options.</span>")
-        self.but_stim_options.setCheckable(True)
-        self.but_stim_options.setChecked(True)
 
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
         self.lbl_stim_cmplx_warn.setToolTip(
-            '<span>Signal is complex valued, '
+            '<span>Signal is complex valued; '
             'single-sided and H<sub>id</sub> spectra may be wrong.</span>')
         self.lbl_stim_cmplx_warn.setStyleSheet("background-color : yellow;"
                                                "border : 1px solid grey")
@@ -370,7 +367,7 @@ class PlotImpz_UI(QWidget):
         self.but_fx_scale.setToolTip(
             "<span>Display data with integer (fixpoint) scale.</span>")
 
-        self.but_fx_range = PushButton(" FX:Range ")
+        self.but_fx_range = PushButton(" FX:Range")
         self.but_fx_range.setObjectName("but_fx_limits")
         self.but_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
 
@@ -435,12 +432,9 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.but_log_time = QPushButton("dB")
-        self.but_log_time.setMaximumWidth(qtext_width(text=" dB"))
+        self.but_log_time = PushButton(" dB")
         self.but_log_time.setObjectName("but_log_time")
         self.but_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.but_log_time.setCheckable(True)
-        self.but_log_time.setChecked(False)
 
         lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
@@ -603,11 +597,11 @@ class PlotImpz_UI(QWidget):
         self.but_Hf.setChecked(False)
         self.but_Hf.setCheckable(True)
 
-        self.but_freq_norm_impz = QPushButtonRT(text=to_html("P_X = 1", frmt="b"),
+        self.but_freq_norm_impz = QPushButtonRT(text="<b><i>E<sub>X</sub></i> = 1</b>",
                                                 margin=5)
         self.but_freq_norm_impz.setToolTip(
             "<span>Normalize the FFT of the stimulus with <i>N<sub>FFT</sub></i> for "
-            "<i>P<sub>X</sub></i> = 1. For a dirac pulse, this yields "
+            "<i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
             "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC and Noise need to be "
             "turned off, window should be Rectangular.</span>")
         self.but_freq_norm_impz.setCheckable(True)
