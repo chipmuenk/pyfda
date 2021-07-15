@@ -305,10 +305,6 @@ qss_tab_bar = """
      margin:  0; */
  }
 
- QTabWidget::tab-bar {
-     left: 0.3em; /* move bar to the right: hack to prevent truncation of labels (QTBUG-6905) */
-     }
-
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:11pt; }
  QTabBar::tab{
@@ -318,50 +314,63 @@ qss_tab_bar = """
      background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
      border: 1px solid #C4C4C3; 
-     border-bottom-color: #C2C7CB; /* same as the pane color */
      border-top-left-radius: 4px;
-     border-top-right-radius: 4px;
-     min-width: 2em;
      padding: 0.2em;
  }
-
- QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
  
- QTabBar::tab:selected {
+QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
+ 
+QTabBar::tab:selected {
      border-color: #9B9B9B;
-     border-bottom-color: #444444; /* same as pane color */
+ }
+ 
+QTabBar::tab:only-one {
+     margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 
- QTabBar::tab:!selected {
-     margin-top: 0.2em; /* make non-selected tabs look smaller */
+QTabBar::tab::top{
+    border-top-right-radius: 4px;
+    min-width: 1em;
+    min-height: 1em;
+    }
+QTabBar::tab::left{
+    border-bottom-left-radius: 4px;
+    min-width: 1em;   
  }
+ 
+QTabBar::tab::top:selected {
+     border-bottom-color: #C2C7CB; /* same as pane color */
+ }
+QTabBar::tab::left:selected {
+     border-right-color: #C2C7CB; /* same as pane color */
+ }
+
+/* make non-selected tabs look smaller */
+QTabBar::tab::top:!selected {
+     margin-top: 0.2em;}
+QTabBar::tab::left:!selected {
+     margin-left: 0.2em;}
+"""
+# Overlap effects for QTabWidget, currently not used
+qss_tab_bar_ovlp = """
 
  /* make use of negative margins to produce overlapping selected tabs */
- QTabBar::tab:selected {
+ QTabBar::tab::top:selected {
      /* expand/overlap to both sides by 0.2em */
-     margin-left: -0.2em;
-     margin-right: -0.2em;
- }
- 
- QTabBar::tab:first{
-    /* the first tab */
-}
-
- QTabBar::tab:first:!selected {
-    /* the first unselected tab */
+     margin-left: -0.1em;
+     margin-right: -0.1em;
  }
   
- QTabBar::tab:first:selected {
+ QTabBar::tab::top:first:selected {
      margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
  }
  
- QTabBar::tab:last:selected {
+ QTabBar::tab::top:last:selected {
      margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
  }
 
- QTabBar::tab:only-one {
-     margin: 0; /* if there is only one tab, we don't want overlapping margins */
- }
+ 
+
 """
 
 # Common qss settings for all themes
