@@ -651,7 +651,7 @@ class PlotImpz_UI(QWidget):
         # Controls for stimuli
         # =====================================================================
         # self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
-        self.lblStimulus = QLabelVert("Stim", self)
+        #self.lblStimulus = QLabelVert("Stim", self)
 
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
@@ -822,7 +822,7 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setObjectName("stimNoi")
 
         layGStim = QGridLayout()
-        layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
+        #layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
         # layGStim.setColumnStretch(0, 10)  # doesnt work
         # QSpacerItem
 
