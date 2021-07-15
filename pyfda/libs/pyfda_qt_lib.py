@@ -515,12 +515,13 @@ class QVLine(QFrame):
 
 
 class PushButton(QPushButton):
-    def __init__(self, txt: str, checkable: bool = True, checked: bool = False):
+    def __init__(self, txt: str = "", N_x: int = 8,
+                 checkable: bool = True, checked: bool = False):
         super(PushButton, self).__init__()
 
         self.setCheckable(checkable)
         self.setChecked(checked)
-        self.w = qtext_width(text=txt, font=self.font())
+        self.w = qtext_width(text=txt, N_x=N_x, font=self.font())
         self.h = super(PushButton, self).sizeHint().height()
         self.setText(txt.strip())
 
