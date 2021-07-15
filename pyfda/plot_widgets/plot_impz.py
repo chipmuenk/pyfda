@@ -10,7 +10,7 @@
 Widget for plotting impulse and general transient responses
 """
 # import time
-from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
+from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QSizePolicy
 
 import numpy as np
 from numpy import pi
@@ -117,25 +117,27 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
         # ----------------------------------------------------------------------
-        self.tabWidget = QTabWidget(self)
-        self.tabWidget.addTab(self.mplwidget_t, "Time")
-        self.tabWidget.setTabToolTip(0, "Impulse and transient response of filter")
-        self.tabWidget.addTab(self.mplwidget_f, "Frequency")
-        self.tabWidget.setTabToolTip(
+        self.tab_widget_w = QTabWidget(self)
+        self.tab_widget_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tab_widget_w.setTabPosition(QTabWidget.West)
+        self.tab_widget_w.addTab(self.mplwidget_t, "Time")
+        self.tab_widget_w.setTabToolTip(0, "Impulse and transient response of filter")
+        self.tab_widget_w.addTab(self.mplwidget_f, "Frequency")
+        self.tab_widget_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
-        self.tabWidget.setTabPosition(QTabWidget.West)
 
         # list with tabWidgets
         self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
 
         layVMain = QVBoxLayout()
-        layVMain.addWidget(self.tabWidget)
-        layVMain.addWidget(self.ui.wdg_ctrl_stim)
+        layVMain.addWidget(self.tab_widget_w)
+        layVMain.addWidget(self.ui.tab_stim_w)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
         self.setLayout(layVMain)
-
+        self.ui.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        self.redraw()
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -182,7 +184,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
         # When user has selected a different tab, trigger a recalculation of current tab
-        self.tabWidget.currentChanged.connect(self.draw)  # passes number of active tab
+        self.tab_widget_w.currentChanged.connect(self.draw)  # passes number of active tab
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -275,6 +277,7 @@ class Plot_Impz(QWidget):
                 # exclude those ui elements  / events that don't require a recalculation
                 # of stimulus and response
                 if dict_sig['ui_changed'] in {'resized', 'tab'}:
+                    logger.warning(self.ui.tab_stim_w.height())
                     pass
                 else:  # all the other ui elements are treated here
                     self.needs_calc = True
@@ -357,10 +360,10 @@ class Plot_Impz(QWidget):
             self.needs_calc = False
             self.needs_redraw = [True] * 2
 
-        if self.needs_redraw[self.tabWidget.currentIndex()]:
+        if self.needs_redraw[self.tab_widget_w.currentIndex()]:
             logger.debug("Redraw impz started!")
             self.draw()
-            self.needs_redraw[self.tabWidget.currentIndex()] = False
+            self.needs_redraw[self.tab_widget_w.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
 
@@ -803,7 +806,7 @@ class Plot_Impz(QWidget):
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 
-        idx = self.tabWidget.currentIndex()
+        idx = self.tab_widget_w.currentIndex()
 
         if idx == 0 and self.needs_redraw[0]:
             self.draw_time()
@@ -1831,8 +1834,8 @@ class Plot_Impz(QWidget):
         """
         Redraw the currently visible canvas when e.g. the canvas size has changed
         """
-        idx = self.tabWidget.currentIndex()
-        self.tabWidget.currentWidget().redraw()
+        idx = self.tab_widget_w.currentIndex()
+        self.tab_widget_w.currentWidget().redraw()
         # wdg = getattr(self, self.tab_mplwidgets[idx])
         logger.debug("Redrawing tab {0}".format(idx))
         # wdg_cur.redraw()

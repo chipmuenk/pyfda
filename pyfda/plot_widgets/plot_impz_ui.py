@@ -14,7 +14,8 @@ import collections
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout, QGridLayout)
+    QIcon, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout, QGridLayout,
+    QTabWidget, QFrame)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
@@ -907,8 +908,31 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_stim = QHBoxLayout()
         layH_ctrl_stim.addLayout(layV_ctrl_stim)
         layH_ctrl_stim.addStretch(10)
-        self.wdg_ctrl_stim = QWidget(self)
-        self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
+
+        # ----------------------------------------------------------------------
+        # Tabbed layout with vertical tabs
+        # ----------------------------------------------------------------------
+        self.wdg_stim = QFrame(self)
+        self.wdg_stim.setLayout(layH_ctrl_stim)
+        logger.warning(self.wdg_stim.minimumSizeHint())
+
+        self.wdg_ctrl_audio = QWidget(self)
+
+        self.tab_stim_w = QTabWidget(self)
+        self.tab_stim_w.setObjectName("tab_stim_w")
+        self.tab_stim_w.setMaximumHeight(68)
+        self.tab_stim_w.setTabPosition(QTabWidget.West)
+        self.tab_stim_w.setStyleSheet("::tab {margin: 0px; padding: 0px;"
+                                      "height: 20px; width: 30px }")
+        # self.tab_ctrl_stim.setStyleSheet("::pane {border: 0 solid white; "
+        #                                  "margin: -13px -9px -13px -9px;}")
+
+        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        self.tab_stim_w.addTab(self.wdg_stim, "Stim")
+        self.tab_stim_w.setTabToolTip(0, "Stimuli")
+
+        self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/plot_style-line"), "")
+        self.tab_stim_w.setTabToolTip(1, "Audio")
 
         # frequency related widgets are scaled with f_s, requiring special handling
         self.ledFreq1.installEventFilter(self)
