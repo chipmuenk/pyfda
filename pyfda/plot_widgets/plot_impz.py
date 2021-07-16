@@ -137,7 +137,7 @@ class Plot_Impz(QWidget):
 
         self.setLayout(layVMain)
         self.ui.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        self.redraw()
+        # self.redraw()
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------

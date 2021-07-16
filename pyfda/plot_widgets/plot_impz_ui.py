@@ -651,9 +651,6 @@ class PlotImpz_UI(QWidget):
         # =====================================================================
         # Controls for stimuli
         # =====================================================================
-        # self.lblStimulus = QLabel(to_html("Stimulus", frmt='bi'), self)
-        #self.lblStimulus = QLabelVert("Stim", self)
-
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
@@ -914,7 +911,6 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         self.wdg_stim = QFrame(self)
         self.wdg_stim.setLayout(layH_ctrl_stim)
-        logger.warning(self.wdg_stim.minimumSizeHint())
 
         self.wdg_ctrl_audio = QWidget(self)
 
