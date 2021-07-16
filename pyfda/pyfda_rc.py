@@ -297,13 +297,14 @@ qss_light = """
 
 # common layout settings for QTabWidget
 qss_tab_bar = """
- .QTabWidget::pane { /* The tab _widget_ frame */ 
-    
-     border-top: 2px solid #C2C7CB; 
+ /* The tab _widget_ frame; general and for North / West orientation */ 
+ .QTabWidget::pane {
      /*border : 5px solid;
      padding: 0;
      margin:  0; */
  }
+ .QTabWidget::pane::left {border-left: 1px solid #C2C7CB;}
+ .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;}
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:11pt; }
@@ -332,10 +333,12 @@ QTabBar::tab::top{
     border-top-right-radius: 4px;
     min-width: 1em;
     min-height: 1em;
+    margin-bottom: -2px;
     }
 QTabBar::tab::left{
     border-bottom-left-radius: 4px;
-    min-width: 1em;   
+    min-width: 1em;
+    margin-right: -1px;
  }
  
 QTabBar::tab::top:selected {
