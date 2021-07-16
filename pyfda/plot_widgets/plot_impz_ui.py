@@ -1161,7 +1161,7 @@ class PlotImpz_UI(QWidget):
         """
         Hide / show panel with stimulus options
         """
-        self.wdg_ctrl_stim.setVisible(self.but_stim_options.isChecked())
+        self.tab_stim_w.setVisible(self.but_stim_options.isChecked())
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
