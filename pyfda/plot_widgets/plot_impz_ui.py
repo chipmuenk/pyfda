@@ -919,7 +919,7 @@ class PlotImpz_UI(QWidget):
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setMaximumHeight(wdg_stim_h)
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        tab_h = self.tab_stim_w.tabBar().height()
+        tab_h = self.tab_stim_w.tabBar().height()  # h = x-direction
         self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding: 0; height: {tab_h}}}")
 
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
