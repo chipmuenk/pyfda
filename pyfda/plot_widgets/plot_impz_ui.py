@@ -911,19 +911,19 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         self.wdg_stim = QFrame(self)
         self.wdg_stim.setLayout(layH_ctrl_stim)
+        wdg_stim_h = self.wdg_stim.minimumSizeHint().height()
 
         self.wdg_ctrl_audio = QWidget(self)
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
-        self.tab_stim_w.setMaximumHeight(68)
+        self.tab_stim_w.setMaximumHeight(wdg_stim_h)
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        self.tab_stim_w.setStyleSheet("::tab {margin: 0px; padding: 0px;"
-                                      "height: 20px; width: 30px }")
-        # self.tab_ctrl_stim.setStyleSheet("::pane {border: 0 solid white; "
-        #                                  "margin: -13px -9px -13px -9px;}")
+        tab_h = self.tab_stim_w.tabBar().height()
+        self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding: 0; height: {tab_h}}}")
 
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        self.tab_stim_w.setIconSize(QSize(tab_h, tab_h))
         self.tab_stim_w.addTab(self.wdg_stim, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
