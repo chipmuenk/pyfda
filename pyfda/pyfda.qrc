@@ -3,6 +3,7 @@
 <qresource>
     <file alias="action-redo.svg">images/icons/dark/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/dark/action-undo.svg</file>
+    <file alias="audio_90.png">images/icons/dark/audio_90.png</file>
     <file alias="brush.svg">images/icons/dark/brush.svg</file>
     <file alias="camera-slr.svg">images/icons/dark/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
@@ -16,6 +17,7 @@
     <file alias="fft.svg">images/icons/fft.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
+    <file alias="graph_90.png">images/icons/dark/graph_90.png</file>
     <file alias="grid_none.svg">images/icons/grid_none.svg</file>
     <file alias="grid_fine.svg">images/icons/grid_fine.svg</file>
     <file alias="grid_coarse.svg">images/icons/grid_coarse.svg</file>

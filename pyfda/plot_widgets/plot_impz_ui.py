@@ -928,10 +928,10 @@ class PlotImpz_UI(QWidget):
         #                                  "margin: -13px -9px -13px -9px;}")
 
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        self.tab_stim_w.addTab(self.wdg_stim, "Stim")
+        self.tab_stim_w.addTab(self.wdg_stim, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
-        self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/plot_style-line"), "")
+        self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/audio_90.png"), "")
         self.tab_stim_w.setTabToolTip(1, "Audio")
 
         # frequency related widgets are scaled with f_s, requiring special handling
