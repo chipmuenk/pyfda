@@ -100,9 +100,10 @@ class Plot_Impz(QWidget):
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
-        self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget_t.layVMainMpl.setContentsMargins(0, 0, 0, 0)
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------------------------------------------------------------------
         # Define MplWidget for FREQUENCY domain plots
@@ -110,22 +111,21 @@ class Plot_Impz(QWidget):
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
-        self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget_f.layVMainMpl.setContentsMargins(0, 0, 0, 0)
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
         # ----------------------------------------------------------------------
         self.tab_widget_w = QTabWidget(self)
-        self.tab_widget_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.tab_widget_w.setTabPosition(QTabWidget.West)
         self.tab_widget_w.addTab(self.mplwidget_t, "Time")
         self.tab_widget_w.setTabToolTip(0, "Impulse and transient response of filter")
         self.tab_widget_w.addTab(self.mplwidget_f, "Frequency")
         self.tab_widget_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
-
         # list with tabWidgets
         self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
 
@@ -133,10 +133,9 @@ class Plot_Impz(QWidget):
         layVMain.addWidget(self.tab_widget_w)
         layVMain.addWidget(self.ui.tab_stim_w)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
-        layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+        layVMain.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(layVMain)
-        self.ui.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         # self.redraw()
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs

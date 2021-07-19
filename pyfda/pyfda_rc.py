@@ -299,24 +299,25 @@ qss_light = """
 qss_tab_bar = """
  /* The tab _widget_ frame; general and for North / West orientation */ 
  .QTabWidget::pane {
-     /*border : 5px solid;
-     padding: 0;
-     margin:  0; */
+    /*border : 5px solid;
+    padding: 0;
+    margin:  0;*/
  }
  .QTabWidget::pane::left {border-left: 1px solid #C2C7CB;}
  .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;}
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:11pt; }
+ 
  QTabBar::tab{
-     color:black;
-     font-size:10pt;
-     font-weight:bold;
-     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+    color:black;
+    font-size:10pt;
+    font-weight:bold;
+    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-     border: 1px solid #C4C4C3; 
-     border-top-left-radius: 4px;
-     padding: 0.2em;
+    border: 1px solid #C4C4C3; 
+    border-top-left-radius: 4px;
+    padding: 0.2em;
  }
  
 QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
@@ -339,6 +340,10 @@ QTabBar::tab::left{
     border-bottom-left-radius: 4px;
     min-width: 1em;
     margin-right: -1px;
+ }
+ 
+ QTabBar::tab::left:first{
+    margin-top: 2px;
  }
  
 QTabBar::tab::top:selected {

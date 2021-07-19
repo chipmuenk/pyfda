@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
-    QVLine, QLabelVert, PushButton)
+    QVLine, PushButton)
 from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -820,9 +820,6 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setObjectName("stimNoi")
 
         layGStim = QGridLayout()
-        #layGStim.addWidget(self.lblStimulus, 0, 0, 2, 1)
-        # layGStim.setColumnStretch(0, 10)  # doesnt work
-        # QSpacerItem
 
         layGStim.addLayout(layHCmbStim, 0, 1)
         layGStim.addLayout(layHStimDC, 1, 1)
@@ -909,9 +906,11 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
         # ----------------------------------------------------------------------
-        self.wdg_stim = QFrame(self)
+        self.wdg_stim = QWidget(self)
         self.wdg_stim.setLayout(layH_ctrl_stim)
+        self.wdg_stim.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         wdg_stim_h = self.wdg_stim.minimumSizeHint().height()
+        logger.warning(self.wdg_stim.minimumSizeHint())
 
         self.wdg_ctrl_audio = QWidget(self)
 
@@ -919,8 +918,11 @@ class PlotImpz_UI(QWidget):
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setMaximumHeight(wdg_stim_h)
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        tab_h = self.tab_stim_w.tabBar().height()  # h = x-direction
-        self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding: 0; height: {tab_h}}}")
+        # Because tab has horizontal orientation, this yields the tab width on the screen
+        # (x-direction), including tab and pane margins (1 px) and padding (?), set in
+        # pyfda_rc.py
+        tab_h = self.tab_stim_w.tabBar().height() - 4
+        self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding:0; height: {tab_h}}}")
 
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.tab_stim_w.setIconSize(QSize(tab_h, tab_h))
