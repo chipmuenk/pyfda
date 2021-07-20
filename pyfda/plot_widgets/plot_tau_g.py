@@ -67,8 +67,9 @@ class Plot_tau_g(QWidget):
         """
         self.chkWarnings = QCheckBox(self.tr("Verbose"), self)
         self.chkWarnings.setChecked(self.verbose)
-        self.chkWarnings.setToolTip(self.tr("<span>Print messages about singular group delay"
-                                            "and calculation times."))
+        self.chkWarnings.setToolTip(self.tr(
+            "<span>Print messages about singular group delay and calculation times."
+            "</span>"))
 
         self.cmbAlgorithm = QComboBox(self)
         qcmb_box_populate(self.cmbAlgorithm, self.cmb_algorithm_items, self.algorithm)
@@ -86,7 +87,7 @@ class Plot_tau_g(QWidget):
 
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
-        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_tau_g.html"
         self.setLayout(self.mplwidget.layVMainMpl)

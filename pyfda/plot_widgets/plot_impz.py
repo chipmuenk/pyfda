@@ -100,7 +100,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
-        self.mplwidget_t.layVMainMpl.setContentsMargins(0, 0, 0, 0)
+        self.mplwidget_t.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -111,7 +111,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
-        self.mplwidget_f.layVMainMpl.setContentsMargins(0, 0, 0, 0)
+        self.mplwidget_f.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -133,7 +133,7 @@ class Plot_Impz(QWidget):
         layVMain.addWidget(self.tab_widget_w)
         layVMain.addWidget(self.ui.tab_stim_w)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
-        layVMain.setContentsMargins(0, 0, 0, 0)
+        layVMain.setContentsMargins(*params['mpl_margins'])
 
         self.setLayout(layVMain)
         # self.redraw()
@@ -276,7 +276,6 @@ class Plot_Impz(QWidget):
                 # exclude those ui elements  / events that don't require a recalculation
                 # of stimulus and response
                 if dict_sig['ui_changed'] in {'resized', 'tab'}:
-                    logger.warning(self.ui.tab_stim_w.height())
                     pass
                 else:  # all the other ui elements are treated here
                     self.needs_calc = True

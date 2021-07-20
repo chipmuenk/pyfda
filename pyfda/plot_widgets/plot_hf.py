@@ -171,7 +171,7 @@ class Plot_Hf(QWidget):
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
-        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_hf.html"
         self.setLayout(self.mplwidget.layVMainMpl)
@@ -636,15 +636,15 @@ class Plot_Hf(QWidget):
             # only use the first half of H and F
             self.H_c = self.H_cmplx[0:params['N_FFT']//2]
             self.F = self.F[0:params['N_FFT']//2]
-        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+        else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
             # use H and F as calculated
             self.H_c = self.H_cmplx
 
         # now calculate mag / real / imaginary part of H_c:
-        if self.chkZerophase.isChecked(): # remove the linear phase
+        if self.chkZerophase.isChecked():  # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
 
-        if self.cmbShowH.currentIndex() == 0: # show magnitude of H
+        if self.cmbShowH.currentIndex() == 0:  # show magnitude of H
             H = abs(self.H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
         elif self.cmbShowH.currentIndex() == 1: # show real part of H
@@ -654,22 +654,22 @@ class Plot_Hf(QWidget):
             H = self.H_c.imag
             H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
 
-        #================ Main Plotting Routine =========================
-        #===  clear the axes and (re)draw the plot (if selectable)
+        # ================ Main Plotting Routine =========================
+        # ===  clear the axes and (re)draw the plot (if selectable)
         if self.ax.get_navigate():
 
             if self.unitA == 'dB':
-                self.log_bottom = safe_eval(self.led_log_bottom.text(),
-                                         self.log_bottom, return_type='float',
-                                         sign='neg')
+                self.log_bottom = safe_eval(
+                    self.led_log_bottom.text(), self.log_bottom,
+                    return_type='float', sign='neg')
                 self.led_log_bottom.setText(str(self.log_bottom))
 
                 self.H_plt = np.maximum(20*np.log10(abs(H)), self.log_bottom)
                 A_lim = [self.log_bottom, 2]
                 H_str += ' in dB ' + r'$\rightarrow$'
-            elif self.unitA == 'V': #  'lin'
+            elif self.unitA == 'V':  #  'lin'
                 self.H_plt = H
-                if self.cmbShowH.currentIndex() != 0: # H can be less than zero
+                if self.cmbShowH.currentIndex() != 0:  # H can be less than zero
                     A_min = max(self.lin_neg_bottom, np.nanmin(self.H_plt[np.isfinite(self.H_plt)]))
                 else:
                     A_min = 0
