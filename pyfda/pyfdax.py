@@ -152,9 +152,9 @@ class pyFDA(QMainWindow):
 
         # ============== UI Layout with H and V-Splitter =====================
 
-        inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        self.loggerWin     = QPlainTextEdit(self)  # logger window
+        inputTabWidgets = input_tab_widgets.InputTabWidgets(self)  # input widgets
+        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self)  # plot widgets
+        self.loggerWin = QPlainTextEdit(self)  # logger window
         self.loggerWin.setReadOnly(True)
         # set custom right-button context menu policy
         self.loggerWin.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -167,9 +167,6 @@ class pyFDA(QMainWindow):
         self.popMenu.addAction('Clear &Window', self.loggerWin.clear)
 
 # =============================================================================
-        # only needed for logging window height measured in lines
-        # mSize = QFontMetrics(loggerWin.font())
-        # row4_height = mSize.lineSpacing() * 4
 
         # add logger window underneath plot Tab Widgets
         spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
@@ -180,7 +177,7 @@ class pyFDA(QMainWindow):
         spltHMain = QSplitter(QtCore.Qt.Horizontal)
         spltHMain.addWidget(inputTabWidgets)
         spltHMain.addWidget(spltVPltLogger)
-        spltHMain.setStretchFactor(1,4) # relative initial sizes of subwidgets
+        spltHMain.setStretchFactor(1, 4)  # relative initial sizes of subwidgets
         spltHMain.setContentsMargins(*rc.params['wdg_margins'])
         spltHMain.setFocus()
         # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!

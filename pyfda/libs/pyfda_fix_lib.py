@@ -438,7 +438,7 @@ class Fixed(object):
         Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
-            if key not in ['Q', 'WF', 'WI', 'W','quant', 'ovfl', 'frmt', 'scale']:
+            if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'scale']:
                 raise Exception(u'Unknown Key "{0:s}"!'.format(key))
 
         q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
