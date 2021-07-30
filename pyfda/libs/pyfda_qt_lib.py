@@ -13,7 +13,7 @@ from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont, QSize)
+    QFont, QSize, QFontMetrics)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -445,7 +445,7 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
     N_x: int
         When `text == ''`, calculate the width from `N_x * width('x')`
 
-    bold: bool (Defaut: True)
+    bold: bool (default: True)
         When `True`, determine width based on bold font
 
     Returns
@@ -470,7 +470,8 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     if font is None:
         font = QFont()
-    font.setBold(True)
+    if bold:
+        font.setBold(True)
 
     document = QtGui.QTextDocument(text)
     document.setDefaultFont(font)
@@ -478,14 +479,54 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     return width
 
+
+# ----------------------------------------------------------------------------
+def qtext_height(text: str = 'X', font=None) -> int:
+    """
+    Calculate size of `text` in points`.
+
+    The actual size of the string is calculated using fontMetrics and the default
+    or the passed font
+
+    Parameters
+    ----------
+
+    test: str
+        string to calculate the height for (default: "X")
+
+    Returns
+    -------
+
+    lineSpacing: int
+        The height of the text (line spacing) in points
+
+    Notes
+    -----
+    This is based on
+    https://stackoverflow.com/questions/27433165/how-to-reimplement-sizehint-for-bold-text-in-a-delegate-qt
+
+    and
+
+    https://stackoverflow.com/questions/47285303/how-can-i-limit-text-box-width-of-
+    #    qlineedit-to-display-at-most-four-characters/47307180#47307180
+
+    https://stackoverflow.com/questions/56282199/fit-qtextedit-size-to-text-size-pyqt5
+
+    """
+    if font is None:
+        font = QFont()
+
+    fm = QFontMetrics(font)
+
+    return fm.lineSpacing()
+
     # width_frm = wdg.textMargins().left() + wdg.textMargins().right() +\
     #     wdg.contentsMargins().left() + wdg.contentsMargins().left() +\
     #     8  # 2 * horizontalMargin() + 2 * frame margin.
 
-    # row4_height = mSize.lineSpacing() * 4
-
-    # size = QSize(document.idealWidth(), something.fontMetrics().height())
-
+    # fm = QFontMetrics(loggerWin.font())
+    # row4_height = fm.lineSpacing() * 4
+    # fm_size = fm.size(0, text)
 
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):

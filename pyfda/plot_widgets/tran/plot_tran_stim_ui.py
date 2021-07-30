@@ -27,13 +27,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class PlotImpz_UI(QWidget):
+class Plot_Tran_Stim_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: not implemented at the moment, update_N is triggered directly
-    # by plot_impz
-    # sig_rx = pyqtSignal(object)
+    # incoming:
+    sig_rx = pyqtSignal(object)
     # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
@@ -49,19 +48,22 @@ class PlotImpz_UI(QWidget):
         - qfft_win_select
         """
 
-        # logger.debug("PROCESS_SIG_RX - vis: {0}\n{1}"
-        #              .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
+                     .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
+        elif 'view_changed' in dict_sig:
+            if dict_sig['view_changed'] == 'f_S':
+                self.recalc_freqs()
 
 # ------------------------------------------------------------------------------
     def __init__(self, parent=None):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
-        super(PlotImpz_UI, self).__init__(parent)
+        super(Plot_Tran_Stim_UI, self).__init__(parent)
 
         """
         Intitialize the widget, consisting of:
@@ -70,9 +72,7 @@ class PlotImpz_UI(QWidget):
         - two bottom rows with action buttons
         """
         # initial settings
-        self.N_start = 0
-        self.N_user = 0
-        self.N = 0
+        self.N_FFT = 0  # TODO: FFT value needs to be passed here somehow?
 
         # stimuli
         self.cmb_stim_item = "impulse"
@@ -99,8 +99,10 @@ class PlotImpz_UI(QWidget):
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * n))"
         self.stim_par1 = 0.5
 
-        self.bottom_f = -120  # initial value for log. scale
-        self.param = None
+        self.scale_impz = 1  # optional energy scaling for impulses
+
+        # self.bottom_f = -120  # initial value for log. scale
+        # self.param = None
 
         # dictionaries with widgets needed for the various stimuli
         self.stim_wdg_dict = collections.OrderedDict()
@@ -450,9 +452,10 @@ class PlotImpz_UI(QWidget):
         layH_stim_formula.addWidget(self.lblStimFormula)
         layH_stim_formula.addWidget(self.ledStimFormula, 10)
 
-        # ----------------------------------------------
+        # ----------------------------------------------------------------------
+        # Main Widget
+        # ----------------------------------------------------------------------
         layH_stim_par = QHBoxLayout()
-
         layH_stim_par.addLayout(layGStim)
 
         layV_stim = QVBoxLayout()
@@ -463,13 +466,13 @@ class PlotImpz_UI(QWidget):
         layH_stim.addLayout(layV_stim)
         layH_stim.addStretch(10)
 
-        # ----------------------------------------------------------------------
-        # Tabbed layout with vertical tabs
-        # ----------------------------------------------------------------------
         self.wdg_stim = QWidget(self)
         self.wdg_stim.setLayout(layH_stim)
         self.wdg_stim.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
+        # ----------------------------------------------------------------------
+        # Event Filter
+        # ----------------------------------------------------------------------
         # frequency related widgets are scaled with f_s, requiring special handling
         self.ledFreq1.installEventFilter(self)
         self.ledFreq2.installEventFilter(self)
@@ -481,7 +484,7 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-
+        self.sig_rx.connect(self.process_sig_rx)
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -508,6 +511,33 @@ class PlotImpz_UI(QWidget):
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
+
+# ------------------------------------------------------------------------------
+    def update_freq_units(self):
+        """
+        Update labels referrring to frequency specs
+        """
+
+        if fb.fil[0]['freq_specs_unit'] == 'k':
+            f_unit = ''
+            t_unit = ''
+            self.lblFreq1.setText(self.txtFreq1_k)
+            self.lblFreq2.setText(self.txtFreq2_k)
+        else:
+            f_unit = fb.fil[0]['plt_fUnit']
+            t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
+            self.lblFreq1.setText(self.txtFreq1_f)
+            self.lblFreq2.setText(self.txtFreq2_f)
+
+        if f_unit in {"f_S", "f_Ny"}:
+            unit_frmt = "i"  # italic
+        else:
+            unit_frmt = None  # don't print units like kHz in italic
+
+        self.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
+        self.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
+        self.lbl_TU1.setText(to_html(t_unit, frmt=unit_frmt))
+        self.lbl_TU2.setText(to_html(t_unit, frmt=unit_frmt))
 
 # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -580,6 +610,7 @@ class PlotImpz_UI(QWidget):
                     source.setText(str(params['FMT'].format(self.TW2 * self.t_scale)))
 
                 self.spec_edited = False  # reset flag
+                self._update_scale_impz()
                 self.emit({'ui_changed': 'stim'})
 
             # nothing has changed, but display frequencies in rounded format anyway
@@ -606,7 +637,7 @@ class PlotImpz_UI(QWidget):
                 _store_entry(source)
 
         # Call base class method to continue normal event processing:
-        return super(PlotImpz_UI, self).eventFilter(source, event)
+        return super(Plot_Tran_Stim_UI, self).eventFilter(source, event)
 
     # -------------------------------------------------------------
     def recalc_freqs(self):
@@ -622,6 +653,8 @@ class PlotImpz_UI(QWidget):
             self.TW1 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
             self.TW2 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
 
+        self._update_scale_impz()
+
         self.update_freqs()
 
         self.emit({'ui_changed': 'f1_f2'})
@@ -636,7 +669,7 @@ class PlotImpz_UI(QWidget):
           from plot_impz.process_sig_rx -> self.recalc_freqs
 
         The sampling frequency is loaded from filter dictionary and stored as
-        `self.f_scale` (except when the frequency unit is k when `f_scale = self.N`).
+        `self.f_scale` (except when the frequency unit is k when `f_scale = self.N_FFT`).
 
         Frequency field entries are always stored normalized w.r.t. f_S in the
         dictionary: When the `f_S` lock button is unlocked, only the displayed
@@ -649,7 +682,7 @@ class PlotImpz_UI(QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         if fb.fil[0]['freq_specs_unit'] == 'k':
-            self.f_scale = self.N
+            self.f_scale = self.N_FFT
         else:
             self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
@@ -671,7 +704,6 @@ class PlotImpz_UI(QWidget):
             self.led_TW1.setText(str(self.TW1 * self.t_scale))
 
         elif self.led_TW2.hasFocus():
-            # widget has focus, show full precision
             self.led_TW2.setText(str(self.TW2 * self.t_scale))
 
         else:
@@ -683,12 +715,17 @@ class PlotImpz_UI(QWidget):
             self.led_TW1.setText(str(params['FMT'].format(self.TW1 * self.t_scale)))
             self.led_TW2.setText(str(params['FMT'].format(self.TW2 * self.t_scale)))
 
+        self.update_freq_units()  # TODO: should only be called at f_S / unit update
+
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
         if self.cmb_stim == "impulse":
             self.stim = qget_cmb_box(self.cmbImpulseType)
+            # recalculate the energy scaling for impulse functions
+            self._update_scale_impz()
+
         elif self.cmb_stim == "sinusoid":
             self.stim = qget_cmb_box(self.cmbSinusoidType)
         elif self.cmb_stim == "periodic":
@@ -785,6 +822,7 @@ class PlotImpz_UI(QWidget):
         self.BW1 = safe_eval(
             self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
         self.led_BW1.setText(str(self.BW1))
+        self._update_scale_impz()
         self.emit({'ui_changed': 'BW1'})
 
     def _update_BW2(self):
@@ -793,6 +831,20 @@ class PlotImpz_UI(QWidget):
             self.led_BW2.text(), self.BW2, return_type='float', sign='pos')
         self.led_BW2.setText(str(self.BW2))
         self.emit({'ui_changed': 'BW2'})
+
+    def _update_scale_impz(self):
+        """
+        recalculate the energy scaling for impulse functions when impulse type or
+        relevant frequency / bandwidth parameter have been updated
+        """
+        if self.stim == "dirac":
+            self.scale_impz = 1.
+        elif self.stim == "sinc":
+            self.scale_impz = self.f1 * 2
+        elif self.stim == "gauss":
+            self.scale_impz = self.f1 * 2 * self.BW1
+        elif self.stim == "rect":
+            self.scale_impz = 1. / self.TW1
 
     def _update_phi2(self):
         """ Update value for self.phi2 from the QLineEditWidget"""
@@ -889,7 +941,7 @@ def main():
 
     app = QApplication(sys.argv)
 
-    mainw = PlotImpz_UI(None)
+    mainw = Plot_Tran_Stim_UI(None)
     layVMain = QVBoxLayout()
     layVMain.addWidget(mainw.wdg_stim)
     layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
@@ -902,7 +954,7 @@ def main():
 
 
 if __name__ == "__main__":
-    """ Run widget standalone with 
+    """ Run widget standalone with
         `python -m pyfda.plot_widgets.tran.plot_tran_stim_ui` """
     import sys
     from pyfda.libs.compat import QApplication
@@ -910,7 +962,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = PlotImpz_UI()
+    mainw = Plot_Tran_Stim_UI()
 
     layVMain = QVBoxLayout()
     layVMain.addWidget(mainw.wdg_stim)

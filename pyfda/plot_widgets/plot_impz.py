@@ -10,12 +10,11 @@
 Widget for plotting impulse and general transient responses
 """
 # import time
-from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QSizePolicy
+from pyfda.libs.compat import (
+    QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 
 import numpy as np
-from numpy import pi
 import scipy.signal as sig
-from scipy.special import sinc, diric
 import matplotlib.patches as mpl_patches
 # import matplotlib.lines as lines
 from matplotlib.ticker import AutoMinorLocator
@@ -23,14 +22,14 @@ from matplotlib.ticker import AutoMinorLocator
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
-from pyfda.libs.pyfda_lib import (
-    to_html, safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
-from pyfda.libs.pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qstyle_widget,
-                                     qcmb_box_add_item, qcmb_box_del_item)
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex
+from pyfda.libs.pyfda_qt_lib import (
+    qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item,
+    qtext_height, qtext_width)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
+from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 import logging
@@ -91,8 +90,8 @@ class Plot_Impz(QWidget):
 
     def _construct_UI(self):
         """
-        Create the top level UI of the widget, consisting of matplotlib widget
-        and control frame.
+        Create the top level UI of the widget, consisting of tabbed matplotlib widgets,
+        tabbed stimuli and a control frame.
         """
         # ----------------------------------------------------------------------
         # Define MplWidget for TIME domain plots
@@ -117,26 +116,57 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------------------------------------------------------------------
-        # Tabbed layout with vertical tabs
+        # Tabbed layout with vertical tabs ("west") for time and frequency domain
         # ----------------------------------------------------------------------
-        self.tab_widget_w = QTabWidget(self)
-        self.tab_widget_w.setTabPosition(QTabWidget.West)
-        self.tab_widget_w.addTab(self.mplwidget_t, "Time")
-        self.tab_widget_w.setTabToolTip(0, "Impulse and transient response of filter")
-        self.tab_widget_w.addTab(self.mplwidget_f, "Frequency")
-        self.tab_widget_w.setTabToolTip(
+        self.tab_mplwidget_w = QTabWidget(self)
+        self.tab_mplwidget_w.setTabPosition(QTabWidget.West)
+        self.tab_mplwidget_w.addTab(self.mplwidget_t, "Time")
+        self.tab_mplwidget_w.setTabToolTip(0, "Impulse and transient response of filter")
+        self.tab_mplwidget_w.addTab(self.mplwidget_f, "Frequency")
+        self.tab_mplwidget_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
-        # list with tabWidgets
-        self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
+
+        # tab_w = qtext_height() * 2
+        tab_w = self.tab_mplwidget_w.tabBar().height() - 4
+        # logger.warning(f"tab_w = {tab_w}")
+
+        # list with mplwidgets
+        self.tab_mplwidget_list = ["mplwidget_t", "mplwidget_f"]
+
+        # ----------------------------------------------------------------------
+        # Tabbed layout with vertical tabs ("west") for stimulus and audio
+        # ----------------------------------------------------------------------
+        self.stim_wdg = Plot_Tran_Stim()
+        self.wdg_ctrl_audio = QWidget(self)
+
+        self.tab_stim_w = QTabWidget(self)
+        self.tab_stim_w.setObjectName("tab_stim_w")
+        self.tab_stim_w.setTabPosition(QTabWidget.West)
+        self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding:0; height: {tab_w}}}")
+        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
+        self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
+        self.tab_stim_w.setTabToolTip(0, "Stimuli")
+
+        self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/audio_90.png"), "")
+        self.tab_stim_w.setTabToolTip(1, "Audio")
+
+        # logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
+        #                f"h = {self.tab_stim_w.tabBar().height()}")
+        # logger.warning(f"w = {self.tab_mplwidget_w.tabBar().width()}, "
+        #                f"h = {self.tab_mplwidget_w.tabBar().height()}")
+
+        self.resize_stim_tab_widget()
 
         layVMain = QVBoxLayout()
-        layVMain.addWidget(self.tab_widget_w)
-        layVMain.addWidget(self.ui.tab_stim_w)
+        layVMain.addWidget(self.tab_mplwidget_w)
+        layVMain.addWidget(self.tab_stim_w)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['mpl_margins'])
 
         self.setLayout(layVMain)
-        # self.redraw()
+        self.updateGeometry()
+
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -144,14 +174,22 @@ class Plot_Impz(QWidget):
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
 
+        self.stim_wdg.sig_tx.connect(self.process_sig_rx)
+        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        # When user has selected a different tab, trigger a recalculation of current tab
+        self.tab_mplwidget_w.currentChanged.connect(self.draw)  # passes # of active tab
+
         # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
+        # UI SIGNALS & SLOTs
         # ----------------------------------------------------------------------
+        self.tab_stim_w.currentChanged.connect(self.resize_stim_tab_widget)
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.impz)
         self.ui.but_run.clicked.connect(self.impz)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
+        self.ui.but_toggle_stim_options.clicked.connect(self.toggle_stim_options)
 
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -179,11 +217,32 @@ class Plot_Impz(QWidget):
         self.ui.but_freq_show_info.clicked.connect(self.draw)
         # self.ui.chk_win_freq.clicked.connect(self.draw)
 
-        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
+# ------------------------------------------------------------------------------
+    def toggle_stim_options(self):
+        """Toggle visibility of stimulus options, depending on the state of the
+        "Stimuli" button
+        """
+        self.tab_stim_w.setVisible(self.ui.but_toggle_stim_options.isChecked())
 
-        # When user has selected a different tab, trigger a recalculation of current tab
-        self.tab_widget_w.currentChanged.connect(self.draw)  # passes number of active tab
+# ------------------------------------------------------------------------------
+    def resize_stim_tab_widget(self):
+        """
+        Resize Tab widget (active tab) to fit the height of the contained
+        widget
+        """
+        logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
+                       f"h = {self.tab_stim_w.tabBar().height()}")
+        logger.warning(f"w = {self.tab_mplwidget_w.tabBar().width()}, "
+                       f"h = {self.tab_mplwidget_w.tabBar().height()}")
+        h_min = self.tab_stim_w.tabBar().height()  # this is also the width / hight of the tab icons
+        logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
+        if self.tab_stim_w.currentWidget() is None:
+            logger.warning("no embedded widget!")
+            h = 0
+        else:
+            h = self.tab_stim_w.currentWidget().minimumSizeHint().height()
+        self.tab_stim_w.setMaximumHeight(max(h, h_min))
+        self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -193,9 +252,8 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-
-        # logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-        #              .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
@@ -226,7 +284,7 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.fx_select("Fixpoint")
                 if self.isVisible():
-                    self.calc_stimulus()
+                    self.calc_stimulus(self.ui.N_start, self.ui.N_end)
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -267,7 +325,7 @@ class Plot_Impz(QWidget):
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
-                    self.ui.recalc_freqs()
+                    self.stim_wdg.ui.recalc_freqs()
                     self.draw()
                 else:
                     self.draw()  # TODO:  redundant??
@@ -278,6 +336,8 @@ class Plot_Impz(QWidget):
                 if dict_sig['ui_changed'] in {'resized', 'tab'}:
                     pass
                 else:  # all the other ui elements are treated here
+                    if True:  # dict_sig['ui_changed'] == 'stim':
+                        self.resize_stim_tab_widget()
                     self.needs_calc = True
                     qstyle_widget(self.ui.but_run, "changed")
                     self.impz()
@@ -286,7 +346,7 @@ class Plot_Impz(QWidget):
                 self.redraw()
                 # self.tabWidget.currentWidget().redraw()
                 # redraw method of current mplwidget, always redraws tab 0
-                self.needs_redraw[self.tabWidget.currentIndex()] = False
+                self.needs_redraw[self.tab_mplwidget_w.currentIndex()] = False
 
         else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
@@ -295,7 +355,7 @@ class Plot_Impz(QWidget):
             elif 'view_changed' in dict_sig:
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
-                    self.ui.recalc_freqs()
+                    self.stim_wdg.ui.recalc_freqs()
             elif 'ui_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
@@ -334,8 +394,9 @@ class Plot_Impz(QWidget):
         """
         # allow scaling the frequency response from pure impulse (no DC, no noise)
         self.ui.but_freq_norm_impz.setEnabled(
-            (self.ui.noi == 0 or self.ui.cmbNoise.currentText() == 'None')
-            and self.ui.DC == 0)
+            (self.stim_wdg.ui.noi == 0 or
+             self.stim_wdg.ui.cmbNoise.currentText() == 'None')
+            and self.stim_wdg.ui.DC == 0)
 
         self.fx_select()  # check for fixpoint setting and update if needed
         if type(arg) == bool:  # but_run has been pressed
@@ -349,7 +410,7 @@ class Plot_Impz(QWidget):
                 self.emit({'fx_sim': 'init'})
                 return
 
-            self.calc_stimulus()
+            self.calc_stimulus(self.ui.N_start, self.ui.N_end)
             self.calc_response()
 
             if self.error:
@@ -358,10 +419,10 @@ class Plot_Impz(QWidget):
             self.needs_calc = False
             self.needs_redraw = [True] * 2
 
-        if self.needs_redraw[self.tab_widget_w.currentIndex()]:
+        if self.needs_redraw[self.tab_mplwidget_w.currentIndex()]:
             logger.debug("Redraw impz started!")
             self.draw()
-            self.needs_redraw[self.tab_widget_w.currentIndex()] = False
+            self.needs_redraw[self.tab_mplwidget_w.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
 
@@ -420,195 +481,19 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus(self):
+    def calc_stimulus(self, N_first, N_last):
         """
-        (Re-)calculate stimulus `self.x`
+        (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_block()`
+        This is work in progress.
         """
-        self.n = np.arange(self.ui.N_end)
-        phi1 = self.ui.phi1 / 180 * pi
-        phi2 = self.ui.phi2 / 180 * pi
-        # T_S = fb.fil[0]['T_S']
-        # calculate index from T1 entry for creating stimulus vectors, shifted
-        # by T1. Limit the value to N_end - 1.
-        self.T1_int = min(int(np.round(self.ui.T1)), self.ui.N_end-1)
-
-        # calculate stimuli x[n] ==============================================
-        self.H_str = ''
-        self.title_str = ""
-
-        if self.ui.stim == "none":
-            self.x = np.zeros(self.ui.N_end)
-            self.title_str = r'Zero Input System Response'
-            self.H_str = r'$h_0[n]$'  # default
-
-        elif self.ui.stim == "dirac":
-            if np_type(self.ui.A1) == complex:
-                A_type = complex
-            else:
-                A_type = float
-
-            self.x = np.zeros(self.ui.N_end, dtype=A_type)
-            self.x[self.T1_int] = self.ui.A1  # create dirac impulse as input signal
-            self.title_str = r'Impulse Response'
-            self.H_str = r'$h[n]$'  # default
-
-        elif self.ui.stim == "sinc":
-            self.x =\
-                self.ui.A1 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T1) * self.ui.f1)\
-                + self.ui.A2 * sinc(2 * (self.n - self.ui.N//2 - self.ui.T2) * self.ui.f2)
-            self.title_str += r'Sinc Impulse '
-
-        elif self.ui.stim == "gauss":
-            self.x = self.ui.A1 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T1),
-                                                 fc=self.ui.f1, bw=self.ui.BW1) +\
-                self.ui.A2 * sig.gausspulse((self.n - self.ui.N//2 - self.ui.T2),
-                                            fc=self.ui.f2, bw=self.ui.BW2)
-            self.title_str += r'Gaussian Impulse '
-
-        elif self.ui.stim == "rect":
-            n_start = int(np.floor((self.ui.N - self.ui.TW1)/2 - self.ui.T1))
-            n_min = max(n_start, 0)
-            n_max = min(n_start + self.ui.TW1, self.ui.N)
-            self.title_str += r'Rect Impulse '
-            self.x = self.ui.A1 * np.where((self.n > n_min) & (self.n <= n_max), 1, 0)
-
-        # ----------------------------------------------------------------------
-        elif self.ui.stim == "step":
-            self.x = self.ui.A1 * np.ones(self.ui.N_end)  # create step function
-            self.x[0:self.T1_int].fill(0)
-            if self.ui.chk_step_err.isChecked():
-                self.title_str = r'Settling Error'
-                self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
-            else:
-                self.title_str = r'Step Response'
-                self.H_str = r'$h_{\epsilon}[n]$'
-
-        # ----------------------------------------------------------------------
-        elif self.ui.stim == "cos":
-            self.x = self.ui.A1 * np.cos(2*pi * self.n * self.ui.f1 + phi1) +\
-                self.ui.A2 * np.cos(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'Cosine Signal'
-
-        elif self.ui.stim == "sine":
-            self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1) +\
-                self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'Sinusoidal Signal '
-
-        elif self.ui.stim == "exp":
-            self.x = self.ui.A1 * np.exp(1j * (2 * pi * self.n * self.ui.f1 + phi1)) +\
-                self.ui.A2 * np.exp(1j * (2 * pi * self.n * self.ui.f2 + phi2))
-            self.title_str += r'Complex Exponential Signal '
-
-        elif self.ui.stim == "diric":
-            self.x = self.ui.A1 * diric((4 * pi * (self.n-self.ui.T1)
-                                        * self.ui.f1 + phi1*2) / self.ui.TW1, self.ui.TW1)
-            self.title_str += r'Periodic Sinc Signal'
-
-        # ----------------------------------------------------------------------
-        elif self.ui.stim == "chirp":
-            if True:  # sig.chirp is buggy, T_sim cannot be larger than T_end
-                T_end = self.ui.N_end
-            else:
-                T_end = self.ui.T2
-            self.x = self.ui.A1 * sig.chirp(self.n, self.ui.f1, T_end, self.ui.f2,
-                                            method=self.ui.chirp_type, phi=phi1)
-            self.title_str += self.ui.chirp_type + ' Chirp Signal'
-
-        # ----------------------------------------------------------------------
-        elif self.ui.stim == "triang":
-            if self.ui.but_stim_bl.isChecked():
-                self.x = self.ui.A1 * triang_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'Bandlim. Triangular Signal'
-            else:
-                self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1,
-                                                   width=0.5)
-                self.title_str += r'Triangular Signal'
-
-        elif self.ui.stim == "saw":
-            if self.ui.but_stim_bl.isChecked():
-                self.x = self.ui.A1 * sawtooth_bl(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'Bandlim. Sawtooth Signal'
-            else:
-                self.x = self.ui.A1 * sig.sawtooth(2*pi * self.n * self.ui.f1 + phi1)
-                self.title_str += r'Sawtooth Signal'
-
-        elif self.ui.stim == "square":
-            if self.ui.but_stim_bl.isChecked():
-                self.x = self.ui.A1 * rect_bl(2*pi * self.n * self.ui.f1 + phi1,
-                                              duty=self.ui.stim_par1)
-                self.title_str += r'Bandlimited Rect. Signal'
-            else:
-                self.x = self.ui.A1 * sig.square(2*pi * self.n * self.ui.f1 + phi1,
-                                                 duty=self.ui.stim_par1)
-                self.title_str += r'Rect. Signal'
-
-        elif self.ui.stim == "comb":
-            self.x = self.ui.A1 * comb_bl(2*pi * self.n * self.ui.f1 + phi1)
-            self.title_str += r'Bandlim. Comb Signal'
-
-        # ----------------------------------------------------------------------
-        elif self.ui.stim == "am":
-            self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1)\
-                * self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2 + phi2)
-            self.title_str += r'AM Signal $A_1 \sin(2 \pi n f_1 + \varphi_1)\
-                                \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$'
-        elif self.ui.stim == "pmfm":
-            self.x = self.ui.A1 * np.sin(2*pi * self.n * self.ui.f1 + phi1 +
-                                         self.ui.A2 * np.sin(2*pi * self.n * self.ui.f2
-                                                             + phi2))
-            self.title_str += r'PM / FM Signal $A_1 \sin(2 \pi n f_1 +\
-                            \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$'
-        elif self.ui.stim == "formula":
-            param_dict = {"A1": self.ui.A1, "A2": self.ui.A2,
-                          "f1": self.ui.f1, "f2": self.ui.f2,
-                          "phi1": self.ui.phi1, "phi2": self.ui.phi2,
-                          "BW1": self.ui.BW1, "BW2": self.ui.BW2,
-                          "f_S": fb.fil[0]['f_S'], "n": self.n}
-
-            self.x = safe_numexpr_eval(self.ui.stim_formula, (self.ui.N_end,), param_dict)
-            self.title_str += r'Formula Defined Signal'
+        if N_first > 0:
+            self.x = self.stim_wdg.calc_stimulus_block(0, N_first)
+            self.x = np.append(self.x, self.stim_wdg.calc_stimulus_block(N_first, N_last))
         else:
-            logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
-            return
-
-        # ----------------------------------------------------------------------
-        # Add noise to stimulus
-        noi = 0
-        if self.ui.noise == "none":
-            pass
-        elif self.ui.noise == "gauss":
-            noi = self.ui.noi * np.random.randn(len(self.x))
-            self.title_str += r' + Gaussian Noise'
-        elif self.ui.noise == "uniform":
-            noi = self.ui.noi * (np.random.rand(len(self.x))-0.5)
-            self.title_str += r' + Uniform Noise'
-        elif self.ui.noise == "prbs":
-            noi = self.ui.noi * 2 * (np.random.randint(0, 2, len(self.x))-0.5)
-            self.title_str += r' + PRBS Noise'
-        elif self.ui.noise == "mls":
-            # max_len_seq returns `sequence, state`. The state is not stored here,
-            # hence, an identical sequence is created every time.
-            noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(len(self.x)))),
-                                     length=len(self.x), state=None)[0] - 0.5)
-            self.title_str += r' + max. length sequence'
-        elif self.ui.noise == "brownian":
-            # brownian noise
-            noi = np.cumsum(self.ui.noi * np.random.randn(len(self.x)))
-            self.title_str += r' + Brownian Noise'
-        else:
-            logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
-        if type(self.ui.noi) == complex:
-            self.x = self.x.astype(complex) + noi
-        else:
-            self.x += noi
-        # Add DC to stimulus when visible / enabled
-        if self.ui.ledDC.isVisible:
-            if type(self.ui.DC) == complex:
-                self.x = self.x.astype(complex) + self.ui.DC
-            else:
-                self.x += self.ui.DC
-            if self.ui.DC != 0:
-                self.title_str += r' + DC'
+            self.x = self.stim_wdg.calc_stimulus_block(N_first, N_last)
+        self.n = np.ndarray(N_last, dtype=np.int32)  # TODO: np.int64 doesn't work?!
+        self.H_str = self.stim_wdg.H_str
+        self.title_str = self.stim_wdg.title_str
 
         if self.fx_sim:
             self.title_str = r'$Fixpoint$ ' + self.title_str
@@ -657,7 +542,7 @@ class Plot_Impz(QWidget):
         else:  # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
 
-        if self.ui.stim == "Step" and self.ui.chk_step_err.isChecked():
+        if self.stim_wdg.ui.stim == "Step" and self.stim_wdg.ui.chk_step_err.isChecked():
             dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
             # subtract DC (final) value from response
             y[self.T1_int:] = y[self.T1_int:] - abs(dc[1])
@@ -757,26 +642,26 @@ class Plot_Impz(QWidget):
             logger.error("Response should have been calculated by now!")
             return
 
-        if fb.fil[0]['freq_specs_unit'] == 'k':
-            f_unit = ''
-            t_unit = ''
-            self.ui.lblFreq1.setText(self.ui.txtFreq1_k)
-            self.ui.lblFreq2.setText(self.ui.txtFreq2_k)
-        else:
-            f_unit = fb.fil[0]['plt_fUnit']
-            t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
-            self.ui.lblFreq1.setText(self.ui.txtFreq1_f)
-            self.ui.lblFreq2.setText(self.ui.txtFreq2_f)
+        # if fb.fil[0]['freq_specs_unit'] == 'k':
+        #     f_unit = ''
+        #     t_unit = ''
+        #     self.ui.lblFreq1.setText(self.ui.txtFreq1_k)
+        #     self.ui.lblFreq2.setText(self.ui.txtFreq2_k)
+        # else:
+        #     f_unit = fb.fil[0]['plt_fUnit']
+        #     t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
+        #     self.ui.lblFreq1.setText(self.ui.txtFreq1_f)
+        #     self.ui.lblFreq2.setText(self.ui.txtFreq2_f)
 
-        if f_unit in {"f_S", "f_Ny"}:
-            unit_frmt = "i"  # italic
-        else:
-            unit_frmt = None  # don't print units like kHz in italic
+        # if f_unit in {"f_S", "f_Ny"}:
+        #     unit_frmt = "i"  # italic
+        # else:
+        #     unit_frmt = None  # don't print units like kHz in italic
 
-        self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
-        self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
-        self.ui.lbl_TU1.setText(to_html(t_unit, frmt=unit_frmt))
-        self.ui.lbl_TU2.setText(to_html(t_unit, frmt=unit_frmt))
+        # self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
+        # self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
+        # self.ui.lbl_TU1.setText(to_html(t_unit, frmt=unit_frmt))
+        # self.ui.lbl_TU2.setText(to_html(t_unit, frmt=unit_frmt))
 
         self.scale_i = self.scale_o = 1
         self.fx_min = -1.
@@ -804,7 +689,7 @@ class Plot_Impz(QWidget):
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 
-        idx = self.tab_widget_w.currentIndex()
+        idx = self.tab_mplwidget_w.currentIndex()
 
         if idx == 0 and self.needs_redraw[0]:
             self.draw_time()
@@ -1077,7 +962,7 @@ class Plot_Impz(QWidget):
                 x_i = np.maximum(20 * np.log10(abs(x_i)), self.ui.bottom_t)
                 y_i = np.maximum(20 * np.log10(abs(y_i)), self.ui.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + r'$\}|$' + ' in dBV'
-                H_str =   r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
+                H_str = r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
             else:
                 H_str = '$|$' + self.H_str + '$|$ in dBV'
 
@@ -1467,15 +1352,8 @@ class Plot_Impz(QWidget):
                 and self.ui.but_freq_norm_impz.isEnabled()\
                     and self.ui.but_freq_norm_impz.isChecked():
                 freq_resp = True  # calculate frequency response from impulse response
-                scale_impz = self.ui.N * self.ui.win_dict['cgain']
-                if self.ui.stim == "dirac":
-                    pass
-                elif self.ui.stim == "sinc":
-                    scale_impz *= self.ui.f1 * 2
-                elif self.ui.stim == "gauss":
-                    scale_impz *= self.ui.f1 * 2 * self.ui.BW1
-                elif self.ui.stim == "rect":
-                    scale_impz /= self.ui.TW1
+                scale_impz = self.ui.N * self.ui.win_dict['cgain']\
+                    * self.stim_wdg.ui.scale_impz
             else:
                 freq_resp = False
                 scale_impz = 1.
@@ -1832,9 +1710,9 @@ class Plot_Impz(QWidget):
         """
         Redraw the currently visible canvas when e.g. the canvas size has changed
         """
-        idx = self.tab_widget_w.currentIndex()
-        self.tab_widget_w.currentWidget().redraw()
-        # wdg = getattr(self, self.tab_mplwidgets[idx])
+        idx = self.tab_mplwidget_w.currentIndex()
+        self.tab_mplwidget_w.currentWidget().redraw()
+        # wdg = getattr(self, self.tab_mplwidget_list[idx])
         logger.debug("Redrawing tab {0}".format(idx))
         # wdg_cur.redraw()
         self.needs_redraw[idx] = False
