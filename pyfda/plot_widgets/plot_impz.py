@@ -79,6 +79,9 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
 
+        self.x = np.zeros(1000000)
+        self.y = np.zeros(1000000)
+
         # self.fmt_stem_stim = params['mpl_stimuli']
 
         self._construct_UI()
@@ -411,7 +414,7 @@ class Plot_Impz(QWidget):
                 return
 
             self.calc_stimulus(self.ui.N_start, self.ui.N_end)
-            self.calc_response()
+            self.calc_response(self.ui.N_start, self.ui.N_end)
 
             if self.error:
                 return
@@ -481,17 +484,17 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus(self, N_first, N_last):
+    def calc_stimulus(self, N_start, N_end):
         """
         (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_block()`
         This is work in progress.
         """
-        if N_first > 0:
-            self.x = self.stim_wdg.calc_stimulus_block(0, N_first)
-            self.x = np.append(self.x, self.stim_wdg.calc_stimulus_block(N_first, N_last))
+        if N_start > 0:
+            self.x[0:N_start] = self.stim_wdg.calc_stimulus_block(0, N_start)
+            self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_block(N_start, N_end)
         else:
-            self.x = self.stim_wdg.calc_stimulus_block(N_first, N_last)
-        self.n = np.ndarray(N_last, dtype=np.int32)  # TODO: np.int64 doesn't work?!
+            self.x[:N_end] = self.stim_wdg.calc_stimulus_block(N_start, N_end)
+        self.n = np.arange(N_end, dtype=float)
         self.H_str = self.stim_wdg.H_str
         self.title_str = self.stim_wdg.title_str
 
@@ -515,13 +518,26 @@ class Plot_Impz(QWidget):
         self.needs_redraw[:] = [True] * 2
 
     # ------------------------------------------------------------------------------
-    def calc_response(self):
+    def calc_response(self, N_first, N_last):
         """
         (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and
         the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
 
         Set the flag `self.cmplx` when response `self.y` or stimulus `self.x`
         are complex and make warning field visible.
+
+        For filtering long signals in batches see:
+        https://stackoverflow.com/questions/58014131/implementing-blockwise-low-pass-iir-filter-in-python
+        https://warrenweckesser.github.io/papers/weckesser-scipy-linear-filters.pdf
+
+        In order for this to work, the filter state ("initial condition") needs to
+        be stored.
+
+        Returns
+        -------
+        None
+
+        ... but it modifies the class attributes `self.y`, `self.cmplx`, `self.needs_redraw`
         """
 
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -536,18 +552,18 @@ class Plot_Impz(QWidget):
         antiCausal = 'zpkA' in fb.fil[0]
 
         if len(sos) > 0 and not antiCausal:  # has second order sections and is causal
-            y = sig.sosfilt(sos, self.x)
+            y = sig.sosfilt(sos, self.x[N_first:N_last])
         elif antiCausal:
-            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
+            y = sig.filtfilt(self.bb, self.aa, self.x[N_first:N_last], -1, None)
         else:  # no second order sections or antiCausals for current filter
-            y = sig.lfilter(self.bb, self.aa, self.x)
+            y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
 
         if self.stim_wdg.ui.stim == "Step" and self.stim_wdg.ui.chk_step_err.isChecked():
             dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
             # subtract DC (final) value from response
             y[self.T1_int:] = y[self.T1_int:] - abs(dc[1])
 
-        self.y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
+        self.y[N_first:N_last] = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 
         self.needs_redraw[:] = [True] * 2
 
@@ -692,7 +708,7 @@ class Plot_Impz(QWidget):
         idx = self.tab_mplwidget_w.currentIndex()
 
         if idx == 0 and self.needs_redraw[0]:
-            self.draw_time()
+            self.draw_time(N_start=self.ui.N_start, N_end=self.ui.N_end)
         elif idx == 1 and self.needs_redraw[1]:
             self.draw_freq()
 
@@ -882,7 +898,7 @@ class Plot_Impz(QWidget):
             ax.yaxis.set_minor_locator(AutoMinorLocator())
 
     # ------------------------------------------------------------------------
-    def draw_time(self):
+    def draw_time(self, N_start, N_end):
         """
         (Re-)draw the time domain mplwidget
         """
@@ -922,16 +938,17 @@ class Plot_Impz(QWidget):
 
         # fixpoint simulation enabled -> scale stimulus and response
         if self.fx_sim and hasattr(self, 'x_q'):
-            x_q = self.x_q * self.scale_i
+            x_q = self.x_q[self.ui.N_start:] * self.scale_i
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
-            logger.debug("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
+            # logger.warning("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
 
-        x = self.x * self.scale_i
-        y = self.y * self.scale_o
+        t = self.t[N_start:N_end]
+        x = self.x[N_start:N_end] * self.scale_i
+        y = self.y[N_start:N_end] * self.scale_o
         win = self.ui.qfft_win_select.get_window(self.ui.N)
         if self.cmplx:
             x_r = x.real
@@ -990,29 +1007,29 @@ class Plot_Impz(QWidget):
         # --------------- Stimulus plot --------------------------------------
         if self.plt_time_stim != "none":
             h_r.append(self.draw_data(
-                self.plt_time_stim, self.ax_r, self.t[self.ui.N_start:],
-                x_r[self.ui.N_start:], label=lbl_x_r, bottom=bottom_t,
+                self.plt_time_stim, self.ax_r, t,
+                x_r, label=lbl_x_r, bottom=bottom_t,
                 plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
             l_r += [lbl_x_r]
 
         # -------------- Stimulus <q> plot ------------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
             h_r.append(self.draw_data(
-                self.plt_time_stmq, self.ax_r, self.t[self.ui.N_start:],
-                x_q[self.ui.N_start:], label='$x_q[n]$', bottom=bottom_t,
+                self.plt_time_stmq, self.ax_r, t,
+                x_q, label='$x_q[n]$', bottom=bottom_t,
                 plt_fmt=self.fmt_plot_stmq, mkr_fmt=fmt_mkr_stmq))
             l_r += ['$x_q[n]$']
         # --------------- Response plot ----------------------------------
         if self.plt_time_resp != "none":
             h_r.append(self.draw_data(
-                self.plt_time_resp, self.ax_r, self.t[self.ui.N_start:],
-                y_r[self.ui.N_start:], label=lbl_y_r, bottom=bottom_t,
+                self.plt_time_resp, self.ax_r, t,
+                y_r, label=lbl_y_r, bottom=bottom_t,
                 plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
             l_r += [lbl_y_r]
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
-                self.t[self.ui.N_start:], win, c="gray",
+                t, win, c="gray",
                 label=self.ui.win_dict['cur_win_name'])[0])
             l_r += [self.ui.win_dict['cur_win_name']]
         # --------------- LEGEND (real part) ----------------------------------
@@ -1025,16 +1042,16 @@ class Plot_Impz(QWidget):
             if self.plt_time_stim != "none":
                 # --- imag. part of stimulus -----
                 h_i.append(self.draw_data(
-                    self.plt_time_stim, self.ax_i, self.t[self.ui.N_start:],
-                    x_i[self.ui.N_start:], label=lbl_x_i, bottom=bottom_t,
+                    self.plt_time_stim, self.ax_i, t,
+                    x_i, label=lbl_x_i, bottom=bottom_t,
                     plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
                 l_i += [lbl_x_i]
 
             if self.plt_time_resp != "none":
                 # --- imag. part of response -----
                 h_i.append(self.draw_data(
-                    self.plt_time_resp, self.ax_i, self.t[self.ui.N_start:],
-                    y_i[self.ui.N_start:], label=lbl_y_i, bottom=bottom_t,
+                    self.plt_time_resp, self.ax_i, t,
+                    y_i, label=lbl_y_i, bottom=bottom_t,
                     plt_fmt=self.fmt_plot_resp, mkr_fmt=fmt_mkr_resp))
                 l_i += [lbl_y_i]
 
@@ -1071,13 +1088,13 @@ class Plot_Impz(QWidget):
             self.ui.led_time_ovlp_spgr.setText(str(self.ui.time_ovlp_spgr))
 
             if self.plt_time_spgr == "xn":
-                s = x[self.ui.N_start:]
+                s = x
                 sig_lbl = 'X'
             elif self.plt_time_spgr == "xqn" and hasattr(self, "x_q"):
-                s = self.x_q[self.ui.N_start:]
+                s = x_q
                 sig_lbl = 'X_Q'
             elif self.plt_time_spgr == "yn":
-                s = y[self.ui.N_start:]
+                s = y
                 sig_lbl = 'Y'
             else:
                 s = None
