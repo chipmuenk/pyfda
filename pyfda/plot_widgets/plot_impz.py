@@ -22,7 +22,8 @@ from matplotlib.ticker import AutoMinorLocator
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex
+from pyfda.libs.pyfda_lib import (
+    safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item,
     qtext_height, qtext_width)
@@ -1113,6 +1114,8 @@ class Plot_Impz(QWidget):
             self.ui.chk_byfs_spgr_time.setVisible(mode == 'psd')
             spgr_pre = ""
             dB_scale = 20  # default log scale for magnitude in dB
+            spgr_unit = r" in W / Hz"  # default unit for spectrogram
+            scaling = "density"  # default scaling for spectrogram
             if self.ui.but_log_spgr_time.isChecked():
                 dB_unit = "dB"
             else:
@@ -1120,6 +1123,19 @@ class Plot_Impz(QWidget):
             if mode == "psd":
                 spgr_symb = r"$S_{{{0}}}$".format(sig_lbl.lower()+sig_lbl.lower())
                 dB_scale = 10  # log scale for PSD
+
+                if self.ui.chk_byfs_spgr_time.isChecked():
+                    # display result scaled by f_S
+                    if self.ui.but_log_spgr_time.isChecked():
+                        spgr_unit = r" in dB re W / Hz"
+                    else:
+                        spgr_unit = r" in W / Hz"
+                    scaling = "density"
+                else:
+                    # display result in W / bin
+                    spgr_unit = r" in {0}W".format(dB_unit)
+                    scaling = "spectrum"
+
             elif mode in {"magnitude", "complex"}:
                 # "complex" cannot be plotted directly
                 spgr_pre = r"|"
@@ -1136,20 +1152,6 @@ class Plot_Impz(QWidget):
                                .format(mode))
                 mode = "psd"
 
-            # Only valid and visible for Power Spectral Density
-            if self.ui.chk_byfs_spgr_time.isChecked():
-                # scale result by f_S
-                Hz_unit = fb.fil[0]['plt_fUnit']
-                # special treatment for PSD units needed
-                if self.ui.but_log_spgr_time.isChecked():
-                    spgr_unit = r" in dB re W / {0}".format(Hz_unit)
-                else:
-                    spgr_unit = r" in W / {0}".format(Hz_unit)
-                scaling = "density"
-            else:
-                # display result in W / bin
-                spgr_unit = r" in {0}W".format(dB_unit)
-                scaling = "spectrum"
 
             # ------- lin / log ----------------------
             if self.ui.but_log_spgr_time.isChecked():
