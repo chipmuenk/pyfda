@@ -82,6 +82,7 @@ class Plot_Impz(QWidget):
 
         self.x = np.zeros(1000000)
         self.y = np.zeros(1000000)
+        self.y_q = np.zeros(1000000)
 
         # self.fmt_stem_stim = params['mpl_stimuli']
 
@@ -939,7 +940,7 @@ class Plot_Impz(QWidget):
 
         # fixpoint simulation enabled -> scale stimulus and response
         if self.fx_sim and hasattr(self, 'x_q'):
-            x_q = self.x_q[self.ui.N_start:] * self.scale_i
+            x_q = self.x_q[self.ui.N_start:N_end] * self.scale_i
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
