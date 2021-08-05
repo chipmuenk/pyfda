@@ -131,10 +131,6 @@ class Plot_Impz(QWidget):
         self.tab_mplwidget_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
 
-        # tab_w = qtext_height() * 2
-        tab_w = self.tab_mplwidget_w.tabBar().height() - 4
-        # logger.warning(f"tab_w = {tab_w}")
-
         # list with mplwidgets
         self.tab_mplwidget_list = ["mplwidget_t", "mplwidget_f"]
 
@@ -147,19 +143,17 @@ class Plot_Impz(QWidget):
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        self.tab_stim_w.setStyleSheet(f"::tab {{border:0; padding:0; height: {tab_w}}}")
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+        tab_w = self.tab_mplwidget_w.tabBar().tabSizeHint(0).width()
+
+        logger.warning(f"tab_w = {tab_w}")
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
         self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/audio_90.png"), "")
         self.tab_stim_w.setTabToolTip(1, "Audio")
-
-        # logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
-        #                f"h = {self.tab_stim_w.tabBar().height()}")
-        # logger.warning(f"w = {self.tab_mplwidget_w.tabBar().width()}, "
-        #                f"h = {self.tab_mplwidget_w.tabBar().height()}")
 
         self.resize_stim_tab_widget()
 

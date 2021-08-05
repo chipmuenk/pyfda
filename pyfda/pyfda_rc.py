@@ -299,8 +299,7 @@ qss_light = """
 # common layout settings for QTabWidget
 qss_tab_bar = """
  /* The tab _widget_ frame; general and for North / West orientation */
- .QTabWidget::pane {
-    /*border : 5px solid;*/
+QTabWidget {
     padding: 0;
     margin:  0;
  }
@@ -308,12 +307,9 @@ qss_tab_bar = """
     padding: 0;
     margin:  0;
  }
-  QTabWidget {
-    padding: 0;
-    margin:  0;
- }
- .QTabWidget::pane::left {border-left: 1px solid #C2C7CB;}
- .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;}
+
+ QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
+ QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:11pt; }
@@ -326,7 +322,6 @@ qss_tab_bar = """
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
     border: 1px solid #C4C4C3;
     border-top-left-radius: 4px;
-    padding: 0.2em;
  }
 
 QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
@@ -343,12 +338,22 @@ QTabBar::tab::top{
     border-top-right-radius: 4px;
     min-width: 1em;
     min-height: 1em;
-    margin-bottom: -2px;
+    margin-bottom: -0.2em;
+    padding: 0.2em;
+    padding-bottom: 0.4em;
     }
 QTabBar::tab::left{
     border-bottom-left-radius: 4px;
-    min-width: 1em;
-    margin-right: -1px;
+    width: 26 px;
+    margin-right: -0.2em;
+    padding: 2px;
+    padding-right: 2px + 0.2em;
+ }
+
+ QTabWidget#tab_stim_w QTabBar::tab{
+     width: 30 px;
+     height: 30 px;
+     padding: 0;
  }
 
  /* small gap above vertical tabs */
