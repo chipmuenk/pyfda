@@ -214,10 +214,10 @@ else:
 # #############################################################################
 
 # .Qxxx{} only matches Qxxx, not its children
-#  #mylabel Qxxx{} only matches Qxxx with object name #mylabel
+#  Qxxx#mylabel {} only matches Qxxx with object name #mylabel
 #  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
-#  Qxxx > Qyyy only matches Qyyy that is a direct child of Qxxxx
-#  Qxxx:mystate only matches Qyyy in state 'mystate' (e.g. disabled)
+#  Qxxx > Qyyy{} only matches Qyyy that is a direct child of Qxxxx
+#  Qxxx:mystate{} only matches Qyyy in state 'mystate' (e.g. disabled)
 
 # ---------------
 # dark QSS theme
@@ -309,7 +309,7 @@ QTabWidget {
  }
 
  QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
- QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
+ .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:11pt; }
@@ -336,8 +336,7 @@ QTabBar::tab:only-one {
 
 QTabBar::tab::top{
     border-top-right-radius: 4px;
-    min-width: 1em;
-    min-height: 1em;
+    min-width: 2em;
     margin-bottom: -0.2em;
     padding: 0.2em;
     padding-bottom: 0.4em;
