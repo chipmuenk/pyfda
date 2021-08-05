@@ -748,7 +748,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            logger.debug(
+            logger.info(
                 'Starting fixpoint simulation with stimulus from "{0}":\n'
                 '\tfx_stimulus:{1}'
                 '\n\tStimuli: Shape {2} of type "{3}"'.format(
@@ -770,16 +770,19 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 # logger.debug("fx_results: {0}"\
                 #            .format(pprint_log(self.fx_results, tab= " ")))
-                logger.debug(
-                    'Fixpoint simulation successful for dict\n{0}'
-                    '\tStimuli: Shape {1} of type "{2}"'
-                    '\n\tResponse: Shape {3} of type "{4}"'
-                    .format(pprint_log(dict_sig),
-                            np.shape(dict_sig['fx_stimulus']),
-                            dict_sig['fx_stimulus'].dtype,
-                            np.shape(self.fx_results),
-                            type(self.fx_results)
-                            ))
+                logger.info(
+                    f'Fixpoint simulation successful for dict\n{pprint_log(dict_sig)}'
+                    f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
+                    f' of type "{dict_sig["fx_stimulus"].dtype}"'
+                    f'\n\tResponse: Shape {np.shape(self.fx_results)}'
+                    f' of type "{type(self.fx_results)}"'
+                )
+                    # .format(pprint_log(dict_sig),
+                    #         np.shape(dict_sig['fx_stimulus']),
+                    #         dict_sig['fx_stimulus'].dtype,
+                    #         np.shape(self.fx_results),
+                    #         type(self.fx_results)
+                    #         ))
                 logger.info('Fixpoint simulation [{0:5.3g} ms]: Response calculated'
                             .format((self.t_resp - self.t_stim)*1000))
 
