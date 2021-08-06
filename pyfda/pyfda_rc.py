@@ -218,6 +218,7 @@ else:
 #  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
 #  Qxxx > Qyyy{} only matches Qyyy that is a direct child of Qxxxx
 #  Qxxx:mystate{} only matches Qyyy in state 'mystate' (e.g. disabled)
+#  Qxxx::YYY{} specify subcontrol like "tab"
 
 # ---------------
 # dark QSS theme
@@ -312,6 +313,7 @@ QTabWidget {
  .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
+ 
  QTabBar {  font-weight: bold; font-size:11pt; }
 
  QTabBar::tab{
@@ -343,20 +345,21 @@ QTabBar::tab::top{
     }
 QTabBar::tab::left{
     border-bottom-left-radius: 4px;
-    width: 26 px;
-    margin-right: -0.2em;
+    width: 26px;
+    margin-right: -4px;
     padding: 2px;
-    padding-right: 2px + 0.2em;
+    padding-right: 2px;
  }
 
+/* separate styling for stimuli / audio widget with icons @ tabs */
  QTabWidget#tab_stim_w QTabBar::tab{
      width: 30 px;
      height: 30 px;
      padding: 0;
  }
 
- /* small gap above vertical tabs */
- QTabBar::tab::left:first{
+ /* small gap above vertical mplwidget tabs */
+ QTabWidget#tab_mpl_w QTabBar::tab::left:first{
     margin-top: 2px;
  }
 
@@ -414,7 +417,7 @@ qss_common = """
                     border: solid darkgrey;
                     border-width: 1px 0 1px 0;
                     padding: 0;
-                    margin: 1px 0 0 0;
+                    margin: 0 0 0 0; /* was: 1px 0 0 0 */
                     }
 
                 /* Frame in frame, e.g. for target specs, only border-top */
