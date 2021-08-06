@@ -123,12 +123,13 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # Tabbed layout with vertical tabs ("west") for time and frequency domain
         # ----------------------------------------------------------------------
-        self.tab_mplwidget_w = QTabWidget(self)
-        self.tab_mplwidget_w.setTabPosition(QTabWidget.West)
-        self.tab_mplwidget_w.addTab(self.mplwidget_t, "Time")
-        self.tab_mplwidget_w.setTabToolTip(0, "Impulse and transient response of filter")
-        self.tab_mplwidget_w.addTab(self.mplwidget_f, "Frequency")
-        self.tab_mplwidget_w.setTabToolTip(
+        self.tab_mpl_w = QTabWidget(self)
+        self.tab_mpl_w.setTabPosition(QTabWidget.West)
+        self.tab_mpl_w.setObjectName("tab_mpl_w")
+        self.tab_mpl_w.addTab(self.mplwidget_t, "Time")
+        self.tab_mpl_w.setTabToolTip(0, "Impulse and transient response of filter")
+        self.tab_mpl_w.addTab(self.mplwidget_f, "Frequency")
+        self.tab_mpl_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
 
         # list with mplwidgets
@@ -145,9 +146,8 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setTabPosition(QTabWidget.West)
         self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-        tab_w = self.tab_mplwidget_w.tabBar().tabSizeHint(0).width()
-
-        logger.warning(f"tab_w = {tab_w}")
+        tab_w = 30  # needs to fit with the tab size defined in pyfda_rc.py
+        # tab_w = self.tab_mpl_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
@@ -158,7 +158,7 @@ class Plot_Impz(QWidget):
         self.resize_stim_tab_widget()
 
         layVMain = QVBoxLayout()
-        layVMain.addWidget(self.tab_mplwidget_w)
+        layVMain.addWidget(self.tab_mpl_w)
         layVMain.addWidget(self.tab_stim_w)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['mpl_margins'])
@@ -177,7 +177,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
         # When user has selected a different tab, trigger a recalculation of current tab
-        self.tab_mplwidget_w.currentChanged.connect(self.draw)  # passes # of active tab
+        self.tab_mpl_w.currentChanged.connect(self.draw)  # passes # of active tab
 
         # ----------------------------------------------------------------------
         # UI SIGNALS & SLOTs
@@ -229,12 +229,12 @@ class Plot_Impz(QWidget):
         Resize Tab widget (active tab) to fit the height of the contained
         widget
         """
-        logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
-                       f"h = {self.tab_stim_w.tabBar().height()}")
-        logger.warning(f"w = {self.tab_mplwidget_w.tabBar().width()}, "
-                       f"h = {self.tab_mplwidget_w.tabBar().height()}")
+        # logger.warning(f"w = {self.tab_stim_w.tabBar().width()}, "
+        #                f"h = {self.tab_stim_w.tabBar().height()}")
+        # logger.warning(f"w = {self.tab_mpl_w.tabBar().width()}, "
+        #                f"h = {self.tab_mpl_w.tabBar().height()}")
         h_min = self.tab_stim_w.tabBar().height()  # this is also the width / hight of the tab icons
-        logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
+        # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
         if self.tab_stim_w.currentWidget() is None:
             logger.warning("no embedded widget!")
             h = 0
@@ -345,7 +345,7 @@ class Plot_Impz(QWidget):
                 self.redraw()
                 # self.tabWidget.currentWidget().redraw()
                 # redraw method of current mplwidget, always redraws tab 0
-                self.needs_redraw[self.tab_mplwidget_w.currentIndex()] = False
+                self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
@@ -418,10 +418,10 @@ class Plot_Impz(QWidget):
             self.needs_calc = False
             self.needs_redraw = [True] * 2
 
-        if self.needs_redraw[self.tab_mplwidget_w.currentIndex()]:
+        if self.needs_redraw[self.tab_mpl_w.currentIndex()]:
             logger.debug("Redraw impz started!")
             self.draw()
-            self.needs_redraw[self.tab_mplwidget_w.currentIndex()] = False
+            self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         qstyle_widget(self.ui.but_run, "normal")
 
@@ -701,7 +701,7 @@ class Plot_Impz(QWidget):
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 
-        idx = self.tab_mplwidget_w.currentIndex()
+        idx = self.tab_mpl_w.currentIndex()
 
         if idx == 0 and self.needs_redraw[0]:
             self.draw_time(N_start=self.ui.N_start, N_end=self.ui.N_end)
@@ -1724,8 +1724,8 @@ class Plot_Impz(QWidget):
         """
         Redraw the currently visible canvas when e.g. the canvas size has changed
         """
-        idx = self.tab_mplwidget_w.currentIndex()
-        self.tab_mplwidget_w.currentWidget().redraw()
+        idx = self.tab_mpl_w.currentIndex()
+        self.tab_mpl_w.currentWidget().redraw()
         # wdg = getattr(self, self.tab_mplwidget_list[idx])
         logger.debug("Redrawing tab {0}".format(idx))
         # wdg_cur.redraw()
