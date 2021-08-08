@@ -467,12 +467,13 @@ class Input_Fixpoint_Specs(QWidget):
         inside QLabel is resized to completely fill the label while keeping
         the aspect ratio.
         """
+        # logger.warning(f"resize_img(): img_fixp = {self.img_fixp.__class__.__name__}")
 
-        if hasattr(self.parent, "width"):  # needed for module test
+        if self.parent is None:  # parent is QApplication, has no width or height
+            par_w, par_h = 300, 700  # fixed size for module test
+        else:  # widget parent is InputTabWidget()
             par_w, par_h = self.parent.width(), self.parent.height()
-        else:
-            par_w, par_h = 300, 700  # fixed size for module testself.lbl_img_fixp
-        # lbl_w, lbl_h = self.lbl_fixp_img.width(), self.lbl_fixp_img.height()
+
         img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
 
         if img_w > 10:
