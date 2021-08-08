@@ -84,8 +84,9 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             self.state = "deactivated"  # "invisible", "disabled"
 
+
 # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
 
@@ -115,6 +116,8 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
             # self.emit({'fx_sim':'specs_changed'})
+
+        # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
                 if self.fx_wdg_found:
@@ -139,7 +142,7 @@ class Input_Fixpoint_Specs(QWidget):
                              '\treceived from "{1}".'
                              .format(dict_sig['fx_sim'], dict_sig['class']))
 
-        # ---- Process local widget signals
+        # ---- Process local widget signals ------------------------------------------
         elif 'ui' in dict_sig:
             if 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_input':
                 """
@@ -186,8 +189,7 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
 # ------------------------------------------------------------------------------
-
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Intitialize the main GUI, consisting of:
 
@@ -367,13 +369,18 @@ class Input_Fixpoint_Specs(QWidget):
         self._update_fixp_widget()
 
 # ------------------------------------------------------------------------------
-    def _update_filter_cmb(self):
+    def _update_filter_cmb(self) -> str:
         """
         (Re-)Read list of available fixpoint filters for a given filter design
         every time a new filter design is selected.
 
         Then try to import the fixpoint designs in the list and populate the
         fixpoint implementation combo box `self.cmb_wdg_fixp` when successfull.
+
+        Returns
+        -------
+        inst_wdg_str: str
+          string with all fixpoint widgets that could be instantiated successfully
         """
         inst_wdg_str = ""  # full names of successfully instantiated widgets for logging
         # remember last fx widget setting:
@@ -422,14 +429,19 @@ class Input_Fixpoint_Specs(QWidget):
         return super(Input_Fixpoint_Specs, self).eventFilter(source, event)
 
 # ------------------------------------------------------------------------------
-    def embed_fixp_img(self, img_file):
+    def embed_fixp_img(self, img_file: str) -> QPixmap:
         """
-        Embed image as self.img_fixp, either in png or svg format
+        Embed `img_file` in png format as `self.img_fixp`
 
-        Parameters:
-
-            img_file: str
+        Parameters
+        ----------
+        img_file: str
             path and file name to image file
+
+        Returns
+        -------
+        self.img_fixp: QPixmap object
+            pixmap containing the passed img_file
         """
         if not os.path.isfile(img_file):
             logger.warning("Image file {0} doesn't exist.".format(img_file))
@@ -451,11 +463,9 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def resize_img(self):
         """
-        Triggered when self (the widget) is resized, consequently the image
+        Triggered when self (the widget) is selected or resized, consequently the image
         inside QLabel is resized to completely fill the label while keeping
         the aspect ratio.
-
-        This doesn't really work at the moment.
         """
 
         if hasattr(self.parent, "width"):  # needed for module test
