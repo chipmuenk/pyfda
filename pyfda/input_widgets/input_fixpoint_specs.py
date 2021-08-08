@@ -835,7 +835,12 @@ class Input_Fixpoint_Specs(QWidget):
 
 ###############################################################################
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`"""
+    """
+    Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`
+
+    Resizing the image does not work standalone as the 'ui_changed: resized' signal is
+    issued from somewhere else
+    """
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
@@ -848,5 +853,6 @@ if __name__ == '__main__':
     fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
     _ = Tree_Builder()  # TODO_ couldn't this be a function?
     mainw = Input_Fixpoint_Specs()
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
