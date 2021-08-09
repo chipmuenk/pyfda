@@ -415,6 +415,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.cmb_wdg_fixp.setCurrentIndex(max(idx, 0))
         else:  # no fixpoint widget
             self.embed_fixp_img(self.no_fx_filter_img)
+
         return inst_wdg_str
 
 # # ------------------------------------------------------------------------------
@@ -461,7 +462,7 @@ class Input_Fixpoint_Specs(QWidget):
         return self.img_fixp
 
 # ------------------------------------------------------------------------------
-    def resize_img(self):
+    def resize_img(self) -> None:
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
         the image inside QLabel to completely fill the label while keeping
@@ -510,7 +511,7 @@ class Input_Fixpoint_Specs(QWidget):
             dummy data
         """
 
-        def _disable_fx_wdg(self):
+        def _disable_fx_wdg(self) -> None:
 
             if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None:
                 # is a fixpoint widget loaded?
@@ -658,7 +659,7 @@ class Input_Fixpoint_Specs(QWidget):
         file_types = "Verilog (*.v)"
         # needed for overwrite confirmation when name is entered without suffix:
         dlg.setDefaultSuffix('v')
-        dlg.setWindowTitle('Export Vlog')
+        dlg.setWindowTitle('Export Verilog')
         dlg.setNameFilter(file_types)
         dlg.setDirectory(dirs.save_dir)
         # set mode "save file" instead "open file":
