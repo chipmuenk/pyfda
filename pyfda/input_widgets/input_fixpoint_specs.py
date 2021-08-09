@@ -108,8 +108,9 @@ class Input_Fixpoint_Specs(QWidget):
         4. Send back HDL response to widget via 'fx_sim':'set_response'
         """
 
-        # logger.debug("SIG_RX(): vis={0}\n{1}"
-        #              .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning("SIG_RX(): vis={0}\n{1}"
+                     .format(self.isVisible(), pprint_log(dict_sig)))
+
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
