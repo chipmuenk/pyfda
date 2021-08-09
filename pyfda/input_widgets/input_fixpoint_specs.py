@@ -193,7 +193,10 @@ class Input_Fixpoint_Specs(QWidget):
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})
 
-            return
+        # resize image when "Fixpoint" tab is selected or widget size is changed:
+        elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
+            and self.isVisible():
+                self.resize_img()
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
