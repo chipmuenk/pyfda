@@ -445,18 +445,15 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning("Image file {0} doesn't exist.".format(img_file))
             img_file = self.default_fx_img
 
-#        _, file_extension = os.path.splitext(self.fx_wdg_inst.img_name)
         _, file_extension = os.path.splitext(img_file)
-        if file_extension == '.png':
-            self.img_fixp = QPixmap(img_file)
-            # self.lbl_fixp_img.setPixmap(QPixmap(self.img_fixp)) # fixed size
-        # elif file_extension == '.svg':
-        #     self.img_fixp = QtSvg.QSvgWidget(img_file)
-
-        else:
+        if file_extension != '.png':
             logger.error('Unknown file extension "{0}"!'.format(file_extension))
+            img_file = self.default_fx_img
 
-        self.resize_img()
+        self.img_fixp = QPixmap(img_file)
+        # logger.warning(f"img_fixp = {img_file}")
+        # logger.warning(f"_embed_fixp_img(): {self.img_fixp.__class__.__name__}")
+        return self.img_fixp
 
 # ------------------------------------------------------------------------------
     def resize_img(self):
