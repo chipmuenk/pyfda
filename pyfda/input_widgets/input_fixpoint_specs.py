@@ -71,6 +71,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.parent = parent
         self.fx_path = os.path.realpath(
             os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
+
         self.no_fx_filter_img = os.path.join(self.fx_path, "no_fx_filter.png")
         if not os.path.isfile(self.no_fx_filter_img):
             logger.error("Image {0:s} not found!".format(self.no_fx_filter_img))
@@ -295,7 +296,6 @@ class Input_Fixpoint_Specs(QWidget):
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.embed_fixp_img(self.no_fx_filter_img)
-
         layHImg = QHBoxLayout()
         layHImg.setContentsMargins(0, 0, 0, 0)
         layHImg.addWidget(self.lbl_fixp_img)  # , Qt.AlignCenter)
@@ -463,8 +463,8 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def resize_img(self):
         """
-        Triggered when self (the widget) is selected or resized, consequently the image
-        inside QLabel is resized to completely fill the label while keeping
+        Triggered when `self` (the widget) is selected or resized. The method resizes
+        the image inside QLabel to completely fill the label while keeping
         the aspect ratio.
         """
         # logger.warning(f"resize_img(): img_fixp = {self.img_fixp.__class__.__name__}")
@@ -488,7 +488,6 @@ class Input_Fixpoint_Specs(QWidget):
         # img_scaled = self.img_fixp.scaled(self.lbl_fixp_img.size(),
         # Qt.KeepAspectRatio, Qt.SmoothTransformation)
         img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
-        # img_scaled = self.img_fixp.scaledToHeight(max_h)
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
@@ -788,12 +787,7 @@ class Input_Fixpoint_Specs(QWidget):
                     f'\n\tResponse: Shape {np.shape(self.fx_results)}'
                     f' of type "{type(self.fx_results)}"'
                 )
-                    # .format(pprint_log(dict_sig),
-                    #         np.shape(dict_sig['fx_stimulus']),
-                    #         dict_sig['fx_stimulus'].dtype,
-                    #         np.shape(self.fx_results),
-                    #         type(self.fx_results)
-                    #         ))
+
                 logger.info('Fixpoint simulation [{0:5.3g} ms]: Response calculated'
                             .format((self.t_resp - self.t_stim)*1000))
 
