@@ -302,7 +302,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
-        self.resize_img()
+
 # ------------------------------------------------------------------------------
 #       Simulation and export Buttons
 # ------------------------------------------------------------------------------
