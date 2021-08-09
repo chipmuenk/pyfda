@@ -605,8 +605,8 @@ class Input_Fixpoint_Specs(QWidget):
                 self.butSimHDL.setEnabled(False)
                 self.butExportHDL.setEnabled(False)
 
-        else:
-            _disable_fx_wdg(self)
+        # else:  # no fixpoint widget found
+        #     _disable_fx_wdg(self)
 
 # ------------------------------------------------------------------------------
     def wdg_dict2ui(self):
