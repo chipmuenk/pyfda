@@ -81,6 +81,13 @@ class Input_Fixpoint_Specs(QWidget):
 
         if HAS_MIGEN:
             self._construct_UI()
+            inst_wdg_list = self._update_filter_cmb()
+            if len(inst_wdg_list) == 0:
+                logger.warning("No fixpoint filters found!")
+            else:
+                logger.debug("Imported {0:d} fixpoint filters:\n{1}"
+                            .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+            self._update_fixp_widget()
         else:
             self.state = "deactivated"  # "invisible", "disabled"
 
@@ -358,15 +365,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimHDL.clicked.connect(self.fx_sim_init)
-        # ----------------------------------------------------------------------
-        inst_wdg_list = self._update_filter_cmb()
-        if len(inst_wdg_list) == 0:
-            logger.warning("No fixpoint filters found!")
-        else:
-            logger.debug("Imported {0:d} fixpoint filters:\n{1}"
-                         .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
-
-        self._update_fixp_widget()
 
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
