@@ -528,12 +528,14 @@ class Input_Fixpoint_Specs(QWidget):
             self.butExportHDL.setEnabled(False)
             # self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
+            self.resize_img()
             self.lblTitle.setText("")
 
             self.fx_wdg_inst = None
 
         # destruct old fixpoint widget instance
         _disable_fx_wdg(self)
+        logger.warning(f"\n_update_fixp_widget(): {self.img_fixp.__class__.__name__}\n")
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
@@ -579,6 +581,9 @@ class Input_Fixpoint_Specs(QWidget):
 
             # ---- instantiate and scale graphic of filter topology ----
             self.embed_fixp_img(img_file)
+            self.resize_img()
+
+            logger.warning(f"Update fixp_widget: img_fixp = {self.img_fixp}\n\n")
 
             # ---- set title and description for filter
             self.lblTitle.setText(self.fx_wdg_inst.title)
