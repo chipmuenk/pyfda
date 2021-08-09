@@ -185,9 +185,15 @@ class PlotImpz_UI(QWidget):
         self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
+        but_height = self.but_auto_run.sizeHint().height()
+
         self.but_run = QPushButton(self)
-        self.but_run.setText("RUN")
-        self.but_run.setMaximumWidth(qtext_width(text=" RUN "))
+        self.but_run.setIcon(QIcon(":/play.svg"))
+
+        self.but_run.setIconSize(QSize(but_height, but_height))
+        self.but_run.setFixedSize(QSize(but_height, but_height))
+        # self.but_run.setText("RUN")
+        # self.but_run.setMaximumWidth(qtext_width(text=" RUN "))
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(not self.but_auto_run.isChecked())
 
