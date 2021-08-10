@@ -175,9 +175,13 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
+        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        # Minimum size, can be changed in the upper hierarchy levels using layouts:
+        # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
-        but_height = self.cmb_firwin_alg.sizeHint().height()
+        but_height = self.qfft_win_select.sizeHint().height()
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
         self.but_fft_wdg.setFixedSize(QSize(but_height, but_height))
         self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
@@ -185,9 +189,6 @@ class Firwin(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
-        # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.layHWin1 = QHBoxLayout()
         # self.layHWin1.addWidget(self.cmb_firwin_win)
