@@ -18,7 +18,7 @@ from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 
 import logging
 logger = logging.getLogger(__name__)
@@ -90,13 +90,12 @@ class Plot_Phi(QWidget):
         self.cmbUnitsPhi.setCurrentIndex(0)
         self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkWrap = QCheckBox("Wrapped Phase", self)
-        self.chkWrap.setChecked(False)
-        self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
+        self.but_wrap = PushButton("wrapped", checked=False)
+        self.but_wrap.setToolTip("Plot phase wrapped to +/- pi")
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.cmbUnitsPhi)
-        layHControls.addWidget(self.chkWrap)
+        layHControls.addWidget(self.but_wrap)
         layHControls.addStretch(10)
 
         # ----------------------------------------------------------------------
@@ -132,7 +131,7 @@ class Plot_Phi(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.chkWrap.clicked.connect(self.draw)
+        self.but_wrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.unit_changed)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
@@ -214,7 +213,7 @@ class Plot_Phi(QWidget):
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
 
-        if self.chkWrap.isChecked():
+        if self.but_wrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
