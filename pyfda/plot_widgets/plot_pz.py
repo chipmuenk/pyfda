@@ -9,22 +9,22 @@
 """
 Widget for plotting poles and zeros
 """
-import logging
-logger = logging.getLogger(__name__)
-
-from pyfda.libs.compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout,
-                      pyqtSlot, pyqtSignal)
+from pyfda.libs.compat import QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import unique_roots
+from pyfda.libs.pyfda_qt_lib import qtext_width, PushButton
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 
 from  matplotlib import patches
+
+import logging
+logger = logging.getLogger(__name__)
 
 classes = {'Plot_PZ': 'P / Z'}  #: Dict containing class name : display name
 
@@ -44,12 +44,12 @@ class Plot_PZ(QWidget):
         self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_calc, self.isVisible()))
+        # logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+        #              .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
@@ -71,13 +71,11 @@ class Plot_PZ(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.chkHf = QCheckBox("Show |H(f)|", self)
-        self.chkHf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
-        self.chkHf.setEnabled(True)
+        self.but_hf = PushButton("|H(f)| ", checked=True)
+        self.but_hf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
 
-        self.chkHfLog = QCheckBox("Log. Scale", self)
-        self.chkHfLog.setToolTip("<span>Log. scale for |H(f)|.</span>")
-        self.chkHfLog.setEnabled(True)
+        self.but_hf_log = PushButton("Log. |H(f)|", checked=False)
+        self.but_hf_log.setToolTip("<span>Log. scale for |H(f)|.</span>")
 
         self.diaRad_Hf = QDial(self)
         self.diaRad_Hf.setRange(2, 10)
@@ -90,17 +88,16 @@ class Plot_PZ(QWidget):
 
         self.lblRad_Hf = QLabel("Radius", self)
 
-        self.chkFIR_P = QCheckBox("Plot FIR Poles", self)
-        self.chkFIR_P.setToolTip("<span>Show FIR poles at the origin.</span>")
-        self.chkFIR_P.setChecked(True)
+        self.but_fir_poles = PushButton("FIR Poles", checked=True)
+        self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.chkHf)
-        layHControls.addWidget(self.chkHfLog)
+        layHControls.addWidget(self.but_hf)
+        layHControls.addWidget(self.but_hf_log)
         layHControls.addWidget(self.diaRad_Hf)
         layHControls.addWidget(self.lblRad_Hf)
         layHControls.addStretch(10)
-        layHControls.addWidget(self.chkFIR_P)
+        layHControls.addWidget(self.but_fir_poles)
 
         # ----------------------------------------------------------------------
         #               ### frmControls ###
@@ -135,10 +132,10 @@ class Plot_PZ(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        self.chkHf.clicked.connect(self.draw)
-        self.chkHfLog.clicked.connect(self.draw)
+        self.but_hf.clicked.connect(self.draw)
+        self.but_hf_log.clicked.connect(self.draw)
         self.diaRad_Hf.valueChanged.connect(self.draw)
-        self.chkFIR_P.clicked.connect(self.draw)
+        self.but_fir_poles.clicked.connect(self.draw)
 
 # ------------------------------------------------------------------------------
     def init_axes(self):
@@ -160,7 +157,7 @@ class Plot_PZ(QWidget):
 
 # ------------------------------------------------------------------------------
     def draw(self):
-        self.chkFIR_P.setVisible(fb.fil[0]['ft'] == 'FIR')
+        self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
         self.draw_pz()
 
 # ------------------------------------------------------------------------------
@@ -188,7 +185,7 @@ class Plot_PZ(QWidget):
 
         [z, p, k] = self.zplane(
             z=zpk[0], p=zpk[1], k=zpk[2], plt_ax=self.ax,
-            plt_poles=self.chkFIR_P.isChecked() or fb.fil[0]['ft'] == 'IIR',
+            plt_poles=self.but_fir_poles.isChecked() or fb.fil[0]['ft'] == 'IIR',
             mps=p_marker[0], mpc=p_marker[1], mzs=z_marker[0], mzc=z_marker[1])
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
@@ -411,15 +408,15 @@ class Plot_PZ(QWidget):
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
 
-        self.chkHfLog.setVisible(self.chkHf.isChecked())
-        self.diaRad_Hf.setVisible(self.chkHf.isChecked())
-        self.lblRad_Hf.setVisible(self.chkHf.isChecked())
-        if not self.chkHf.isChecked():
+        self.but_hf_log.setVisible(self.but_hf.isChecked())
+        self.diaRad_Hf.setVisible(self.but_hf.isChecked())
+        self.lblRad_Hf.setVisible(self.but_hf.isChecked())
+        if not self.but_hf.isChecked():
             return
         ba = fb.fil[0]['ba']
         w, H = sig.freqz(ba[0], ba[1], worN=params['N_FFT'], whole=True)
         H = np.abs(H)
-        if self.chkHfLog.isChecked():
+        if self.but_hf_log.isChecked():
             H = np.clip(np.log10(H), -6, None) # clip to -120 dB
             H = H - np.max(H) # shift scale to H_min ... 0
             H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r
