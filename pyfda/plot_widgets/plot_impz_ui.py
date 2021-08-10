@@ -191,7 +191,7 @@ class PlotImpz_UI(QWidget):
         self.but_run.setIcon(QIcon(":/play.svg"))
 
         self.but_run.setIconSize(QSize(but_height, but_height))
-        self.but_run.setFixedSize(QSize(but_height, but_height))
+        self.but_run.setFixedSize(QSize(2*but_height, but_height))
         # self.but_run.setText("RUN")
         # self.but_run.setMaximumWidth(qtext_width(text=" RUN "))
         self.but_run.setToolTip("Run simulation")
@@ -230,9 +230,8 @@ class PlotImpz_UI(QWidget):
 
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
-        but_height = self.but_auto_run.sizeHint().height()
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
-        self.but_fft_wdg.setFixedSize(QSize(but_height, but_height))
+        self.but_fft_wdg.setFixedSize(QSize(1.5 * but_height, but_height))
         self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
                                     ' and display its properties).</span>')
         self.but_fft_wdg.setCheckable(True)
