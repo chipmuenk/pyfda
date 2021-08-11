@@ -480,7 +480,7 @@ class PlotImpz_UI(QWidget):
             "<span>Normalize the FFT of the stimulus with <i>N<sub>FFT</sub></i> for "
             "<i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
             "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC and Noise need to be "
-            "turned off, window should be Rectangular.</span>")
+            "turned off, window should be <b>Rectangular</b>.</span>")
         self.but_freq_norm_impz.setCheckable(True)
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
