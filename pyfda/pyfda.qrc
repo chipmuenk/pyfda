@@ -3,7 +3,6 @@
 <qresource>
     <file alias="action-redo.svg">images/icons/dark/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/dark/action-undo.svg</file>
-    <file alias="audio_90.png">images/icons/dark/audio_90.png</file>
     <file alias="brush.svg">images/icons/dark/brush.svg</file>
     <file alias="camera-slr.svg">images/icons/dark/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
@@ -21,7 +20,7 @@
     <file alias="grid_fine.svg">images/icons/grid_fine.svg</file>
     <file alias="grid_coarse.svg">images/icons/grid_coarse.svg</file>
     <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  
-    <file alias="help.svg">images/icons/help.svg</file>
+    <file alias="help.svg">images/icons/dark/ic_help_outline_24px.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
