@@ -144,11 +144,11 @@ class Plot_Tran_Stim(QWidget):
 
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_start = int(np.floor((N - self.ui.TW1)/2 - self.ui.T1))
+            n_start = int(self.T1_int - np.floor(self.ui.TW1/2))
             n_min = max(n_start, 0)
             n_max = min(n_start + self.ui.TW1, N)
             self.title_str += r'Rect Impulse '
-            x = self.ui.A1 * np.where((n > n_min) & (n <= n_max), 1, 0)
+            x = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
 
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
