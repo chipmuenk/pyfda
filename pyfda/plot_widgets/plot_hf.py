@@ -235,15 +235,15 @@ class Plot_Hf(QWidget):
         ax2_scale = ax2_ydelta_lim / ax2_ydelta_vis
         # calculate new offset between lower limit and first tick
         ax2_yoffset = ax1_yoffset * ax2_ydelta_lim / ax1_ydelta_lim
-        logger.warning("ax2: delta_vis: {0}, scale: {1}, offset: {2}"
-                       .format(ax2_ydelta_vis, ax2_scale, ax2_yoffset))
-        logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
+        # logger.warning("ax2: delta_vis: {0}, scale: {1}, offset: {2}"
+        #                .format(ax2_ydelta_vis, ax2_scale, ax2_yoffset))
+        # logger.warning("Ticks: {0} # {1}".format(ax1_nticks, ax2_nticks))
 
         ax2.set_yticks(np.linspace(ax2_yticks[0],
                                    (ax2_yticks[1]-ax2_yticks[0]),
                                    ax1_nticks))
-        logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
-                                   ax2_yticks[1], ax2_yticks[-1]))
+        # logger.warning("ax2[0]={0} | ax2[1]={1} ax2[-1]={2}".format(ax2_yticks[0],
+        #                            ax2_yticks[1], ax2_yticks[-1]))
         ax2_lim0 = ax2_yticks[0] - ax2_yoffset
         ax2.set_ybound(ax2_lim0, ax2_lim0 + ax2_ydelta_lim)
 

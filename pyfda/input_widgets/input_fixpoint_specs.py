@@ -537,7 +537,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         # destruct old fixpoint widget instance
         _disable_fx_wdg(self)
-        logger.warning(f"\n_update_fixp_widget(): {self.img_fixp.__class__.__name__}\n")
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
