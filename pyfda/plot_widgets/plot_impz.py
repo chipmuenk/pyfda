@@ -554,10 +554,11 @@ class Plot_Impz(QWidget):
         else:  # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
 
-        if self.stim_wdg.ui.stim == "Step" and self.stim_wdg.ui.chk_step_err.isChecked():
+        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
             dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
             # subtract DC (final) value from response
-            y[self.T1_int:] = y[self.T1_int:] - abs(dc[1])
+            y[max(N_first, self.stim_wdg.T1_int):N_last] = \
+                y[max(N_first, self.stim_wdg.T1_int):N_last] - abs(dc[1])
 
         self.y[N_first:N_last] = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 
