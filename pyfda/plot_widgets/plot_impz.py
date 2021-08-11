@@ -619,7 +619,7 @@ class Plot_Impz(QWidget):
                 # self.X_q[0] = self.X_q[0] * np.sqrt(2) # correct value at DC
 
         if self.y is None or len(self.y) < self.ui.N_end:
-            self.Y = np.zeros(self.ui.N_end-self.ui.N_start)  # dummy result
+            self.Y = np.zeros(self.ui.N)  # dummy result
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
