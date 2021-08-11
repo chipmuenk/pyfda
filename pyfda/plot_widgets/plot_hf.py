@@ -12,9 +12,6 @@ frequency response \|H(f)\| of the filter either in linear or logarithmic
 scale. Optionally, the magnitude specifications and the phase
 can be overlayed.
 """
-import logging
-logger = logging.getLogger(__name__)
-
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, pyqtSlot, pyqtSignal)
 import numpy as np
@@ -26,8 +23,11 @@ from matplotlib.ticker import AutoMinorLocator
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval
+from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval, to_html
+from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width
 
+import logging
+logger = logging.getLogger(__name__)
 classes = {'Plot_Hf': '|H(f)|'}  #: Dict containing class name : display name
 
 
@@ -96,9 +96,10 @@ class Plot_Hf(QWidget):
             "V and W are gain (less than 1).</span>")
         self.cmbUnitsA.setCurrentIndex(0)
 
-        self.lbl_log_bottom = QLabel("Bottom", self)
+        self.lbl_log_bottom = QLabel(to_html("min =", 'bi'), self)
         self.led_log_bottom = QLineEdit(self)
         self.led_log_bottom.setText(str(self.log_bottom))
+        self.led_log_bottom.setMaximumWidth(qtext_width(N_x=8))
         self.led_log_bottom.setToolTip(
             "<span>Minimum display value for dB. scale.</span>")
         self.lbl_log_unit = QLabel("dB", self)
@@ -106,12 +107,12 @@ class Plot_Hf(QWidget):
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkZerophase = QCheckBox("Zero phase", self)
-        self.chkZerophase.setToolTip(
+        self.but_zerophase = PushButton("Zero phase", checked=False)
+        self.but_zerophase.setToolTip(
             "<span>Remove linear phase calculated from filter order.\n"
             "Attention: This makes no sense for a non-linear phase system!</span>")
 
-        self.lblInset = QLabel("Inset", self)
+        self.lblInset = QLabel(to_html("Inset", "bi"), self)
         self.cmbInset = QComboBox(self)
         self.cmbInset.addItems(['off', 'edit', 'fixed'])
         self.cmbInset.setObjectName("cmbInset")
@@ -119,20 +120,17 @@ class Plot_Hf(QWidget):
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0  # store previous index for comparison
 
-        self.chkSpecs = QCheckBox("Specs", self)
-        self.chkSpecs.setChecked(False)
-        self.chkSpecs.setToolTip("Display filter specs as hatched regions")
+        self.but_specs = PushButton("Specs", checked=False)
+        self.but_specs.setToolTip("Display filter specs as hatched regions")
 
-        self.chkPhase = QCheckBox("Phase", self)
-        self.chkPhase.setToolTip("Overlay phase")
-        self.chkPhase.setChecked(False)
+        self.but_phase = PushButton("Phase", checked=False)
+        self.but_phase.setToolTip("Overlay phase")
 
-        self.chkAlign = QCheckBox("Align", self)
-        self.chkAlign.setToolTip(
-            "<span>Try to align grids for magnitude and phase "
+        self.but_align = PushButton("Align", checked=True)
+        self.but_align.setToolTip(
+            "<span>Try to align gridlines for magnitude and phase "
             "(doesn't work in all cases).</span>")
-        self.chkAlign.setChecked(True)
-        self.chkAlign.setVisible(self.chkPhase.isChecked())
+        self.but_align.setVisible(self.but_phase.isChecked())
 
         # ----------------------------------------------------------------------
         #               ### frmControls ###
@@ -140,7 +138,6 @@ class Plot_Hf(QWidget):
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
         layHControls = QHBoxLayout()
-        layHControls.addStretch(10)
         layHControls.addWidget(self.cmbShowH)
         layHControls.addWidget(self.lblIn)
         layHControls.addWidget(self.cmbUnitsA)
@@ -149,15 +146,15 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.led_log_bottom)
         layHControls.addWidget(self.lbl_log_unit)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chkZerophase)
+        layHControls.addWidget(self.but_zerophase)
         layHControls.addStretch(1)
         layHControls.addWidget(self.lblInset)
         layHControls.addWidget(self.cmbInset)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chkSpecs)
+        layHControls.addWidget(self.but_specs)
         layHControls.addStretch(1)
-        layHControls.addWidget(self.chkPhase)
-        layHControls.addWidget(self.chkAlign)
+        layHControls.addWidget(self.but_phase)
+        layHControls.addWidget(self.but_align)
         layHControls.addStretch(10)
 
         self.frmControls = QFrame(self)
@@ -191,12 +188,12 @@ class Plot_Hf(QWidget):
         self.led_log_bottom.editingFinished.connect(self.update_view)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
-        self.chkZerophase.clicked.connect(self.draw)
+        self.but_zerophase.clicked.connect(self.draw)
         self.cmbInset.currentIndexChanged.connect(self.draw_inset)
 
-        self.chkSpecs.clicked.connect(self.draw)
-        self.chkPhase.clicked.connect(self.draw)
-        self.chkAlign.clicked.connect(self.draw)
+        self.but_specs.clicked.connect(self.draw)
+        self.but_phase.clicked.connect(self.draw)
+        self.but_align.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
@@ -492,7 +489,7 @@ class Plot_Hf(QWidget):
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
-                if self.chkSpecs.isChecked():
+                if self.but_specs.isChecked():
                     self.plot_spec_limits(self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
@@ -521,7 +518,7 @@ class Plot_Hf(QWidget):
         # except (KeyError, AttributeError):
         #     pass
 
-        if self.chkPhase.isChecked():
+        if self.but_phase.isChecked():
             self.ax_p = ax.twinx()  # second axes system with same x-axis for phase
             self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
@@ -558,7 +555,7 @@ class Plot_Hf(QWidget):
         """
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.chkAlign.setVisible(self.chkPhase.isChecked())
+        self.but_align.setVisible(self.but_phase.isChecked())
         self.calc_hf()
         self.update_view()
 
@@ -607,10 +604,10 @@ class Plot_Hf(QWidget):
 
         # Linphase settings only makes sense for amplitude plot and
         # for plottin real/imag. part of H, not its magnitude
-        self.chkZerophase.setCheckable(self.unitA == 'V')
-        self.chkZerophase.setEnabled(self.unitA == 'V')
+        self.but_zerophase.setCheckable(self.unitA == 'V')
+        self.but_zerophase.setEnabled(self.unitA == 'V')
 
-        self.specs = self.chkSpecs.isChecked()
+        self.specs = self.but_specs.isChecked()
 
         self.f_max = fb.fil[0]['f_max']
 
@@ -641,7 +638,7 @@ class Plot_Hf(QWidget):
             self.H_c = self.H_cmplx
 
         # now calculate mag / real / imaginary part of H_c:
-        if self.chkZerophase.isChecked():  # remove the linear phase
+        if self.but_zerophase.isChecked():  # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
 
         if self.cmbShowH.currentIndex() == 0:  # show magnitude of H
@@ -691,7 +688,7 @@ class Plot_Hf(QWidget):
             #-----------------------------------------------------------
 
             #============= Set Limits and draw specs =========================
-            if self.chkSpecs.isChecked():
+            if self.but_specs.isChecked():
                 self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
@@ -701,7 +698,7 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
-            if self.chkPhase.isChecked():
+            if self.but_phase.isChecked():
                 self.ax.set_title(r'Magnitude and Phase Frequency Response')
             else:
                 self.ax.set_title(r'Magnitude Frequency Response')
@@ -717,7 +714,7 @@ class Plot_Hf(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
-        if hasattr(self, 'ax_p') and self.chkAlign.isChecked():
+        if hasattr(self, 'ax_p') and self.but_align.isChecked():
             # Align gridlines between H(f) and phi nicely
             self.align_y_axes(self.ax, self.ax_p)
         self.mplwidget.redraw()
