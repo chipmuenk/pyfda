@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-07-xx)
+### [v0.6.0a1](https://github.com/chipmuenk/pyfda/tree/v0.6.0a1) (2021-08-12)
 
 ### Bug fixes
 
@@ -45,7 +45,11 @@
   * 'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
      providing an time-to-live mechanisms for signals
 
-- Lots of improvements in `y[n]` tab: 
+- Lots of improvements in `y[n]` tab:
+
+  - UI overhaul
+  
+  - Started introducing audio features (not usable yet)
 
   - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
       for  impulses
