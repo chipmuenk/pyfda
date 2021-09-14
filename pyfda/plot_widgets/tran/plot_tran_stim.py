@@ -79,26 +79,26 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus_block(self, N_first: int, N_last: int) -> ndarray:
+    def calc_stimulus_frame(self, N_first: int, N: int) -> ndarray:
         """
-        Calculate a data block of stimulus `x` with a length of `N_last - N_first`
-        samples.
-        
+        Calculate a data frame of stimulus `x` with a length of `N` samples,
+        starting with index `N_first`
+
         Parameters
         ----------
         N_first: int
-            number of first data point
-            
-        N_last: int
-            number of last data point
-            
+            index of first data point
+
+        N: int
+            number of samples to be generated
+
         Returns
         -------
         x: ndarray
-            an array with `N_last - N_first` stimulus data points
+            an array with `N` stimulus data points
         """
-        N = N_last - N_first
-        n = N_first + np.arange(N)
+        N_last = N_first + N
+        n = np.arange(N_first, N)
         # use radians for angle internally
         phi1 = self.ui.phi1 / 180 * pi
         phi2 = self.ui.phi2 / 180 * pi

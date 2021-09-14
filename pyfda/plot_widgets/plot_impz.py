@@ -482,15 +482,16 @@ class Plot_Impz(QWidget):
 # ------------------------------------------------------------------------------
     def calc_stimulus(self, N_start, N_end):
         """
-        (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_block()`
+        (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_frame()`
         This is work in progress.
         """
+        N = N_end - N_start
         if N_start > 0:
-            self.x[0:N_start] = self.stim_wdg.calc_stimulus_block(0, N_start)
-            self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_block(N_start, N_end)
-        else:
-            self.x[:N_end] = self.stim_wdg.calc_stimulus_block(N_start, N_end)
+            self.x[0:N_start] = self.stim_wdg.calc_stimulus_frame(0, N_start)
+        self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_frame(N_start, N)
+
         self.n = np.arange(N_end, dtype=float)
+        
         self.H_str = self.stim_wdg.H_str
         self.title_str = self.stim_wdg.title_str
 
