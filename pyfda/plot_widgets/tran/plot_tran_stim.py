@@ -53,7 +53,7 @@ class Plot_Tran_Stim(QWidget):
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None) -> None:
         """
         Process signals coming from
         - the navigation toolbars (time and freq.)
@@ -64,7 +64,7 @@ class Plot_Tran_Stim(QWidget):
         logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
                        .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
-    def _construct_UI(self):
+    def _construct_UI(self) -> None:
         """
         Instantiate the UI of the widget.
         """
