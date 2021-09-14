@@ -87,6 +87,7 @@ class PlotImpz_UI(QWidget):
         self.N_start = 0
         self.N_user = 0
         self.N = 0
+        self.N_frame = 1024
 
         # time
         self.plt_time_resp = "stem"
@@ -207,7 +208,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N))
         self.led_N_points.setToolTip(
-            "<span>Number of displayed data points. "
+            "<span>Last data point. "
             "<i>N</i> = 0 tries to choose for you.</span>")
         self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
@@ -215,6 +216,15 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
+
+        self.lbl_N_frame = QLabel(to_html("&Delta;N", frmt='bi') + " =", self)
+        self.led_N_frame = QLineEdit(self)
+        self.led_N_frame.setText(str(self.N_frame))
+        self.led_N_frame.setToolTip(
+            "<span>Frame length, longer frames calculate faster but calculation cannot "
+            "be stopped so easily. "
+            "<i>&Delta;N</i> = 0 calculates all samples.</span>")
+        self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
         self.but_toggle_stim_options = PushButton("Stimuli ", checked=True)
         self.but_toggle_stim_options.setObjectName("but_stim_options")
@@ -257,6 +267,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
+        layH_ctrl_run.addWidget(self.lbl_N_frame)
+        layH_ctrl_run.addWidget(self.led_N_frame)
 
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_toggle_stim_options)
@@ -540,6 +552,7 @@ class PlotImpz_UI(QWidget):
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
         self.led_N_points.editingFinished.connect(self.update_N)
+        self.led_N_frame.editingFinished.connect(self.update_N)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
     # -------------------------------------------------------------------------
@@ -564,6 +577,11 @@ class PlotImpz_UI(QWidget):
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
                                  return_type='int', sign='poszero')
         self.led_N_start.setText(str(self.N_start))  # update widget
+
+        self.N_frame = safe_eval(self.led_N_frame.text(), self.N_frame,
+                                 return_type='int', sign='poszero')
+        self.led_N_frame.setText(str(self.N_frame))  # update widget
+
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
