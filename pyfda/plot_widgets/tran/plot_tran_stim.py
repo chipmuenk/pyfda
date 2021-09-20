@@ -79,7 +79,7 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, N_first: int, N: int) -> ndarray:
+    def calc_stimulus_frame(self, N_first: int, N: int, init: bool = False) -> ndarray:
         """
         Calculate a data frame of stimulus `x` with a length of `N` samples,
         starting with index `N_first`
@@ -91,31 +91,114 @@ class Plot_Tran_Stim(QWidget):
 
         N: int
             number of samples to be generated
+            
+        init: bool
+            when init == True, initialize stimulus settings
 
         Returns
         -------
         x: ndarray
             an array with `N` stimulus data points
         """
+        def init_fnct(self):
+            '''intialize title string, y-axis label and some variables'''
+            # use radians for angle internally
+            self.rad_phi1 = self.ui.phi1 / 180 * pi
+            self.rad_phi2 = self.ui.phi2 / 180 * pi
+
+            self.H_str = r'$y[n]$'  # default
+            self.title_str = ""
+            if self.ui.stim == "none":
+                self.title_str = r'Zero Input System Response'
+                self.H_str = r'$h_0[n]$' 
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "dirac":
+                self.title_str = r'Impulse Response'
+                self.H_str = r'$h[n]$'
+            elif self.ui.stim == "sinc":
+                self.title_str = r'Sinc Impulse '
+            elif self.ui.stim == "gauss":
+                self.title_str = r'Gaussian Impulse '
+            elif self.ui.stim == "rect":
+                self.title_str = r'Rect Impulse '
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "step":
+                if self.ui.chk_step_err.isChecked():
+                    self.title_str = r'Settling Error $\epsilon$'
+                    self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+                else:
+                    self.title_str = r'Step Response'
+                    self.H_str = r'$h_{\epsilon}[n]$'
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "cos":
+                self.title_str = r'Cosine Stimulus'
+            elif self.ui.stim == "sine":
+                self.title_str = r'Sinusoidal Stimulus '
+            elif self.ui.stim == "exp":
+                self.title_str = r'Complex Exponential Stimulus '
+            elif self.ui.stim == "diric":
+                self.title_str = r'Periodic Sinc Stimulus'
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "chirp":
+                self.title_str = self.ui.chirp_type.capitalize() + ' Chirp Stimulus'
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "triang":
+                if self.ui.but_stim_bl.isChecked():
+                    self.title_str = r'Bandlim. Triangular Stimulus'
+                else:
+                    self.title_str = r'Triangular Stimulus'
+            elif self.ui.stim == "saw":
+                if self.ui.but_stim_bl.isChecked():
+                    self.title_str = r'Bandlim. Sawtooth Stimulus'
+                else:
+                    self.title_str = r'Sawtooth Stimulus'
+            elif self.ui.stim == "square":
+                if self.ui.but_stim_bl.isChecked():
+                    self.title_str = r'Bandlimited Rect. Stimulus'
+                else:
+                    self.title_str = r'Rect. Stimulus'
+            elif self.ui.stim == "comb":
+                self.title_str = r'Bandlim. Comb Stimulus'
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "am":
+                self.title_str = (
+                    r'AM Stimulus: $A_1 \sin(2 \pi n f_1 + \varphi_1)'
+                    r'\cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$')
+            elif self.ui.stim == "pmfm":
+                self.title_str = (
+                    r'PM / FM Stimulus: $A_1 \sin(2 \pi n f_1'
+                    r'+ \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$')
+            # ------------------------------------------------------------------
+            elif self.ui.stim == "formula":
+                self.title_str = r'Formula Defined Stimulus'
+            # ==================================================================
+            if self.ui.noise == "gauss":
+                self.title_str += r' + Gaussian Noise'
+            elif self.ui.noise == "uniform":
+                self.title_str += r' + Uniform Noise'
+            elif self.ui.noise == "prbs":
+                self.title_str += r' + PRBS Noise'
+            elif self.ui.noise == "mls":
+                self.title_str += r' + max. length sequence'
+            elif self.ui.noise == "brownian":
+                self.title_str += r' + Brownian Noise'
+            # ==================================================================
+            if self.ui.ledDC.isVisible and self.ui.DC != 0:
+                self.title_str += r' + DC'
+        # ----------------------------------------------------------------------
+        if init or N_first == 0:
+            init_fnct(self)
         N_last = N_first + N
         n = np.arange(N_first, N)
-        # use radians for angle internally
-        phi1 = self.ui.phi1 / 180 * pi
-        phi2 = self.ui.phi2 / 180 * pi
+
         # T_S = fb.fil[0]['T_S']
         # calculate index from T1 entry for creating stimulus vectors, shifted
         # by T1. Limit the value to N_last - 1.
         self.T1_int = min(int(np.round(self.ui.T1)), N_last-1)
 
         # calculate stimuli x[n] ==============================================
-        self.H_str = ''
-        self.title_str = ""
-
         if self.ui.stim == "none":
             x = np.zeros(N)
-            self.title_str = r'Zero Input System Response'
-            self.H_str = r'$h_0[n]$'  # default
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if np_type(self.ui.A1) == complex:
@@ -125,67 +208,43 @@ class Plot_Tran_Stim(QWidget):
 
             x = np.zeros(N, dtype=A_type)
             x[self.T1_int] = self.ui.A1  # create dirac impulse as input signal
-            self.title_str = r'Impulse Response'
-            self.H_str = r'$h[n]$'  # default
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
             x = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
                 + self.ui.A2 * sinc(2 * (n - self.ui.T2) * self.ui.f2)
-            self.title_str += r'Sinc Impulse '
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "gauss":
             x = self.ui.A1 * sig.gausspulse(
                     (n - self.ui.T1), fc=self.ui.f1, bw=self.ui.BW1) +\
                 self.ui.A2 * sig.gausspulse(
                     (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
-            self.title_str += r'Gaussian Impulse '
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
             n_start = int(self.T1_int - np.floor(self.ui.TW1/2))
             n_min = max(n_start, 0)
             n_max = min(n_start + self.ui.TW1, N)
-            self.title_str += r'Rect Impulse '
             x = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
             x = self.ui.A1 * np.ones(N)  # create step function
             x[0:self.T1_int].fill(0)
-            if self.ui.chk_step_err.isChecked():
-                self.title_str = r'Settling Error $\epsilon$'
-                self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
-            else:
-                self.title_str = r'Step Response'
-                self.H_str = r'$h_{\epsilon}[n]$'
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
-            x = self.ui.A1 * np.cos(2*pi * n * self.ui.f1 + phi1) +\
-                self.ui.A2 * np.cos(2*pi * n * self.ui.f2 + phi2)
-            self.title_str += r'Cosine Stimulus'
-
+            x = self.ui.A1 * np.cos(2*pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.A2 * np.cos(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sine":
-            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + phi1) +\
-                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + phi2)
-            self.title_str += r'Sinusoidal Stimulus '
-
+            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "exp":
-            x = self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + phi1)) +\
-                self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + phi2))
-            self.title_str += r'Complex Exponential Stimulus '
-
+            x = self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
+                self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
             x = self.ui.A1 * diric(
-                (4 * pi * (n-self.ui.T1) * self.ui.f1 + phi1*2)
+                (4 * pi * (n-self.ui.T1) * self.ui.f1 + self.rad_phi1*2)
                 / self.ui.TW1, self.ui.TW1)
-            self.title_str += r'Periodic Sinc Stimulus'
-
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
             if True:  # sig.chirp is buggy, T_sim cannot be larger than T_end
@@ -193,60 +252,40 @@ class Plot_Tran_Stim(QWidget):
             else:
                 T_end = self.ui.T2
             x = self.ui.A1 * sig.chirp(n, self.ui.f1, T_end, self.ui.f2,
-                                       method=self.ui.chirp_type, phi=phi1)
-            self.title_str += self.ui.chirp_type.capitalize() + ' Chirp Stimulus'
-
+                                       method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
             if self.ui.but_stim_bl.isChecked():
-                x = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + phi1)
-                self.title_str += r'Bandlim. Triangular Stimulus'
+                x = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
                 x = self.ui.A1 * sig.sawtooth(
-                    2*pi * n * self.ui.f1 + phi1, width=0.5)
-                self.title_str += r'Triangular Stimulus'
-
+                    2*pi * n * self.ui.f1 + self.rad_phi1, width=0.5)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
             if self.ui.but_stim_bl.isChecked():
-                x = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + phi1)
-                self.title_str += r'Bandlim. Sawtooth Stimulus'
+                x = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                x = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + phi1)
-                self.title_str += r'Sawtooth Stimulus'
-
+                x = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "square":
             if self.ui.but_stim_bl.isChecked():
                 x = self.ui.A1 * rect_bl(
-                    2 * pi * n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
-                self.title_str += r'Bandlimited Rect. Stimulus'
+                    2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
                 x = self.ui.A1 * sig.square(
-                    2 * pi * n * self.ui.f1 + phi1, duty=self.ui.stim_par1)
-                self.title_str += r'Rect. Stimulus'
-
+                    2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
-            x = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + phi1)
-            self.title_str += r'Bandlim. Comb Stimulus'
-
+            x = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
-            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + phi1)\
-                * self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + phi2)
-            self.title_str += (r'AM Stimulus: $A_1 \sin(2 \pi n f_1'
-                               r'+ \varphi_1) \cdot A_2 \sin(2 \pi n f_2 + \varphi_2)$')
-
+            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
+                * self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pmfm":
             x = self.ui.A1 * np.sin(
-                2 * pi * n * self.ui.f1 + phi1 +
-                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + phi2))
-            self.title_str += (
-                r'PM / FM Stimulus: $A_1 \sin(2 \pi n f_1'
-                r'+ \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$')
-
+                2 * pi * n * self.ui.f1 + self.rad_phi1 +
+                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "formula":
             param_dict = {"A1": self.ui.A1, "A2": self.ui.A2,
@@ -256,11 +295,9 @@ class Plot_Tran_Stim(QWidget):
                           "f_S": fb.fil[0]['f_S'], "n": n}
 
             x = safe_numexpr_eval(self.ui.stim_formula, (N,), param_dict)
-            self.title_str += r'Formula Defined Stimulus'
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None
-
         # ----------------------------------------------------------------------
         # Add noise to stimulus
         noi = 0
@@ -268,23 +305,18 @@ class Plot_Tran_Stim(QWidget):
             pass
         elif self.ui.noise == "gauss":
             noi = self.ui.noi * np.random.randn(N)
-            self.title_str += r' + Gaussian Noise'
         elif self.ui.noise == "uniform":
             noi = self.ui.noi * (np.random.rand(N)-0.5)
-            self.title_str += r' + Uniform Noise'
         elif self.ui.noise == "prbs":
             noi = self.ui.noi * 2 * (np.random.randint(0, 2, N)-0.5)
-            self.title_str += r' + PRBS Noise'
         elif self.ui.noise == "mls":
             # max_len_seq returns `sequence, state`. The state is not stored here,
             # hence, an identical sequence is created every time.
             noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(N))),
                                      length=N, state=None)[0] - 0.5)
-            self.title_str += r' + max. length sequence'
         elif self.ui.noise == "brownian":
             # brownian noise
             noi = np.cumsum(self.ui.noi * np.random.randn(N))
-            self.title_str += r' + Brownian Noise'
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
         if type(self.ui.noi) == complex:
@@ -297,8 +329,6 @@ class Plot_Tran_Stim(QWidget):
                 x = x.astype(complex) + self.ui.DC
             else:
                 x += self.ui.DC
-            if self.ui.DC != 0:
-                self.title_str += r' + DC'
 
         return x
 # ------------------------------------------------------------------------------
