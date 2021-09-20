@@ -409,6 +409,7 @@ class Plot_Impz(QWidget):
                 self.emit({'fx_sim': 'init'})
                 return
 
+            # for n in np.arange(0, self.ui.N_end, self.ui.N_frame):
             self.calc_stimulus(self.ui.N_start, self.ui.N_end)
             self.calc_response(self.ui.N_start, self.ui.N_end)
 
@@ -491,7 +492,7 @@ class Plot_Impz(QWidget):
         self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_frame(N_start, N)
 
         self.n = np.arange(N_end, dtype=float)
-        
+
         self.H_str = self.stim_wdg.H_str
         self.title_str = self.stim_wdg.title_str
 
