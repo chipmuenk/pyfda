@@ -80,10 +80,6 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
 
-        self.x = np.zeros(1000000)
-        self.y = np.zeros(1000000)
-        self.y_q = np.zeros(1000000)
-
         # self.fmt_stem_stim = params['mpl_stimuli']
 
         self._construct_UI()
@@ -406,9 +402,18 @@ class Plot_Impz(QWidget):
             if self.fx_sim:  # start a fixpoint simulation
                 self.emit({'fx_sim': 'init'})
                 return
+            self.x = np.empty(self.ui.N_end)  # initialize array
+            self.x_q = np.empty_like(self.x, dtype=np.float64)
+            
+            for N_first in np.arange(0, self.ui.N_end, self.ui.N_frame):
+                L_frame = min(self.ui.N_frame, self.ui.N_end - N_first)
+                self.x[N_first:N_first + L_frame] =\
+                    self.stim_wdg.calc_stimulus_frame(
+                        N_first, L_frame, N_end=self.ui.N_end)
 
-            # for n in np.arange(0, self.ui.N_end, self.ui.N_frame):
             self.calc_stimulus(self.ui.N_start, self.ui.N_end)
+
+            self.y = np.empty_like(self.x)
             self.calc_response(self.ui.N_start, self.ui.N_end)
 
             if self.error:
@@ -485,9 +490,9 @@ class Plot_Impz(QWidget):
         This is work in progress.
         """
         N = N_end - N_start
-        if N_start > 0:
-            self.x[0:N_start] = self.stim_wdg.calc_stimulus_frame(0, N_start)
-        self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_frame(N_start, N)
+        # if N_start > 0:
+        #     self.x[0:N_start] = self.stim_wdg.calc_stimulus_frame(0, N_start)
+        # self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_frame(N_start, N)
 
         self.n = np.arange(N_end, dtype=float)
 

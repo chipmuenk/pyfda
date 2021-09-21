@@ -76,7 +76,8 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, N_first: int, N: int, init: bool = False) -> ndarray:
+    def calc_stimulus_frame(self, N_first: int, N: int, N_end: int, 
+                            init: bool = False) -> ndarray:
         """
         Calculate a data frame of stimulus `x` with a length of `N` samples,
         starting with index `N_first`
@@ -97,11 +98,17 @@ class Plot_Tran_Stim(QWidget):
         x: ndarray
             an array with `N` stimulus data points
         """
-        def init_fnct(self):
+        if init or N_first == 0:
             '''intialize title string, y-axis label and some variables'''
             # use radians for angle internally
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
+            if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
+                (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
+                    (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex): 
+                self.xf = np.zeros(N, dtype=complex)
+            else:
+                self.xf = np.zeros(N, dtype=float)
 
             self.H_str = r'$y[n]$'  # default
             self.title_str = ""
@@ -183,104 +190,106 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.ledDC.isVisible and self.ui.DC != 0:
                 self.title_str += r' + DC'
         # ----------------------------------------------------------------------
-        if init or N_first == 0:
-            init_fnct(self)
+
         N_last = N_first + N
-        n = np.arange(N_first, N)
+        n = np.arange(N_first, N_last)
 
         # T_S = fb.fil[0]['T_S']
-        # calculate index from T1 entry for creating stimulus vectors, shifted
-        # by T1. Limit the value to N_last - 1.
-        self.T1_int = min(int(np.round(self.ui.T1)), N_last-1)
+        T1_int = int(np.round(self.ui.T1))
 
         # calculate stimuli x[n] ==============================================
         if self.ui.stim == "none":
-            x = np.zeros(N)
+            self.xf.fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
-            if np_type(self.ui.A1) == complex:
-                A_type = complex
-            else:
-                A_type = float
-
-            x = np.zeros(N, dtype=A_type)
-            x[self.T1_int] = self.ui.A1  # create dirac impulse as input signal
+            self.xf.fill(0)  # = np.zeros(N, dtype=A_type)
+            if N_first <= T1_int < N_last:
+                self.xf[T1_int - N_first] = self.ui.A1  # create dirac impulse as input signal
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
-            x = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
+            self.xf = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
                 + self.ui.A2 * sinc(2 * (n - self.ui.T2) * self.ui.f2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "gauss":
-            x = self.ui.A1 * sig.gausspulse(
+            self.xf = self.ui.A1 * sig.gausspulse(
                     (n - self.ui.T1), fc=self.ui.f1, bw=self.ui.BW1) +\
                 self.ui.A2 * sig.gausspulse(
                     (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_start = int(self.T1_int - np.floor(self.ui.TW1/2))
-            n_min = max(n_start, 0)
-            n_max = min(n_start + self.ui.TW1, N)
-            x = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
+            n_rise = int(T1_int - np.floor(self.ui.TW1/2))
+            n_min = max(n_rise, 0)
+            n_max = min(n_rise + self.ui.TW1, N)
+            self.xf = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
-            x = self.ui.A1 * np.ones(N)  # create step function
-            x[0:self.T1_int].fill(0)
+            if T1_int < N_first:   # step before current frame
+                self.xf.fill(self.ui.A1)
+            if N_first <= T1_int < N_last:  # step in current frame
+                self.xf[0:T1_int - N_first].fill(0)
+                self.xf[T1_int - N_first:].fill(self.ui.A1)
+            elif T1_int >= N_last:  # step after current frame
+                self.xf.fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
-            x = self.ui.A1 * np.cos(2*pi * n * self.ui.f1 + self.rad_phi1) +\
+            self.xf =\
+                self.ui.A1 * np.cos(2*pi * n * self.ui.f1 + self.rad_phi1) +\
                 self.ui.A2 * np.cos(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sine":
-            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1) +\
+            self.xf =\
+                self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1) +\
                 self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "exp":
-            x = self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
+            self.xf =\
+                self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
                 self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
-            x = self.ui.A1 * diric(
+            self.xf = self.ui.A1 * diric(
                 (4 * pi * (n-self.ui.T1) * self.ui.f1 + self.rad_phi1*2)
                 / self.ui.TW1, self.ui.TW1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
-            if True:  # sig.chirp is buggy, T_sim cannot be larger than T_end
-                T_end = N_last
+            if self.ui.T2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
+                T_end = N_end  # frequency sweep over complete interval
             else:
-                T_end = self.ui.T2
-            x = self.ui.A1 * sig.chirp(n, self.ui.f1, T_end, self.ui.f2,
-                                       method=self.ui.chirp_type, phi=self.rad_phi1)
+                T_end = self.ui.T2  # frequency sweep till T2
+            self.xf = self.ui.A1 * sig.chirp(
+                n, self.ui.f1, T_end, self.ui.f2,
+                method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
             if self.ui.but_stim_bl.isChecked():
-                x = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                self.xf = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                x = self.ui.A1 * sig.sawtooth(
+                self.xf = self.ui.A1 * sig.sawtooth(
                     2*pi * n * self.ui.f1 + self.rad_phi1, width=0.5)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
             if self.ui.but_stim_bl.isChecked():
-                x = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                self.xf = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                x = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
+                self.xf = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "square":
             if self.ui.but_stim_bl.isChecked():
-                x = self.ui.A1 * rect_bl(
+                self.xf = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
-                x = self.ui.A1 * sig.square(
+                self.xf = self.ui.A1 * sig.square(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
-            x = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
+            self.xf = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
-            x = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
+            self.xf = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
                 * self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pmfm":
-            x = self.ui.A1 * np.sin(
+            self.xf = self.ui.A1 * np.sin(
                 2 * pi * n * self.ui.f1 + self.rad_phi1 +
                 self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
@@ -291,7 +300,7 @@ class Plot_Tran_Stim(QWidget):
                           "BW1": self.ui.BW1, "BW2": self.ui.BW2,
                           "f_S": fb.fil[0]['f_S'], "n": n}
 
-            x = safe_numexpr_eval(self.ui.stim_formula, (N,), param_dict)
+            self.xf = safe_numexpr_eval(self.ui.stim_formula, (N,), param_dict)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None
@@ -317,17 +326,18 @@ class Plot_Tran_Stim(QWidget):
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
         if type(self.ui.noi) == complex:
-            x = x.astype(complex) + noi
+            self.xf = self.xf.astype(complex) + noi
         else:
-            x += noi
+            self.xf += noi
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             if type(self.ui.DC) == complex:
-                x = x.astype(complex) + self.ui.DC
+                self.xf = self.xf.astype(complex) + self.ui.DC
             else:
-                x += self.ui.DC
+                self.xf += self.ui.DC
+        logger.warning(type(self.xf[0]))
 
-        return x
+        return self.xf[:N]
 # ------------------------------------------------------------------------------
 
 
