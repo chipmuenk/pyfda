@@ -9,19 +9,17 @@
 """
 Widget for plotting impulse and general transient responses
 """
-# import time
-from pyfda.libs.compat import QWidget, pyqtSignal, QTabWidget, QVBoxLayout
+from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 from numpy import ndarray, pi
 import scipy.signal as sig
 from scipy.special import sinc, diric
 
 import pyfda.filterbroker as fb
-import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
     safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
+    rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
@@ -46,7 +44,7 @@ class Plot_Tran_Stim(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-        
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -89,7 +87,7 @@ class Plot_Tran_Stim(QWidget):
 
         N: int
             number of samples to be generated
-            
+
         init: bool
             when init == True, initialize stimulus settings
 
