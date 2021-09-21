@@ -74,10 +74,10 @@ class Plot_Tran_Stim(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, N_first: int, N: int, N_end: int, 
+    def calc_stimulus_frame(self, N_first: int, N_frm: int, N_end: int,
                             init: bool = False) -> ndarray:
         """
-        Calculate a data frame of stimulus `x` with a length of `N` samples,
+        Calculate a data frame of stimulus `x` with a length of `N_frm` samples,
         starting with index `N_first`
 
         Parameters
@@ -85,7 +85,7 @@ class Plot_Tran_Stim(QWidget):
         N_first: int
             index of first data point
 
-        N: int
+        N_frm: int
             number of samples to be generated
 
         init: bool
@@ -103,16 +103,16 @@ class Plot_Tran_Stim(QWidget):
             self.rad_phi2 = self.ui.phi2 / 180 * pi
             if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
                 (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
-                    (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex): 
-                self.xf = np.zeros(N, dtype=complex)
+                    (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
+                self.xf = np.zeros(N_frm, dtype=complex)
             else:
-                self.xf = np.zeros(N, dtype=float)
+                self.xf = np.zeros(N_frm, dtype=float)
 
             self.H_str = r'$y[n]$'  # default
             self.title_str = ""
             if self.ui.stim == "none":
                 self.title_str = r'Zero Input System Response'
-                self.H_str = r'$h_0[n]$' 
+                self.H_str = r'$h_0[n]$'
             # ------------------------------------------------------------------
             elif self.ui.stim == "dirac":
                 self.title_str = r'Impulse Response'
@@ -189,7 +189,7 @@ class Plot_Tran_Stim(QWidget):
                 self.title_str += r' + DC'
         # ----------------------------------------------------------------------
 
-        N_last = N_first + N
+        N_last = N_first + N_frm
         n = np.arange(N_first, N_last)
 
         # T_S = fb.fil[0]['T_S']
@@ -200,9 +200,9 @@ class Plot_Tran_Stim(QWidget):
             self.xf.fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
-            self.xf.fill(0)  # = np.zeros(N, dtype=A_type)
+            self.xf.fill(0)  # = np.zeros(N_frm, dtype=A_type)
             if N_first <= T1_int < N_last:
-                self.xf[T1_int - N_first] = self.ui.A1  # create dirac impulse as input signal
+                self.xf[T1_int - N_first] = self.ui.A1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
             self.xf = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
@@ -217,7 +217,7 @@ class Plot_Tran_Stim(QWidget):
         elif self.ui.stim == "rect":
             n_rise = int(T1_int - np.floor(self.ui.TW1/2))
             n_min = max(n_rise, 0)
-            n_max = min(n_rise + self.ui.TW1, N)
+            n_max = min(n_rise + self.ui.TW1, N_end)
             self.xf = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
@@ -298,7 +298,7 @@ class Plot_Tran_Stim(QWidget):
                           "BW1": self.ui.BW1, "BW2": self.ui.BW2,
                           "f_S": fb.fil[0]['f_S'], "n": n}
 
-            self.xf = safe_numexpr_eval(self.ui.stim_formula, (N,), param_dict)
+            self.xf = safe_numexpr_eval(self.ui.stim_formula, (N_frm,), param_dict)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None
@@ -308,19 +308,19 @@ class Plot_Tran_Stim(QWidget):
         if self.ui.noise == "none":
             pass
         elif self.ui.noise == "gauss":
-            noi = self.ui.noi * np.random.randn(N)
+            noi = self.ui.noi * np.random.randn(N_frm)
         elif self.ui.noise == "uniform":
-            noi = self.ui.noi * (np.random.rand(N)-0.5)
+            noi = self.ui.noi * (np.random.rand(N_frm)-0.5)
         elif self.ui.noise == "prbs":
-            noi = self.ui.noi * 2 * (np.random.randint(0, 2, N)-0.5)
+            noi = self.ui.noi * 2 * (np.random.randint(0, 2, N_frm)-0.5)
         elif self.ui.noise == "mls":
             # max_len_seq returns `sequence, state`. The state is not stored here,
             # hence, an identical sequence is created every time.
-            noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(N))),
-                                     length=N, state=None)[0] - 0.5)
+            noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(N_frm))),
+                                     length=N_frm, state=None)[0] - 0.5)
         elif self.ui.noise == "brownian":
             # brownian noise
-            noi = np.cumsum(self.ui.noi * np.random.randn(N))
+            noi = np.cumsum(self.ui.noi * np.random.randn(N_frm))
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
         if type(self.ui.noi) == complex:
@@ -335,7 +335,7 @@ class Plot_Tran_Stim(QWidget):
                 self.xf += self.ui.DC
         logger.warning(type(self.xf[0]))
 
-        return self.xf[:N]
+        return self.xf[:N_frm]
 # ------------------------------------------------------------------------------
 
 
