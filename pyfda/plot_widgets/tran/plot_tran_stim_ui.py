@@ -20,7 +20,7 @@ from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
-    QVLine, PushButton)
+    PushButton)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
