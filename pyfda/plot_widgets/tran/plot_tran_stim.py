@@ -24,7 +24,6 @@ from pyfda.libs.pyfda_lib import (
     rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
-
 from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
 
 import logging
@@ -39,17 +38,15 @@ class Plot_Tran_Stim(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
-        super(Plot_Tran_Stim, self).__init__(parent)
-
-        self.ACTIVE_3D = False
+    def __init__(self):
+        super().__init__()
         self.ui = Plot_Tran_Stim_UI(self)  # create the UI part with buttons etc.
 
         # initial settings
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-
+        
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
