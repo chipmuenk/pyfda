@@ -99,8 +99,9 @@ class Plot_Impz(QWidget):
         tabbed stimuli and a control frame.
         """
         # ----------------------------------------------------------------------
-        # Define MplWidget for TIME domain plots
+        # Tabbed layout with vertical tabs ("west") for time and frequency domain
         # ----------------------------------------------------------------------
+        # ---------- MplWidget for TIME domain plots ---------------------------
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
@@ -109,9 +110,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # ----------------------------------------------------------------------
-        # Define MplWidget for FREQUENCY domain plots
-        # ----------------------------------------------------------------------
+        # ---------- MplWidget for FREQUENCY domain plots ----------------------
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
@@ -120,9 +119,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # ----------------------------------------------------------------------
-        # Tabbed layout with vertical tabs ("west") for time and frequency domain
-        # ----------------------------------------------------------------------
+        # ----------- Construct TabWidget with time and frequency plot widgets
         self.tab_mpl_w = QTabWidget(self)
         self.tab_mpl_w.setTabPosition(QTabWidget.West)
         self.tab_mpl_w.setObjectName("tab_mpl_w")
@@ -131,7 +128,6 @@ class Plot_Impz(QWidget):
         self.tab_mpl_w.addTab(self.mplwidget_f, "Frequency")
         self.tab_mpl_w.setTabToolTip(
             1, "Spectral representation of impulse or transient response")
-
         # list with mplwidgets
         self.tab_mplwidget_list = ["mplwidget_t", "mplwidget_f"]
 
@@ -139,7 +135,7 @@ class Plot_Impz(QWidget):
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
         self.stim_wdg = Plot_Tran_Stim()
-        self.wdg_ctrl_audio = QWidget(self)
+        self.wdg_ctrl_audio = QWidget(self)  # only placeholder so far
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
@@ -156,7 +152,9 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setTabToolTip(1, "Audio")
 
         self.resize_stim_tab_widget()
-
+        # ----------------------------------------------------------------------
+        # ---------------- GLOBAL LAYOUT ---------------------------------------
+        # ----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tab_mpl_w)
         layVMain.addWidget(self.tab_stim_w)
@@ -496,6 +494,7 @@ class Plot_Impz(QWidget):
         self.H_str = self.stim_wdg.H_str
         self.title_str = self.stim_wdg.title_str
 
+        # ---- calculate quantized stimulus from x
         if self.fx_sim:
             self.title_str = r'$Fixpoint$ ' + self.title_str
             # setup quantizer for input quantization:
