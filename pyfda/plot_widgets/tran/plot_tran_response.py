@@ -49,7 +49,6 @@ def calc_response_frame(self, x: ndarray, N_first: int, init: bool = False) -> n
     y: ndarray
         an array with the same number of response data points as the stimulus
     """
-    
 
     return x
 # ------------------------------------------------------------------------------
