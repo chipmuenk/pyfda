@@ -119,7 +119,7 @@ class Plot_Tran_Stim_UI(QWidget):
             "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "diric":   {"dc", "a1", "phi1", "T1", "TW1", "f1", "noise"},
 
-            "chirp":   {"dc", "a1", "phi1", "f1", "f2", "noise"},
+            "chirp":   {"dc", "a1", "phi1", "f1", "f2", "T2", "noise"},
             "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
             "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
             "square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
@@ -155,8 +155,8 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # combobox tooltip + data / text / tooltip for chirp signals items
         self.cmb_stim_chirp_items = [
-            "<span>Type of frequency sweep from <i>f</i><sub>1</sub> to "
-            "<i>f</i><sub>2</sub></span>",
+            "<span>Type of frequency sweep from <i>f</i><sub>1</sub> @ <i>t</i> = 0 to "
+            "<i>f</i><sub>2</sub> @ t = <i>T</i><sub>2</sub>.</span>",
             ("linear", "Lin", "Linear frequency sweep"),
             ("quadratic", "Square", "Quadratic frequency sweep"),
             ("logarithmic", "Log", "Logarithmic frequency sweep"),
