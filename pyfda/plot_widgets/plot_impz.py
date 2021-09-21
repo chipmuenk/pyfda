@@ -373,15 +373,13 @@ class Plot_Impz(QWidget):
         if autorun:
             self.impz()
 
-    def impz(self, arg=None):
+    # --------------------------------------------------------------------------
+    def impz_init(self, arg=None):
         """
         Triggered by:
-            - construct_UI()  [Initialization]
-            - Pressing "Run" button, passing button state as a boolean
-            - Activating "Autorun" via `self.calc_auto()`
-            - 'fx_sim' : 'specs_changed'
-            -
-        Calculate response and redraw it.
+            - 
+
+        Initialize impulse calculation
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
@@ -389,7 +387,9 @@ class Plot_Impz(QWidget):
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
              self.stim_wdg.ui.cmbNoise.currentText() == 'None')
-            and self.stim_wdg.ui.DC == 0)
+            and self.stim_wdg.ui.DC == 0
+            and self.stim_wdg.ui.cmb_stim == "impulse"
+            )
 
         self.fx_select()  # check for fixpoint setting and update if needed
         if type(arg) == bool:  # but_run has been pressed
@@ -398,29 +398,102 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            logger.debug("Calc impz started!")
-            if self.fx_sim:  # start a fixpoint simulation
-                self.emit({'fx_sim': 'init'})
-                return
+            logger.warning("Calc impz started!")
+
+            self.n = np.arange(self.ui.N_end, dtype=float)
             self.x = np.empty(self.ui.N_end)  # initialize array
             self.x_q = np.empty_like(self.x, dtype=np.float64)
-            
+            self.y = np.empty_like(self.x)
+
+            if self.fx_sim:
+                # ---- initialize input quantizer
+                # self.title_str = r'$Fixpoint$ ' + self.title_str
+                # setup quantizer for input quantization:
+                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
+                self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
+                self.emit({'fx_sim': 'init'})
+                return
+
+
+    # --------------------------------------------------------------------------
+    def impz(self, arg=None):
+        """
+        Triggered by:
+            - construct_UI()  [Initialization]
+            - Pressing "Run" button, passing button state as a boolean
+            - Activating "Autorun" via `self.calc_auto()`
+            - 'fx_sim' : 'specs_changed'
+
+        Calculate response and redraw it.
+
+        Stimulus and response are only calculated if `self.needs_calc == True`.
+        """
+        # allow scaling the frequency response from pure impulse (no DC, no noise)
+        # self.ui.but_freq_norm_impz.setEnabled(
+        #     (self.stim_wdg.ui.noi == 0 or
+        #      self.stim_wdg.ui.cmbNoise.currentText() == 'None')
+        #     and self.stim_wdg.ui.DC == 0
+        #     and self.stim_wdg.ui.cmb_stim == "impulse"
+        #     )
+
+        # self.fx_select()  # check for fixpoint setting and update if needed
+        # if type(arg) == bool:  # but_run has been pressed
+        #     self.needs_calc = True  # force recalculation when but_run is pressed
+        # elif not self.ui.but_auto_run.isChecked():
+        #     return
+
+        # if self.needs_calc:
+        #     logger.warning("Calc impz started!")
+
+        #     self.n = np.arange(self.ui.N_end, dtype=float)
+        #     self.x = np.empty(self.ui.N_end)  # initialize array
+        #     self.x_q = np.empty_like(self.x, dtype=np.float64)
+        #     self.y = np.empty_like(self.x)
+
+        #     if self.fx_sim:
+        #         # ---- initialize input quantizer
+        #         # self.title_str = r'$Fixpoint$ ' + self.title_str
+        #         # setup quantizer for input quantization:
+        #         self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
+        #         self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
+        #         self.emit({'fx_sim': 'init'})
+        #         return
+        self.impz_init()
+        if self.needs_calc:
             for N_first in np.arange(0, self.ui.N_end, self.ui.N_frame):
                 L_frame = min(self.ui.N_frame, self.ui.N_end - N_first)
                 self.x[N_first:N_first + L_frame] =\
                     self.stim_wdg.calc_stimulus_frame(
                         N_first, L_frame, N_end=self.ui.N_end)
 
-            self.calc_stimulus(self.ui.N_start, self.ui.N_end)
+            self.title_str = self.stim_wdg.title_str
+            # self.calc_stimulus()
 
-            self.y = np.empty_like(self.x)
+            if self.fx_sim:
+                # ---- calculate quantized stimulus from x
+                self.title_str = r'$Fixpoint$ ' + self.title_str
+                # setup quantizer for input quantization:
+
+                if np.any(np.iscomplex(self.x)):
+                    logger.warning(
+                        "Complex stimulus: Only its real part will be processed by the "
+                        "fixpoint filter!")
+
+                self.x_q = self.q_i.fixp(self.x.real)
+
+                self.emit(
+                    {'fx_sim': 'send_stimulus',
+                     'fx_stimulus': np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
+                logger.warning("fx stimulus sent")
+
+            self.needs_redraw[:] = [True] * 2
+
             self.calc_response(self.ui.N_start, self.ui.N_end)
 
             if self.error:
                 return
 
             self.needs_calc = False
-            self.needs_redraw = [True] * 2
 
         if self.needs_redraw[self.tab_mpl_w.currentIndex()]:
             logger.debug("Redraw impz started!")
@@ -450,7 +523,7 @@ class Plot_Impz(QWidget):
 
         If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
-        logger.debug("start fx_select")
+        logger.warning("start fx_select")
 
         if fx in {0, 1}:  # connected to index change of combo box
             pass
@@ -484,40 +557,12 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus(self, N_start, N_end):
+    def calc_stimulus(self):
         """
         (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_frame()`
         This is work in progress.
         """
-        N = N_end - N_start
-        # if N_start > 0:
-        #     self.x[0:N_start] = self.stim_wdg.calc_stimulus_frame(0, N_start)
-        # self.x[N_start:N_end] = self.stim_wdg.calc_stimulus_frame(N_start, N)
-
-        self.n = np.arange(N_end, dtype=float)
-
-        self.H_str = self.stim_wdg.H_str
-        self.title_str = self.stim_wdg.title_str
-
-        # ---- calculate quantized stimulus from x
-        if self.fx_sim:
-            self.title_str = r'$Fixpoint$ ' + self.title_str
-            # setup quantizer for input quantization:
-            self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
-            self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-            if np.any(np.iscomplex(self.x)):
-                logger.warning(
-                    "Complex stimulus: Only its real part will be processed by the "
-                    "fixpoint filter!")
-
-            self.x_q = self.q_i.fixp(self.x.real)
-
-            self.emit(
-                {'fx_sim': 'send_stimulus',
-                 'fx_stimulus': np.round(self.x_q * (1 << self.q_i.WF)).astype(int)})
-            logger.debug("fx stimulus sent")
-
-        self.needs_redraw[:] = [True] * 2
+        pass
 
     # ------------------------------------------------------------------------------
     def calc_response(self, N_first, N_last):
@@ -889,19 +934,21 @@ class Plot_Impz(QWidget):
                 self.mplwidget_t.fig.delaxes(ax)
             return
 
+        H_str = self.stim_wdg.H_str
+
         self._init_axes_time()
         self._log_mode_time()
 
         # '$h... = some impulse response, don't change
-        if not self.H_str or self.H_str[1] != 'h':
-            self.H_str = ''
+        if not H_str or H_str[1] != 'h':
+            H_str = ''
             if qget_cmb_box(self.ui.cmb_plt_time_stim) != "none":
-                self.H_str += r'$x$, '
+                H_str += r'$x$, '
             if qget_cmb_box(self.ui.cmb_plt_time_stmq) != "none" and self.fx_sim:
-                self.H_str += r'$x_Q$, '
+                H_str += r'$x_Q$, '
             if qget_cmb_box(self.ui.cmb_plt_time_resp) != "none":
-                self.H_str += r'$y$'
-            self.H_str = self.H_str.rstrip(', ')
+                H_str += r'$y$'
+            H_str = H_str.rstrip(', ')
 
         if "*" in qget_cmb_box(self.ui.cmb_plt_time_stim):
             fmt_mkr_stim = self.fmt_mkr_stim
@@ -960,10 +1007,10 @@ class Plot_Impz(QWidget):
             if self.cmplx:
                 x_i = np.maximum(20 * np.log10(abs(x_i)), self.ui.bottom_t)
                 y_i = np.maximum(20 * np.log10(abs(y_i)), self.ui.bottom_t)
-                H_i_str = r'$|\Im\{$' + self.H_str + r'$\}|$' + ' in dBV'
-                H_str = r'$|\Re\{$' + self.H_str + r'$\}|$' + ' in dBV'
+                H_i_str = r'$|\Im\{$' + H_str + r'$\}|$' + ' in dBV'
+                H_str = r'$|\Re\{$' + H_str + r'$\}|$' + ' in dBV'
             else:
-                H_str = '$|$' + self.H_str + '$|$ in dBV'
+                H_str = '$|$' + H_str + '$|$ in dBV'
 
             fx_min = 20*np.log10(abs(self.fx_min))
             fx_max = fx_min
@@ -972,10 +1019,10 @@ class Plot_Impz(QWidget):
             fx_max = self.fx_max
             fx_min = self.fx_min
             if self.cmplx:
-                H_i_str = r'$\Im\{$' + self.H_str + r'$\}$ in V'
-                H_str = r'$\Re\{$' + self.H_str + r'$\}$ in V'
+                H_i_str = r'$\Im\{$' + H_str + r'$\}$ in V'
+                H_str = r'$\Re\{$' + H_str + r'$\}$ in V'
             else:
-                H_str = self.H_str + ' in V'
+                H_str = H_str + ' in V'
 
         if self.ui.but_fx_range.isChecked() and self.fx_sim:
             self.ax_r.axhline(fx_max, 0, 1, color='k', linestyle='--')
@@ -1132,7 +1179,6 @@ class Plot_Impz(QWidget):
                 logger.warning("Unknown spectrogram mode {0}, falling back to 'psd'"
                                .format(mode))
                 mode = "psd"
-
 
             # ------- lin / log ----------------------
             if self.ui.but_log_spgr_time.isChecked():
@@ -1354,6 +1400,10 @@ class Plot_Impz(QWidget):
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.win_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
+                if self.ui.win_dict['cur_win_name'].lower() not in\
+                    {'boxcar', 'rectangular'}:
+                        logger.warning("Window type needs to be Boxcar (Rectangular)"
+                                       " for correct scaling!")
             else:
                 freq_resp = False
                 scale_impz = 1.
