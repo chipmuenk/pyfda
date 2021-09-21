@@ -33,8 +33,8 @@ class Plot_PZ(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
-    def __init__(self, parent=None):
-        super(Plot_PZ, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.needs_calc = True   # flag whether filter data has been changed
         self.needs_draw = False  # flag whether whether figure needs to be drawn
                                  # with new limits etc. (not implemented yet)

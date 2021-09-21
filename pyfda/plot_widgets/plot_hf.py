@@ -38,8 +38,8 @@ class Plot_Hf(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
-    def __init__(self, parent=None):
-        super(Plot_Hf, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.needs_calc = True  # flag whether plot needs to be updated
         self.needs_draw = True  # flag whether plot needs to be redrawn
         self.tool_tip = "Magnitude and phase frequency response"

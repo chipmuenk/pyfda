@@ -33,8 +33,8 @@ class Plot_Phi(QWidget):
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
-        super(Plot_Phi, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.needs_calc = True  # recalculation of filter function necessary
         self.needs_draw = True  # plotting neccessary (e.g. log instead of  lin)
         self.tool_tip = "Phase frequency response"

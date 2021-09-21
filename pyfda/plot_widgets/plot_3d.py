@@ -59,8 +59,8 @@ class Plot_3D(QWidget):
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
-    def __init__(self, parent=None):
-        super(Plot_3D, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80

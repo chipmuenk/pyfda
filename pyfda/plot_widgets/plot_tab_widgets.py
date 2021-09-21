@@ -71,7 +71,7 @@ class PlotTabWidgets(QTabWidget):
                 mod = importlib.import_module(mod_fq_name)  # import plot widget module
                 wdg_class = getattr(mod, plot_class)  # get plot widget class ...
                 # and instantiate it
-                inst = wdg_class(self)
+                inst = wdg_class()
             except ImportError as e:
                 logger.warning('Class "{0}" could not be imported from {1}:\n{2}.'
                                .format(plot_class, mod_fq_name, e))
