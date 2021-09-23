@@ -44,7 +44,8 @@ clipboard = None
 
 base_dir = "" #: Project base directory
 
-design_filt_state = "changed" #: State of filter design: "ok", "changed", "error", "failed"
+# State of filter design: "ok", "changed", "error", "failed", "active" 
+design_filt_state = "changed"
 
 #==============================================================================
 # -----------------------------------------------------------------------------

@@ -313,7 +313,7 @@ QTabWidget {
  .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
- 
+
  QTabBar {  font-weight: bold; font-size:11pt; }
 
  QTabBar::tab{
@@ -452,6 +452,10 @@ qss_common = """
 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+                                color: black;}
+
+                QPushButton[state="active"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 blue, stop: 1.0 #999999);
                                 color: black;}
 
                 QPushButton[state="changed"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
