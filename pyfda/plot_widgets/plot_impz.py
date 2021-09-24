@@ -339,9 +339,7 @@ class Plot_Impz(QWidget):
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
-                    self.draw()
-                else:
-                    self.draw()  # TODO:  redundant??
+                self.draw()
 
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
