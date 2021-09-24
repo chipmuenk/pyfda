@@ -31,6 +31,7 @@ from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
 from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
+from pyfda.plot_widgets.tran.plot_tran_response import calc_response_frame
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 import logging
@@ -434,6 +435,8 @@ class Plot_Impz(QWidget):
             self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # initialize array
             self.x_q = np.empty_like(self.x, dtype=np.float64)
             self.y = np.empty_like(self.x)
+            self.z = None
+            self.run_phase = "calc_frame"
 
             if self.fx_sim:
                 # - update title string and setup input quantizer self.q_i
@@ -478,12 +481,10 @@ class Plot_Impz(QWidget):
                         N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
                 # =============================================================
                 if not self.fx_sim:
-                    pass
                 #==============================================================
                 # ==== calculate response for current frame
-                # self.y[frame] =\
-                #     self.stim_wdg.calc_response_frame(x[frame],
-                #         N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+                    self.y[frame], self.z =\
+                        calc_response_frame(self, self.x[frame], self.z, N_first=self.N_first)
                 # =============================================================
                 else:
                     # quantize stimulus

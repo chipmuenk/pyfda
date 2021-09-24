@@ -11,32 +11,30 @@ Calculate transient response for one frame
 """
 # import time
 import numpy as np
-from numpy import ndarray, pi
+from numpy import ndarray
 import scipy.signal as sig
-from scipy.special import sinc, diric
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
-from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, calc_Hcomplex, safe_numexpr_eval)
-
-from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+# from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-def calc_response_frame(self, x: ndarray, N_first: int, init: bool = False) -> ndarray:
+def calc_response_frame(self, x: ndarray, z, N_first: int, init: bool = False) -> ndarray:
     """
-    Calculate a data frame of stimulus `x` with a length of `N` samples,
+    Calculate the response for a data frame of stimulus `x`,
     starting with index `N_first`
 
     Parameters
     ----------
     x: ndarray
         sequence of data to be filtered
+        
+    z: ndarray
+        filter memory
 
     N_first: int
         index of first data point
@@ -50,23 +48,54 @@ def calc_response_frame(self, x: ndarray, N_first: int, init: bool = False) -> n
         an array with the same number of response data points as the stimulus
     """
 
-    return x
 # ------------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------
-    def calc_response_frame(self, N_first, N_last, zi):
-        # calculate one frame with the response
-        batch_size = N # Number of samples per batch
-        # Array of initial conditions for the SOS filter.
-        z = np.zeros((sos.shape[0], 2))
-        # Preallocate space for the filtered signal.
-        y = np.empty_like(x)
-        start = 0
-        while start < len(x):
-            stop = min(start + batch_size, len(x))
-            y[start:stop], z = sosfilt(sos, x[start:stop], zi=z)
-            start = stop
-        return y, z
+    # def calc_sos_frame(self, N_first, N_last, zi):
+    #     # calculate one frame with the response
+    #     batch_size = N # Number of samples per batch
+    #     # Array of initial conditions for the SOS filter.
+    #     z = np.zeros((sos.shape[0], 2))
+    #     # Preallocate space for the filtered signal.
+    #     y = np.empty_like(x)
+    #     start = 0
+    #     while start < len(x):
+    #         stop = min(start + batch_size, len(x))
+    #         y, z = sig.sosfilt(sos, x, zi=z)
+    #     return y, z
+    
+    bb = np.asarray(fb.fil[0]['ba'][0])
+    aa = np.asarray(fb.fil[0]['ba'][1])
+    if min(len(aa), len(bb)) < 2:
+        logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+        return
+
+    logger.debug("Coefficient area = {0}".format(np.sum(np.abs(bb))))
+    has_sos = 'sos' in fb.fil[0]
+    sos = np.asarray(fb.fil[0]['sos'])
+
+    if len(sos) > 0:  # has second order sections
+        zi = sig.sosfilt_zi(sos)
+        y, *z = sig.sosfilt(sos, x, zi=zi)
+        logger.warning(y)
+        logger.warning("\n")
+        logger.warning(z)
+#    elif antiCausal:
+#        y = sig.filtfilt(self.bb, self.aa, x, -1, None)
+    else:  # no second order sections or antiCausals for current filter
+        y, z = sig.lfilter(bb, aa, x, zi=z)
+
+
+    if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+        dc = sig.freqz(bb, aa, [0])  # DC response of the system
+        # subtract DC (final) value from response
+        y[max(N_first, self.ui.stim_wdg.T1_int):] = \
+            y[max(N_first, self.stim_wdg.T1_int):] - abs(dc[1])
+
+    y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
+
+    return y, z
+
 
 if __name__ == "__main__":
     """ Run standalone with `python -m pyfda.plot_widgets.tran.plot_tran_response` """
