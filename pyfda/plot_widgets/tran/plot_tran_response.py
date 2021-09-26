@@ -23,7 +23,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-def calc_response_frame(self, x: ndarray, z, N_first: int, init: bool = False) -> ndarray:
+def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False) -> ndarray:
     """
     Calculate the response for a data frame of stimulus `x`,
     starting with index `N_first`
@@ -33,7 +33,7 @@ def calc_response_frame(self, x: ndarray, z, N_first: int, init: bool = False) -
     x: ndarray
         sequence of data to be filtered
         
-    z: ndarray
+    zi: ndarray
         filter memory
 
     N_first: int
@@ -66,25 +66,21 @@ def calc_response_frame(self, x: ndarray, z, N_first: int, init: bool = False) -
     
     bb = np.asarray(fb.fil[0]['ba'][0])
     aa = np.asarray(fb.fil[0]['ba'][1])
-    if min(len(aa), len(bb)) < 2:
-        logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-        return
 
     logger.debug("Coefficient area = {0}".format(np.sum(np.abs(bb))))
-    has_sos = 'sos' in fb.fil[0]
+    # has_sos = 'sos' in fb.fil[0]
     sos = np.asarray(fb.fil[0]['sos'])
 
     if len(sos) > 0:  # has second order sections
-        zi = sig.sosfilt_zi(sos)
-        y, *z = sig.sosfilt(sos, x, zi=zi)
-        logger.warning(y)
-        logger.warning("\n")
-        logger.warning(z)
+        # zi = sig.sosfilt_zi(sos)
+        y, z = sig.sosfilt(sos, x, zi=zi)
+        logger.warning(y.shape)
+        logger.warning(z.shape)
 #    elif antiCausal:
 #        y = sig.filtfilt(self.bb, self.aa, x, -1, None)
     else:  # no second order sections or antiCausals for current filter
-        y, z = sig.lfilter(bb, aa, x, zi=z)
-
+        # zi = sig.lfilter_zi(bb, aa)
+        y, z = sig.lfilter(bb, aa, x, zi=zi)
 
     if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
         dc = sig.freqz(bb, aa, [0])  # DC response of the system

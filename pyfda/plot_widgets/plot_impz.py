@@ -50,6 +50,8 @@ class Plot_Impz(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
+    # signal for frame based simulation in `impz()`, should not leave the instance:
+    sig_impz = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
@@ -62,9 +64,6 @@ class Plot_Impz(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-        # initial setting for fixpoint simulation:
-        self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
-        self.fx_sim_old = self.fx_sim
         self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
         self.active_tab = 0  # index for active tab
@@ -86,8 +85,11 @@ class Plot_Impz(QWidget):
         self._construct_UI()
 
         # --------------------------------------------
+        # initial setting for fixpoint simulation:
+        self.fx_sim = self.fx_sim_old = qget_cmb_box(
+            self.ui.cmb_sim_select, data=False) == 'Fixpoint'
+        self.fx_select()    # initialize UI for fixpoint or float simulation
         # initialize routines and settings
-        self.fx_select()    # initialize fixpoint or float simulation
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
     def _construct_UI(self):
@@ -167,6 +169,9 @@ class Plot_Impz(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
+        # let method impz() work frame by frame
+        self.sig_impz.connect(self.process_sig_impz)
+
 
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -240,6 +245,25 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
+
+# ------------------------------------------------------------------------------
+    def process_sig_impz(self, dict_sig=None):
+        """
+        Process signals coming from the iterations of `impz()`
+        """
+        logger.warning("SIG_RX LOCAL - needs_calc: {0} | vis: {1}\n{2}"
+                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        if dict_sig['sim'] == 'calc_frame':
+            self.impz()
+
+        elif not dict_sig['sim']:
+            logger.error('Missing value for key "sim".')
+
+        else:
+            logger.error('Unknown value "{0}" for "sim" key\n'
+                            '\treceived from "{1}"'.format(dict_sig['sim'],
+                                                        dict_sig['class']))
+
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -295,7 +319,7 @@ class Plot_Impz(QWidget):
                 self.error = False
                 qstyle_widget(self.ui.but_run, "active")
                 if self.isVisible():
-                    self.impz(dict_sig=dict_sig)
+                    self.impz_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -306,7 +330,7 @@ class Plot_Impz(QWidget):
                 logger.warning("FX: Received results.")
                 self.cmplx = np.any(np.iscomplex(self.x))
                 self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-                self.impz(dict_sig=dict_sig)
+                self.impz_fx(dict_sig=dict_sig)
                 # self.draw_response_fx(dict_sig=dict_sig)
 
             elif dict_sig['fx_sim'] == 'error':
@@ -416,6 +440,7 @@ class Plot_Impz(QWidget):
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
             )
+        self.needs_redraw = [True] * 2
 
         self.fx_select()  # check for fixpoint setting and update if needed
 
@@ -432,11 +457,10 @@ class Plot_Impz(QWidget):
 
             self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
-            self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # initialize array
-            self.x_q = np.empty_like(self.x, dtype=np.float64)
-            self.y = np.empty_like(self.x)
-            self.z = None
-            self.run_phase = "calc_frame"
+            self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
+            self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
+            self.y = np.empty_like(self.x)  # response
+            self.cmplx = False  # Flag for complex signal
 
             if self.fx_sim:
                 # - update title string and setup input quantizer self.q_i
@@ -452,10 +476,24 @@ class Plot_Impz(QWidget):
                 self.emit({'fx_sim': 'init'})
                 return
             else:
-                self.impz()  # continue with actual calculation of impulse response
+                # initialize filter registers with zeros
+                sos = np.asarray(fb.fil[0]['sos'])
+                logger.warning(f"sos.shape = {sos.shape}")
+                if len(sos) > 0:  # has second order sections
+                    self.zi = np.zeros((sos.shape[0], 2))
+                else:
+                    bb = np.asarray(fb.fil[0]['ba'][0])
+                    aa = np.asarray(fb.fil[0]['ba'][1])
+                    if min(len(aa), len(bb)) < 2:
+                        logger.error(
+                            'No proper filter coefficients: len(a), len(b) < 2 !')
+                        return
+                    self.zi = np.zeros(max(len(aa), len(bb)) - 1)
+                # calculate float impulse response:
+                self.impz()
 
     # --------------------------------------------------------------------------
-    def impz(self, dict_sig: dict = {}):
+    def impz(self):
         """
         Calculate response and redraw it.
 
@@ -463,87 +501,103 @@ class Plot_Impz(QWidget):
 
         Triggered by:
         - `self.impz_init()`
-        - Fixpoint widget, requesting "get_stimulus" (via `process_rx_signal()`)
+        - 'Continue' simulation (not yet implemented)
         """
-        # if self.needs_calc:
         # ---------------------------------------------------------------------
         # ----------------------- calc_frame ----------------------------------
         # ---------------------------------------------------------------------
-        if self.run_phase == "calc_frame":
-            if self.N_first <= self.ui.N_end:
-                # The last frame could be shorter than self.ui.N_frame:
-                L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
-                frame = slice(self.N_first, self.N_first + L_frame)
-                #==============================================================
-                # ==== calculate stimulus for current frame
+        logger.warning(f"{self.N_first} of {self.ui.N_end}")
+        while self.N_first < self.ui.N_end:
+            # The last frame could be shorter than self.ui.N_frame:
+            L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            frame = slice(self.N_first, self.N_first + L_frame)
+            # -------------------------------------------------------------
+            # ---- calculate stimulus for current frame
+            self.x[frame] =\
+                self.stim_wdg.calc_stimulus_frame(
+                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            # -------------------------------------------------------------
+            # ---- calculate response for current frame
+            # -------------------------------------------------------------
+            self.y[frame], self.zi =\
+                calc_response_frame(self, self.x[frame], self.zi,
+                                    N_first=self.N_first)
+            # ==== Increase frame counter =================================
+            self.N_first += self.ui.N_frame
+            # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
+            # TODO: Test for Run Button here
+        # self.N_first > self.ui.end
+        # -------------------------------------------------------------
+        # ----------------------- finish ------------------------------
+        # -------------------------------------------------------------
+        logger.warning("FINISH - Redraw impz started!")
+        # Test whether response or stimulus are complex
+        # TODO: shouldn't stimulus and response be treated separately?
+        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+        self.draw()
+        # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
+        self.needs_calc = False
+
+        qstyle_widget(self.ui.but_run, "normal")
+
+    # --------------------------------------------------------------------------
+    def impz_fx(self, dict_sig: dict = {}):
+        """
+        Calculate fixpoint response and redraw it.
+
+        Stimulus and response are only calculated if `self.needs_calc == True`.
+
+        Triggered by:
+        - Fixpoint widget, requesting "get_stimulus" (via `process_rx_signal()`)
+        """
+        if self.N_first <= self.ui.N_end:
+            # The last frame could be shorter than self.ui.N_frame:
+            L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            frame = slice(self.N_first, self.N_first + L_frame)
+            # -------------------------------------------------------------
+            # ---- Calculate, quantize and set stimulus for current frame
+            # -------------------------------------------------------------
+            if dict_sig['fx_sim'] == 'get_stimulus':
                 self.x[frame] =\
                     self.stim_wdg.calc_stimulus_frame(
                         N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-                # =============================================================
-                if not self.fx_sim:
-                #==============================================================
-                # ==== calculate response for current frame
-                    self.y[frame], self.z =\
-                        calc_response_frame(self, self.x[frame], self.z, N_first=self.N_first)
-                # =============================================================
+                # quantize stimulus
+                self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
+
+                self.emit(
+                    {'fx_sim': 'send_stimulus',
+                    'fx_stimulus': np.round(self.x_q[frame]\
+                        * (1 << self.q_i.WF)).astype(int)})
+
+                logger.info("fx stimulus sent")
+
+            # -----------------------------------------------------------------
+            # ---- Get FX results and store them ------------------------------
+            # -----------------------------------------------------------------
+            elif dict_sig['fx_sim'] == "set_results":
+                # t_draw_start = time.process_time()
+                self.error = dict_sig['fx_results'] is None
+                if self.error:
+                    qstyle_widget(self.ui.but_run, "error")
+                    self.needs_calc = True
                 else:
-                    # quantize stimulus
-                    self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
+                    self.y[frame] = np.asarray(dict_sig['fx_results'])
 
-                    self.emit(
-                        {'fx_sim': 'send_stimulus',
-                        'fx_stimulus': np.round(self.x_q[frame]\
-                            * (1 << self.q_i.WF)).astype(int)})
-
-                    logger.info("fx stimulus sent")
-
-                self.N_first += self.ui.N_frame
-            else: # self.N_first > self.ui.end
-                self.run_phase = "finish"
+        # ==== Increase frame counter =========================================
+            self.N_first += self.ui.N_frame
         # ---------------------------------------------------------------------
-        # ----------------------- fx_results ----------------------------------
+        # ---- Last frame reached, finish simulation --------------------------
         # ---------------------------------------------------------------------
-        elif self.run_phase == "fx_results":
-
-            # self.needs_redraw[:] = [True] * 2
-            self.needs_redraw = [True] * 2
-
-            # def draw_response_fx(self, dict_sig=None):
-            #     """
-            #     Get Fixpoint results and plot them
-            #    """
-
-            # t_draw_start = time.process_time()
-            self.y[frame] = np.asarray(dict_sig['fx_results'])
-            if self.y is None:
-                qstyle_widget(self.ui.but_run, "error")
-                self.needs_calc = True
-            else:
-                self.needs_calc = False
-
-                self.draw()
-                qstyle_widget(self.ui.but_run, "normal")
-
-                self.emit({'fx_sim': 'finish'})
-
-
-            self.calc_response(self.ui.N_start, self.ui.N_end)
-
-            if self.error:
-                return
-
+        else: # self.N_first > self.ui.end
             self.needs_calc = False
-
-        # ---------------------------------------------------------------------
-        # ----------------------- finish --------------------------------------
-        # ---------------------------------------------------------------------
-        if self.run_phase == "finish":
-            if self.needs_redraw[self.tab_mpl_w.currentIndex()]:
-                logger.debug("Redraw impz started!")
-                self.draw()
-                self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
-
             qstyle_widget(self.ui.but_run, "normal")
+
+            self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+            self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+            self.draw()
+
+            self.emit({'fx_sim': 'finish'})
 
 # =============================================================================
 
@@ -598,14 +652,6 @@ class Plot_Impz(QWidget):
             self.needs_calc = True
 
         self.fx_sim_old = self.fx_sim
-
-# ------------------------------------------------------------------------------
-    def calc_stimulus(self):
-        """
-        (Re-)calculate stimulus `self.x` using the routine `calc_stimulus_frame()`
-        This is work in progress.
-        """
-        pass
 
     # ------------------------------------------------------------------------------
     def calc_response(self, N_first: int, N_last: int) -> None:
