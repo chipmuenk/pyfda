@@ -22,8 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
-def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False)\
-        -> ndarray:
+def calc_response_frame(self, x: ndarray, zi) -> ndarray:
     """
     Calculate the response for a data frame of stimulus `x`,
     starting with index `N_first`

@@ -519,8 +519,7 @@ class Plot_Impz(QWidget):
             # -------------------------------------------------------------
             # ---- calculate response for current frame
             # -------------------------------------------------------------
-            self.y[frame], self.zi = calc_response_frame(
-                self, self.x[frame], self.zi, N_first=self.N_first)
+            self.y[frame], self.zi = calc_response_frame(self, self.x[frame], self.zi)
             # ==== Increase frame counter =================================
             self.N_first += self.ui.N_frame
             # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
