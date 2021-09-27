@@ -522,7 +522,6 @@ class Plot_Impz(QWidget):
             self.N_first += self.ui.N_frame
             # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
             # TODO: Test for Run Button here
-        # self.N_first > self.ui.end
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
         # -------------------------------------------------------------

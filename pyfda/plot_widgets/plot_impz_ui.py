@@ -178,11 +178,11 @@ class PlotImpz_UI(QWidget):
         # Run control widgets
         # ---------------------------------------------------------------
         # self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=0)
-        self.but_auto_run = QPushButton("Auto", self)
+        self.but_auto_run = QPushButton(" Auto", self)
         self.but_auto_run.setObjectName("but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
+        #self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
         self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 

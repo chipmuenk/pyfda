@@ -17,7 +17,7 @@ import time
 
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
-    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QEvent, QSizePolicy)
+    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import numpy as np
 
@@ -87,7 +87,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.warning("No fixpoint filters found!")
             else:
                 logger.debug("Imported {0:d} fixpoint filters:\n{1}"
-                            .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+                             .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
             self._update_fixp_widget()
         else:
             self.state = "deactivated"  # "invisible", "disabled"
@@ -108,8 +108,8 @@ class Input_Fixpoint_Specs(QWidget):
         4. Send back HDL response to widget via 'fx_sim':'set_response'
         """
 
-        logger.warning("SIG_RX(): vis={0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning(
+            "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
@@ -159,7 +159,8 @@ class Input_Fixpoint_Specs(QWidget):
                 When I/O lock is active, copy input fixpoint word format to output
                 word format.
                 """
-                if dict_sig['ui'] == 'butLock' and not self.wdg_w_input.butLock.isChecked():
+                if dict_sig['ui'] == 'butLock'\
+                        and not self.wdg_w_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return
                 elif self.wdg_w_input.butLock.isChecked():
@@ -197,8 +198,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         # resize image when "Fixpoint" tab is selected or widget size is changed:
         elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
-            and self.isVisible():
-                self.resize_img()
+                and self.isVisible():
+            self.resize_img()
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -390,6 +391,7 @@ class Input_Fixpoint_Specs(QWidget):
         last_fx_wdg = qget_cmb_box(self.cmb_wdg_fixp, data=False)
         self.cmb_wdg_fixp.clear()
         fc = fb.fil[0]['fc']
+
         if 'fix' in fb.filter_classes[fc]:
             for class_name in fb.filter_classes[fc]['fix']:  # get class name
                 try:
@@ -403,12 +405,12 @@ class Input_Fixpoint_Specs(QWidget):
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(class_name, e))
                     self.embed_fixp_img(self.no_fx_filter_img)
-                    continue
+                    continue  # with next `class_name` of for loop
                 except KeyError as e:
                     logger.warning("No fixpoint filter for filter type {0} available."
                                    .format(e))
                     self.embed_fixp_img(self.no_fx_filter_img)
-                    continue
+                    continue  # with next `class_name` of for loop
 
             # restore last fxp widget if possible
             idx = self.cmb_wdg_fixp.findText(last_fx_wdg)
