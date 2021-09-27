@@ -92,7 +92,6 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             self.state = "deactivated"  # "invisible", "disabled"
 
-
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
@@ -393,6 +392,7 @@ class Input_Fixpoint_Specs(QWidget):
         fc = fb.fil[0]['fc']
 
         if 'fix' in fb.filter_classes[fc]:
+            self.cmb_wdg_fixp.blockSignals(True)
             for class_name in fb.filter_classes[fc]['fix']:  # get class name
                 try:
                     # construct module + class name ...
@@ -416,9 +416,10 @@ class Input_Fixpoint_Specs(QWidget):
             idx = self.cmb_wdg_fixp.findText(last_fx_wdg)
             # set to idx 0 if not found (returned -1)
             self.cmb_wdg_fixp.setCurrentIndex(max(idx, 0))
+            self.cmb_wdg_fixp.blockSignals(False)
         else:  # no fixpoint widget
             self.embed_fixp_img(self.no_fx_filter_img)
-
+        self._update_fixp_widget()
         return inst_wdg_str
 
 # # ------------------------------------------------------------------------------
@@ -513,6 +514,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Try to instantiate HDL filter as `self.fx_wdg_inst.fixp_filter` with
             dummy data
         """
+        logger.info("_update_fixp_widget")
 
         def _disable_fx_wdg(self) -> None:
 
