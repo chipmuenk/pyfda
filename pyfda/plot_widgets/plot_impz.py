@@ -459,6 +459,9 @@ class Plot_Impz(QWidget):
             self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
             self.y = np.empty_like(self.x)  # response
             self.cmplx = False  # Flag for complex signal
+            # initialize progress bar
+            self.ui.prg_wdg.setMaximum(self.ui.N_end)
+            self.ui.prg_wdg.setValue(0)
 
             if self.fx_sim:
                 # - update title string and setup input quantizer self.q_i
@@ -522,6 +525,8 @@ class Plot_Impz(QWidget):
             self.N_first += self.ui.N_frame
             # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
             # TODO: Test for Run Button here
+            self.ui.prg_wdg.setValue(self.N_first)
+
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
         # -------------------------------------------------------------
@@ -591,6 +596,7 @@ class Plot_Impz(QWidget):
 
         # ==== Increase frame counter =========================================
             self.N_first += self.ui.N_frame
+            self.ui.prg_wdg.setValue(self.N_first)
         # ---------------------------------------------------------------------
         # ---- Last frame reached, finish simulation --------------------------
         # ---------------------------------------------------------------------
