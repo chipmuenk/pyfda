@@ -25,8 +25,7 @@ from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
     safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
 from pyfda.libs.pyfda_qt_lib import (
-    qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item,
-    qtext_height, qtext_width)
+    qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
@@ -172,7 +171,6 @@ class Plot_Impz(QWidget):
         # let method impz() work frame by frame
         self.sig_impz.connect(self.process_sig_impz)
 
-
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -235,7 +233,8 @@ class Plot_Impz(QWidget):
         #                f"h = {self.tab_stim_w.tabBar().height()}")
         # logger.warning(f"w = {self.tab_mpl_w.tabBar().width()}, "
         #                f"h = {self.tab_mpl_w.tabBar().height()}")
-        h_min = self.tab_stim_w.tabBar().height()  # this is also the width / hight of the tab icons
+        # tabBar height is also the width / hight of the tab icons
+        h_min = self.tab_stim_w.tabBar().height()
         # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
         if self.tab_stim_w.currentWidget() is None:
             logger.warning("no embedded widget!")
@@ -261,7 +260,7 @@ class Plot_Impz(QWidget):
 
         else:
             logger.error('Unknown value "{0}" for "sim" key\n'
-                            '\treceived from "{1}"'.format(dict_sig['sim'],
+                         '\treceived from "{1}"'.format(dict_sig['sim'],
                                                         dict_sig['class']))
 
 # ------------------------------------------------------------------------------
@@ -451,7 +450,7 @@ class Plot_Impz(QWidget):
 
         if self.needs_calc:
             logger.warning("Calc impz started!")
-             # set title and axis string and calculate 10 samples to determine ndtype
+            # set title and axis string and calculate 10 samples to determine ndtype
             x_test = self.stim_wdg.calc_stimulus_frame(init=True)
             self.title_str = self.stim_wdg.title_str
 
@@ -519,9 +518,8 @@ class Plot_Impz(QWidget):
             # -------------------------------------------------------------
             # ---- calculate response for current frame
             # -------------------------------------------------------------
-            self.y[frame], self.zi =\
-                calc_response_frame(self, self.x[frame], self.zi,
-                                    N_first=self.N_first)
+            self.y[frame], self.zi = calc_response_frame(
+                self, self.x[frame], self.zi, N_first=self.N_first)
             # ==== Increase frame counter =================================
             self.N_first += self.ui.N_frame
             # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
@@ -559,16 +557,15 @@ class Plot_Impz(QWidget):
             # ---- Calculate, quantize and set stimulus for current frame
             # -------------------------------------------------------------
             if dict_sig['fx_sim'] == 'get_stimulus':
-                self.x[frame] =\
-                    self.stim_wdg.calc_stimulus_frame(
+                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                         N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
                 # quantize stimulus
                 self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
 
                 self.emit(
                     {'fx_sim': 'send_stimulus',
-                    'fx_stimulus': np.round(self.x_q[frame]\
-                        * (1 << self.q_i.WF)).astype(int)})
+                     'fx_stimulus': np.round(self.x_q[frame]
+                                             * (1 << self.q_i.WF)).astype(int)})
 
                 logger.info("fx stimulus sent")
 
@@ -589,11 +586,12 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         # ---- Last frame reached, finish simulation --------------------------
         # ---------------------------------------------------------------------
-        else: # self.N_first > self.ui.end
+        else:  # self.N_first > self.ui.end
             self.needs_calc = False
             qstyle_widget(self.ui.but_run, "normal")
 
-            self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+            self.cmplx = bool(np.any(np.iscomplex(self.y)) or
+                              np.any(np.iscomplex(self.x)))
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
             self.draw()
 
@@ -1490,9 +1488,9 @@ class Plot_Impz(QWidget):
                 scale_impz = self.ui.N * self.ui.win_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
                 if self.ui.win_dict['cur_win_name'].lower() not in\
-                    {'boxcar', 'rectangular'}:
-                        logger.warning("Window type needs to be Boxcar (Rectangular)"
-                                       " for correct scaling!")
+                        {'boxcar', 'rectangular'}:
+                    logger.warning("Window type needs to be Boxcar (Rectangular)"
+                                   " for correct scaling!")
             else:
                 freq_resp = False
                 scale_impz = 1.
