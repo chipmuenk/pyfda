@@ -282,19 +282,18 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'specs_changed':
                 """
-                Specs of fixpoint widget have been updated, start a simulation if this
-                widget is visible and auto-run is enabled
-                - Select Fixpoint mode via `self.fx_select("Fixpoint")`
-                - Set `self.needs_calc = True` and `self.ui.but_run` to "changed"
+                Specs of fixpoint widget have been updated, start an FX simulation if
+                this widget is visible, `self.fx_sim == True` and auto-run is enabled
+                - Set `self.needs_calc_fx = True` and `self.ui.but_run` to "changed"
                 - Initialize fixpoint widget and start simulation via `self.impz_init()`
                   when widget is visible
                 """
                 logger.warning("FX specs changed!")
-                self.needs_calc = True
+                # self.needs_calc = True
+                self.needs_calc_fx = True
                 self.error = False
-                qstyle_widget(self.ui.but_run, "changed")
-                self.fx_select("Fixpoint")
-                if self.isVisible():
+                if self.fx_sim and self.isVisible():
+                    qstyle_widget(self.ui.but_run, "changed")
                     self.impz_init()
 
             elif dict_sig['fx_sim'] == 'get_stimulus':
@@ -350,7 +349,7 @@ class Plot_Impz(QWidget):
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():  # all signals except 'fx_sim'
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                    or self.needs_calc:
+                    or self.needs_calc or (self.fx_sim and self.needs_calc_fx):
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
