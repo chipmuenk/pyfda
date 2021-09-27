@@ -15,15 +15,15 @@ from numpy import ndarray
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-import pyfda.libs.pyfda_fix_lib as fx
-from pyfda.libs.pyfda_sig_lib import angle_zero
-# from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+# from pyfda.libs.pyfda_sig_lib import angle_zero
 
 import logging
 logger = logging.getLogger(__name__)
 
+
 # ------------------------------------------------------------------------------
-def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False) -> ndarray:
+def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False)\
+        -> ndarray:
     """
     Calculate the response for a data frame of stimulus `x`,
     starting with index `N_first`
@@ -32,9 +32,9 @@ def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False) 
     ----------
     x: ndarray
         sequence of data to be filtered
-        
+
     zi: ndarray
-        filter memory
+        filter state for initialization
 
     N_first: int
         index of first data point
@@ -97,5 +97,6 @@ if __name__ == "__main__":
     """ Run standalone with `python -m pyfda.plot_widgets.tran.plot_tran_response` """
     import sys
 
+# TODO: just a dummy test right now
     print(np.arange(100))
     sys.exit()
