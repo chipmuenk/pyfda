@@ -501,6 +501,25 @@ qss_common = """
                     width: 8px;
                     image: url(':/ellipses_h.svg');
                     }
+
+                QProgressBar{text-align: center; font-weight: bold; 
+                             border: 1px solid darkgrey;}
+                QProgressBar::chunk{background-color: lightblue;}
+/* 
+#GreenProgressBar {
+    min-height: 12px;
+    max-height: 12px;
+    border: 2px solid #2196F3;
+    border-radius: 6px;
+}
+#GreenProgressBar::chunk {
+    border-radius: 6px;
+    background-color: #009688;
+    width: 10px;
+    margin: 0.5px;
+}
+*/
+
             """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 

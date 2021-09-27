@@ -11,8 +11,8 @@ Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout, QGridLayout,
-    QTabWidget, QFrame)
+    QIcon, QProgressBar, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout,
+    QGridLayout, QTabWidget, QFrame)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
@@ -226,7 +226,12 @@ class PlotImpz_UI(QWidget):
             "<i>&Delta;N</i> = 0 calculates all samples.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
-        self.but_toggle_stim_options = PushButton("Stimuli ", checked=True)
+        self.prg_wdg = QProgressBar(self)
+        self.prg_wdg.setFixedHeight(but_height)
+        self.prg_wdg.setMinimum(0)
+        self.prg_wdg.setValue(0)
+
+        self.but_toggle_stim_options = PushButton(" Stimuli ", checked=True)
         self.but_toggle_stim_options.setObjectName("but_stim_options")
         self.but_toggle_stim_options.setToolTip("<span>Show / hide stimulus options.</span>")
 
@@ -269,6 +274,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addWidget(self.lbl_N_frame)
         layH_ctrl_run.addWidget(self.led_N_frame)
+        layH_ctrl_run.addWidget(self.prg_wdg)
 
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.but_toggle_stim_options)
