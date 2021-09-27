@@ -49,44 +49,13 @@ def calc_response_frame(self, x: ndarray, zi, N_first: int, init: bool = False)\
     """
 
 # ------------------------------------------------------------------------------
-
-    # ------------------------------------------------------------------------------
-    # def calc_sos_frame(self, N_first, N_last, zi):
-    #     # calculate one frame with the response
-    #     batch_size = N # Number of samples per batch
-    #     # Array of initial conditions for the SOS filter.
-    #     z = np.zeros((sos.shape[0], 2))
-    #     # Preallocate space for the filtered signal.
+    #     # Preallocate space for the filtered signal?
     #     y = np.empty_like(x)
-    #     start = 0
-    #     while start < len(x):
-    #         stop = min(start + batch_size, len(x))
-    #         y, z = sig.sosfilt(sos, x, zi=z)
-    #     return y, z
-    
-    bb = np.asarray(fb.fil[0]['ba'][0])
-    aa = np.asarray(fb.fil[0]['ba'][1])
 
-    logger.debug("Coefficient area = {0}".format(np.sum(np.abs(bb))))
-    # has_sos = 'sos' in fb.fil[0]
-    sos = np.asarray(fb.fil[0]['sos'])
-
-    if len(sos) > 0:  # has second order sections
-        # zi = sig.sosfilt_zi(sos)
-        y, z = sig.sosfilt(sos, x, zi=zi)
-        logger.warning(y.shape)
-        logger.warning(z.shape)
-#    elif antiCausal:
-#        y = sig.filtfilt(self.bb, self.aa, x, -1, None)
+    if len(self.sos) > 0:  # has second order sections
+        y, z = sig.sosfilt(self.sos, x, zi=zi)
     else:  # no second order sections or antiCausals for current filter
-        # zi = sig.lfilter_zi(bb, aa)
-        y, z = sig.lfilter(bb, aa, x, zi=zi)
-
-    if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
-        dc = sig.freqz(bb, aa, [0])  # DC response of the system
-        # subtract DC (final) value from response
-        y[max(N_first, self.ui.stim_wdg.T1_int):] = \
-            y[max(N_first, self.stim_wdg.T1_int):] - abs(dc[1])
+        y, z = sig.lfilter(self.bb, self.aa, x, zi=zi)
 
     y = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
 

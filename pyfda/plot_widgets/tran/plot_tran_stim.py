@@ -195,7 +195,7 @@ class Plot_Tran_Stim(QWidget):
         n = np.arange(N_first, N_last)
 
         # T_S = fb.fil[0]['T_S']
-        T1_int = int(np.round(self.ui.T1))
+        self.T1_idx = int(np.round(self.ui.T1))
 
         # calculate stimuli x[n] ==============================================
         if self.ui.stim == "none":
@@ -203,8 +203,8 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             self.xf.fill(0)  # = np.zeros(N_frame, dtype=A_type)
-            if N_first <= T1_int < N_last:
-                self.xf[T1_int - N_first] = self.ui.A1
+            if N_first <= self.T1_idx < N_last:
+                self.xf[self.T1_idx - N_first] = self.ui.A1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
             self.xf = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
@@ -217,18 +217,18 @@ class Plot_Tran_Stim(QWidget):
                     (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_rise = int(T1_int - np.floor(self.ui.TW1/2))
+            n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))
             n_min = max(n_rise, 0)
             n_max = min(n_rise + self.ui.TW1, N_end)
             self.xf = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
-            if T1_int < N_first:   # step before current frame
+            if self.T1_idx < N_first:   # step before current frame
                 self.xf.fill(self.ui.A1)
-            if N_first <= T1_int < N_last:  # step in current frame
-                self.xf[0:T1_int - N_first].fill(0)
-                self.xf[T1_int - N_first:].fill(self.ui.A1)
-            elif T1_int >= N_last:  # step after current frame
+            if N_first <= self.T1_idx < N_last:  # step in current frame
+                self.xf[0:self.T1_idx - N_first].fill(0)
+                self.xf[self.T1_idx - N_first:].fill(self.ui.A1)
+            elif self.T1_idx >= N_last:  # step after current frame
                 self.xf.fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":

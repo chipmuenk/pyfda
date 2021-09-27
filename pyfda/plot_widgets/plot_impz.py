@@ -244,7 +244,6 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
-
 # ------------------------------------------------------------------------------
     def process_sig_impz(self, dict_sig=None):
         """
@@ -476,18 +475,17 @@ class Plot_Impz(QWidget):
                 return
             else:
                 # initialize filter registers with zeros
-                sos = np.asarray(fb.fil[0]['sos'])
-                logger.warning(f"sos.shape = {sos.shape}")
-                if len(sos) > 0:  # has second order sections
-                    self.zi = np.zeros((sos.shape[0], 2))
+                self.sos = np.asarray(fb.fil[0]['sos'])
+                if len(self.sos) > 0:  # has second order sections
+                    self.zi = np.zeros((self.sos.shape[0], 2))
                 else:
-                    bb = np.asarray(fb.fil[0]['ba'][0])
-                    aa = np.asarray(fb.fil[0]['ba'][1])
-                    if min(len(aa), len(bb)) < 2:
+                    self.bb = np.asarray(fb.fil[0]['ba'][0])
+                    self.aa = np.asarray(fb.fil[0]['ba'][1])
+                    if min(len(self.aa), len(self.bb)) < 2:
                         logger.error(
                             'No proper filter coefficients: len(a), len(b) < 2 !')
                         return
-                    self.zi = np.zeros(max(len(aa), len(bb)) - 1)
+                    self.zi = np.zeros(max(len(self.aa), len(self.bb)) - 1)
                 # calculate float impulse response:
                 self.impz()
 
@@ -528,6 +526,17 @@ class Plot_Impz(QWidget):
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
         # -------------------------------------------------------------
+
+        # step error calculation: calculate system DC response and subtract it
+        # from the response
+        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+            if len(self.sos) > 0:  # has second order sections
+                dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
+            else:
+                dc = sig.freqz(self.bb, self.aa, [0])
+            self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
+                self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
+
         logger.warning("FINISH - Redraw impz started!")
         # Test whether response or stimulus are complex
         # TODO: shouldn't stimulus and response be treated separately?
@@ -549,7 +558,7 @@ class Plot_Impz(QWidget):
         Triggered by:
         - Fixpoint widget, requesting "get_stimulus" (via `process_rx_signal()`)
         """
-        if self.N_first <= self.ui.N_end:
+        if self.N_first < self.ui.N_end:
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             frame = slice(self.N_first, self.N_first + L_frame)
@@ -652,59 +661,61 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
     # ------------------------------------------------------------------------------
-    def calc_response(self, N_first: int, N_last: int) -> None:
-        """
-        (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and
-        the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
+    # def calc_response(self, N_first: int, N_last: int) -> None:
+    #     """
+    #     (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and
+    #     the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
 
-        Set the flag `self.cmplx` when response `self.y` or stimulus `self.x`
-        are complex and make warning field visible.
+    #     Set the flag `self.cmplx` when response `self.y` or stimulus `self.x`
+    #     are complex and make warning field visible.
 
-        For filtering long signals in batches see:
-        https://stackoverflow.com/questions/58014131/implementing-blockwise-low-pass-iir-filter-in-python
-        https://warrenweckesser.github.io/papers/weckesser-scipy-linear-filters.pdf
+    #     For filtering long signals in batches see:
+    #     https://stackoverflow.com/questions/58014131/implementing-blockwise-low-pass-iir-filter-in-python
+    #     https://warrenweckesser.github.io/papers/weckesser-scipy-linear-filters.pdf
 
-        In order for this to work, the filter state ("initial condition") needs to
-        be stored.
+    #     In order for this to work, the filter state ("initial condition") needs to
+    #     be stored.
 
-        Returns
-        -------
-        None
+    #     Returns
+    #     -------
+    #     None
 
-        ... but it modifies the class attributes `self.y`, `self.cmplx`, `self.needs_redraw`
-        """
+    #     ... but it modifies the class attributes `self.y`, `self.cmplx`,
+    #     `self.needs_redraw`
+    #     """
 
-        self.bb = np.asarray(fb.fil[0]['ba'][0])
-        self.aa = np.asarray(fb.fil[0]['ba'][1])
-        if min(len(self.aa), len(self.bb)) < 2:
-            logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-            return
+    #     self.bb = np.asarray(fb.fil[0]['ba'][0])
+    #     self.aa = np.asarray(fb.fil[0]['ba'][1])
+    #     if min(len(self.aa), len(self.bb)) < 2:
+    #         logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+    #         return
 
-        logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
+    #     logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
 
-        sos = np.asarray(fb.fil[0]['sos'])
-        antiCausal = 'zpkA' in fb.fil[0]
+    #     sos = np.asarray(fb.fil[0]['sos'])
+    #     antiCausal = 'zpkA' in fb.fil[0]
 
-        if len(sos) > 0 and not antiCausal:  # has second order sections and is causal
-            y = sig.sosfilt(sos, self.x[N_first:N_last])
-        elif antiCausal:
-            y = sig.filtfilt(self.bb, self.aa, self.x[N_first:N_last], -1, None)
-        else:  # no second order sections or antiCausals for current filter
-            y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
+    #     if len(sos) > 0 and not antiCausal:  # has second order sections and is causal
+    #         y = sig.sosfilt(sos, self.x[N_first:N_last])
+    #     elif antiCausal:
+    #         y = sig.filtfilt(self.bb, self.aa, self.x[N_first:N_last], -1, None)
+    #     else:  # no second order sections or antiCausals for current filter
+    #         y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
 
-        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
-            dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
-            # subtract DC (final) value from response
-            y[max(N_first, self.stim_wdg.T1_int):N_last] = \
-                y[max(N_first, self.stim_wdg.T1_int):N_last] - abs(dc[1])
+    #     if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+    #         dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
+    #         # subtract DC (final) value from response
+    #         y[max(N_first, self.stim_wdg.T1_idx):N_last] = \
+    #             y[max(N_first, self.stim_wdg.T1_idx):N_last] - abs(dc[1])
 
-        self.y[N_first:N_last] = np.real_if_close(y, tol=1e3)  # tol specified in multiples of machine eps
+    #     # tol specified in multiples of machine eps:
+    #     self.y[N_first:N_last] = np.real_if_close(y, tol=1e3)
 
-        self.needs_redraw[:] = [True] * 2
+    #     self.needs_redraw[:] = [True] * 2
 
-        # Calculate imag. and real components from response
-        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
-        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+    #     # Calculate imag. and real components from response
+    #     self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+    #     self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
     # ------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
