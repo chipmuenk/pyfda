@@ -49,7 +49,7 @@ class Plot_Impz(QWidget):
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     # signal for frame based simulation in `impz()`, should not leave the instance:
-    sig_impz = pyqtSignal(object)
+    sig_tx_local = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
@@ -168,7 +168,7 @@ class Plot_Impz(QWidget):
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
         # let method impz() work frame by frame
-        self.sig_impz.connect(self.process_sig_impz)
+        self.sig_tx_local.connect(self.process_sig_rx_local)
 
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -244,17 +244,22 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
 # ------------------------------------------------------------------------------
-    def process_sig_impz(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig=None):
         """
-        Process signals coming from the iterations of `impz()`
+        Process signals coming from the iterations of `impz()` and `impz_fx()`
         """
         logger.warning("SIG_RX LOCAL - needs_calc: {0} | vis: {1}\n{2}"
                        .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
-        if dict_sig['sim'] == 'calc_frame':
-            self.impz()
 
-        elif not dict_sig['sim']:
-            logger.error('Missing value for key "sim".')
+        if dict_sig['sim'] == 'next_frame':
+            # self.test_for_break()
+            self.impz()
+            return
+
+        elif dict_sig['sim'] == 'next_frame_fx':
+            # self.test_for_break()
+            self.impz_fx({'fx_sim': 'get_stimulus'})
+            return
 
         else:
             logger.error('Unknown value "{0}" for "sim" key\n'
@@ -276,10 +281,20 @@ class Plot_Impz(QWidget):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        self.error = False
-
         if 'fx_sim' in dict_sig:
-            if dict_sig['fx_sim'] == 'specs_changed':
+            if dict_sig['fx_sim'] == 'start':
+                """
+                Start fixpoint simulation, this is triggered by the fixpoint widget.
+                - Always require recalculation when triggered externally
+                  (`self.needs_calc = True`)
+                - Force fixpoint mode
+                """
+                self.needs_calc = True
+                self.error = False
+                self.fx_select("Fixpoint")
+                # further actions following below
+
+            if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
                 """
                 Specs of fixpoint widget have been updated, start an FX simulation if
                 this widget is visible, `self.fx_sim == True` and auto-run is enabled
@@ -287,35 +302,25 @@ class Plot_Impz(QWidget):
                 - Initialize fixpoint widget and start simulation via `self.impz_init()`
                   when widget is visible
                 """
-                logger.warning("FX specs changed!")
-                # self.needs_calc = True
+                logger.info("FX specs changed!")
                 self.needs_calc_fx = True
                 self.error = False
                 if self.fx_sim and self.isVisible():
-                    qstyle_widget(self.ui.but_run, "changed")
                     self.impz_init()
 
             elif dict_sig['fx_sim'] == 'get_stimulus':
                 """
                 The fixpoint widget has been initialized and requests a stimulus:
-                TODO: Can this happen without calling self.impz_init(), e.g. from the
-                fixpoint_widget? This shouldn't happen, a signal "specs_changed" could
-                be sent.
 
-                - Always require recalculation when triggered externally
-                  (`self.needs_calc = True`)
                 - Calculate stimuli, quantize and pass via `dict_sig` with
                   `'fx_sim': 'send_stimulus'` and `'fx_stimulus': <quant stimulus array>`.
                   Stimuli are scaled with the input fractional word length, i.e.
                   with 2**WF (input) to obtain integer values
                 """
                 logger.info("FX get_stimulus")
-                self.needs_calc = True
-                self.needs_redraw = [True] * 2
-                self.error = False
-                qstyle_widget(self.ui.but_run, "active")
                 if self.isVisible():
                     self.impz_fx(dict_sig=dict_sig)
+                return
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
@@ -328,6 +333,7 @@ class Plot_Impz(QWidget):
                 self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
                 self.impz_fx(dict_sig=dict_sig)
                 # self.draw_response_fx(dict_sig=dict_sig)
+                return
 
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
@@ -346,7 +352,7 @@ class Plot_Impz(QWidget):
                                                             dict_sig['class']))
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
-        elif self.isVisible():  # all signals except 'fx_sim'
+        elif self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc or (self.fx_sim and self.needs_calc_fx):
                 # update number of data points in impz_ui and FFT window
@@ -354,13 +360,7 @@ class Plot_Impz(QWidget):
                 # a different number of data points for simulation. Don't emit a signal.
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
-                qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
-
-            elif 'view_changed' in dict_sig:
-                if dict_sig['view_changed'] == 'f_S':
-                    self.stim_wdg.ui.recalc_freqs()
-                self.draw()
 
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
@@ -371,13 +371,15 @@ class Plot_Impz(QWidget):
                     if True:  # dict_sig['ui_changed'] == 'stim':
                         self.resize_stim_tab_widget()
                     self.needs_calc = True
-                    qstyle_widget(self.ui.but_run, "changed")
                     self.impz_init()
+
+            elif 'view_changed' in dict_sig:
+                if dict_sig['view_changed'] == 'f_S':
+                    self.stim_wdg.ui.recalc_freqs()
+                self.draw()
 
             elif 'home' in dict_sig:
                 self.redraw()
-                # self.tabWidget.currentWidget().redraw()
-                # redraw method of current mplwidget, always redraws tab 0
                 self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         else:  # invisible
@@ -390,11 +392,6 @@ class Plot_Impz(QWidget):
                     self.stim_wdg.ui.recalc_freqs()
             elif 'ui_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
-
-#            elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'get_stimulus':
-#                    self.needs_calc = True # always recalculate when triggered externally
-#                    qstyle_widget(self.ui.but_run, "changed")
-#                    self.fx_select("Fixpoint")
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -460,10 +457,11 @@ class Plot_Impz(QWidget):
             # initialize progress bar
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
             self.ui.prg_wdg.setValue(0)
+            qstyle_widget(self.ui.but_run, "running")
 
             if self.fx_sim:
                 # - update title string and setup input quantizer self.q_i
-                # - emit {'fx_sim': 'init'}
+                # - emit {'fx_sim': 'init'} to listening widgets
                 self.title_str = r'$Fixpoint$ ' + self.title_str
                 if np.any(np.iscomplex(x_test)):
                     logger.warning(
@@ -508,6 +506,7 @@ class Plot_Impz(QWidget):
         while self.N_first < self.ui.N_end:
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            # Define slicing expression for the current frame
             frame = slice(self.N_first, self.N_first + L_frame)
             # -------------------------------------------------------------
             # ---- calculate stimulus for current frame
@@ -528,7 +527,7 @@ class Plot_Impz(QWidget):
             self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
             # ==== Increase frame counter =================================
             self.N_first += self.ui.N_frame
-            # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
+            # self.emit({'sim':'next_frame'}, sig_name="sig_tx_local")  # ... once again!
             # TODO: Test for Run Button here
             self.ui.prg_wdg.setValue(self.N_first)
 
@@ -585,23 +584,26 @@ class Plot_Impz(QWidget):
                      'fx_stimulus': np.round(self.x_q[frame]
                                              * (1 << self.q_i.WF)).astype(int)})
 
-                logger.info("fx stimulus sent")
+                logger.info("FX stimulus sent")
+                return
 
             # -----------------------------------------------------------------
-            # ---- Get FX results and store them ------------------------------
+            # ---- Get FX results and store them, increase frame counter ------
             # -----------------------------------------------------------------
             elif dict_sig['fx_sim'] == "set_results":
-                # t_draw_start = time.process_time()
                 self.error = dict_sig['fx_results'] is None
                 if self.error:
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
                 else:
                     self.y[frame] = np.asarray(dict_sig['fx_results'])
-
-        # ==== Increase frame counter =========================================
+            # ==== Increase frame counter ======================================
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
+            # ================================================================== 
+            logger.info("FX results received")
+            self.emit({'sim': 'next_frame_fx'}, sig_name='sig_tx_local')
+
         # ---------------------------------------------------------------------
         # ---- Last frame reached, finish simulation --------------------------
         # ---------------------------------------------------------------------
@@ -612,8 +614,10 @@ class Plot_Impz(QWidget):
             self.cmplx = bool(np.any(np.iscomplex(self.y)) or
                               np.any(np.iscomplex(self.x)))
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+            # t_draw_start = time.process_time()
             self.draw()
-
+            # logger.info('Fixpoint simulation [{0:5.3g} ms]: Plotting finished'
+            #            .format((time.process_time() - self.t_resp)*1000))
             self.emit({'fx_sim': 'finish'})
 
 # =============================================================================
@@ -637,14 +641,15 @@ class Plot_Impz(QWidget):
 
         If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
-        logger.warning("start fx_select")
+        logger.info("start fx_select")
 
         if fx in {0, 1}:  # connected to index change of combo box
             pass
+        elif fx is None:  # called without argument, updates ui according to cmbbox
+            pass
         elif fx in {"Float", "Fixpoint"}:  # direct function call
             qset_cmb_box(self.ui.cmb_sim_select, fx)
-        elif fx is None:
-            pass
+
         else:
             logger.error('Unknown argument "{0}".'.format(fx))
             return
