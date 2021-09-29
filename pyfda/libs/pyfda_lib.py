@@ -86,14 +86,8 @@ except ImportError:
     MODULES.update({'pyfixp': {'V_FX': None}})
 
 try:
-    import migen
-    MODULES.update({'migen': {'V_MG': 'installed'}})
-except (ImportError, SyntaxError):
-    MODULES.update({'migen': {'V_MG': None}})
-
-try:
     from nmigen import __version__ as V_NMG
-    MODULES.update({'nMigen': {'V_NMG': V_NMG}})
+    MODULES.update({'nmigen': {'V_NMG': V_NMG}})
 except ImportError:
     pass
 
