@@ -143,8 +143,6 @@ class Input_Fixpoint_Specs(QWidget):
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
                 qstyle_widget(self.butSimHDL, "normal")
-                logger.info('Fixpoint simulation [{0:5.3g} ms]: Plotting finished'
-                            .format((time.process_time() - self.t_resp)*1000))
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
@@ -362,7 +360,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimHDL.clicked.connect(self.fx_sim_init)
+        self.butSimHDL.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -733,9 +731,7 @@ class Input_Fixpoint_Specs(QWidget):
         Initialize fix-point simulation:
 
         - Update the `fxqc_dict` containing all quantization information
-
-        - Setup a filter instance for migen simulation
-
+        - Setup a filter instance for (n)migen simulation
         - Request a stimulus signal
         """
         if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
