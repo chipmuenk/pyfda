@@ -27,6 +27,13 @@ from operator import add
 
 from migen import Signal, Module, run_simulation
 from migen.fhdl import verilog
+
+import nmigen
+from nmigen.back import verilog as verilog_nmigen
+from nmigen.build.plat import Platform
+from nmigen.hdl import ast, dsl, ir
+from nmigen.sim.core import Simulator, Tick, Delay
+
 ################################
 
 import logging
@@ -317,6 +324,10 @@ class FIR_DF_wdg(QWidget):
 
         return response
 
+# ------------------------------------------------------------------------------
+    def sim_nmigen():
+        sim = Simulator(FIRn)
+
 
 ###############################################################################
 # A synthesizable FIR filter.
@@ -357,6 +368,57 @@ class FIR(Module):
 
         # rescale from accumulator format to output width
         self.comb += self.o.eq(requant(self, sum_accu, p['QA'], p['QO']))
+
+
+###############################################################################
+# A synthesizable nMigen FIR filter.
+class FIRn(ir.Elaboratable):
+    def __init__(self):
+        self.p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        # ------------- Define I/Os as signed --------------------------------------
+        self.i = ast.Signal(ast.signed(self.p['QI']['W']))  # input signal
+        self.o = ast.Signal(ast.signed(self.p['QO']['W']))  # output signal
+
+    def ports(self):
+        return [self.i, self.o]
+
+    def elaborate(self, platform):
+        """
+        `platform` normally specifies FPGA platform, not needed here.
+        """
+        m = dsl.Module()  # instantiate a module
+        ###
+        muls = []    # list for partial products b_i * x_i
+        DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
+        # word format for sum of partial products b_i * x_i
+        QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
+              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
+        QP.update({'W': QP['WI'] + QP['WF'] + 1})
+
+        src = self.i  # first register is connected to input signal
+
+        for b in self.p['b']:
+            sreg = ast.Signal(ast.signed(self.p['QI']['W']))  # create chain of registers
+            m.d.sync += sreg.eq(src)            # with input word length
+            src = sreg
+            muls.append(int(b)*sreg)
+
+        logger.debug("b = {0}\nW(b) = {1}".format(
+            pprint_log(self.p['b']), self.p['QCB']['W']))
+
+        # saturation logic doesn't make much sense with a FIR filter, this is
+        # just for demonstration
+        sum_full = ast.Signal(ast.signed(QP['W']))
+        m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
+
+        # rescale from full product format to accumulator format
+        sum_accu = ast.Signal(ast.signed(self.p['QA']['W']))
+        m.d.comb += sum_accu.eq(requant(self, sum_full, QP, self.p['QA']))
+
+        # rescale from accumulator format to output width
+        m.d.comb += self.o.eq(requant(self, sum_accu, self.p['QA'], self.p['QO']))
+
+        return m
 
 
 # ------------------------------------------------------------------------------
