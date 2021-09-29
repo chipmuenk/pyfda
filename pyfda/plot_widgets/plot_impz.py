@@ -30,7 +30,6 @@ from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
 from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
-from pyfda.plot_widgets.tran.plot_tran_response import calc_response_frame
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 import logging
@@ -518,7 +517,15 @@ class Plot_Impz(QWidget):
             # -------------------------------------------------------------
             # ---- calculate response for current frame
             # -------------------------------------------------------------
-            self.y[frame], self.zi = calc_response_frame(self, self.x[frame], self.zi)
+            if len(self.sos) > 0:  # has second order sections
+                self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
+            else:  # no second order sections or antiCausals for current filter
+                self.y[frame], self.zi = sig.lfilter(
+                    self.bb, self.aa, self.x[frame], zi=self.zi)
+
+            # remove complex values produced by numerical inaccuracies,
+            # `tol` is specified in multiples of machine eps
+            self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
             # ==== Increase frame counter =================================
             self.N_first += self.ui.N_frame
             # self.emit({'sim':'calc_frame'}, sig_name="sig_impz")  # ... once again!
