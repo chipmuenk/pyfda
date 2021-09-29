@@ -450,29 +450,41 @@ qss_common = """
                  */
                  }
 
-                QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-                                color: black;}
+                QPushButton[state="normal"]{background-color: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+                    color: black;}
 
-                QPushButton[state="active"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 #cccccc, stop: 0.1 blue, stop: 1.0 #999999);
-                                color: black;}
+                QPushButton[state="running"]{background-color: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 #cccccc, stop: 0.1 orange, stop: 1.0 #999999);
+                    color: white;}
 
-                QPushButton[state="changed"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
-                                color: black;}
+                QPushButton[state="changed"]{background-color: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
+                    color: black;}
 
-                QPushButton[state="error"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
-                                color: white;}
+                QPushButton[state="error"]{background-color: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
+                    color: white;}
+
                 QPushButton[state="failed"]{background-color:orange; color:white}
-                QPushButton[state="ok"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
-                                color: white;}
+
+                QPushButton[state="ok"]{background-color: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
+                    color: white;}
+
                 *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
+
                 QPushButton:pressed {background-color:black; color:white}
-                QPushButton:checked {background-color:lightblue; color:black;font-weight:800;}
-                QPushButtonRT:checked {background-color:lightblue; color:black;font-weight:800;}
+
+                QPushButton:checked{
+                    background-color:lightblue; color:black;font-weight:800;}
+                QPushButtonRT:checked{
+                    background-color:lightblue; color:black;font-weight:800;}
 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
@@ -502,10 +514,10 @@ qss_common = """
                     image: url(':/ellipses_h.svg');
                     }
 
-                QProgressBar{text-align: center; font-weight: bold; 
+                QProgressBar{text-align: center; font-weight: bold;
                              border: 1px solid darkgrey;}
                 QProgressBar::chunk{background-color: lightblue;}
-/* 
+/*
 #GreenProgressBar {
     min-height: 12px;
     max-height: 12px;
