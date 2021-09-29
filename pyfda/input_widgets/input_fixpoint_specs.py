@@ -13,7 +13,6 @@ Widget for simulating fixpoint filters and generating Verilog Code
 import sys, os, io
 import re
 import importlib
-import time
 
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
@@ -33,12 +32,12 @@ from pyfda.pyfda_rc import params
 import logging
 logger = logging.getLogger(__name__)
 
-# when migen is present, instantiate the fixpoint widget
-if cmp_version("migen", "0.1") >= -1:  # currently, version cannot be determined
-    import migen
-    HAS_MIGEN = True
+# when nmigen is present, instantiate the fixpoint widget
+if cmp_version("nmigen", "0.2") >= 0:  # currently, version cannot be determined
+    import nmigen
+    HAS_NMIGEN = True
 else:
-    HAS_MIGEN = False
+    HAS_NMIGEN = False
 
 # when deltasigma module is present, add a corresponding entry to the combobox
 try:
@@ -80,7 +79,7 @@ class Input_Fixpoint_Specs(QWidget):
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
 
-        if HAS_MIGEN:
+        if HAS_NMIGEN:
             self._construct_UI()
             inst_wdg_list = self._update_filter_cmb()
             if len(inst_wdg_list) == 0:
@@ -90,6 +89,7 @@ class Input_Fixpoint_Specs(QWidget):
                              .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
             self._update_fixp_widget()
         else:
+            logger.warning("No nmigen module found, fixpoint functionality disabled.")
             self.state = "deactivated"  # "invisible", "disabled"
 
 # ------------------------------------------------------------------------------
@@ -742,7 +742,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         try:
             logger.info("Fixpoint simulation started")
-            self.t_start = time.process_time()
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance
 
@@ -758,9 +757,7 @@ class Input_Fixpoint_Specs(QWidget):
     def fx_sim_set_stimulus(self, dict_sig):
         """
         - Get fixpoint stimulus from `dict_sig` in integer format
-
         - Pass it to the fixpoint filter and calculate the fixpoint response
-
         - Send the reponse to the plotting widget
         """
         try:
@@ -773,13 +770,9 @@ class Input_Fixpoint_Specs(QWidget):
                             np.shape(dict_sig['fx_stimulus']),
                             dict_sig['fx_stimulus'].dtype,
                             ))
-            self.t_stim = time.process_time()
-            logger.info("Fixpoint simulation [{0:5.3g} ms]: Stimuli generated"
-                        .format((self.t_stim-self.t_start)*1000))
 
             # Run fixpoint simulation and return the results as integer values:
             self.fx_results = self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])
-            self.t_resp = time.process_time()
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
@@ -794,16 +787,7 @@ class Input_Fixpoint_Specs(QWidget):
                     f' of type "{type(self.fx_results)}"'
                 )
 
-                logger.info('Fixpoint simulation [{0:5.3g} ms]: Response calculated'
-                            .format((self.t_resp - self.t_stim)*1000))
-
             # TODO: fixed point / integer to float conversion?
-            # TODO: color push-button to show state of simulation
-            # TODO: add QTimer single shot
-#            self.timer_id = QtCore.QTimer()
-#            self.timer_id.setSingleShot(True)
-#            # kill simulation after some idle time, also add a button for this
-#            self.timer_id.timeout.connect(self.kill_sim)
 
         except ValueError as e:
             logger.error("Simulator error {0}".format(e))

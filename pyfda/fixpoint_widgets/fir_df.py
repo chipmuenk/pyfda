@@ -25,14 +25,18 @@ from .fixpoint_helpers import UI_W, UI_Q, requant
 from functools import reduce
 from operator import add
 
-from migen import Signal, Module, run_simulation
-from migen.fhdl import verilog
+# from migen import Signal, Module, run_simulation
+# from migen.fhdl import verilog
 
-import nmigen
-from nmigen.back import verilog as verilog_nmigen
-from nmigen.build.plat import Platform
-from nmigen.hdl import ast, dsl, ir
-from nmigen.sim.core import Simulator, Tick, Delay
+from nmigen import *
+# from nmigen import Signal, signed
+from nmigen.back import verilog
+# from nmigen.build.plat import Platform
+# from nmigen.hdl import ast, dsl, ir
+# from nmigen.sim.core import Simulator, Tick, Delay
+from nmigen.sim import Simulator, Tick  # , Delay, Settle
+# from nmigen.build import Platform
+# from nmigen.back.pysim import Simulator, Delay, Settle
 
 ################################
 
@@ -62,7 +66,8 @@ class FIR_DF_wdg(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
-        self.construct_fixp_filter()
+        # TODO: not needed, remove test in input_fixpoint_specs
+        # self.construct_fixp_filter()
 # ------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -290,7 +295,7 @@ class FIR_DF_wdg(QWidget):
             logger.error("Coefficients contain complex values!")
             return
 
-        self.fixp_filter = FIR()
+        # self.fixp_filter = FIR()
 
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
@@ -301,92 +306,69 @@ class FIR_DF_wdg(QWidget):
                                ios={self.fixp_filter.i, self.fixp_filter.o},
                                **kwargs)
 
-# ------------------------------------------------------------------------------
+    """ # ------------------------------------------------------------------------------
     def tb_wdg_stim(self, stimulus, outputs):
-        """ use stimulus list from widget as input to filter """
+        ''' use stimulus list from widget as input to filter '''
         for x in stimulus:
             yield self.fixp_filter.i.eq(int(x))  # pass one stimulus value to filter
             # append filter output to output list
             outputs.append((yield self.fixp_filter.o))
             yield  # next x until stimulus is used up
 
-# ------------------------------------------------------------------------------
-    def run_sim(self, stimulus):
-        """
+    # ------------------------------------------------------------------------------
+    def run_sim_migen(self, stimulus):
+        '''
         Pass stimuli and run filter simulation, see
         https://reconfig.io/2018/05/hello_world_migen
         https://github.com/m-labs/migen/blob/master/examples/sim/fir.py
-        """
+        '''
 
         response = []
         testbench = self.tb_wdg_stim(stimulus, response)
         run_simulation(self.fixp_filter, testbench)
 
-        return response
+        return response """
 
-# ------------------------------------------------------------------------------
-    def sim_nmigen():
-        sim = Simulator(FIRn)
+    # ------------------------------------------------------------------------------
+    def run_sim(self, stimulus):
 
+        dut = FIR()
 
-###############################################################################
-# A synthesizable FIR filter.
-class FIR(Module):
-    def __init__(self):
-        p = fb.fil[0]['fxqc']
+        def process():
+            input = stimulus
+            self.output = []
+            for i in input:
+                yield dut.i.eq(int(i))
+                yield Tick()
+                self.output.append((yield dut.o))
 
-        # ------------- Define I/Os -------------------------------------------
-        self.i = Signal((p['QI']['W'], True))  # input signal
-        self.o = Signal((p['QO']['W'], True))  # output signal
+        sim = Simulator(dut)
 
-        ###
-        muls = []    # list for partial products b_i * x_i
-        DW = int(np.ceil(np.log2(len(p['b']))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        QP = {'WI': p['QI']['WI'] + p['QCB']['WI'] + DW,
-              'WF': p['QI']['WF'] + p['QCB']['WF']}
-        QP.update({'W': QP['WI'] + QP['WF'] + 1})
+        sim.add_clock(1/48000)
+        sim.add_process(process)
+        sim.run()
 
-        src = self.i  # first register is connected to input signal
-
-        for b in p['b']:
-            sreg = Signal((p['QI']['W'], True))  # create chain of registers
-            self.sync += sreg.eq(src)            # with input word length
-            src = sreg
-            muls.append(int(b)*sreg)
-
-        logger.debug("b = {0}\nW(b) = {1}".format(pprint_log(p['b']), p['QCB']['W']))
-
-        # saturation logic doesn't make much sense with a FIR filter, this is
-        # just for demonstration
-        sum_full = Signal((QP['W'], True))
-        self.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
-
-        # rescale from full product format to accumulator format
-        sum_accu = Signal((p['QA']['W'], True))
-        self.comb += sum_accu.eq(requant(self, sum_full, QP, p['QA']))
-
-        # rescale from accumulator format to output width
-        self.comb += self.o.eq(requant(self, sum_accu, p['QA'], p['QO']))
+        return self.output
 
 
 ###############################################################################
 # A synthesizable nMigen FIR filter.
-class FIRn(ir.Elaboratable):
+class FIR(Elaboratable):
     def __init__(self):
         self.p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os as signed --------------------------------------
-        self.i = ast.Signal(ast.signed(self.p['QI']['W']))  # input signal
-        self.o = ast.Signal(ast.signed(self.p['QO']['W']))  # output signal
+        self.i = Signal(signed(self.p['QI']['W']))  # input signal
+        self.o = Signal(signed(self.p['QO']['W']))  # output signal
+        pass
 
-    def ports(self):
-        return [self.i, self.o]
+    # def ports(self):
+    #     return [self.i, self.o]
 
-    def elaborate(self, platform):
+    def elaborate(self, platform) -> Module:
         """
         `platform` normally specifies FPGA platform, not needed here.
         """
-        m = dsl.Module()  # instantiate a module
+        m = Module()  # instantiate a module
         ###
         muls = []    # list for partial products b_i * x_i
         DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
@@ -398,7 +380,7 @@ class FIRn(ir.Elaboratable):
         src = self.i  # first register is connected to input signal
 
         for b in self.p['b']:
-            sreg = ast.Signal(ast.signed(self.p['QI']['W']))  # create chain of registers
+            sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
             m.d.sync += sreg.eq(src)            # with input word length
             src = sreg
             muls.append(int(b)*sreg)
@@ -408,15 +390,15 @@ class FIRn(ir.Elaboratable):
 
         # saturation logic doesn't make much sense with a FIR filter, this is
         # just for demonstration
-        sum_full = ast.Signal(ast.signed(QP['W']))
+        sum_full = Signal(signed(QP['W']))
         m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
 
         # rescale from full product format to accumulator format
-        sum_accu = ast.Signal(ast.signed(self.p['QA']['W']))
-        m.d.comb += sum_accu.eq(requant(self, sum_full, QP, self.p['QA']))
+        sum_accu = Signal(signed(self.p['QA']['W']))
+        m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QA']))
 
         # rescale from accumulator format to output width
-        m.d.comb += self.o.eq(requant(self, sum_accu, self.p['QA'], self.p['QO']))
+        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QA'], self.p['QO']))
 
         return m
 
@@ -427,6 +409,25 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
+    dut = FIR()
+
+    def process():
+        # input = stimulus
+        output = []
+        for i in np.ones(20):
+            yield dut.i.eq(int(i))
+            yield Tick()
+            output.append((yield dut.o))
+        print(output)
+
+    sim = Simulator(dut)
+    # with Simulator(m) as sim:
+
+    sim.add_clock(1/48000)
+    sim.add_process(process)
+    sim.run()
+
+    # ------------ test ui ----------------
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
     mainw = FIR_DF_wdg()

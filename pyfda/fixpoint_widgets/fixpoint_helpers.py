@@ -11,14 +11,15 @@ Helper classes and functions for generating and simulating fixpoint filters
 """
 import sys
 
-# import pyfda.filterbroker as fb
+from numpy.lib.function_base import iterable
+
 import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
     QVBoxLayout, QHBoxLayout, QFrame, pyqtSignal)
 
-from migen import Cat, If, Replicate, Signal
+from nmigen import Signal, signed, Cat, Module, Repl
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 # from pyfda.pyfda_rc import params
@@ -28,7 +29,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def requant(mod, sig_i, QI, QO):
+# ------------------------------------------------------------------------------
+def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
     """
     Change word length of input signal `sig_i` to `WO` bits, using the
     quantization and saturation methods specified by ``QO['quant']`` and
@@ -37,10 +39,10 @@ def requant(mod, sig_i, QI, QO):
     Parameters
     ----------
 
-    mod: Module (migen)
+    mod: Module (nmigen)
         instance of migen module
 
-    sig_i: Signal (migen)
+    sig_i: Signal (nmigen)
         Signal to be requantized
 
     QI: dict
@@ -57,7 +59,7 @@ def requant(mod, sig_i, QI, QO):
     Returns
     -------
 
-    sig_o: Signal (migen)
+    sig_o: Signal (nmigen)
         Requantized signal
 
     Documentation
@@ -120,22 +122,26 @@ def requant(mod, sig_i, QI, QO):
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
 
-    sig_i_q = Signal((max(WI, WO), True))  # intermediate signal with requantized fractional part
-    sig_o = Signal((WO, True))
+    # intermediate signal with requantized fractional part
+    sig_i_q = Signal(signed(max(WI, WO)))
+    sig_o = Signal(signed(WO))
 
-    logger.debug("rescale: dWI={0}, dWF={1}, QU:{2}, OV:{3}".format(dWI, dWF, QO['quant'],
-                                                                    QO['ovfl']))
+    logger.debug(f"rescale: dWI={dWI}, dWF={dWF}, QU:{QO['quant']}, OV:{QO['ovfl']}")
+
+    # -----------------------------------------------------------------------
+    # Requantize fractional part
+    # -----------------------------------------------------------------------
     if dWF <= 0:  # Extend fractional word length of output word by multiplying with 2^dWF
-        mod.comb += sig_i_q.eq(sig_i << -dWF)  # shift input left by -dWF
-    else:  # dWF > 0, reduce fractional word length by dividing by 2^dWF (shift right by dWF)
+        mod.d.comb += sig_i_q.eq(sig_i << -dWF)  # shift input left by -dWF
+    else:  # dWF > 0, reduce fract. word length by dividing by 2^dWF (shift right by dWF)
         if QO['quant'] == 'round':
             # add half an LSB (1 << (dWF - 1)) before right shift
-            mod.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
+            mod.d.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
         elif QO['quant'] == 'floor':  # just shift right
-            mod.comb += sig_i_q.eq(sig_i >> dWF)
+            mod.d.comb += sig_i_q.eq(sig_i >> dWF)
         elif QO['quant'] == 'fix':
             # add sign bit (sig_i[-1]) as LSB (1 << dWF) before right shift
-            mod.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
+            mod.d.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
         else:
             raise Exception(u'Unknown quantization method "%s"!' % (QI['quant']))
 
@@ -143,11 +149,11 @@ def requant(mod, sig_i, QI, QO):
     # Requantize integer part
     # -----------------------------------------------------------------------
     if dWI < 0:  # WI_I < WO_I, sign extend integer part (prepend copies of sign bit)
-        mod.comb += sig_o.eq(Cat(sig_i_q, Replicate(sig_i_q[-1], -dWI)))
+        mod.d.comb += sig_o.eq(Cat(sig_i_q, Repl(sig_i_q[-1], -dWI)))
     elif dWI == 0:  # WI = WO, don't change integer part
-        mod.comb += sig_o.eq(sig_i_q)
+        mod.d.comb += sig_o.eq(sig_i_q)
     elif QO['ovfl'] == 'sat':
-        mod.comb += \
+        mod.d.comb += \
             If(sig_i_q[-1] == 1,
                If(sig_i_q < MIN_o,
                   sig_o.eq(MIN_o)
@@ -157,29 +163,15 @@ def requant(mod, sig_i, QI, QO):
                       ).Else(sig_o.eq(sig_i_q)
                              )
     elif QO['ovfl'] == 'wrap':  # wrap around (shift left)
-        mod.comb += sig_o.eq(sig_i_q)
-
-# =============================================================================
-#             If(sig_i_q[-1] == 1,
-#                If(sig_i_q[-1:-dWI-1] != Replicate(sig_i_q[-1], dWI),
-#             #If(sig_i_q < MIN_o,
-#             #If(sig_i_q[WO-1:] == 0b10,
-#                     sig_o.eq(MIN_o)
-#                 ).Else(sig_o.eq(sig_i_q)# >> dWI
-#             ).Elif(sig_i_q > MAX_o,
-#             #).Elif(sig_i_q[WO-1:] == 0b01,
-#                 sig_o.eq(MAX_o)
-#             ).Else(sig_o.eq(sig_i_q)# >> dWI)
-#             )
-# =============================================================================
+        mod.d.comb += sig_o.eq(sig_i_q)
 
     else:
         raise Exception(u'Unknown overflow method "%s"!' % (QI['ovfl']))
 
     return sig_o
+
+
 # ------------------------------------------------------------------------------
-
-
 class UI_W(QWidget):
     """
     Widget for entering integer and fractional bits. The result can be read out
@@ -229,7 +221,7 @@ class UI_W(QWidget):
         # default settings
         dict_ui = {'wdg_name': 'ui_w', 'label': 'WI.WF', 'lbl_sep': '.',
                    'max_led_width': 30,
-                   'WI': 0, 'WI_len': 2, 'tip_WI' : 'Number of integer bits',
+                   'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'enabled': True, 'visible': True, 'fractional': True,
                    'combo_visible': False, 'combo_items': ['auto', 'full', 'man'],
@@ -327,7 +319,7 @@ class UI_W(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-    def quant_coeffs(self, q_dict, coeffs):
+    def quant_coeffs(self, q_dict: dict, coeffs: iterable) -> list:
         """
         Quantize the coefficients, scale and convert them to integer and return them
         as a list of integers
@@ -336,7 +328,10 @@ class UI_W(QWidget):
 
         Parameters:
         -----------
-        None
+        q_dict: dict
+        
+        coeffs: iterable
+           a list or ndarray of coefficients
 
         Returns:
         --------
@@ -344,8 +339,9 @@ class UI_W(QWidget):
         of the passed quantization dict
 
         """
-        # Create coefficient quantizer instances using the quantization parameters dict
-        # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
+        # Create coefficient quantizer instances using the passed quantization parameters
+        # dict built in `input_widgets/input_coeffs.py` (and stored in the central
+        # filter dict)
         Q_coeff = fx.Fixed(q_dict)
         Q_coeff.frmt = 'dec'  # always use decimal format for coefficients
 
@@ -541,7 +537,7 @@ class UI_Q(QWidget):
     # --------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Update the quantization dict and the attributes `self.ovfl` and 
+        Update the quantization dict and the attributes `self.ovfl` and
         `self.quant` from the UI
         """
         self.ovfl = self.cmbOvfl.currentText()
