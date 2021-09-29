@@ -9,7 +9,7 @@
 """
 Widget for plotting impulse and general transient responses
 """
-# import time
+import time
 from pyfda.libs.compat import (
     QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
 
@@ -59,7 +59,11 @@ class Plot_Impz(QWidget):
         self.ui = PlotImpz_UI(self)  # create the UI part with buttons etc.
 
         # initial settings
-        self.needs_calc = True   # flag whether plots need to be recalculated
+        #==================
+        # flag whether specs have been changed and plots need to be recalculated
+        self.needs_calc = True
+        # same when fixpoint specs have been changed, only needed in Fixpoint mode
+        self.needs_calc_fx = True
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
         self.tool_tip = "Impulse / transient response and their spectra"
@@ -290,6 +294,7 @@ class Plot_Impz(QWidget):
                 - Force fixpoint mode
                 """
                 self.needs_calc = True
+                self.needs_calc_fx = True
                 self.error = False
                 self.fx_select("Fixpoint")
                 # further actions following below
@@ -458,6 +463,7 @@ class Plot_Impz(QWidget):
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
             self.ui.prg_wdg.setValue(0)
             qstyle_widget(self.ui.but_run, "running")
+            self.t_start = time.process_time()
 
             if self.fx_sim:
                 # - update title string and setup input quantizer self.q_i
@@ -470,6 +476,8 @@ class Plot_Impz(QWidget):
 
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
+                logger.info("Start FX simulation")
+                self.t_start = time.process_time()
                 self.emit({'fx_sim': 'init'})
                 return
             else:
@@ -550,10 +558,15 @@ class Plot_Impz(QWidget):
         # TODO: shouldn't stimulus and response be treated separately?
         self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+        self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
+        self.t_resp = time.process_time()
+        logger.info('[{0:5.4g} ms]: Floating point response calculated.'
+                    .format((self.t_resp - self.t_start)*1000))
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
-
+        logger.info('[{0:5.4g} ms]: Floating point plot drawn.'
+                    .format((time.process_time() - self.t_resp)*1000))
         qstyle_widget(self.ui.but_run, "normal")
 
     # --------------------------------------------------------------------------
@@ -583,7 +596,6 @@ class Plot_Impz(QWidget):
                     {'fx_sim': 'send_stimulus',
                      'fx_stimulus': np.round(self.x_q[frame]
                                              * (1 << self.q_i.WF)).astype(int)})
-
                 logger.info("FX stimulus sent")
                 return
 
@@ -610,14 +622,16 @@ class Plot_Impz(QWidget):
         else:  # self.N_first > self.ui.end
             self.needs_calc = False
             qstyle_widget(self.ui.but_run, "normal")
-
+            self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
             self.cmplx = bool(np.any(np.iscomplex(self.y)) or
                               np.any(np.iscomplex(self.x)))
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-            # t_draw_start = time.process_time()
+            self.t_resp = time.process_time()
+            logger.info('[{0:5.4g} ms]: Fixpoint response calculated'
+                        .format((self.t_resp - self.t_start)*1000))
             self.draw()
-            # logger.info('Fixpoint simulation [{0:5.3g} ms]: Plotting finished'
-            #            .format((time.process_time() - self.t_resp)*1000))
+            logger.info('[{0:5.4g} ms]: Fixpoint plot drawn.'
+                        .format((time.process_time() - self.t_resp)*1000))
             self.emit({'fx_sim': 'finish'})
 
 # =============================================================================
