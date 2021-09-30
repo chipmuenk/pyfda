@@ -13,7 +13,7 @@ version_nr = {}
 with open(path.join(here, 'pyfda/version.py'), encoding='utf-8') as f_v:
     exec(f_v.read(), version_nr)
 
-# --- read requirements.txt, remove comments and unneeded modules   
+# --- read requirements.txt, remove comments and unneeded modules
 with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f_r:
     requirements_list = f_r.read().strip().split("\n")
 
@@ -34,21 +34,21 @@ except ImportError:
 print("Installing packages\n{0}\n".format(requirements_list))
 
 setup(
-    name = 'pyfda',
-    version = version_nr['__version__'],
-    description = 'pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
+    name='pyfda',
+    version=version_nr['__version__'],
+    description='pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
     long_description_content_type='text/markdown',
-    #long_description_content_type='text/x-rst',
-    long_description = long_description,
-    keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
-    url = 'https://github.com/chipmuenk/pyFDA',
-    author = 'Christian Muenker',
-    author_email = 'mail07@chipmuenk.de',
-    license = 'MIT',
-    platforms = ['any'],
-    install_requires = requirements_list,
+    # long_description_content_type='text/x-rst',
+    long_description=long_description,
+    keywords=["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
+    url='https://github.com/chipmuenk/pyFDA',
+    author='Christian Muenker',
+    author_email='mail07@chipmuenk.de',
+    license='MIT',
+    platforms=['any'],
+    install_requires=requirements_list,
 
-     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -75,9 +75,9 @@ setup(
     ],
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
-    packages = find_packages(exclude=('contrib', 'docs', 'test')),
+    packages=find_packages(exclude=('contrib', 'docs', 'test')),
     # Read information from MANIFEST.in
-    include_package_data = True,
+    include_package_data=True,
     # add additional data files (= non *.py) for package / subpackages relative
     # to package directory, include 'qrc_resources.py' instead of 'images/icons/*',
     # ('qrc_resources.py','version.py' are automatically installed).
@@ -86,17 +86,17 @@ setup(
     # include files that get installed OUTSIDE the package
     ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
     # Required modules
-#    install_requires = [
-#        'numpy',
-#        'scipy',
-#        'matplotlib',
-#        'pyqt5',
-#        'docutils',
-#        ],
+    #    install_requires = [
+    #        'numpy',
+    #        'scipy',
+    #        'matplotlib',
+    #        'pyqt5',
+    #        'docutils',
+    #        ],
 
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'pyfdax = pyfda.pyfdax:main',
         ],
@@ -111,7 +111,8 @@ setup(
 On non-Windows platforms (using "setup.py install", "setup.py develop",
 or by using EasyInstall), a "pyfdax" script will be installed that opens up
 a terminal and imports "main" from pyfdax.py.
-main() is called with no arguments, and the return value is passed to sys.exit(), so an errorlevel or message to print
+main() is called with no arguments, and the return value is passed to sys.exit(),
+so an errorlevel or message to print
 to stderr could be provided (not implemented yet).
 
 pyfdax_no_term does essentially the same but it starts no terminal.
