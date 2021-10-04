@@ -12,13 +12,14 @@ Widget for specifying the parameters of a direct-form DF1 FIR filter
 import sys
 
 import numpy as np
+from numpy.lib.function_base import iterable
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-# import pyfda.libs.pyfda_fix_lib as fx
+import pyfda.libs.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_Q, requant
 
 #####################
@@ -306,29 +307,6 @@ class FIR_DF_wdg(QWidget):
                                ios={self.fixp_filter.i, self.fixp_filter.o},
                                **kwargs)
 
-    """ # ------------------------------------------------------------------------------
-    def tb_wdg_stim(self, stimulus, outputs):
-        ''' use stimulus list from widget as input to filter '''
-        for x in stimulus:
-            yield self.fixp_filter.i.eq(int(x))  # pass one stimulus value to filter
-            # append filter output to output list
-            outputs.append((yield self.fixp_filter.o))
-            yield  # next x until stimulus is used up
-
-    # ------------------------------------------------------------------------------
-    def run_sim_migen(self, stimulus):
-        '''
-        Pass stimuli and run filter simulation, see
-        https://reconfig.io/2018/05/hello_world_migen
-        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py
-        '''
-
-        response = []
-        testbench = self.tb_wdg_stim(stimulus, response)
-        run_simulation(self.fixp_filter, testbench)
-
-        return response """
-
     # ------------------------------------------------------------------------------
     def run_sim(self, stimulus):
 
@@ -350,6 +328,9 @@ class FIR_DF_wdg(QWidget):
 
         return self.output
 
+    # ------------------------------------------------------------------------------
+    def sim_pyfixp(self, stimulus):
+        pass
 
 ###############################################################################
 # A synthesizable nMigen FIR filter.
@@ -401,6 +382,163 @@ class FIR(Elaboratable):
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QA'], self.p['QO']))
 
         return m
+
+
+class FIR_DF(object):
+    """
+    Usage:
+    Q = FIR_DF(b, q_mul, q_acc) # Instantiate fixpoint filter object
+    x_bq = self.Q_mul.filt(x, bq)
+    The fixpoint object has two different quantizers:
+    - b is an array with coefficients
+    - q_mul describes requanitization after coefficient multiplication
+      ('quant' and 'sat' can both be set to 'none' if there is none)
+    - q_acc describes requantization after each summation in the accumulator
+            (resp. in the common summation point)
+    """
+    def __init__(self, b: iterable, q_acc: dict, q_mul: dict = None):
+        """
+        Initialize fixed object with q_obj
+
+        Parameters
+        ----------
+        b : array-like
+            filter coefficients
+
+        q_acc : dict
+                dictionary with quantizer settings for the accumulator
+
+        q_mul : dict
+                dictionary with quantizer settings for the partial products (optional)
+
+        """
+        # test if all passed keys of quantizer object are known
+        if q_mul is None:
+            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+        self.Q_mul = fx.Fixed(q_mul)  # create quantizer for partial product
+        self.Q_acc = fx.Fixed(q_acc)  # create quantizer for accumulator
+        self.b = b  # coefficients
+        self.L = len(self.b)  # filter length
+
+    def init(self, zi: iterable = None) -> None:
+        """
+        Initialize filter by resetting all counters
+        Parameters
+        ----------
+        zi : array-like
+            initialize filter registers; maximum length is
+            len(b) - 1. The rest is filled with zeros, when zi is None, the registers
+            are filled with zeros.
+
+        Returns
+        -------
+        None.
+        """
+        self.Q_mul.resetN()  # reset overflow counter of Q_mul
+        self.Q_acc.resetN()  # reset overflow counter of Q_acc
+        self.N_over_filt = 0  # total number of overflows in filter
+
+        # Initialize vectors (also speeds up calculation)
+        self.xbq = np.zeros(len(self.b))  # partial products
+
+        if zi is None:
+            self.xi = np.zeros(self.N)
+        else:  # initialize filter memory and fill up with zeros
+            if len(zi) == self.N - 1:
+                self.xi = zi
+            elif len(zi) < self.N:
+                self.xi = np.concatenate((zi, np.zeros(self.N - len(zi))))
+            else:
+                self.xi = zi[:self.N]
+
+    def update_coeffs(self, b: iterable) -> None:
+        """
+        Load filter with new set of coefficients
+
+        Parameters
+        ----------
+        b : array-like
+            filter coefficients. Length must be identical to the coefficient
+            set used during initialization
+
+        Returns
+        -------
+
+        nothing
+
+        """
+        if len(b) == len(self.b):
+            self.b = b
+        else:
+            raise IndexError("Number of coefficients differs from initialization!")
+        return
+
+    def fxfilter_zi(self, b: iterable, x, zi: iterable = None) -> np.ndarray:
+        """
+        TODO: When len(x) < len(b), only zeros are returned because the for loop
+        is never executed
+
+        Calculate FIR filter (direct form) response via difference equation with
+        quantization. Registers can be initialized with `zi`.
+
+        Parameters
+        ----------
+        x :  scalar or array-like
+             input value(s)
+
+        b :  array-like
+             filter coefficients; when None, the old coefficients are left untouched
+
+        zi : array-like
+             initial conditions; you can
+
+        Returns
+        -------
+        yq : ndarray
+            The quantized input value(s) as a scalar or an ndarray with np.float64.
+            and the same shape as x.
+        """
+
+        if b is not None:  # update coefficients
+            if len(b) == len(self.b):
+                self.b = b
+            else:
+                raise IndexError("Number of coefficients differs from initialization!")
+
+        if zi is not None:  # initialize filter memory and fill up with zeros
+            if len(zi) == self.L:
+                self.xi = zi
+            elif len(zi) < self.L:
+                self.xi = np.concatenate((zi, np.zeros(self.L - len(len(zi)))))
+            else:
+                self.xi = zi[:self.L]
+                logger.warning("len(zi) > len(b) - 1, zi was truncated")
+
+        # initialize quantized partial products and output arrays
+        y_q = xb_q = np.zeros(len(x))
+
+        # Calculate response by:
+        # - append new stimuli `x` to register state `self.xi`
+        # - slide a window with length `len(b)` over `self.xi`, starting at position `k`
+        #   and multiply it with the coefficients `b`, yielding the partial products x*b
+        #   TODO: Doing this for the last len(x) terms should be enough
+        # - quantize the partial products x*b, yielding xb_q
+        # - sum up the quantized partial products, yielding result y[k]
+        # - quantize result, yielding y_q[k]
+
+        self.xi = np.concatenate((self.xi, x))
+
+        for k in range(len(x)):
+            # weighted state-vector x at time k:
+            xb_q = self.Q_mul.fixp(
+                self.xi[k:k + len(self.b)] * self.b)
+            # sum up x_bq to get accu[k]
+            y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
+
+        self.xi = self.xi[-self.L:]  # store last L inputs (i.e. the L registers)
+        self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
+
+        return y_q[:len(x)], self.xi
 
 
 # ------------------------------------------------------------------------------
