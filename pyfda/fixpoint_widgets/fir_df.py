@@ -31,7 +31,6 @@ from operator import add
 
 from nmigen import *
 # from nmigen import Signal, signed
-from nmigen.back import verilog
 # from nmigen.build.plat import Platform
 # from nmigen.hdl import ast, dsl, ir
 # from nmigen.sim.core import Simulator, Tick, Delay
