@@ -40,6 +40,9 @@
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
+    <file alias="pause_w.svg">images/icons/light/ic_pause_48px_white.svg</file>
+    <file alias="play_w.svg">images/icons/light/ic_play_arrow_48px_white.svg</file>
+
     <file alias="plot_style-none">images/icons/plot_style-none.png</file>
     <file alias="plot_style-mkr">images/icons/plot_style-mkr.png</file>
     <file alias="plot_style-line">images/icons/plot_style-line.png</file>
