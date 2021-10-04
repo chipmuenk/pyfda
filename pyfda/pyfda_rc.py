@@ -455,10 +455,7 @@ qss_common = """
                     stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
                     color: black;}
 
-                QPushButton[state="running"]{background-color: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 orange, stop: 1.0 #999999);
-                    color: white;}
+                QPushButton[state="running"]{background-color: orange; color: white;}
 
                 QPushButton[state="changed"]{background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
