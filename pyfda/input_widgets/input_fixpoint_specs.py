@@ -763,12 +763,9 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info(
                 'Starting fixpoint simulation with stimulus from "{0}":\n'
-                '\tfx_stimulus:{1}'
-                '\n\tStimuli: Shape {2} of type "{3}"'.format(
+                '\tfx_stimulus:\n{1}'.format(
                             dict_sig['class'],
                             pprint_log(dict_sig['fx_stimulus'], tab=" "),
-                            np.shape(dict_sig['fx_stimulus']),
-                            dict_sig['fx_stimulus'].dtype,
                             ))
 
             # Run fixpoint simulation and return the results as integer values:
