@@ -448,7 +448,7 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            logger.warning("Calc impz started!")
+            logger.info("Calc impz started!")
             # set title and axis string and calculate 10 samples to determine ndtype
             x_test = self.stim_wdg.calc_stimulus_frame(init=True)
             self.title_str = self.stim_wdg.title_str
@@ -456,7 +456,8 @@ class Plot_Impz(QWidget):
             self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
             self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
+            if self.fx_sim:
+                self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
             self.y = np.empty_like(self.x)  # response
             self.cmplx = False  # Flag for complex signal
             # initialize progress bar
@@ -466,7 +467,8 @@ class Plot_Impz(QWidget):
             self.t_start = time.process_time()
 
             if self.fx_sim:
-                # - update title string and setup input quantizer self.q_i
+                # - update title string
+                # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets
                 self.title_str = r'$Fixpoint$ ' + self.title_str
                 if np.any(np.iscomplex(x_test)):
@@ -481,7 +483,8 @@ class Plot_Impz(QWidget):
                 self.emit({'fx_sim': 'init'})
                 return
             else:
-                # initialize filter registers with zeros
+                # Initialize filter memory with zeros, for either cascaded structure (sos)
+                # or direct form
                 self.sos = np.asarray(fb.fil[0]['sos'])
                 if len(self.sos) > 0:  # has second order sections
                     self.zi = np.zeros((self.sos.shape[0], 2))
