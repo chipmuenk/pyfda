@@ -456,7 +456,8 @@ class Plot_Impz(QWidget):
             self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
             self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
+            if self.fx_sim:
+                self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
             self.y = np.empty_like(self.x)  # response
             self.cmplx = False  # Flag for complex signal
             # initialize progress bar
