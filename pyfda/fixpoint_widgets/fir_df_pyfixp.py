@@ -12,7 +12,7 @@ Widget for specifying the parameters of a direct-form DF1 FIR filter
 import typing
 import numpy as np
 from numpy.lib.function_base import iterable
-from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
+# from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
 
 import pyfda.libs.pyfda_fix_lib as fx
 
