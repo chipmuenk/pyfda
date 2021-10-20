@@ -409,7 +409,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
             if not first:
                 s += cr + tab
             if type(d[k]) in {list, np.ndarray}:
-                s += k + ' (L=' + str(len(d[k])) + ') :'\
+                s += k + ' (L=' + str(len(d[k])) + '): '\
                                 + str(d[k][: min(N-1, len(d[k]))]) + ' ...'
             else:
                 s += k + ' : ' + str(d[k])
@@ -418,8 +418,8 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
         # if type(d) == np.ndarray:
         #    d = d.tolist()
         if np.ndim(d) == 1:
-            s += ('Type: {0} -> {1}, Shape =  ({2} x 1)' + cr + tab)\
-                .format(type(d), type(d[0]), len(d))
+            s += ('Type: {0} of {1}, Shape =  ({2} x 1)' + cr + tab)\
+                .format(type(d).__name__, type(d[0]).__name__, len(d))
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
@@ -439,7 +439,7 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
                 if rows > N-1:
                     s += ' ...'
                 first = False
-        s = d
+            s = d
 
     return s
 
