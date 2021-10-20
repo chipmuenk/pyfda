@@ -502,7 +502,7 @@ class Plot_Impz(QWidget):
     # --------------------------------------------------------------------------
     def impz(self):
         """
-        Calculate response and redraw it.
+        Calculate floating point response and redraw it.
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
 
