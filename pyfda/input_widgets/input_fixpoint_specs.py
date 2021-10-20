@@ -101,10 +101,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 
-        3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in
-            'fx_sim':'send_stimulus' and pass it to HDL object for simulation
+        3. ``fx_sim_calc_response()``: Receive stimulus from widget in
+            'fx_sim':'send_stimulus' and pass it to fixpoint simulation method
 
-        4. Send back HDL response to widget via 'fx_sim':'set_response'
+        4. Send back fixpoint response to widget via 'fx_sim':'set_response'
         """
 
         logger.warning(
@@ -136,7 +136,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'error'})
 
             elif dict_sig['fx_sim'] == 'send_stimulus':
-                self.fx_sim_set_stimulus(dict_sig)
+                self.fx_sim_calc_response(dict_sig)
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui
                 # and set run button to "changed" in wdg_dict2ui()
@@ -754,19 +754,18 @@ class Input_Fixpoint_Specs(QWidget):
         return
 
 # ------------------------------------------------------------------------------
-    def fx_sim_set_stimulus(self, dict_sig):
+    def fx_sim_calc_response(self, dict_sig):
         """
-        - Get fixpoint stimulus from `dict_sig` in integer format
+        - Read fixpoint stimulus from `dict_sig` in integer format
         - Pass it to the fixpoint filter and calculate the fixpoint response
         - Send the reponse to the plotting widget
         """
         try:
             logger.info(
-                'Starting fixpoint simulation with stimulus from "{0}":\n'
-                '\tfx_stimulus:\n{1}'.format(
-                            dict_sig['class'],
-                            pprint_log(dict_sig['fx_stimulus'], tab=" "),
-                            ))
+                'Simulate fixpoint frame with "{0}" stimulus:\n{1}'.format(
+                    dict_sig['class'],
+                    pprint_log(dict_sig['fx_stimulus'], tab=" "),
+                    ))
 
             # Run fixpoint simulation and return the results as integer values:
             self.fx_results = self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])
