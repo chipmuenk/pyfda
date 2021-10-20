@@ -448,7 +448,7 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            logger.info("Calc impz started!")
+            logger.info("Starting calculation of transient response")
             # set title and axis string and calculate 10 samples to determine ndtype
             x_test = self.stim_wdg.calc_stimulus_frame(init=True)
             self.title_str = self.stim_wdg.title_str
@@ -478,7 +478,7 @@ class Plot_Impz(QWidget):
 
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-                logger.info("Start FX simulation")
+                logger.info("Starting calculation of fixpoint transient response")
                 self.t_start = time.process_time()
                 self.emit({'fx_sim': 'init'})
                 return
@@ -513,8 +513,8 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         # ----------------------- calc_frame ----------------------------------
         # ---------------------------------------------------------------------
-        logger.warning(f"{self.N_first} of {self.ui.N_end}")
         while self.N_first < self.ui.N_end:
+            logger.info(f"impz(): Calculating {self.N_first} of {self.ui.N_end}")
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
@@ -556,19 +556,18 @@ class Plot_Impz(QWidget):
             self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
                 self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
 
-        logger.warning("FINISH - Redraw impz started!")
         # Test whether response or stimulus are complex
         # TODO: shouldn't stimulus and response be treated separately?
         self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
-        logger.info('[{0:5.4g} ms]: Floating point response calculated.'
+        logger.info('[{0:5.4g} ms]: Floating point response calculated [impz()].'
                     .format((self.t_resp - self.t_start)*1000))
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
-        logger.info('[{0:5.4g} ms]: Floating point plot drawn.'
+        logger.info('[{0:5.4g} ms]: Transient response plotted.'
                     .format((time.process_time() - self.t_resp)*1000))
         qstyle_widget(self.ui.but_run, "normal")
 
@@ -658,7 +657,7 @@ class Plot_Impz(QWidget):
 
         If `self.fx_sim` has changed, `self.needs_calc` is set to True.
         """
-        logger.info("start fx_select")
+        logger.info(f"Called fx_select({fx})")
 
         if fx in {0, 1}:  # connected to index change of combo box
             pass
