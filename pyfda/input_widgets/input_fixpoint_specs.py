@@ -780,7 +780,8 @@ class Input_Fixpoint_Specs(QWidget):
                     f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
                     f' of type "{dict_sig["fx_stimulus"].dtype}"'
                     f'\n\tResponse: Shape {np.shape(self.fx_results)}'
-                    f' of type "{type(self.fx_results)}"'
+                    f' of type "{type(self.fx_results).__name__} "'
+                    f' ("{type(self.fx_results[0]).__name__}")'
                 )
 
             # TODO: fixed point / integer to float conversion?
