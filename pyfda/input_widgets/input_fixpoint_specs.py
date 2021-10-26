@@ -136,7 +136,9 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'error'})
 
             elif dict_sig['fx_sim'] == 'send_stimulus':
-                self.fx_sim_calc_response(dict_sig)
+                dict_sig = self.fx_sim_calc_response(dict_sig)
+                self.emit(dict_sig)
+                return
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui
                 # and set run button to "changed" in wdg_dict2ui()
@@ -733,6 +735,11 @@ class Input_Fixpoint_Specs(QWidget):
         - Update the `fxqc_dict` containing all quantization information
         - Setup a filter instance for (n)migen simulation
         - Request a stimulus signal
+        
+        Returns
+        -------
+        dict_sig: dict
+            dictionary with stuff to emit (either error or )
         """
         if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
             logger.error(
@@ -754,11 +761,17 @@ class Input_Fixpoint_Specs(QWidget):
         return
 
 # ------------------------------------------------------------------------------
-    def fx_sim_calc_response(self, dict_sig):
+    def fx_sim_calc_response(self, dict_sig) -> dict:
         """
         - Read fixpoint stimulus from `dict_sig` in integer format
         - Pass it to the fixpoint filter and calculate the fixpoint response
         - Send the reponse to the plotting widget
+        
+        Returns
+        -------
+        dict_sig: dict
+            dictionary with stuff to emit (either `{'fx_sim': 'error'}` or
+            `{'fx_sim': 'set_results', 'fx_results': self.fx_results}`
         """
         try:
             logger.info(
@@ -790,8 +803,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.error("Simulator error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
-            self.emit({'fx_sim': 'error'})
-            return
+            return {'fx_sim': 'error'}
         except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
                          '\twith msg. "{1}"\n\tStimuli: Shape {2} of type "{3}"'
@@ -805,14 +817,12 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
-            self.emit({'fx_sim': 'error'})
-            return
+            return {'fx_sim': 'error'}
 
         logger.debug("Sending fixpoint results")
         dict_sig = {'fx_sim': 'set_results', 'fx_results': self.fx_results}
-        self.emit(dict_sig)
         qstyle_widget(self.butSimHDL, "normal")
-        return
+        return dict_sig
 
 
 ###############################################################################
