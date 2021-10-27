@@ -21,7 +21,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'FIR_DF_wdg': 'FIR_DF'}  #: Dict containing widget class name : display name
+classes = {'FIR_DF_pyfixp': 'FIR_DF'}  #: Dict containing widget class name : display name
 
 
 class FIR_DF_pyfixp(object):
