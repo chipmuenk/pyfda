@@ -124,7 +124,7 @@ class FIR_DF_pyfixp(object):
 
     # --------------------------------------------------------------------------
     def lfilter_zi(self, b: iterable, x: iterable, zi: iterable = None)\
-            -> typing.Tuple(np.ndarray, np.ndarray):
+            -> typing.Tuple[np.ndarray, np.ndarray]:
         """
         TODO: When len(x) < len(b), only zeros are returned because the for loop
         is never executed
