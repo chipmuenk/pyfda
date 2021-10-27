@@ -208,3 +208,5 @@ if __name__ == '__main__':
 
     xq = dut.lfilter(b=None, x=stim[:10])
     print(xq)
+    xq = dut.lfilter_zi(b=None, x=np.zeros(10))
+    print(xq)
