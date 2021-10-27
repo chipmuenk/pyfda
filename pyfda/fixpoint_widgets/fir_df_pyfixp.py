@@ -199,7 +199,7 @@ class FIR_DF_pyfixp(object):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df` """
+    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df_pyfixp` """
 
     dut = FIR_DF_pyfixp(b=[1, 1, 1, 1, 1],
                         q_acc={'Q': '5.0', 'ovfl': 'wrap', 'quant': 'round'})
