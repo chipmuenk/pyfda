@@ -112,15 +112,21 @@ class FIR_DF_pyfixp(object):
         return
 
     # --------------------------------------------------------------------------
-    def lfilter(self, b: iterable, x) -> np.ndarray:
+    def lfilter(self, b: iterable = None, x: iterable = None) -> np.ndarray:
         """
         Calculate FIR filter (direct form) response via difference equation with
         quantization. The filter is initialized with zeros.
 
         This method is equivalent to `scipy.signal.lfilter()`.
         """
+        
+        if b is not None:  # update coefficients
+            self.b = b
+        if x is None:
+            x = np.zeros(len(self.b))
+            x[0] = 1  # return impulse response
 
-        return self.lfilter_zi(b=b, x=x, zi=np.zeros(len(b)))[0]
+        return self.lfilter_zi(b=b, x=x, zi=np.zeros(len(self.b)))[0]
 
     # --------------------------------------------------------------------------
     def lfilter_zi(self, b: iterable, x: iterable, zi: iterable = None)\
