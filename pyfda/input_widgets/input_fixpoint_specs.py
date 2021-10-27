@@ -32,9 +32,9 @@ from pyfda.pyfda_rc import params
 import logging
 logger = logging.getLogger(__name__)
 
+# TODO: 
 # when nmigen is present, instantiate the fixpoint widget
-if cmp_version("nmigen", "0.2") >= 0:  # currently, version cannot be determined
-    import nmigen
+if cmp_version("nmigen", "0.2") >= 0:
     HAS_NMIGEN = True
 else:
     HAS_NMIGEN = False

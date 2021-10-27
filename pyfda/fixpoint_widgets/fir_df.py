@@ -20,7 +20,8 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 import pyfda.libs.pyfda_fix_lib as fx
-from .fixpoint_helpers import UI_W, UI_Q, requant
+from .fixpoint_helpers import UI_W, UI_Q
+from .fixpoint_helpers_nmigen import requant
 
 #####################
 from functools import reduce
