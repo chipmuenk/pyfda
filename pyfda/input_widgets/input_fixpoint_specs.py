@@ -79,7 +79,7 @@ class Input_Fixpoint_Specs(QWidget):
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
 
-        if HAS_NMIGEN:
+        if True: # HAS_NMIGEN:
             self._construct_UI()
             inst_wdg_list = self._update_filter_cmb()
             if len(inst_wdg_list) == 0:
@@ -550,6 +550,7 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod_class_name = qget_cmb_box(self.cmb_wdg_fixp, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
             fx_wdg_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
+            logger.info(f"Instantiating {fx_mod.__name__} - {fx_wdg_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_wdg_inst = fx_wdg_class(self)  # instantiate the fixpoint widget
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
