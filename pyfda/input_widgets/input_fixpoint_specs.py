@@ -32,7 +32,7 @@ from pyfda.pyfda_rc import params
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO: 
+# TODO:
 # when nmigen is present, instantiate the fixpoint widget
 if cmp_version("nmigen", "0.2") >= 0:
     HAS_NMIGEN = True
@@ -79,7 +79,7 @@ class Input_Fixpoint_Specs(QWidget):
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
 
-        if True: # HAS_NMIGEN:
+        if True:  # HAS_NMIGEN:
             self._construct_UI()
             inst_wdg_list = self._update_filter_cmb()
             if len(inst_wdg_list) == 0:
@@ -736,7 +736,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Update the `fxqc_dict` containing all quantization information
         - Setup a filter instance for (n)migen simulation
         - Request a stimulus signal
-        
+
         Returns
         -------
         dict_sig: dict
@@ -767,7 +767,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Read fixpoint stimulus from `dict_sig` in integer format
         - Pass it to the fixpoint filter and calculate the fixpoint response
         - Send the reponse to the plotting widget
-        
+
         Returns
         -------
         dict_sig: dict

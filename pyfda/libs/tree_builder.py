@@ -14,10 +14,7 @@ import os, sys, re, ast
 from collections import OrderedDict
 from pprint import pformat
 import importlib
-import configparser # only py3
-
-import logging
-logger = logging.getLogger(__name__)
+import configparser
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -25,7 +22,11 @@ import pyfda.libs.pyfda_dirs as dirs
 
 from .frozendict import freeze_hierarchical
 
-#--------------------------------------------------------------------------
+import logging
+logger = logging.getLogger(__name__)
+
+
+# --------------------------------------------------------------------------
 def merge_dicts(d1, d2, path=None, mode='keep1'):
     """
     Merge the hierarchical dictionaries ``d1`` and ``d2``.  The dict ``d1`` is
@@ -46,7 +47,8 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 
         * :'keep2': keep the entry from ``d2``
 
-        * :'add1': merge the entries, putting the values from ``d2`` first (important for lists)
+        * :'add1': merge the entries, putting the values from ``d2`` first
+                    (important for lists)
 
         * :'add2': merge the entries, putting the values from ``d1`` first (  "  )
 
@@ -82,29 +84,30 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
         # at least one of the arguments is not a dict -> don't do anything
         return d1
 
-    if path is None: path = ""
+    if path is None:
+        path = ""
     for key in d2:
         if key in d1:
             if isinstance(d1[key], dict) and isinstance(d2[key], dict):
                 # both entries are dicts, recurse one level deeper:
-                merge_dicts(d1[key], d2[key], path = path + str(key), mode=mode)
-#TODO:            elif <either d1[key] OR d2[key] is not a dict> -> exception
+                merge_dicts(d1[key], d2[key], path=path + str(key), mode=mode)
+# TODO:            elif <either d1[key] OR d2[key] is not a dict> -> exception
             elif d1[key] == d2[key] or mode == 'keep1':
                 pass  # keep item in dict1, discard item with same key in dict1
             elif mode == 'keep2':
-                d1[key] = d2[key] # replace item in dict1 by item in dict2
+                d1[key] = d2[key]  # replace item in dict1 by item in dict2
             else:
                 try:
                     if mode == 'add2':
                         if (isinstance(d1[key], tuple) and
-                            isinstance(d2[key], tuple)):
+                                isinstance(d2[key], tuple)):
                             d1[key] = (d2[key][0], d2[key][1] + d1[key][1])
                         else:
                             d1[key] = d2[key] + d1[key]
 
                     elif mode == 'add1':
                         if (isinstance(d1[key], tuple) and
-                            isinstance(d2[key], tuple)):
+                                isinstance(d2[key], tuple)):
                             d1[key] = (d1[key][0], d1[key][1] + d2[key][1])
                         else:
                             d1[key] = d1[key] + d2[key]
@@ -112,13 +115,16 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
                     else:
                         logger.warning("Unknown merge mode {0}.".format(mode))
                 except Exception as e:
-                    logger.warning("Merge conflict at {0}: {1}".format(path + str(key), e ))
+                    logger.warning(
+                        f"Merge conflict at {path + str(key)}: {e}")
         else:
-            d1[key] = d2[key] # add new entry to dict1
+            d1[key] = d2[key]  # add new entry to dict1
     return d1
+
 
 class ParseError(Exception):
     pass
+
 
 class Tree_Builder(object):
     """
@@ -126,19 +132,16 @@ class Tree_Builder(object):
 
     - all filter combinations
     - valid combinations of filter widgets and fixpoint implementations
-
-
     """
 
     def __init__(self):
-
         logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
 
-        self.REQ_VERSION = 4 # required version for config file
+        self.REQ_VERSION = 4  # required version for config file
         self.parse_conf_file()
         self.init_filters()
 
-#==============================================================================
+    # --------------------------------------------------------------------------
     def init_filters(self):
         """
         Run at startup to populate global dictionaries and lists:
@@ -159,7 +162,6 @@ class Tree_Builder(object):
 
             **rt-ft-fc-fo-subwidget:params** .
 
-
         Parameters
         ----------
         None
@@ -172,17 +174,20 @@ class Tree_Builder(object):
 
         """
 
-        #self.parse_conf_file()
+        # self.parse_conf_file()
 
         fil_tree = {}
 
-        for fc in fb.filter_classes:  # iterate over all previously found filter classes fc
+        for fc in fb.filter_classes:  # iterate over all previously found filter
+                                      # classes fc
 
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
-                logger.warning('Skipping filter class "{0:s}" due to import error {1:d}'.format(fc, err_code))
-                continue # continue with next entry in fb.filter_classes
+                logger.warning(
+                    'Skipping filter class "{0:s}" due to import error {1:d}'
+                    .format(fc, err_code))
+                continue  # continue with next entry in fb.filter_classes
 
             # add attributes from dict to fil_tree for filter class fc
             fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
@@ -191,7 +196,6 @@ class Tree_Builder(object):
             if hasattr(ff.fil_inst, 'rt_dict_add'):
                 fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
                 merge_dicts(fil_tree, fil_tree_add, mode='add1')
-
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
         fb.fil_tree = freeze_hierarchical(fil_tree)
@@ -204,7 +208,7 @@ class Tree_Builder(object):
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
-#==============================================================================
+    # --------------------------------------------------------------------------
     def parse_conf_file(self):
         """
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
@@ -246,8 +250,8 @@ class Tree_Builder(object):
                 sect += "\t\t[" + str(s) + "]\n"
             logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
                         .format(dirs.USER_CONF_DIR_FILE, sect))
-        # -----------------------------------------------------------------
 
+        # ----------------------------------------------------------------------
         def read_conf_version():
             """
             Try to read out the version of the config file, if the version
@@ -258,27 +262,29 @@ class Tree_Builder(object):
             try:
                 conf_ver = int(self.commons['version'][0])
                 if conf_ver != self.REQ_VERSION:
-                    logger.error("User config file\n\t'{conf_file:s}'\n\thas the wrong version '{conf_ver}' "
-                                 "(required: '{req_version}')."
-                                 .format(conf_file=dirs.USER_CONF_DIR_FILE,
-                                         conf_ver=conf_ver,
-                                         req_version=self.REQ_VERSION))
+                    logger.error(
+                        "User config file\n\t'{conf_file:s}'\n\thas the wrong version "
+                        "'{conf_ver}' (required: '{req_version}')."
+                        .format(conf_file=dirs.USER_CONF_DIR_FILE, conf_ver=conf_ver,
+                                req_version=self.REQ_VERSION))
                     success = False
             except KeyError:
                 logger.error("No entry 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
                 success = False
             except (IndexError, ValueError, TypeError):
-                logger.error("No suitable value for 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
-                success  = False
+                logger.error(
+                    f"No suitable value for 'version' in {dirs.USER_CONF_DIR_FILE}")
+                success = False
 
             return success
-       # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
 
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
             if not os.access(dirs.USER_CONF_DIR_FILE, os.R_OK):
-                raise IOError('Config file "{0}" cannot be read.'.format(dirs.USER_CONF_DIR_FILE))
+                raise IOError(
+                    f'Config file "{dirs.USER_CONF_DIR_FILE}"')
 
             # -----------------------------------------------------------------
             # setup an instance of config parser, allow  keys without value
@@ -288,12 +294,12 @@ class Tree_Builder(object):
             # Set it to function str()
             self.conf.optionxform = str
             # Allow interpolation across sections, ${Dirs:dir1}
-            self.conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
+            self.conf._interpolation = configparser.ExtendedInterpolation()
 
             read_conf_file()
-            # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
             # Parsing [Common]
-            #------------------------------------------------------------------
+            # ------------------------------------------------------------------
             self.commons = self.parse_conf_section("Common")
             logger.info("Found {0} entries in [Common]".format(len(self.commons)))
 
@@ -301,7 +307,8 @@ class Tree_Builder(object):
                 dirs.update_conf_files(logger)
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
-                logger.info("Found {0} entries in [Common] (new config file)".format(len(self.commons)))
+                logger.info(
+                    f"Found {len(self.commons)} entries in [Common] (new config file)")
 
                 if not read_conf_version():
                     logger.critical("Version number is still invalid, terminating.")
@@ -322,17 +329,17 @@ class Tree_Builder(object):
             else:
                 logger.info("No valid user directory specified.")
 
-            # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
             # Parsing [Input Widgets]
-            #------------------------------------------------------------------
+            # ------------------------------------------------------------------
             fb.input_classes = self.build_class_dict("Input Widgets", "input_widgets")
-            # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
             # Parsing [Plot Widgets]
-            #------------------------------------------------------------------
+            # ------------------------------------------------------------------
             fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
-            # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
             # Parsing [Filter Widgets]
-            #------------------------------------------------------------------
+            # ------------------------------------------------------------------
             fb.filter_classes = self.build_class_dict("Filter Widgets", "filter_widgets")
             # currently, option "opt" can only be an association with a fixpoint
             # widget, so replace key "opt" by key "fix":
@@ -340,12 +347,14 @@ class Tree_Builder(object):
             for c in fb.filter_classes:
                 if 'opt' in fb.filter_classes[c]:
                     fb.filter_classes[c]['fix'] = fb.filter_classes[c].pop('opt')
-                if 'fix' in fb.filter_classes[c] and type(fb.filter_classes[c]['fix']) == str:
+                if 'fix' in fb.filter_classes[c] and\
+                        type(fb.filter_classes[c]['fix']) == str:
                     fb.filter_classes[c]['fix'] = fb.filter_classes[c]['fix'].split(',')
-            # -----------------------------------------------------------------
+            # ------------------------------------------------------------------
             # Parsing [Fixpoint Filters]
-            #------------------------------------------------------------------
-            fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
+            # ------------------------------------------------------------------
+            fb.fixpoint_classes = self.build_class_dict(
+                "Fixpoint Widgets", "fixpoint_widgets")
 
             # First check whether fixpoint options of the filter widgets are
             # valid fixpoint classes by comparing them to the verified items of
@@ -354,8 +363,9 @@ class Tree_Builder(object):
                 if 'fix' in fb.filter_classes[c]:
                     for w in fb.filter_classes[c]['fix']:
                         if w not in fb.fixpoint_classes:
-                            logger.warning('Removing invalid fixpoint module\n\t"{0}" for filter class "{1}".'\
-                                           .format(w,c))
+                            logger.warning(
+                                f'Removing invalid fixpoint module\n\t"{w}" '
+                                f'for filter class "{c}".')
                             fb.filter_classes[c]['fix'].remove(w)
             # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
             # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
@@ -363,27 +373,28 @@ class Tree_Builder(object):
 
                 # collect all fixpoint widgets (keys in fb.fixpoint_classes) which
                 # have the class name c as a value
-                fix_wdg = {k for k,val in fb.fixpoint_classes.items() if c in val['opt']}
+                fix_wdg = {k for k, val in fb.fixpoint_classes.items() if c in val['opt']}
                 if len(fix_wdg) > 0:
                     if 'fix' in fb.filter_classes[c]:
-                        #... and merge it with the fixpoint options of class c
+                        # ... and merge it with the fixpoint options of class c
                         fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
 
-                    fb.filter_classes[c].update({'fix':list(fix_wdg)})
+                    fb.filter_classes[c].update({'fix': list(fix_wdg)})
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
-            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            logger.critical('Duplicate section in config file '
+                            f'"{dirs.USER_CONF_DIR_FILE}":\n{e}.')
             sys.exit()
         except configparser.ParsingError as e:
-            logger.critical('Parsing Error in config file "{0}:\n{1}".'
-                            .format(dirs.USER_CONF_DIR_FILE,e))
+            logger.critical('Parsing error in config file "{0}:\n{1}".'
+                            .format(dirs.USER_CONF_DIR_FILE, e))
             sys.exit()
         except configparser.Error as e:
-            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            logger.critical(f'{e} in config file "{dirs.USER_CONF_DIR_FILE}".')
             sys.exit()
 
-#==============================================================================
+    # --------------------------------------------------------------------------
     def parse_conf_section(self, section):
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
@@ -403,7 +414,8 @@ class Tree_Builder(object):
         """
         try:
             section_conf_dict = OrderedDict()
-            items_list = self.conf.items(section) # entries from config file with [name, path]
+            # get entries from config file with [name, path]
+            items_list = self.conf.items(section)
 
             if len(items_list) > 0:
                 for i in items_list:
@@ -411,20 +423,20 @@ class Tree_Builder(object):
                     val = i[1].strip(' \t\n\r[]"')
                     if len(i[1]) == 0:
                         val = ""
-                    elif i[1][0] == '{': # try to convert to dict
+                    elif i[1][0] == '{':  # try to convert to dict
                         try:
                             val = ast.literal_eval(val)
                         except SyntaxError as e:
-                            logger.warning("Syntax Error in config file\n{0}".format(e) )
+                            logger.warning(f"Syntax Error in config file\n{e}")
                             val = ""
                     else:
                         val = re.sub('["\'\[\]]','', val)
-                        val = re.split('; |, |\n|,\n|\r', val) # TODO: Test
+                        val = re.split('; |, |\n|,\n|\r', val)  # TODO: Test
 
-                    section_conf_dict.update({i[0]:val})
+                    section_conf_dict.update({i[0]: val})
 
                 logger.debug('Found {0:2d} entries in [{1:s}].'
-                        .format(len(section_conf_dict), section))
+                             .format(len(section_conf_dict), section))
             else:
                 logger.warning('Empty section [{0:s}].'.format(section))
 
@@ -442,7 +454,7 @@ class Tree_Builder(object):
 
         return section_conf_dict
 
-#==============================================================================
+    # --------------------------------------------------------------------------
     def build_class_dict(self, section, subpackage=""):
         """
         - Try to dynamically import the modules (= files) parsed in `section`
@@ -487,91 +499,97 @@ class Tree_Builder(object):
               'fix': 'IIR_cascade',
               'opt': ["option1", "option2"]}
         """
-        classes_dict = OrderedDict() # dict for all successfully imported classes
-        num_imports = 0       # number of successful module imports
-        imported_classes = "" # names of successful module imports
-        pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.'] # search in that order
+        classes_dict = OrderedDict()  # dict for all successfully imported classes
+        num_imports = 0        # number of successful module imports
+        imported_classes = ""  # names of successful module imports
+        pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.']  # search in that order
 
         section_conf_dict = self.parse_conf_section(section)
 
-        for mod_name in section_conf_dict: # iterate over dict keys found in config file
+        for mod_name in section_conf_dict:  # iterate over dict keys found in config file
             for p in pckg_names:
                 try:  # Try to import the module from the package list above
-                    mod_fq_name = p + mod_name # fully qualified module name (fqn)
+                    mod_fq_name = p + mod_name  # fully qualified module name (fqn)
                     # Try to import the module from the  package and get a handle:
                     ################################################
                     mod = importlib.import_module(mod_fq_name)
                     ################################################
-                    break #-> successful import, break out of pckg_names loop
+                    break  # -> successful import, break out of pckg_names loop
                 except ImportError:
                     mod_fq_name = None
-                    continue # module not found, try next package
+                    continue  # module not found, try next package
                 except Exception as e:
-                    logger.warning('Error during import of "{0}":\n{1}'.format(mod_fq_name, e))
+                    logger.warning(f'Error during import of "{mod_fq_name}":\n{e}')
                     mod_fq_name = None
-                    continue # Some other error ocurred during import, try next package
+                    continue  # Some other error ocurred during import, try next package
 
             if not mod_fq_name:
-                logger.warning('Module "{0}" could not be imported.'.format(mod_name))
+                logger.warning(f'Module "{mod_name}" could not be imported.')
                 continue
 
             if hasattr(mod, 'classes'):
                 # check type of module attribute 'classes', try to convert to dict
-                if isinstance(mod.classes, dict): # dict {class name : combo box name}
-                    mod_dict = mod.classes # one or more filter classes in one file
-                elif isinstance(mod.classes, str): # String, create a dict with the
-                    mod_dict = {mod.classes:mod.classes} # string as both key and value
-                elif isinstance(mod.classes, list): # list, create a dict with list items
-                    mod_dict = {l:l for l in list}  # as both key and value
+                if isinstance(mod.classes, dict):  # dict {class name : combo box name}
+                    mod_dict = mod.classes  # one or more filter classes in one file
+                elif isinstance(mod.classes, str):  # String, create a dict with the
+                    mod_dict = {mod.classes: mod.classes}  # string as both key and value
+                elif isinstance(mod.classes, list):  # list, create a dict with list items
+                    mod_dict = {l: l for l in list}  # as both key and value
                 else:
-                    logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
-                    %(str(mod_name), str(type(mod.classes).__name__)))
-                    continue # with next entry in section_conf_dict
-                #logger.info("MOD_DICT: {0}".format(mod_dict))
+                    logger.warning(
+                        f"Skipping module '{mod_name}', its attribute 'classes' "
+                        f"has the wrong type '{type(mod.classes).__name__}'.")
+                    continue  # with next entry in section_conf_dict
+                # logger.info("MOD_DICT: {0}".format(mod_dict))
             else:
                 # no `classes` attribute - skip entry
-                logger.warning('Skipping module "{0}" due to missing attribute "classes".'.format(mod_name))
+                logger.warning(
+                    f'Skipping module "{mod_name}" due to missing attribute "classes".')
                 continue
 
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:
-                if not hasattr(mod, c): # class c doesn't exist in module
-                    logger.warning("Skipping class '{0}', it doesn't exist in module '{1}'."\
-                                   .format(c, mod_fq_name))
-                    continue # continue with next entry in classes_dict
+                if not hasattr(mod, c):  # class c doesn't exist in module
+                    logger.warning(
+                        f"Skipping class '{c}', it doesn't exist in "
+                        f"module '{mod_fq_name}'.")
+                    continue  # continue with next entry in classes_dict
                 else:
-                    classes_dict.update({c:{'name':mod_dict[c],  # Class name
-                                            'mod':mod_fq_name}}) # Fully qualified module name
+                    classes_dict.update(
+                        {c: {'name': mod_dict[c],   # Class name
+                             'mod': mod_fq_name}})  # Fully qualified module name
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and a dict containing
-                    # "name":display name and "mod":fully qualified module name as values, e.g.
-                    # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
+                    # "name":display name and "mod":fully qualified module name as values,
+                    # e.g. 'Butter':{'name':'Butterworth',
+                    #                'mod':'pyfda.filter_design.butter'}
 
                     # check whether options have been defined in the config file
                     opt = section_conf_dict[mod_name]
                     if opt:
                         if type(opt) == dict:
                             classes_dict[c].update(opt)
-                        elif type(opt) in {str, list}: # create dict {'opt':<OPTION>}
-                            classes_dict[c].update({"opt":opt})
+                        elif type(opt) in {str, list}:  # create dict {'opt':<OPTION>}
+                            classes_dict[c].update({"opt": opt})
                         else:
-                            logger.warning('Class "{0}" option data type "{1}" not understood:\n "{2}"'\
-                                           .format(c, type(opt).__name__, opt))
+                            logger.warning(
+                                f'Class "{c}" option data type "{type(opt).__name__}" '
+                                f'not understood:\n "{opt}"')
 
                 # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
-                imported_classes += "\t" + mod_fq_name + "."+ c + "\n"
+                imported_classes += "\t" + mod_fq_name + "." + c + "\n"
 
         if num_imports < 1:
             logger.warning("No class could be imported.")
         else:
-            logger.info("Found {0:d} classes in [{1:s}]:\n{2:s}"\
-                    .format(num_imports, section, imported_classes))
+            logger.info("Found {0:d} classes in [{1:s}]:\n{2:s}"
+                        .format(num_imports, section, imported_classes))
         logger.debug(classes_dict)
         return classes_dict
 
-#==============================================================================
-    def build_fil_tree(self, fc, rt_dict, fil_tree = None):
+    # --------------------------------------------------------------------------
+    def build_fil_tree(self, fc, rt_dict, fil_tree=None):
         """
         Read attributes (ft, rt, rt:fo) from filter class fc)
         Attributes are stored in
@@ -656,34 +674,34 @@ class Tree_Builder(object):
         if not fil_tree:
             fil_tree = {}
 
-        ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
+        ft = ff.fil_inst.ft                    # get filter type (e.g. 'FIR')
 
-        for rt in rt_dict:                   # iterate over all response types
-            if rt == 'COM':                  # handle common info later
+        for rt in rt_dict:                     # iterate over all response types
+            if rt == 'COM':                    # handle common info later
                 continue
 
-            if rt not in fil_tree:           # is response type already in dict?
-                fil_tree.update({rt:{}})     # no, create it
+            if rt not in fil_tree:             # is response type already in dict?
+                fil_tree.update({rt: {}})      # no, create it
 
-            if ft not in fil_tree[rt]:       # filter type already in dict[rt]?
-                fil_tree[rt].update({ft:{}}) # no, create it
+            if ft not in fil_tree[rt]:         # filter type already in dict[rt]?
+                fil_tree[rt].update({ft: {}})  # no, create it
 
-            if fc not in fil_tree[rt][ft]:       # filter class already in dict[rt][ft]?
-                fil_tree[rt][ft].update({fc:{}}) # no, create it
+            if fc not in fil_tree[rt][ft]:         # filter class already in dict[rt][ft]?
+                fil_tree[rt][ft].update({fc: {}})  # no, create it
 
             # now append all the individual 'min' / 'man'  subwidget infos to fc:
             fil_tree[rt][ft][fc].update(rt_dict[rt])
 
             if 'COM' in rt_dict:      # Now handle common info
-                for fo in rt_dict[rt]: # iterate over 'min' / 'max'
-                    if fo in rt_dict['COM']: # and add common info first
+                for fo in rt_dict[rt]:  # iterate over 'min' / 'max'
+                    if fo in rt_dict['COM']:  # and add common info first
                         merge_dicts(fil_tree[rt][ft][fc][fo],
                                     rt_dict['COM'][fo], mode='add2')
 
         return fil_tree
 
 
-#==============================================================================
+# ==============================================================================
 if __name__ == "__main__":
 
     # Need to start a QApplication to avoid the error

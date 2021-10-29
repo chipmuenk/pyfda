@@ -119,7 +119,7 @@ class FIR_DF_pyfixp(object):
 
         This method is equivalent to `scipy.signal.lfilter()`.
         """
-        
+
         if b is not None:  # update coefficients
             self.b = b
         if x is None:
