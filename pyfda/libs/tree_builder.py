@@ -146,16 +146,6 @@ class Tree_Builder(object):
         """
         Run at startup to populate global dictionaries and lists:
 
-        - :func:`parse_conf_file()`:  Parse the configuration file `pyfda.conf`
-          (specified in ``dirs.USER_CONF_DIR_FILE``) using :func:`build_class_dict()`
-          which calls :func:`parse_conf_section()`: Try to find and import the
-          modules specified in the corresponding sections  there; extract and
-          import the classes defined in each module and give back an OrderedDict
-          containing successfully imported classes with their options
-          (like fully qualified module names, display name, associated fixpoint
-          widgets etc.). Information for each  section is stored in globally
-          accessible OrderdDicts like`fb.filter_classes`.
-
         - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
           in the global dict ``fb.filter_classes`` and store them in the filter
           tree dict ``fil_tree`` with the hierarchy
@@ -211,7 +201,23 @@ class Tree_Builder(object):
     # --------------------------------------------------------------------------
     def parse_conf_file(self):
         """
-        Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
+        Parse the configuration file `pyfda.conf` (specified in
+        ``dirs.USER_CONF_DIR_FILE``). This is run only once at instantiation.
+
+        This is performed using :func:`build_class_dict()` which calls
+        :func:`parse_conf_section()`:
+
+        - Try to find and import the modules specified in the corresponding sections
+
+        - Extract and import the classes defined in each module and give back an 
+          OrderedDict with the successfully imported classes and their options
+          (like fully qualified module names, display name, associated fixpoint
+          widgets etc.).
+
+        - Information for each  section is stored in globally
+          accessible OrderdDicts like`fb.filter_classes`.
+
+        The following sections are analyzed:
 
         :[Commons]:
             Try to find user directories; if they exist add them to
@@ -221,17 +227,16 @@ class Tree_Builder(object):
         as keys and dictionaries with options as values.
 
         :[Input Widgets]:
-            Store (user) input widgets in `fb.input_dict`
+            Store (user) input widgets in `fb.input_classes`
 
         :[Plot Widgets]:
-            Store (user) plot widgets in `fb.plot_dict`
+            Store (user) plot widgets in `fb.plot_classes`
 
         :[Filter Widgets]:
-            Store (user) filter widgets in `fb.filter_dict`
+            Store (user) filter widgets in `fb.filter_classes`
 
         :[Fixpoint Widgets]:
-            Store (user) fixpoint widgets in `fb.fixpoint_dict`
-
+            Store (user) fixpoint widgets in `fb.fixpoint_classes`
 
         Parameters
         ----------
@@ -239,7 +244,7 @@ class Tree_Builder(object):
 
         Returns
         -------
-        None
+        None, but `self.conf` contains the parsed configuration file.
 
         """
         def read_conf_file():
@@ -251,7 +256,7 @@ class Tree_Builder(object):
             logger.info("Parsing config file\n\t'{0}' with sections:\n{1}"
                         .format(dirs.USER_CONF_DIR_FILE, sect))
 
-        # ----------------------------------------------------------------------
+        # -----------------
         def read_conf_version():
             """
             Try to read out the version of the config file, if the version
@@ -277,8 +282,9 @@ class Tree_Builder(object):
                 success = False
 
             return success
-            # ------------------------------------------------------------------
+        # --------------
 
+        # ========= Starting here! =============================================
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
@@ -458,10 +464,10 @@ class Tree_Builder(object):
     def build_class_dict(self, section, subpackage=""):
         """
         - Try to dynamically import the modules (= files) parsed in `section`
-          reading their module level attribute `classes` with classes contained
-          in the module.
+          reading their module level attribute `classes` listing the classes
+          contained in the module.
 
-          `classes` is a dictionary, e.g. `{"Cheby":"Chebyshev 1"}` where
+          When `classes` is a dictionary, e.g. `{"Cheby":"Chebyshev 1"}` where
           the key is the class name in the module and the value the corresponding
           display name (used for the combo box).
 
