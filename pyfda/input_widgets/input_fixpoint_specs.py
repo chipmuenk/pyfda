@@ -16,7 +16,7 @@ import importlib
 
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
-    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
+    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy, QPalette, QColor)
 
 import numpy as np
 
@@ -290,10 +290,17 @@ class Input_Fixpoint_Specs(QWidget):
         frmQoWdg.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
-#       Dynamically updated image of filter topology
+#       Dynamically updated image of filter topology (label as placeholder)
 # ------------------------------------------------------------------------------
-        # label is a placeholder for image
+        # allow setting background color
+        # lbl_fixp_img_palette = QPalette()
+        # lbl_fixp_img_palette.setColor(QPalette(window, Qt: white))
+        # lbl_fixp_img_palette.setBrush(self.backgroundRole(), QColor(150, 0, 0))
+        # lbl_fixp_img_palette.setColor(QPalette: WindowText, Qt: blue)
+
         self.lbl_fixp_img = QLabel("img not set", self)
+        self.lbl_fixp_img.setAutoFillBackground(True)
+        # self.lbl_fixp_img.setPalette(lbl_fixp_img_palette)
         # self.lbl_fixp_img.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.embed_fixp_img(self.no_fx_filter_img)
@@ -470,19 +477,20 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
         the image inside QLabel to completely fill the label while keeping
-        the aspect ratio.
+        the aspect ratio. An offset of some pixels is needed, otherwise the image
+        is clipped.
         """
         # logger.warning(f"resize_img(): img_fixp = {self.img_fixp.__class__.__name__}")
 
         if self.parent is None:  # parent is QApplication, has no width or height
-            par_w, par_h = 300, 700  # fixed size for module test
+            par_w, par_h = 300, 700  # fixed size for module level test
         else:  # widget parent is InputTabWidget()
             par_w, par_h = self.parent.width(), self.parent.height()
 
         img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
 
         if img_w > 10:
-            max_h = int(max(np.floor(img_h * par_w/img_w) - 15, 20))
+            max_h = int(max(np.floor(img_h * par_w/img_w) - 5, 20))
         else:
             max_h = 200
         logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}"
