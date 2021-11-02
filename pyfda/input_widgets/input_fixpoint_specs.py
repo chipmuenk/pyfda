@@ -546,8 +546,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.lblTitle.setText("")
 
             self.fx_wdg_inst = None
-
-        # destruct old fixpoint widget instance
+        # -----------------------------------------------------------
+        # destruct old fixpoint widget instance:
         _disable_fx_wdg(self)
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
