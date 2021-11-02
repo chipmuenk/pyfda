@@ -20,31 +20,12 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 import pyfda.libs.pyfda_fix_lib as fx
-from .fixpoint_helpers import UI_W, UI_Q
-from .fixpoint_helpers_nmigen import requant
-
-#####################
-from functools import reduce
-from operator import add
-
-# from migen import Signal, Module, run_simulation
-# from migen.fhdl import verilog
-
-from nmigen import *
-# from nmigen import Signal, signed
-# from nmigen.build.plat import Platform
-# from nmigen.hdl import ast, dsl, ir
-# from nmigen.sim.core import Simulator, Tick, Delay
-from nmigen.sim import Simulator, Tick  # , Delay, Settle
-# from nmigen.build import Platform
-# from nmigen.back.pysim import Simulator, Delay, Settle
-
-################################
+from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'FIR_DF_wdg': 'FIR_DF'}  #: Dict containing widget class name : display name
+classes = {'FIR_DF_wdg': 'FIR_DF_py'}  # widget class name : display name
 
 
 # =============================================================================
@@ -299,91 +280,21 @@ class FIR_DF_wdg(QWidget):
         # self.fixp_filter = FIR()
 
 # ------------------------------------------------------------------------------
-    def to_verilog(self, **kwargs):
-        """
-        Convert the migen description to Verilog
-        """
-        return verilog.convert(self.fixp_filter,
-                               ios={self.fixp_filter.i, self.fixp_filter.o},
-                               **kwargs)
+    # def to_verilog(self, **kwargs):
+    #     """
+    #     Convert the migen description to Verilog
+    #     """
+    #     return verilog.convert(self.fixp_filter,
+    #                            ios={self.fixp_filter.i, self.fixp_filter.o},
+    #                            **kwargs)
 
-    # ------------------------------------------------------------------------------
-    def run_sim_nmigen(self, stimulus):
-
-        dut = FIR()
-
-        def process():
-            input = stimulus
-            self.output = []
-            for i in input:
-                yield dut.i.eq(int(i))
-                yield Tick()
-                self.output.append((yield dut.o))
-
-        sim = Simulator(dut)
-
-        sim.add_clock(1/48000)
-        sim.add_process(process)
-        sim.run()
-
-        return self.output
 
     # ------------------------------------------------------------------------------
     def run_sim(self, stimulus):
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        dut = FIR_DF(p['b'], p['QA'])
+        dut = FIR_DF(p)
         return dut.fxfilter_zi(stimulus)
 
-###############################################################################
-# A synthesizable nMigen FIR filter.
-class FIR(Elaboratable):
-    def __init__(self):
-        self.p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        # ------------- Define I/Os as signed --------------------------------------
-        self.i = Signal(signed(self.p['QI']['W']))  # input signal
-        self.o = Signal(signed(self.p['QO']['W']))  # output signal
-        pass
-
-    # def ports(self):
-    #     return [self.i, self.o]
-
-    def elaborate(self, platform) -> Module:
-        """
-        `platform` normally specifies FPGA platform, not needed here.
-        """
-        m = Module()  # instantiate a module
-        ###
-        muls = []    # list for partial products b_i * x_i
-        DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
-        QP.update({'W': QP['WI'] + QP['WF'] + 1})
-
-        src = self.i  # first register is connected to input signal
-
-        for b in self.p['b']:
-            sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
-            m.d.sync += sreg.eq(src)            # with input word length
-            src = sreg
-            muls.append(int(b)*sreg)
-
-        logger.debug("b = {0}\nW(b) = {1}".format(
-            pprint_log(self.p['b']), self.p['QCB']['W']))
-
-        # saturation logic doesn't make much sense with a FIR filter, this is
-        # just for demonstration
-        sum_full = Signal(signed(QP['W']))
-        m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
-
-        # rescale from full product format to accumulator format
-        sum_accu = Signal(signed(self.p['QA']['W']))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QA']))
-
-        # rescale from accumulator format to output width
-        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QA'], self.p['QO']))
-
-        return m
 
 
 class FIR_DF(object):
@@ -398,7 +309,7 @@ class FIR_DF(object):
     - q_acc describes requantization after each summation in the accumulator
             (resp. in the common summation point)
     """
-    def __init__(self):
+    def __init__(self, p):
         """
         Initialize fixed object with q_obj
 
@@ -415,7 +326,7 @@ class FIR_DF(object):
 
         """
         # test if all passed keys of quantizer object are known
-        self.p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        self.p = p  # parameter dictionary with coefficients etc.
 
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
             q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
@@ -548,7 +459,7 @@ class FIR_DF(object):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df` """
+    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_ui` """
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
