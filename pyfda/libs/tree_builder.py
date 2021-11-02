@@ -517,11 +517,13 @@ class Tree_Builder(object):
                 try:  # Try to import the module from the package list above
                     mod_fq_name = p + mod_name  # fully qualified module name (fqn)
                     # Try to import the module from the  package and get a handle:
+                    logger.debug(mod_fq_name)
                     ################################################
                     mod = importlib.import_module(mod_fq_name)
                     ################################################
                     break  # -> successful import, break out of pckg_names loop
-                except ImportError:
+                except ImportError as e:
+                    logger.debug(f'Import error for "{mod_fq_name}":\n{e}')
                     mod_fq_name = None
                     continue  # module not found, try next package
                 except Exception as e:
