@@ -281,14 +281,14 @@ class FIR_DF_wdg(QWidget):
     #                            **kwargs)
 
 
-    # ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     def run_sim(self, stimulus):
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         dut = FIR_DF(p)
         return dut.fxfilter_zi(stimulus)
 
 
-
+# =============================================================================
 class FIR_DF(object):
     """
     Usage:
