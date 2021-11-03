@@ -455,23 +455,6 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
-    dut = FIR()
-
-    def process():
-        # input = stimulus
-        output = []
-        for i in np.ones(20):
-            yield dut.i.eq(int(i))
-            yield Tick()
-            output.append((yield dut.o))
-        print(output)
-
-    sim = Simulator(dut)
-    # with Simulator(m) as sim:
-
-    sim.add_clock(1/48000)
-    sim.add_process(process)
-    sim.run()
 
     # ------------ test ui ----------------
     app = QApplication(sys.argv)
