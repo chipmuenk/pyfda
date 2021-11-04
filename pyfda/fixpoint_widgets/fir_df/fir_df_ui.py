@@ -307,17 +307,12 @@ class FIR_DF(object):
 
         Parameters
         ----------
-        b : array-like
-            filter coefficients as integers
 
-        q_acc : dict
-                dictionary with quantizer settings for the accumulator
+        p : dict
+            dictionary with coefficients and quantizer settings with the following keys:
 
-        q_mul : dict
-                dictionary with quantizer settings for the partial products (optional)
+            - 'b', values: array-like, coefficients as integers
 
-        """
-        # test if all passed keys of quantizer object are known
         self.p = p  # parameter dictionary with coefficients etc.
 
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
@@ -330,13 +325,19 @@ class FIR_DF(object):
 
     def init(self, zi: iterable = None) -> None:
         """
-        Initialize filter by resetting all counters
+        Initialize filter by initialising all registers and resetting overflow counters
+
         Parameters
         ----------
+        p : dict
+            dictionary with coefficients and quantizer settings (see docstring of
+            `__init__()` for details)
+
         zi : array-like
-            initialize filter registers; maximum length is
-            len(b) - 1. The rest is filled with zeros, when zi is None, the registers
-            are filled with zeros.
+            Initialize `L = len(b)` filter registers. Strictly speaking, `zi[0]` is
+            not a register but the current input value.
+            When `len(zi) != len(b)`, truncate or fill up with zeros.
+            When `zi == None`, all registers are filled with zeros.
 
         Returns
         -------
@@ -346,7 +347,7 @@ class FIR_DF(object):
         self.Q_acc.resetN()  # reset overflow counter of Q_acc
         self.N_over_filt = 0  # total number of overflows in filter
 
-        # Initialize vectors (also speeds up calculation)
+        # Initialize vectors (also speeds up calculation for large arrays)
         self.xbq = np.zeros(len(self.b))  # partial products
 
         if zi is None:
@@ -391,20 +392,23 @@ class FIR_DF(object):
 
         Parameters
         ----------
-        x :  scalar or array-like
-             input value(s)
+        x :  array-like or scalar or None
+             input value(s); when x is a scalar, calculate impulse response with the
+             amplitude defined by the scalar. When `x == None`, calculate impulse
+             response with amplitude one.
 
         b :  array-like
-             filter coefficients; when None, the old coefficients are left untouched
+             filter coefficients; when `b == None`, the old coefficients are left untouched
 
         zi : array-like
-             initial conditions; you can
+             initial conditions; when `zi == None`, the register contents are used from
+             the last run.
 
         Returns
         -------
         yq : ndarray
-            The quantized input value(s) as a scalar or an ndarray with np.float64.
-            and the same shape as x.
+            The quantized input value(s) as an ndarray of np.float64
+            and the same shape as `x resp. `b` (impulse response).
         """
 
         if b is not None:  # update coefficients
@@ -426,8 +430,8 @@ class FIR_DF(object):
         y_q = xb_q = np.zeros(len(x))
 
         # Calculate response by:
-        # - append new stimuli `x` to register state `self.xi`
-        # - slide a window with length `len(b)` over `self.xi`, starting at position `k`
+        # - append new stimuli `x` to register state `self.zi`
+        # - slide a window with length `len(b)` over `self.zi`, starting at position `k`
         #   and multiply it with the coefficients `b`, yielding the partial products x*b
         #   TODO: Doing this for the last len(x) terms should be enough
         # - quantize the partial products x*b, yielding xb_q
