@@ -463,6 +463,15 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
+    p = {'b':[1,2,3,2,1], 'QA':{'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'}}
+    dut = FIR_DF(p)
+    x = np.ones(4)
+    y = dut.fxfilter(x=x)
+    print(y)
+    y = dut.fxfilter(x=np.zeros(5))
+    print(y)
+
+
 
     # ------------ test ui ----------------
     app = QApplication(sys.argv)
