@@ -360,27 +360,6 @@ class FIR_DF(object):
             else:
                 self.xi = zi[:self.N]
 
-    def update_coeffs(self, b: iterable) -> None:
-        """
-        Load filter with new set of coefficients
-
-        Parameters
-        ----------
-        b : array-like
-            filter coefficients. Length must be identical to the coefficient
-            set used during initialization
-
-        Returns
-        -------
-
-        nothing
-
-        """
-        if len(b) == len(self.b):
-            self.b = b
-        else:
-            raise IndexError("Number of coefficients differs from initialization!")
-        return
 
     def fxfilter_zi(self, b: iterable, x, zi: iterable = None) -> np.ndarray:
         """
