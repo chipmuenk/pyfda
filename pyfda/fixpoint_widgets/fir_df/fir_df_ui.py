@@ -267,9 +267,10 @@ class FIR_DF_wdg(QWidget):
     def construct_fixp_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
-        the 'fxqc' quantizer dict (not needed anymore)
+        the 'fxqc' quantizer dict
         """
-        pass
+        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        self.dut = FIR_DF(p)
 
 # ------------------------------------------------------------------------------
     # def to_verilog(self, **kwargs):
