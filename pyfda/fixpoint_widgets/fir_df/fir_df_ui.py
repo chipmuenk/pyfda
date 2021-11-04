@@ -292,10 +292,10 @@ class FIR_DF_wdg(QWidget):
 # =============================================================================
 class FIR_DF(object):
     """
-    Usage:
-    Q = FIR_DF(b, q_mul, q_acc) # Instantiate fixpoint filter object
-    x_bq = self.Q_mul.filt(x, bq)
-    The fixpoint object has two different quantizers:
+    Fixpoint filter object
+    filt = FIR_DF(p) # Instantiate fixpoint filter object
+    
+    The fixpoint object contains two different quantizers:
     - b is an array with coefficients
     - q_mul describes requanitization after coefficient multiplication
       ('quant' and 'sat' can both be set to 'none' if there is none)
@@ -304,7 +304,7 @@ class FIR_DF(object):
     """
     def __init__(self, p):
         """
-        Initialize fixed object with q_obj
+        Instantiate fixed point object parameter dict
 
         Parameters
         ----------
@@ -314,19 +314,19 @@ class FIR_DF(object):
 
             - 'b', values: array-like, coefficients as integers
 
-        self.p = p  # parameter dictionary with coefficients etc.
+            - 'QA' value: dict with quantizer settings for the accumulator
 
-        if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+            - 'q_mul' : dict with quantizer settings for the partial products (optional)
 
-        self.Q_mul = fx.Fixed(q_mul)  # create quantizer for partial product
-        self.Q_acc = fx.Fixed(self.p['QA'])  # create quantizer for accumulator
-        self.b = self.p['b']  # coefficients
-        self.L = len(self.b)  # filter length
-
-    def init(self, zi: iterable = None) -> None:
         """
-        Initialize filter by initialising all registers and resetting overflow counters
+        self.init(p)
+
+    # ---------------------------------------------------------
+    def init(self, p, zi: iterable = None) -> None:
+        """
+        Initialize filter with parameter dict `p` by initialising all registers
+        and quantizers.
+        This needs to be done every time quantizers or coefficients are updated.
 
         Parameters
         ----------
@@ -344,19 +344,32 @@ class FIR_DF(object):
         -------
         None.
         """
+        logger.error(p)
+        self.p = p  # parameter dictionary with coefficients etc.
+
+        if 'q_mul' not in self.p or self.p['q_mul'] is None:
+            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+        else:
+            q_mul = p['q_mul']
+
+        self.b = self.p['b']  # coefficients
+        self.L = len(self.b)  # filter length = number of taps
+        self.Q_mul = fx.Fixed(q_mul)  # create quantizer for partial product
+        self.Q_acc = fx.Fixed(self.p['QA'])  # create quantizer for accumulator
+        self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
         # Initialize vectors (also speeds up calculation for large arrays)
         self.xbq = np.zeros(len(self.b))  # partial products
 
         if zi is None:
-            self.xi = np.zeros(self.N)
+            self.zi = np.zeros(self.L - 1)
         else:  # initialize filter memory and fill up with zeros
-            if len(zi) == self.N - 1:
-                self.xi = zi
-            elif len(zi) < self.N:
-                self.xi = np.concatenate((zi, np.zeros(self.N - len(zi))))
+            if len(zi) == self.L - 1:
+                self.zi = zi
+            elif len(zi) < self.L - 1:
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
             else:
-                self.xi = zi[:self.N]
+                self.zi = zi[:self.L - 1]
 
     # ---------------------------------------------------------
     def reset(self):
