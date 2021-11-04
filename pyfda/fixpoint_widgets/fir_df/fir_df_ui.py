@@ -378,7 +378,8 @@ class FIR_DF(object):
         self.Q_acc.resetN()  # reset overflow counter of Q_acc
         self.N_over_filt = 0  # total number of overflows in filter
 
-    def fxfilter_zi(self, b: iterable, x, zi: iterable = None) -> np.ndarray:
+    # ---------------------------------------------------------
+    def fxfilter(self, b: iterable = None, x: iterable = None, zi: iterable = None) -> np.ndarray:
         """
         TODO: When len(x) < len(b), only zeros are returned because the for loop
         is never executed
@@ -407,20 +408,28 @@ class FIR_DF(object):
             and the same shape as `x resp. `b` (impulse response).
         """
 
-        if b is not None:  # update coefficients
-            if len(b) == len(self.b):
-                self.b = b
-            else:
-                raise IndexError("Number of coefficients differs from initialization!")
+        if not b is None and np.any(b != self.b): # update coefficients, reset filter
+            self.p['b'] = self.b = b
+            self.init(self.p)
 
-        if zi is not None:  # initialize filter memory and fill up with zeros
-            if len(zi) == self.L:
-                self.xi = zi
-            elif len(zi) < self.L:
-                self.xi = np.concatenate((zi, np.zeros(self.L - len(len(zi)))))
-            else:
-                self.xi = zi[:self.L]
+        # When `zi` is specified, initialize filter memory with it and pad with zeros
+        # When `zi == None`, use register contents from last run
+        if zi is not None:
+            if len(zi) == self.L - 1:   # use zi as it is
+                self.zi = zi
+            elif len(zi) < self.L - 1:  # append zeros
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:                       # truncate zi
+                self.zi = zi[:self.L - 1]
                 logger.warning("len(zi) > len(b) - 1, zi was truncated")
+
+        if np.isscalar(x):
+            A = x
+            x = np.zeros(len(self.b))
+            x[0] = A
+        elif x is None: # calculate impulse response
+            x = np.zeros(len(self.b))
+            x[0] = 1
 
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
@@ -434,19 +443,19 @@ class FIR_DF(object):
         # - sum up the quantized partial products, yielding result y[k]
         # - quantize result, yielding y_q[k]
 
-        self.xi = np.concatenate((self.xi, x))
+        self.zi = np.concatenate((self.zi, x))
 
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(
-                self.xi[k:k + len(self.b)] * self.b)
+                self.zi[k:k + len(self.b)] * self.b)
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
-        self.xi = self.xi[-self.L:]  # store last L inputs (i.e. the L registers)
+        self.zi = self.zi[-self.L:]  # store last L inputs (i.e. the L registers)
         self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
 
-        return y_q[:len(x)], self.xi
+        return y_q[:len(x)], self.zi
 
 
 # ------------------------------------------------------------------------------
