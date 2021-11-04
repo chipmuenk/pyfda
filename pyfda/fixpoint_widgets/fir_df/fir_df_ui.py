@@ -344,9 +344,6 @@ class FIR_DF(object):
         -------
         None.
         """
-        self.Q_mul.resetN()  # reset overflow counter of Q_mul
-        self.Q_acc.resetN()  # reset overflow counter of Q_acc
-        self.N_over_filt = 0  # total number of overflows in filter
 
         # Initialize vectors (also speeds up calculation for large arrays)
         self.xbq = np.zeros(len(self.b))  # partial products
@@ -361,6 +358,12 @@ class FIR_DF(object):
             else:
                 self.xi = zi[:self.N]
 
+    # ---------------------------------------------------------
+    def reset(self):
+        """ resetting overflow counters """
+        self.Q_mul.resetN()  # reset overflow counter of Q_mul
+        self.Q_acc.resetN()  # reset overflow counter of Q_acc
+        self.N_over_filt = 0  # total number of overflows in filter
 
     def fxfilter_zi(self, b: iterable, x, zi: iterable = None) -> np.ndarray:
         """
