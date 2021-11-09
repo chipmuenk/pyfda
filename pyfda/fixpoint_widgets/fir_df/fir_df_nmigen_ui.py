@@ -296,7 +296,7 @@ class FIR_DF_NM_ui(QWidget):
             logger.error("Coefficients contain complex values!")
             return
 
-        # self.fixp_filter = FIR()
+        self.filt = FIR()
 
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
@@ -310,17 +310,15 @@ class FIR_DF_NM_ui(QWidget):
     # ------------------------------------------------------------------------------
     def run_sim(self, stimulus):
 
-        dut = FIR()
-
         def process():
             input = stimulus
             self.output = []
             for i in input:
-                yield dut.i.eq(int(i))
+                yield self.filt.i.eq(int(i))
                 yield Tick()
-                self.output.append((yield dut.o))
+                self.output.append((yield self.filt.o))
 
-        sim = Simulator(dut)
+        sim = Simulator(self.filt)
 
         sim.add_clock(1/48000)
         sim.add_process(process)
@@ -388,19 +386,18 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
-    dut = FIR()
+    filt = FIR()
 
     def process():
         # input = stimulus
         output = []
         for i in np.ones(20):
-            yield dut.i.eq(int(i))
+            yield filt.i.eq(int(i))
             yield Tick()
-            output.append((yield dut.o))
+            output.append((yield filt.o))
         print(output)
 
-    sim = Simulator(dut)
-    # with Simulator(m) as sim:
+    sim = Simulator(filt)
 
     sim.add_clock(1/48000)
     sim.add_process(process)
