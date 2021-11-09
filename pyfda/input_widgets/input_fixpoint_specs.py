@@ -135,9 +135,8 @@ class Input_Fixpoint_Specs(QWidget):
                 elif self.fx_sim_init() != 0:  # returned an error
                     qstyle_widget(self.butSimHDL, "error")
                     self.emit({'fx_sim': 'error'})
-                else:
-                    dict_sig = {'fx_sim': 'get_stimulus'}
-                    self.emit(dict_sig)
+                else: 
+                    self.emit({'fx_sim': 'get_stimulus'})
 
             elif dict_sig['fx_sim'] == 'send_stimulus':
                 dict_sig = self.fx_sim_calc_response(dict_sig)
