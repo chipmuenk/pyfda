@@ -38,7 +38,7 @@ together with the referenced picture.
 First, a filter widget is instantiated as ``self.fx_wdg_inst`` (after the previous
 one has been destroyed).
 
-Next, ``fx_wdg_inst.construct_fixp_filter()`` constructs an instance ``fixp_filter``
+Next, ``fx_wdg_inst.init_filter()`` constructs an instance ``fixp_filter``
 of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
 
 The widget's methods 

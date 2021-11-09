@@ -666,11 +666,6 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Synthesize HDL description of filter
         """
-        if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
-            logger.warning('Fixpoint widget has no method "construct_fixp_filter", '
-                           'aborting.')
-            return
-
         dlg = QFD(self)  # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
@@ -712,7 +707,7 @@ class Input_Fixpoint_Specs(QWidget):
                         .format(hdl_full_name, vlog_mod_name))
             try:
                 self.update_fxqc_dict()
-                self.fx_wdg_inst.construct_fixp_filter()
+                self.fx_wdg_inst.init_filter()   # setup filter instance
                 code = self.fx_wdg_inst.to_verilog(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
                 with io.open(hdl_full_name, 'w', encoding="utf8") as f:
@@ -762,7 +757,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
-            self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance
+            self.fx_wdg_inst.init_filter()   # setup filter instance
             return 0
 
         except ValueError as e:

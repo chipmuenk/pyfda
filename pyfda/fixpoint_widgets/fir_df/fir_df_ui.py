@@ -264,7 +264,7 @@ class FIR_DF_wdg(QWidget):
         return fxqc_dict
 
 # ------------------------------------------------------------------------------
-    def construct_fixp_filter(self):
+    def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
         the 'fxqc' quantizer dict

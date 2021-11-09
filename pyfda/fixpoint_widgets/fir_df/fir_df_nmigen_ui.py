@@ -67,8 +67,6 @@ class FIR_DF_NM_ui(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
-        # TODO: not needed, remove test in input_fixpoint_specs
-        # self.construct_fixp_filter()
 # ------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -283,7 +281,7 @@ class FIR_DF_NM_ui(QWidget):
         return fxqc_dict
 
 # ------------------------------------------------------------------------------
-    def construct_fixp_filter(self):
+    def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
         the 'fxqc' quantizer dict
