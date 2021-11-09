@@ -97,7 +97,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
 
-        Play PingPong with a stimulus & plot widget:
+        Play PingPong with a stimulus & plot widget for fx simulation:
 
         2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 
@@ -128,12 +128,17 @@ class Input_Fixpoint_Specs(QWidget):
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
-                if self.fx_wdg_found:
-                    self.fx_sim_init()
-                else:
+                if not self.fx_wdg_found:
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimHDL, "error")
                     self.emit({'fx_sim': 'error'})
+                elif self.fx_sim_init() != 0:  # returned an error
+                    logger.error("No fixpoint widget found!")
+                    qstyle_widget(self.butSimHDL, "error")
+                    self.emit({'fx_sim': 'error'})
+                else:
+                    dict_sig = {'fx_sim': 'get_stimulus'}
+                    self.emit(dict_sig)
 
             elif dict_sig['fx_sim'] == 'send_stimulus':
                 dict_sig = self.fx_sim_calc_response(dict_sig)
@@ -226,14 +231,14 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
 # ------------------------------------------------------------------------------
-        self.cmb_wdg_fixp = QComboBox(self)
-        self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_fx_wdg = QComboBox(self)
+        self.cmb_fx_wdg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.lblTitle = QLabel("not set", self)
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layHTitle = QHBoxLayout()
-        layHTitle.addWidget(self.cmb_wdg_fixp)
+        layHTitle.addWidget(self.cmb_fx_wdg)
         layHTitle.addWidget(self.lblTitle)
 
         self.frmTitle = QFrame(self)
@@ -367,7 +372,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
+        self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimHDL.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
         # ----------------------------------------------------------------------
@@ -385,7 +390,7 @@ class Input_Fixpoint_Specs(QWidget):
         every time a new filter design is selected.
 
         Then try to import the fixpoint designs in the list and populate the
-        fixpoint implementation combo box `self.cmb_wdg_fixp` when successfull.
+        fixpoint implementation combo box `self.cmb_fx_wdg` when successfull.
 
         Returns
         -------
@@ -394,20 +399,19 @@ class Input_Fixpoint_Specs(QWidget):
         """
         inst_wdg_str = ""  # full names of successfully instantiated widgets for logging
         # remember last fx widget setting:
-        last_fx_wdg = qget_cmb_box(self.cmb_wdg_fixp, data=False)
-        self.cmb_wdg_fixp.clear()
+        last_fx_wdg = qget_cmb_box(self.cmb_fx_wdg, data=False)
+        self.cmb_fx_wdg.clear()
         fc = fb.fil[0]['fc']
 
         if 'fix' in fb.filter_classes[fc]:
-            self.cmb_wdg_fixp.blockSignals(True)
+            self.cmb_fx_wdg.blockSignals(True)
             for class_name in fb.filter_classes[fc]['fix']:  # get class name
-                try:
-                    # construct module + class name ...
+                try:   # construct module + class name ...
                     mod_class_name = fb.fixpoint_classes[class_name]['mod'] + '.'\
                         + class_name
                     # ... and display name
                     disp_name = fb.fixpoint_classes[class_name]['name']
-                    self.cmb_wdg_fixp.addItem(disp_name, mod_class_name)
+                    self.cmb_fx_wdg.addItem(disp_name, mod_class_name)
                     inst_wdg_str += '\t' + class_name + ' : ' + mod_class_name + '\n'
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(class_name, e))
@@ -419,11 +423,11 @@ class Input_Fixpoint_Specs(QWidget):
                     self.embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` of for loop
 
-            # restore last fxp widget if possible
-            idx = self.cmb_wdg_fixp.findText(last_fx_wdg)
+            # restore last fx widget if possible
+            idx = self.cmb_fx_wdg.findText(last_fx_wdg)
             # set to idx 0 if not found (returned -1)
-            self.cmb_wdg_fixp.setCurrentIndex(max(idx, 0))
-            self.cmb_wdg_fixp.blockSignals(False)
+            self.cmb_fx_wdg.setCurrentIndex(max(idx, 0))
+            self.cmb_fx_wdg.blockSignals(False)
         else:  # no fixpoint widget
             self.embed_fixp_img(self.no_fx_filter_img)
         self._update_fixp_widget()
@@ -551,11 +555,11 @@ class Input_Fixpoint_Specs(QWidget):
         _disable_fx_wdg(self)
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
-        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
+        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_fx_wdg, data=False)
         if cmb_wdg_fx_cur:  # at least one valid fixpoint widget found
             self.fx_wdg_found = True
             # get list [module name and path, class name]
-            fx_mod_class_name = qget_cmb_box(self.cmb_wdg_fixp, data=True).rsplit('.', 1)
+            fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
             fx_wdg_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
             logger.info(f"Instantiating {fx_mod.__name__} - {fx_wdg_class.__name__}")
@@ -753,21 +757,18 @@ class Input_Fixpoint_Specs(QWidget):
         if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
             logger.error(
                 'Fixpoint widget has no method "construct_fixp_filter", aborting.')
-            self.emit({'fx_sim': 'error'})
-            return
+            return -1
 
         try:
             logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
             self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance
-
-            dict_sig = {'fx_sim': 'get_stimulus'}
-            self.emit(dict_sig)
+            return 0
 
         except ValueError as e:
-            logger.error('Fixpoint stimulus generation failed during "init" for dict\n{0}'
-                         '\nwith "{1} "'.format(pprint_log(dict_sig), e))
-        return
+            logger.error('Fixpoint stimulus generation failed during "init"'
+                         '\nwith "{0} "'.format(e))
+        return -1
 
 # ------------------------------------------------------------------------------
     def fx_sim_calc_response(self, dict_sig) -> dict:
