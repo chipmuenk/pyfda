@@ -48,8 +48,6 @@ class FIR_DF_wdg(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
-        # TODO: not needed, remove test in input_fixpoint_specs
-        # self.construct_fixp_filter()
 # ------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -270,7 +268,7 @@ class FIR_DF_wdg(QWidget):
         the 'fxqc' quantizer dict
         """
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        self.dut = FIR_DF(p)
+        self.filt = FIR_DF(p)
 
 # ------------------------------------------------------------------------------
     # def to_verilog(self, **kwargs):
@@ -285,7 +283,7 @@ class FIR_DF_wdg(QWidget):
     # ------------------------------------------------------------------------
     def run_sim(self, stimulus):
 
-        return self.dut.fxfilter(stimulus)[0]
+        return self.filt.fxfilter(x=stimulus)[0]
 
 
 # =============================================================================
@@ -378,7 +376,7 @@ class FIR_DF(object):
         self.N_over_filt = 0  # total number of overflows in filter
 
     # ---------------------------------------------------------
-    def fxfilter(self, b: iterable = None, x: iterable = None, zi: iterable = None) -> np.ndarray:
+    def fxfilter(self, x: iterable = None, b: iterable = None, zi: iterable = None) -> np.ndarray:
         """
         TODO: When len(x) < len(b), only zeros are returned because the for loop
         is never executed
