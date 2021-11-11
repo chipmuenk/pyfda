@@ -292,6 +292,10 @@ class FIR_DF(object):
     """
     Fixpoint filter object
 
+    Usage:
+    ------
+    filt = FIR_DF(p) # Instantiate fixpoint filter object with parameter dict
+
     The fixpoint object contains two different quantizers:
     - b is an array with coefficients
     - q_mul describes requanitization after coefficient multiplication
@@ -301,7 +305,7 @@ class FIR_DF(object):
     """
     def __init__(self, p):
         """
-        Instantiate fixed point object parameter dict
+        Construct fixed point object with parameter dict
 
         Parameters
         ----------
@@ -387,13 +391,15 @@ class FIR_DF(object):
 
         Parameters
         ----------
-        x :  array-like or scalar or None
-             input value(s); when x is a scalar, calculate impulse response with the
-             amplitude defined by the scalar. When `x == None`, calculate impulse
-             response with amplitude one.
+        x : array of integer or integer or None
+            input value(s) scaled and quantized according to the setting of `p['QI']`
+            - When x is a scalar, calculate impulse response with the
+                amplitude defined by the scalar.
+            - When `x == None`, calculate impulse response with amplitude = 1.
 
         b :  array-like
-             filter coefficients; when `b == None`, the old coefficients are left untouched
+             filter coefficients
+             When `b == None`, the old coefficients are left untouched
 
         zi : array-like
              initial conditions; when `zi == None`, the register contents are used from
@@ -403,10 +409,10 @@ class FIR_DF(object):
         -------
         yq : ndarray
             The quantized input value(s) as an ndarray of np.float64
-            and the same shape as `x resp. `b` (impulse response).
+            and the same shape as `x` resp. `b` (impulse response).
         """
 
-        if not b is None and np.any(b != self.b): # update coefficients, reset filter
+        if b is not None and np.any(b != self.b):  # update coefficients, reset filter
             self.p['b'] = self.b = b
             self.init(self.p)
 
@@ -425,7 +431,7 @@ class FIR_DF(object):
             A = x
             x = np.zeros(len(self.b))
             x[0] = A
-        elif x is None: # calculate impulse response
+        elif x is None:  # calculate impulse response
             x = np.zeros(len(self.b))
             x[0] = 1
 
