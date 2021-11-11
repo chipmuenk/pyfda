@@ -10,10 +10,8 @@
 Fixpoint library for converting numpy scalars and arrays to quantized
 numpy values and formatting reals in various formats
 """
-#===========================================================================
+# ===========================================================================
 import re
-import logging
-logger = logging.getLogger(__name__)
 
 import numpy as np
 try:
@@ -24,10 +22,15 @@ try:
 except ImportError:
     DS = False
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.6
+
 
 def qstr(text):
     """ carefully replace qstr() function - only needed for Py2 compatibility """
@@ -41,40 +44,44 @@ def bin2hex(bin_str, WI=0):
     and after the radix point (position given by `WI`) is a multiple of 4.
     """
 
-    wmap ={'0000': '0',
-           '0001': '1',
-           '0010': '2',
-           '0011': '3',
-           '0100': '4',
-           '0101': '5',
-           '0110': '6',
-           '0111': '7',
-           '1000': '8',
-           '1001': '9',
-           '1010': 'A',
-           '1011': 'B',
-           '1100': 'C',
-           '1101': 'D',
-           '1110': 'E',
-           '1111': 'F'}
+    wmap = {
+        '0000': '0',
+        '0001': '1',
+        '0010': '2',
+        '0011': '3',
+        '0100': '4',
+        '0101': '5',
+        '0110': '6',
+        '0111': '7',
+        '1000': '8',
+        '1001': '9',
+        '1010': 'A',
+        '1011': 'B',
+        '1100': 'C',
+        '1101': 'D',
+        '1110': 'E',
+        '1111': 'F'
+        }
 
     hex_str = ""
 
     if WI > 0:
-        # slice string with integer bits and prepend with zeros to obtain a multiple of 4 length
+        # slice string with integer bits and prepend with zeros to obtain a
+        # multiple of 4 length:
         bin_i_str = bin_str[:WI+1]
         while (len(bin_i_str) % 4 != 0):
             bin_i_str = "0" + bin_i_str
 
         i = 0
-        while (i < len(bin_i_str)): # map chunks of 4 binary bits to one hex digit
+        while (i < len(bin_i_str)):  # map chunks of 4 binary bits to one hex digit
             hex_str = hex_str + wmap[bin_i_str[i:i + 4]]
             i = i + 4
     else:
-        hex_str = bin_str[0] # copy MSB as sign bit
+        hex_str = bin_str[0]  # copy MSB as sign bit
 
     WF = len(bin_str) - WI - 1
-    # slice string with fractional bits and append with zeros to obtain a multiple of 4 length
+    # slice string with fractional bits and append with zeros to obtain a
+    # multiple of 4 length:
     if WF > 0:
         hex_str = hex_str + '.'
         bin_f_str = bin_str[WI+1:]
@@ -83,7 +90,7 @@ def bin2hex(bin_str, WI=0):
             bin_f_str = bin_f_str + "0"
 
         i = 0
-        while (i < len(bin_f_str)): # map chunks of 4 binary bits to one hex digit
+        while (i < len(bin_f_str)):  # map chunks of 4 binary bits to one hex digit
             hex_str = hex_str + wmap[bin_f_str[i:i + 4]]
             i = i + 4
 
@@ -91,8 +98,11 @@ def bin2hex(bin_str, WI=0):
     hex_str = "0" if len(hex_str) == 0 else hex_str
     return hex_str
 
-bin2hex_vec = np.vectorize(bin2hex) # safer than frompyfunction()
 
+bin2hex_vec = np.vectorize(bin2hex)  # safer than frompyfunction()
+
+
+# ------------------------------------------------------------------------------
 def dec2hex(val, nbits, WF=0):
     """
     --- currently not used, no unit test ---
@@ -115,8 +125,9 @@ def dec2hex(val, nbits, WF=0):
     """
 
     return "{0:X}".format(np.int64((val + (1 << nbits)) % (1 << nbits)))
-#------------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------------
 def dec2csd(dec_val, WF=0):
     """
     Convert the argument `dec_val` to a string in CSD Format.
@@ -141,9 +152,9 @@ def dec2csd(dec_val, WF=0):
 
     """
     # figure out binary range, special case for 0
-    if dec_val == 0 :
+    if dec_val == 0:
         return '0'
-    if np.abs(dec_val) < 1.0 :
+    if np.abs(dec_val) < 1.0:
         k = 0
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
@@ -154,17 +165,15 @@ def dec2csd(dec_val, WF=0):
     csd_digits = []
     remainder = dec_val
     prev_non_zero = False
-    k -= 1 # current exponent in the CSD string under construction
+    k -= 1  # current exponent in the CSD string under construction
 
-    while( k >= -WF): # has the last fractional digit been reached
-
-
+    while(k >= -WF):  # has the last fractional digit been reached
         limit = pow(2.0, k+1) / 3.0
 
         # logger.debug("\t{0} - {1}".format(remainder, limit))
 
         # decimal point?
-        if k == -1 :
+        if k == -1:
             if csd_digits == []:
                 if dec_val > limit:
                     remainder -= 1
@@ -175,27 +184,27 @@ def dec2csd(dec_val, WF=0):
                     csd_digits.extend(['-.'])
                     prev_non_zero = True
                 else:
-                    csd_digits.extend( ['0.'] )
+                    csd_digits.extend(['0.'])
             else:
-                csd_digits.extend( ['.'] )
+                csd_digits.extend(['.'])
 
         # convert the number
         if prev_non_zero:
-            csd_digits.extend( ['0'] )
+            csd_digits.extend(['0'])
             prev_non_zero = False
 
-        elif remainder > limit :
-            csd_digits.extend( ['+'] )
-            remainder -= pow(2.0, k )
+        elif remainder > limit:
+            csd_digits.extend(['+'])
+            remainder -= pow(2.0, k)
             prev_non_zero = True
 
-        elif remainder < -limit :
-            csd_digits.extend( ['-'] )
-            remainder += pow(2.0, k )
+        elif remainder < -limit:
+            csd_digits.extend(['-'])
+            remainder += pow(2.0, k)
             prev_non_zero = True
 
-        else :
-            csd_digits.extend( ['0'] )
+        else:
+            csd_digits.extend(['0'])
             prev_non_zero = False
 
         k -= 1
@@ -213,8 +222,11 @@ def dec2csd(dec_val, WF=0):
 
     return csd_str
 
+
 dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
 
+
+# ------------------------------------------------------------------------------
 def csd2dec(csd_str):
     """
     Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
@@ -245,17 +257,17 @@ def csd2dec(csd_str):
     # logger.debug("Converting: {0}".format(csd_str))
 
     # Intialize calculation, start with the MSB (integer)
-    msb_power = len(csd_str)-1 #
+    msb_power = len(csd_str) - 1
     dec_val = 0.0
 
     # start from the MSB and work all the way down to the last digit
-    for ii in range( len(csd_str) ):
+    for ii in range(len(csd_str)):
 
         power_of_two = 2.0**(msb_power-ii)
 
-        if csd_str[ii] == '+' :
+        if csd_str[ii] == '+':
             dec_val += power_of_two
-        elif csd_str[ii] == '-' :
+        elif csd_str[ii] == '-':
             dec_val -= power_of_two
         # else
         #    ... all other values are ignored
@@ -265,10 +277,12 @@ def csd2dec(csd_str):
 
     return dec_val
 
-#csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
-csd2dec_vec = np.vectorize(csd2dec) # safer than np.frompyfunc()
 
-#------------------------------------------------------------------------
+# csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+csd2dec_vec = np.vectorize(csd2dec)  # safer than np.frompyfunc()
+
+
+# ------------------------------------------------------------------------
 class Fixed(object):
     """
     Implement binary quantization of signed scalar or array-like objects
@@ -303,7 +317,8 @@ class Fixed(object):
 
     * **'quant'** : Quantization method, optional; default = 'floor'
 
-      - 'floor': (default) largest integer `I` such that :math:`I \\le x` (= binary truncation)
+      - 'floor': (default) largest integer `I` such that :math:`I \\le x`
+                 (= binary truncation)
       - 'round': (binary) rounding
       - 'fix': round to nearest integer towards zero ('Betragsschneiden')
       - 'ceil': smallest integer `I`, such that :math:`I \\ge x`
@@ -381,7 +396,7 @@ class Fixed(object):
 
     ovr_flag : integer or integer array (same shape as input argument)
         overflow flag, meaning:
-            
+
                         0 : no overflow
 
                         +1: positive overflow
@@ -419,15 +434,15 @@ class Fixed(object):
         """
         # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
-        self.resetN() # initialize overflow-counter
+        self.resetN()  # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
         self.FRMT_REGEX = {
-                'bin' : r'[^0|1|.|,|\-]',
-                'csd' : r'[^0|\+|\-|.|,]',
-                'dec' : r'[^0-9|.|,|\-]',
-                'hex' : r'[^0-9A-Fa-f|.|,|\-]'
+                'bin': r'[^0|1|.|,|\-]',
+                'csd': r'[^0|\+|\-|.|,]',
+                'dec': r'[^0-9|.|,|\-]',
+                'hex': r'[^0-9A-Fa-f|.|,|\-]'
                         }
 
     def setQobj(self, q_obj):
@@ -461,7 +476,7 @@ class Fixed(object):
                 if hasattr(self, k):
                     q_obj[k] = getattr(self, k)  # ... class attribute
                 else:
-                    q_obj[k] = q_obj_default[k] # ... default dict
+                    q_obj[k] = q_obj_default[k]  # ... default dict
 
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
@@ -485,7 +500,7 @@ class Fixed(object):
             else:
                 raise ValueError
 
-        self.q_obj = q_obj # store quant. dict in instance
+        self.q_obj = q_obj  # store quant. dict in instance
 
         self.LSB = 2. ** -self.WF  # value of LSB
         self.MSB = 2. ** (self.WI - 1)   # value of MSB
@@ -513,9 +528,9 @@ class Fixed(object):
         else:
             raise Exception(u'Unknown format "{0:s}"!'.format(self.frmt))
 
-        self.ovr_flag = 0 # initialize to allow reading when freshly initialized
+        self.ovr_flag = 0  # initialize to allow reading when freshly initialized
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
         """
         Return fixed-point integer or fractional representation for `y`
@@ -569,36 +584,36 @@ class Fixed(object):
         >>> bq = bq.astype(btype) # restore original variable type
         """
 
-        #======================================================================
+        # ======================================================================
         # (1) : INITIALIZATION
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
-        #======================================================================
+        # =====================================================================
         scaling = scaling.lower()
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
             #   for speedup, test for invalid types
             SCALAR = False
-            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
+            y = np.asarray(y)  # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
-            over_pos = over_neg = np.zeros(y.shape, dtype = bool)
-            self.ovr_flag = np.zeros(y.shape, dtype = int)
+            over_pos = over_neg = np.zeros(y.shape, dtype=bool)
+            self.ovr_flag = np.zeros(y.shape, dtype=int)
 
-            if np.issubdtype(y.dtype, np.number): # numpy number type
+            if np.issubdtype(y.dtype, np.number):  # numpy number type
                 self.N += y.size
-            elif y.dtype.kind in {'U', 'S'}: # string or unicode
+            elif y.dtype.kind in {'U', 'S'}:  # string or unicode
                 try:
-                    y = y.astype(np.float64) # try to convert to float
+                    y = y.astype(np.float64)  # try to convert to float
                     self.N += y.size
                 except (TypeError, ValueError):
                     try:
-                        np.char.replace(y, ' ', '') # remove all whitespace
-                        y = y.astype(complex) # try to convert to complex
+                        np.char.replace(y, ' ', '')  # remove all whitespace
+                        y = y.astype(complex)  # try to convert to complex
                         self.N += y.size * 2
-                    except (TypeError, ValueError) as e: # try converting elements recursively
+                    except (TypeError, ValueError) as e:  # try converting elements recursively
                         y = np.asarray(list(map(lambda y_scalar:
-                            self.fixp(y_scalar, scaling=scaling), y))) # was: list()
+                            self.fixp(y_scalar, scaling=scaling), y)))
                         self.N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
@@ -614,14 +629,14 @@ class Fixed(object):
             # to float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
                 y = qstr(y)
-                y = y.replace(' ','') # remove all whitespace
+                y = y.replace(' ', '')  # remove all whitespace
                 try:
                     y = float(y)
                 except (TypeError, ValueError):
                     try:
                         y = complex(y)
                     except (TypeError, ValueError) as e:
-                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                        logger.error("Argument '{0}' yields \n {1}".format(y, e))
                         y = 0.0
             over_pos = over_neg = yq = 0
             self.ovr_flag = 0
@@ -634,12 +649,12 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        y_in = y # y before scaling / quantizing
-        #======================================================================
+        y_in = y  # y before scaling / quantizing
+        # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
         #       when `scaling=='mult'`or 'multdiv'
-        #======================================================================
+        # ======================================================================
         if scaling in {'mult', 'multdiv'}:
             y = y * self.scale
 
