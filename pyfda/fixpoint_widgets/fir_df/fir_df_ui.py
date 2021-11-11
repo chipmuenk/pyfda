@@ -281,19 +281,17 @@ class FIR_DF_wdg(QWidget):
     #                            ios={self.fixp_filter.i, self.fixp_filter.o},
     #                            **kwargs)
 
-
     # ------------------------------------------------------------------------
     def run_sim(self, stimulus):
 
-        return self.dut.fxfilter(stimulus)[0]
+        return self.dut.fxfilter(x=stimulus)[0]
 
 
 # =============================================================================
 class FIR_DF(object):
     """
     Fixpoint filter object
-    filt = FIR_DF(p) # Instantiate fixpoint filter object
-    
+
     The fixpoint object contains two different quantizers:
     - b is an array with coefficients
     - q_mul describes requanitization after coefficient multiplication
@@ -378,7 +376,8 @@ class FIR_DF(object):
         self.N_over_filt = 0  # total number of overflows in filter
 
     # ---------------------------------------------------------
-    def fxfilter(self, b: iterable = None, x: iterable = None, zi: iterable = None) -> np.ndarray:
+    def fxfilter(self, x: iterable = None, b: iterable = None, zi: iterable = None)\
+            -> np.ndarray:
         """
         TODO: When len(x) < len(b), only zeros are returned because the for loop
         is never executed
