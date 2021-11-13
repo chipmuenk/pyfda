@@ -130,11 +130,11 @@ class Input_Fixpoint_Specs(QWidget):
             if dict_sig['fx_sim'] == 'init':
                 if not self.fx_wdg_found:
                     logger.error("No fixpoint widget found!")
-                    qstyle_widget(self.butSimHDL, "error")
+                    qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 elif self.fx_sim_init() != 0:  # returned an error
                     logger.error("No fixpoint widget found!")
-                    qstyle_widget(self.butSimHDL, "error")
+                    qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
                     dict_sig = {'fx_sim': 'get_stimulus'}
@@ -149,7 +149,7 @@ class Input_Fixpoint_Specs(QWidget):
                 # and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
-                qstyle_widget(self.butSimHDL, "normal")
+                qstyle_widget(self.butSimFx, "normal")
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
@@ -320,20 +320,16 @@ class Input_Fixpoint_Specs(QWidget):
 #       Simulation and export Buttons
 # ------------------------------------------------------------------------------
         self.butExportHDL = QPushButton(self)
-        self.butExportHDL.setToolTip("Export fixpoint filter in Verilog format.")
+        self.butExportHDL.setToolTip(
+            "Create Verilog or VHDL netlist for fixpoint filter.")
         self.butExportHDL.setText("Create HDL")
 
-        self.butSimHDL = QPushButton(self)
-        self.butSimHDL.setToolTip("Start migen fixpoint simulation.")
-        self.butSimHDL.setText("Sim. HDL")
-
-        self.butSimFxPy = QPushButton(self)
-        self.butSimFxPy.setToolTip("Simulate filter with fixpoint effects.")
-        self.butSimFxPy.setText("Sim. FixPy")
+        self.butSimFx = QPushButton(self)
+        self.butSimFx.setToolTip("Start fixpoint simulation.")
+        self.butSimFx.setText("Sim. FX")
 
         self.layHHdlBtns = QHBoxLayout()
-        self.layHHdlBtns.addWidget(self.butSimFxPy)
-        self.layHHdlBtns.addWidget(self.butSimHDL)
+        self.layHHdlBtns.addWidget(self.butSimFx)
         self.layHHdlBtns.addWidget(self.butExportHDL)
         # This frame encompasses the HDL buttons sim and convert
         frmHdlBtns = QFrame(self)
@@ -374,7 +370,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimHDL.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
+        self.butSimFx.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -541,8 +537,7 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n{0}".format(e))
 
             self.fx_wdg_found = False
-            self.butSimFxPy.setVisible(False)
-            self.butSimHDL.setEnabled(False)
+            self.butSimFx.setEnabled(False)
             self.butExportHDL.setEnabled(False)
             # self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
@@ -606,15 +601,12 @@ class Input_Fixpoint_Specs(QWidget):
             # ---- set title and description for filter
             self.lblTitle.setText(self.fx_filt_ui.title)
 
-            # --- Check whether fixpoint widget contains HDL filters -----
-            if hasattr(self.fx_filt_ui, 'fixp_filter'):
-                self.butExportHDL.setEnabled(hasattr(self.fx_filt_ui, "to_verilog"))
-                self.butSimHDL.setEnabled(hasattr(self.fx_filt_ui, "run_sim"))
-                self.update_fxqc_dict()
-                self.emit({'fx_sim': 'specs_changed'})
-            else:
-                self.butSimHDL.setEnabled(False)
-                self.butExportHDL.setEnabled(False)
+            # Check which methods the fixpoint widget provides and enable
+            # corresponding buttons:
+            self.butExportHDL.setEnabled(hasattr(self.fx_filt_ui, "to_verilog"))
+            self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
+            self.update_fxqc_dict()
+            self.emit({'fx_sim': 'specs_changed'})
 
         # else:  # no fixpoint widget found
         #     _disable_fx_wdg(self)
@@ -639,7 +631,7 @@ class Input_Fixpoint_Specs(QWidget):
 #            dict_sig = {'fx_sim':'specs_changed'}
 #            self.emit(dict_sig)
 
-        qstyle_widget(self.butSimHDL, "changed")
+        qstyle_widget(self.butSimFx, "changed")
 
 # ------------------------------------------------------------------------------
     def update_fxqc_dict(self):
@@ -715,25 +707,6 @@ class Input_Fixpoint_Specs(QWidget):
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
-# ------------------------------------------------------------------------------
-#    def fx_sim_py(self):
-#        """
-#        Start fix-point simulation: Send the ``fxqc_dict``
-#        containing all quantization information and request a stimulus signal
-#        Not implemented yet
-#        """
-#        try:
-#            logger.info("Started python fixpoint simulation")
-#            self.update_fxqc_dict()
-#            self.fxpyfilter.setup(fb.fil[0]['fxqc'])   # setup filter instance
-#            dict_sig = {'fx_sim':'get_stimulus'}
-#            self.emit(dict_sig)
-#
-#        except AttributeError as e:
-#            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
-#        return
-
-# ------------------------------------------------------------------------------
     def fx_sim_init(self):
         """
         Initialize fix-point simulation:
@@ -805,7 +778,7 @@ class Input_Fixpoint_Specs(QWidget):
         except ValueError as e:
             logger.error("Simulator error {0}".format(e))
             self.fx_results = None
-            qstyle_widget(self.butSimHDL, "error")
+            qstyle_widget(self.butSimFx, "error")
             return {'fx_sim': 'error'}
         except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
@@ -819,12 +792,12 @@ class Input_Fixpoint_Specs(QWidget):
                                 ))
 
             self.fx_results = None
-            qstyle_widget(self.butSimHDL, "error")
+            qstyle_widget(self.butSimFx, "error")
             return {'fx_sim': 'error'}
 
         logger.debug("Sending fixpoint results")
         dict_sig = {'fx_sim': 'set_results', 'fx_results': self.fx_results}
-        qstyle_widget(self.butSimHDL, "normal")
+        qstyle_widget(self.butSimFx, "normal")
         return dict_sig
 
 
