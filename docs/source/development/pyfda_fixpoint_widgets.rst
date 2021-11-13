@@ -2,37 +2,37 @@
 
 Package fixpoint_widgets
 ======================================
-This package contains widgets and fixpoint descriptions for simulating filter 
-designs with fixpoint arithmetics and for converting filter designs to Verilog 
+This package contains widgets and fixpoint descriptions for simulating filter
+designs with fixpoint arithmetics and for converting filter designs to Verilog
 using the migen library. These Verilog netlists can be synthesized e.g. on an FPGA.
 
-Hardware implementations for discrete-time filters usually imply fixpoint 
-arithmetics but this could change in the future as floating point arithmetics 
+Hardware implementations for discrete-time filters usually imply fixpoint
+arithmetics but this could change in the future as floating point arithmetics
 can be implemented on FPGAs using dedicated floating point units (FPUs).
 
 Filter topologies are defined in the corresponding classes and can be implemented
-in hardware. The filter topologies use the order and the coefficients that have 
-been determined by a filter design algorithm from the `pyfda.filter_widgets` 
+in hardware. The filter topologies use the order and the coefficients that have
+been determined by a filter design algorithm from the `pyfda.filter_widgets`
 package for a target filter specification (usually in the frequency domain). Filter
 coefficients are quantized according to the settings in the fixpoint widget.
 
 Each fixpoint module / class contains a widget that is constructed using helper
 classes from :mod:`fixpoint_widgets.fixpoint_helpers`. The widgets allow entering
-fixpoint specifications like word lengths and formats for input, output and 
-internal structures (like an accumulator) for each class. It also contains a 
+fixpoint specifications like word lengths and formats for input, output and
+internal structures (like an accumulator) for each class. It also contains a
 reference to a picture showing the filter topology.
 
-The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
+The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF``
 and ``IIR_DF1``) can be used with which filter design algorithm.
 `tree_builder` parses this file and writes all fixpoint modules
-into the list `fb.fixpoint_widgets_list`. 
+into the list `fb.fixpoint_widgets_list`.
 
 The widgets are selected and instantiated in the widget :ref:`dev_input_fixpoint_specs`.
 
-The input widget 
-:mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
-with references to all successfully imported fixpoint modules. The currently 
-selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets` 
+The input widget
+:mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list
+with references to all successfully imported fixpoint modules. The currently
+selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets`
 together with the referenced picture.
 
 First, a filter widget is instantiated as ``self.fx_filt_ui`` (after the previous
@@ -41,19 +41,19 @@ one has been destroyed).
 Next, ``fx_filt_ui.construct_fixp_filter()`` constructs an instance ``fixp_filter``
 of a fixpoint filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
 
-The widget's methods 
+The widget's methods
 
 * ``response = fx_filt_ui.fx_filt.run_sim(stimulus)``
 * ``fx_filt_ui.fx_filt.to_verilog()``
 
-are used for bit-true simulations and for generating Verilog code for the filter. 
+are used for bit-true simulations and for generating Verilog code for the filter.
 
 .. _dev_input_fixpoint_specs:
 
 input_widgets.input_fixpoint_specs
 ------------------------------------
 
-A fixpoint filter for a given filter design is selected in this widget 
+A fixpoint filter for a given filter design is selected in this widget
 
 .. automodule:: pyfda.input_widgets.input_fixpoint_specs
 	:members:
@@ -66,4 +66,3 @@ A fixpoint filter for a given filter design is selected in this widget
 --------------------------------------
 .. automodule:: pyfda.fixpoint_widgets.fir_df
 	:members:
- 

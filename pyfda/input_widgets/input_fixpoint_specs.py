@@ -133,12 +133,10 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 elif self.fx_sim_init() != 0:  # returned an error
-                    logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    dict_sig = {'fx_sim': 'get_stimulus'}
-                    self.emit(dict_sig)
+                    self.emit({'fx_sim': 'get_stimulus'})
 
             elif dict_sig['fx_sim'] == 'send_stimulus':
                 dict_sig = self.fx_sim_calc_response(dict_sig)
@@ -651,11 +649,6 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Synthesize HDL description of filter
         """
-        if not hasattr(self.fx_filt_ui, 'construct_fixp_filter'):
-            logger.warning('Fixpoint widget has no method "construct_fixp_filter", '
-                           'aborting.')
-            return
-
         dlg = QFD(self)  # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
@@ -717,18 +710,13 @@ class Input_Fixpoint_Specs(QWidget):
 
         Returns
         -------
-        dict_sig: dict
-            dictionary with stuff to emit (either error or )
+        error: int
+            0 for sucessful fx widget construction, -1 for error
         """
-        if not hasattr(self.fx_filt_ui, 'construct_fixp_filter'):
-            logger.error(
-                'Fixpoint widget has no method "construct_fixp_filter", aborting.')
-            return -1
-
         try:
             logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
-            self.fx_filt_ui.construct_fixp_filter()   # setup filter instance
+            self.fx_wdg_inst.init_filter()   # setup filter instance
             return 0
 
         except ValueError as e:
