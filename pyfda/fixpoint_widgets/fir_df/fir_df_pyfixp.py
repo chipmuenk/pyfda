@@ -7,130 +7,116 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for specifying the parameters of a direct-form DF1 FIR filter
+Fixpoint class for calculating direct-form DF1 FIR filter
 """
-import typing
 import numpy as np
 from numpy.lib.function_base import iterable
-# from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
-
 import pyfda.libs.pyfda_fix_lib as fx
-
-################################
 
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'FIR_DF_pyfixp': 'FIR_DF'}  #: Dict containing widget class name : display name
 
-
+# =============================================================================
 class FIR_DF_pyfixp(object):
     """
-    This class describes a direct form FIR fixpoint filter implemented with the `pyfixp`
-    fixpoint library.
+    Fixpoint filter object
 
-    Usage
-    =====
-    > Q = FIR_DF(b, q_mul, q_acc) # Instantiate fixpoint filter object
-    > x_bq = self.Q_mul.filt(x, bq)
+    Usage:
+    ------
+    filt = FIR_DF(p) # Instantiate fixpoint filter object with parameter dict
 
-    The fixpoint object has two different quantizers:
+    The fixpoint object contains two different quantizers:
     - b is an array with coefficients
     - q_mul describes requanitization after coefficient multiplication
       ('quant' and 'sat' can both be set to 'none' if there is none)
     - q_acc describes requantization after each summation in the accumulator
             (resp. in the common summation point)
     """
-    def __init__(self, b: iterable, q_acc: dict, q_mul: dict = None) -> None:
+    def __init__(self, p):
         """
-        Initialize fixpoint object with coefficients and quantizer dict(s)
+        Construct fixed point object with parameter dict
 
         Parameters
         ----------
-        b : array-like
-            filter coefficients
 
-        q_acc : dict
-                dictionary with quantizer settings for the accumulator
+        p : dict
+            dictionary with coefficients and quantizer settings with the following keys:
 
-        q_mul : dict
-                dictionary with quantizer settings for the partial products (optional)
+            - 'b', values: array-like, coefficients as integers
+
+            - 'QA' value: dict with quantizer settings for the accumulator
+
+            - 'q_mul' : dict with quantizer settings for the partial products (optional)
+
+        """
+        self.init(p)
+
+    # ---------------------------------------------------------
+    def init(self, p, zi: iterable = None) -> None:
+        """
+        Initialize filter with parameter dict `p` by initialising all registers
+        and quantizers.
+        This needs to be done every time quantizers or coefficients are updated.
+
+        Parameters
+        ----------
+        p : dict
+            dictionary with coefficients and quantizer settings (see docstring of
+            `__init__()` for details)
+
+        zi : array-like
+            Initialize `L = len(b)` filter registers. Strictly speaking, `zi[0]` is
+            not a register but the current input value.
+            When `len(zi) != len(b)`, truncate or fill up with zeros.
+            When `zi == None`, all registers are filled with zeros.
 
         Returns
         -------
-        None
+        None.
         """
-        if q_mul is None:
+        logger.error(p)
+        self.p = p  # parameter dictionary with coefficients etc.
+
+        if 'q_mul' not in self.p or self.p['q_mul'] is None:
             q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
-        self.Q_acc = fx.Fixed(q_acc)  # create quantizer for accumulator
-        self.Q_mul = fx.Fixed(q_mul)  # create quantizer for partial product
-        self.N_over_filt = 0          # total number of overflows
-
-        self.b = b  # coefficients
-        self.L = len(self.b)  # filter length
-        self.xi = np.zeros(self.L)  # initialize the filter registers
-
-    # --------------------------------------------------------------------------
-    def reset(self) -> None:
-        """
-        Reset all overflow counters
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        self.Q_mul.resetN()  # reset overflow counter of Q_mul
-        self.Q_acc.resetN()  # reset overflow counter of Q_acc
-        self.N_over_filt = 0  # total number of overflows in filter
-
-        return
-
-    # --------------------------------------------------------------------------
-    def update_filter(self, b: iterable) -> None:
-        """
-        Load filter with new set of coefficients
-
-        Parameters
-        ----------
-        b : array-like
-            filter coefficients. Length must be identical to the coefficient
-            set used during initialization
-
-        Returns
-        -------
-        None
-
-        """
-        if len(b) == len(self.b):
-            self.b = b
         else:
-            raise IndexError("Number of coefficients differs from initialization!")
-        return
+            q_mul = p['q_mul']
 
-    # --------------------------------------------------------------------------
-    def lfilter(self, b: iterable = None, x: iterable = None) -> np.ndarray:
-        """
-        Calculate FIR filter (direct form) response via difference equation with
-        quantization. The filter is initialized with zeros.
+        self.b = self.p['b']  # coefficients
+        self.L = len(self.b)  # filter length = number of taps
+        # create various quantizers
+        self.Q_I = fx.Fixed(dict(self.p['QI'], **{'scale': 'int'}))  # input
+        self.Q_mul = fx.Fixed(q_mul)  # partial products
+        self.Q_acc = fx.Fixed(dict(self.p['QA'], **{'scale': 'int'}))  # accumulator
+        self.Q_O = fx.Fixed(dict(self.p['QO'], **{'scale': 'int'}))  # output
+        self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
-        This method is equivalent to `scipy.signal.lfilter()`.
-        """
+        # Initialize vectors (also speeds up calculation for large arrays)
+        self.xbq = np.zeros(len(self.b))  # partial products
 
-        if b is not None:  # update coefficients
-            self.b = b
-        if x is None:
-            x = np.zeros(len(self.b))
-            x[0] = 1  # return impulse response
+        if zi is None:
+            self.zi = np.zeros(self.L - 1)
+        else:  # initialize filter memory and fill up with zeros
+            if len(zi) == self.L - 1:
+                self.zi = zi
+            elif len(zi) < self.L - 1:
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:
+                self.zi = zi[:self.L - 1]
 
-        return self.lfilter_zi(b=b, x=x, zi=np.zeros(len(self.b)))[0]
+    # ---------------------------------------------------------
+    def reset(self):
+        """ resetting overflow counters of quantizers """
+        self.Q_I.resetN()
+        self.Q_mul.resetN()
+        self.Q_acc.resetN()
+        self.Q_O.resetN()
+        self.N_over_filt = 0
 
-    # --------------------------------------------------------------------------
-    def lfilter_zi(self, b: iterable, x: iterable, zi: iterable = None)\
-            -> typing.Tuple[np.ndarray, np.ndarray]:
+    # ---------------------------------------------------------
+    def fxfilter(self, x: iterable = None, b: iterable = None, zi: iterable = None)\
+            -> np.ndarray:
         """
         TODO: When len(x) < len(b), only zeros are returned because the for loop
         is never executed
@@ -138,81 +124,92 @@ class FIR_DF_pyfixp(object):
         Calculate FIR filter (direct form) response via difference equation with
         quantization. Registers can be initialized with `zi`.
 
-        This method is equivalent to `scipy.signal.lfilter_zi()`.
-
         Parameters
         ----------
-        x :  scalar or array-like
-             input value(s)
+        x : array of integer or integer or None
+            input value(s) scaled and quantized according to the setting of `p['QI']`
+            - When x is a scalar, calculate impulse response with the
+                amplitude defined by the scalar.
+            - When `x == None`, calculate impulse response with amplitude = 1.
 
         b :  array-like
-             filter coefficients; when None, the old coefficients are left untouched
+             filter coefficients
+             When `b == None`, the old coefficients are left untouched
 
         zi : array-like
-             initial conditions; when `zi == None`, instance attributes are reused
+             initial conditions; when `zi == None`, the register contents are used from
+             the last run.
 
         Returns
         -------
         yq : ndarray
-            The quantized input value(s) as a scalar or an ndarray with np.float64.
-            and the same shape as x.
-
-        zi : ndarray
-            The final filter state, same length as `b`
+            The quantized input value(s) as an ndarray of np.float64
+            and the same shape as `x` resp. `b` (impulse response).
         """
 
-        if b is not None:  # update coefficients
-            if len(b) == len(self.b):
-                self.b = b
-            else:
-                raise IndexError("Number of coefficients differs from initialization!")
+        if b is not None and np.any(b != self.b):  # update coefficients, reset filter
+            self.p['b'] = self.b = b
+            self.init(self.p)
 
-        if zi is not None:  # initialize filter memory and fill up with zeros
-            if len(zi) == self.L:
-                self.xi = zi
-            elif len(zi) < self.L:
-                self.xi = np.concatenate((zi, np.zeros(self.L - len(len(zi)))))
-            else:
-                self.xi = zi[:self.L]
+        # When `zi` is specified, initialize filter memory with it and pad with zeros
+        # When `zi == None`, use register contents from last run
+        if zi is not None:
+            if len(zi) == self.L - 1:   # use zi as it is
+                self.zi = zi
+            elif len(zi) < self.L - 1:  # append zeros
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:                       # truncate zi
+                self.zi = zi[:self.L - 1]
                 logger.warning("len(zi) > len(b) - 1, zi was truncated")
+
+        if np.isscalar(x):
+            A = x
+            x = np.zeros(len(self.b))
+            x[0] = A
+        elif x is None:  # calculate impulse response
+            x = np.zeros(len(self.b))
+            x[0] = 1
+        # else:  # don't change x, it is integer anyway
+        #    x = x
 
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
 
         # Calculate response by:
-        # - append new stimuli `x` to register state `self.xi`
-        # - slide a window with length `len(b)` over `self.xi`, starting at position `k`
+        # - append new stimuli `x` to register state `self.zi`
+        # - slide a window with length `len(b)` over `self.zi`, starting at position `k`
         #   and multiply it with the coefficients `b`, yielding the partial products x*b
         #   TODO: Doing this for the last len(x) terms should be enough
         # - quantize the partial products x*b, yielding xb_q
         # - sum up the quantized partial products, yielding result y[k]
         # - quantize result, yielding y_q[k]
 
-        self.xi = np.concatenate((self.xi, x))
+        self.zi = np.concatenate((self.zi, x))
 
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(
-                self.xi[k:k + len(self.b)] * self.b)
+                self.zi[k:k + len(self.b)] * self.b)
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
-        self.xi = self.xi[-self.L:]  # store last L inputs (i.e. the L registers)
+        self.zi = self.zi[-self.L:]  # store last L inputs (i.e. the L registers)
         self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
 
-        return y_q[:len(x)], self.xi
+        return self.Q_O.fixp(y_q[:len(x)], scaling='mult'), self.zi
 
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df_pyfixp` """
+    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_ui` """
 
-    dut = FIR_DF_pyfixp(b=[1, 1, 1, 1, 1],
-                        q_acc={'Q': '5.0', 'ovfl': 'wrap', 'quant': 'round'})
-
-    stim = np.arange(100)
-
-    xq = dut.lfilter(b=None, x=stim[:10])
-    print(xq)
-    xq = dut.lfilter_zi(b=None, x=np.zeros(10))
-    print(xq)
+    p = {'b': [1, 2, 3, 2, 1], 'QA': {'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'Q': '2.3', 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'Q': '5.3', 'ovfl': 'wrap', 'quant': 'round'}
+         }
+    dut = FIR_DF(p)
+    x = np.ones(4)
+    y = dut.fxfilter(x=x)
+    print(y)
+    y = dut.fxfilter(x=np.zeros(5))
+    print(y)
