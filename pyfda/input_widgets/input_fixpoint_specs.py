@@ -514,7 +514,7 @@ class Input_Fixpoint_Specs(QWidget):
         This method is called at the initialization of the widget and when
         a new fixpoint filter implementation is selected from the combo box:
 
-        - Destruct old instance of fixpoint filter widget `self.fx_wdg_inst`
+        - Destruct old instance of fixpoint filter widget `self.fx_filt_ui`
 
         - Import and instantiate new fixpoint filter widget e.g. after changing the
           filter topology as
@@ -523,20 +523,20 @@ class Input_Fixpoint_Specs(QWidget):
 
         - Update the UI of the widget
 
-        - Try to instantiate HDL filter as `self.fx_wdg_inst.fixp_filter` with
+        - Try to instantiate HDL filter as `self.fx_filt_ui.fixp_filter` with
             dummy data
         """
         logger.info("_update_fixp_widget")
 
         def _disable_fx_wdg(self) -> None:
 
-            if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None:
+            if hasattr(self, "fx_filt_ui") and self.fx_filt_ui is not None:
                 # is a fixpoint widget loaded?
                 try:
                     # try to remove widget from layout
-                    self.layH_fx_wdg.removeWidget(self.fx_wdg_inst)
+                    self.layH_fx_wdg.removeWidget(self.fx_filt_ui)
                     # delete QWidget when scope has been left
-                    self.fx_wdg_inst.deleteLater()
+                    self.fx_filt_ui.deleteLater()
                 except AttributeError as e:
                     logger.error("Destructing UI failed!\n{0}".format(e))
 
@@ -549,30 +549,30 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()
             self.lblTitle.setText("")
 
-            self.fx_wdg_inst = None
+            self.fx_filt_ui = None
         # -----------------------------------------------------------
         # destruct old fixpoint widget instance:
         _disable_fx_wdg(self)
 
-        # instantiate new fixpoint widget class as self.fx_wdg_inst
+        # instantiate new fixpoint widget class as self.fx_filt_ui
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_fx_wdg, data=False)
         if cmb_wdg_fx_cur:  # at least one valid fixpoint widget found
             self.fx_wdg_found = True
             # get list [module name and path, class name]
             fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
-            fx_wdg_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
-            logger.info(f"Instantiating {fx_mod.__name__} - {fx_wdg_class.__name__}")
+            fx_filt_ui_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
+            logger.info(f"Instantiating\n{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            self.fx_wdg_inst = fx_wdg_class(self)  # instantiate the fixpoint widget
+            self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # and add it to layout:
-            self.layH_fx_wdg.addWidget(self.fx_wdg_inst, stretch=1)
-            self.fx_wdg_inst.setVisible(True)
+            self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
+            self.fx_filt_ui.setVisible(True)
 # Doesn't work at the moment, combo box becomes inaccessible
 #            try:
-#                self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
-#                self.layH_fx_wdg.addWidget(self.fx_wdg_inst, stretch=1) # add to layout
+#                self.fx_filt_ui = fx_filt_ui_class() # instantiate the widget
+#                self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1) # add to layout
 #            except KeyError as e:
 #                logger.warning('Key Error {0} in fixpoint filter \n{1}'\
 #                               .format(e, fx_mod_name + "." + cmb_wdg_fx_cur))
@@ -581,21 +581,21 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.wdg_dict2ui()  # initialize the fixpoint subwidgets from the fxqc_dict
 
-            # ---- connect signals to fx_wdg_inst ----
-            if hasattr(self.fx_wdg_inst, "sig_rx"):
-                self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
-            if hasattr(self.fx_wdg_inst, "sig_tx"):
-                self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
+            # ---- connect signals to fx_filt_ui ----
+            if hasattr(self.fx_filt_ui, "sig_rx"):
+                self.sig_rx.connect(self.fx_filt_ui.sig_rx)
+            if hasattr(self.fx_filt_ui, "sig_tx"):
+                self.fx_filt_ui.sig_tx.connect(self.sig_rx)
 
             # ---- get name of new fixpoint filter image ----
-            if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name):
+            if not (hasattr(self.fx_filt_ui, "img_name") and self.fx_filt_ui.img_name):
                 # no image name defined, use default image
                 img_file = self.default_fx_img
             else:
                 # get path of imported fixpoint widget ...
                 file_path = os.path.dirname(fx_mod.__file__)
                 # ... and construct full image name from it
-                img_file = os.path.join(file_path, self.fx_wdg_inst.img_name)
+                img_file = os.path.join(file_path, self.fx_filt_ui.img_name)
 
             # ---- instantiate and scale graphic of filter topology ----
             self.embed_fixp_img(img_file)
@@ -604,19 +604,12 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning(f"Update fixp_widget: img_fixp = {self.img_fixp}\n\n")
 
             # ---- set title and description for filter
-            self.lblTitle.setText(self.fx_wdg_inst.title)
-
-            # --- try to reference Python fixpoint filter instance -----
-#            if hasattr(self.fx_wdg_inst,'fxpy_filter'):
-#                self.fxpy_filter_inst = self.fx_wdg_inst.fxpy_filter
-#                self.butSimFxPy.setEnabled(True)
-#            else:
-#                self.butSimFxPy.setVisible(False)
+            self.lblTitle.setText(self.fx_filt_ui.title)
 
             # --- Check whether fixpoint widget contains HDL filters -----
-            if hasattr(self.fx_wdg_inst, 'fixp_filter'):
-                self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst, "to_verilog"))
-                self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst, "run_sim"))
+            if hasattr(self.fx_filt_ui, 'fixp_filter'):
+                self.butExportHDL.setEnabled(hasattr(self.fx_filt_ui, "to_verilog"))
+                self.butSimHDL.setEnabled(hasattr(self.fx_filt_ui, "run_sim"))
                 self.update_fxqc_dict()
                 self.emit({'fx_sim': 'specs_changed'})
             else:
@@ -641,8 +634,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_q_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
-            self.fx_wdg_inst.dict2ui()
+        if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
+            self.fx_filt_ui.dict2ui()
 #            dict_sig = {'fx_sim':'specs_changed'}
 #            self.emit(dict_sig)
 
@@ -655,8 +648,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         if self.fx_wdg_found:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
-            if hasattr(self.fx_wdg_inst, "ui2dict"):
-                fb.fil[0]['fxqc'].update(self.fx_wdg_inst.ui2dict())
+            if hasattr(self.fx_filt_ui, "ui2dict"):
+                fb.fil[0]['fxqc'].update(self.fx_filt_ui.ui2dict())
                 logger.debug("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
         else:
             logger.error("No fixpoint widget found!")
@@ -666,7 +659,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Synthesize HDL description of filter
         """
-        if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
+        if not hasattr(self.fx_filt_ui, 'construct_fixp_filter'):
             logger.warning('Fixpoint widget has no method "construct_fixp_filter", '
                            'aborting.')
             return
@@ -712,8 +705,8 @@ class Input_Fixpoint_Specs(QWidget):
                         .format(hdl_full_name, vlog_mod_name))
             try:
                 self.update_fxqc_dict()
-                self.fx_wdg_inst.construct_fixp_filter()
-                code = self.fx_wdg_inst.to_verilog(name=vlog_mod_name)
+                self.fx_filt_ui.construct_fixp_filter()
+                code = self.fx_filt_ui.to_verilog(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
                 with io.open(hdl_full_name, 'w', encoding="utf8") as f:
                     f.write(str(code))
@@ -754,7 +747,7 @@ class Input_Fixpoint_Specs(QWidget):
         dict_sig: dict
             dictionary with stuff to emit (either error or )
         """
-        if not hasattr(self.fx_wdg_inst, 'construct_fixp_filter'):
+        if not hasattr(self.fx_filt_ui, 'construct_fixp_filter'):
             logger.error(
                 'Fixpoint widget has no method "construct_fixp_filter", aborting.')
             return -1
@@ -762,7 +755,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
-            self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance
+            self.fx_filt_ui.construct_fixp_filter()   # setup filter instance
             return 0
 
         except ValueError as e:
@@ -791,7 +784,7 @@ class Input_Fixpoint_Specs(QWidget):
                     ))
 
             # Run fixpoint simulation and return the results as integer values:
-            self.fx_results = self.fx_wdg_inst.run_sim(dict_sig['fx_stimulus'])
+            self.fx_results = self.fx_filt_ui.run_sim(dict_sig['fx_stimulus'])
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")

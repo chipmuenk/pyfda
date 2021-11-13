@@ -35,16 +35,16 @@ with references to all successfully imported fixpoint modules. The currently
 selected fixpoint widget (e.g. `FIR_DF`) is imported from :ref:`dev_mod_fixpoint_widgets` 
 together with the referenced picture.
 
-First, a filter widget is instantiated as ``self.fx_wdg_inst`` (after the previous
+First, a filter widget is instantiated as ``self.fx_filt_ui`` (after the previous
 one has been destroyed).
 
-Next, ``fx_wdg_inst.construct_fixp_filter()`` constructs an instance ``fixp_filter``
-of a migen filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
+Next, ``fx_filt_ui.construct_fixp_filter()`` constructs an instance ``fixp_filter``
+of a fixpoint filter class (of e.g. :ref:`dev_fixpoint_widgets_fir_df`).
 
 The widget's methods 
 
-* ``response = fx_wdg_inst.run_sim(stimulus)``
-* ``fx_wdg_inst.to_verilog()``
+* ``response = fx_filt_ui.fx_filt.run_sim(stimulus)``
+* ``fx_filt_ui.fx_filt.to_verilog()``
 
 are used for bit-true simulations and for generating Verilog code for the filter. 
 
