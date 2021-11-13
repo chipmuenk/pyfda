@@ -297,7 +297,8 @@ class FIR_DF_nmigen_ui(QWidget):
             logger.error("Coefficients contain complex values!")
             return
 
-        # self.fixp_filter = FIR()
+        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        self.fx_filt = FIR(p)
 
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
@@ -311,17 +312,15 @@ class FIR_DF_nmigen_ui(QWidget):
     # ------------------------------------------------------------------------------
     def fxfilter(self, stimulus):
 
-        dut = FIR()
-
         def process():
             input = stimulus
             self.output = []
             for i in input:
-                yield dut.i.eq(int(i))
+                yield self.fx_filt.i.eq(int(i))
                 yield Tick()
-                self.output.append((yield dut.o))
+                self.output.append((yield self.fx_filt.o))
 
-        sim = Simulator(dut)
+        sim = Simulator(self.fx_filt)
 
         sim.add_clock(1/48000)
         sim.add_process(process)
@@ -329,11 +328,28 @@ class FIR_DF_nmigen_ui(QWidget):
 
         return self.output
 
+
 ###############################################################################
-# A synthesizable nMigen FIR filter.
+
 class FIR(Elaboratable):
-    def __init__(self):
-        self.p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+    """
+    A synthesizable nMigen FIR filter in Direct Form.
+
+    Parameters
+    ----------
+    p : dict
+        Dictionary with quantizer settings
+
+    Attributes
+    ----------
+    i : Signal, in
+        Input to the filter with  width `self.p['QI']['W']`
+
+    o : Signal, out
+        Output from the filter with width self.p['QO']['W']`
+    """
+    def __init__(self, p):
+        self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os as signed --------------------------------------
         self.i = Signal(signed(self.p['QI']['W']))  # input signal
         self.o = Signal(signed(self.p['QO']['W']))  # output signal
