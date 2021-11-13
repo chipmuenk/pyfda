@@ -282,7 +282,7 @@ class FIR_DF_pyfixp_UI(QWidget):
     #                            **kwargs)
 
     # ------------------------------------------------------------------------
-    def run_sim(self, stimulus):
+    def fxfilter(self, stimulus):
 
         return self.fx_filt.fxfilter(x=stimulus)[0]
 

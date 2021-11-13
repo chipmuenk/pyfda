@@ -784,7 +784,7 @@ class Input_Fixpoint_Specs(QWidget):
                     ))
 
             # Run fixpoint simulation and return the results as integer values:
-            self.fx_results = self.fx_filt_ui.run_sim(dict_sig['fx_stimulus'])
+            self.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")

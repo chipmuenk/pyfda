@@ -309,7 +309,7 @@ class FIR_DF_nmigen_ui(QWidget):
                                **kwargs)
 
     # ------------------------------------------------------------------------------
-    def run_sim(self, stimulus):
+    def fxfilter(self, stimulus):
 
         dut = FIR()
 
