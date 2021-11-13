@@ -44,11 +44,12 @@ from nmigen.sim import Simulator, Tick  # , Delay, Settle
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'FIR_DF_NM_ui': 'FIR_DF_nm'}  #: Dict containing widget class name : display name
+#  Dict containing {widget class name : display name}
+classes = {'FIR_DF_nmigen_ui': 'FIR_DF (nmigen)'}
 
 
 # =============================================================================
-class FIR_DF_NM_ui(QWidget):
+class FIR_DF_nmigen_ui(QWidget):
     """
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
@@ -57,8 +58,8 @@ class FIR_DF_NM_ui(QWidget):
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
-        super(FIR_DF_NM_ui, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
                       "Standard FIR topology.")
@@ -382,8 +383,8 @@ class FIR(Elaboratable):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with 
-        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui` 
+    """ Run widget standalone with
+        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui`
     """
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
@@ -409,7 +410,7 @@ if __name__ == '__main__':
     # ------------ test ui ----------------
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = FIR_DF_NM_ui()
+    mainw = FIR_DF_nmigen_ui()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
