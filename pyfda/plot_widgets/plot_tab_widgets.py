@@ -133,26 +133,31 @@ class PlotTabWidgets(QTabWidget):
         the size of QTabWidget manually, remove the layout and call QTabWidget::resize
         according to the currentChanged signal.
 
-        You can set the size policy of the widget that is displayed to QSizePolicy::Preferred
-        and the other ones to QSizePolicy::Ignored. After that call adjustSize to update the sizes.
+        You can set the size policy of the widget that is displayed to
+        QSizePolicy::Preferred
+        and the other ones to
+        QSizePolicy::Ignored. After that call adjustSize to update the sizes.
 
         void MainWindow::updateSizes(int index)
         {
         for(int i=0;i<ui->tabWidget->count();i++)
             if(i!=index)
-                ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+                ui->tabWidget->widget(i)->setSizePolicy(
+                                            QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-        ui->tabWidget->widget(index)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        ui->tabWidget->widget(index)->resize(ui->tabWidget->widget(index)->minimumSizeHint());
+        ui->tabWidget->widget(index)->setSizePolicy(
+                                        QSizePolicy::Preferred, QSizePolicy::Preferred);
+        ui->tabWidget->widget(index)->resize(
+                                        ui->tabWidget->widget(index)->minimumSizeHint());
         ui->tabWidget->widget(index)->adjustSize();
         resize(minimumSizeHint());
         adjustSize();
         }
 
-        adjustSize(): The last two lines resize the main window itself. You might want to avoid it,
-        depending on your application. For example, if you set the rest of the widgets
-        to expand into the space just made available, it's not so nice if the window
-        resizes itself instead.
+        adjustSize(): The last two lines resize the main window itself. You might want
+        to avoid it, depending on your application.
+        For example, if you set the rest of the widgets to expand into the space just
+        made available, it's not so nice if the window resizes itself instead.
         """
 
 # ------------------------------------------------------------------------------

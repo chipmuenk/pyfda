@@ -614,7 +614,7 @@ class Plot_Impz(QWidget):
             # ==== Increase frame counter ======================================
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
-            # ================================================================== 
+            # ==================================================================
             logger.info("FX results received")
             self.emit({'sim': 'next_frame_fx'}, sig_name='sig_tx_local')
 
