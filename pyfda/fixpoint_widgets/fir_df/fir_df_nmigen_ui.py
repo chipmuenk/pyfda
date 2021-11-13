@@ -31,6 +31,7 @@ from operator import add
 # from migen.fhdl import verilog
 
 from nmigen import *
+from nmigen.back import verilog
 # from nmigen import Signal, signed
 # from nmigen.build.plat import Platform
 # from nmigen.hdl import ast, dsl, ir
@@ -303,10 +304,10 @@ class FIR_DF_nmigen_ui(QWidget):
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
         """
-        Convert the migen description to Verilog
+        Convert the nmigen description to Verilog
         """
-        return verilog.convert(self.fixp_filter,
-                               ios={self.fixp_filter.i, self.fixp_filter.o},
+        return verilog.convert(self.fx_filt,
+                               ports=[self.fx_filt.i, self.fx_filt.o],
                                **kwargs)
 
     # ------------------------------------------------------------------------------
