@@ -201,13 +201,16 @@ class FIR_DF_pyfixp(object):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fir_df.fir_df_ui` """
+    """
+    Run widget standalone with
+    `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
+    """
 
     p = {'b': [1, 2, 3, 2, 1], 'QA': {'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'Q': '2.3', 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'Q': '5.3', 'ovfl': 'wrap', 'quant': 'round'}
          }
-    dut = FIR_DF(p)
+    dut = FIR_DF_pyfixp(p)
     x = np.ones(4)
     y = dut.fxfilter(x=x)
     print(y)
