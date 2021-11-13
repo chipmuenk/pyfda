@@ -472,7 +472,7 @@ class Fixed(object):
         # missing key-value pairs are either taken from default dict or from
         # instance attributes
         for k in q_obj_default.keys():  # loop over all defined keys
-            if k not in q_obj.keys():  # key is not in passed dict, get key: value pair from ...
+            if k not in q_obj.keys():  # key is not in passed dict, get k:v pair from ...
                 if hasattr(self, k):
                     q_obj[k] = getattr(self, k)  # ... class attribute
                 else:
@@ -588,7 +588,7 @@ class Fixed(object):
         # (1) : INITIALIZATION
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
-        # =====================================================================
+        # ======================================================================
         scaling = scaling.lower()
         if np.shape(y):
             # Input is an array:
@@ -658,26 +658,26 @@ class Fixed(object):
         if scaling in {'mult', 'multdiv'}:
             y = y * self.scale
 
-        #======================================================================
+        # ======================================================================
         # (3) : QUANTIZATION
         #       Divide by LSB to obtain an intermediate format where the
         #       quantization step size = 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
         #       Finally, multiply by LSB to restore original scale.
-        #=====================================================================
+        # ======================================================================
         y = y / self.LSB
 
-        if   self.quant == 'floor':  yq = np.floor(y)
-             # largest integer i, such that i <= x (= binary truncation)
-        elif self.quant == 'round':  yq = np.round(y)
-             # rounding, also = binary rounding
-        elif self.quant == 'fix':    yq = np.fix(y)
-             # round to nearest integer towards zero ("Betragsschneiden")
-        elif self.quant == 'ceil':   yq = np.ceil(y)
-             # smallest integer i, such that i >= x
-        elif self.quant == 'rint':   yq = np.rint(y)
-             # round towards nearest int
+        if self.quant == 'floor':
+            yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
+        elif self.quant == 'round':
+            yq = np.round(y)  # rounding, also = binary rounding
+        elif self.quant == 'fix':
+            yq = np.fix(y)  # round to nearest integer towards zero ("Betragsschneiden")
+        elif self.quant == 'ceil':
+            yq = np.ceil(y)  # smallest integer i, such that i >= x
+        elif self.quant == 'rint':
+            yq = np.rint(y)  # round towards nearest int
         elif self.quant == 'dsm':
             if DS:
                 # Synthesize DSM loop filter, 
@@ -690,22 +690,22 @@ class Fixed(object):
                 # v: quantizer output (-1 or 1)
                 # xn: modulator states.
                 # xmax: maximum value that each state reached during simulation
-                # y: The quantizer input (ie the modulator output). 
+                # y: The quantizer input (ie the modulator output).
             else:
                 raise Exception('"deltasigma" Toolbox not found.\n'
                                 'Try installing it with "pip install deltasigma".')
-        elif self.quant == 'none':   yq = y
-            # return unquantized value
+        elif self.quant == 'none':
+            yq = y  # return unquantized value
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
         yq = yq * self.LSB
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
-        #======================================================================
+        # ======================================================================
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
         #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
-        #=====================================================================
-        if   self.ovfl == 'none':
+        # ====================================================================
+        if self.ovfl == 'none':
             pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
@@ -720,33 +720,34 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, self.MAX, yq) # (cond, true, false)
+                yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
                 yq = np.where(over_neg, self.MIN, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)/(4*self.MSB)), yq)
+                              yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)
+                                                        /(4*self.MSB)), yq)
             else:
-                raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
+                raise Exception('Unknown overflow type "%s"!' %(self.ovfl))
                 return None
-        #======================================================================
+        # ======================================================================
         # (5) : OUTPUT SCALING
         #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         #       to obtain correct scaling for floats
         #       - frmt2float() always returns float
         #       - input_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
-        #======================================================================
+        # ======================================================================
 
         if scaling in {'div', 'multdiv'}:
             yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
-            yq = yq.item() # convert singleton array to scalar
+            yq = yq.item()  # convert singleton array to scalar
 
         return yq
 
-#------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def resetN(self):
         """ Reset counter and overflow-counters of Fixed object"""
         self.N = 0
@@ -755,8 +756,7 @@ class Fixed(object):
         self.N_over_neg = 0
         self.N_over_pos = 0
 
-
-#------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
         """
         Return floating point representation for fixpoint scalar `y` given in
@@ -791,7 +791,7 @@ class Fixed(object):
             return 0
 
         if isinstance(y, np.str_):
-            #logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
+            # logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
             y = str(y)
 
         if frmt is None:
@@ -816,29 +816,29 @@ class Fixed(object):
                 except Exception as e:
                     y_float = None
                     logger.warning("'y': type {0}, len {1}".format(type(y), len(y)))
-                    logger.warning("Can't convert {0}: {1}".format(y,e))
+                    logger.warning("Can't convert {0}: {1}".format(y, e))
             return y_float
 
-        else: # {'dec', 'bin', 'hex', 'csd'}
-         # Find the number of places before the first radix point (if there is one)
-         # and join integer and fractional parts
-         # when returned string is empty, skip general conversions and rely on error handling
-         # of individual routines
-         # remove illegal characters and trailing zeros
-            val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)).lstrip('0')
+        else:  # {'dec', 'bin', 'hex', 'csd'}
+            # Find the number of places before the first radix point (if there is one)
+            # and join integer and fractional parts
+            # when returned string is empty, skip general conversions and rely on 
+            # error handling of individual routines
+            # remove illegal characters and trailing zeros
+            val_str = re.sub(self.FRMT_REGEX[frmt], r'', qstr(y)).lstrip('0')
             if len(val_str) > 0:
-                val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
-                if val_str[0] == '.': # prepend '0' when the number starts with '.'
+                val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
+                if val_str[0] == '.':  # prepend '0' when the number starts with '.'
                     val_str = '0' + val_str
 
                 # count number of fractional places in string
                 try:
                     _, frc_str = val_str.split('.') # split into integer and fractional places
                     frc_places = len(frc_str)
-                except ValueError: # no fractional part
+                except ValueError:  # no fractional part
                     frc_places = 0
 
-                raw_str = val_str.replace('.','') # join integer and fractional part
+                raw_str = val_str.replace('.', '')  # join integer and fractional part
 
                 # logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
             else:
@@ -884,14 +884,14 @@ class Fixed(object):
                     # recalculate y_dec for truncated string
                     y_dec = int(raw_str, 2) / self.base**frc_places
 
-                    if y_dec == 0: # avoid log2(0) error in code below
+                    if y_dec == 0:  # avoid log2(0) error in code below
                         return 0
 
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0) # ... and int_bits
                 # now, y_dec is in the correct range:
-                if int_bits <= self.WI: # positive number
+                if int_bits <= self.WI:  # positive number
                     pass
-                elif int_bits == self.WI + 1: # negative, calculate 2's complemente
+                elif int_bits == self.WI + 1:  # negative, calculate 2's complement
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
                 if neg_sign:
@@ -909,7 +909,7 @@ class Fixed(object):
             # - Divide by 2 ** <number of fractional places> for correct scaling
             # - Calculate fixpoint representation for saturation / overflow effects
 
-            y_dec = csd2dec_vec(raw_str) # csd -> integer
+            y_dec = csd2dec_vec(raw_str)  # csd -> integer
             if y_dec is not None:
                 y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
         # ----
@@ -927,7 +927,7 @@ class Fixed(object):
         else:
             return 0.0
 
-#------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def float2frmt(self, y):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
@@ -963,13 +963,13 @@ class Fixed(object):
         Parameters: bin_str : string
                     pos     : integer
         """
-        insert_binary_point = np.vectorize(lambda bin_str, pos:(
+        insert_binary_point = np.vectorize(lambda bin_str, pos: (
                                     bin_str[:pos+1] + "." + bin_str[pos+1:]))
 
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
-        #======================================================================
+        # ======================================================================
 
-        if self.frmt == 'float': # return float input value unchanged (no string)
+        if self.frmt == 'float':  # return float input value unchanged (no string)
             return y
         elif self.frmt == 'float32':
             return np.float32(y)
@@ -982,7 +982,7 @@ class Fixed(object):
 
             if self.frmt == 'dec':
                 if self.WF == 0:
-                    y_str = np.int64(y_fix) # get rid of trailing zero
+                    y_str = np.int64(y_fix)  # get rid of trailing zero
                     # y_str = np.char.mod('%d', y_fix)
                     # elementwise conversion from integer (%d) to string
                     # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
@@ -990,9 +990,9 @@ class Fixed(object):
                     # y_str = np.char.mod('%f',y_fix)
                     y_str = y_fix
             elif self.frmt == 'csd':
-                y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
+                y_str = dec2csd_vec(y_fix, self.WF)  # convert with WF fractional bits
 
-            else: # bin or hex
+            else:  # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
                 y_fix_int = np.int64(np.round(y_fix / self.LSB))
                 # convert to (array of) string with 2's complement binary
@@ -1016,8 +1016,9 @@ class Fixed(object):
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
 
+
 ########################################
-if __name__=='__main__':
+if __name__ == '__main__':
     """
     Run a simple test with python -m pyfda.libs.pyfda_fix_lib
     or a more elaborate one with
@@ -1025,8 +1026,8 @@ if __name__=='__main__':
     """
     import pprint
 
-    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
-    myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
+    q_obj = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 1}
+    myQ = Fixed(q_obj)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
     myQ.setQobj(q_obj)
@@ -1037,7 +1038,7 @@ if __name__=='__main__':
         print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
     print("\nTesting frmt2float()\n====================")
-    q_obj = {'WI':3, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 2}
+    q_obj = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 2}
     pprint.pprint(q_obj)
     myQ.setQobj(q_obj)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]

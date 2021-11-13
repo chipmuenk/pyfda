@@ -101,7 +101,7 @@ class IIR_DF1(QWidget):
         a = [ int(x) for x in self.hdl_dict['a']] # convert np.int64 to python int
 
         # call setup method of filter widget - this is not implemented (yet)
-        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
+        # self.fx_filt_ui.fx_filt.setup_HDL(self.hdl_dict)
         
         self.hdlfilter.set_coefficients(coeff_b = b, coeff_a = a)  # Coefficients for the filter
 

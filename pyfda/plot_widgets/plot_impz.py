@@ -59,7 +59,7 @@ class Plot_Impz(QWidget):
         self.ui = PlotImpz_UI(self)  # create the UI part with buttons etc.
 
         # initial settings
-        #==================
+        # ==================
         # flag whether specs have been changed and plots need to be recalculated
         self.needs_calc = True
         # same when fixpoint specs have been changed, only needed in Fixpoint mode
@@ -733,7 +733,8 @@ class Plot_Impz(QWidget):
     #     else:  # no second order sections or antiCausals for current filter
     #         y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
 
-    #     if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+    #     if self.stim_wdg.ui.stim == "step"\
+    #           and self.stim_wdg.ui.chk_step_err.isChecked():
     #         dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
     #         # subtract DC (final) value from response
     #         y[max(N_first, self.stim_wdg.T1_idx):N_last] = \
