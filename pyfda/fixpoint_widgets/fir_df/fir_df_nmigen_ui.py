@@ -12,35 +12,19 @@ Widget for specifying the parameters of a direct-form DF1 FIR filter
 import sys
 
 import numpy as np
-from numpy.lib.function_base import iterable
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-import pyfda.libs.pyfda_fix_lib as fx
+from .fir_df_nmigen import FIR_DF_nmigen
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
-from pyfda.fixpoint_widgets.fixpoint_helpers_nmigen import requant
 
 #####################
-from functools import reduce
-from operator import add
-
-# from migen import Signal, Module, run_simulation
-# from migen.fhdl import verilog
-
-from nmigen import *
 from nmigen.back import verilog
-# from nmigen import Signal, signed
-# from nmigen.build.plat import Platform
-# from nmigen.hdl import ast, dsl, ir
-# from nmigen.sim.core import Simulator, Tick, Delay
 from nmigen.sim import Simulator, Tick  # , Delay, Settle
-# from nmigen.build import Platform
-# from nmigen.back.pysim import Simulator, Delay, Settle
-
-################################
+#####################
 
 import logging
 logger = logging.getLogger(__name__)
@@ -290,7 +274,7 @@ class FIR_DF_nmigen_ui(QWidget):
         Construct an instance of the fixpoint filter object using the settings from
         the 'fxqc' quantizer dict
         """
-        p = fb.fil[0]['fxqc']
+        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         if not all(np.isfinite(p['b'])):
             logger.error("Coefficients contain non-finite values!")
             return
@@ -298,8 +282,7 @@ class FIR_DF_nmigen_ui(QWidget):
             logger.error("Coefficients contain complex values!")
             return
 
-        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        self.fx_filt = FIR(p)
+        self.fx_filt = FIR_DF_nmigen(p)
 
 # ------------------------------------------------------------------------------
     def to_verilog(self, **kwargs):
@@ -330,74 +313,6 @@ class FIR_DF_nmigen_ui(QWidget):
         return self.output
 
 
-###############################################################################
-
-class FIR(Elaboratable):
-    """
-    A synthesizable nMigen FIR filter in Direct Form.
-
-    Parameters
-    ----------
-    p : dict
-        Dictionary with quantizer settings
-
-    Attributes
-    ----------
-    i : Signal, in
-        Input to the filter with  width `self.p['QI']['W']`
-
-    o : Signal, out
-        Output from the filter with width self.p['QO']['W']`
-    """
-    def __init__(self, p):
-        self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        # ------------- Define I/Os as signed --------------------------------------
-        self.i = Signal(signed(self.p['QI']['W']))  # input signal
-        self.o = Signal(signed(self.p['QO']['W']))  # output signal
-        pass
-
-    # def ports(self):
-    #     return [self.i, self.o]
-
-    def elaborate(self, platform) -> Module:
-        """
-        `platform` normally specifies FPGA platform, not needed here.
-        """
-        m = Module()  # instantiate a module
-        ###
-        muls = []    # list for partial products b_i * x_i
-        DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
-        QP.update({'W': QP['WI'] + QP['WF'] + 1})
-
-        src = self.i  # first register is connected to input signal
-
-        for b in self.p['b']:
-            sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
-            m.d.sync += sreg.eq(src)            # with input word length
-            src = sreg
-            muls.append(int(b)*sreg)
-
-        logger.debug("b = {0}\nW(b) = {1}".format(
-            pprint_log(self.p['b']), self.p['QCB']['W']))
-
-        # saturation logic doesn't make much sense with a FIR filter, this is
-        # just for demonstration
-        sum_full = Signal(signed(QP['W']))
-        m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
-
-        # rescale from full product format to accumulator format
-        sum_accu = Signal(signed(self.p['QA']['W']))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QA']))
-
-        # rescale from accumulator format to output width
-        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QA'], self.p['QO']))
-
-        return m
-
-
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     """ Run widget standalone with
@@ -406,25 +321,6 @@ if __name__ == '__main__':
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
-    dut = FIR()
-
-    def process():
-        # input = stimulus
-        output = []
-        for i in np.ones(20):
-            yield dut.i.eq(int(i))
-            yield Tick()
-            output.append((yield dut.o))
-        print(output)
-
-    sim = Simulator(dut)
-    # with Simulator(m) as sim:
-
-    sim.add_clock(1/48000)
-    sim.add_process(process)
-    sim.run()
-
-    # ------------ test ui ----------------
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
     mainw = FIR_DF_nmigen_ui()
