@@ -30,11 +30,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 #  Dict containing {widget class name : display name}
-classes = {'FIR_DF_nmigen_ui': 'FIR_DF (nmigen)'}
+classes = {'FIR_DF_nmigen_UI': 'FIR_DF (nmigen)'}
 
 
 # =============================================================================
-class FIR_DF_nmigen_ui(QWidget):
+class FIR_DF_nmigen_UI(QWidget):
     """
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
@@ -323,7 +323,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = FIR_DF_nmigen_ui()
+    mainw = FIR_DF_nmigen_UI()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
