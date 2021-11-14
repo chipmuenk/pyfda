@@ -9,16 +9,14 @@
 """
 Helper classes and functions for nmigen fixpoint filters
 """
-import sys
-
 from pyfda.libs.pyfda_lib import cmp_version
-# import pyfda.libs.pyfda_fix_lib as fx
 import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 if cmp_version("nmigen", "0.2") >= 0:
     from nmigen import Signal, signed, Cat, Module, Repl
+
     def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         """
         Change word length of input signal `sig_i` to `WO` bits, using the
@@ -81,7 +79,7 @@ if cmp_version("nmigen", "0.2") >= 0:
 
         - For reducing the number of fractional bits by `dWF`, simply right-shift the
         integer number by `dWF`. For rounding, add '1' to the bit below the truncation
-        point before right-shifting. 
+        point before right-shifting.
 
         - Extend the number of fractional bits by left-shifting the integer by `dWF`,
         LSB's are filled with zeros.
@@ -120,9 +118,11 @@ if cmp_version("nmigen", "0.2") >= 0:
         # -----------------------------------------------------------------------
         # Requantize fractional part
         # -----------------------------------------------------------------------
-        if dWF <= 0:  # Extend fractional word length of output word by multiplying with 2^dWF
+        if dWF <= 0:    # Extend fractional word length of output word by
+                        # multiplying with 2^dWF
             mod.d.comb += sig_i_q.eq(sig_i << -dWF)  # shift input left by -dWF
-        else:  # dWF > 0, reduce fract. word length by dividing by 2^dWF (shift right by dWF)
+        else:   # dWF > 0, reduce fract. word length by dividing by 2^dWF
+                # (shift right by dWF)
             if QO['quant'] == 'round':
                 # add half an LSB (1 << (dWF - 1)) before right shift
                 mod.d.comb += sig_i_q.eq((sig_i + (1 << (dWF - 1))) >> dWF)
@@ -158,16 +158,8 @@ if cmp_version("nmigen", "0.2") >= 0:
             raise Exception(u'Unknown overflow method "%s"!' % (QI['ovfl']))
 
         return sig_o
-    
 else:
     logger.error('Module "nmigen" not found!')
 
 # ==============================================================================
 if __name__ == '__main__':
-
-    from pyfda.libs.compat import QApplication
-    app = QApplication(sys.argv)
-    mainw = UI_W(None)
-    mainw.show()
-
-    app.exec_()
