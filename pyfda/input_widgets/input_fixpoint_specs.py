@@ -705,7 +705,7 @@ class Input_Fixpoint_Specs(QWidget):
         Initialize fix-point simulation:
 
         - Update the `fxqc_dict` containing all quantization information
-        - Setup a filter instance for (n)migen simulation
+        - Setup a filter instance for fixpoint simulation
         - Request a stimulus signal
 
         Returns
@@ -716,7 +716,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
-            self.fx_wdg_inst.init_filter()   # setup filter instance
+            self.fx_filt_ui.init_filter()   # setup filter instance
             return 0
 
         except ValueError as e:
