@@ -142,15 +142,16 @@ if cmp_version("nmigen", "0.2") >= 0:
         elif dWI == 0:  # WI = WO, don't change integer part
             mod.d.comb += sig_o.eq(sig_i_q)
         elif QO['ovfl'] == 'sat':
-            mod.d.comb += \
-                If(sig_i_q[-1] == 1,
-                If(sig_i_q < MIN_o,
-                    sig_o.eq(MIN_o)
-                    ).Else(sig_o.eq(sig_i_q))
-                ).Elif(sig_i_q > MAX_o,
-                        sig_o.eq(MAX_o)
-                        ).Else(sig_o.eq(sig_i_q)
-                                )
+            with mod.If(sig_i_q[-1] == 1):
+                with mod.If(sig_i_q < MIN_o):
+                    mod.d.comb += sig_o.eq(MIN_o)
+                with mod.Else():
+                    mod.d.comb += sig_o.eq(sig_i_q)
+            with mod.Elif(sig_i_q > MAX_o):  # sig_i_q[-1] == 0
+                mod.d.comb += sig_o.eq(MAX_o)
+            with mod.Else():
+                mod.d.comb += sig_o.eq(sig_i_q)
+
         elif QO['ovfl'] == 'wrap':  # wrap around (shift left)
             mod.d.comb += sig_o.eq(sig_i_q)
 
@@ -163,3 +164,4 @@ else:
 
 # ==============================================================================
 if __name__ == '__main__':
+    pass
