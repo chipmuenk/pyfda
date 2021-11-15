@@ -293,9 +293,23 @@ class FIR_DF_nmigen_UI(QWidget):
 
     # ------------------------------------------------------------------------------
     def fxfilter(self, stimulus):
+        """
+        Calculate the fixpoint filter response in float format for a frame of
+        stimulus data (float).
 
+        Parameters
+        ----------
+        stimulus : ndarray of float
+            One frame of stimuli data (float) scaled as WI.WF
+
+        Returns
+        -------
+        output : ndarray of float
+            One frame of response data (float) scaled as WI.WF
+        """
         def process():
-            input = stimulus
+            # convert stimulus to int by multiplying with 2 ^ WF
+            input = np.round(stimulus * (1 << self.fx_filt.p['QI']['WF'])).astype(int)
             self.output = []
             for i in input:
                 yield self.fx_filt.i.eq(int(i))
@@ -308,7 +322,8 @@ class FIR_DF_nmigen_UI(QWidget):
         sim.add_process(process)
         sim.run()
 
-        return self.output
+        # convert output to ndarray of float by dividing the integer response by 2 ^ WF
+        return np.array(self.output, dtype='f') / (1 << self.fx_filt.p['QO']['WF'])
 
 
 # ------------------------------------------------------------------------------

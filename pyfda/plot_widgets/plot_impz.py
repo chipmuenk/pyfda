@@ -596,8 +596,8 @@ class Plot_Impz(QWidget):
 
                 self.emit(
                     {'fx_sim': 'send_stimulus',
-                     'fx_stimulus': np.round(self.x_q[frame]
-                                             * (1 << self.q_i.WF)).astype(int)})
+                     'fx_stimulus': self.x_q[frame]})
+
                 logger.info("FX stimulus sent")
                 return
 
@@ -692,64 +692,6 @@ class Plot_Impz(QWidget):
         self.fx_sim_old = self.fx_sim
 
     # ------------------------------------------------------------------------------
-    # def calc_response(self, N_first: int, N_last: int) -> None:
-    #     """
-    #     (Re-)calculate ideal filter response `self.y` from stimulus `self.x` and
-    #     the filter coefficients using `lfilter()`, `sosfilt()` or `filtfilt()`.
-
-    #     Set the flag `self.cmplx` when response `self.y` or stimulus `self.x`
-    #     are complex and make warning field visible.
-
-    #     For filtering long signals in batches see:
-    #     https://stackoverflow.com/questions/58014131/implementing-blockwise-low-pass-iir-filter-in-python
-    #     https://warrenweckesser.github.io/papers/weckesser-scipy-linear-filters.pdf
-
-    #     In order for this to work, the filter state ("initial condition") needs to
-    #     be stored.
-
-    #     Returns
-    #     -------
-    #     None
-
-    #     ... but it modifies the class attributes `self.y`, `self.cmplx`,
-    #     `self.needs_redraw`
-    #     """
-
-    #     self.bb = np.asarray(fb.fil[0]['ba'][0])
-    #     self.aa = np.asarray(fb.fil[0]['ba'][1])
-    #     if min(len(self.aa), len(self.bb)) < 2:
-    #         logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-    #         return
-
-    #     logger.debug("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
-
-    #     sos = np.asarray(fb.fil[0]['sos'])
-    #     antiCausal = 'zpkA' in fb.fil[0]
-
-    #     if len(sos) > 0 and not antiCausal:  # has second order sections and is causal
-    #         y = sig.sosfilt(sos, self.x[N_first:N_last])
-    #     elif antiCausal:
-    #         y = sig.filtfilt(self.bb, self.aa, self.x[N_first:N_last], -1, None)
-    #     else:  # no second order sections or antiCausals for current filter
-    #         y = sig.lfilter(self.bb, self.aa, self.x[N_first:N_last])
-
-    #     if self.stim_wdg.ui.stim == "step"\
-    #           and self.stim_wdg.ui.chk_step_err.isChecked():
-    #         dc = sig.freqz(self.bb, self.aa, [0])  # DC response of the system
-    #         # subtract DC (final) value from response
-    #         y[max(N_first, self.stim_wdg.T1_idx):N_last] = \
-    #             y[max(N_first, self.stim_wdg.T1_idx):N_last] - abs(dc[1])
-
-    #     # tol specified in multiples of machine eps:
-    #     self.y[N_first:N_last] = np.real_if_close(y, tol=1e3)
-
-    #     self.needs_redraw[:] = [True] * 2
-
-    #     # Calculate imag. and real components from response
-    #     self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
-    #     self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-
-    # ------------------------------------------------------------------------------
     def draw_response_fx(self, dict_sig=None):
         """
         Get Fixpoint results and plot them
@@ -757,7 +699,7 @@ class Plot_Impz(QWidget):
         if self.needs_calc:
             self.needs_redraw = [True] * 2
             # t_draw_start = time.process_time()
-            self.y = np.asarray(dict_sig['fx_results'])
+            self.y = dict_sig['fx_results']
             if self.y is None:
                 qstyle_widget(self.ui.but_run, "error")
                 self.needs_calc = True
@@ -843,16 +785,15 @@ class Plot_Impz(QWidget):
             try:
                 if self.ui.but_fx_scale.isChecked():
                     # display stimulus and response as integer values:
-                    # - multiply stimulus by 2 ** WF
-                    # - display response unscaled
+                    # - multiply stimulus and response by 2 ** WF
                     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
                     self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['W']-1)
                     self.fx_max = -self.fx_min - 1
                 else:
-                    # display values scaled as "real world values"
-                    self.scale_o = 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
+                    # display values scaled as "real world (float) values"
                     self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
-                    self.fx_max = -self.fx_min - self.scale_o
+                    self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))

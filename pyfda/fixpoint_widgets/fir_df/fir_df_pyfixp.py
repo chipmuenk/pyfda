@@ -14,6 +14,8 @@ from numpy.lib.function_base import iterable
 import pyfda.libs.pyfda_fix_lib as fx
 
 import logging
+
+from pyfda.libs.pyfda_lib import pprint_log
 logger = logging.getLogger(__name__)
 
 
@@ -86,10 +88,9 @@ class FIR_DF_pyfixp(object):
         self.b = self.p['b']  # coefficients
         self.L = len(self.b)  # filter length = number of taps
         # create various quantizers
-        self.Q_I = fx.Fixed(dict(self.p['QI'], **{'scale': 'int'}))  # input
         self.Q_mul = fx.Fixed(q_mul)  # partial products
-        self.Q_acc = fx.Fixed(dict(self.p['QA'], **{'scale': 'int'}))  # accumulator
-        self.Q_O = fx.Fixed(dict(self.p['QO'], **{'scale': 'int'}))  # output
+        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
+        self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
         # Initialize vectors (also speeds up calculation for large arrays)
@@ -107,8 +108,7 @@ class FIR_DF_pyfixp(object):
 
     # ---------------------------------------------------------
     def reset(self):
-        """ resetting overflow counters of quantizers """
-        self.Q_I.resetN()
+        """ reset overflow counters of quantizers """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
@@ -126,7 +126,7 @@ class FIR_DF_pyfixp(object):
 
         Parameters
         ----------
-        x : array of integer or integer or None
+        x : array of float or float or None
             input value(s) scaled and quantized according to the setting of `p['QI']`
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
@@ -189,14 +189,14 @@ class FIR_DF_pyfixp(object):
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(
-                self.zi[k:k + len(self.b)] * self.b)
+                self.zi[k:k + len(self.b)] * self.b / (1 << self.p['QCB']['WF']))
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
         self.zi = self.zi[-self.L:]  # store last L inputs (i.e. the L registers)
         self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
 
-        return self.Q_O.fixp(y_q[:len(x)], scaling='mult'), self.zi
+        return self.Q_O.fixp(y_q[:len(x)]), self.zi
 
 
 # ------------------------------------------------------------------------------
