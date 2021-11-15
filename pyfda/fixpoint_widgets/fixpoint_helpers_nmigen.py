@@ -113,7 +113,7 @@ if cmp_version("nmigen", "0.2") >= 0:
         sig_i_q = Signal(signed(max(WI, WO)))
         sig_o = Signal(signed(WO))
 
-        logger.debug(f"rescale: dWI={dWI}, dWF={dWF}, QU:{QO['quant']}, OV:{QO['ovfl']}")
+        # logger.debug(f"rescale: dWI={dWI}, dWF={dWF}, Qu:{QO['quant']}, Ov:{QO['ovfl']}")
 
         # -----------------------------------------------------------------------
         # Requantize fractional part

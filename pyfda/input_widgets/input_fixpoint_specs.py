@@ -79,18 +79,14 @@ class Input_Fixpoint_Specs(QWidget):
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
 
-        if True:  # HAS_NMIGEN:
-            self._construct_UI()
-            inst_wdg_list = self._update_filter_cmb()
-            if len(inst_wdg_list) == 0:
-                logger.warning("No fixpoint filters found!")
-            else:
-                logger.debug("Imported {0:d} fixpoint filters:\n{1}"
-                             .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
-            self._update_fixp_widget()
+        self._construct_UI()
+        inst_wdg_list = self._update_filter_cmb()
+        if len(inst_wdg_list) == 0:
+            logger.warning("No fixpoint filters found!")
         else:
-            logger.warning("No nmigen module found, fixpoint functionality disabled.")
-            self.state = "deactivated"  # "invisible", "disabled"
+            logger.debug("Imported {0:d} fixpoint filters:\n{1}"
+                            .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+        self._update_fixp_widget()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
@@ -509,14 +505,10 @@ class Input_Fixpoint_Specs(QWidget):
         a new fixpoint filter implementation is selected from the combo box:
 
         - Destruct old instance of fixpoint filter widget `self.fx_filt_ui`
-
         - Import and instantiate new fixpoint filter widget e.g. after changing the
           filter topology as
-
         - Try to load image for filter topology
-
         - Update the UI of the widget
-
         - Try to instantiate HDL filter as `self.fx_filt_ui.fixp_filter` with
             dummy data
         """
@@ -544,8 +536,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.fx_filt_ui = None
         # -----------------------------------------------------------
-        # destruct old fixpoint widget instance:
-        _disable_fx_wdg(self)
+        _disable_fx_wdg(self)  # destruct old fixpoint widget instance:
 
         # instantiate new fixpoint widget class as self.fx_filt_ui
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_fx_wdg, data=False)
@@ -700,6 +691,7 @@ class Input_Fixpoint_Specs(QWidget):
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
+    # --------------------------------------------------------------------------
     def fx_sim_init(self):
         """
         Initialize fix-point simulation:
