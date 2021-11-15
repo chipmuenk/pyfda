@@ -11,6 +11,7 @@ Fixpoint class for calculating direct-form DF1 FIR filter using nMigen library
 """
 
 import numpy as np
+from numpy.lib.function_base import iterable
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.fixpoint_widgets.fixpoint_helpers_nmigen import requant
 
@@ -55,13 +56,38 @@ class FIR_DF_nmigen(Elaboratable):
         Output from the filter with width self.p['QO']['W']`
     """
     def __init__(self, p):
+        self.init(p)
+
+    # ---------------------------------------------------------
+    def init(self, p, zi: iterable = None) -> None:
+        """
+        Initialize filter with parameter dict `p` by initialising all registers
+        and quantizers.
+        This needs to be done every time quantizers or coefficients are updated.
+
+        Parameters
+        ----------
+        p : dict
+            dictionary with coefficients and quantizer settings (see docstring of
+            `__init__()` for details)
+
+        zi : array-like
+            Initialize `L = len(b)` filter registers. Strictly speaking, `zi[0]` is
+            not a register but the current input value.
+            When `len(zi) != len(b)`, truncate or fill up with zeros.
+            When `zi == None`, all registers are filled with zeros.
+
+        Returns
+        -------
+        None.
+        """
         self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os --------------------------------------
         self.i = Signal(signed(self.p['QI']['W']))  # input signal
         self.o = Signal(signed(self.p['QO']['W']))  # output signal
         self.muls = None  # list for partial products b_i * x_i
-        # TODO: initialize with a suitable number of empty values
 
+    # ---------------------------------------------------------
     def elaborate(self, platform) -> Module:
         """
         `platform` normally specifies FPGA platform, not needed here.
