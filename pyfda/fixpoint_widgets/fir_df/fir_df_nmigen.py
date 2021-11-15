@@ -59,6 +59,8 @@ class FIR_DF_nmigen(Elaboratable):
         # ------------- Define I/Os --------------------------------------
         self.i = Signal(signed(self.p['QI']['W']))  # input signal
         self.o = Signal(signed(self.p['QO']['W']))  # output signal
+        self.muls = None  # list for partial products b_i * x_i
+        # TODO: initialize with a suitable number of empty values
 
     def elaborate(self, platform) -> Module:
         """
@@ -66,7 +68,9 @@ class FIR_DF_nmigen(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        muls = []    # list for partial products b_i * x_i
+        if not self.muls:
+            self.muls = [0] * len(self.p['b'])
+
         DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
         # word format for sum of partial products b_i * x_i
         QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
@@ -75,16 +79,19 @@ class FIR_DF_nmigen(Elaboratable):
 
         src = self.i  # first register is connected to input signal
 
+        i = 0
         for b in self.p['b']:
             sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
             m.d.sync += sreg.eq(src)            # with input word length
             src = sreg
-            muls.append(int(b)*sreg)
+            self.muls[i] = int(b)*sreg
+            i += 1
+            # TODO: overwrite old data with new data to allow for frame based processing
 
         logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
-        sum_full = Signal(signed(QP['W']))
-        m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
+        sum_full = Signal(signed(QP['W']))  # sum of all multiplication products with
+        m.d.sync += sum_full.eq(reduce(add, self.muls))  # full product wordlength
 
         # rescale from full product wordlength to accumulator format
         sum_accu = Signal(signed(self.p['QA']['W']))
