@@ -56,13 +56,9 @@ class FIR_DF_nmigen(Elaboratable):
     """
     def __init__(self, p):
         self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        # ------------- Define I/Os as signed --------------------------------------
+        # ------------- Define I/Os --------------------------------------
         self.i = Signal(signed(self.p['QI']['W']))  # input signal
         self.o = Signal(signed(self.p['QO']['W']))  # output signal
-        pass
-
-    # def ports(self):
-    #     return [self.i, self.o]
 
     def elaborate(self, platform) -> Module:
         """
@@ -85,22 +81,19 @@ class FIR_DF_nmigen(Elaboratable):
             src = sreg
             muls.append(int(b)*sreg)
 
-        logger.debug("b = {0}\nW(b) = {1}".format(
-            pprint_log(self.p['b']), self.p['QCB']['W']))
+        logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
-        # saturation logic doesn't make much sense with a FIR filter, this is
-        # just for demonstration
         sum_full = Signal(signed(QP['W']))
         m.d.sync += sum_full.eq(reduce(add, muls))  # sum of multiplication products
 
-        # rescale from full product format to accumulator format
+        # rescale from full product wordlength to accumulator format
         sum_accu = Signal(signed(self.p['QA']['W']))
         m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QA']))
 
         # rescale from accumulator format to output width
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QA'], self.p['QO']))
 
-        return m
+        return m   # return result as list of integers
 
 
 # ------------------------------------------------------------------------------
