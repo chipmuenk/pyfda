@@ -90,7 +90,7 @@ class Plot_Impz(QWidget):
         # initial setting for fixpoint simulation:
         self.fx_sim = self.fx_sim_old = qget_cmb_box(
             self.ui.cmb_sim_select, data=False) == 'Fixpoint'
-        self.fx_select()    # initialize UI for fixpoint or float simulation
+        self.update_fx_ui()    # initialize UI for fixpoint or float simulation
         # initialize routines and settings
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
@@ -296,7 +296,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
                 self.needs_calc_fx = True
                 self.error = False
-                self.fx_select("Fixpoint")
+                self.update_fx_ui("Fixpoint")
                 # further actions following below
 
             if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
@@ -440,7 +440,7 @@ class Plot_Impz(QWidget):
             )
         self.needs_redraw = [True] * 2
 
-        self.fx_select()  # check for fixpoint setting and update if needed
+        self.update_fx_ui()  # check for fixpoint setting and update ui if needed
 
         if type(arg) == bool:  # but_run has been pressed
             self.needs_calc = True  # force recalculation when but_run is pressed
@@ -638,47 +638,42 @@ class Plot_Impz(QWidget):
 
 # =============================================================================
 
-    def fx_select(self, fx=None):
+    def update_fx_ui(self, fx=None):
         """
-        Select between fixpoint and floating point simulation.
+        Select between fixpoint and floating point simulation and update FX UI
+        settings.
+
         Parameter `fx` can be:
 
-        - str "Fixpoint" or "Float" when called directly
+        - str "Fixpoint", "Float" or `None` when called directly. "Fixpoint"
+          or "Float" updates the combobox setting correspondingly. `None`
+          only upcates the UI.
 
         - int 0 or 1 when triggered by changing the index of combobox
           `self.ui.cmb_sim_select` (signal-slot-connection)
 
-        In both cases, the index of the combobox is updated according to the
-        passed argument. If the index has been changed since last time,
-        `self.needs_calc` is set to True and the run button is set to "changed".
-
         When fixpoint simulation is selected, all corresponding widgets are made
-        visible. `self.fx_sim` is set to True.
+        visible and `self.fx_sim` is set to True.
 
-        If `self.fx_sim` has changed, `self.needs_calc` is set to True.
+        If `self.fx_sim` has been changed since last time, `self.needs_calc`
+        is set to True and the run button is set to "changed".
         """
-        logger.info(f"Called fx_select({fx})")
-
-        if fx in {0, 1}:  # connected to index change of combo box
-            pass
-        elif fx is None:  # called without argument, updates ui according to cmbbox
-            pass
-        elif fx in {"Float", "Fixpoint"}:  # direct function call
+        if fx in {"Float", "Fixpoint"}:  # direct function call
             qset_cmb_box(self.ui.cmb_sim_select, fx)
-
-        else:
-            logger.error('Unknown argument "{0}".'.format(fx))
-            return
 
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
 
-        self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)
-        self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)
-        self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)
-        self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)
-        self.ui.but_fx_scale.setVisible(self.fx_sim)
-        self.ui.but_fx_range.setVisible(self.fx_sim)
+        logger.info(f"update_fx_ui = {fx}, fx_sim = {self.fx_sim}")
 
+        # plot styles for quantized stimulus signal
+        self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)  # cmb box freq. domain
+        self.ui.lbl_plt_freq_stmq.setVisible(self.fx_sim)  # label freq. domain
+        self.ui.cmb_plt_time_stmq.setVisible(self.fx_sim)  # cmb box time domain
+        self.ui.lbl_plt_time_stmq.setVisible(self.fx_sim)  # cmb box time domain
+        self.ui.but_fx_scale.setVisible(self.fx_sim)  # fx scale int
+        self.ui.but_fx_range.setVisible(self.fx_sim)  # display fx range limits
+
+        # add / delete fixpoint entry to / from spectrogram combo box:
         if self.fx_sim:
             qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
         else:
