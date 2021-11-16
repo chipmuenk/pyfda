@@ -252,8 +252,8 @@ class Plot_Impz(QWidget):
         """
         Process signals coming from the iterations of `impz()` and `impz_fx()`
         """
-        logger.warning("SIG_RX LOCAL - needs_calc: {0} | vis: {1}\n{2}"
-                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        # logger.warning(f"SIG_RX LOCAL - needs_calc: {self.needs_calc} | "
+        #                f"vis: {self.isVisible()}\n{pprint_log(dict_sig}")
 
         if dict_sig['sim'] == 'next_frame':
             # self.test_for_break()
