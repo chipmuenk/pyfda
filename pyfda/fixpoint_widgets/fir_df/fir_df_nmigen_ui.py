@@ -283,7 +283,7 @@ class FIR_DF_nmigen_UI(QWidget):
         self.fx_filt = FIR_DF_nmigen(p)
 
 # ------------------------------------------------------------------------------
-    def to_verilog(self, **kwargs):
+    def to_hdl(self, **kwargs):
         """
         Convert the nmigen description to Verilog
         """

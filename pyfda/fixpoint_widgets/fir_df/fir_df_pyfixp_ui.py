@@ -271,7 +271,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.fx_filt = FIR_DF_pyfixp(p)
 
 # ------------------------------------------------------------------------------
-    # def to_verilog(self, **kwargs):
+    # def to_hdl(self, **kwargs):
     #     """
     #     Convert the migen description to Verilog
     #     """

@@ -592,7 +592,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
-            self.butExportHDL.setEnabled(hasattr(self.fx_filt_ui, "to_verilog"))
+            self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
             self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
             self.update_fxqc_dict()
             self.emit({'fx_sim': 'specs_changed'})
@@ -682,7 +682,7 @@ class Input_Fixpoint_Specs(QWidget):
             try:
                 self.update_fxqc_dict()
                 self.fx_filt_ui.construct_fixp_filter()
-                code = self.fx_filt_ui.to_verilog(name=vlog_mod_name)
+                code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
                 with io.open(hdl_full_name, 'w', encoding="utf8") as f:
                     f.write(str(code))
