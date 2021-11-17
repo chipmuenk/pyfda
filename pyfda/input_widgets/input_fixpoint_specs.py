@@ -731,7 +731,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             logger.info(
-                'Simulate fixpoint frame with "{0}" stimulus:\n{1}'.format(
+                'Simulate fixpoint frame with "{0}" stimulus:\n\t{1}'.format(
                     dict_sig['class'],
                     pprint_log(dict_sig['fx_stimulus'], tab=" "),
                     ))
