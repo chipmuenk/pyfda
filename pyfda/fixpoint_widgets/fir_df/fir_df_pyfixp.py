@@ -108,9 +108,6 @@ class FIR_DF_pyfixp(object):
     def fxfilter(self, x: iterable = None, b: iterable = None, zi: iterable = None)\
             -> np.ndarray:
         """
-        TODO: When len(x) < len(b), only zeros are returned because the for loop
-        is never executed
-
         Calculate FIR filter (direct form) response via difference equation with
         quantization. Registers can be initialized with `zi`.
 
