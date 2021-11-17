@@ -65,6 +65,7 @@ class FIR_DF_nmigen(Elaboratable):
         Output from the filter with width self.p['QO']['W']`
     """
     def __init__(self, p):
+        self.muls = None
         self.init(p)
 
     # ---------------------------------------------------------
@@ -94,7 +95,6 @@ class FIR_DF_nmigen(Elaboratable):
         # ------------- Define I/Os --------------------------------------
         self.i = Signal(signed(self.p['QI']['W']))  # input signal
         self.o = Signal(signed(self.p['QO']['W']))  # output signal
-        self.muls = None  # list for partial products b_i * x_i
 
     # ---------------------------------------------------------
     def elaborate(self, platform) -> Module:
@@ -103,7 +103,7 @@ class FIR_DF_nmigen(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        if not self.muls:
+        if self.muls is None:   # initialize list for partial products b_i * x_i
             self.muls = [0] * len(self.p['b'])
 
         DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
@@ -119,9 +119,9 @@ class FIR_DF_nmigen(Elaboratable):
             sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
             m.d.sync += sreg.eq(src)            # with input word length
             src = sreg
+            # TODO: keep old data sreg to allow frame based processing (requiring reset)
             self.muls[i] = int(b)*sreg
             i += 1
-            # TODO: overwrite old data with new data to allow for frame based processing
 
         logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
