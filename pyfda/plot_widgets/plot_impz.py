@@ -23,7 +23,7 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
+    safe_eval, pprint_log, first_item, calc_ssb_spectrum, calc_Hcomplex)
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -282,7 +282,7 @@ class Plot_Impz(QWidget):
                        .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
-            logger.warning(f"Stopped infinite loop:\n{dict_sig[0]}") #  .format(pprint_log(dict_sig)))
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         if 'fx_sim' in dict_sig:

@@ -388,7 +388,14 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
         for k, v in default_dict.items():
             if k not in d:
                 d[k] = v
-
+# -----------------------------------------------------------------------------
+def first_item(d: dict) -> str:
+    """
+    Return the first item of the dictionary as a string. This only works in a
+    reproducible fashion for Python 3.7 and above.
+    """
+    k = next(iter(d))
+    return str(k) + ": " + str(d[k])
 
 # ------------------------------------------------------------------------------
 def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
