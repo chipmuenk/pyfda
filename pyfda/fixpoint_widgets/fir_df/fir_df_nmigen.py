@@ -45,6 +45,15 @@ class FIR_DF_nmigen(Elaboratable):
     Parameters
     ----------
     p : dict
+        Dictionary with coefficients and quantizer settings with a.o.
+        the following keys:
+
+        - 'b', values: array-like, coefficients as integers
+
+        - 'QA' value: dict with quantizer settings for the accumulator
+
+        - 'q_mul' : dict with quantizer settings for the partial products
+           optional, 'quant' and 'sat' are both be set to 'none' if there is none
         Dictionary with quantizer settings
 
     Attributes

@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Fixpoint class for calculating direct-form DF1 FIR filter
+Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
 """
 import numpy as np
 from numpy.lib.function_base import iterable
@@ -15,43 +15,33 @@ import pyfda.libs.pyfda_fix_lib as fx
 
 import logging
 
-from pyfda.libs.pyfda_lib import pprint_log
+# from pyfda.libs.pyfda_lib import pprint_log
 logger = logging.getLogger(__name__)
 
 
 # =============================================================================
 class FIR_DF_pyfixp(object):
     """
-    Fixpoint filter object
+    Construct fixed point object with parameter dict `p`
 
     Usage:
     ------
     filt = FIR_DF(p) # Instantiate fixpoint filter object with parameter dict
 
-    The fixpoint object contains two different quantizers:
-    - b is an array with coefficients
-    - q_mul describes requanitization after coefficient multiplication
-      ('quant' and 'sat' can both be set to 'none' if there is none)
-    - q_acc describes requantization after each summation in the accumulator
-            (resp. in the common summation point)
+    Parameters
+    ----------
+    p : dict
+        Dictionary with coefficients and quantizer settings with a.o.
+        the following keys:
+
+        - 'b', values: array-like, coefficients as integers
+
+        - 'QA' value: dict with quantizer settings for the accumulator
+
+        - 'q_mul' : dict with quantizer settings for the partial products
+           optional, 'quant' and 'sat' are both be set to 'none' if there is none
     """
     def __init__(self, p):
-        """
-        Construct fixed point object with parameter dict
-
-        Parameters
-        ----------
-
-        p : dict
-            dictionary with coefficients and quantizer settings with the following keys:
-
-            - 'b', values: array-like, coefficients as integers
-
-            - 'QA' value: dict with quantizer settings for the accumulator
-
-            - 'q_mul' : dict with quantizer settings for the partial products (optional)
-
-        """
         self.init(p)
 
     # ---------------------------------------------------------
