@@ -657,10 +657,10 @@ class Input_Coeffs(QWidget):
         self._refresh_table()
 
 # ------------------------------------------------------------------------------
-    def _set_number_format(self):
+    def _set_number_format(self, emit=True):
         """
         Triggered by `contruct_UI()`, `qdict2ui()`and by `ui.cmbQFrmt.currentIndexChanged()`
-        
+
         Set one of three number formats: Integer, fractional, normalized fractional
         (triggered by self.ui.cmbQFrmt combobox)
         """
@@ -723,7 +723,7 @@ class Input_Coeffs(QWidget):
         self._update_MSB_LSB()
 
 # ------------------------------------------------------------------------------
-    def ui2qdict(self):
+    def ui2qdict(self, emit=True):
         """
         Read out the settings of the quantization comboboxes.
 
@@ -753,8 +753,9 @@ class Input_Coeffs(QWidget):
 
         self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])  # update fixpoint object
 
-        self.emit({'view_changed': 'q_coeff'})
-        
+        if emit:
+            self.emit({'view_changed': 'q_coeff'})
+
         self._update_MSB_LSB()
 
         self._refresh_table()
