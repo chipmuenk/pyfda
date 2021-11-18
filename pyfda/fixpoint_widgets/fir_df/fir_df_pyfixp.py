@@ -32,13 +32,13 @@ class FIR_DF_pyfixp(object):
     ----------
     p : dict
         Dictionary with coefficients and quantizer settings with a.o.
-        the following keys:
+        the following keys : values
 
-        - 'b', values: array-like, coefficients as integers
+        - 'b', value: array of coefficients as floats, scaled as `WI:WF`
 
-        - 'QA' value: dict with quantizer settings for the accumulator
+        - 'QA', value: dict with quantizer settings for the accumulator
 
-        - 'q_mul' : dict with quantizer settings for the partial products
+        - 'q_mul', value: dict with quantizer settings for the partial products
            optional, 'quant' and 'sat' are both be set to 'none' if there is none
     """
     def __init__(self, p):
@@ -120,7 +120,7 @@ class FIR_DF_pyfixp(object):
             - When `x == None`, calculate impulse response with amplitude = 1.
 
         b :  array-like
-             filter coefficients
+             filter coefficients as quantized floats scaled as `WI.WF`
              When `b == None`, the old coefficients are left untouched
 
         zi : array-like
@@ -137,7 +137,6 @@ class FIR_DF_pyfixp(object):
         if b is not None and np.any(b != self.b):  # update coefficients, reset filter
             self.p['b'] = self.b = b
             self.init(self.p)
-
         # When `zi` is specified, initialize filter memory with it and pad with zeros
         # When `zi == None`, use register contents from last run
         if zi is not None:
@@ -168,8 +167,7 @@ class FIR_DF_pyfixp(object):
         #   and multiply it with the coefficients `b`, yielding the partial products x*b
         #   TODO: Doing this for the last len(x) terms should be enough
         # - quantize the partial products x*b, yielding xb_q
-        # - sum up the quantized partial products, yielding result y[k]
-        # - quantize result, yielding y_q[k]
+        # - accumulate the quantized partial products and quantize result, yielding y_q[k]
 
         self.zi = np.concatenate((self.zi, x))
 

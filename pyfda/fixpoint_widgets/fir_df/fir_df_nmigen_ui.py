@@ -262,8 +262,8 @@ class FIR_DF_nmigen_UI(QWidget):
         else:
             fxqc_dict['QCB'].update(self.wdg_w_coeffs.q_dict)
 
-        fxqc_dict.update({'b': self.wdg_w_coeffs.quant_coeffs(self.wdg_w_coeffs.q_dict,
-                                                              fb.fil[0]['ba'][0])})
+        fxqc_dict.update({'b': self.wdg_w_coeffs.quant_coeffs(
+            self.wdg_w_coeffs.q_dict, fb.fil[0]['ba'][0], to_int=True)})
         return fxqc_dict
 
 # ------------------------------------------------------------------------------
