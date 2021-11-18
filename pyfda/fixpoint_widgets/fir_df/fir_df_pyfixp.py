@@ -179,9 +179,8 @@ class FIR_DF_pyfixp(object):
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
-        self.zi = self.zi[-self.L:]  # store last L inputs (i.e. the L registers)
+        self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
-
         return self.Q_O.fixp(y_q[:len(x)]), self.zi
 
 
