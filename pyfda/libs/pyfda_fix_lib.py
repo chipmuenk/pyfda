@@ -379,7 +379,7 @@ class Fixed(object):
 
     scale : float
         The factor between integer fixpoint representation and the floating point
-        value, RWV = FXP / scale. By default, scale = 1 << WI. 
+        value, RWV = FXP / scale. By default, scale = 1 << WI.
 
         Examples:
             WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
@@ -611,9 +611,10 @@ class Fixed(object):
                         np.char.replace(y, ' ', '')  # remove all whitespace
                         y = y.astype(complex)  # try to convert to complex
                         self.N += y.size * 2
-                    except (TypeError, ValueError) as e:  # try converting elements recursively
+                    # try converting elements recursively:
+                    except (TypeError, ValueError):
                         y = np.asarray(list(map(lambda y_scalar:
-                            self.fixp(y_scalar, scaling=scaling), y)))
+                                            self.fixp(y_scalar, scaling=scaling), y)))
                         self.N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
@@ -680,7 +681,7 @@ class Fixed(object):
             yq = np.rint(y)  # round towards nearest int
         elif self.quant == 'dsm':
             if DS:
-                # Synthesize DSM loop filter, 
+                # Synthesize DSM loop filter,
                 # TODO: parameters should be adjustable via quantizer dict
                 H = synthesizeNTF(order=3, osr=64, opt=1)
                 # Calculate DSM stream and shift/scale it from -1 ... +1 to
@@ -726,7 +727,7 @@ class Fixed(object):
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
                               yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)
-                                                        /(4*self.MSB)), yq)
+                                                        / (4*self.MSB)), yq)
             else:
                 raise Exception('Unknown overflow type "%s"!' %(self.ovfl))
                 return None
@@ -822,7 +823,7 @@ class Fixed(object):
         else:  # {'dec', 'bin', 'hex', 'csd'}
             # Find the number of places before the first radix point (if there is one)
             # and join integer and fractional parts
-            # when returned string is empty, skip general conversions and rely on 
+            # when returned string is empty, skip general conversions and rely on
             # error handling of individual routines
             # remove illegal characters and trailing zeros
             val_str = re.sub(self.FRMT_REGEX[frmt], r'', qstr(y)).lstrip('0')
@@ -833,7 +834,7 @@ class Fixed(object):
 
                 # count number of fractional places in string
                 try:
-                    _, frc_str = val_str.split('.') # split into integer and fractional places
+                    _, frc_str = val_str.split('.')  # split into integer and fractional places
                     frc_places = len(frc_str)
                 except ValueError:  # no fractional part
                     frc_places = 0
@@ -914,13 +915,12 @@ class Fixed(object):
                 y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
         # ----
         else:
-            logger.error('Unknown output format "%s"!'.format(frmt))
+            logger.error(f'Unknown output format "{frmt}"!')
 
-        #if frmt != "float":
+        # if frmt != "float":
             # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
             #             .format(self.MSB, self.scale, raw_str, val_str))
             # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
-
 
         if y_float is not None:
             return y_float

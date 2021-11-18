@@ -26,6 +26,7 @@ from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 import logging
 logger = logging.getLogger(__name__)
 
+
 # ------------------------------------------------------------------------------
 class UI_W(QWidget):
     """
@@ -43,7 +44,7 @@ class UI_W(QWidget):
     'fractional'    : True                      # Display WF, otherwise WF=0
     'lbl_sep'       : '.'                       # label between WI and WF field
     'max_led_width' : 30                        # max. length of lineedit field
-    'WI'            : 0                         # number of frac. *bits*                
+    'WI'            : 0                         # number of frac. *bits*
     'WI_len'        : 2                         # max. number of integer *digits*
     'tip_WI'        : 'Number of integer bits'  # Mouse-over tooltip
     'WF'            : 15                        # number of frac. *bits*
@@ -58,7 +59,7 @@ class UI_W(QWidget):
     'combo_items'   : ['auto', 'full', 'man']   # Combo selection
     'tip_combo'     : 'Calculate Acc. width.'   # tooltip for combo
     """
-    # sig_rx = pyqtSignal(object)  # incoming, 
+    # sig_rx = pyqtSignal(object)  # incoming,
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
@@ -130,7 +131,7 @@ class UI_W(QWidget):
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
-        self.ledWF.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
+        self.ledWF.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
         self.ledWF.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
@@ -184,9 +185,10 @@ class UI_W(QWidget):
         Parameters:
         -----------
         q_dict: dict
-        
+           Dictionary with quantizer settings for coefficients
+
         coeffs: iterable
-           a list or ndarray of coefficients
+           a list or ndarray of coefficients to be quantized
 
         Returns:
         --------
@@ -194,8 +196,8 @@ class UI_W(QWidget):
         of the passed quantization dict
 
         """
-        # Create coefficient quantizer instances using the passed quantization parameters
-        # dict built in `input_widgets/input_coeffs.py` (and stored in the central
+        # Create coefficient quantizer instance using the passed quantization parameters
+        # dict from `input_widgets/input_coeffs.py` (and stored in the central
         # filter dict)
         Q_coeff = fx.Fixed(q_dict)
         Q_coeff.frmt = 'dec'  # always use decimal format for coefficients
@@ -304,7 +306,7 @@ class UI_Q(QWidget):
     'visible'   : True                              # Is widget visible?
     """
     # incoming,
-    #sig_rx = pyqtSignal(object)
+    # sig_rx = pyqtSignal(object)
     # outcgoing
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
@@ -341,7 +343,7 @@ class UI_Q(QWidget):
         self.cmbQuant.addItems(dict_ui['cmb_q'])
         qset_cmb_box(self.cmbQuant, dict_ui['cur_q'])
         self.cmbQuant.setToolTip(dict_ui['tip_q'])
-        self.cmbQuant.setObjectName('quant') 
+        self.cmbQuant.setObjectName('quant')
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
@@ -361,7 +363,7 @@ class UI_Q(QWidget):
         layH.addStretch()
         layH.addWidget(lblOvfl)
         layH.addWidget(self.cmbOvfl)
-        #layH.addStretch(1)
+        # layH.addStretch(1)
         layH.addWidget(lblQuant)
         layH.addWidget(self.cmbQuant)
         layH.setContentsMargins(0, 0, 0, 0)
@@ -379,7 +381,7 @@ class UI_Q(QWidget):
         # INITIAL SETTINGS
         # ----------------------------------------------------------------------
         self.ovfl = qget_cmb_box(self.cmbOvfl, data=False)
-        self.quant = qget_cmb_box(self.cmbQuant, data=False) 
+        self.quant = qget_cmb_box(self.cmbQuant, data=False)
         frmMain.setEnabled(dict_ui['enabled'])
         frmMain.setVisible(dict_ui['visible'])
 

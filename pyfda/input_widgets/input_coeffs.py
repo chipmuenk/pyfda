@@ -11,14 +11,15 @@ Widget for displaying and modifying filter coefficients
 """
 import sys
 
-from pyfda.libs.compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
-                      QIcon, QSize, QTableWidget, QTableWidgetItem, QVBoxLayout,
-                      pyqtSignal, QStyledItemDelegate, QColor, QBrush)
+from pyfda.libs.compat import (
+    Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, first_item, pprint_log
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
+from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, first_item
+from pyfda.libs.pyfda_qt_lib import (
+    qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
 
 from pyfda.pyfda_rc import params
@@ -37,7 +38,8 @@ logger = logging.getLogger(__name__)
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
 #
-# TODO: Filters need to be scaled properly, see e.g. http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
+# TODO: Filters need to be scaled properly, see e.g.
+#       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
@@ -85,7 +87,7 @@ class ItemDelegate(QStyledItemDelegate):
 #
 #         if index_role == QtCore.QLatin1String("separator"):
 #             y = (option.rect.top() + option.rect.bottom()) / 2
-#             #        painter.setPen(option.palette.color( QPalette.Active, QPalette.Dark ) )
+#             #     painter.setPen(option.palette.color( QPalette.Active, QPalette.Dark ))
 #             painter.drawLine(option.rect.left(), y, option.rect.right(), y )
 #         else:
 #             # continue with the original `paint()` method
@@ -101,12 +103,12 @@ class ItemDelegate(QStyledItemDelegate):
         Afterwards, check whether an fixpoint overflow has occured and color item
         background accordingly.
         """
-        if index.row() == 0 and index.column() == 1: # a[0]: always 1
-            option.text = "1" # QString object
+        if index.row() == 0 and index.column() == 1:  # a[0]: always 1
+            option.text = "1"  # QString object
             option.font.setBold(True)
             option.displayAlignment = Qt.AlignRight | Qt.AlignCenter
             # see http://zetcode.com/gui/pyqt5/painting/ :
-            option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
+            option.backgroundBrush = QBrush(Qt.BDiagPattern)  # QColor(100, 200, 100, 200))
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
             # don't continue with default initStyleOption... display routine ends here
         else:
@@ -146,7 +148,7 @@ class ItemDelegate(QStyledItemDelegate):
         Return item text as string transformed by self.displayText()
         """
         # return qstr(item.text()) # convert to "normal" string
-        return  qstr(self.displayText(item.text(), QtCore.QLocale()))
+        return qstr(self.displayText(item.text(), QtCore.QLocale()))
 
     def displayText(self, text, locale):
         """
@@ -158,21 +160,22 @@ class ItemDelegate(QStyledItemDelegate):
         The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
         negative overflows, else it is 0.
         """
-        data_str = qstr(text) # convert to "normal" string
+        data_str = qstr(text)  # convert to "normal" string
 
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(data_str, return_type='auto') # convert to float
+            data = safe_eval(data_str, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
         elif self.parent.myQ.frmt == 'dec' and self.parent.myQ.WF > 0:
             # decimal fixpoint representation with fractional part
             return "{0:.{1}g}".format(self.parent.myQ.float2frmt(data_str),
-                                        params['FMT_ba'])
+                                      params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
-                                        self.parent.myQ.places)
+                                     self.parent.myQ.places)
 
-# see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
+# see:
+# http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
         """
@@ -185,7 +188,7 @@ class ItemDelegate(QStyledItemDelegate):
         line_edit = QLineEdit(parent)
         H = int(round(line_edit.sizeHint().height()))
         W = int(round(line_edit.sizeHint().width()))
-        line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
+        line_edit.setMinimumSize(QSize(W, H))  # (160, 25));
 
         return line_edit
 
@@ -213,7 +216,8 @@ class ItemDelegate(QStyledItemDelegate):
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
-            # fixpoint format with base: pass requantized data with required number of places
+            # fixpoint format with base:
+            # pass requantized data with required number of places
             editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                              self.parent.myQ.places))
 
@@ -239,10 +243,10 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'float':
             data = safe_eval(qstr(editor.text()),
                              self.parent.ba[index.column()][index.row()],
-                             return_type='auto') # raw data without fixpoint formatting
+                             return_type='auto')  # raw data without fixpoint formatting
         else:
-            data = self.parent.myQ.frmt2float(qstr(editor.text()),
-                                    self.parent.myQ.frmt)  # transform back to float
+            data = self.parent.myQ.frmt2float(
+                qstr(editor.text()), self.parent.myQ.frmt)  # transform back to float
 
         model.setData(index, data)                          # store in QTableWidget
         # if the entry is complex, convert ba (list of arrays) to complex type
@@ -251,7 +255,7 @@ class ItemDelegate(QStyledItemDelegate):
             self.parent.ba[1] = self.parent.ba[1].astype(complex)
         self.parent.ba[index.column()][index.row()] = data  # store in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
-        self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
+        self.parent._refresh_table_item(index.row(), index.column())  # refresh table entry
 
 ###############################################################################
 
@@ -310,7 +314,7 @@ class Input_Coeffs(QWidget):
                 self.load_dict()
                 self.data_changed = False
             if self.fx_specs_changed or\
-                ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
+                    ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
                 self.fx_specs_changed = False
                 self.qdict2ui()
         else:
@@ -535,7 +539,7 @@ class Input_Coeffs(QWidget):
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 qset_cmb_box(self.ui.cmbFilterType, 'IIR')
 
-                self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
+                self.ba[1][0] = 1.0  # restore fa[0] = 1 of denonimator polynome
 
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
@@ -550,8 +554,8 @@ class Input_Coeffs(QWidget):
 
             # make a[0] selectable but not editable
             if fb.fil[0]['ft'] == 'IIR':
-                item = self.tblCoeff.item(0,1)
-                item.setFlags(Qt.ItemIsSelectable| Qt.ItemIsEnabled)
+                item = self.tblCoeff.item(0, 1)
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 item.setFont(self.ui.bfont)
 
             self.tblCoeff.blockSignals(False)
@@ -576,9 +580,9 @@ class Input_Coeffs(QWidget):
         for different lengths of b and a subarrays while adding / deleting items.
         """
 
-        self.ba = [0., 0.] # initial list with two elements
-        self.ba[0] = np.array(fb.fil[0]['ba'][0]) # deep copy from filter dict to
-        self.ba[1] = np.array(fb.fil[0]['ba'][1]) # coefficient register
+        self.ba = [0., 0.]  # initial list with two elements
+        self.ba[0] = np.array(fb.fil[0]['ba'][0])  # deep copy from filter dict to
+        self.ba[1] = np.array(fb.fil[0]['ba'][1])  # coefficient register
 
         # set quantization comboBoxes from dictionary
         self.qdict2ui()
@@ -610,12 +614,13 @@ class Input_Coeffs(QWidget):
         Read data from clipboard / file and copy it to `self.ba` as float / cmplx
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients") # returns ndarray of str
+        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")  # returns ndarray of str
         if data_str is None:  # file operation has been aborted or some other error
             return
 
-        logger.debug("importing data: dim - shape = {0} - {1} - {2}\n{3}"\
-                       .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
+        logger.debug(
+            "importing data: dim - shape = {0} - {1} - {2}\n{3}"
+            .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
         conv = self.myQ.frmt2float  # frmt2float_vec?
         frmt = self.myQ.frmt
@@ -872,8 +877,8 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not any(sel): # nothing selected, append one row of zeros to table
-            self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)  #"insert" row after last
+        if not any(sel):  # nothing selected, append one row of zeros to table
+            self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)  # "insert" row after last
         elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':  # only complete rows selected
             self.ba = np.insert(self.ba, sel[0], 0, axis=1)
 #        elif len(sel[0]) == len(sel[1]):
@@ -901,7 +906,8 @@ class Input_Coeffs(QWidget):
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
         """
-        self.ui.eps = safe_eval(self.ui.ledEps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
+        self.ui.eps = safe_eval(
+            self.ui.ledEps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
         self.ui.ledEps.setText(str(self.ui.eps))
 
 # ------------------------------------------------------------------------------
@@ -937,7 +943,7 @@ class Input_Coeffs(QWidget):
             for i in idx:
                 if np.logical_and(
                     np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.ui.eps),
-                                  (self.ba[i[0]][i[1]] != targ_val)):
+                        (self.ba[i[0]][i[1]] != targ_val)):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
         if changed:
