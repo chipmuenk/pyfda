@@ -22,12 +22,19 @@ import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log
+from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log, first_item
 # import pyfda.libs.pyfda_fix_lib as fx
 # from pyfda.libs.pyfda_io_lib import extract_file_ext
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
+
+# when deltasigma module is present, add a corresponding entry to the combobox
+try:
+    import deltasigma
+    HAS_DS = True
+except ImportError:
+    HAS_DS = False
 
 import logging
 logger = logging.getLogger(__name__)
@@ -39,12 +46,6 @@ if cmp_version("nmigen", "0.2") >= 0:
 else:
     HAS_NMIGEN = False
 
-# when deltasigma module is present, add a corresponding entry to the combobox
-try:
-    import deltasigma
-    HAS_DS = True
-except ImportError:
-    HAS_DS = False
 # ------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : display name
@@ -107,7 +108,8 @@ class Input_Fixpoint_Specs(QWidget):
             "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
