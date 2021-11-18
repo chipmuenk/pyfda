@@ -175,8 +175,7 @@ class FIR_DF_pyfixp(object):
 
         for k in range(len(x)):
             # weighted state-vector x at time k:
-            xb_q = self.Q_mul.fixp(
-                self.zi[k:k + len(self.b)] * self.b / (1 << self.p['QCB']['WF']))
+            xb_q = self.Q_mul.fixp(self.zi[k:k + len(self.b)] * self.b)
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 

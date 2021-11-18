@@ -65,7 +65,6 @@ class FIR_DF_nmigen(Elaboratable):
         Output from the filter with width self.p['QO']['W']`
     """
     def __init__(self, p):
-        self.muls = None
         self.init(p)
 
     # ---------------------------------------------------------
@@ -103,8 +102,7 @@ class FIR_DF_nmigen(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        if self.muls is None:   # initialize list for partial products b_i * x_i
-            self.muls = [0] * len(self.p['b'])
+        muls = [0] * len(self.p['b'])
 
         DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
         # word format for sum of partial products b_i * x_i
@@ -120,13 +118,13 @@ class FIR_DF_nmigen(Elaboratable):
             m.d.sync += sreg.eq(src)            # with input word length
             src = sreg
             # TODO: keep old data sreg to allow frame based processing (requiring reset)
-            self.muls[i] = int(b)*sreg
+            muls[i] = int(b)*sreg
             i += 1
 
-        logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
+        # logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
         sum_full = Signal(signed(QP['W']))  # sum of all multiplication products with
-        m.d.sync += sum_full.eq(reduce(add, self.muls))  # full product wordlength
+        m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
 
         # rescale from full product wordlength to accumulator format
         sum_accu = Signal(signed(self.p['QA']['W']))

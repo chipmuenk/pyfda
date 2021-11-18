@@ -175,7 +175,7 @@ class UI_W(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-    def quant_coeffs(self, q_dict: dict, coeffs: iterable) -> list:
+    def quant_coeffs(self, q_dict: dict, coeffs: iterable, to_int: bool = False) -> list:
         """
         Quantize the coefficients, scale and convert them to integer and return them
         as a list of integers
@@ -204,10 +204,13 @@ class UI_W(QWidget):
 
         if coeffs is None:
             logger.error("Coeffs empty!")
-        # quantize floating point coefficients and convert them to the
-        # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF),
-        # next convert array float -> array of fixp - > list of int (scaled by 2^WF)
-        return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
+        # quantize floating point coefficients with the selected scale (WI.WF),
+        # next convert array float  -> array of fixp
+        #                           -> list of int (scaled by 2^WF) when `to_int == True`
+        if to_int:
+            return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
+        else:
+            return list(Q_coeff.fixp(coeffs))
 
     # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
