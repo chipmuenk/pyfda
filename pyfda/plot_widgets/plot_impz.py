@@ -363,8 +363,10 @@ class Plot_Impz(QWidget):
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
+                # Highlight "RUN" button
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
+                qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
             elif 'ui_changed' in dict_sig:
@@ -404,13 +406,10 @@ class Plot_Impz(QWidget):
     def calc_auto(self, autorun=None):
         """
         Triggered when checkbox "Autorun" is clicked.
-        Enable or disable the "Run" button depending on the setting of the
-        checkbox.
-        When checkbox is checked (`autorun == True` passed via signal-
+
+        When Autorun has been pushed (`autorun == True` passed via signal-
         slot connection), automatically run `impz_init()`.
         """
-
-        self.ui.but_run.setEnabled(not autorun)
         if autorun and self.needs_calc:
             self.impz_init()
 

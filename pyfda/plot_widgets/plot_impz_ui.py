@@ -193,10 +193,8 @@ class PlotImpz_UI(QWidget):
 
         self.but_run.setIconSize(QSize(but_height, but_height))
         self.but_run.setFixedSize(QSize(2*but_height, but_height))
-        # self.but_run.setText("RUN")
-        # self.but_run.setMaximumWidth(qtext_width(text=" RUN "))
         self.but_run.setToolTip("Run simulation")
-        self.but_run.setEnabled(not self.but_auto_run.isChecked())
+        self.but_run.setEnabled(True)
 
         self.cmb_sim_select = QComboBox(self)
         self.cmb_sim_select.addItems(["Float", "Fixpoint"])
