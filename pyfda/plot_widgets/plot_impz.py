@@ -310,6 +310,7 @@ class Plot_Impz(QWidget):
                 logger.info("FX specs changed!")
                 self.needs_calc_fx = True
                 self.error = False
+                qstyle_widget(self.ui.but_run, "changed")
                 if self.fx_sim and self.isVisible():
                     self.impz_init()
 
