@@ -530,7 +530,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.fx_wdg_found = False
             self.butSimFx.setEnabled(False)
-            self.butExportHDL.setEnabled(False)
+            self.butExportHDL.setVisible(False)
             # self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
