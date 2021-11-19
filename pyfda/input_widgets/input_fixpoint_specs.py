@@ -181,7 +181,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             elif 'wdg_name' in dict_sig and dict_sig['wdg_name'] in \
                     {'w_coeff', 'q_input', 'q_output', 'w_accu', 'q_accu'}:
-                pass  # nothing to do for now
+                pass  # nothing to do for now, just security check
 
             else:
                 if 'wdg_name' not in dict_sig:
