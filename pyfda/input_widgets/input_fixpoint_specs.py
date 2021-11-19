@@ -151,7 +151,7 @@ class Input_Fixpoint_Specs(QWidget):
                              '\treceived from "{1}".'
                              .format(dict_sig['fx_sim'], dict_sig['class']))
 
-        # ---- Process local widget signals ------------------------------------------
+        # ---- Process local widget signals ('ui' in dict_sig) -----------------
         elif 'ui' in dict_sig:
             if 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_input':
                 """
@@ -190,11 +190,13 @@ class Input_Fixpoint_Specs(QWidget):
                 else:
                     logger.warning("Unknown 'wdg_name = {0}' in dict_sig:\n{1}"
                                    .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
+                return
 
-            if not dict_sig['ui'] in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+            if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
                 logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
-            self.emit({'fx_sim': 'specs_changed'})
+            self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
 
         # resize image when "Fixpoint" tab is selected or widget size is changed:
         elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
