@@ -127,7 +127,7 @@ class FIR_DF_nmigen_UI(QWidget):
 
                 fb.fil[0]['fxqc'].update(self.ui2dict())
 
-            elif dict_sig['wdg_name'] == 'cmbW':
+            elif dict_sig['wdg_name'] == 'w_accu':
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
