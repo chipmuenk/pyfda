@@ -110,7 +110,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
-        # if not, just pass the dict.
+        # if not, just emit the dict.
         if 'ui' in dict_sig:
             if dict_sig['wdg_name'] == 'w_coeff':  # coefficient format updated
                 """
@@ -126,10 +126,10 @@ class FIR_DF_pyfixp_UI(QWidget):
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
-                if cmbW in {'full', 'auto'}:
+                if cmbW in {'full', 'auto'}\
+                        or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     self.dict2ui()
-                    self.emit({'specs_changed': 'cmbW'})
-                else:
+                elif cmbW == 'man':  # don't do anything
                     return
 
             dict_sig.update({'id': id(self)})  # currently only local
