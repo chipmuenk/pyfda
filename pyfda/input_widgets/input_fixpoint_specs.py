@@ -83,10 +83,10 @@ class Input_Fixpoint_Specs(QWidget):
         self._construct_UI()
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
-            logger.warning("No fixpoint filters found!")
+            logger.warning("No fixpoint filter found for this type of filter!")
         else:
             logger.debug("Imported {0:d} fixpoint filters:\n{1}"
-                            .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+                         .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
         self._update_fixp_widget()
 
 # ------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class Input_Fixpoint_Specs(QWidget):
         Process signals coming in from dynamically instantiated subwidget
         """
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
@@ -165,7 +165,7 @@ class Input_Fixpoint_Specs(QWidget):
         4. Send back fixpoint response to widget via 'fx_sim':'set_response'
         """
 
-        logger.warning(
+        logger.info(
             "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
@@ -538,8 +538,6 @@ class Input_Fixpoint_Specs(QWidget):
         - Try to instantiate HDL filter as `self.fx_filt_ui.fixp_filter` with
             dummy data
         """
-        logger.info("_update_fixp_widget")
-
         def _disable_fx_wdg(self) -> None:
 
             if hasattr(self, "fx_filt_ui") and self.fx_filt_ui is not None:
@@ -572,7 +570,8 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
             fx_filt_ui_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
-            logger.info(f"Instantiating\n{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
+            logger.info("Instantiating new FX widget\n\t"
+                        f"{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -601,8 +600,6 @@ class Input_Fixpoint_Specs(QWidget):
             self.embed_fixp_img(img_file)
             self.resize_img()
 
-            logger.warning(f"Update fixp_widget: img_fixp = {self.img_fixp}\n\n")
-
             # ---- set title and description for filter
             self.lblTitle.setText(self.fx_filt_ui.title)
 
@@ -612,9 +609,6 @@ class Input_Fixpoint_Specs(QWidget):
             self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
             self.update_fxqc_dict()
             self.emit({'fx_sim': 'specs_changed'})
-
-        # else:  # no fixpoint widget found
-        #     _disable_fx_wdg(self)
 
 # ------------------------------------------------------------------------------
     def wdg_dict2ui(self):

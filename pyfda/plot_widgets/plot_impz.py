@@ -288,16 +288,16 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'start':
                 """
-                Start fixpoint simulation, this is triggered by the fixpoint widget.
+                Start fixpoint simulation, triggered by the input_fixpoint_specs widget.
                 - Always require recalculation when triggered externally
                   (`self.needs_calc = True`)
                 - Force fixpoint mode
                 """
-                self.needs_calc = True
-                self.needs_calc_fx = True
-                self.error = False
-                self.update_fx_ui("Fixpoint")
-                # further actions following below
+                self.needs_calc = True         # force recalculation
+                self.needs_calc_fx = True      # force recalculation of fx sim
+                self.error = False             # reset error flag
+                self.update_fx_ui("Fixpoint")  # force fixpoint mode
+                # further actions following below:
 
             if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
                 """
@@ -313,6 +313,7 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 if self.fx_sim and self.isVisible():
                     self.impz_init()
+                return
 
             elif dict_sig['fx_sim'] == 'get_stimulus':
                 """
@@ -334,7 +335,6 @@ class Plot_Impz(QWidget):
                 - Convert simulation results to integer and transfer them to the plotting
                   routine in `self.draw_response_fx()`
                 """
-                logger.warning("FX: Received results.")
                 self.cmplx = np.any(np.iscomplex(self.x))
                 self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
                 self.impz_fx(dict_sig=dict_sig)
@@ -443,12 +443,11 @@ class Plot_Impz(QWidget):
         self.update_fx_ui()  # check for fixpoint setting and update ui if needed
 
         if type(arg) == bool:  # but_run has been pressed
-            self.needs_calc = True  # force recalculation when but_run is pressed
-        elif not self.ui.but_auto_run.isChecked():
+            self.needs_calc = True  # but_run has been clicked -> force recalculation
+        elif not self.ui.but_auto_run.isChecked():  # "Auto" is not active, return
             return
 
         if self.needs_calc:
-            logger.info("Starting calculation of transient response")
             # set title and axis string and calculate 10 samples to determine ndtype
             x_test = self.stim_wdg.calc_stimulus_frame(init=True)
             self.title_str = self.stim_wdg.title_str
@@ -456,8 +455,6 @@ class Plot_Impz(QWidget):
             self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
             self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            if self.fx_sim:
-                self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
             self.y = np.empty_like(self.x)  # response
             self.cmplx = False  # Flag for complex signal
             # initialize progress bar
@@ -470,19 +467,20 @@ class Plot_Impz(QWidget):
                 # - update title string
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets
+                logger.info("Starting calculation of fixpoint transient response")
                 self.title_str = r'$Fixpoint$ ' + self.title_str
+                self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
                 if np.any(np.iscomplex(x_test)):
                     logger.warning(
                         "Complex stimulus: Only its real part will be processed by "
                         "the fixpoint filter!")
-
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-                logger.info("Starting calculation of fixpoint transient response")
                 self.t_start = time.process_time()
                 self.emit({'fx_sim': 'init'})
                 return
             else:
+                logger.info("Starting calculation of transient response")
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
                 self.sos = np.asarray(fb.fil[0]['sos'])
@@ -514,7 +512,9 @@ class Plot_Impz(QWidget):
         # ----------------------- calc_frame ----------------------------------
         # ---------------------------------------------------------------------
         while self.N_first < self.ui.N_end:
-            logger.info(f"impz(): Calculating {self.N_first} of {self.ui.N_end}")
+            logger.info("impz(): Calculating frame "
+                        f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
+                        f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
@@ -663,7 +663,7 @@ class Plot_Impz(QWidget):
 
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
 
-        logger.info(f"update_fx_ui = {fx}, fx_sim = {self.fx_sim}")
+        logger.info(f"update_fx_ui({fx}): fx_sim = {self.fx_sim}")
 
         # plot styles for quantized stimulus signal
         self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)  # cmb box freq. domain
