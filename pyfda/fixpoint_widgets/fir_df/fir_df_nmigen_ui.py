@@ -112,10 +112,10 @@ class FIR_DF_nmigen_UI(QWidget):
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
-        # if not, just pass the dict.
+        # if not, just emit the dict.
         if 'ui' in dict_sig:
             if dict_sig['wdg_name'] == 'w_coeff':  # coefficient format updated
                 """
@@ -127,19 +127,34 @@ class FIR_DF_nmigen_UI(QWidget):
 
                 fb.fil[0]['fxqc'].update(self.ui2dict())
 
-            elif dict_sig['wdg_name'] == 'w_accu':
+            elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
-                if cmbW in {'full', 'auto'}:
-                    self.dict2ui()
-                    self.emit({'specs_changed': 'cmbW'})
-                else:
+                if cmbW in {'full', 'auto'}\
+                        or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
+                    pass
+
+                elif cmbW == 'man':  # switched to manual, don't do anything
                     return
 
-            dict_sig.update({'id': id(self)})  # currently only local
+            # Accu quantization or overflow settings have been changed
+            elif dict_sig['wdg_name'] == 'q_accu':
+                pass
 
-        self.emit(dict_sig)
+            else:
+                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
+                             f"in '{__name__}' !")
+                return
+
+            # - update fixpoint accu and coefficient quantization dict
+            # - emit {'fx_sim': 'specs_changed'}
+            fb.fil[0]['fxqc'].update(self.ui2dict())
+            self.emit({'fx_sim': 'specs_changed'})
+
+        else:
+            logger.error(f"Unknown key '{dict_sig['wdg_name']}' (should be 'ui')"
+                         f"in '{__name__}' !")
 
 # ------------------------------------------------------------------------------
     def update_q_coeff(self, dict_sig):
@@ -185,13 +200,16 @@ class FIR_DF_nmigen_UI(QWidget):
             fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # calculate total accumulator word length
+        # calculate total accumulator word length and 'Q' format
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
+        fb.fil[0]['fxqc']['QA']['Q'] = str(fb.fil[0]['fxqc']['QA']['WI'])\
+            + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
 
         # update quantization settings
         fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)
 
+        # update UI
         self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
 # ------------------------------------------------------------------------------
@@ -240,11 +258,11 @@ class FIR_DF_nmigen_UI(QWidget):
 
            containing the following keys and values:
 
-        - 'QCB': dictionary with coefficients quantization settings
+        - 'QCB': dictionary with b coefficients quantization settings
 
         - 'QA': dictionary with accumulator quantization settings
 
-        - 'b' : list of coefficients in integer format
+        - 'b' : list of quantized b coefficients in format WI.WF
 
         """
         fxqc_dict = fb.fil[0]['fxqc']

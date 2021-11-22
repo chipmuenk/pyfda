@@ -24,6 +24,7 @@ from .fir_df_pyfixp import FIR_DF_pyfixp
 import logging
 logger = logging.getLogger(__name__)
 
+#  Dict containing {widget class name : display name}
 classes = {'FIR_DF_pyfixp_UI': 'FIR_DF (pyfixp)'}  # widget class name : display name
 
 
@@ -39,7 +40,6 @@ class FIR_DF_pyfixp_UI(QWidget):
 
     def __init__(self):
         super().__init__()
-        # super(FIR_DF_wdg, self).__init__(parent)
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
                       "Standard FIR topology.")
@@ -122,19 +122,34 @@ class FIR_DF_pyfixp_UI(QWidget):
 
                 fb.fil[0]['fxqc'].update(self.ui2dict())
 
-            elif dict_sig['wdg_name'] == 'w_accu':
+            elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
                 self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
                 if cmbW in {'full', 'auto'}\
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
-                    self.dict2ui()
-                elif cmbW == 'man':  # don't do anything
+                    pass
+
+                elif cmbW == 'man':  # switched to manual, don't do anything
                     return
 
-            dict_sig.update({'id': id(self)})  # currently only local
+            # Accu quantization or overflow settings have been changed
+            elif dict_sig['wdg_name'] == 'q_accu':
+                pass
 
-        self.emit(dict_sig)
+            else:
+                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
+                             f"in '{__name__}' !")
+                return
+
+            # - update fixpoint accu and coefficient quantization dict
+            # - emit {'fx_sim': 'specs_changed'}
+            fb.fil[0]['fxqc'].update(self.ui2dict())
+            self.emit({'fx_sim': 'specs_changed'})
+
+        else:
+            logger.error(f"Unknown key '{dict_sig['wdg_name']}' (should be 'ui')"
+                         f"in '{__name__}' !")
 
 # ------------------------------------------------------------------------------
     def update_q_coeff(self, dict_sig):
@@ -180,13 +195,16 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # calculate total accumulator word length
+        # calculate total accumulator word length and 'Q' format
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
+        fb.fil[0]['fxqc']['QA']['Q'] = str(fb.fil[0]['fxqc']['QA']['WI'])\
+            + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
 
         # update quantization settings
         fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)
 
+        # update UI
         self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
 # ------------------------------------------------------------------------------
@@ -235,11 +253,11 @@ class FIR_DF_pyfixp_UI(QWidget):
 
            containing the following keys and values:
 
-        - 'QCB': dictionary with coefficients quantization settings
+        - 'QCB': dictionary with b coefficients quantization settings
 
         - 'QA': dictionary with accumulator quantization settings
 
-        - 'b' : list of coefficients in integer format
+        - 'b' : list of quantized b coefficients in format WI.WF
 
         """
         fxqc_dict = fb.fil[0]['fxqc']
