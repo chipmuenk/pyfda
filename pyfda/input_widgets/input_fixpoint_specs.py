@@ -90,6 +90,67 @@ class Input_Fixpoint_Specs(QWidget):
         self._update_fixp_widget()
 
 # ------------------------------------------------------------------------------
+    def process_sig_rx_local(self, dict_sig: dict = None) -> None:
+        """
+        Process signals coming in from dynamically instantiated subwidget
+        """
+        if dict_sig['id'] == id(self):
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            return
+
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
+            self.emit(dict_sig)
+            return
+
+        # ---- Process input and output quantizer settings ('ui' in dict_sig) -----------------
+        elif 'ui' in dict_sig:
+            if 'wdg_name' not in dict_sig:
+                logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
+                return
+
+            elif dict_sig['wdg_name'] == 'w_input':
+                """
+                Input fixpoint format has been changed or butLock has been clicked.
+                When I/O lock is active, copy input fixpoint word format to output
+                word format.
+                """
+                if dict_sig['ui'] == 'butLock'\
+                        and not self.wdg_w_input.butLock.isChecked():
+                    # butLock was deactivitated, don't do anything
+                    return
+                elif self.wdg_w_input.butLock.isChecked():
+                    # but lock was activated or wordlength setting have been changed
+                    fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
+                    fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
+                    fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
+
+            elif dict_sig['wdg_name'] == 'w_output':
+                """
+                Output fixpoint format has been changed. When I/O lock is active, copy
+                output fixpoint word format to input word format.
+                """
+                if self.wdg_w_input.butLock.isChecked():
+                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
+                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                    fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
+
+            else:
+                logger.warning("Unknown 'wdg_name = {0}' in dict_sig:\n{1}"
+                               .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
+                return
+
+            if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+
+            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
+
+        else:
+            logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
+
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process signals coming in via subwidgets and sig_rx
@@ -151,54 +212,7 @@ class Input_Fixpoint_Specs(QWidget):
                              '\treceived from "{1}".'
                              .format(dict_sig['fx_sim'], dict_sig['class']))
 
-        # ---- Process local widget signals ('ui' in dict_sig) -----------------
-        elif 'ui' in dict_sig:
-            if 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_input':
-                """
-                Input fixpoint format has been changed or butLock has been clicked.
-                When I/O lock is active, copy input fixpoint word format to output
-                word format.
-                """
-                if dict_sig['ui'] == 'butLock'\
-                        and not self.wdg_w_input.butLock.isChecked():
-                    # butLock was deactivitated, don't do anything
-                    return
-                elif self.wdg_w_input.butLock.isChecked():
-                    # but lock was activated or wordlength setting have been changed
-                    fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
-                    fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
-                    fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
-
-            elif 'wdg_name' in dict_sig and dict_sig['wdg_name'] == 'w_output':
-                """
-                Output fixpoint format has been changed. When I/O lock is active, copy
-                output fixpoint word format to input word format.
-                """
-                if self.wdg_w_input.butLock.isChecked():
-                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
-                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
-                    fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
-
-            elif 'wdg_name' in dict_sig and dict_sig['wdg_name'] in \
-                    {'w_coeff', 'q_input', 'q_output', 'w_accu', 'q_accu'}:
-                pass  # nothing to do for now, just security check
-
-            else:
-                if 'wdg_name' not in dict_sig:
-                    logger.warning("No key 'wdg_name' in dict_sig:\n{0}"
-                                   .format(pprint_log(dict_sig)))
-                else:
-                    logger.warning("Unknown 'wdg_name = {0}' in dict_sig:\n{1}"
-                                   .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
-                return
-
-            if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-
-            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
-            self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
-
-        # resize image when "Fixpoint" tab is selected or widget size is changed:
+        # ---- resize image when "Fixpoint" tab is selected or widget size is changed:
         elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
                 and self.isVisible():
             self.resize_img()
@@ -252,19 +266,19 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict=fb.fil[0]['fxqc']['QI'],
                                 wdg_name='w_input', label='', lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
+        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_local)
 
         cmb_q = ['round', 'floor', 'fix']
 
         self.wdg_w_output = UI_W(self, q_dict=fb.fil[0]['fxqc']['QO'],
                                  wdg_name='w_output', label='')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx)
+        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_local)
 
         self.wdg_q_output = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QO'],
                                  wdg_name='q_output',
                                  label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
                                  cmb_q=cmb_q, cmb_ov=['wrap', 'sat'])
-        self.wdg_q_output.sig_tx.connect(self.sig_rx)
+        self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         if HAS_DS:
             cmb_q.append('dsm')
@@ -272,7 +286,7 @@ class Input_Fixpoint_Specs(QWidget):
                                 wdg_name='q_input',
                                 label='Input Format <i>Q<sub>X&nbsp;</sub></i>:',
                                 cmb_q=cmb_q)
-        self.wdg_q_input.sig_tx.connect(self.sig_rx)
+        self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
 
         # Layout and frame for input quantization
         layVQiWdg = QVBoxLayout()
@@ -363,6 +377,14 @@ class Input_Fixpoint_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
+        self.sig_rx_local.connect(self.process_sig_rx_local)
+        # dynamic connection in `self._update_fixp_widget()`:
+        # -----
+        # if hasattr(self.fx_filt_ui, "sig_rx"):
+        #     self.sig_rx.connect(self.fx_filt_ui.sig_rx)
+        # if hasattr(self.fx_filt_ui, "sig_tx"):
+        #     self.fx_filt_ui.sig_tx.connect(self.sig_rx_local)
+        # ----
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -557,23 +579,13 @@ class Input_Fixpoint_Specs(QWidget):
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
             self.fx_filt_ui.setVisible(True)
-# Doesn't work at the moment, combo box becomes inaccessible
-#            try:
-#                self.fx_filt_ui = fx_filt_ui_class() # instantiate the widget
-#                self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1) # add to layout
-#            except KeyError as e:
-#                logger.warning('Key Error {0} in fixpoint filter \n{1}'\
-#                               .format(e, fx_mod_name + "." + cmb_wdg_fx_cur))
-#                _disable_fx_wdg(self)
-#                return
-
             self.wdg_dict2ui()  # initialize the fixpoint subwidgets from the fxqc_dict
 
             # ---- connect signals to fx_filt_ui ----
             if hasattr(self.fx_filt_ui, "sig_rx"):
                 self.sig_rx.connect(self.fx_filt_ui.sig_rx)
             if hasattr(self.fx_filt_ui, "sig_tx"):
-                self.fx_filt_ui.sig_tx.connect(self.sig_rx)
+                self.fx_filt_ui.sig_tx.connect(self.sig_rx_local)
 
             # ---- get name of new fixpoint filter image ----
             if not (hasattr(self.fx_filt_ui, "img_name") and self.fx_filt_ui.img_name):
