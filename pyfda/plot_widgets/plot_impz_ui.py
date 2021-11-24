@@ -116,7 +116,7 @@ class PlotImpz_UI(QWidget):
                           "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
                           "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
                           "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
-        self.cur_win_name = "Hann"  # set initial window type
+        self.cur_win_name = "Rectangular"  # set initial window type
 
         # initialize windows dict with the list above
         self.win_dict = get_windows_dict(
