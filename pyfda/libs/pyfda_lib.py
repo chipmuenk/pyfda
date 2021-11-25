@@ -126,6 +126,7 @@ for k in MODULES.keys():
 CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
 
+# ------------------------------------------------------------------------------
 def cmp_version(mod, version):
     """
     Compare version number of installed module `mod` against string `version` and
@@ -388,6 +389,8 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
         for k, v in default_dict.items():
             if k not in d:
                 d[k] = v
+
+
 # -----------------------------------------------------------------------------
 def first_item(d: dict) -> str:
     """
@@ -396,6 +399,7 @@ def first_item(d: dict) -> str:
     """
     k = next(iter(d))
     return str(k) + ": " + str(d[k])
+
 
 # ------------------------------------------------------------------------------
 def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
@@ -691,7 +695,8 @@ def to_html(text: str, frmt: str = None) -> str:
         html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
         # don't render numbers as italic
 #        if "<i>" in html:
-#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)', r'\1<span class="font-style:normal">\2</span>', html)
+#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)',
+#                           r'\1<span class="font-style:normal">\2</span>', html)
 
     # (^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
     # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
@@ -1234,7 +1239,6 @@ def expand_lim(ax, eps_x: float, eps_y: float = None) -> None:
             factor by which y-axis limits are expanded. If eps_y is None, eps_x
             is used for eps_y as well.
 
-
     Returns
     -------
     None
@@ -1558,7 +1562,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
-        raise ValueError("\t'fil_convert()': Unknown input format {0:s}".format(format_in))
+        raise ValueError(f"\t'fil_convert()': Unknown input format {format_in:s}")
 
     # eliminate complex coefficients created by numerical inaccuracies
     # `tol` is specified in multiples of machine eps

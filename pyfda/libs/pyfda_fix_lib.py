@@ -698,7 +698,7 @@ class Fixed(object):
         elif self.quant == 'none':
             yq = y  # return unquantized value
         else:
-            raise Exception('Unknown Requantization type "%s"!'%(self.quant))
+            raise Exception(f'Unknown Requantization type "{self.quant:s}"!')
         yq = yq * self.LSB
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
@@ -729,8 +729,8 @@ class Fixed(object):
                               yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)
                                                         / (4*self.MSB)), yq)
             else:
-                raise Exception('Unknown overflow type "%s"!' %(self.ovfl))
-                return None
+                raise Exception(f'Unknown overflow type "{self.ovfl:s}"!')
+
         # ======================================================================
         # (5) : OUTPUT SCALING
         #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
@@ -834,14 +834,15 @@ class Fixed(object):
 
                 # count number of fractional places in string
                 try:
-                    _, frc_str = val_str.split('.')  # split into integer and fractional places
+                    # split into integer and fractional places
+                    _, frc_str = val_str.split('.')
                     frc_places = len(frc_str)
                 except ValueError:  # no fractional part
                     frc_places = 0
 
                 raw_str = val_str.replace('.', '')  # join integer and fractional part
 
-                # logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
+                # logger.debug(f"y={y}, val_str={val_str}, raw_str={raw_str}")
             else:
                 return 0.0
 
@@ -862,7 +863,8 @@ class Fixed(object):
             # - Divide by <base> ** <number of fractional places> for correct scaling
             # - Strip MSBs outside fixpoint range
             # - Transform numbers in negative 2's complement to negative floats.
-            # - Calculate the fixpoint representation for correct saturation / quantization
+            # - Calculate the fixpoint representation for correct saturation /
+            #   quantization
             neg_sign = False
             try:
                 if raw_str[0] == '-':
@@ -888,7 +890,7 @@ class Fixed(object):
                     if y_dec == 0:  # avoid log2(0) error in code below
                         return 0
 
-                    int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0) # ... and int_bits
+                    int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # now, y_dec is in the correct range:
                 if int_bits <= self.WI:  # positive number
                     pass
@@ -902,8 +904,8 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            # logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
-            # logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
+            # logger.debug(f"MSB={self.MSB} | LSB={self.LSB} | scale={self.scale}")
+            # logger.debug(f"y_in={y} | y_dec={y_dec}")
         # ----
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
@@ -1001,7 +1003,7 @@ class Fixed(object):
                 if self.frmt == 'hex':
                     y_str = bin2hex_vec(y_bin_str, self.WI)
 
-                else: # self.frmt == 'bin':
+                else:  # self.frmt == 'bin':
                     # insert radix point if required
                     if self.WF > 0:
                         y_str = insert_binary_point(y_bin_str, self.WI)
@@ -1009,12 +1011,11 @@ class Fixed(object):
                         y_str = y_bin_str
 
             if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
-                y_str = y_str.item() # convert singleton array to scalar
+                y_str = y_str.item()  # convert singleton array to scalar
 
             return y_str
         else:
-            raise Exception('Unknown output format "%s"!'%(self.frmt))
-            return None
+            raise Exception(f'Unknown output format "{self.frmt}"!')
 
 
 ########################################
