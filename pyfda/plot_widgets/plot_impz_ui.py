@@ -226,6 +226,7 @@ class PlotImpz_UI(QWidget):
 
         self.prg_wdg = QProgressBar(self)
         self.prg_wdg.setFixedHeight(but_height)
+        self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
