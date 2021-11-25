@@ -82,7 +82,6 @@ class Input_Specs(QWidget):
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> call update_UI
             self.update_UI(dict_sig)
-            self.color_design_button("changed")
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
                 """
@@ -278,6 +277,7 @@ class Input_Specs(QWidget):
         else:
             self.w_specs.hide()
 
+        # MESSAGE PANE
         if ('msg' in all_widgets and len(all_widgets['msg']) > 1 and
                 all_widgets['msg'][0] != 'i'):
             self.frmMsg.setVisible(True)
@@ -285,6 +285,10 @@ class Input_Specs(QWidget):
             self.lblMsg.setText(all_widgets['msg'][1:][0])
         else:
             self.frmMsg.hide()
+
+        # Update state of "DESIGN FILTER" button
+        # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
+        self.color_design_button("changed")
 
 # ------------------------------------------------------------------------------
     def load_dict(self):
@@ -299,8 +303,7 @@ class Input_Specs(QWidget):
         self.w_specs.load_dict()  # weight specification
         self.t_specs.load_dict()  # target specs
 
-        fb.design_filt_state = "ok"
-        qstyle_widget(self.butDesignFilt, "ok")
+        self.color_design_button("ok")
 
 # ------------------------------------------------------------------------------
     def start_design_filt(self):
@@ -374,6 +377,10 @@ class Input_Specs(QWidget):
             self.color_design_button("error")
 
     def color_design_button(self, state):
+        man = "manual" in fb.fil[0]['fc'].lower()
+        self.butDesignFilt.setDisabled(man)
+        if man:
+            state = 'ok'
         fb.design_filt_state = state
         qstyle_widget(self.butDesignFilt, state)
 
