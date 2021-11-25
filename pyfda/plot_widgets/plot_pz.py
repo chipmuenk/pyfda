@@ -71,7 +71,7 @@ class Plot_PZ(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.but_hf = PushButton("|H(f)| ", checked=True)
+        self.but_hf = PushButton("|H(f)| ", checked=False)
         self.but_hf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
 
         self.but_hf_log = PushButton("Log. |H(f)|", checked=False)

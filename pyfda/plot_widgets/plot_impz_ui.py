@@ -116,7 +116,7 @@ class PlotImpz_UI(QWidget):
                           "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
                           "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
                           "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
-        self.cur_win_name = "Hann"  # set initial window type
+        self.cur_win_name = "Rectangular"  # set initial window type
 
         # initialize windows dict with the list above
         self.win_dict = get_windows_dict(
@@ -226,6 +226,7 @@ class PlotImpz_UI(QWidget):
 
         self.prg_wdg = QProgressBar(self)
         self.prg_wdg.setFixedHeight(but_height)
+        self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
