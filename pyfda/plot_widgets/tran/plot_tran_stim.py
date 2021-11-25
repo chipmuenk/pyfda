@@ -298,7 +298,7 @@ class Plot_Tran_Stim(QWidget):
                           "f1": self.ui.f1, "f2": self.ui.f2,
                           "phi1": self.ui.phi1, "phi2": self.ui.phi2,
                           "BW1": self.ui.BW1, "BW2": self.ui.BW2,
-                          "f_S": fb.fil[0]['f_S'], "n": n}
+                          "f_S": fb.fil[0]['f_S'], "n": n, "j": 1j}
 
             self.xf = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
         else:
