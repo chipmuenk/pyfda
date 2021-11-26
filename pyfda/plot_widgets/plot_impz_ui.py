@@ -87,7 +87,8 @@ class PlotImpz_UI(QWidget):
         self.N_start = 0
         self.N_user = 0
         self.N = 0
-        self.N_frame = 1024
+        self.N_frame_user = 0
+        self.N_frame = 0
 
         # time
         self.plt_time_resp = "stem"
@@ -219,9 +220,9 @@ class PlotImpz_UI(QWidget):
         self.led_N_frame = QLineEdit(self)
         self.led_N_frame.setText(str(self.N_frame))
         self.led_N_frame.setToolTip(
-            "<span>Frame length, longer frames calculate faster but calculation cannot "
-            "be stopped so easily. "
-            "<i>&Delta;N</i> = 0 calculates all samples.</span>")
+            "<span>Frame length; longer frames calculate faster but calculation cannot "
+            "be stopped so quickly. "
+            "<i>&Delta;N</i> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
         self.prg_wdg = QProgressBar(self)
@@ -583,10 +584,6 @@ class PlotImpz_UI(QWidget):
                                  return_type='int', sign='poszero')
         self.led_N_start.setText(str(self.N_start))  # update widget
 
-        self.N_frame = safe_eval(self.led_N_frame.text(), self.N_frame,
-                                 return_type='int', sign='poszero')
-        self.led_N_frame.setText(str(self.N_frame))  # update widget
-
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
@@ -599,6 +596,16 @@ class PlotImpz_UI(QWidget):
 
         # total number of points to be calculated: N + N_start
         self.N_end = self.N + self.N_start
+        
+        self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
+                                 return_type='int', sign='poszero')
+        
+        if self.N_frame_user == 0:
+            self.N_frame = self.N_end  # use N_end for frame length
+            self.led_N_frame.setText("0")  # update widget with "0" as set by user
+        else:
+            self.N_frame = self.N_frame_user
+            self.led_N_frame.setText(str(self.N_frame))  # update widget
 
         # recalculate displayed freq. index values when freq. unit == 'k'
         if fb.fil[0]['freq_specs_unit'] == 'k':
