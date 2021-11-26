@@ -311,6 +311,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc_fx = True
                 self.error = False
                 qstyle_widget(self.ui.but_run, "changed")
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 if self.fx_sim and self.isVisible():
                     self.impz_init()
                 return
@@ -344,6 +345,7 @@ class Plot_Impz(QWidget):
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
                 self.error = True
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "error")
                 if 'err_msg' in dict_sig:
                     logger.error(dict_sig['err_msg'])
@@ -367,6 +369,7 @@ class Plot_Impz(QWidget):
                 # Highlight "RUN" button
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
@@ -460,6 +463,7 @@ class Plot_Impz(QWidget):
             # initialize progress bar
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
             self.ui.prg_wdg.setValue(0)
+            self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
             self.t_start = time.process_time()
 
@@ -569,6 +573,7 @@ class Plot_Impz(QWidget):
         self.needs_calc = False
         logger.info('[{0:5.4g} ms]: Transient response plotted.'
                     .format((time.process_time() - self.t_resp)*1000))
+        self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
 
     # --------------------------------------------------------------------------
@@ -607,6 +612,7 @@ class Plot_Impz(QWidget):
             elif dict_sig['fx_sim'] == "set_results":
                 self.error = dict_sig['fx_results'] is None
                 if self.error:
+                    self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
                 else:
@@ -623,6 +629,7 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         else:  # self.N_first > self.ui.end
             self.needs_calc = False
+            self.ui.but_run.setIcon(QIcon(":/play.svg"))
             qstyle_widget(self.ui.but_run, "normal")
             self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
             self.cmplx = bool(np.any(np.iscomplex(self.y)) or
@@ -680,6 +687,7 @@ class Plot_Impz(QWidget):
             qcmb_box_del_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
 
         if self.fx_sim != self.fx_sim_old:
+            self.ui.but_run.setIcon(QIcon(":/play.svg"))
             qstyle_widget(self.ui.but_run, "changed")
             # even if nothing else has changed, stimulus and response must be recalculated
             self.needs_calc = True
@@ -696,12 +704,14 @@ class Plot_Impz(QWidget):
             # t_draw_start = time.process_time()
             self.y = dict_sig['fx_results']
             if self.y is None:
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "error")
                 self.needs_calc = True
             else:
                 self.needs_calc = False
 
                 self.draw()
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "normal")
 
                 self.emit({'fx_sim': 'finish'})
