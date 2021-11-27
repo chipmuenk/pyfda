@@ -537,6 +537,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Update the UI of the widget
         - Try to instantiate HDL filter as `self.fx_filt_ui.fixp_filter` with
             dummy data
+        - emit {'fx_sim': 'specs_changed'} when successful
         """
         def _disable_fx_wdg(self) -> None:
 
