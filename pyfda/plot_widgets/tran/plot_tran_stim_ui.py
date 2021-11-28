@@ -741,12 +741,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblDC.setVisible("dc" in stim_wdg)
         self.ledDC.setVisible("dc" in stim_wdg)
 
-        # This widget is now part of the frequency tab!
-        # self.but_freq_norm_impz.setVisible("norm" in stim_wdg)
-        self.but_freq_norm_impz_enabled =\
-            self.cmb_stim == "impulse" and self.DC == 0\
-            and (self.noi == 0 or self.cmbNoise.currentText() == 'None')
-
         self.chk_step_err.setVisible(self.stim == "step")
 
         self.lblStimPar1.setVisible("par1" in stim_wdg)

@@ -434,13 +434,17 @@ class Plot_Impz(QWidget):
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
         """
+
         # allow scaling the frequency response from pure impulse (no DC, no noise)
+        # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
              self.stim_wdg.ui.cmbNoise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
             )
+        self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
+
         self.needs_redraw = [True] * 2
 
         self.update_fx_ui()  # check for fixpoint setting and update ui if needed
