@@ -82,8 +82,6 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_stmq = {'marker': 'D', 'color': 'darkgreen', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
 
-        # self.fmt_stem_stim = params['mpl_stimuli']
-
         self._construct_UI()
 
         # --------------------------------------------
@@ -273,8 +271,9 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        # logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+        #                .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.info(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -319,7 +318,7 @@ class Plot_Impz(QWidget):
                   Stimuli are scaled with the input fractional word length, i.e.
                   with 2**WF (input) to obtain integer values
                 """
-                logger.info("FX get_stimulus")
+                logger.info("FX start_fx_response_calculation")
                 if self.isVisible():
                     self.impz_fx(dict_sig=dict_sig)
                 return
@@ -469,7 +468,7 @@ class Plot_Impz(QWidget):
                 # - update plot title string
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets
-                logger.info("Starting calculation of fixpoint transient response")
+                logger.info("Starting fixpoint transient response calculation")
                 self.title_str = r'$Fixpoint$ ' + self.title_str
                 self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
                 if np.any(np.iscomplex(x_test)):
@@ -482,7 +481,7 @@ class Plot_Impz(QWidget):
                 self.emit({'fx_sim': 'init'})
                 return
             else:
-                logger.info("Starting calculation of transient response")
+                logger.info("Starting transient response calculation")
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
                 self.sos = np.asarray(fb.fil[0]['sos'])
@@ -510,9 +509,6 @@ class Plot_Impz(QWidget):
         - `self.impz_init()`
         - 'Continue' simulation (not yet implemented)
         """
-        # ---------------------------------------------------------------------
-        # ----------------------- calc_frame ----------------------------------
-        # ---------------------------------------------------------------------
         while self.N_first < self.ui.N_end:
             logger.info("impz(): Calculating frame "
                         f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
@@ -521,17 +517,19 @@ class Plot_Impz(QWidget):
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
             frame = slice(self.N_first, self.N_first + L_frame)
-            # -------------------------------------------------------------
-            # ---- calculate stimulus for current frame
-            self.x[frame] =\
-                self.stim_wdg.calc_stimulus_frame(
+
+            # ------------------------------------------------------------------
+            # ---- calculate stimulus for current frame ------------------------
+            # ------------------------------------------------------------------
+            self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+
             # -------------------------------------------------------------
             # ---- calculate response for current frame
             # -------------------------------------------------------------
             if len(self.sos) > 0:  # has second order sections
                 self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
-            else:  # no second order sections or antiCausals for current filter
+            else:  # no second order sections
                 self.y[frame], self.zi = sig.lfilter(
                     self.bb, self.aa, self.x[frame], zi=self.zi)
 
@@ -670,8 +668,6 @@ class Plot_Impz(QWidget):
             qset_cmb_box(self.ui.cmb_sim_select, fx)
 
         self.fx_sim = qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
-
-        logger.info(f"update_fx_ui({fx}): fx_sim = {self.fx_sim}")
 
         # plot styles for quantized stimulus signal
         self.ui.cmb_plt_freq_stmq.setVisible(self.fx_sim)  # cmb box freq. domain
