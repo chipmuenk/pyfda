@@ -137,9 +137,11 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
                     fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
 
+            elif dict_sig['wdg_name'] in {'q_output', 'q_input'}:
+                pass
             else:
-                logger.warning("Unknown 'wdg_name = {0}' in dict_sig:\n{1}"
-                               .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
+                logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
+                             .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
                 return
 
             if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
