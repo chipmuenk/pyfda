@@ -286,28 +286,27 @@ class Plot_Impz(QWidget):
             return
 
         if 'fx_sim' in dict_sig:
-            if dict_sig['fx_sim'] == 'start':
-                """
-                Start fixpoint simulation from widget `input_fixpoint_specs`
-                - Always require recalculation when triggered externally
-                  (`self.needs_calc = True`)
-                - Force fixpoint mode
-                """
-                self.needs_calc = True         # force recalculation
-                self.update_fx_ui("Fixpoint")  # force fixpoint mode
-                # further actions following below:
-
             if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
                 """
-                Specs of fixpoint widget have been updated, start an FX simulation if
-                this widget is visible, `self.fx_sim == True` and auto-run is enabled
-                - Set `self.needs_calc_fx = True` and `self.ui.but_run` to "changed"
-                - Initialize fixpoint widget and start simulation via `self.impz_init()`
-                  when widget is visible
+                'start' : Fixpoint simulation started from widget 'input_fixpoint_specs'
+                    - Set fixpoint mode
+                    - continue with actions for 'specs_changed'
+
+                'specs_changed': Fixpoint widget specs have been updated, 
+                                  set `self.needs_calc_fx = True`. If fixpoint is active:
+                    - reset error flag
+                    - force recalculation (`self.needs_calc = True`)
+                    - update run button style to "changed"
+                    - if widget is visible, initialize fixpoint widget and
+                      start simulation via `self.impz_init()`
                 """
-                logger.info("FX specs changed!")
+                if dict_sig['fx_sim'] == 'start':
+                    self.update_fx_ui("Fixpoint")  # set fixpoint mode
+                else:
+                    logger.info("FX specs changed!")
+
                 self.needs_calc_fx = True   # fx sim needs recalculation
-                if self.fx_sim:
+                if self.fx_sim:             # fixpoint mode is set
                     self.error = False      # reset error flag
                     self.needs_calc = True  # force recalculation
                     qstyle_widget(self.ui.but_run, "changed")
