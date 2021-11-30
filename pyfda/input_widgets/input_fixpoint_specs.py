@@ -16,7 +16,7 @@ import importlib
 
 from pyfda.libs.compat import (
     Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
-    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy, QPalette, QColor)
+    QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import numpy as np
 
@@ -92,7 +92,8 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in from dynamically instantiated subwidget
+        Process signals coming in from input and output quantizer subwidget and the
+        dynamically instantiated subwidget
         """
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -104,7 +105,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit(dict_sig)
             return
 
-        # ---- Process input and output quantizer settings ('ui' in dict_sig) -----------------
+        # ---- Process input and output quantizer settings ('ui' in dict_sig) --
         elif 'ui' in dict_sig:
             if 'wdg_name' not in dict_sig:
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")

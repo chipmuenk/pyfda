@@ -532,6 +532,7 @@ def qtext_height(text: str = 'X', font=None) -> int:
     # row4_height = fm.lineSpacing() * 4
     # fm_size = fm.size(0, text)
 
+
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):
     """
@@ -556,7 +557,9 @@ class QVLine(QFrame):
         # self.setFrameShadow(QFrame.Sunken)
         # self.setLineWidth(width)
         # self.setFrameShape(QFrame.StyledPanel);
-        self.setStyleSheet("border-width: 2px; border-top-style: none; border-right-style: solid; border-bottom-style: none; border-left-style: solid; border-color: grey; ")
+        self.setStyleSheet(
+            "border-width: 2px; border-top-style: none; border-right-style: solid; "
+            "border-bottom-style: none; border-left-style: solid; border-color: grey;")
 
 
 class PushButton(QPushButton):
