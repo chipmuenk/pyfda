@@ -42,9 +42,9 @@ from pyfda.libs.frozendict import freeze_hierarchical
 clipboard = None
 """ Handle to central clipboard instance """
 
-base_dir = "" #: Project base directory
+base_dir = ""  #: Project base directory
 
-# State of filter design: "ok", "changed", "error", "failed", "active" 
+# State of filter design: "ok", "changed", "error", "failed", "active"
 design_filt_state = "changed"
 
 #==============================================================================
@@ -102,26 +102,26 @@ name of the module containing the class.
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo):
 fil_tree = freeze_hierarchical({
-    'LP':{
-        'FIR':{
-            'Equiripple':{
+    'LP': {
+        'FIR': {
+            'Equiripple': {
                 'man':{'fo':     ('a', 'N'),
                        'fspecs': ('a', 'F_C'),
                        'wspecs': ('a', 'W_PB', 'W_SB'),
-                       'tspecs': ('u', {'frq':('u', 'F_PB', 'F_SB'),
-                                        'amp':('u', 'A_PB', 'A_SB')}),
+                       'tspecs': ('u', {'frq': ('u', 'F_PB', 'F_SB'),
+                                        'amp': ('u', 'A_PB', 'A_SB')}),
                        'msg':    ('a',
                                   "Enter desired filter order <b><i>N</i></b>, corner "
         "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
         "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
         "value <b><i>W</i></b>&nbsp; for each band."
                                  )
-                      },
+                        },
                 'min':{'fo':     ('d', 'N'),
                        'fspecs': ('d', 'F_C'),
                        'wspecs': ('d', 'W_PB', 'W_SB'),
-                       'tspecs': ('a', {'frq':('a', 'F_PB', 'F_SB'),
-                                        'amp':('a', 'A_PB', 'A_SB')}),
+                       'tspecs': ('a', {'frq': ('a', 'F_PB', 'F_SB'),
+                                        'amp': ('a', 'A_PB', 'A_SB')}),
                        'msg':    ('a',
             "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
             "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
@@ -132,85 +132,85 @@ fil_tree = freeze_hierarchical({
                        },
                 }
             },
-        'IIR':{
-            'Cheby1':{
+        'IIR': {
+            'Cheby1': {
                 'man':{'fo':     ('a', 'N'),
                        'fspecs': ('a', 'F_C'),
-                       'tspecs': ('u', {'frq':('u', 'F_PB', 'F_SB'),
-                                        'amp':('u', 'A_PB', 'A_SB')})
+                       'tspecs': ('u', {'frq': ('u', 'F_PB', 'F_SB'),
+                                        'amp': ('u', 'A_PB', 'A_SB')})
                        },
                 'min':{'fo':     ('d', 'N'),
                        'fspecs': ('d', 'F_C'),
-                       'tspecs': ('a', {'frq':('a', 'F_PB', 'F_SB'),
-                                        'amp':('a', 'A_PB', 'A_SB')})
+                       'tspecs': ('a', {'frq': ('a', 'F_PB', 'F_SB'),
+                                        'amp': ('a', 'A_PB', 'A_SB')})
                        }
                 }
             }
         },
-    'HP':{
-        'FIR':{
-            'Equiripple':{
+    'HP': {
+        'FIR': {
+            'Equiripple': {
                 'man':{'fo':     ('a', 'N'),
                        'fspecs': ('a', 'F_C'),
                        'wspecs': ('a', 'W_SB', 'W_PB'),
-                       'tspecs': ('u', {'frq':('u', 'F_SB', 'F_PB'),
-                                        'amp':('u', 'A_SB', 'A_PB')})
+                       'tspecs': ('u', {'frq': ('u', 'F_SB', 'F_PB'),
+                                        'amp': ('u', 'A_SB', 'A_PB')})
                       },
                 'min':{'fo':     ('d', 'N'),
                        'wspecs': ('d', 'W_SB', 'W_PB'),
                        'fspecs': ('d', 'F_C'),
-                       'tspecs': ('a', {'frq':('a', 'F_SB', 'F_PB'),
-                                        'amp':('a', 'A_SB', 'A_PB')})
+                       'tspecs': ('a', {'frq': ('a', 'F_SB', 'F_PB'),
+                                        'amp': ('a', 'A_SB', 'A_PB')})
                        }
                     }
               },
-        'IIR':{
-            'Cheby1':{
+        'IIR': {
+            'Cheby1': {
                 'man':{'fo':     ('a', 'N'),
                        'fspecs': ('a', 'F_C'),
-                       'tspecs': ('u', {'frq':('u', 'F_SB', 'F_PB'),
-                                        'amp':('u', 'A_SB', 'A_PB')})
+                       'tspecs': ('u', {'frq': ('u', 'F_SB', 'F_PB'),
+                                        'amp': ('u', 'A_SB', 'A_PB')})
                        },
                 'min':{'fo':     ('d', 'N'),
                        'fspecs': ('d', 'F_C'),
-                       'tspecs': ('a', {'frq':('a', 'F_SB', 'F_PB'),
-                                        'amp':('a', 'A_SB', 'A_PB')})
+                       'tspecs': ('a', {'frq': ('a', 'F_SB', 'F_PB'),
+                                        'amp': ('a', 'A_SB', 'A_PB')})
                        }
                     }
                 }
         },
-    'BP':{
-        'FIR':{
-            'Equiripple':{
+    'BP': {
+        'FIR': {
+            'Equiripple': {
                 'man':{'fo':     ('a', 'N'),
                        'wspecs': ('a', 'W_SB', 'W_PB', 'W_SB2'),
                        'fspecs': ('a', 'F_C', 'F_C2'),
-                       'tspecs': ('u', {'frq':('u', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
-                                        'amp':('u', 'A_SB', 'A_PB', 'A_SB2')})
+                       'tspecs': ('u', {'frq': ('u', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
+                                        'amp': ('u', 'A_SB', 'A_PB', 'A_SB2')})
                        },
                 'min':{'fo':     ('d', 'N'),
                        'fspecs': ('d', 'F_C', 'F_C2'),
                        'wspecs': ('d', 'W_SB', 'W_PB', 'W_SB2'),
-                       'tspecs': ('a', {'frq':('a', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
-                                        'amp':('a', 'A_SB', 'A_PB', 'A_SB2')})
+                       'tspecs': ('a', {'frq': ('a', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
+                                        'amp': ('a', 'A_SB', 'A_PB', 'A_SB2')})
                        }
                     }
                 }
             },
-    'BS':{
-        'FIR':{
-            'Equiripple':{
+    'BS': {
+        'FIR': {
+            'Equiripple': {
                 'man':{'fo':     ('a', 'N'),
                        'wspecs': ('a', 'W_PB', 'W_SB', 'W_PB2'),
                        'fspecs': ('a', 'F_C', 'F_C2'),
-                       'tspecs': ('u', {'frq':('u', 'F_PB', 'F_SB', 'F_SB2', 'F_PB2'),
-                                        'amp':('u', 'A_PB', 'A_SB', 'A_PB2')})
-                    },
+                       'tspecs': ('u', {'frq': ('u', 'F_PB', 'F_SB', 'F_SB2', 'F_PB2'),
+                                        'amp': ('u', 'A_PB', 'A_SB', 'A_PB2')})
+                       },
                 'min':{'fo':     ('d', 'N'),
                        'wspecs': ('d', 'W_PB', 'W_SB', 'W_PB2'),
                        'fspecs': ('d', 'F_C', 'F_C2'),
-                       'tspecs': ('a', {'frq':('a', 'F_PB', 'F_SB', 'F_SB2', 'F_PB2'),
-                                        'amp':('a', 'A_PB', 'A_SB', 'A_PB2')})
+                       'tspecs': ('a', {'frq': ('a', 'F_PB', 'F_SB', 'F_SB2', 'F_PB2'),
+                                        'amp': ('a', 'A_PB', 'A_SB', 'A_PB2')})
                        }
                           }
                 }
