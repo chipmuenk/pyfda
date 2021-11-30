@@ -113,18 +113,18 @@ class Plot_Tran_Stim(QWidget):
             self.H_str = r'$y[n]$'  # default
             self.title_str = ""
             if self.ui.stim == "none":
-                self.title_str = r'Zero Input System Response'
+                self.title_str = r'Zero Input Response'
                 self.H_str = r'$h_0[n]$'
             # ------------------------------------------------------------------
             elif self.ui.stim == "dirac":
                 self.title_str = r'Impulse Response'
                 self.H_str = r'$h[n]$'
             elif self.ui.stim == "sinc":
-                self.title_str = r'Sinc Impulse '
+                self.title_str = r'Sinc Impulse'
             elif self.ui.stim == "gauss":
-                self.title_str = r'Gaussian Impulse '
+                self.title_str = r'Gaussian Impulse'
             elif self.ui.stim == "rect":
-                self.title_str = r'Rect Impulse '
+                self.title_str = r'Rect Impulse'
             # ------------------------------------------------------------------
             elif self.ui.stim == "step":
                 if self.ui.chk_step_err.isChecked():
@@ -137,9 +137,9 @@ class Plot_Tran_Stim(QWidget):
             elif self.ui.stim == "cos":
                 self.title_str = r'Cosine Stimulus'
             elif self.ui.stim == "sine":
-                self.title_str = r'Sinusoidal Stimulus '
+                self.title_str = r'Sinusoidal Stimulus'
             elif self.ui.stim == "exp":
-                self.title_str = r'Complex Exponential Stimulus '
+                self.title_str = r'Complex Exponential Stimulus'
             elif self.ui.stim == "diric":
                 self.title_str = r'Periodic Sinc Stimulus'
             # ------------------------------------------------------------------
