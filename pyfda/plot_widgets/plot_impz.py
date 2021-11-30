@@ -48,8 +48,6 @@ class Plot_Impz(QWidget):
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
-    # signal for frame based simulation in `impz()`, should not leave the instance:
-    sig_tx_local = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self):
@@ -169,8 +167,6 @@ class Plot_Impz(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
-        # let method impz() work frame by frame
-        self.sig_tx_local.connect(self.process_sig_rx_local)
 
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -246,24 +242,6 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
 # ------------------------------------------------------------------------------
-    def process_sig_rx_local(self, dict_sig=None):
-        """
-        Process signals coming from the iterations of `impz()` and `impz_fx()`
-        """
-        # logger.warning(f"SIG_RX LOCAL - needs_calc: {self.needs_calc} | "
-        #                f"vis: {self.isVisible()}\n{pprint_log(dict_sig}")
-
-        if dict_sig['sim'] == 'next_frame_fx':
-            # self.test_for_break()
-            self.impz_fx({'fx_sim': 'get_stimulus'})
-            return
-
-        else:
-            logger.error('Unknown value "{0}" for "sim" key\n'
-                         '\treceived from "{1}"'.format(dict_sig['sim'],
-                                                        dict_sig['class']))
-
-# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -309,18 +287,18 @@ class Plot_Impz(QWidget):
                         self.impz_init()
                 return
 
-            elif dict_sig['fx_sim'] == 'get_stimulus':
+            elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 """
                 The fixpoint widget has been initialized and requests a stimulus:
 
                 - Calculate stimuli, quantize and pass via `dict_sig` with
-                  `'fx_sim': 'send_stimulus'` and `'fx_stimulus': <quant stimulus array>`.
+                  `'fx_sim': 'calc_frame_fx_response'` and `'fx_stimulus': <quant stimulus array>`.
                   Stimuli are scaled with the input fractional word length, i.e.
                   with 2**WF (input) to obtain integer values
                 """
                 logger.info("FX start_fx_response_calculation")
                 if self.isVisible():
-                    self.impz_fx(dict_sig=dict_sig)
+                    self.impz_fx()
                 return
 
             elif dict_sig['fx_sim'] == 'set_results':
@@ -572,55 +550,48 @@ class Plot_Impz(QWidget):
         qstyle_widget(self.ui.but_run, "normal")
 
     # --------------------------------------------------------------------------
-    def impz_fx(self, dict_sig: dict = {}):
+    def impz_fx(self):
         """
         Calculate fixpoint response and redraw it.
 
         Stimulus and response are only calculated if `self.needs_calc == True`.
 
         Triggered by:
-        - Fixpoint widget, requesting "get_stimulus" (via `process_rx_signal()`)
+        - Fixpoint widget, requesting "start_fx_response_calculation" (via `process_rx_signal()`)
         """
-        if self.N_first < self.ui.N_end:  # not finished yet
+        while self.N_first < self.ui.N_end:  # not finished yet
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             frame = slice(self.N_first, self.N_first + L_frame)
             # -------------------------------------------------------------
             # ---- Calculate, quantize and SEND STIMULUS for current frame
             # -------------------------------------------------------------
-            if dict_sig['fx_sim'] == 'get_stimulus':
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                        N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-                # quantize stimulus
-                self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
+            self.x[frame] = self.stim_wdg.calc_stimulus_frame(
+                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            # quantize stimulus
+            self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
 
-                self.emit(
-                    {'fx_sim': 'send_stimulus',
-                     'fx_stimulus': self.x_q[frame]})
+            self.emit(
+                {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
 
-                logger.info("FX stimulus sent")
-                return
+            logger.info("FX stimulus sent")
 
             # -----------------------------------------------------------------
             # ---- Get FX results and store them, increase frame counter ------
             # -----------------------------------------------------------------
-            elif dict_sig['fx_sim'] == "set_results":
-                self.error = fb.fx_results is None
-                # self.error = dict_sig['fx_results'] is None
-                if self.error:
-                    self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                    qstyle_widget(self.ui.but_run, "error")
-                    self.needs_calc = True
-                else:
-                    self.y[frame] = np.asarray(fb.fx_results)
-                    # self.y[frame] = np.asarray(dict_sig['fx_results'])
+            self.error = fb.fx_results is None
+            if self.error:
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
+                qstyle_widget(self.ui.but_run, "error")
+                self.needs_calc = True
+            else:
+                self.y[frame] = np.asarray(fb.fx_results)
+
             # ==== Increase frame counter ======================================
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
             # ==================================================================
             logger.info("FX results received")
-            self.emit({'sim': 'next_frame_fx'}, sig_name='sig_tx_local')
-            return
 
         # ---------------------------------------------------------------------
         # ---- Last frame reached, FINISH simulation and draw ------------------
@@ -640,7 +611,7 @@ class Plot_Impz(QWidget):
             logger.info('[{0:5.4g} ms]: Fixpoint plot drawn.'
                         .format((time.process_time() - self.t_resp)*1000))
             self.emit({'fx_sim': 'finish'})
-            return
+        return
 
 # =============================================================================
 

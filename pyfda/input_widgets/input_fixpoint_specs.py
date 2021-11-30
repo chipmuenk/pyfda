@@ -93,7 +93,8 @@ class Input_Fixpoint_Specs(QWidget):
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
         Process signals coming in from input and output quantizer subwidget and the
-        dynamically instantiated subwidget
+        dynamically instantiated subwidget and emit {'fx_sim': 'specs_changed'} in
+        the end.
         """
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -158,14 +159,15 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
 
-        Play PingPong with a stimulus & plot widget for fx simulation:
+        Trigger fx simulation:
 
-        2. ``fx_sim_init()``: Request stimulus by sending 'fx_sim':'get_stimulus'
+        1. ``fx_sim': 'init'``: Start fixpoint simulation by sending
+           'fx_sim':'start_fx_response_calculation'
 
-        3. ``fx_sim_calc_response()``: Receive stimulus from widget in
-            'fx_sim':'send_stimulus' and pass it to fixpoint simulation method
+        2. ``fx_sim_calc_response()``: Receive stimulus from widget in
+            'fx_sim':'calc_frame_fx_response' and pass it to fixpoint simulation method
 
-        4. Send back fixpoint response to widget via 'fx_sim':'set_response'
+        3. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
         logger.info(
@@ -180,12 +182,12 @@ class Input_Fixpoint_Specs(QWidget):
             # New filter has been designed, update list of available filter topologies
             self._update_filter_cmb()
             return
+
         elif 'data_changed' in dict_sig or\
              ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
-            # self.emit({'fx_sim':'specs_changed'})
 
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
@@ -198,12 +200,13 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    self.emit({'fx_sim': 'get_stimulus'})
+                    self.emit({'fx_sim': 'start_fx_response_calculation'})
 
-            elif dict_sig['fx_sim'] == 'send_stimulus':
-                dict_sig = self.fx_sim_calc_response(dict_sig)
-                self.emit(dict_sig)
+            elif dict_sig['fx_sim'] == 'calc_frame_fx_response':
+                self.fx_sim_calc_response(dict_sig)
+                # return directly to the routine calculating the complete response
                 return
+
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specification have been changed somewhere, update ui
                 # and set run button to "changed" in wdg_dict2ui()
@@ -731,17 +734,16 @@ class Input_Fixpoint_Specs(QWidget):
         return -1
 
 # ------------------------------------------------------------------------------
-    def fx_sim_calc_response(self, dict_sig) -> dict:
+    def fx_sim_calc_response(self, dict_sig) -> None:
         """
         - Read fixpoint stimulus from `dict_sig` in integer format
-        - Pass it to the fixpoint filter and calculate the fixpoint response
-        - Send the reponse to the plotting widget
+        - Pass it to the fixpoint filter which calculates the fixpoint response
+        - Store the result in `fb.fx_results` and return. In case of an error,
+          `fb.fx_results == None`
 
         Returns
         -------
-        dict_sig: dict
-            dictionary with stuff to emit (either `{'fx_sim': 'error'}` or
-            `{'fx_sim': 'set_results'}`
+        None
         """
         try:
             logger.info(
@@ -750,28 +752,27 @@ class Input_Fixpoint_Specs(QWidget):
                     pprint_log(dict_sig['fx_stimulus'], tab=" "),
                     ))
 
-            # Run fixpoint simulation and return the results as integer values:
+            # Run fixpoint simulation and store the results as integer values:
             fb.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
             if len(fb.fx_results) == 0:
-                logger.warning("Fixpoint simulation returned empty results!")
-            else:
-                # logger.debug("fx_results: {0}"\
-                #            .format(pprint_log(fb.fx_results, tab= " ")))
-                logger.info(
-                    f'Fixpoint simulation successful for dict\n{pprint_log(dict_sig)}'
-                    f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
-                    f' of type "{dict_sig["fx_stimulus"].dtype}"'
-                    f'\n\tResponse: Shape {np.shape(fb.fx_results)}'
-                    f' of type "{type(fb.fx_results).__name__} "'
-                    f' ("{type(fb.fx_results[0]).__name__}")'
-                )
+                logger.error("Fixpoint simulation returned empty results!")
+            # else:
+            #     # logger.debug("fx_results: {0}"\
+            #     #            .format(pprint_log(fb.fx_results, tab= " ")))
+            #     logger.info(
+            #         f'Fixpoint simulation successful for dict\n{pprint_log(dict_sig)}'
+            #         f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
+            #         f' of type "{dict_sig["fx_stimulus"].dtype}"'
+            #         f'\n\tResponse: Shape {np.shape(fb.fx_results)}'
+            #         f' of type "{type(fb.fx_results).__name__} "'
+            #         f' ("{type(fb.fx_results[0]).__name__}")'
+            #     )
 
         except ValueError as e:
             logger.error("Simulator error {0}".format(e))
             fb.fx_results = None
-            qstyle_widget(self.butSimFx, "error")
-            return {'fx_sim': 'error'}
+
         except AssertionError as e:
             logger.error('Fixpoint simulation failed for dict\n{0}'
                          '\twith msg. "{1}"\n\tStimuli: Shape {2} of type "{3}"'
@@ -782,15 +783,14 @@ class Input_Fixpoint_Specs(QWidget):
                             np.shape(fb.fx_results),
                             type(fb.fx_results)
                                 ))
-
             fb.fx_results = None
-            qstyle_widget(self.butSimFx, "error")
-            return {'fx_sim': 'error'}
 
-        logger.debug("Sending fixpoint results")
-        dict_sig = {'fx_sim': 'set_results'}
-        qstyle_widget(self.butSimFx, "normal")
-        return dict_sig
+        if fb.fx_results is None:
+            qstyle_widget(self.butSimFx, "error")
+        else:
+            logger.debug("Sending fixpoint results")
+            qstyle_widget(self.butSimFx, "normal")
+        return
 
 
 ###############################################################################
