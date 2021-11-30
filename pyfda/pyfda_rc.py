@@ -44,8 +44,7 @@ mpl_ms = 8  # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}',  # format string for QLineEdit fields
-          'CSV':    # format options and parameters for CSV-files and clipboard
-              {
+          'CSV':  {  # format options and parameters for CSV-files and clipboard
                   'delimiter': ',',  # default delimiter
                   'lineterminator': CRLF,  # OS-dependend line break from pyfda_lib
                   'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
@@ -127,7 +126,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'axes.formatter.use_mathtext': True,  # use mathtext for scientific notation.
           'grid.linestyle'            : ':',
           'grid.linewidth'            : 0.5,    # in points
-          #'grid.color'               : b0b0b0, # grid color, set in dark / light styles
+          # 'grid.color'               : b0b0b0, # grid color, set in dark / light styles
           'grid.alpha'                : 0.5,    # transparency, between 0.0 and 1.0
 
           'xtick.direction'           : 'in',
@@ -240,7 +239,8 @@ qss_dark = """
     QScrollArea{background-color: #222222}
     QScrollArea > QWidget > QWidget{background-color: #222222}
 
-    .QTabWidget::pane{color: white; background-color: #555555;} /* background of tab content */
+    /* background of tab content */
+    .QTabWidget::pane{color: white; background-color: #555555;}
 
     QLineEdit{background: #222222;
                 border-style: outset;
@@ -548,7 +548,7 @@ elif THEME == 'none':
     params.update(mpl_params_light)
     qss_rc = qss_common
 
-else: # use the THEME name as the QStyle name
+else:  # use the THEME name as the QStyle name
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
     qss_rc = THEME
