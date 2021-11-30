@@ -288,14 +288,12 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'start':
                 """
-                Start fixpoint simulation, triggered by the input_fixpoint_specs widget.
+                Start fixpoint simulation from widget `input_fixpoint_specs`
                 - Always require recalculation when triggered externally
                   (`self.needs_calc = True`)
                 - Force fixpoint mode
                 """
                 self.needs_calc = True         # force recalculation
-                self.needs_calc_fx = True      # force recalculation of fx sim
-                self.error = False             # reset error flag
                 self.update_fx_ui("Fixpoint")  # force fixpoint mode
                 # further actions following below:
 
@@ -308,12 +306,14 @@ class Plot_Impz(QWidget):
                   when widget is visible
                 """
                 logger.info("FX specs changed!")
-                self.needs_calc_fx = True
-                self.error = False
-                qstyle_widget(self.ui.but_run, "changed")
-                self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                if self.fx_sim and self.isVisible():
-                    self.impz_init()
+                self.needs_calc_fx = True   # fx sim needs recalculation
+                if self.fx_sim:
+                    self.error = False      # reset error flag
+                    self.needs_calc = True  # force recalculation
+                    qstyle_widget(self.ui.but_run, "changed")
+                    self.ui.but_run.setIcon(QIcon(":/play.svg"))
+                    if self.isVisible():
+                        self.impz_init()
                 return
 
             elif dict_sig['fx_sim'] == 'get_stimulus':
