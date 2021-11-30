@@ -80,12 +80,12 @@ operations only when the widget is visible and store the need for a redraw in a 
             if 'filt_changed' in dict_sig:
                 self.filt_changed = True
 
-Information is transmitted via the global ``sig_tx`` signal (referenced by the imported
+Data can be transmitted via the global ``sig_tx`` signal (referenced by the imported
 ``emit()`` method):
 
 .. code::
 
-        dict_sig = {'fx_sim':'set_results', 'fx_results':self.fx_results}
+        dict_sig = {'fx_sim':'update_data', 'fx_results':some_new_data}
         self.emit(dict_sig)
 
 The following dictionary keys are generally used, individual ones can be created
