@@ -343,11 +343,15 @@ def qstyle_widget(widget, state):
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
 
+    This requires settinng the property, "unpolishing" and "polishing" the widget
+    and finally forcing an update.
+
     - "normal": default, no color styling
     - "ok":  green, filter has been designed, everything ok
     - "changed": yellow, filter specs have been changed
+    - "running": orange, simulation is running
     - "error" : red, an error has occurred during filter design
-    - "failed" : orange, filter fails to meet target specs
+    - "failed" : pink, filter fails to meet target specs (not used yet)
     - "u" or "unused": grey text color
     - "d" or "disabled": background color darkgrey
     - "a" or "active": no special style defined

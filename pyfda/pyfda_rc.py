@@ -18,11 +18,13 @@ which are global (similar to class variables).
 """
 
 from pyfda import qrc_resources  # contains all icons
-import logging
-logger = logging.getLogger(__name__)
 
 from pyfda.libs.pyfda_lib import CRLF, cmp_version
 from cycler import cycler
+import matplotlib.font_manager
+
+import logging
+logger = logging.getLogger(__name__)
 
 # #############################################################################
 # General layout settings
@@ -56,15 +58,15 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
           'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
           'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
-          'mpl_margins': (0, 0, 0, 0), # margins around matplotlib widgets
+          'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
           'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}
           }
 mpl_params_dark = {
             'mpl_hatch': {                          # hatched area for specs
                          'facecolor': 'none',
-                         'hatch'    : '/',
-                         'edgecolor': '#808080',   # same as figure.edgecolor
-                         'lw'       : 0.0},        # no border around hatched area
+                         'hatch': '/',
+                         'edgecolor': '#808080',    # same as figure.edgecolor
+                         'lw': 0.0},                # no border around hatched area
 
             'mpl_stimuli': {                       # style for stimulus signals
                           'mfc': 'w', 'mec': 'w',  # marker face + edge color
@@ -77,11 +79,11 @@ mpl_params_dark = {
 # fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'],
 # 'lw':0.0}
 mpl_params_light = {
-            'mpl_hatch': {                         # hatched area for specs
+            'mpl_hatch': {                          # hatched area for specs
                          'facecolor': 'none',
-                         'hatch'    : '/',
-                         'edgecolor': '#808080',   # same as figure.edgecolor
-                         'lw'       : 0.0},        # no border around hatched area
+                         'hatch': '/',
+                         'edgecolor': '#808080',    # same as figure.edgecolor
+                         'lw': 0.0},                # no border around hatched area
 
             'mpl_stimuli': {                         # style for stimulus signals
                           'mfc': 'k', 'mec': 'k',  # marker face + edge color
@@ -179,7 +181,6 @@ mpl_rc_light = {
             }
 
 # --------------------- Matplotlib Fonts --------------------------------------
-import matplotlib.font_manager
 afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
 ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
 
@@ -187,17 +188,17 @@ if 'DejaVu Sans' in ttf_fonts:
     logger.info("Using 'DejaVu Sans' font.")
     mpl_rc.update({
                    'mathtext.fontset': 'custom',
-                   'mathtext.rm' : 'DejaVu Sans',
-                   'mathtext.it' : 'DejaVu Sans:italic',
-                   'mathtext.bf' : 'DejaVu Sans:bold'
+                   'mathtext.rm': 'DejaVu Sans',
+                   'mathtext.it': 'DejaVu Sans:italic',
+                   'mathtext.bf': 'DejaVu Sans:bold'
                   })
 elif 'Bitstream Vera Sans' in ttf_fonts:
     logger.info("Using 'Bitstream Vera Sans' font.")
     mpl_rc.update({
-                   'mathtext.fontset' : 'custom',
-                   'mathtext.rm' : 'Bitstream Vera Sans',
-                   'mathtext.it' : 'Bitstream Vera Sans:italic',
-                   'mathtext.bf' : 'Bitstream Vera Sans:bold'
+                   'mathtext.fontset': 'custom',
+                   'mathtext.rm': 'Bitstream Vera Sans',
+                   'mathtext.it': 'Bitstream Vera Sans:italic',
+                   'mathtext.bf': 'Bitstream Vera Sans:bold'
                   })
 else:
     logger.info("Found neither 'DejaVu Sans' nor 'Bitstream Vera Sans' font, "
@@ -205,8 +206,8 @@ else:
 # else: use sans-serif and stix-sans
 
 # set all text to Stix font
-#matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
-#matplotlib.rcParams['font.family'] = 'STIXGeneral'
+# matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
+# matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
 # #############################################################################
@@ -467,7 +468,7 @@ qss_common = """
                     stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
                     color: white;}
 
-                QPushButton[state="failed"]{background-color:orange; color:white}
+                QPushButton[state="failed"]{background-color:pink; color:black}
 
                 QPushButton[state="ok"]{background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
