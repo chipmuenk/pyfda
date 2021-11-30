@@ -310,3 +310,5 @@ for k in fil_init:
     fil[0].update({k: fil_init[k]})
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
+
+fx_results = None  # memory for exchanging fixpoint simulation data between widgets

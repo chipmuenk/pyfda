@@ -741,7 +741,7 @@ class Input_Fixpoint_Specs(QWidget):
         -------
         dict_sig: dict
             dictionary with stuff to emit (either `{'fx_sim': 'error'}` or
-            `{'fx_sim': 'set_results', 'fx_results': self.fx_results}`
+            `{'fx_sim': 'set_results'}`
         """
         try:
             logger.info(
@@ -751,27 +751,25 @@ class Input_Fixpoint_Specs(QWidget):
                     ))
 
             # Run fixpoint simulation and return the results as integer values:
-            self.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
+            fb.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
-            if len(self.fx_results) == 0:
+            if len(fb.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
                 # logger.debug("fx_results: {0}"\
-                #            .format(pprint_log(self.fx_results, tab= " ")))
+                #            .format(pprint_log(fb.fx_results, tab= " ")))
                 logger.info(
                     f'Fixpoint simulation successful for dict\n{pprint_log(dict_sig)}'
                     f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
                     f' of type "{dict_sig["fx_stimulus"].dtype}"'
-                    f'\n\tResponse: Shape {np.shape(self.fx_results)}'
-                    f' of type "{type(self.fx_results).__name__} "'
-                    f' ("{type(self.fx_results[0]).__name__}")'
+                    f'\n\tResponse: Shape {np.shape(fb.fx_results)}'
+                    f' of type "{type(fb.fx_results).__name__} "'
+                    f' ("{type(fb.fx_results[0]).__name__}")'
                 )
-
-            # TODO: fixed point / integer to float conversion?
 
         except ValueError as e:
             logger.error("Simulator error {0}".format(e))
-            self.fx_results = None
+            fb.fx_results = None
             qstyle_widget(self.butSimFx, "error")
             return {'fx_sim': 'error'}
         except AssertionError as e:
@@ -781,16 +779,16 @@ class Input_Fixpoint_Specs(QWidget):
                             pprint_log(dict_sig), e,
                             np.shape(dict_sig['fx_stimulus']),
                             dict_sig['fx_stimulus'].dtype,
-                            np.shape(self.fx_results),
-                            type(self.fx_results)
+                            np.shape(fb.fx_results),
+                            type(fb.fx_results)
                                 ))
 
-            self.fx_results = None
+            fb.fx_results = None
             qstyle_widget(self.butSimFx, "error")
             return {'fx_sim': 'error'}
 
         logger.debug("Sending fixpoint results")
-        dict_sig = {'fx_sim': 'set_results', 'fx_results': self.fx_results}
+        dict_sig = {'fx_sim': 'set_results'}
         qstyle_widget(self.butSimFx, "normal")
         return dict_sig
 

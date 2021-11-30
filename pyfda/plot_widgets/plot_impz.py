@@ -255,12 +255,7 @@ class Plot_Impz(QWidget):
         # logger.warning(f"SIG_RX LOCAL - needs_calc: {self.needs_calc} | "
         #                f"vis: {self.isVisible()}\n{pprint_log(dict_sig}")
 
-        if dict_sig['sim'] == 'next_frame':
-            # self.test_for_break()
-            self.impz()
-            return
-
-        elif dict_sig['sim'] == 'next_frame_fx':
+        if dict_sig['sim'] == 'next_frame_fx':
             # self.test_for_break()
             self.impz_fx({'fx_sim': 'get_stimulus'})
             return
@@ -292,7 +287,7 @@ class Plot_Impz(QWidget):
                     - Set fixpoint mode
                     - continue with actions for 'specs_changed'
 
-                'specs_changed': Fixpoint widget specs have been updated, 
+                'specs_changed': Fixpoint widget specs have been updated,
                                   set `self.needs_calc_fx = True`. If fixpoint is active:
                     - reset error flag
                     - force recalculation (`self.needs_calc = True`)
@@ -331,14 +326,14 @@ class Plot_Impz(QWidget):
 
             elif dict_sig['fx_sim'] == 'set_results':
                 """
-                - Check whether floating stimuli are complex and set flag correspondingly
-                - Convert simulation results to integer and transfer them to the plotting
-                  routine in `self.draw_response_fx()`
+                - Check whether floating point stimuli are complex and highlight
+                  label correspondingly
+                - Quantize stimuli and send them to the fixpoint widget in
+                  `self.impz_fx()`
                 """
                 self.cmplx = np.any(np.iscomplex(self.x))
                 self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
                 self.impz_fx(dict_sig=dict_sig)
-                # self.draw_response_fx(dict_sig=dict_sig)
                 return
 
             elif dict_sig['fx_sim'] == 'error':
@@ -471,7 +466,7 @@ class Plot_Impz(QWidget):
             self.t_start = time.process_time()
 
             if self.fx_sim:
-                # - update title string
+                # - update plot title string
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets
                 logger.info("Starting calculation of fixpoint transient response")
@@ -545,7 +540,6 @@ class Plot_Impz(QWidget):
             self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
             # ==== Increase frame counter =================================
             self.N_first += self.ui.N_frame
-            # self.emit({'sim':'next_frame'}, sig_name="sig_tx_local")  # ... once again!
             # TODO: Test for Run Button here
             self.ui.prg_wdg.setValue(self.N_first)
 
@@ -589,12 +583,12 @@ class Plot_Impz(QWidget):
         Triggered by:
         - Fixpoint widget, requesting "get_stimulus" (via `process_rx_signal()`)
         """
-        if self.N_first < self.ui.N_end:
+        if self.N_first < self.ui.N_end:  # not finished yet
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             frame = slice(self.N_first, self.N_first + L_frame)
             # -------------------------------------------------------------
-            # ---- Calculate, quantize and set stimulus for current frame
+            # ---- Calculate, quantize and SEND STIMULUS for current frame
             # -------------------------------------------------------------
             if dict_sig['fx_sim'] == 'get_stimulus':
                 self.x[frame] = self.stim_wdg.calc_stimulus_frame(
@@ -613,22 +607,25 @@ class Plot_Impz(QWidget):
             # ---- Get FX results and store them, increase frame counter ------
             # -----------------------------------------------------------------
             elif dict_sig['fx_sim'] == "set_results":
-                self.error = dict_sig['fx_results'] is None
+                self.error = fb.fx_results is None
+                # self.error = dict_sig['fx_results'] is None
                 if self.error:
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
                 else:
-                    self.y[frame] = np.asarray(dict_sig['fx_results'])
+                    self.y[frame] = np.asarray(fb.fx_results)
+                    # self.y[frame] = np.asarray(dict_sig['fx_results'])
             # ==== Increase frame counter ======================================
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
             # ==================================================================
             logger.info("FX results received")
             self.emit({'sim': 'next_frame_fx'}, sig_name='sig_tx_local')
+            return
 
         # ---------------------------------------------------------------------
-        # ---- Last frame reached, finish simulation --------------------------
+        # ---- Last frame reached, FINISH simulation and draw ------------------
         # ---------------------------------------------------------------------
         else:  # self.N_first > self.ui.end
             self.needs_calc = False
@@ -645,6 +642,7 @@ class Plot_Impz(QWidget):
             logger.info('[{0:5.4g} ms]: Fixpoint plot drawn.'
                         .format((time.process_time() - self.t_resp)*1000))
             self.emit({'fx_sim': 'finish'})
+            return
 
 # =============================================================================
 
@@ -696,28 +694,6 @@ class Plot_Impz(QWidget):
             self.needs_calc = True
 
         self.fx_sim_old = self.fx_sim
-
-    # ------------------------------------------------------------------------------
-    def draw_response_fx(self, dict_sig=None):
-        """
-        Get Fixpoint results and plot them
-        """
-        if self.needs_calc:
-            self.needs_redraw = [True] * 2
-            # t_draw_start = time.process_time()
-            self.y = dict_sig['fx_results']
-            if self.y is None:
-                self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                qstyle_widget(self.ui.but_run, "error")
-                self.needs_calc = True
-            else:
-                self.needs_calc = False
-
-                self.draw()
-                self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                qstyle_widget(self.ui.but_run, "normal")
-
-                self.emit({'fx_sim': 'finish'})
 
     # ------------------------------------------------------------------------
     def calc_fft(self):
