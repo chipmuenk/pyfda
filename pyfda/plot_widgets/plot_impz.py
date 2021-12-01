@@ -502,9 +502,9 @@ class Plot_Impz(QWidget):
             self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
 
-            # -------------------------------------------------------------
+            # ------------------------------------------------------------------
             # ---- calculate response for current frame
-            # -------------------------------------------------------------
+            # ------------------------------------------------------------------
             if len(self.sos) > 0:  # has second order sections
                 self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
             else:  # no second order sections
@@ -514,9 +514,11 @@ class Plot_Impz(QWidget):
             # remove complex values produced by numerical inaccuracies,
             # `tol` is specified in multiples of machine eps
             self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
-            # ==== Increase frame counter =================================
+
+            # TODO: Test for user interrupt here
+
+            # --- Increase frame counter ---------------------------------------
             self.N_first += self.ui.N_frame
-            # TODO: Test for Run Button here
             self.ui.prg_wdg.setValue(self.N_first)
 
         # -------------------------------------------------------------
@@ -557,7 +559,8 @@ class Plot_Impz(QWidget):
         Stimulus and response are only calculated if `self.needs_calc == True`.
 
         Triggered by:
-        - Fixpoint widget, requesting "start_fx_response_calculation" (via `process_rx_signal()`)
+        - Fixpoint widget, requesting "start_fx_response_calculation"
+          via `process_rx_signal()`
         """
         while self.N_first < self.ui.N_end:  # not finished yet
             # The last frame could be shorter than self.ui.N_frame:
@@ -577,7 +580,7 @@ class Plot_Impz(QWidget):
             logger.info("FX stimulus sent")
 
             # -----------------------------------------------------------------
-            # ---- Get FX results and store them, increase frame counter ------
+            # ---- Get FX response for current frame --------------------------
             # -----------------------------------------------------------------
             self.error = fb.fx_results is None
             if self.error:
