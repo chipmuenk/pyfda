@@ -86,7 +86,7 @@ class Plot_Impz(QWidget):
         # initial setting for fixpoint simulation:
         self.fx_sim = self.fx_sim_old = qget_cmb_box(
             self.ui.cmb_sim_select, data=False) == 'Fixpoint'
-        self.update_fx_ui()    # initialize UI for fixpoint or float simulation
+        self.update_fx_ui_settings()    # initialize UI for fixpoint or float simulation
         # initialize routines and settings
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
@@ -273,7 +273,7 @@ class Plot_Impz(QWidget):
                       start simulation via `self.impz_init()`
                 """
                 if dict_sig['fx_sim'] == 'start':
-                    self.update_fx_ui("Fixpoint")  # set fixpoint mode
+                    self.update_fx_ui_settings("Fixpoint")  # set fixpoint mode
                 else:
                     logger.info("FX specs changed!")
 
@@ -418,7 +418,7 @@ class Plot_Impz(QWidget):
 
         self.needs_redraw = [True] * 2
 
-        self.update_fx_ui()  # check for fixpoint setting and update ui if needed
+        self.update_fx_ui_settings()  # check for fixpoint setting and update ui if needed
 
         if type(arg) == bool:  # but_run has been pressed
             self.needs_calc = True  # but_run has been clicked -> force recalculation
@@ -615,7 +615,7 @@ class Plot_Impz(QWidget):
 
 # =============================================================================
 
-    def update_fx_ui(self, fx=None):
+    def update_fx_ui_settings(self, fx=None):
         """
         Select between fixpoint and floating point simulation and update FX UI
         settings.
