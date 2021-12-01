@@ -289,28 +289,12 @@ class Plot_Impz(QWidget):
 
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 """
-                The fixpoint widget has been initialized and requests a stimulus:
-
-                - Calculate stimuli, quantize and pass via `dict_sig` with
-                  `'fx_sim': 'calc_frame_fx_response'` and `'fx_stimulus': <quant stimulus array>`.
-                  Stimuli are scaled with the input fractional word length, i.e.
-                  with 2**WF (input) to obtain integer values
+                The fixpoint widget has been initialized and starts the fx simulation
+                when the widget is visible via `self.impz_fx()`
                 """
                 logger.info("FX start_fx_response_calculation")
                 if self.isVisible():
                     self.impz_fx()
-                return
-
-            elif dict_sig['fx_sim'] == 'set_results':
-                """
-                - Check whether floating point stimuli are complex and highlight
-                  label correspondingly
-                - Quantize stimuli and send them to the fixpoint widget in
-                  `self.impz_fx()`
-                """
-                self.cmplx = np.any(np.iscomplex(self.x))
-                self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-                self.impz_fx(dict_sig=dict_sig)
                 return
 
             elif dict_sig['fx_sim'] == 'error':
@@ -524,32 +508,7 @@ class Plot_Impz(QWidget):
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
         # -------------------------------------------------------------
-
-        # step error calculation: calculate system DC response and subtract it
-        # from the response
-        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
-            if len(self.sos) > 0:  # has second order sections
-                dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
-            else:
-                dc = sig.freqz(self.bb, self.aa, [0])
-            self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
-                self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
-
-        # Test whether response or stimulus are complex
-        # TODO: shouldn't stimulus and response be treated separately?
-        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
-        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-        self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
-        self.t_resp = time.process_time()
-        logger.info('[{0:5.4g} ms]: Floating point response calculated [impz()].'
-                    .format((self.t_resp - self.t_start)*1000))
-        self.draw()
-        # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
-        self.needs_calc = False
-        logger.info('[{0:5.4g} ms]: Transient response plotted.'
-                    .format((time.process_time() - self.t_resp)*1000))
-        self.ui.but_run.setIcon(QIcon(":/play.svg"))
-        qstyle_widget(self.ui.but_run, "normal")
+        self.impz_finish()
 
     # --------------------------------------------------------------------------
     def impz_fx(self):
@@ -565,6 +524,7 @@ class Plot_Impz(QWidget):
         while self.N_first < self.ui.N_end:  # not finished yet
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
+            # Define slicing expression for the current frame
             frame = slice(self.N_first, self.N_first + L_frame)
             # -------------------------------------------------------------
             # ---- Calculate, quantize and SEND STIMULUS for current frame
@@ -600,21 +560,48 @@ class Plot_Impz(QWidget):
         # ---- Last frame reached, FINISH simulation and draw ------------------
         # ---------------------------------------------------------------------
         else:  # self.N_first > self.ui.end
-            self.needs_calc = False
-            self.ui.but_run.setIcon(QIcon(":/play.svg"))
-            qstyle_widget(self.ui.but_run, "normal")
-            self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
-            self.cmplx = bool(np.any(np.iscomplex(self.y)) or
-                              np.any(np.iscomplex(self.x)))
-            self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
-            self.t_resp = time.process_time()
-            logger.info('[{0:5.4g} ms]: Fixpoint response calculated'
-                        .format((self.t_resp - self.t_start)*1000))
-            self.draw()
-            logger.info('[{0:5.4g} ms]: Fixpoint plot drawn.'
-                        .format((time.process_time() - self.t_resp)*1000))
+            self.impz_finish()
             self.emit({'fx_sim': 'finish'})
         return
+
+    # --------------------------------------------------------------------------
+    def impz_finish(self):
+        """
+        Do some housekeeping, resetting and drawing when `self.impz()` or `self.impz_fx()`
+        have finished:
+
+        - Calculate step error if selected
+        - Check for complex stimulus or response
+        - Calculate simulation time
+        - Draw the signals
+        - Reset Run Icon to normal state, reset `needs_calc` flag
+
+        """
+        # step error calculation: calculate system DC response and subtract it
+        # from the response
+        if self.stim_wdg.ui.stim == "step" and self.stim_wdg.ui.chk_step_err.isChecked():
+            if len(self.sos) > 0:  # has second order sections
+                dc = sig.sosfreqz(self.sos, [0])  # yields (w(0), H(0))
+            else:
+                dc = sig.freqz(self.bb, self.aa, [0])
+            self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
+                self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
+
+        # Test whether response or stimulus are complex
+        # TODO: shouldn't stimulus and response be treated separately?
+        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+        self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
+        self.t_resp = time.process_time()
+        logger.info('[{0:5.4g} ms]: Transient response calculated.'
+                    .format((self.t_resp - self.t_start)*1000))
+        self.draw()
+        # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
+        self.needs_calc = False
+        logger.info('[{0:5.4g} ms]: Transient response plotted.'
+                    .format((time.process_time() - self.t_resp)*1000))
+        self.ui.but_run.setIcon(QIcon(":/play.svg"))
+        qstyle_widget(self.ui.but_run, "normal")
 
 # =============================================================================
 
