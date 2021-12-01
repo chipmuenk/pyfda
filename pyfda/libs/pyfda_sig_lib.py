@@ -516,7 +516,7 @@ Examples
     if sos and alg != "shpak":
         b,a = sig.sos2tf(b)
 
-    time_0 = time.perf_counter_ns()
+    time_0 = int(time.perf_counter() * 1e9)
 
     # ---------------------
     if alg == 'diff':
@@ -619,7 +619,7 @@ Examples
         logger.error('Unknown algorithm "{0}"!'.format(alg))
         tau_g = np.zeros_like(w)
     
-    time_1 = time.perf_counter_ns()
+    time_1 = int(time.perf_counter() * 1e9)
     delta_t = time_1 - time_0
     if verbose:
         logger.info("grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
