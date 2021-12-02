@@ -74,13 +74,13 @@ class Plot_PZ(QWidget):
         self.but_hf = PushButton("|H(f)| ", checked=False)
         self.but_hf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
 
-        self.but_hf_log = PushButton("Log. |H(f)|", checked=False)
+        self.but_hf_log = PushButton(" Log. |H(f)| ", checked=False)
         self.but_hf_log.setToolTip("<span>Log. scale for |H(f)|.</span>")
 
         self.diaRad_Hf = QDial(self)
         self.diaRad_Hf.setRange(2, 10)
         self.diaRad_Hf.setValue(2)
-        self.diaRad_Hf.setTracking(False) # produce less events when turning
+        self.diaRad_Hf.setTracking(False)  # produce less events when turning
         self.diaRad_Hf.setFixedHeight(30)
         self.diaRad_Hf.setFixedWidth(30)
         self.diaRad_Hf.setWrapping(False)

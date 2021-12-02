@@ -90,7 +90,7 @@ class Plot_Phi(QWidget):
         self.cmbUnitsPhi.setCurrentIndex(0)
         self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_wrap = PushButton("wrapped", checked=False)
+        self.but_wrap = PushButton("wrapped ", checked=False)
         self.but_wrap.setToolTip("Plot phase wrapped to +/- pi")
 
         layHControls = QHBoxLayout()
