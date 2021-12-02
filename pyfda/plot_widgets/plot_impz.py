@@ -424,13 +424,14 @@ class Plot_Impz(QWidget):
             self.ui.prg_wdg.setValue(0)
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
+
+            logger.info("Starting transient response calculation")
             self.t_start = time.process_time()
 
             if self.fx_sim:
                 # - update plot title string
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets
-                logger.info("Starting fixpoint transient response calculation")
                 self.title_str = r'$Fixpoint$ ' + self.title_str
                 self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
                 if np.any(np.iscomplex(x_test)):
@@ -439,11 +440,10 @@ class Plot_Impz(QWidget):
                         "the fixpoint filter!")
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-                self.t_start = time.process_time()
                 self.emit({'fx_sim': 'init'})
                 return
             else:
-                logger.info("Starting transient response calculation")
+
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
                 self.sos = np.asarray(fb.fil[0]['sos'])
@@ -559,10 +559,8 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         # ---- Last frame reached, FINISH simulation and draw ------------------
         # ---------------------------------------------------------------------
-        else:  # self.N_first > self.ui.end
-            self.impz_finish()
-            self.emit({'fx_sim': 'finish'})
-        return
+        # self.N_first > self.ui.end
+        self.impz_finish()
 
     # --------------------------------------------------------------------------
     def impz_finish(self):
@@ -602,6 +600,9 @@ class Plot_Impz(QWidget):
                     .format((time.process_time() - self.t_resp)*1000))
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
+
+        if self.fx_sim:
+            self.emit({'fx_sim': 'finish'})
 
 # =============================================================================
 
