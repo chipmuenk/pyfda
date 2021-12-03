@@ -67,7 +67,7 @@ class FIR_DF_pyfixp(object):
         -------
         None.
         """
-        logger.error(p)
+        # logger.error(p)
         self.p = p  # parameter dictionary with coefficients etc.
 
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
