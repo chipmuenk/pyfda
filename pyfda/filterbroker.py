@@ -311,4 +311,5 @@ for k in fil_init:
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
 
-fx_results = None  # memory for exchanging fixpoint simulation data between widgets
+fx_stimuli = None  # memory for exchanging fixpoint stimuli and
+fx_results = None  # simulation results between widgets
