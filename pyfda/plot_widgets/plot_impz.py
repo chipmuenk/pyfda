@@ -426,7 +426,7 @@ class Plot_Impz(QWidget):
             qstyle_widget(self.ui.but_run, "running")
 
             logger.info("Starting transient response calculation")
-            self.t_start = time.process_time()
+            self.t_start = time.process_time()  # store starting time
 
             if self.fx_sim:
                 # - update plot title string
@@ -436,14 +436,13 @@ class Plot_Impz(QWidget):
                 self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
                 if np.any(np.iscomplex(x_test)):
                     logger.warning(
-                        "Complex stimulus: Only its real part will be processed by "
-                        "the fixpoint filter!")
-                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
+                        "Complex stimulus: Only its real part is used for the "
+                        "fixpoint filter!")
+                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])  # setup quantizer
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-                self.emit({'fx_sim': 'init'})
+                self.emit({'fx_sim': 'init'})  # initialize FX filter
                 return
             else:
-
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
                 self.sos = np.asarray(fb.fil[0]['sos'])
@@ -472,9 +471,9 @@ class Plot_Impz(QWidget):
         - 'Continue' simulation (not yet implemented)
         """
         while self.N_first < self.ui.N_end:
-            logger.info("impz(): Calculating frame "
-                        f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
-                        f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
+            # logger.info("impz(): Calculating frame "
+            #             f"{int(np.ceil(self.N_first / self.ui.N_frame)) + 1} of "
+            #             f"{int(np.ceil(self.ui.N_end / self.ui.N_frame))}")
             # The last frame could be shorter than self.ui.N_frame:
             L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
             # Define slicing expression for the current frame
@@ -533,12 +532,10 @@ class Plot_Impz(QWidget):
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
             # quantize stimulus
             self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
-
             self.emit(
                 {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
 
-            logger.info("FX stimulus sent")
-
+            # logger.info("FX stimulus sent")
             # -----------------------------------------------------------------
             # ---- Get FX response for current frame --------------------------
             # -----------------------------------------------------------------
@@ -547,14 +544,15 @@ class Plot_Impz(QWidget):
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "error")
                 self.needs_calc = True
+                break  # exit while loop
             else:
                 self.y[frame] = np.asarray(fb.fx_results)
+                # logger.info("FX results received")
 
             # ==== Increase frame counter ======================================
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
             # ==================================================================
-            logger.info("FX results received")
 
         # ---------------------------------------------------------------------
         # ---- Last frame reached, FINISH simulation and draw ------------------
