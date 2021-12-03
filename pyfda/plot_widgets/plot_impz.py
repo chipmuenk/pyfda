@@ -290,11 +290,11 @@ class Plot_Impz(QWidget):
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 """
                 The fixpoint widget has been initialized and starts the fx simulation
-                when the widget is visible via `self.impz_fx()`
+                when the widget is visible via `self.impz()`
                 """
                 logger.info("FX start_fx_response_calculation")
                 if self.isVisible():
-                    self.impz_fx()
+                    self.impz()
                 return
 
             elif dict_sig['fx_sim'] == 'error':
@@ -385,9 +385,8 @@ class Plot_Impz(QWidget):
         The following tasks are performed:
             - Enable energy scaling for impulse stimuli when requirements are met
             - check for and enable fixpoint settings
-            - check whether method has been triggered
-
-        Stimulus and response are only calculated if `self.needs_calc == True`.
+            - when triggered by `but_run` or when `Auto`== pressed and
+              `self.needs_calc == True`, continue with calculating stimulus and response
         """
 
         # allow scaling the frequency response from pure impulse (no DC, no noise)
@@ -462,13 +461,12 @@ class Plot_Impz(QWidget):
     # --------------------------------------------------------------------------
     def impz(self):
         """
-        Calculate floating point response and redraw it.
-
-        Stimulus and response are only calculated if `self.needs_calc == True`.
+        Calculate floating point / fixpoint response and redraw it
 
         Triggered by:
-        - `self.impz_init()`
-        - 'Continue' simulation (not yet implemented)
+        - `self.impz_init()` (floating point)
+        -  Fixpoint widget, requesting "start_fx_response_calculation"
+            via `process_rx_signal()` (fixpoint filter)
         """
         while self.N_first < self.ui.N_end:
             # logger.info("impz(): Calculating frame "
@@ -488,18 +486,38 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # ---- calculate response for current frame
             # ------------------------------------------------------------------
-            if len(self.sos) > 0:  # has second order sections
-                self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
-            else:  # no second order sections
-                self.y[frame], self.zi = sig.lfilter(
-                    self.bb, self.aa, self.x[frame], zi=self.zi)
+            if self.fx_sim:  # fixpoint filter
+                self.x_q[frame] = self.q_i.fixp(self.x[frame].real)  # quantize stimulus
+                # -----------------------------------------------------------------
+                # ---- Get FX response for current frame --------------------------
+                # -----------------------------------------------------------------
+                self.emit(
+                    {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
+                # logger.info("FX stimulus sent")
+                self.error = fb.fx_results is None
+                if self.error:
+                    self.ui.but_run.setIcon(QIcon(":/play.svg"))
+                    qstyle_widget(self.ui.but_run, "error")
+                    self.needs_calc = True
+                    break  # exit while loop
+                else:
+                    self.y[frame] = np.asarray(fb.fx_results)
+                    # logger.info("FX results received")
 
-            # remove complex values produced by numerical inaccuracies,
-            # `tol` is specified in multiples of machine eps
-            self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
+            else:  # floating point
+                # -----------------------------------------------------------------
+                # ---- Get FP response for current frame --------------------------
+                # -----------------------------------------------------------------
+                if len(self.sos) > 0:  # has second order sections
+                    self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
+                else:  # no second order sections
+                    self.y[frame], self.zi = sig.lfilter(
+                        self.bb, self.aa, self.x[frame], zi=self.zi)
+                # remove complex values produced by numerical inaccuracies,
+                # `tol` is specified in multiples of machine eps
+                self.y[frame] = np.real_if_close(self.y[frame], tol=1e3)
 
             # TODO: Test for user interrupt here
-
             # --- Increase frame counter ---------------------------------------
             self.N_first += self.ui.N_frame
             self.ui.prg_wdg.setValue(self.N_first)
@@ -510,61 +528,10 @@ class Plot_Impz(QWidget):
         self.impz_finish()
 
     # --------------------------------------------------------------------------
-    def impz_fx(self):
-        """
-        Calculate fixpoint response and redraw it.
-
-        Stimulus and response are only calculated if `self.needs_calc == True`.
-
-        Triggered by:
-        - Fixpoint widget, requesting "start_fx_response_calculation"
-          via `process_rx_signal()`
-        """
-        while self.N_first < self.ui.N_end:  # not finished yet
-            # The last frame could be shorter than self.ui.N_frame:
-            L_frame = min(self.ui.N_frame, self.ui.N_end - self.N_first)
-            # Define slicing expression for the current frame
-            frame = slice(self.N_first, self.N_first + L_frame)
-            # -------------------------------------------------------------
-            # ---- Calculate, quantize and SEND STIMULUS for current frame
-            # -------------------------------------------------------------
-            self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-            # quantize stimulus
-            self.x_q[frame] = self.q_i.fixp(self.x[frame].real)
-            self.emit(
-                {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
-
-            # logger.info("FX stimulus sent")
-            # -----------------------------------------------------------------
-            # ---- Get FX response for current frame --------------------------
-            # -----------------------------------------------------------------
-            self.error = fb.fx_results is None
-            if self.error:
-                self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                qstyle_widget(self.ui.but_run, "error")
-                self.needs_calc = True
-                break  # exit while loop
-            else:
-                self.y[frame] = np.asarray(fb.fx_results)
-                # logger.info("FX results received")
-
-            # ==== Increase frame counter ======================================
-            self.N_first += self.ui.N_frame
-            self.ui.prg_wdg.setValue(self.N_first)
-            # ==================================================================
-
-        # ---------------------------------------------------------------------
-        # ---- Last frame reached, FINISH simulation and draw ------------------
-        # ---------------------------------------------------------------------
-        # self.N_first > self.ui.end
-        self.impz_finish()
-
-    # --------------------------------------------------------------------------
     def impz_finish(self):
         """
-        Do some housekeeping, resetting and drawing when `self.impz()` or `self.impz_fx()`
-        have finished:
+        Do some housekeeping, resetting and drawing when `self.impz()`
+        has finished:
 
         - Calculate step error if selected
         - Check for complex stimulus or response
