@@ -170,12 +170,13 @@ class Input_Fixpoint_Specs(QWidget):
         3. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
+        # logger.info(
+        #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         logger.info(
-            "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
+            f'SIG_RX():  "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
-            # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
