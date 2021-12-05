@@ -478,13 +478,13 @@ class Plot_Impz(QWidget):
             frame = slice(self.N_first, self.N_first + L_frame)
 
             # ------------------------------------------------------------------
-            # ---- calculate stimulus for current frame ------------------------
+            # ---- calculate stimuli for current frame -------------------------
             # ------------------------------------------------------------------
             self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
-            # ---- calculate response for current frame
+            # ---- calculate fixpoint or floating point response for current frame
             # ------------------------------------------------------------------
             if self.fx_sim:  # fixpoint filter
                 self.x_q[frame] = self.q_i.fixp(self.x[frame].real)  # quantize stimulus

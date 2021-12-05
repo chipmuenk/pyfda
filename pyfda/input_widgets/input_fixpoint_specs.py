@@ -204,7 +204,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             elif dict_sig['fx_sim'] == 'calc_frame_fx_response':
                 self.fx_sim_calc_response(dict_sig)
-                # return directly to the routine calculating the complete response
+                # return to the routine collecting the response frame by frame
                 return
 
             elif dict_sig['fx_sim'] == 'specs_changed':
