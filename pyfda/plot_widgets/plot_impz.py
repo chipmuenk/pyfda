@@ -251,10 +251,10 @@ class Plot_Impz(QWidget):
         """
         # logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
         #                .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
-        logger.info(f'SIG_RX: "{first_item(dict_sig)}"')
+        # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            # logger.debug(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         if 'fx_sim' in dict_sig:

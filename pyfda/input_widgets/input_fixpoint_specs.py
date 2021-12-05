@@ -172,8 +172,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # logger.info(
         #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-        logger.info(
-            f'SIG_RX():  "{first_item(dict_sig)}"')
+        # logger.debug(f'SIG_RX():  "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -792,8 +791,8 @@ class Input_Fixpoint_Specs(QWidget):
         if fb.fx_results is None:
             qstyle_widget(self.butSimFx, "error")
         else:
-            logger.debug("Sending fixpoint results")
-            qstyle_widget(self.butSimFx, "normal")
+            pass # everything ok, return 
+            # logger.debug("Sending fixpoint results")
         return
 
 
