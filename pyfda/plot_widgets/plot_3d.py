@@ -10,21 +10,18 @@
 Widget for plotting \|H(z)\| in 3D
 """
 from pyfda.libs.compat import (
-    QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame,
-    pyqtSlot, pyqtSignal)
+    QWidget, QComboBox, QLabel, QLineEdit, QDial, QGridLayout, QFrame, pyqtSignal)
 
 import numpy as np
 from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
 
-
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval, to_html
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
-from mpl_toolkits import mplot3d # import to register 3D projection
 from matplotlib import cm # Colormap
 from matplotlib.pyplot import colormaps
 from matplotlib.colors import LightSource
