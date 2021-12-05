@@ -85,46 +85,41 @@ class Plot_3D(QWidget):
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
-        self.chkLog = QCheckBox("Log.", self)
-        self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("Logarithmic scale")
-        self.chkLog.setChecked(False)
+        self.but_log = PushButton("dB", checked=False)
+        self.but_log.setObjectName("but_log")
+        self.but_log.setToolTip("Logarithmic scale")
 
-        self.chk_plot_in_UC = QCheckBox("|z| < 1", self)
-        self.chk_plot_in_UC.setObjectName("chk_plot_in_UC")
-        self.chk_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
-        self.chk_plot_in_UC.setChecked(False)
+        self.but_plot_in_UC = PushButton("|z| < 1", checked=False)
+        self.but_plot_in_UC.setObjectName("but_plot_in_UC")
+        self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
-        self.lblBottom = QLabel("Bottom:", self)
+        self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
         self.ledBottom = QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
-        self.lblBottomdB.setVisible(self.chkLog.isChecked())
+        self.lblBottomdB.setVisible(self.but_log.isChecked())
 
-        self.lblTop = QLabel("Top:", self)
+        self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
         self.ledTop = QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
         self.lblTopdB = QLabel("dB", self)
-        self.lblTopdB.setVisible(self.chkLog.isChecked())
+        self.lblTopdB.setVisible(self.but_log.isChecked())
 
-        self.chkUC = QCheckBox("UC", self)
-        self.chkUC.setObjectName("chkUC")
-        self.chkUC.setToolTip("Plot unit circle")
-        self.chkUC.setChecked(True)
+        self.plt_UC = PushButton("UC", checked=True)
+        self.plt_UC.setObjectName("plt_UC")
+        self.plt_UC.setToolTip("Plot unit circle")
 
-        self.chkPZ = QCheckBox("P/Z", self)
-        self.chkPZ.setObjectName("chkPZ")
-        self.chkPZ.setToolTip("Plot poles and zeros")
-        self.chkPZ.setChecked(True)
+        self.but_PZ = PushButton("P/Z", checked=True)
+        self.but_PZ.setObjectName("but_PZ")
+        self.but_PZ.setToolTip("Plot poles and zeros")
 
-        self.chkHf = QCheckBox("H(f)", self)
-        self.chkHf.setObjectName("chkHf")
-        self.chkHf.setToolTip("Plot H(f) along the unit circle")
-        self.chkHf.setChecked(True)
+        self.but_Hf = PushButton("H(f)", checked=True)
+        self.but_Hf.setObjectName("but_Hf")
+        self.but_Hf.setToolTip("Plot H(f) along the unit circle")
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
         self.cmbMode3D = QComboBox(self)
@@ -134,25 +129,23 @@ class Plot_3D(QWidget):
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkColormap_r = QCheckBox("reverse", self)
-        self.chkColormap_r.setToolTip("reverse colormap")
-        self.chkColormap_r.setChecked(True)
+        self.but_colormap_r = PushButton("reverse", checked=True)
+        self.but_colormap_r.setObjectName("but_colormap_r")
+        self.but_colormap_r.setToolTip("reverse colormap")
 
         self.cmbColormap = QComboBox(self)
         self._init_cmb_colormap(cmap_init=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.chkColBar = QCheckBox("Colorbar", self)
-        self.chkColBar.setObjectName("chkColBar")
-        self.chkColBar.setToolTip("Show colorbar")
-        self.chkColBar.setChecked(False)
+        self.but_colbar = PushButton("Colorbar", checked=False)
+        self.but_colbar.setObjectName("chkColBar")
+        self.but_colbar.setToolTip("Show colorbar")
 
-        self.chkLighting = QCheckBox("Lighting", self)
-        self.chkLighting.setObjectName("chkLighting")
-        self.chkLighting.setToolTip("Enable light source")
-        self.chkLighting.setChecked(False)
+        self.but_lighting = PushButton("Lighting", checked=False)
+        self.but_lighting.setObjectName("but_lighting")
+        self.but_lighting.setToolTip("Enable light source")
 
-        self.lblAlpha = QLabel("Alpha", self)
+        self.lblAlpha = QLabel(to_html("Alpha", frmt='bi'), self)
         self.diaAlpha = QDial(self)
         self.diaAlpha.setRange(0, 10)
         self.diaAlpha.setValue(10)
@@ -162,7 +155,7 @@ class Plot_3D(QWidget):
         self.diaAlpha.setWrapping(False)
         self.diaAlpha.setToolTip("<span>Set transparency for surf and contour plots.</span>")
 
-        self.lblHatch = QLabel("Stride", self)
+        self.lblHatch = QLabel(to_html("Stride", frmt='bi'), self)
         self.diaHatch = QDial(self)
         self.diaHatch.setRange(0, 9)
         self.diaHatch.setValue(5)
@@ -172,17 +165,16 @@ class Plot_3D(QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set line density for various plots.")
 
-        self.chkContour2D = QCheckBox("Contour2D", self)
-        self.chkContour2D.setObjectName("chkContour2D")
-        self.chkContour2D.setToolTip("Plot 2D-contours at z =0")
-        self.chkContour2D.setChecked(False)
+        self.but_contour_2d = PushButton("Contour2D", checked=False)
+        self.but_contour_2d.setObjectName("chkContour2D")
+        self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
 
         # ----------------------------------------------------------------------
         # LAYOUT for UI widgets
         # ----------------------------------------------------------------------
         layGControls = QGridLayout()
-        layGControls.addWidget(self.chkLog, 0, 0)
-        layGControls.addWidget(self.chk_plot_in_UC, 1, 0)
+        layGControls.addWidget(self.but_log, 0, 0)
+        layGControls.addWidget(self.but_plot_in_UC, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
         layGControls.addWidget(self.ledTop, 0, 4)
         layGControls.addWidget(self.lblTopdB, 0, 5)
@@ -191,17 +183,17 @@ class Plot_3D(QWidget):
         layGControls.addWidget(self.lblBottomdB, 1, 5)
         layGControls.setColumnStretch(5,1)
 
-        layGControls.addWidget(self.chkUC, 0, 6)
-        layGControls.addWidget(self.chkHf, 1, 6)
-        layGControls.addWidget(self.chkPZ, 0, 8)
+        layGControls.addWidget(self.plt_UC, 0, 6)
+        layGControls.addWidget(self.but_Hf, 1, 6)
+        layGControls.addWidget(self.but_PZ, 0, 8)
 
         layGControls.addWidget(self.cmbMode3D, 0, 10)
-        layGControls.addWidget(self.chkContour2D, 1, 10)
+        layGControls.addWidget(self.but_contour_2d, 1, 10)
         layGControls.addWidget(self.cmbColormap, 0, 12, 1, 1)
-        layGControls.addWidget(self.chkColormap_r, 1, 12)
+        layGControls.addWidget(self.but_colormap_r, 1, 12)
 
-        layGControls.addWidget(self.chkLighting, 0, 14)
-        layGControls.addWidget(self.chkColBar, 1, 14)
+        layGControls.addWidget(self.but_lighting, 0, 14)
+        layGControls.addWidget(self.but_colbar, 1, 14)
 
         layGControls.addWidget(self.lblAlpha, 0, 15)
         layGControls.addWidget(self.diaAlpha, 0, 16)
@@ -234,24 +226,24 @@ class Plot_3D(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.chkLog.clicked.connect(self._log_clicked)
+        self.but_log.clicked.connect(self._log_clicked)
         self.ledBottom.editingFinished.connect(self._log_clicked)
         self.ledTop.editingFinished.connect(self._log_clicked)
 
-        self.chk_plot_in_UC.clicked.connect(self._init_grid)
-        self.chkUC.clicked.connect(self.draw)
-        self.chkHf.clicked.connect(self.draw)
-        self.chkPZ.clicked.connect(self.draw)
+        self.but_plot_in_UC.clicked.connect(self._init_grid)
+        self.plt_UC.clicked.connect(self.draw)
+        self.but_Hf.clicked.connect(self.draw)
+        self.but_PZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
-        self.chkColBar.clicked.connect(self.draw)
+        self.but_colbar.clicked.connect(self.draw)
 
         self.cmbColormap.currentIndexChanged.connect(self.draw)
-        self.chkColormap_r.clicked.connect(self.draw)
+        self.but_colormap_r.clicked.connect(self.draw)
 
-        self.chkLighting.clicked.connect(self.draw)
+        self.but_lighting.clicked.connect(self.draw)
         self.diaAlpha.valueChanged.connect(self.draw)
         self.diaHatch.valueChanged.connect(self.draw)
-        self.chkContour2D.clicked.connect(self.draw)
+        self.but_contour_2d.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
@@ -296,7 +288,7 @@ class Plot_3D(QWidget):
         dx = (self.xmax - self.xmin) / steps
         dy = (self.ymax - self.ymin) / steps  # grid size cartesian range
 
-        if self.chk_plot_in_UC.isChecked():  # Plot circular range in 3D-Plot
+        if self.but_plot_in_UC.isChecked():  # Plot circular range in 3D-Plot
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
                                    np.linspace(0, 2 * pi, steps, endpoint=True))
             self.x = r * cos(phi)
@@ -367,9 +359,8 @@ class Plot_3D(QWidget):
         Change scale and settings to log / lin when log setting is changed
         Update min / max settings when lineEdits have been edited
         """
-        self.log = self.chkLog.isChecked()
-        if self.sender().objectName() == 'chkLog':  # clicking chkLog triggered the slot
-            if self.log:
+        if self.sender().objectName() == 'but_log':  # clicking but_log triggered the slot
+            if self.but_log.isChecked():
                 self.ledBottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
                 self.ledTop.setText(str(self.zmax_dB))
@@ -383,7 +374,7 @@ class Plot_3D(QWidget):
                 self.lblBottomdB.setVisible(False)
 
         else:  # finishing a lineEdit field triggered the slot
-            if self.log:
+            if self.but_log.isChecked():
                 self.zmin_dB = safe_eval(
                     self.ledBottom.text(), self.zmin_dB, return_type='float')
                 self.ledBottom.setText(str(self.zmin_dB))
@@ -426,7 +417,7 @@ class Plot_3D(QWidget):
         alpha = self.diaAlpha.value()/10.
 
         cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
-        if self.chkColormap_r.isChecked():
+        if self.but_colormap_r.isChecked():
             cmap = cmap.reversed() # use reversed colormap
 
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
@@ -435,10 +426,10 @@ class Plot_3D(QWidget):
 
         surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}
         self.cmbColormap.setEnabled(surf_enabled)
-        self.chkColormap_r.setEnabled(surf_enabled)
-        self.chkLighting.setEnabled(surf_enabled)
-        self.chkColBar.setEnabled(surf_enabled)
-        self.diaAlpha.setEnabled(surf_enabled or self.chkContour2D.isChecked())
+        self.but_colormap_r.setEnabled(surf_enabled)
+        self.but_lighting.setEnabled(surf_enabled)
+        self.but_colbar.setEnabled(surf_enabled)
+        self.diaAlpha.setEnabled(surf_enabled or self.but_contour_2d.isChecked())
 
         # cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         # scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
@@ -460,7 +451,7 @@ class Plot_3D(QWidget):
         plevel_rel = 1.05  # height of plotted pole position relative to zmax
         zlevel_rel = 0.1  # height of plotted zero position relative to zmax
 
-        if self.chkLog.isChecked():  # logarithmic scale
+        if self.but_log.isChecked():  # logarithmic scale
             # suppress "divide by zero in log10" warnings
             old_settings_seterr = np.seterr()
             np.seterr(divide='ignore')
@@ -499,13 +490,13 @@ class Plot_3D(QWidget):
 
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped
         # between bottom and top
-        H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=self.chkLog.isChecked())
-        Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.chkLog.isChecked())
+        H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=self.but_log.isChecked())
+        Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=self.but_log.isChecked())
 
         # ===============================================================
         # Plot Unit Circle (UC)
         # ===============================================================
-        if self.chkUC.isChecked():
+        if self.plt_UC.isChecked():
             #  Plot unit circle and marker at (1,0):
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag,
                            ones(len(self.xy_UC)) * bottom, lw=2, color='k')
@@ -514,7 +505,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot ||H(f)| along unit circle as 3D-lineplot
         # ===============================================================
-        if self.chkHf.isChecked():
+        if self.but_Hf.isChecked():
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha=0.8, lw=4)
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--', lw=4)
@@ -529,7 +520,7 @@ class Plot_3D(QWidget):
         # ===============================================================
         # Plot Poles and Zeros
         # ===============================================================
-        if self.chkPZ.isChecked():
+        if self.but_PZ.isChecked():
 
             PN_SIZE = 8  # size of P/N symbols
 
@@ -582,7 +573,7 @@ class Plot_3D(QWidget):
                 mlab.show()
 
             else:
-                if self.chkLighting.isChecked():
+                if self.but_lighting.isChecked():
                     ls = LightSource(azdeg=0, altdeg=65)  # Create light source object
                     rgb = ls.shade(Hmag, cmap=cmap)  # Shade data, creating an rgb array
                     cmap_surf = None
@@ -612,7 +603,7 @@ class Plot_3D(QWidget):
         #       along the other axis?
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
-        if self.chkContour2D.isChecked():
+        if self.but_contour_2d.isChecked():
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin,
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
@@ -622,7 +613,7 @@ class Plot_3D(QWidget):
                                 cmap=cmap, alpha=alpha)
 
         # plot colorbar for suitable plot modes
-        if self.chkColBar.isChecked() and (self.chkContour2D.isChecked() or
+        if self.but_colbar.isChecked() and (self.but_contour_2d.isChecked() or
                 str(self.cmbMode3D.currentText()) in {'Contour', 'Surf'}):
                             self.colb = self.mplwidget.fig.colorbar(m_cb,
                                 ax=self.ax3d, shrink=0.8, aspect=20,
