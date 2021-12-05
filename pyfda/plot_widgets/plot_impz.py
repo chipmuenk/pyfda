@@ -493,8 +493,8 @@ class Plot_Impz(QWidget):
                 # -----------------------------------------------------------------
                 self.emit(
                     {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
-                fb.fx_stimuli = self.x_q[frame]
                 # logger.info("FX stimulus sent")
+ 
                 self.error = fb.fx_results is None
                 if self.error:
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))

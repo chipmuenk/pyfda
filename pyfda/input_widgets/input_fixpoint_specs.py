@@ -754,9 +754,6 @@ class Input_Fixpoint_Specs(QWidget):
 
             # Run fixpoint simulation and store the results as integer values:
             fb.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
-            # TODO: This crashes when Delta N is changed from 0 to < max ?!
-            # TODO: fb.fx_stimuli = some_array is a reference, dict_sig provides a copy?!
-            # fb.fx_results = self.fx_filt_ui.fxfilter(fb.fx_stimuli)
 
             if len(fb.fx_results) == 0:
                 logger.error("Fixpoint simulation returned empty results!")
