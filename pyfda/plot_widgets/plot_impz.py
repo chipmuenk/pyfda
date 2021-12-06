@@ -171,7 +171,8 @@ class Plot_Impz(QWidget):
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        # When user has selected a different tab, trigger a redraw of current tab
+        # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
+        # When user has selected a different local tab, trigger a redraw of current tab
         self.tab_mpl_w.currentChanged.connect(self.draw)  # passes # of active tab
 
         # ---------------------------------------------------------------------
@@ -260,12 +261,14 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
                 """
-                'start' : Fixpoint simulation started from widget 'input_fixpoint_specs'
+                'start' : Fixpoint simulation started from widget 'input_fixpoint_specs' 
+                      by pressing the "Sim FX" button
                     - Set fixpoint mode
                     - continue with actions for 'specs_changed'
 
                 'specs_changed': Fixpoint widget specs have been updated,
-                                  set `self.needs_calc_fx = True`. If fixpoint is active:
+                                  set `self.needs_calc_fx = True`.
+                    If fixpoint is active:
                     - reset error flag
                     - force recalculation (`self.needs_calc = True`)
                     - update run button style to "changed"
@@ -293,6 +296,10 @@ class Plot_Impz(QWidget):
                 when the widget is visible via `self.impz()`
                 """
                 logger.info("FX start_fx_response_calculation")
+                self.fxfilter = dict_sig['fxfilter_func']
+                # logger.warning(self.fxfilter)
+                # logger.warning(self.fxfilter(1))
+                # logger.warning(self.fxfilter([1,1,1,1,1,1]))
                 if self.isVisible():
                     self.impz()
                 return
@@ -494,7 +501,7 @@ class Plot_Impz(QWidget):
                 self.emit(
                     {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
                 # logger.info("FX stimulus sent")
- 
+
                 self.error = fb.fx_results is None
                 if self.error:
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
