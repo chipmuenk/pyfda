@@ -89,7 +89,7 @@ class Plot_3D(QWidget):
         self.but_log.setObjectName("but_log")
         self.but_log.setToolTip("Logarithmic scale")
 
-        self.but_plot_in_UC = PushButton("|z| < 1", checked=False)
+        self.but_plot_in_UC = PushButton("|z| < 1 ", checked=False)
         self.but_plot_in_UC.setObjectName("but_plot_in_UC")
         self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
@@ -113,11 +113,11 @@ class Plot_3D(QWidget):
         self.plt_UC.setObjectName("plt_UC")
         self.plt_UC.setToolTip("Plot unit circle")
 
-        self.but_PZ = PushButton("P/Z", checked=True)
+        self.but_PZ = PushButton("P/Z ", checked=True)
         self.but_PZ.setObjectName("but_PZ")
         self.but_PZ.setToolTip("Plot poles and zeros")
 
-        self.but_Hf = PushButton("H(f)", checked=True)
+        self.but_Hf = PushButton("H(f) ", checked=True)
         self.but_Hf.setObjectName("but_Hf")
         self.but_Hf.setToolTip("Plot H(f) along the unit circle")
 
@@ -137,7 +137,7 @@ class Plot_3D(QWidget):
         self._init_cmb_colormap(cmap_init=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.but_colbar = PushButton("Colorbar", checked=False)
+        self.but_colbar = PushButton("Colorbar ", checked=False)
         self.but_colbar.setObjectName("chkColBar")
         self.but_colbar.setToolTip("Show colorbar")
 
@@ -165,7 +165,7 @@ class Plot_3D(QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set line density for various plots.")
 
-        self.but_contour_2d = PushButton("Contour2D", checked=False)
+        self.but_contour_2d = PushButton("Contour2D ", checked=False)
         self.but_contour_2d.setObjectName("chkContour2D")
         self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
 
@@ -418,13 +418,14 @@ class Plot_3D(QWidget):
 
         cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
         if self.but_colormap_r.isChecked():
-            cmap = cmap.reversed() # use reversed colormap
+            cmap = cmap.reversed()  # use reversed colormap
 
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
         stride = 10 - self.diaHatch.value()
         NL = 3 * self.diaHatch.value() + 5
 
-        surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}
+        surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}\
+            or self.but_contour_2d.isChecked()
         self.cmbColormap.setEnabled(surf_enabled)
         self.but_colormap_r.setEnabled(surf_enabled)
         self.but_lighting.setEnabled(surf_enabled)
