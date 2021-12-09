@@ -297,9 +297,6 @@ class Plot_Impz(QWidget):
                 """
                 logger.info("FX start_fx_response_calculation")
                 self.fxfilter = dict_sig['fxfilter_func']
-                # logger.warning(self.fxfilter)
-                # logger.warning(self.fxfilter(1))
-                # logger.warning(self.fxfilter([1,1,1,1,1,1]))
                 if self.isVisible():
                     self.impz()
                 return
@@ -512,10 +509,10 @@ class Plot_Impz(QWidget):
                     self.y[frame] = np.asarray(fb.fx_results)
                     # logger.info("FX results received")
 
-            else:  # floating point
-                # -----------------------------------------------------------------
-                # ---- Get FP response for current frame --------------------------
-                # -----------------------------------------------------------------
+            else:
+                # --------------------------------------------------------------
+                # ---- Get floating point response for current frame -----------
+                # --------------------------------------------------------------
                 if len(self.sos) > 0:  # has second order sections
                     self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
                 else:  # no second order sections

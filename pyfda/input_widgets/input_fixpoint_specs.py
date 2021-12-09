@@ -157,7 +157,7 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in via subwidgets and sig_rx
+        Process signals coming in via `sig_rx` from other widgets.
 
         Trigger fx simulation:
 
@@ -185,13 +185,22 @@ class Input_Fixpoint_Specs(QWidget):
 
         elif 'data_changed' in dict_sig or\
              ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
-            # update fields in the filter topology widget - wordlength may have
-            # been changed. Also set RUN button to "changed" in wdg_dict2ui()
+            # Filter data has changed (but not the filter type) or the coefficient
+            # format / wordlength have been changed in `input_coeffs`. The latter means
+            # the view / display has been changed (wordlength) but not the actual
+            # coefficients in the `input_coeffs` widget. However, the wordlength setting
+            # is copied to the fxqc dict and from there to the fixpoint widget.
+            # - update fields in the fixpoint filter widget - wordlength may have
+            #   been changed.
+            # - Set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
 
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
             if dict_sig['fx_sim'] == 'init':
+                # fixpoint simulation has been started externally, e.g. by
+                # `impz.impz_init()`, return a handle to the fixpoint filter function
+                # via signal-slot connection
                 if not self.fx_wdg_found:
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimFx, "error")
