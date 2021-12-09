@@ -433,7 +433,7 @@ class Plot_Impz(QWidget):
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
 
-            logger.info("Starting transient response calculation")
+            logger.info(f"Starting transient {self.fx_str}response calculation")
             self.t_start = time.process_time()  # store starting time
 
             if self.fx_sim:
@@ -571,13 +571,13 @@ class Plot_Impz(QWidget):
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
-        logger.info('[{0:5.4g} ms]: Transient response calculated.'
-                    .format((self.t_resp - self.t_start)*1000))
+        logger.info('[{0:5.4g} ms]: Transient {1}response calculated.'
+                    .format((self.t_resp - self.t_start)*1000, self.fx_str))
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
-        logger.info('[{0:5.4g} ms]: Transient response plotted.'
-                    .format((time.process_time() - self.t_resp)*1000))
+        logger.info('[{0:5.4g} ms]: Transient {1}response plotted.'
+                    .format((time.process_time() - self.t_resp)*1000, self.fx_str))
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
 
@@ -585,7 +585,6 @@ class Plot_Impz(QWidget):
             self.emit({'fx_sim': 'finish'})
 
 # =============================================================================
-
     def update_fx_ui_settings(self, fx=None):
         """
         Select between fixpoint and floating point simulation and update FX UI
@@ -619,11 +618,14 @@ class Plot_Impz(QWidget):
         self.ui.but_fx_scale.setVisible(self.fx_sim)  # fx scale int
         self.ui.but_fx_range.setVisible(self.fx_sim)  # display fx range limits
 
-        # add / delete fixpoint entry to / from spectrogram combo box:
+        # add / delete fixpoint entry to / from spectrogram combo box and set
+        # `fx_str = "fixpoint"`` or `""``
         if self.fx_sim:
             qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
+            self.fx_str = "fixpoint "
         else:
             qcmb_box_del_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
+            self.fx_str = ""
 
         if self.fx_sim != self.fx_sim_old:
             self.ui.but_run.setIcon(QIcon(":/play.svg"))
