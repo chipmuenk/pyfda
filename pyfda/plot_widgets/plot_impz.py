@@ -287,7 +287,11 @@ class Plot_Impz(QWidget):
                     qstyle_widget(self.ui.but_run, "changed")
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     if self.isVisible():
-                        self.impz_init()
+                        # run button clicked in input_fixpoint_specs
+                        if dict_sig['fx_sim'] == 'start':
+                            self.impz_init(True)  # force running simulation
+                        else:
+                            self.impz_init()
                 return
 
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
