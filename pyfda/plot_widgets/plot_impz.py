@@ -295,7 +295,8 @@ class Plot_Impz(QWidget):
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 """
                 The fixpoint widget has been initialized and starts the fx simulation
-                when the widget is visible via `self.impz()`
+                when the widget is visible via `self.impz()` and the handle to the
+                fixpoint simulation method `self.fxfilter = dict_sig['fxfilter_func']`
                 """
                 self.fxfilter = dict_sig['fxfilter_func']
                 if self.isVisible():
@@ -430,7 +431,7 @@ class Plot_Impz(QWidget):
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
 
-            logger.info(f"Starting transient {self.fx_str}response calculation")
+            logger.info(f"Started transient {self.fx_str}response calculation")
             self.t_start = time.process_time()  # store starting time
 
             if self.fx_sim:
@@ -568,12 +569,14 @@ class Plot_Impz(QWidget):
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
-        logger.info('[{0:5.4g} ms]: Transient {1}response calculated.'
-                    .format((self.t_resp - self.t_start)*1000, self.fx_str))
+
+        t_sim_str = f"[{(self.t_resp - self.t_start) * 1000:5.4g} ms]: "
+        logger.info(t_sim_str + f"Calculated transient {self.fx_str}response")
+
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
-        logger.info('[{0:5.4g} ms]: Transient {1}response plotted.'
+        logger.info('[{0:5.4g} ms]: Plotted transient {1}response'
                     .format((time.process_time() - self.t_resp)*1000, self.fx_str))
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
