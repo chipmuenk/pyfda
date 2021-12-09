@@ -733,7 +733,6 @@ class Input_Fixpoint_Specs(QWidget):
             0 for sucessful fx widget construction, -1 for error
         """
         try:
-            logger.info("Fixpoint simulation started")
             self.update_fxqc_dict()
             self.fx_filt_ui.init_filter()   # setup filter instance
             return 0

@@ -277,8 +277,6 @@ class Plot_Impz(QWidget):
                 """
                 if dict_sig['fx_sim'] == 'start':
                     self.update_fx_ui_settings("Fixpoint")  # set fixpoint mode
-                else:
-                    logger.info("FX specs changed!")
 
                 self.needs_calc_fx = True   # fx sim needs recalculation
                 if self.fx_sim:             # fixpoint mode is set
@@ -299,7 +297,6 @@ class Plot_Impz(QWidget):
                 The fixpoint widget has been initialized and starts the fx simulation
                 when the widget is visible via `self.impz()`
                 """
-                logger.info("FX start_fx_response_calculation")
                 self.fxfilter = dict_sig['fxfilter_func']
                 if self.isVisible():
                     self.impz()
