@@ -403,6 +403,7 @@ class Plot_Impz(QWidget):
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
+        self.error = False
         self.needs_redraw = [True] * 2
 
         self.update_fx_ui_settings()  # check for fixpoint setting and update ui if needed
@@ -443,8 +444,9 @@ class Plot_Impz(QWidget):
                         "fixpoint filter!")
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])  # setup quantizer
                 self.q_i.setQobj({'frmt': 'dec'})  # always use integer decimal format
-                self.emit({'fx_sim': 'init'})  # initialize FX filter
-                return
+                # initialize FX filter and get a handle for `fxfilter()` function
+                self.emit({'fx_sim': 'init'})
+                return  # process_sig_rx() switches directly to impz() in next step
             else:
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
@@ -492,29 +494,33 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             if self.fx_sim:  # fixpoint filter
                 self.x_q[frame] = self.q_i.fixp(self.x[frame].real)  # quantize stimulus
-                # -----------------------------------------------------------------
-                # ---- Get FX response for current frame --------------------------
-                # -----------------------------------------------------------------
-                self.emit(
-                    {'fx_sim': 'calc_frame_fx_response', 'fx_stimulus': self.x_q[frame]})
-                # logger.info("FX stimulus sent")
+                # --------------------------------------------------------------
+                # ---- Get fixpoint response for current frame -----------------
+                # --------------------------------------------------------------
+                try:
+                    self.y[frame] = np.asarray(self.fxfilter(self.x_q[frame]))
 
-                self.error = fb.fx_results is None
+                except ValueError as e:
+                    if self.fxfilter(self.x_q[frame]) is None:
+                        logger.error("Fixpoint simulation returned empty results!")
+                    else:
+                        logger.error("Simulator error {0}".format(e))
+                        fb.fx_results = None
+                    self.error = True
+
                 if self.error:
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     qstyle_widget(self.ui.but_run, "error")
                     self.needs_calc = True
                     break  # exit while loop
-                else:
-                    self.y[frame] = np.asarray(fb.fx_results)
-                    # logger.info("FX results received")
 
             else:
                 # --------------------------------------------------------------
                 # ---- Get floating point response for current frame -----------
                 # --------------------------------------------------------------
                 if len(self.sos) > 0:  # has second order sections
-                    self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame], zi=self.zi)
+                    self.y[frame], self.zi = sig.sosfilt(self.sos, self.x[frame],
+                                                         zi=self.zi)
                 else:  # no second order sections
                     self.y[frame], self.zi = sig.lfilter(
                         self.bb, self.aa, self.x[frame], zi=self.zi)

@@ -209,7 +209,8 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    self.emit({'fx_sim': 'start_fx_response_calculation'})
+                    self.emit({'fx_sim': 'start_fx_response_calculation',
+                               'fxfilter_func': self.fx_filt_ui.fxfilter})
 
             elif dict_sig['fx_sim'] == 'calc_frame_fx_response':
                 self.fx_sim_calc_response(dict_sig)
