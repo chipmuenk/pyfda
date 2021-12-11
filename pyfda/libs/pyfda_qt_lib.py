@@ -13,7 +13,7 @@ from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont, QSize, QFontMetrics)
+    QFont, QSize, QFontMetrics, QIcon)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -565,15 +565,41 @@ class QVLine(QFrame):
 
 
 class PushButton(QPushButton):
-    def __init__(self, txt: str = "", N_x: int = 8,
+    """
+    Create a QPushButton with a width fitting the label with bold font as well
+
+    Parameters
+    ----------
+    txt : str
+        Text for button (optional)
+
+    icon : QIcon
+        Icon for button. Either `txt` or `icon` must be defined.
+
+    N_x : int
+        Width in number of "x"
+
+    checkable : bool
+        Whether button is checkable
+
+    checked : bool
+        Whether initial state is checked
+    """
+    def __init__(self, txt: str = "", icon: QIcon = None, N_x: int = 8,
                  checkable: bool = True, checked: bool = False):
         super(PushButton, self).__init__()
 
         self.setCheckable(checkable)
         self.setChecked(checked)
-        self.w = qtext_width(text=txt, N_x=N_x, font=self.font())
-        self.h = super(PushButton, self).sizeHint().height()
-        self.setText(txt.strip())
+        if icon is None:
+            self.w = qtext_width(text=txt, N_x=N_x, font=self.font())
+            self.h = super(PushButton, self).sizeHint().height()
+            self.setText(txt.strip())
+        else:
+            self.setIcon(icon)
+            # use sizeHint of parent
+            self.w = super(PushButton, self).sizeHint().width()
+            self.h = super(PushButton, self).sizeHint().height()
 
     def sizeHint(self) -> QtCore.QSize:
         return QSize(self.w, self.h)
