@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the UI for the PlotImz class
+Create the UI for the Plot_Tran_Impz class
 """
 import collections
 
@@ -59,11 +59,8 @@ class Plot_Tran_Stim_UI(QWidget):
                 self.recalc_freqs()
 
 # ------------------------------------------------------------------------------
-    def __init__(self, parent=None):
-        """
-        Pass instance `parent` of parent class (FilterCoeffs)
-        """
-        super(Plot_Tran_Stim_UI, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         """
         Intitialize the widget, consisting of:

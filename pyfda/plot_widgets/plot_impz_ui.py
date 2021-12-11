@@ -71,11 +71,8 @@ class PlotImpz_UI(QWidget):
                     self.emit(dict_sig)
 
 # ------------------------------------------------------------------------------
-    def __init__(self, parent=None):
-        """
-        Pass instance `parent` of parent class (FilterCoeffs)
-        """
-        super(PlotImpz_UI, self).__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         """
         Intitialize the widget, consisting of:
