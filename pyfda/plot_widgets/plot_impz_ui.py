@@ -133,22 +133,22 @@ class PlotImpz_UI(QWidget):
         # data / icon / tooltipp (none) for plotting styles
         self.plot_styles_list = [
             ("Plot style"),
-            ("none", QIcon(":/plot_style-none"), ""),
-            ("dots*", QIcon(":/plot_style-mkr"), ""),
-            ("line", QIcon(":/plot_style-line"), ""),
-            ("line*", QIcon(":/plot_style-line-mkr"), ""),
-            ("stem", QIcon(":/plot_style-stem"), ""),
-            ("stem*", QIcon(":/plot_style-stem-mkr"), ""),
-            ("steps", QIcon(":/plot_style-steps"), ""),
-            ("steps*", QIcon(":/plot_style-steps-mkr"), "")
+            ("none", QIcon(":/plot_style-none"), "off"),
+            ("dots*", QIcon(":/plot_style-mkr"), "markers only"),
+            ("line", QIcon(":/plot_style-line"), "line"),
+            ("line*", QIcon(":/plot_style-line-mkr"), "line + markers"),
+            ("stem", QIcon(":/plot_style-stem"), "stems"),
+            ("stem*", QIcon(":/plot_style-stem-mkr"), "stems + markers"),
+            ("steps", QIcon(":/plot_style-steps"), "steps"),
+            ("steps*", QIcon(":/plot_style-steps-mkr"), "steps + markers")
             ]
 
         self.cmb_time_spgr_items = [
             "<span>Show Spectrogram for selected signal.</span>",
             ("none", "None", ""),
-            ("xn", "x[n]", ""),
-            ("xqn", "x_q[n]", ""),
-            ("yn", "y[n]", "")
+            ("xn", "x[n]", "input"),
+            ("xqn", "x_q[n]", "quantized input"),
+            ("yn", "y[n]", "output")
             ]
 
         self.cmb_mode_spgr_time_items = [
@@ -183,7 +183,7 @@ class PlotImpz_UI(QWidget):
         self.but_auto_run.setObjectName("but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
-        #self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
+        # self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
         self.but_auto_run.setCheckable(True)
         self.but_auto_run.setChecked(True)
 
