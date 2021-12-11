@@ -14,9 +14,9 @@ from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
 from pyfda.libs.pyfda_io_lib import CSV_option_box
-from pyfda.libs.pyfda_lib import to_html, pprint_log
+from pyfda.libs.pyfda_lib import to_html
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 
@@ -40,6 +40,18 @@ class Input_PZ_UI(QWidget):
         super(Input_PZ_UI, self).__init__(parent)
 #        self.parent = parent # instance of the parent (not the base) class
         self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
+
+        # Items for PZ-format combobox (data, display text, tool tip):
+        self.cmb_pz_frmt_list = [
+            """<span>Set display format for poles and zeros to
+            either cartesian (x + jy) or polar (r * &ang; &Omega;)."
+            Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>""",
+            #
+            ('cartesian', 'Cartesian'), ('polar_rad', 'Polar (rad)'),
+            ('polar_pi', 'Polar (pi)'), ('polar_deg', 'Polar (°)')]
+        # π: u'3C0, °: u'B0, ∠: u'2220
+        self.cmb_pz_frmt_init = 'polar_deg'  # initial setting
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -76,30 +88,16 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-
-        self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        self.butEnable = PushButton(self, icon=QIcon(':/circle-x.svg'), checked=True)
         q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
-        self.butEnable.setIconSize(q_icon_size)
-        self.butEnable.setCheckable(True)
-        self.butEnable.setChecked(True)
+        # self.butEnable.setIconSize(q_icon_size)  # and set the size
         self.butEnable.setToolTip(
             "<span>Show / hide poles and zeros in an editable table."
             " For high order systems, the table display might be slow.</span>")
 
         self.cmbPZFrmt = QComboBox(self)
-        # (display text, data):
-        pz_formats = [('Cartesian', 'cartesian'), ('Polar (rad)', 'polar_rad'),
-                      ('Polar (pi)', 'polar_pi'), ('Polar (°)', 'polar_deg')]
-        # π: u'3C0, °: u'B0, ∠: u'2220
-        for pz in pz_formats:
-            self.cmbPZFrmt.addItem(*pz)
-        self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        # self.cmbPZFrmt.setEnabled(False)
-        self.cmbPZFrmt.setToolTip(
-            "<span>Set display format for poles and zeros to"
-            " either cartesian (x + jy) or polar (r * &ang; &Omega;)."
-            " Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>")
+        qcmb_box_populate(
+            self.cmbPZFrmt, self.cmb_pz_frmt_list, self.cmb_pz_frmt_init)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
@@ -107,16 +105,16 @@ class Input_PZ_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
-        self.cmbCausal = QComboBox(self)
-        causal_types = ['Causal', 'Acausal', 'Anticausal']
-        for cs in causal_types:
-            self.cmbCausal.addItem(cs)
+        # self.cmbCausal = QComboBox(self)
+        # causal_types = ['Causal', 'Acausal', 'Anticausal']
+        # for cs in causal_types:
+        #     self.cmbCausal.addItem(cs)
 
-        qset_cmb_box(self.cmbCausal, 'Causal')
-        self.cmbCausal.setToolTip(
-            '<span>Set the system type. Not implemented yet.</span>')
-        self.cmbCausal.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbCausal.setEnabled(False)
+        # qset_cmb_box(self.cmbCausal, 'Causal')
+        # self.cmbCausal.setToolTip(
+        #     '<span>Set the system type. Not implemented yet.</span>')
+        # self.cmbCausal.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        # self.cmbCausal.setEnabled(False)
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -124,7 +122,7 @@ class Input_PZ_UI(QWidget):
         layHDisplay.addWidget(self.cmbPZFrmt)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.cmbCausal)
+        # layHDisplay.addWidget(self.cmbCausal)
         layHDisplay.addStretch()
 
         # ---------------------------------------------
