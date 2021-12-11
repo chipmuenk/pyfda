@@ -14,7 +14,7 @@ from pyfda.libs.compat import (
     pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
-from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine
+from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine, PushButton
 from pyfda.libs.pyfda_io_lib import CSV_option_box
 from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_dirs as dirs
@@ -78,12 +78,8 @@ class Input_Coeffs_UI(QWidget):
         #
         # UI Elements for controlling the display
         # ---------------------------------------------
-        self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
         q_icon_size = self.butEnable.iconSize()  # <- uncomment this for manual sizing
-        self.butEnable.setIconSize(q_icon_size)
-        self.butEnable.setCheckable(True)
-        self.butEnable.setChecked(True)
         self.butEnable.setToolTip(
             "<span>Show / hide filter coefficients in an editable table."
             " For high order systems, table display might be slow.</span>")
@@ -201,14 +197,12 @@ class Input_Coeffs_UI(QWidget):
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
 
-        self.but_csv_options = QPushButton(self)
-        self.but_csv_options.setIcon(QIcon(':/settings.svg'))
+        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+                                          checked=False)
         self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
-        self.but_csv_options.setCheckable(True)
-        self.but_csv_options.setChecked(False)
 
         self._set_load_save_icons()  # initialize icon / button settings
 

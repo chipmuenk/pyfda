@@ -88,7 +88,7 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-        self.butEnable = PushButton(self, icon=QIcon(':/circle-x.svg'), checked=True)
+        self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
         q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
         # self.butEnable.setIconSize(q_icon_size)  # and set the size
         self.butEnable.setToolTip(

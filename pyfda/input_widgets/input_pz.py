@@ -443,7 +443,7 @@ class Input_PZ(QWidget):
 
         if self.ui.butEnable.isChecked():
 
-            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
 
             self._restore_gain()
 
@@ -462,7 +462,7 @@ class Input_PZ(QWidget):
             self.tblPZ.clearSelection()
 
         else:  # disable widgets
-            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
+            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
 
 # ------------------------------------------------------------------------------
     def load_dict(self):

@@ -523,7 +523,7 @@ class Input_Coeffs(QWidget):
         self.ui.frmQSettings.setVisible(not is_float)  # hide all q-settings for float
 
         if self.ui.butEnable.isChecked():
-            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.ui.frmButtonsCoeffs.setVisible(True)
             self.tblCoeff.setVisible(True)
 
@@ -566,7 +566,7 @@ class Input_Coeffs(QWidget):
 
         else:
             self.ui.frmButtonsCoeffs.setVisible(False)
-            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
+            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(False)
 
     # --------------------------------------------------------------------------
@@ -963,7 +963,8 @@ class Input_Coeffs(QWidget):
                 self.ba[1] = self.myQ.fixp(self.ba, scaling='multdiv')[0]
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling='multdiv')
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]],
+                                                    scaling='multdiv')
 
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
