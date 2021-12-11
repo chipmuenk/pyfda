@@ -30,6 +30,7 @@ from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, scatter
 
 from pyfda.plot_widgets.tran.plot_tran_stim import Plot_Tran_Stim
+from pyfda.plot_widgets.tran.tran_io import Tran_IO
 from pyfda.plot_widgets.plot_impz_ui import PlotImpz_UI
 
 import logging
@@ -54,7 +55,7 @@ class Plot_Impz(QWidget):
         super().__init__()
 
         self.ACTIVE_3D = False
-        self.ui = PlotImpz_UI(self)  # create the UI part with buttons etc.
+        self.ui = PlotImpz_UI()  # create the UI part with buttons etc.
 
         # initial settings
         # ==================
@@ -132,7 +133,7 @@ class Plot_Impz(QWidget):
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
         self.stim_wdg = Plot_Tran_Stim()
-        self.wdg_ctrl_audio = QWidget(self)  # only placeholder so far
+        self.file_io_wdg = Tran_IO()
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
@@ -145,8 +146,8 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
-        self.tab_stim_w.addTab(self.wdg_ctrl_audio, QIcon(":/speaker_90.svg"), "")
-        self.tab_stim_w.setTabToolTip(1, "Audio")
+        self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/speaker_90.svg"), "")
+        self.tab_stim_w.setTabToolTip(1, "I/O")
 
         self.resize_stim_tab_widget()
         # ----------------------------------------------------------------------

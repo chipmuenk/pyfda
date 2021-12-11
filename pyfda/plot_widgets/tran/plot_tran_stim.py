@@ -38,7 +38,7 @@ class Plot_Tran_Stim(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.ui = Plot_Tran_Stim_UI(self)  # create the UI part with buttons etc.
+        self.ui = Plot_Tran_Stim_UI()  # create the UI part with buttons etc.
 
         # initial settings
         self.needs_calc = True   # flag whether plots need to be recalculated
