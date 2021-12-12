@@ -39,10 +39,11 @@ datas = []
 datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
 
 # add images and configuration files
-datas += [ ('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
-            ('pyfda/libs/*.conf', 'pyfda/libs'),
-            ('./*.md', '.'),
-            ('pyfda/*.md', 'pyfda')]
+datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
+    ('pyfda/fixpoint_widgets/*/*.png', 'pyfda/fixpoint_widgets/fir_df'),
+    ('pyfda/libs/*.conf', 'pyfda/libs'),
+    ('./*.md', '.'),
+    ('pyfda/*.md', 'pyfda')]
 
 hiddenimports += ['html.parser'] # needed for markdown 3.3 compatibility
 hiddenimports += ['scipy.special.cython_special']
@@ -63,13 +64,14 @@ hiddenimports += [
 	'pyfda.filter_widgets.manual'] 
 ### Fixpoint Widgets
 hiddenimports += [
-    'pyfda.fixpoint_widgets.fir_df']# ,'pyfda.fixpoint_widgets.fx_delay']
+    'pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui',
+    'pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui']
 
 excludes  = collect_submodules('tornado') 
 excludes += collect_submodules('colorama')
 excludes += collect_submodules('tkinter') 
 excludes += collect_submodules('jedi')
-excludes += collect_submodules('PIL')
+# excludes += collect_submodules('PIL')
 excludes += collect_submodules('nbconvert')
 excludes += collect_submodules('nbformat')
 #excludes += collect_submodules('scipy.optimize') # needed
