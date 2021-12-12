@@ -11,9 +11,6 @@ Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
 
-import logging
-logger = logging.getLogger(__name__)
-
 import os, re, io
 import csv
 import datetime
@@ -36,6 +33,9 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFD,
                      QFileDialog, QHBoxLayout, QVBoxLayout, QGridLayout, pyqtSignal)
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
@@ -76,11 +76,13 @@ class CSV_option_box(QDialog):
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
 
         lblTerminator = QLabel("Line Terminator:", self)
-        terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
+        terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
+                      ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
         self.cmbLineTerminator = QComboBox(self)
-        self.cmbLineTerminator.setToolTip("<span>Terminator at the end of a data row."
-                " (depending on the operating system). 'None' can be used for a single "
-                "row of data with added line breaks.")
+        self.cmbLineTerminator.setToolTip(
+            "<span>Terminator at the end of a data row."
+            " (depending on the operating system). 'None' can be used for a single "
+            "row of data with added line breaks.</span>")
         for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
 
@@ -88,7 +90,8 @@ class CSV_option_box(QDialog):
         butClose.setText("Close")
 
         lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Horz.', 'auto'), ('Vertical', 'vert'), ('Horizontal', 'horiz')]
+        orientation = [('Auto/Horz.', 'auto'),
+                       ('Vertical', 'vert'), ('Horizontal', 'horiz')]
         self.cmbOrientation = QComboBox(self)
         self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
         for o in orientation:
@@ -211,7 +214,8 @@ def prune_file_ext(file_type):
 
     return re.sub('\([^\)]+\)', '', file_type)
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def extract_file_ext(file_type):
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
@@ -221,7 +225,8 @@ def extract_file_ext(file_type):
     ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     """
     Transform table to CSV formatted text and copy to clipboard or file
@@ -266,7 +271,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
             - \*nix   : Line feed
 
     :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
-            orientation the table is written. 'vert' means a line break after 
+            orientation the table is written. 'vert' means a line break after
             each entry or pair of entries which usually is not what you want.
             'auto' doesn't make much sense when writing, 'horiz' is used in this case.
 
@@ -309,27 +314,27 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 
     sel = qget_selected(table, reverse=False)['sel']
 
-    #============================================================================
+    # ==========================================================================
     # Nothing selected, but cell format is non-float:
     # -> select whole table, copy all cells further down below:
-    #============================================================================
+    # ==========================================================================
     if not np.any(sel) and frmt != 'float':
         sel = qget_selected(table, reverse=False, select_all = True)['sel']
 
-    #============================================================================
+    # ==========================================================================
     # Nothing selected, copy complete table from the model (data) in float format:
-    #============================================================================
+    # ==========================================================================
     if not np.any(sel):
-        if orientation_horiz: # rows are horizontal
+        if orientation_horiz:  # rows are horizontal
             for c in range(num_cols):
-                if use_header: # add the table header
+                if use_header:  # add the table header
                     text += table.horizontalHeaderItem(c).text() + delim
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
-            text = text.rstrip(cr) # delete last CR
+            text = text.rstrip(cr)  # delete last CR
         else:  # rows are vertical
-            if use_header: # add the table header
+            if use_header:  # add the table header
                 for c in range(num_cols):
                     text += table.horizontalHeaderItem(c).text() + delim
                 text = text.rstrip(delim) + cr
@@ -337,32 +342,32 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
                 for c in range(num_cols):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
-            text = text.rstrip(cr) # delete CR after last row
+            text = text.rstrip(cr)  # delete CR after last row
 
-    #=======================================================================
+    # =======================================================================
     # Copy only selected cells in displayed format:
-    #=======================================================================
+    # =======================================================================
     else:
-        if orientation_horiz: # horizontal orientation, one or two rows
-            if use_header: # add the table header
+        if orientation_horiz:  # horizontal orientation, one or two rows
+            if use_header:  # add the table header
                 text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
                 for r in sel[0]:
                     item = table.item(r,0)
-                    if item  and item.text() != "":
-                            text += table.itemDelegate().text(item).lstrip(" ") + delim
-                text = text.rstrip(delim) # remove last tab delimiter again
+                    if item and item.text() != "":
+                        text += table.itemDelegate().text(item).lstrip(" ") + delim
+                text = text.rstrip(delim)  # remove last tab delimiter again
 
-            if sel[1]: # returns False for []
-                text += cr # add a CRLF when there are two columns
-                if use_header: # add the table header
+            if sel[1]:  # returns False for []
+                text += cr  # add a CRLF when there are two columns
+                if use_header:  # add the table header
                     text += table.horizontalHeaderItem(1).text() + delim
                 for r in sel[1]:
-                    item = table.item(r,1)
+                    item = table.item(r, 1)
                     if item and item.text() != "":
-                            text += table.itemDelegate().text(item) + delim
-                text = text.rstrip(delim) # remove last tab delimiter again
-        else: # vertical orientation, one or two columns
+                        text += table.itemDelegate().text(item) + delim
+                text = text.rstrip(delim)  # remove last tab delimiter again
+        else:  # vertical orientation, one or two columns
             sel_c = []
             if sel[0]:
                 sel_c.append(0)
@@ -375,10 +380,10 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
                     # cr is added further below
                 text.rstrip(delim)
 
-            for r in range(num_rows): # iterate over whole table
+            for r in range(num_rows):  # iterate over whole table
                 for c in sel_c:
-                    if r in sel[c]: # selected item?
-                        item = table.item(r,c)
+                    if r in sel[c]:  # selected item?
+                        item = table.item(r, c)
                         # print(c,r)
                         if item and item.text() != "":
                             text += table.itemDelegate().text(item).lstrip(" ") + delim
@@ -390,7 +395,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     else:
         export_data(parent, text, fkey, title=title)
 
-#==============================================================================
+# ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
 #     ##if you want to write in column:
 #
@@ -405,11 +410,11 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 #             row.append(str(x))
 #     writer.writerow(row)
 #
-#==============================================================================
+# ==============================================================================
 
 
-#------------------------------------------------------------------------------
-def qtext2table(parent, fkey, title = "Import"):
+# ------------------------------------------------------------------------------
+def qtext2table(parent, fkey, title="Import"):
     """
     Copy data from clipboard or file to table
 
@@ -457,24 +462,24 @@ def qtext2table(parent, fkey, title = "Import"):
         table data
     """
 
-    if params['CSV']['clipboard']: # data from clipboard
+    if params['CSV']['clipboard']:  # data from clipboard
         text = fb.clipboard.text()
         logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
-        if isinstance(data_arr, str): # returned an error message instead of numpy data
+        if isinstance(data_arr, str):  # returned an error message instead of numpy data
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
-    else: # data from file
+    else:  # data from file
         data_arr = import_data(parent, fkey, title=title)
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0} | {1}\n{2}".format(np.shape(data_arr), np.ndim(data_arr), data_arr))
-        if type(data_arr) == int and data_arr == -1: # file operation cancelled
+        if type(data_arr) == int and data_arr == -1:  # file operation cancelled
             data_arr = None
     return data_arr
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def csv2array(f):
     """
     Convert comma-separated values from file or text
@@ -499,10 +504,10 @@ def csv2array(f):
     io_error: str
         String with the error message when import was unsuccessful
     """
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # Get CSV parameter settings
-    #------------------------------------------------------------------------------
-    io_error = "" # initialize string for I/O error messages
+    # ------------------------------------------------------------------------------
+    io_error = ""  # initialize string for I/O error messages
     CSV_dict = params['CSV']
     try:
         header = CSV_dict['header'].lower()
@@ -529,12 +534,13 @@ def csv2array(f):
         return io_error
 
     try:
-        #------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------
         # Analyze CSV object
-        #------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------
         if header == 'auto' or tab == 'auto' or cr == 'auto':
-        # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' '])
+            # test the first line for delimiters (of the given selection)
+            dialect = csv.Sniffer().sniff(f.readline(),
+                                          delimiters=['\t', ';', ',', '|', ' '])
             f.seek(0)                               # and reset the file pointer
         else:
             dialect = csv.get_dialect('excel-tab') # fall back, alternatives: 'excel', 'unix'
@@ -546,7 +552,7 @@ def csv2array(f):
     except csv.Error as e:
         logger.warning("Error during CSV analysis:\n{0},\n"
                        "continuing with format 'excel-tab'".format(e))
-        dialect = csv.get_dialect('excel-tab') # fall back
+        dialect = csv.get_dialect('excel-tab')  # fall back
         use_header = False
 
     if header == 'on':
@@ -567,13 +573,13 @@ def csv2array(f):
 
     logger.info("Parsing CSV data with \n"
                 "\tHeader = {0} | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3} '"
-                #"\n\tType of passed text: '{4}'"
+                # "\n\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar))#,f.__class__.__name__))
-    #------------------------------------------------
+                        quotechar))  # ,f.__class__.__name__))
+    # ------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
-    #------------------------------------------------
+    # ------------------------------------------------
 # =============================================================================
 #     with open('/your/path/file') as f:
 #         for line in f:
@@ -604,7 +610,7 @@ def csv2array(f):
 
     try:
         if data_list is None:
-            return "Imported data is None."           
+            return "Imported data is None."
         data_arr = np.array(data_list)
         if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
             return "Imported data is a scalar: '0'".format(data_arr)
@@ -636,13 +642,15 @@ def csv2array(f):
 #             return data_arr.T
 #         else:
 #             return data_arr
-# 
+#
 #     except (TypeError, ValueError) as e:
 #         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
 #         return io_error
-# 
+#
 # =============================================================================
-#------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
 def csv2array_new(f):
     """
     Convert comma-separated values from file or text
@@ -667,10 +675,10 @@ def csv2array_new(f):
     io_error: str
         String with the error message when import was unsuccessful
     """
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # Get CSV parameter settings
-    #------------------------------------------------------------------------------
-    io_error = "" # initialize string for I/O error messages
+    # ------------------------------------------------------------------------------
+    io_error = ""  # initialize string for I/O error messages
     CSV_dict = params['CSV']
     logger.warning("Fileobject format: {0}".format(type(f).__name__))
     try:
@@ -698,15 +706,16 @@ def csv2array_new(f):
         return io_error
 
     try:
-        #------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------
         # Analyze CSV object
-        #------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------
         if header == 'auto' or tab == 'auto' or cr == 'auto':
-        # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' '])
+            # test the first line for delimiters (of the given selection)
+            dialect = csv.Sniffer().sniff(f.readline(),
+                                          delimiters=['\t', ';', ',', '|', ' '])
             f.seek(0)                               # and reset the file pointer
         else:
-            dialect = csv.get_dialect('excel-tab') # fall back, alternatives: 'excel', 'unix'
+            dialect = csv.get_dialect('excel-tab')  # fall back, alternatives: 'excel', 'unix'
 
         if header == "auto":
             use_header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
@@ -739,27 +748,28 @@ def csv2array_new(f):
                 "\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
                         quotechar,f.__class__.__name__))
-    #------------------------------------------------
+    # ------------------------------------------------
     # finally, create iterator from csv data
-    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator)
-    #------------------------------------------------
+    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
+                           lineterminator=lineterminator)
+    # ------------------------------------------------
 # =============================================================================
-    """ 
-    newline controls how universal newlines works (it only applies to text mode). 
+    """
+    newline controls how universal newlines works (it only applies to text mode).
     It can be None, '', '\n', '\r', and '\r\n'. It works as follows:
 
-    - On input, if newline is None, universal newlines mode is enabled. Lines in 
+    - On input, if newline is None, universal newlines mode is enabled. Lines in
       the input can end in '\n', '\r', or '\r\n', and these are translated into
       '\n' before being returned to the caller. If it is '', universal newline
       mode is enabled, but line endings are returned to the caller untranslated.
-      If it has any of the other legal values, input lines are only terminated 
+      If it has any of the other legal values, input lines are only terminated
       by the given string, and the line ending is returned to the caller untranslated.
 
-    - On output, if newline is None, any '\n' characters written are translated 
-      to the system default line separator, os.linesep. If newline is '', 
-      no translation takes place. If newline is any of the other legal values, 
+    - On output, if newline is None, any '\n' characters written are translated
+      to the system default line separator, os.linesep. If newline is '',
+      no translation takes place. If newline is any of the other legal values,
       any '\n' characters written are translated to the given string.
-      
+
       Example: convert from Windows-style line endings to Linux:
       fileContents = open(filename,"r").read()
       f = open(filename,"w", newline="\n")
@@ -769,21 +779,18 @@ def csv2array_new(f):
      """
 
     data_list = []
-    
+
     def process(line):
         data_list.append(line.split(lineterminator)) # split into lines (if not split yet)
 
-
-    #with open(fo) as f:
+    # with open(fo) as f:
     for line in f:
         process(line)
-        
+
     for e in data_list:
         pass
-        
 
     # Where you define your process function any way you want. For example:
-
 
     # This will work nicely for any file size and you go through your file in just 1 pass.
     # This is typically how generic parsers will work.
@@ -793,7 +800,7 @@ def csv2array_new(f):
 # =============================================================================
 #     if use_header:
 #         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
-# 
+#
 #     try:
 #         for row in data_iter:
 #             logger.debug("{0}".format(row))
@@ -805,7 +812,7 @@ def csv2array_new(f):
 
     try:
         if data_list is None:
-            return "Imported data is None."           
+            return "Imported data is None."
         data_arr = np.array(data_list)
         if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
             return "Imported data is a scalar: '0'".format(data_arr)
@@ -858,25 +865,25 @@ def import_data(parent, fkey=None, title="Import",
     ndarray
         Data from the file
     """
-    dlg = QFileDialog(parent) # create instance for QFileDialog
+    dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen) # set dialog to "file open" mode
+    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
     dlg.setNameFilter(file_filters)
-    dlg.setDefaultSuffix('csv') # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt) # default filter selected in file dialog
+    dlg.setDefaultSuffix('csv')  # default suffix when none is given
+    dlg.selectNameFilter(dirs.save_filt)  # default filter selected in file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0] # pick only first selected file
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[1]
         sel_filt = '*' + file_type
-        #sel_filt = dlg.selectedNameFilter()
+        # sel_filt = dlg.selectedNameFilter()
     else:
         return -1  # operation cancelled
 
     # strip extension from returned file name (if any) + append file type:
-    #file_name = os.path.splitext(file_name)[0] + file_type
-    
+    # file_name = os.path.splitext(file_name)[0] + file_type
+
     logger.info('Try to import file \n\t"{0}"'.format(file_name))
 
     file_type_err = False
@@ -885,8 +892,10 @@ def import_data(parent, fkey=None, title="Import",
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
-                if isinstance(data_arr, str): # returned an error message instead of numpy data
-                    logger.error("Error loading file '{0}':\n{1}".format(file_name, data_arr))
+                if isinstance(data_arr, str):
+                    # returned an error message instead of numpy data:
+                    logger.error(
+                        "Error loading file '{0}':\n{1}".format(file_name, data_arr))
                     return None
         else:
             with open(file_name, 'rb') as f:
@@ -899,25 +908,28 @@ def import_data(parent, fkey=None, title="Import",
                     fdict = np.load(f)
                     if fkey not in fdict:
                         file_type_err = True
-                        raise IOError("Key '{0}' not in file '{1}'.\nKeys found: {2}"\
-                                     .format(fkey, file_name, fdict.files))
+                        raise IOError(
+                            "Key '{0}' not in file '{1}'.\nKeys found: {2}"
+                            .format(fkey, file_name, fdict.files))
                     else:
-                        data_arr = fdict[fkey] # pick the array `fkey` from the dict
+                        data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
                     file_type_err = True
 
         if not file_type_err:
-            logger.info("Success! Parsed data format:\n{0}".format(pprint_log(data_arr,N=3)))
+            logger.info(
+                "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
             dirs.save_dir = os.path.dirname(file_name)
             dirs.save_filt = sel_filt
-            return data_arr # returns numpy array
+            return data_arr  # returns numpy array
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
         return None
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def export_data(parent, data, fkey, title="Export"):
     """
     Export coefficients or pole/zero data in various formats
@@ -1170,7 +1182,7 @@ def export_coe_xilinx(f):
     if qc.frmt == 'hex': # select hex format
         coe_radix = 16
     if qc.frmt == 'bin': # select binary format
-        coe_radix = 2        
+        coe_radix = 2
     else:
         logger.warning('Coefficients in "{0}" format are not supported in COE files, '
                        'using decimal format.')
@@ -1218,7 +1230,7 @@ def export_coe_microsemi(f):
         coeff_str += str(b) + "\n"
 
     f.write(coeff_str)
-    
+
     return None
 
 #------------------------------------------------------------------------------
@@ -1228,7 +1240,7 @@ def export_coe_vhdl_package(f):
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB']) # instantiate fixpoint object
-    if not qc.frmt == 'float' and qc.WF != 0: 
+    if not qc.frmt == 'float' and qc.WF != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
         qc.setQobj({'W':qc.W, 'scale':1 << qc.W-1})
         logger.warning("Fractional formats are not supported, using integer format.")
@@ -1243,14 +1255,14 @@ def export_coe_vhdl_package(f):
         post = "#"
     elif qc.frmt in {'dec', 'float'}:
         pre = ""
-        post = ""    
+        post = ""
     else:
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
         pre = ""
-        post = ""    
+        post = ""
         logger.warning('Coefficients in "{0}" format are currently not supported, '
                        'using decimal format.'.format(qc.frmt))
-        
+
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
@@ -1265,7 +1277,7 @@ def export_coe_vhdl_package(f):
     if qc.frmt == 'float':
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
-        exp_str += "type coeff_type is array(0 to n_taps) of integer "        
+        exp_str += "type coeff_type is array(0 to n_taps) of integer "
         exp_str += "range {0} to {1};\n\n".format(-1 << WO-1, (1 << WO-1) - 1)
     exp_str += "constant coeff : coeff_type := "
 
@@ -1277,7 +1289,7 @@ def export_coe_vhdl_package(f):
     exp_str += "end coeff_package;"
 
     f.write(exp_str)
-    
+
     return None
 
 #------------------------------------------------------------------------------
@@ -1337,7 +1349,7 @@ def load_filter(self):
                     # fix_imports will try to map old py2 names to new py3
                     # names when unpickling.
                     a = np.load(f, fix_imports=True, encoding='bytes', allow_pickle = True) # array containing dict, dtype 'object'
-                    
+
                     logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
                     for key in sorted(a):
                         logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
@@ -1372,7 +1384,7 @@ def load_filter(self):
         except Exception as e:
             logger.error("Unexpected error:\n{0}".format(e))
             fb.fil[0] = fb.fil[1] # restore backup
-            
+
 #------------------------------------------------------------------------------
 
 def save_filter(self):
