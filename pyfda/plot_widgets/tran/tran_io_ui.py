@@ -40,8 +40,8 @@ class Tran_IO_UI(QWidget):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
-        - 
-        - 
+        -
+        -
         """
 
         logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
@@ -67,18 +67,20 @@ class Tran_IO_UI(QWidget):
         # Controls
         # =====================================================================
 
-        self.butLoad = PushButton(self, icon=QIcon(':/download.svg'),
+        self.butLoad = PushButton(self, icon=QIcon(':/file.svg'),
                                   checkable=False)
         # self.butLoad.setIconSize(q_icon_size)
         self.butLoad.setToolTip("Load data from file.")
+        self.butLoad.setEnabled(False)
 
-        # self.butLoad.clicked.connect(xxx)
+        self.lbl_info = QLabel(to_html("  coming soon ...", frmt="b"))
 
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
         layH_io_par = QHBoxLayout()
         layH_io_par.addWidget(self.butLoad)
+        layH_io_par.addWidget(self.lbl_info)
 
         layV_io = QVBoxLayout()
         layV_io.addLayout(layH_io_par)
