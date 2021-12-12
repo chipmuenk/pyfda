@@ -10,13 +10,12 @@
 Widget for plotting impulse and general transient responses
 """
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
-import numpy as np
-from numpy import ndarray, pi
-import scipy.signal as sig
-from scipy.special import sinc, diric
+#import numpy as np
+#from numpy import ndarray, pi
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_sig_lib import angle_zero
+import pyfda.libs.pyfda_io_lib as io
+
 from pyfda.libs.pyfda_lib import (
     safe_eval, pprint_log, np_type, calc_ssb_spectrum,
     rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
@@ -56,6 +55,7 @@ class Tran_IO(QWidget):
         logger.warning("SIG_RX - vis: {0}\n{1}"
                        .format(self.isVisible(), pprint_log(dict_sig)))
 
+# ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
         Instantiate the UI of the widget.
@@ -65,7 +65,22 @@ class Tran_IO(QWidget):
         layVMain.addWidget(self.ui.wdg_top)
         layVMain.setContentsMargins(*params['mpl_margins'])
 
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
         self.ui.sig_tx.connect(self.sig_tx)  # relay UI events further up
         self.sig_rx.connect(self.ui.sig_rx)  # ... and the other way round
 
+        # ---------------------------------------------------------------------
+        # UI SIGNALS & SLOTs
+        # ---------------------------------------------------------------------
+        self.ui.butLoad.clicked.connect(self.import_data)
+
         self.setLayout(layVMain)
+
+# ------------------------------------------------------------------------------
+    def import_data(self):
+        self.x = io.import_data(
+            self, title="Import Data",
+            file_filters="Comma / Tab Separated Values (*.csv *.txt);;")
+
