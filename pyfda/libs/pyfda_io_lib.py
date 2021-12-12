@@ -829,30 +829,35 @@ def csv2array_new(f):
         return io_error
 
 
-#------------------------------------------------------------------------------
-def import_data(parent, fkey, title="Import"):
+# ------------------------------------------------------------------------------
+def import_data(parent, fkey=None, title="Import",
+                file_filters=(
+                    "Comma / Tab Separated Values (*.csv *.txt);;"
+                    "Matlab-Workspace (*.mat);;"
+                    "Binary Numpy Array (*.npy);;"
+                    "Zipped Binary Numpy Array(*.npz)")):
     """
     Import data from a file and convert it to a numpy array.
 
     Parameters
     ----------
-    parent: handle to calling instance
+    parent : handle to calling instance
 
-    fkey: str
+    fkey : str
         Key for accessing data in *.npz or Matlab workspace (*.mat) file with
         multiple entries.
 
-    title: str
+    title : str
         title string for the file dialog box (e.g. "filter coefficients ")
+
+    file_filter : tuple of str
+        list supported file types
 
     Returns
     -------
     ndarray
         Data from the file
     """
-    file_filters = ("Comma / Tab Separated Values (*.csv *.txt);;"
-                    "Matlab-Workspace (*.mat);;"
-    "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array(*.npz)")
     dlg = QFileDialog(parent) # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
