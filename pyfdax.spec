@@ -110,6 +110,7 @@ a.binaries = a.binaries - TOC([
  #('libstdc++.so.6', None, None),
  ('libzmq.so.5', None, None),
  ('libsqlite3.so.0', None, None)
+ # ('opengl32sw.dll', None, None) # need to test
     ])
  # ('_ssl', None, None), # needed for?
  # libicudata.so.58' # central Qt library 
