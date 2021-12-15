@@ -88,7 +88,7 @@ class Plot_PZ(QWidget):
 
         self.lblRad_Hf = QLabel("Radius", self)
 
-        self.but_fir_poles = PushButton("FIR Poles", checked=True)
+        self.but_fir_poles = PushButton(" FIR Poles ", checked=True)
         self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
         layHControls = QHBoxLayout()
