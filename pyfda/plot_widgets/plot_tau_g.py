@@ -15,7 +15,7 @@ from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 import numpy as np
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
-from pyfda.libs.pyfda_sig_lib import group_delay, group_delayz
+from pyfda.libs.pyfda_sig_lib import group_delay
 from pyfda.libs.compat import (QCheckBox, QWidget, QFrame, QComboBox,
                                QHBoxLayout, pyqtSignal)
 import logging
@@ -141,7 +141,8 @@ class Plot_tau_g(QWidget):
         aa = fb.fil[0]['ba'][1]
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
+        # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'],
+        #                                           whole = True)
 
         if fb.fil[0]['creator'][0] == 'sos':  # one of 'sos', 'zpk', 'ba'
             self.W, self.tau_g = group_delay(fb.fil[0]['sos'], nfft=params['N_FFT'],
@@ -152,7 +153,7 @@ class Plot_tau_g(QWidget):
             self.W, self.tau_g = group_delay(bb, aa, nfft=params['N_FFT'], whole=True,
                                              verbose=self.chkWarnings.isChecked(),
                                              alg=self.cmbAlgorithm.currentData())
-                                             # self.chkWarnings.isChecked())
+            #                                   self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
