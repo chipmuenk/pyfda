@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_qt_lib import qtext_width, PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 
-from  matplotlib import patches
+from matplotlib import patches
 
 import logging
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class Plot_PZ(QWidget):
 
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -64,7 +64,7 @@ class Plot_PZ(QWidget):
             if 'view_changed' in dict_sig:
                 self.needs_draw = True
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -143,7 +143,7 @@ class Plot_PZ(QWidget):
         Initialize and clear the axes (this is only run once)
         """
         if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
-            self.ax = self.mplwidget.fig.subplots()  #.add_subplot(111)
+            self.ax = self.mplwidget.fig.subplots()  # .add_subplot(111)
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 
@@ -285,10 +285,10 @@ class Plot_PZ(QWidget):
         # - add keywords for color of circle -> **kwargs
         # - add option for multi-dimensional arrays and zpk data
 
-        # make sure that all inputs are arrays
+        # make sure that all inputs are (at least 1D) arrays
         b = np.atleast_1d(b)
         a = np.atleast_1d(a)
-        z = np.atleast_1d(z) # make sure that p, z  are arrays
+        z = np.atleast_1d(z)
         p = np.atleast_1d(p)
 
         if b.any():  # coefficients were specified
@@ -313,32 +313,32 @@ class Plot_PZ(QWidget):
             p = np.roots(a)
             z = np.roots(b)
             k = kn/kd
-        elif not (len(p) or len(z)): # P/Z were specified
+        elif not (len(p) or len(z)):  # P/Z were specified
             logger.error('Either b,a or z,p must be specified!')
             return z, p, k
 
         # find multiple poles and zeros and their multiplicities
-        if len(p) < 2: # single pole, [None] or [0]
-            if not p or p == 0: # only zeros, create equal number of poles at origin
-                p = np.array(0,ndmin=1) #
+        if len(p) < 2:  # single pole, [None] or [0]
+            if not p or p == 0:  # only zeros, create equal number of poles at origin
+                p = np.array(0, ndmin=1)
                 num_p = np.atleast_1d(len(z))
             else:
-                num_p = [1.] # single pole != 0
+                num_p = [1.]  # single pole != 0
         else:
-            #p, num_p = sig.signaltools.unique_roots(p, tol = pn_eps, rtype='avg')
-            p, num_p = unique_roots(p, tol = pn_eps, rtype='avg')
+            # p, num_p = sig.signaltools.unique_roots(p, tol = pn_eps, rtype='avg')
+            p, num_p = unique_roots(p, tol=pn_eps, rtype='avg')
     #        p = np.array(p); num_p = np.ones(len(p))
         if len(z) > 0:
-            z, num_z = unique_roots(z, tol = pn_eps, rtype='avg')
+            z, num_z = unique_roots(z, tol=pn_eps, rtype='avg')
     #        z = np.array(z); num_z = np.ones(len(z))
-            #z, num_z = sig.signaltools.unique_roots(z, tol = pn_eps, rtype='avg')
+            # z, num_z = sig.signaltools.unique_roots(z, tol = pn_eps, rtype='avg')
         else:
             num_z = []
 
-        ax = plt_ax  #.subplot(111)
+        ax = plt_ax
         if analog is False:
             # create the unit circle for the z-plane
-            uc = patches.Circle((0,0), radius=1, fill=False,
+            uc = patches.Circle((0, 0), radius=1, fill=False,
                                 color='grey', ls='solid', zorder=1)
             ax.add_patch(uc)
             if style == 'square':
@@ -350,25 +350,25 @@ class Plot_PZ(QWidget):
         #    ax.spines['right'].set_visible(True)
         #    ax.spines['top'].set_visible(True)
 
-        else: # s-plane
+        else:  # s-plane
             if anaCircleRad > 0:
                 # plot a circle with radius = anaCircleRad
-                uc = patches.Circle((0,0), radius=anaCircleRad, fill=False,
+                uc = patches.Circle((0, 0), radius=anaCircleRad, fill=False,
                                     color='grey', ls='solid', zorder=1)
                 ax.add_patch(uc)
             # plot real and imaginary axis
-            ax.axhline(lw=2, color = 'k', zorder=1)
-            ax.axvline(lw=2, color = 'k', zorder=1)
+            ax.axhline(lw=2, color='k', zorder=1)
+            ax.axvline(lw=2, color='k', zorder=1)
 
         # Plot the zeros
-        ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker = 'o',
-                   facecolor = 'none', edgecolor = mzc, lw = lw, label=zlabel)
+        ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker='o',
+                   facecolor='none', edgecolor=mzc, lw=lw, label=zlabel)
         # and print their multiplicity
         for i in range(len(z)):
             logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
             if num_z[i] > 1:
-                ax.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',
-                                va = 'top', color=mzc)
+                ax.text(np.real(z[i]), np.imag(z[i]), '  (' + str(num_z[i]) + ')',
+                        va='top', color=mzc)
         if plt_poles:
             # Plot the poles
             ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
@@ -377,8 +377,8 @@ class Plot_PZ(QWidget):
             for i in range(len(p)):
                 logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
                 if num_p[i] > 1:
-                    ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
-                                    va = 'bottom', color=mpc)
+                    ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) + ')',
+                            va='bottom', color=mpc)
 
 # =============================================================================
 #            # increase distance between ticks and labels
@@ -391,14 +391,17 @@ class Plot_PZ(QWidget):
 #             tick.label1 = tick._get_text1()
 #
 # =============================================================================
-        xl = ax.get_xlim(); Dx = max(abs(xl[1]-xl[0]), 0.05)
-        yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)
-        ax.set_xlim((xl[0]-Dx*0.05, max(xl[1]+Dx*0.05,0)))
-        ax.set_ylim((yl[0]-Dy*0.05, yl[1] + Dy*0.05))
+        xl = ax.get_xlim()
+        Dx = max(abs(xl[1]-xl[0]), 0.05)
+        yl = ax.get_ylim()
+        Dy = max(abs(yl[1]-yl[0]), 0.05)
+
+        ax.set_xlim((xl[0]-Dx*0.02, max(xl[1]+Dx*0.02, 0)))
+        ax.set_ylim((yl[0]-Dy*0.02, yl[1] + Dy*0.02))
 
         return z, p, k
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
     def draw_Hf(self, r=2):
         """
@@ -417,17 +420,17 @@ class Plot_PZ(QWidget):
         w, H = sig.freqz(ba[0], ba[1], worN=params['N_FFT'], whole=True)
         H = np.abs(H)
         if self.but_hf_log.isChecked():
-            H = np.clip(np.log10(H), -6, None) # clip to -120 dB
-            H = H - np.max(H) # shift scale to H_min ... 0
-            H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r
+            H = np.clip(np.log10(H), -6, None)  # clip to -120 dB
+            H = H - np.max(H)  # shift scale to H_min ... 0
+            H = 1 + (r-1) * (1 + H / abs(np.min(H)))  # scale to 1 ... r
         else:
-            H = 1 + (r-1) * H / np.max(H)  #  map |H(f)| to a range 1 ... r
+            H = 1 + (r-1) * H / np.max(H)  # map |H(f)| to a range 1 ... r
         y = H * np.sin(w)
         x = H * np.cos(w)
 
-        self.ax.plot(x,y, label="|H(f)|")
-        uc = patches.Circle((0,0), radius=r, fill=False,
-                                    color='grey', ls='dashed', zorder=1)
+        self.ax.plot(x, y, label="|H(f)|")
+        uc = patches.Circle((0, 0), radius=r, fill=False,
+                            color='grey', ls='dashed', zorder=1)
         self.ax.add_patch(uc)
 
         xl = self.ax.get_xlim()
