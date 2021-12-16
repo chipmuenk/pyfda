@@ -186,7 +186,7 @@ class AboutWindow(QDialog):
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         dirs_md = ("### Directories ###\n"
-                   "| *Function*    | *Path*|\n"#"|  <!-- -->     |  <!-- -->  |\n"
+                   "| *Function*    | *Path*|\n"  # "|  <!-- -->     |  <!-- -->  |\n"
                    "|:  ----        |:  ----     |\n"
                    "| **Install Dir**  | `{install_dir}` |\n"
                    "| **User Module Dir ** | `{user_dir}` |\n"
