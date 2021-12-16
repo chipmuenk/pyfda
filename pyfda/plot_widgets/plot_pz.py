@@ -15,8 +15,8 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import unique_roots
-from pyfda.libs.pyfda_qt_lib import qtext_width, PushButton
+from pyfda.libs.pyfda_lib import unique_roots, H_mag
+from pyfda.libs.pyfda_qt_lib import PushButton
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
@@ -197,6 +197,8 @@ class Plot_PZ(QWidget):
         self.draw_Hf(r=self.diaRad_Hf.value())
 
         self.redraw()
+
+        # self.draw_contours()
 
 # ------------------------------------------------------------------------------
     def redraw(self):
@@ -402,7 +404,19 @@ class Plot_PZ(QWidget):
         return z, p, k
 
 # ------------------------------------------------------------------------------
+    def draw_contours(self):
+        xl = self.ax.get_xlim()
+        yl = self.ax.get_ylim()
+        logger.warning(xl)
+        logger.warning(yl)
+        [x, y] = np.meshgrid(
+            np.arange(xl[0], xl[1], 0.01),
+            np.arange(yl[0], yl[1], 0.01))
+        z = x + 1j*y  # create coordinate grid for complex plane
+        Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, 0, H_min=None, log=True)
+        self.ax.contour(x, y, Hmag, 20, alpha=0.5)
 
+# ------------------------------------------------------------------------------
     def draw_Hf(self, r=2):
         """
         Draw the magnitude frequency response around the UC
