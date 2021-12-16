@@ -10,6 +10,7 @@
 Widget for exporting / importing and saving / loading filter data
 """
 import os
+import re
 import markdown
 
 from pyfda.libs.compat import (
@@ -18,7 +19,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qwindow_stay_on_top
 import pyfda.version as version
-import pyfda.libs.pyfda_lib as pyfda_lib
+from pyfda.libs.pyfda_lib import mod_version, CRLF
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
@@ -121,28 +122,33 @@ class AboutWindow(QDialog):
         butClose.clicked.connect(self.close)
 
 # ------------------------------------------------------------------------------
-
-    def to_clipboard(self, my_string):
+    def to_clipboard(self, my_string, html=False):
         """
         Copy version info to clipboard
+        TODO: This is stupid: md -> html -> md ?!
         """
-        mapping = [('<br>', '\n'), ('<br />', '\n'),  ('</tr>', '\n'),
-                   ('</th>', '\n==============\n'), ('</table>', '\n'),
-                   ('<hr>', '\n---------\n'),
-                   ('<b>', ''), ('</b>', ''), ('<tr>', ''), ('<td>', ''), ('</td>', '\t'),
-                   ('<th>', ''), ('&emsp;', ' '), ('<table>', ''),  # ('</a>',''),
-                   ("<th style='font-size:large;'>", "\n")
-                   ]
-# =============================================================================
-#         """ Map some HTML tags to control codes"""
-#         for k, v in mapping:
-#             my_string = my_string.replace(k, v)
-#
-#         """Remove html tags from a string"""
-#         clean = re.compile('<.*?>')
-#         fb.clipboard.setText(re.sub(clean, '', my_string))
-# =============================================================================
-        fb.clipboard.setText(my_string)
+        if not html:
+            # remove line breaks from string
+            my_string = re.sub('\n', '', my_string)
+            # a_string.replace("\n", " ")
+            # map some HTML tags to control codes
+            mapping = [('\r\n', ' '), ('\n', ' '), ('\r', ' '),
+                       ('</th></tr>', CRLF + '=' * 20 + CRLF),
+                       ('</table>', CRLF), ('<h3>', CRLF + '*'),
+                       ('<br>', CRLF), ('<br />', CRLF),  ('</tr>', CRLF),
+                       ('<hr>', '-' * 20), ('</h3>', '*' + CRLF + '-' * 20 + CRLF),
+                       ('<b>', '*'), ('</b>', '*'), ('<em>', '*'), ('</em>', '*'),
+                       ('<strong>', '*'), ('</strong>', '*'),
+                       ('</td>', '\t'), ('</th>', '\t'), ('&emsp;', ' '), ('&gt;', '>')
+                       ]
+            for k, v in mapping:
+                my_string = my_string.replace(k, v)
+
+            # Remove remaining HTML tags
+            clean = re.compile('<.*?>')
+            fb.clipboard.setText(re.sub(clean, '', my_string))
+        else:
+            fb.clipboard.setText(my_string)  # copy untreated string
 # ------------------------------------------------------------------------------
 
     def collect_info(self):
@@ -175,22 +181,22 @@ class AboutWindow(QDialog):
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         os_str = (f"<b>OS:</b> {dirs.OS} {dirs.OS_VER}<br><b>User Name:</b> "
-                  "{dirs.USER_NAME}")
+                  f"{dirs.USER_NAME}")
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         dirs_md = ("### Directories ###\n"
                    "| *Function*    | *Path*|\n"#"|  <!-- -->     |  <!-- -->  |\n"
                    "|:  ----        |:  ----     |\n"
-                   "| **Install Dir **  | `{install_dir}` |\n"
+                   "| **Install Dir**  | `{install_dir}` |\n"
                    "| **User Module Dir ** | `{user_dir}` |\n"
                    "| **Home Dir**  |   `{home_dir}` |\n"
-                   "| **Temp Dir ** | `{temp_dir}` |\n"
-                   "| **Config Dir ** | `{conf_dir}` |\n"
+                   "| **Temp Dir** | `{temp_dir}` |\n"
+                   "| **Config Dir** | `{conf_dir}` |\n"
                    "| - - - - - - -  | - - - - - - - - -|\n"
-                   "| **pyFDA Config ** | `{pyfda_conf}` |\n"
-                   "| **Log. Config ** | `{log_conf}` |\n"
-                   "| **Logfile **  | `{log_file}` |"
+                   "| **pyFDA Config** | `{pyfda_conf}` |\n"
+                   "| **Log. Config** | `{log_conf}` |\n"
+                   "| **Logfile**  | `{log_file}` |"
                    .format(home_dir=dirs.HOME_DIR, install_dir=dirs.INSTALL_DIR,
                            conf_dir=dirs.CONF_DIR, user_dir=user_dirs_str[:-6],
                            temp_dir=dirs.TEMP_DIR, pyfda_conf=dirs.USER_CONF_DIR_FILE,
@@ -203,7 +209,7 @@ class AboutWindow(QDialog):
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        ver_str = pyfda_lib.mod_version()
+        ver_str = mod_version()
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         if False:  # dirs.PYINSTALLER:

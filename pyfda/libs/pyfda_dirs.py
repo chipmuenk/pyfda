@@ -118,7 +118,7 @@ def get_yosys_dir():
     Try to find YOSYS path and version from environment variable or path:
     """
     yosys_exe = env("YOSYS")
-    yosys_ver = ""
+    yosys_ver = "not found"
 
     if yosys_exe:  # something is stored in the environment variable
         # redirect `yosys -V` output to string

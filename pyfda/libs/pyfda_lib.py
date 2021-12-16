@@ -86,14 +86,6 @@ except ImportError:
     MODULES.update({'pyfixp': {'V_FX': None}})
 
 try:
-    from nmigen import __version__ as V_NMG
-    MODULES.update({'nmigen': {'V_NMG': V_NMG}})
-except ImportError:
-    pass
-
-MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
-
-try:
     from docutils import __version__ as V_DOC
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
 except ImportError:
@@ -104,6 +96,14 @@ try:
     MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
 except ImportError:
     pass
+
+try:
+    from nmigen import __version__ as V_NMG
+    MODULES.update({'nmigen': {'V_NMG': V_NMG}})
+except ImportError:
+    pass
+
+MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
 try:
     from xlwt import __version__ as V_XLWT
