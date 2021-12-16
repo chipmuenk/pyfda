@@ -183,7 +183,7 @@ class pyFDA(QMainWindow):
         # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
         self.setCentralWidget(spltHMain)
         spltVPltLoggerH = spltVPltLogger.size().height()
-        spltVPltLogger.setSizes([spltVPltLoggerH*0.95, spltVPltLoggerH*0.05 - 8])
+        spltVPltLogger.setSizes([int(spltVPltLoggerH*0.95), int(spltVPltLoggerH*0.05 - 8)])
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
