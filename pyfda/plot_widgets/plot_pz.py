@@ -423,7 +423,7 @@ class Plot_PZ(QWidget):
     def draw_contours(self, overlay):
         if overlay not in {"contour", "contourf"}:
             return
-
+        self.ax.apply_aspect()  # normally, the correct aspect is only set when plotting
         xl = self.ax.get_xlim()
         yl = self.ax.get_ylim()
         # logger.warning(xl)
@@ -453,6 +453,10 @@ class Plot_PZ(QWidget):
         self.col_bar = self.mplwidget.fig.colorbar(
             m_cb, ax=self.ax, shrink=1.0, aspect=40, pad=0.01, fraction=0.08)
 
+        # Contour plots and color bar somehow mess up the coordinates:
+        # restore to previous settings
+        self.ax.set_xlim(xl)
+        self.ax.set_xlim(yl)
 # ------------------------------------------------------------------------------
     def draw_Hf(self, r=2, Hf_visible=True):
         """
