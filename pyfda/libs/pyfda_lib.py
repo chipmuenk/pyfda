@@ -963,7 +963,7 @@ def H_mag(num, den, z, H_max, H_min=None, log=False, div_by_0='ignore'):
     H_max : float
         The maximum value to which the result is clipped
     H_min : float, optional
-        The minimum value to which the result is clipped (default: 0)
+        The minimum value to which the result is clipped (default: None)
     log : boolean, optional
         When true, return 20 * log10 (\|H(z)\|). The clipping limits have to
         be given as dB in this case.
