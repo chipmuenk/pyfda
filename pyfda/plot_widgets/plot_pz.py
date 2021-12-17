@@ -426,8 +426,9 @@ class Plot_PZ(QWidget):
 
         xl = self.ax.get_xlim()
         yl = self.ax.get_ylim()
-        logger.warning(xl)
-        logger.warning(yl)
+        # logger.warning(xl)
+        # logger.warning(yl)
+
         [x, y] = np.meshgrid(
             np.arange(xl[0], xl[1], 0.01),
             np.arange(yl[0], yl[1], 0.01))
