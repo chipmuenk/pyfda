@@ -225,7 +225,7 @@ class Plot_PZ(QWidget):
 
 # ------------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
-               plt_ax=None, plt_poles=True, style='square', anaCircleRad=0, lw=2,
+               plt_ax=None, plt_poles=True, style='equal', anaCircleRad=0, lw=2,
                mps=10, mzs=10, mpc='r', mzc='b', plabel='', zlabel=''):
         """
         Plot the poles and zeros in the complex z-plane either from the
@@ -266,9 +266,10 @@ class Plot_PZ(QWidget):
             Plot poles. This can be used to suppress poles for FIR systems
             where all poles are at the origin.
 
-        style : string (default: 'square')
-            Style of the plot, for style == 'square' make scale of x- and y-
-            axis equal.
+        style : string (default: 'scaled')
+            Style of the plot, for `style == 'scaled'` make scale of x- and y-
+            axis equal, `style == 'equal'` forces x- and y-axes to be equal. This
+            is passed as an argument to the matplotlib `ax.axis(style)`
 
         mps : integer  (default: 10)
             Size for pole marker
@@ -353,16 +354,12 @@ class Plot_PZ(QWidget):
         else:
             num_z = []
 
-        ax = plt_ax
         if analog is False:
             # create the unit circle for the z-plane
             uc = patches.Circle((0, 0), radius=1, fill=False,
                                 color='grey', ls='solid', zorder=1)
-            ax.add_patch(uc)
-            if style == 'square':
-                # r = 1.1
-                # ax.axis([-r, r, -r, r]) # overridden by next option
-                ax.axis('equal')
+            plt_ax.add_patch(uc)
+            plt_ax.axis(style)
         #    ax.spines['left'].set_position('center')
         #    ax.spines['bottom'].set_position('center')
         #    ax.spines['right'].set_visible(True)
@@ -373,30 +370,30 @@ class Plot_PZ(QWidget):
                 # plot a circle with radius = anaCircleRad
                 uc = patches.Circle((0, 0), radius=anaCircleRad, fill=False,
                                     color='grey', ls='solid', zorder=1)
-                ax.add_patch(uc)
+                plt_ax.add_patch(uc)
             # plot real and imaginary axis
-            ax.axhline(lw=2, color='k', zorder=1)
-            ax.axvline(lw=2, color='k', zorder=1)
+            plt_ax.axhline(lw=2, color='k', zorder=1)
+            plt_ax.axvline(lw=2, color='k', zorder=1)
 
         # Plot the zeros
-        ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker='o',
-                   facecolor='none', edgecolor=mzc, lw=lw, label=zlabel)
+        plt_ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker='o',
+                       facecolor='none', edgecolor=mzc, lw=lw, label=zlabel)
         # and print their multiplicity
         for i in range(len(z)):
             logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
             if num_z[i] > 1:
-                ax.text(np.real(z[i]), np.imag(z[i]), '  (' + str(num_z[i]) + ')',
-                        va='top', color=mzc)
+                plt_ax.text(np.real(z[i]), np.imag(z[i]), '  (' + str(num_z[i]) + ')',
+                            va='top', color=mzc)
         if plt_poles:
             # Plot the poles
-            ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
-                       color=mpc, lw=lw, label=plabel)
+            plt_ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
+                           color=mpc, lw=lw, label=plabel)
             # and print their multiplicity
             for i in range(len(p)):
                 logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
                 if num_p[i] > 1:
-                    ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) + ')',
-                            va='bottom', color=mpc)
+                    plt_ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) + ')',
+                                va='bottom', color=mpc)
 
 # =============================================================================
 #            # increase distance between ticks and labels
@@ -409,13 +406,13 @@ class Plot_PZ(QWidget):
 #             tick.label1 = tick._get_text1()
 #
 # =============================================================================
-        xl = ax.get_xlim()
+        xl = plt_ax.get_xlim()
         Dx = max(abs(xl[1]-xl[0]), 0.05)
-        yl = ax.get_ylim()
+        yl = plt_ax.get_ylim()
         Dy = max(abs(yl[1]-yl[0]), 0.05)
 
-        ax.set_xlim((xl[0]-Dx*0.02, max(xl[1]+Dx*0.02, 0)))
-        ax.set_ylim((yl[0]-Dy*0.02, yl[1] + Dy*0.02))
+        plt_ax.set_xlim((xl[0]-Dx*0.02, max(xl[1]+Dx*0.02, 0)))
+        plt_ax.set_ylim((yl[0]-Dy*0.02, yl[1] + Dy*0.02))
 
         return z, p, k
 
