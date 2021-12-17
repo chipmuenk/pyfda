@@ -86,7 +86,7 @@ class Plot_PZ(QWidget):
         self.cmb_overlay = QComboBox(self)
         qcmb_box_populate(self.cmb_overlay, self.cmb_overlay_list, self.cmb_overlay_item)
 
-        self.but_log = PushButton(" Log.", checked=False)
+        self.but_log = PushButton(" Log.", checked=True)
         self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
         self.diaRad_Hf = QDial(self)
