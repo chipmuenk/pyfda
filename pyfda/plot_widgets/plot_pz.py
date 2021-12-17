@@ -9,14 +9,15 @@
 """
 Widget for plotting poles and zeros
 """
-from pyfda.libs.compat import QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal
+from pyfda.libs.compat import (
+    QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox)
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import unique_roots, H_mag
-from pyfda.libs.pyfda_qt_lib import PushButton
+from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html
+from pyfda.libs.pyfda_qt_lib import PushButton, qcmb_box_populate, qget_cmb_box
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
@@ -41,6 +42,16 @@ class Plot_PZ(QWidget):
         self.tool_tip = "Pole / zero plan"
         self.tab_label = "P / Z"
 
+        self.cmb_overlay_list = [
+            "<span>Add various overlays to P/Z diagram.</span>",
+            ("none", "None", ""),
+            ("h(f)", "|H(f)|",
+             "<span>Show |H(f)|, wrapped around the unit circle.</span>"),
+            ("contour", "Contour", "<span>Show contour lines for |H(z)|</span>"),
+            ("contourf", "Contourf", "<span>Show filled contours for |H(z)|</span>"),
+            ]
+        self.cmb_overlay_item = "none"  # default setting
+        self.cmap = "viridis"  # colormap
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -71,11 +82,12 @@ class Plot_PZ(QWidget):
         - Matplotlib widget with NavigationToolbar
         - Frame with control elements
         """
-        self.but_hf = PushButton("|H(f)| ", checked=False)
-        self.but_hf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
+        self.lbl_overlay = QLabel(to_html("Overlay:", frmt='bi'), self)
+        self.cmb_overlay = QComboBox(self)
+        qcmb_box_populate(self.cmb_overlay, self.cmb_overlay_list, self.cmb_overlay_item)
 
-        self.but_hf_log = PushButton(" Log. |H(f)| ", checked=False)
-        self.but_hf_log.setToolTip("<span>Log. scale for |H(f)|.</span>")
+        self.but_log = PushButton(" Log.", checked=False)
+        self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
         self.diaRad_Hf = QDial(self)
         self.diaRad_Hf.setRange(2, 10)
@@ -92,8 +104,9 @@ class Plot_PZ(QWidget):
         self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.but_hf)
-        layHControls.addWidget(self.but_hf_log)
+        layHControls.addWidget(self.lbl_overlay)
+        layHControls.addWidget(self.cmb_overlay)
+        layHControls.addWidget(self.but_log)
         layHControls.addWidget(self.diaRad_Hf)
         layHControls.addWidget(self.lblRad_Hf)
         layHControls.addStretch(10)
@@ -132,8 +145,8 @@ class Plot_PZ(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        self.but_hf.clicked.connect(self.draw)
-        self.but_hf_log.clicked.connect(self.draw)
+        self.cmb_overlay.currentIndexChanged.connect(self.draw)
+        self.but_log.clicked.connect(self.draw)
         self.diaRad_Hf.valueChanged.connect(self.draw)
         self.but_fir_poles.clicked.connect(self.draw)
 
@@ -194,13 +207,16 @@ class Plot_PZ(QWidget):
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
 
-        self.draw_Hf(r=self.diaRad_Hf.value())
+        overlay = qget_cmb_box(self.cmb_overlay)
+        self.but_log.setVisible(overlay != "none")
+
+        self.draw_Hf(r=self.diaRad_Hf.value(), Hf_visible=(overlay == "h(f)"))
+
+        self.draw_contours(overlay)
 
         self.redraw()
 
-        # self.draw_contours()
-
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
@@ -404,7 +420,10 @@ class Plot_PZ(QWidget):
         return z, p, k
 
 # ------------------------------------------------------------------------------
-    def draw_contours(self):
+    def draw_contours(self, overlay):
+        if overlay not in {"contour", "contourf"}:
+            return
+
         xl = self.ax.get_xlim()
         yl = self.ax.get_ylim()
         logger.warning(xl)
@@ -413,27 +432,39 @@ class Plot_PZ(QWidget):
             np.arange(xl[0], xl[1], 0.01),
             np.arange(yl[0], yl[1], 0.01))
         z = x + 1j*y  # create coordinate grid for complex plane
-        Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, 0, H_min=None, log=True)
-        self.ax.contour(x, y, Hmag, 20, alpha=0.5)
+
+        if self.but_log.isChecked:
+            H_max = 0
+            H_min = -100
+        else:
+            H_max = 1
+            H_min = 0
+        Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, H_max, H_min=H_min,
+                     log=self.but_log.isChecked())
+
+        if overlay == "contour":
+            self.ax.contour(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
+        else:
+            self.ax.contourf(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
+
 
 # ------------------------------------------------------------------------------
-    def draw_Hf(self, r=2):
+    def draw_Hf(self, r=2, Hf_visible=True):
         """
         Draw the magnitude frequency response around the UC
         """
+        self.diaRad_Hf.setVisible(Hf_visible)
+        self.lblRad_Hf.setVisible(Hf_visible)
+        if not Hf_visible:
+            return
+
         # suppress "divide by zero in log10" warnings
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
-
-        self.but_hf_log.setVisible(self.but_hf.isChecked())
-        self.diaRad_Hf.setVisible(self.but_hf.isChecked())
-        self.lblRad_Hf.setVisible(self.but_hf.isChecked())
-        if not self.but_hf.isChecked():
-            return
         ba = fb.fil[0]['ba']
         w, H = sig.freqz(ba[0], ba[1], worN=params['N_FFT'], whole=True)
         H = np.abs(H)
-        if self.but_hf_log.isChecked():
+        if self.but_log.isChecked():
             H = np.clip(np.log10(H), -6, None)  # clip to -120 dB
             H = H - np.max(H)  # shift scale to H_min ... 0
             H = 1 + (r-1) * (1 + H / abs(np.min(H)))  # scale to 1 ... r
