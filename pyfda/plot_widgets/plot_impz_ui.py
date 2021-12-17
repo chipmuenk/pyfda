@@ -243,7 +243,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
         self.but_fft_wdg.setIconSize(QSize(but_height, but_height))
-        self.but_fft_wdg.setFixedSize(QSize(1.5 * but_height, but_height))
+        self.but_fft_wdg.setFixedSize(QSize(int(1.5 * but_height), but_height))
         self.but_fft_wdg.setToolTip('<span>Show / hide FFT widget (select window type '
                                     ' and display its properties).</span>')
         self.but_fft_wdg.setCheckable(True)
