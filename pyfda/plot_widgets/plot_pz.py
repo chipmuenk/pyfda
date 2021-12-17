@@ -22,7 +22,7 @@ from pyfda.libs.pyfda_qt_lib import PushButton, qcmb_box_populate, qget_cmb_box
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
 
-from matplotlib import patches
+from matplotlib import patches, cm
 
 import logging
 logger = logging.getLogger(__name__)
@@ -155,6 +155,7 @@ class Plot_PZ(QWidget):
         """
         Initialize and clear the axes (this is only run once)
         """
+        self.mplwidget.fig.clf()  # needed to get rid of colorbar
         if len(self.mplwidget.fig.get_axes()) == 0:  # empty figure, no axes
             self.ax = self.mplwidget.fig.subplots()  # .add_subplot(111)
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
@@ -171,6 +172,8 @@ class Plot_PZ(QWidget):
 # ------------------------------------------------------------------------------
     def draw(self):
         self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
+        if True:
+            self.init_axes()
         self.draw_pz()
 
 # ------------------------------------------------------------------------------
@@ -444,6 +447,10 @@ class Plot_PZ(QWidget):
         else:
             self.ax.contourf(x, y, Hmag, 20, alpha=0.5, cmap=self.cmap)
 
+        m_cb = cm.ScalarMappable(cmap=self.cmap)    # normalized proxy object that is
+        m_cb.set_array(Hmag)                        # mappable for colorbar (?)
+        self.col_bar = self.mplwidget.fig.colorbar(
+            m_cb, ax=self.ax, shrink=1.0, aspect=40, pad=0.01, fraction=0.08)
 
 # ------------------------------------------------------------------------------
     def draw_Hf(self, r=2, Hf_visible=True):
