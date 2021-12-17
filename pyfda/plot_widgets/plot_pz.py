@@ -15,6 +15,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
+from pyfda.plot_widgets import mpl_widget
 from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html
 from pyfda.libs.pyfda_qt_lib import PushButton, qcmb_box_populate, qget_cmb_box
@@ -434,7 +435,7 @@ class Plot_PZ(QWidget):
             np.arange(yl[0], yl[1], 0.01))
         z = x + 1j*y  # create coordinate grid for complex plane
 
-        if self.but_log.isChecked:
+        if self.but_log.isChecked():
             H_max = 0
             H_min = -100
         else:
@@ -457,6 +458,7 @@ class Plot_PZ(QWidget):
         # restore to previous settings
         self.ax.set_xlim(xl)
         self.ax.set_xlim(yl)
+
 # ------------------------------------------------------------------------------
     def draw_Hf(self, r=2, Hf_visible=True):
         """
