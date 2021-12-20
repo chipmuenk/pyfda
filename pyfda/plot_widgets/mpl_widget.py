@@ -11,6 +11,7 @@ Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
 import sys
+import base64
 from pyfda.libs.pyfda_lib import cmp_version
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
@@ -35,7 +36,7 @@ except ImportError:
 
 from pyfda.libs.compat import (
     QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
-    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot)
+    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
@@ -424,7 +425,10 @@ class MplToolbar(NavigationToolbar):
 
         self.a_cb = self.addAction(
             QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
-        self.a_cb.setToolTip('Copy to clipboard in png format.')
+        self.a_cb.setToolTip(
+            '<span>Copy to clipboard in png format. Press &lt;SHIFT&gt; for base64 '
+            'encoded png format (e.g. for Jupyter Notebooks). Press &lt;SHIFT&gt; to '
+            'embed base64 encoded PNG in &lt;img&gt; tag.</span>')
         self.a_cb.setShortcut("Ctrl+C")
 
         # --------------------------------------
@@ -639,10 +643,33 @@ class MplToolbar(NavigationToolbar):
 # ------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
-        Save current figure to temporary file and copy it to the clipboard.
+        Copy current figure to the clipboard, either directly as PNG file or as
+        base64 encoded PNG file.
         """
         try:
             img = QImage(self.canvas.grab())
-            self.cb.setImage(img)
+
+            modifiers = QtWidgets.QApplication.keyboardModifiers()
+            if modifiers in {QtCore.Qt.ShiftModifier, QtCore.Qt.ControlModifier}:
+                ba = QtCore.QByteArray()
+                buffer = QtCore.QBuffer(ba)  # create buffer of ByteArray
+                buffer.open(QtCore.QIODevice.WriteOnly)  # ... open it
+                img.save(buffer, 'PNG')  # ... save image data to buffer
+                # ... convert to base64 bytes -> str -> strip b' ... '
+                base64_str = str(ba.toBase64().data()).lstrip("b'").rstrip("'")
+                # ... and copy as string to clipboard after removing b' ... '
+                if modifiers == QtCore.Qt.ShiftModifier:
+                    self.cb.setText(base64_str)
+                    logger.info('Copied plot as base64 encoded PNG image to Clipboard.')
+                elif modifiers == QtCore.Qt.ControlModifier:
+                    self.cb.setText(
+                        '<img src="data:image/png;base64,' + base64_str + '"/>')
+                    logger.info('Copied plot as base64 encoded PNG image with <img> tag '
+                                'to Clipboard.')
+                # elif modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
+                #     logger.warning('Control+Shift+Click')
+            else:
+                self.cb.setImage(img)
+                logger.info('Copied plot as PNG image to Clipboard.')
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))

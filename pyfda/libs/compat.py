@@ -12,7 +12,7 @@ been removed
 """
 
 # import PyQt5
-from PyQt5 import QtGui, QtCore, QtTest
+from PyQt5 import QtGui, QtCore, QtTest, QtWidgets
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
                           QObject, QVariant, QPoint, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor,
