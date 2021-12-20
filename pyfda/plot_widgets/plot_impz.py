@@ -432,7 +432,7 @@ class Plot_Impz(QWidget):
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
 
-            logger.info(f"Started transient {self.fx_str}response calculation")
+            # logger.info(f"Started transient {self.fx_str}response calculation")
             self.t_start = time.process_time()  # store starting time
 
             if self.fx_sim:
@@ -577,6 +577,7 @@ class Plot_Impz(QWidget):
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
+        self.needs_calc_fx = False
         logger.info('[{0:5.4g} ms]: Plotted transient {1}response'
                     .format((time.process_time() - self.t_resp)*1000, self.fx_str))
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
