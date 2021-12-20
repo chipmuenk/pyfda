@@ -60,20 +60,24 @@ class Plot_PZ(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        # logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+        # logger.info("Processing {0} | needs_draw = {1}, visible = {2}"\
         #              .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False
-            if 'view_changed' in dict_sig or self.needs_draw:
+            elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+                self.draw()
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
-            if 'view_changed' in dict_sig:
+            elif 'view_changed' in dict_sig:
+                self.needs_draw = True
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_draw = True
 
 # ------------------------------------------------------------------------------
