@@ -36,7 +36,8 @@ print("Installing packages\n{0}\n".format(requirements_list))
 setup(
     name='pyfda',
     version=version_nr['__version__'],
-    description='pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time filters.',
+    description=("Design and analyse discrete time DSP filters with a user-friendly GUI "
+                 "tool. Fixpoint filters in time and frequency domain, too."),
     long_description_content_type='text/markdown',
     # long_description_content_type='text/x-rst',
     long_description=long_description,
