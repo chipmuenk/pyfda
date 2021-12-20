@@ -11,7 +11,6 @@ Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
 import sys
-import base64
 from pyfda.libs.pyfda_lib import cmp_version
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
@@ -28,7 +27,6 @@ try:
         MPL_CURS = False
 except ImportError:
     MPL_CURS = False
-    print(MPL_CURS)
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
@@ -319,17 +317,20 @@ class MplToolbar(NavigationToolbar):
         # self.canvas = canv
         self.mpl_widget = mpl_widget
 
-# -----------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # ----  Construct Toolbar using QRC icons -------------------
 
-        # ---------------- Construct Toolbar using QRC icons -------------------
+        # ---------------------------------------------
         # ENABLE:
-#        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
-#        self.a_en.setToolTip('Enable / disable plot')
-#        self.a_en.setCheckable(True)
-#        self.a_en.setChecked(True)
-#        self.a.setEnabled(False)
+        # ---------------------------------------------
+        self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Update',
+                                   self.enable_plot)
+        self.a_en.setToolTip('Enable / disable plot')
+        self.a_en.setCheckable(True)
+        self.a_en.setChecked(True)
+        self.a_en.setVisible(False)
 
-#        self.addSeparator() #---------------------------------------------
+        # self.addSeparator()
 
         # ---------------------------------------------
         # HOME:
@@ -609,21 +610,20 @@ class MplToolbar(NavigationToolbar):
         self.emit({'lock_zoom': self.zoom_locked})
 
 # ------------------------------------------------------------------------------
-# =============================================================================
-#     def enable_plot(self, state = None):
-#         """
-#         Toggle the enable button and setting and enable / disable all
-#         buttons accordingly.
-#         """
-#         if state is not None:
-#             self.enabled = state
-#         else:
-#             self.enabled = not self.enabled
-#         if self.enabled:
-#             self.a_en.setIcon(QIcon(':/circle-x.svg'))
-#         else:
-#             self.a_en.setIcon(QIcon(':/circle-check.svg'))
-#
+    def enable_plot(self, state=None):
+        """
+        Toggle the enable button and setting
+        """
+        if state is not None:
+            self.enabled = state
+        else:
+            self.enabled = not self.enabled
+
+        if self.enabled:
+            self.a_en.setIcon(QIcon(':/circle-check.svg'))
+        else:
+            self.a_en.setIcon(QIcon(':/circle-x.svg'))
+
 #         self.a_ho.setEnabled(self.enabled)
 #         self.a_ba.setEnabled(self.enabled)
 #         self.a_fw.setEnabled(self.enabled)
