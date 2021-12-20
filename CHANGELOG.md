@@ -1,6 +1,6 @@
 ## Changelog
 
-### [v0.6.0a1](https://github.com/chipmuenk/pyfda/tree/v0.6.0a1) (2021-08-12)
+### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0a1) (2021-12-23)
 
 ### Bug fixes
 
@@ -17,8 +17,6 @@
   
 - It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab.
   Changing the filter type now highlights the save button.
-  
-- Improve group delay algorithms for IIR, allow selection between algorithms
 
 - Complex flag is reset in fixpoint simulation when switching back from complex
   to real stimuli
@@ -26,11 +24,11 @@
 - Improved legend in the y[n] / Y(f) tab (markers were missing, tab alignment didn't
   work)
 
-- Equalize length of f and tau_g in differentiation algorithm for the calculation 
-  of group delay (selecting 'Diff' crashed pyfda for dual sided spectra)
+- Improve group delay algorithms for IIR, allow selection between algorithms.
+  Equalize length of f and tau_g in differentiation algorithm (selecting 'Diff' 
+  crashed pyfda for dual sided spectra)
 
-
-### New features
+### New features accessible from the UI
 - Improved FFT window widget for displaying the window in time and frequency domain, it
   can be invoked from the `y[n]` tab and the Firwin filter design subwidget with
   much improved selection of window function for spectral analysis (`y[n]` tab)
@@ -40,10 +38,6 @@
     the FFT widget
   * improved tooltipps
   * optional combobox for window parameters (used e.g. for Blackmanharris window)
-
-- Complete make-over of signalling for DRY using new methods
-  * 'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
-     providing an time-to-live mechanisms for signals
 
 - Lots of improvements in `y[n]` tab:
 
@@ -62,19 +56,43 @@
 
   - Tooltips for combo box items
 
-  - Replace some check boxes by checkable push bottons for a cleaner UI
+  - Replace check boxes by checkable push bottons for a cleaner UI
 
   - Group stimuli for a better overview
 
   - Allow changing the number of FFT data points via `Info -> Settings`
 
   - Display magnitude and phase in frequency tab
-
-- Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
-  and `dirs.YOSYS_VER`
   
 - Allow turning off automatic grid alignment between mag. and phase in the 
   `H(f)` tab
+
+- Plots can be copied to the clipboard in base64 encoded PNG format for easier
+  embedding in e.g. HTML pages or Jupyter Noteboks.
+  The \<img\> tag can be included as well. This is controlled with the modifiers
+  \<SHIFT\> or \<CTRL\>.
+
+- New overlays 'Contours' and 'Filled Contours' for P/Z Plots
+
+### Code maintenance
+
+- Complete make-over of signalling for DRY using new method
+  'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
+     providing an time-to-live mechanisms for signals
+
+- Fixpoint and floating point simulation is now frame based; in a future version
+  this will allow to stop long running simulation and / or update the plot during
+  simulation. Restructured and simplified fixpoint simulation flow.
+
+- Started using pyfixp for fixpoint simulations. nMigen / Amaranth interfaces are
+  still implemented but filter is not enabled by default as frame based simulations
+  are not implemented.
+
+- Fixpoint filters now live in their own subdirectories together with graphics and
+  other related files.
+
+- Try to detect YOSYS executable and store path and version in `dirs.YOSYS_EXE`
+  and `dirs.YOSYS_VER`
   
 - Started preparation of code for i18n
 
