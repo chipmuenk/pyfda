@@ -68,8 +68,8 @@ class Input_Specs(QWidget):
         """
         # logger.debug(f"SIG_RX: {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
-            logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
-                           \n{pprint_log(dict_sig)}")
+            # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
+            #               \n{pprint_log(dict_sig)}")
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()

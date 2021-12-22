@@ -49,14 +49,14 @@ class FreqSpecs(QWidget):
 
         self._construct_UI()
 
-#-------------------------------------------------------------
+# -------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
         """
         # logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()
