@@ -170,6 +170,7 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx)
 
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
+        self.sig_rx.connect(self.stim_wdg.sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
