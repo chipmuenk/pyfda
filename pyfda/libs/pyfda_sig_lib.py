@@ -7,19 +7,20 @@
 # (see file LICENSE in root directory for details)
 
 """
-Library with various signal processing related functions 
+Library with various signal processing related functions
 """
 import time
-import logging
-logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 
+import logging
+logger = logging.getLogger(__name__)
 
-def impz(b, a=1, FS=1, N=0, step = False):
+
+def impz(b, a=1, FS=1, N=0, step=False):
     """
 Calculate impulse response of a discrete time filter, specified by
 numerator coefficients b and denominator coefficients a of the system
@@ -42,15 +43,15 @@ FS : float (optional, default: FS = 1)
 N :  float (optional)
      Number of calculated points.
      Default: N = len(b) for FIR filters, N = 100 for IIR filters
-     
+
 step : bool (optional, default False)
      return the step response instead of the impulse response
 
 Returns
 -------
-hn : ndarray 
+hn : ndarray
     impulse or step response with length N (see above)
-td : ndarray 
+td : ndarray
     contains the time steps with same length as hn
 
 
@@ -65,7 +66,7 @@ Examples
     if len(a) == 1:
         if len(b) == 1:
             raise TypeError(
-            'No proper filter coefficients: len(a) = len(b) = 1 !')
+                'No proper filter coefficients: len(a) = len(b) = 1 !')
         else:
             IIR = False
     else:
@@ -78,44 +79,46 @@ Examples
         else:
             IIR = True
 
-    if N == 0: # set number of data points automatically
+    if N == 0:  # set number of data points automatically
         if IIR:
-            N = 100 # TODO: IIR: more intelligent algorithm needed
+            N = 100  # TODO: IIR: more intelligent algorithm needed
         else:
-            N = min(len(b),  100) # FIR: N = number of coefficients (max. 100)
+            N = min(len(b),  100)  # FIR: N = number of coefficients (max. 100)
 
     impulse = np.zeros(N)
-    impulse[0] =1.0 # create dirac impulse as input signal
-    hn = np.array(sig.lfilter(b, a, impulse)) # calculate impulse response
+    impulse[0] = 1.0  # create dirac impulse as input signal
+    hn = np.array(sig.lfilter(b, a, impulse))  # calculate impulse response
     td = np.arange(len(hn)) / FS
 
-    if step: # calculate step response
+    if step:  # calculate step response
         hn = np.cumsum(hn)
 
     return hn, td
 
-#==================================================================
+
+# ------------------------------------------------------------------------------
 def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
-#==================================================================
+
     """
     Calculate angle of argument `X` when abs(X) > `n_eps` * machine resolution.
     Otherwise, zero is returned.
     """
-    
-    phi = np.angle(np.where((np.abs(X) > n_eps *  np.spacing(1)), X, 0))
-    
+
+    phi = np.angle(np.where((np.abs(X) > n_eps * np.spacing(1)), X, 0))
+
     return phi
 
-#==================================================================
+
+# ------------------------------------------------------------------------------
 def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
-#==================================================================
+
     """
     Perform elementwise array division after treating singularities, meaning:
     - check whether denominator (`den`) coefficients approach zero
     - check whether numerator (`num`) or denominator coefficients are non-finite, i.e.
-      one of `nan`, `ìnf` or `ninf`. 
-    
-    At each singularity, replace denominator coefficient by `1` and numerator 
+      one of `nan`, `ìnf` or `ninf`.
+
+    At each singularity, replace denominator coefficient by `1` and numerator
     coefficient by `0`
 
     Parameters
@@ -124,17 +127,17 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
         numerator coefficients
     den : array_like
         denominator coefficients
-        
+
     n_eps : float
-        n_eps * machine resolution is the limit for the denominator below which 
-        the ratio is set to zero. The machine resolution in numpy is given by 
-        `np.spacing(1)`, the distance to the nearest number which is equivalent 
+        n_eps * machine resolution is the limit for the denominator below which
+        the ratio is set to zero. The machine resolution in numpy is given by
+        `np.spacing(1)`, the distance to the nearest number which is equivalent
         to matlab's "eps".
-    
+
     i_scale : float
-        The scale for the index `i` for `num, den` for printing the index of 
+        The scale for the index `i` for `num, den` for printing the index of
         the singularities.
-    
+
     verbose : bool, optional
         whether to print  The default is False.
 
@@ -145,22 +148,22 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
 
     """
     singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
-                        (abs(den) < n_eps * np.spacing(1)))[0] 
+                        (abs(den) < n_eps * np.spacing(1)))[0]
 
     if verbose and np.any(singular):
         logger.warning('div_safe singularity -> setting to 0 at:')
         for i in singular:
             logger.warning('i = {0} '.format(i * i_scale))
-    
+
     num[singular] = 0
     den[singular] = 1
-    
+
     return num / den
-                    
-#==================================================================
-def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, 
-                sos=False, alg="scipy", n_eps=100):
-#==================================================================
+
+
+# ------------------------------------------------------------------------------
+def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
+                fs=2.*pi, sos=False, alg="scipy", n_eps=100):
     """
 Calculate group delay of a discrete time filter, specified by
 numerator coefficients `b` and denominator coefficients `a` of the system
@@ -190,17 +193,17 @@ nfft :  integer (optional, default: 512)
 
 fs : float (optional, default: fs = 2*pi)
      Sampling frequency.
-     
+
 alg : str (default: "scipy")
       The algorithm for calculating the group delay:
-          - "scipy" The algorithm used by scipy's grpdelay, 
+          - "scipy" The algorithm used by scipy's grpdelay,
           - "jos": The original J.O.Smith algorithm; same as in "scipy" except that
             the frequency response is calculated with the FFT instead of polyval
           - "diff": Group delay is calculated by differentiating the phase
           - "Shpakh": Group delay is calculated from second-order sections
-          
+
 n_eps : integer (optional, default : 100)
-        Minimum value in the calculation of intermediate values before tau_g is set 
+        Minimum value in the calculation of intermediate values before tau_g is set
         to zero.
 
 Returns
@@ -219,12 +222,12 @@ The following explanations follow [JOS]_.
 **Definition and direct calculation ('diff')**
 
 The group delay :math:`\\tau_g(\\omega)` of discrete time (DT) and continuous time
-(CT) systems is the rate of change of phase with respect to angular frequency. 
+(CT) systems is the rate of change of phase with respect to angular frequency.
 In the following, derivative is always meant w.r.t. :math:`\\omega`:
 
 .. math::
 
-    \\tau_g(\\omega) 
+    \\tau_g(\\omega)
         = -\\frac{\\partial }{\\partial \\omega}\\angle H( \\omega)
         = -\\frac{\\partial \\phi(\\omega)}{\\partial \\omega}
         = -  \\phi'(\\omega)
@@ -235,16 +238,16 @@ With numpy / scipy, the group delay can be calculated directly with
 
     w, H = sig.freqz(b, a, worN=nfft, whole=whole)
     tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
-    
-The derivative can create numerical problems for e.g. phase jumps at zeros of 
+
+The derivative can create numerical problems for e.g. phase jumps at zeros of
 frequency response or when the complex frequency response becomes very small e.g.
 in the stop band.
 
-This can be avoided by calculating the group delay from the derivative of the 
+This can be avoided by calculating the group delay from the derivative of the
 *logarithmic* frequency response in polar form (amplitude response and phase):
 
 .. math::
-    
+
     \\ln ( H( \\omega))
       = \\ln \\left({H_A( \\omega)} e^{j \\phi(\\omega)} \\right)
       = \\ln \\left({H_A( \\omega)} \\right) + j \\phi(\\omega)
@@ -254,15 +257,15 @@ This can be avoided by calculating the group delay from the derivative of the
 
 where :math:`H_A(\\omega)` is the amplitude response. :math:`H_A(\\omega)` and
 its derivative :math:`H_A'(\\omega)` are real-valued, therefore, the group
-delay can be calculated by separating real and imginary components (and discarding 
+delay can be calculated by separating real and imginary components (and discarding
 the real part):
 
 .. math::
-    
+
     \\begin{align}
-    \\Re \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\} &= \\frac{H_A'( \\omega)}{H_A( \\omega)} \\\                                                                      
+    \\Re \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\} &= \\frac{H_A'( \\omega)}{H_A( \\omega)} \\\
     \\Im \\left\\{\\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))\\right\\} &= \\phi'(\\omega)
-    \\end{align}                                                                    
+    \\end{align}
 
 and hence
 
@@ -273,23 +276,23 @@ and hence
       \\ln ( H( \\omega)) \\right\\}
       =-\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
 
-Note: The last term contains the complex response :math:`H(\omega)`, not the 
+Note: The last term contains the complex response :math:`H(\omega)`, not the
 amplitude response :math:`H_A(\omega)`!
 
-In the following, it will be shown that the derivative of birational functions 
+In the following, it will be shown that the derivative of birational functions
 (like DT and CT filters) can be calculated very efficiently and from this the group
 delay.
 
 
 **J.O. Smith's basic algorithm for FIR filters ('scipy')**
 
-An efficient form of calculating the group delay of FIR filters based on the 
-derivative of the logarithmic frequency response has been described in [JOS]_ 
-and [Lyons]_ for discrete time systems. 
+An efficient form of calculating the group delay of FIR filters based on the
+derivative of the logarithmic frequency response has been described in [JOS]_
+and [Lyons]_ for discrete time systems.
 
 A FIR filter is defined via its polyome :math:`H(z) = \\sum_k b_k z^{-k}` and has
 the following derivative:
-    
+
 .. math::
 
     \\frac{\\partial }{\\partial \\omega} H(z = e^{j \\omega T})
@@ -297,7 +300,7 @@ the following derivative:
     =  -jT \\sum_{k = 0}^{N} k b_{k} e^{-j k \\omega T}
     =  -jT H_R(e^{j \\omega T})
 
-where :math:`H_R` is the "ramped" polynome, i.e. polynome :math:`H` multiplied 
+where :math:`H_R` is the "ramped" polynome, i.e. polynome :math:`H` multiplied
 with a ramp :math:`k`, yielding
 
 .. math::
@@ -307,50 +310,50 @@ with a ramp :math:`k`, yielding
                     = -\\Im \\left\\{ -j T \\frac{H_R(e^{j \\omega T})}
                     {H(e^{j \\omega T})} \\right\\}
                     = T \\, \\Re \\left\\{\\frac{H_R(e^{j \\omega T})}
-                    {H(e^{j \\omega T})} \\right\\}     
+                    {H(e^{j \\omega T})} \\right\\}
 
-scipy's grpdelay directly calculates the complex frequency response 
-:math:`H(e^{j\\omega T})` and its ramped function at the frequency points using 
+scipy's grpdelay directly calculates the complex frequency response
+:math:`H(e^{j\\omega T})` and its ramped function at the frequency points using
 the polyval function.
 
-When zeros of the frequency response are on or near the data points of the DFT, this 
+When zeros of the frequency response are on or near the data points of the DFT, this
 algorithm runs into numerical problems. Hence, it is neccessary to check whether
-the magnitude of the denominator is less than e.g. 100 times the machine eps. 
-In this case, :math:`\\tau_g` is set to zero. 
+the magnitude of the denominator is less than e.g. 100 times the machine eps.
+In this case, :math:`\\tau_g` is set to zero.
 
 **J.O. Smith's basic algorithm for IIR filters ('scipy')**
 
 IIR filters are defined by
 
 .. math::
-    
+
         H(z) = \\frac {B(z)}{A(z)} = \\frac {\\sum b_k z^k}{\\sum a_k z^k},
-        
+
 their group delay can be calculated numerically via the logarithmic frequency
 response as well.
-   
+
 The derivative  of :math:`H(z)` w.r.t. :math:`\\omega` is calculated using the
-quotient rule and by replacing the derivatives of numerator and denominator 
-polynomes with their ramp functions: 
-    
+quotient rule and by replacing the derivatives of numerator and denominator
+polynomes with their ramp functions:
+
 .. math::
-    
+
     \\begin{align}
-    \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})} 
+    \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})}
     &= \\frac{\\left(B(e^{j \\omega T})/A(e^{j \\omega T})\\right)'}{B(e^{j \\omega T})/A(e^{j \\omega T})}
     = \\frac{B'(e^{j \\omega T}) A(e^{j \\omega T}) - A'(e^{j \\omega T})B(e^{j \\omega T})}
     { A(e^{j \\omega T}) B(e^{j \\omega T})}  \\\\
-    &= \\frac {B'(e^{j \\omega T})} { B(e^{j \\omega T})}  
+    &= \\frac {B'(e^{j \\omega T})} { B(e^{j \\omega T})}
       - \\frac { A'(e^{j \\omega T})} { A(e^{j \\omega T})}
     = -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})} - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}\\right)
     \\end{align}
-                               
+
 This result is substituted once more into the log. derivative from above:
 
 .. math::
-    
+
     \\begin{align}
-    \\tau_g(e^{j \\omega T}) 
+    \\tau_g(e^{j \\omega T})
     =-\\Im \\left\\{ \\frac{H'(e^{j \\omega T})}{H(e^{j \\omega T})} \\right\\}
     &=-\\Im \\left\\{
         -j T \\left(\\frac { B_R(e^{j \\omega T})} {B(e^{j \\omega T})}
@@ -360,7 +363,7 @@ This result is substituted once more into the log. derivative from above:
                     - \\frac { A_R(e^{j \\omega T})} {A(e^{j \\omega T})}
          \\right\\}
     \\end{align}
-                  
+
 
 If the denominator of the computation becomes too small, the group delay
 is set to zero.  (The group delay approaches infinity when
@@ -368,7 +371,7 @@ there are poles or zeros very close to the unit circle in the z plane.)
 
 **J.O. Smith's algorithm for CT filters**
 
-The same process can be applied for CT systems as well: The derivative of a CT 
+The same process can be applied for CT systems as well: The derivative of a CT
 polynome :math:`P(s)` w.r.t. :math:`\\omega` is calculated by:
 
 .. math::
@@ -391,68 +394,68 @@ the ramped polynome has to be calculated differently).
 
 **J.O. Smith's improved algorithm for IIR filters ('jos')**
 
-J.O. Smith gives the following speed and accuracy optimizations for the basic 
+J.O. Smith gives the following speed and accuracy optimizations for the basic
 algorithm:
 
-    * convert the filter to a FIR filter with identical phase and group delay 
+    * convert the filter to a FIR filter with identical phase and group delay
       (but with different magnitude response)
-        
+
     * use FFT instead of polyval to calculate the frequency response
 
 The group delay of an IIR filter :math:`H(z) = B(z)/A(z)` can also
-be calculated from an equivalent FIR filter :math:`C(z)` with the same phase 
-response (and hence group delay) as the original filter. This filter is obtained 
+be calculated from an equivalent FIR filter :math:`C(z)` with the same phase
+response (and hence group delay) as the original filter. This filter is obtained
 by the following steps:
-    
-* The zeros of :math:`A(z)` are the poles of :math:`1/A(z)`, its phase response is
-  :math:`\\angle A(z) = - \\angle 1/A(z)`. 
 
-* Transforming :math:`z \\rightarrow 1/z` mirrors the zeros at the unit circle, 
+* The zeros of :math:`A(z)` are the poles of :math:`1/A(z)`, its phase response is
+  :math:`\\angle A(z) = - \\angle 1/A(z)`.
+
+* Transforming :math:`z \\rightarrow 1/z` mirrors the zeros at the unit circle,
   correcting the negative phase response. This can be performed numerically by "flipping"
   the order of the coefficients and multiplying by :math:`z^{-N}` where :math:`N`
   is the order of :math:`A(z)`. This operation also conjugates the coefficients (?)
   which mirrors the zeros at the real axis. This effect has to be compensated,
-  yielding the polynome :math:`\\tilde{A}(z)`. It is the "flip-conjugate" or 
+  yielding the polynome :math:`\\tilde{A}(z)`. It is the "flip-conjugate" or
   "Hermitian conjugate" of :math:`A(z)`.
-  
+
   Frequently (e.g. in the scipy and until recently in the Matlab implementation)
   the conjugate operation is omitted which gives wrong results for complex
   coefficients.
-  
+
 * Finally, :math:`C(z) = B(z) \\tilde{A}(z)`:
 
 .. math::
-    
+
     C(z) = B(z)\\left[ z^{-N}{A}^{*}(1/z)\\right] = B(z)\\tilde{A}(z)
-    
-where 
+
+where
 
 .. math::
-    
+
     \\begin{align}
     \\tilde{A}(z) &=  z^{-N}{A}^{*}(1/z) = {a}^{*}_N + {a}^{*}_{N-1}z^{-1} + \ldots + {a}^{*}_1 z^{-(N-1)}+z^{-N}\\\\
     \Rightarrow \\tilde{A}(e^{j\omega T}) &=  e^{-jN \omega T}{A}^{*}(e^{-j\omega T}) \\\\
     \\Rightarrow \\angle\\tilde{A}(e^{j\omega T}) &= -\\angle A(e^{j\omega T}) - N\omega T
-    \\end{align}    
+    \\end{align}
 
 
-In Python, the coefficients of :math:`C(z)` are calculated efficiently by 
+In Python, the coefficients of :math:`C(z)` are calculated efficiently by
 convolving the coefficients of :math:`B(z)` and  :math:`\\tilde{A}(z)`:
 
 .. code-block:: python
 
     c = np.convolve(b, np.conj(a[::-1]))
 
-where :math:`b` and :math:`a` are the coefficient vectors of the original 
-numerator and denominator polynomes. The actual group delay is then calculated 
+where :math:`b` and :math:`a` are the coefficient vectors of the original
+numerator and denominator polynomes. The actual group delay is then calculated
 from the equivalent FIR filter as described above.
 
-Calculating the frequency response with the `np.polyval(p,z)` function at the 
-`NFFT` frequency points along the unit circle, :math:`z = \\exp(-j \\omega)`, 
-seems to be numerically less robust than using the FFT for the same task, it 
+Calculating the frequency response with the `np.polyval(p,z)` function at the
+`NFFT` frequency points along the unit circle, :math:`z = \\exp(-j \\omega)`,
+seems to be numerically less robust than using the FFT for the same task, it
 is also much slower.
 
-This measure fixes already most of the problems described for narrowband IIR 
+This measure fixes already most of the problems described for narrowband IIR
 filters in scipy issues [SC9310]_ and [SC1175]_. In my experience, these problems
 occur for all narrowband IIR response types.
 
@@ -465,7 +468,7 @@ it is recommended to calculate the group delay using the D. J. Shpak's algorithm
 Code is available at [ENDO5828333]_ (GPL licensed) or at [SPA]_ (MIT licensed).
 
 This algorithm sums the group delays of the individual sections which is much
-more robust as only second-order functions are involved. However, converting `(b,a)` 
+more robust as only second-order functions are involved. However, converting `(b,a)`
 coefficients to SOS coefficients introduces inaccuracies.
 
 References
@@ -492,63 +495,66 @@ Examples
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
 >>> tau_g, td = pyfda_lib.grpdelay(b)
 """
-                
+
     if not whole:
         nfft = 2*nfft
-    w = fs * np.arange(0, nfft)/nfft # create frequency vector
-    
-    tau_g = np.zeros_like(w) # initialize tau_g
-    
-    #----------------
+    w = fs * np.arange(0, nfft)/nfft  # create frequency vector
+
+    tau_g = np.zeros_like(w)  # initialize tau_g
+
+    # ----------------
 
     if alg == 'auto':
         if sos:
-            logger.info("Filter in SOS format, using Shpak algorithm for group delay.")
             alg = "shpak"
+            if verbose:
+                logger.info("Filter in SOS format, using Shpak algorithm for group delay.")
 
         elif fb.fil[0]['ft'] == 'IIR':
-            alg = 'jos' # TODO: use 'shpak' here as well?
-            logger.info("IIR filter, using J.O. Smith's algorithm for group delay.")
+            alg = 'jos'  # TODO: use 'shpak' here as well?
+            if verbose:
+                logger.info("IIR filter, using J.O. Smith's algorithm for group delay.")
         else:
             alg = 'jos'
-            logger.info("FIR filter, using J.O. Smith's algorithm for group delay.")
+            if verbose:
+                logger.info("FIR filter, using J.O. Smith's algorithm for group delay.")
 
     if sos and alg != "shpak":
-        b,a = sig.sos2tf(b)
+        b, a = sig.sos2tf(b)
 
     time_0 = int(time.perf_counter() * 1e9)
 
     # ---------------------
     if alg == 'diff':
-        #logger.info("Diff!")
         w, H = sig.freqz(b, a, worN=nfft, whole=whole)
-        singular = np.absolute(H) < n_eps * 10 * np.spacing(1) # equivalent to matlab "eps"
+        # np.spacing(1) is equivalent to matlab "eps"
+        singular = np.absolute(H) < n_eps * 10 * np.spacing(1)
         H[singular] = 0
-        tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w) # differentiation returns one element less
+        tau_g = -np.diff(np.unwrap(np.angle(H)))/np.diff(w)
+        # differentiation returns one element less than its input
         w = w[:-1]
 
     # ---------------------
     elif alg == 'jos':
-        #logger.info("Octave / JOS!")
         b, a = map(np.atleast_1d, (b, a))  # when scalars, convert to 1-dim. arrays
 
-        c = np.convolve(b, a[::-1]) # equivalent FIR polynome
-                                    # c(z) = b(z) * a(1/z)*z^(-oa)
-        cr = c * np.arange(c.size)  # multiply with ramp -> derivative of c wrt 1/z
+        c = np.convolve(b, a[::-1])     # equivalent FIR polynome
+                                        # c(z) = b(z) * a(1/z)*z^(-oa)
+        cr = c * np.arange(c.size)      # multiply with ramp -> derivative of c wrt 1/z
 
-        den = np.fft.fft(c,nfft)   # FFT = evaluate polynome around unit circle
-        num = np.fft.fft(cr,nfft)  # and ramped polynome at NFFT equidistant points
-        
-        # Check for singularities i.e. where denominator (`den`) coefficients 
-        # approach zero or numerator (`num`) or denominator coefficients are 
-        # non-finite, i.e. `nan`, `ìnf` or `ninf`. 
+        den = np.fft.fft(c, nfft)   # FFT = evaluate polynome around unit circle
+        num = np.fft.fft(cr, nfft)  # and ramped polynome at NFFT equidistant points
+
+        # Check for singularities i.e. where denominator (`den`) coefficients
+        # approach zero or numerator (`num`) or denominator coefficients are
+        # non-finite, i.e. `nan`, `ìnf` or `ninf`.
         singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
-                        (abs(den) < n_eps * np.spacing(1)))[0] 
+                            (abs(den) < n_eps * np.spacing(1)))[0]
 
         with np.errstate(invalid='ignore', divide='ignore'):
             # element-wise division of numerator and denominator FFTs
             tau_g = np.real(num / den) - a.size + 1
-        
+
         # set group delay = 0 at each singularity
         tau_g[singular] = 0
 
@@ -574,21 +580,20 @@ Examples
         #     den = np.fft.fft(a_b,nfft)
 
     # ---------------------
-    elif alg == "scipy": # implementation as in scipy.signal
-        #logger.info("Scipy!")
+    elif alg == "scipy":  # implementation as in scipy.signal
         w = np.atleast_1d(w)
         b, a = map(np.atleast_1d, (b, a))
-        c = np.convolve(b, a[::-1])   # coefficients of equivalent FIR polynome
-        cr = c * np.arange(c.size)    #  and of the ramped polynome
-        z = np.exp(-1j * w) # complex frequency points around the unit circle
-        den = np.polyval(c[::-1], z)  # evaluate polynome 
-        num = np.polyval(cr[::-1], z) # and ramped polynome
-        
-        # Check for singularities i.e. where denominator (`den`) coefficients 
-        # approach zero or numerator (`num`) or denominator coefficients are 
-        # non-finite, i.e. `nan`, `ìnf` or `ninf`. 
+        c = np.convolve(b, a[::-1])    # coefficients of equivalent FIR polynome
+        cr = c * np.arange(c.size)     # and of the ramped polynome
+        z = np.exp(-1j * w)            # complex frequency points around the unit circle
+        den = np.polyval(c[::-1], z)   # evaluate polynome
+        num = np.polyval(cr[::-1], z)  # and ramped polynome
+
+        # Check for singularities i.e. where denominator (`den`) coefficients
+        # approach zero or numerator (`num`) or denominator coefficients are
+        # non-finite, i.e. `nan`, `ìnf` or `ninf`.
         singular = np.where(~np.isfinite(den) | ~np.isfinite(num) |
-                        (abs(den) < n_eps * np.spacing(1)))[0] 
+                            (abs(den) < n_eps * np.spacing(1)))[0]
 
         with np.errstate(invalid='ignore', divide='ignore'):
             # element-wise division of numerator and denominator FFTs
@@ -596,7 +601,7 @@ Examples
 
         # set group delay = 0 at each singularity
         tau_g[singular] = 0
-        
+
         if verbose and np.any(singular):
             logger.warning('singularity -> setting to 0 at:')
             for i in singular:
@@ -608,25 +613,25 @@ Examples
             w = w[0:nfft]
 
     # ---------------------
-    elif alg.lower() == "shpak":
-        #logger.info("Using Shpak's algorithm")
+    elif alg.lower() == "shpak":  # Use Shpak's algorith
         if sos:
             w, tau_g = sos_group_delayz(b, w, fs=fs)
         else:
-            w, tau_g = group_delayz(b,a, w, fs=fs)
-            
+            w, tau_g = group_delayz(b, a, w, fs=fs)
+
     else:
         logger.error('Unknown algorithm "{0}"!'.format(alg))
         tau_g = np.zeros_like(w)
-    
+
     time_1 = int(time.perf_counter() * 1e9)
     delta_t = time_1 - time_0
     if verbose:
-        logger.info("grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
+        logger.info(
+            "grpdelay calculation ({0}): {1:.3g} ms".format(alg, delta_t/1.e6))
     return w, tau_g
-    
-# ----------------------------------------------------------------------
-    
+
+
+# ------------------------------------------------------------------------------
 def group_delayz(b, a, w, plot=None, fs=2*np.pi):
     """
     Compute the group delay of digital filter.
@@ -655,7 +660,7 @@ def group_delayz(b, a, w, plot=None, fs=2*np.pi):
     b, a = map(np.atleast_1d, (b, a))
     if len(a) == 1:
         # scipy.signal.group_delay returns gd in samples thus scaled by 1/fs
-        gd = sig.group_delay((b, a), w=w, fs=fs)[1] # / fs
+        gd = sig.group_delay((b, a), w=w, fs=fs)[1]
     else:
         sos = sig.tf2sos(b, a)
         gd = sos_group_delayz(sos, w, plot, fs)[1]
@@ -663,15 +668,16 @@ def group_delayz(b, a, w, plot=None, fs=2*np.pi):
         plot(w, gd)
     return w, gd
 
-#==============================================================================
+
+# ------------------------------------------------------------------------------
 #
-# The *_group_delayz routines and subroutines have been copied from 
+# The *_group_delayz routines and subroutines have been copied from
 #
 # https://github.com/spatialaudio/group-delay-of-filters
 #
 # committed by Nara Hahn under MIT license
 #
-#==============================================================================
+# ------------------------------------------------------------------------------
 def sos_group_delayz(sos, w, plot=None, fs=2*np.pi):
     """
     Compute group delay of digital filter in SOS format.
