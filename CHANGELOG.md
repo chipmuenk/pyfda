@@ -43,10 +43,11 @@
 
   - UI overhaul
   
-  - Started introducing audio features (not usable yet)
+  - Simulation is now frame based simulation to interrupt simulation of long 
+    sequences and audio I/O in the future. Progress bar works, though.
 
-  - Add widgets T1 and T2 for time / TW1 and TW2 for delays in y[n] and use them 
-      for  impulses
+  - Add widgets T1 and T2 for time and TW1 and TW2 for delays in y[n] and use them 
+      for impulse shaped stimuli
 
   - New stimuli 'Gauss' and 'Rect impulse'
 
@@ -60,12 +61,12 @@
 
   - Group stimuli for a better overview
 
-  - Allow changing the number of FFT data points via `Info -> Settings`
-
   - Display magnitude and phase in frequency tab
   
 - Allow turning off automatic grid alignment between mag. and phase in the 
   `H(f)` tab
+
+- Allow changing the number of FFT data points via `Info -> Settings`
 
 - Plots can be copied to the clipboard in base64 encoded PNG format for easier
   embedding in e.g. HTML pages or Jupyter Noteboks.
