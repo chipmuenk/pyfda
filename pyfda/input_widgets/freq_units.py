@@ -178,9 +178,10 @@ class FreqUnits(QWidget):
         rescaled like `f_a *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']` to maintain
         the displayed value `f_a * f_S`.
 
-        This has to be accomplished by each frequency widget.
+        This has to be accomplished by each frequency widget (currently, these are
+        freq_specs and freq_units).
 
-        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`
+        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`,
         the signal 'view_changed':'f_S' is emitted.
         """
 
@@ -309,7 +310,7 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'T_S': 1./fb.fil[0]['f_S']})
                 fb.fil[0].update({'f_max': fb.fil[0]['f_S']})
 
-                self._freq_range(emit = False)  # update plotting range
+                self._freq_range(emit=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
                 self.spec_edited = False  # reset flag, changed entry has been saved
 
@@ -328,7 +329,7 @@ class FreqUnits(QWidget):
 
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
-                source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced precision
+                source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced prec.
         # Call base class method to continue normal event processing:
         return super(FreqUnits, self).eventFilter(source, event)
 

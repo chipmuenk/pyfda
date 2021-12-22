@@ -62,9 +62,9 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs()
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.recalc_freqs()
-            #self.load_dict()
+            # self.load_dict()
 
-#-------------------------------------------------------------
+# -------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct the User Interface
@@ -101,14 +101,14 @@ class FreqSpecs(QWidget):
 
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # EVENT FILTER
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # DYNAMIC SIGNAL SLOT CONNECTION:
         # Every time a field is edited, call self.store_entries
         # This is achieved by dynamically installing and
@@ -151,7 +151,7 @@ class FreqSpecs(QWidget):
         # Call base class method to continue normal event processing:
         return super(FreqSpecs, self).eventFilter(source, event)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _store_entry(self, event_source):
         """
         _store_entry is triggered by `QEvent.focusOut` in the eventFilter:
@@ -161,7 +161,8 @@ class FreqSpecs(QWidget):
         """
         if self.spec_edited:
             f_label = str(event_source.objectName())
-            f_value = safe_eval(event_source.text(), fb.data_old, sign='pos') / fb.fil[0]['f_S']
+            f_value = safe_eval(
+                event_source.text(), fb.data_old, sign='pos') / fb.fil[0]['f_S']
             fb.fil[0].update({f_label: f_value})
             self.sort_dict_freqs()
             self.emit({'specs_changed': 'f_specs'})
@@ -171,7 +172,7 @@ class FreqSpecs(QWidget):
         else:
             self.load_dict()
 
-# -------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_UI(self, new_labels=()):
         """
         Called from filter_specs.update_UI() and target_specs.update_UI()
@@ -197,36 +198,39 @@ class FreqSpecs(QWidget):
 
         # ---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
-                            fb.fil[0]['rt'],fb.fil[0]['fc'],fb.fil[0]['fo']))
+                            fb.fil[0]['rt'], fb.fil[0]['fc'],fb.fil[0]['fo']))
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}:
                 self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
-            else: # convert 'F' to 'f' for frequencies in Hz
-                self.qlabels[i].setText(to_html(new_labels[i][0].lower()\
-                            + new_labels[i][1:], frmt='bi'))
+            else:  # convert 'F' to 'f' for frequencies in Hz
+                self.qlabels[i].setText(
+                    to_html(new_labels[i][0].lower() + new_labels[i][1:], frmt='bi'))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
 
             if "sb" in new_labels[i].lower():
-                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) stop band" + f_range + ".</span>")
+                self.qlineedit[i].setToolTip(
+                    "<span>Corner frequency for (this) stop band" + f_range + ".</span>")
             elif "pb" in new_labels[i].lower():
-                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) pass band" + f_range + ".</span>")
+                self.qlineedit[i].setToolTip(
+                    "<span>Corner frequency for (this) pass band" + f_range + ".</span>")
             else:
-                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) band" + f_range + ".</span>")
+                self.qlineedit[i].setToolTip(
+                    "<span>Corner frequency for (this) band" + f_range + ".</span>")
 
         self.n_cur_labels = num_new_labels  # update number of currently visible labels
-        self.sort_dict_freqs() # sort frequency entries in dictionary and update display
+        self.sort_dict_freqs()  # sort frequency entries in dictionary and update display
 
-# -------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies if required. This is called by via signal 
-        ['ui_changed':'f_S']
+        Update normalized frequencies if required. This is called by via signal
+        ['ui_changed': 'f_S']
         """
         if fb.fil[0]['freq_locked']:
             for i in range(len(self.qlineedit)):
@@ -323,8 +327,8 @@ class FreqSpecs(QWidget):
                 self.qlineedit[i].installEventFilter(self)  # filter events
 
                 # first entry is the title
-                self.layGSpecs.addWidget(self.qlabels[i],i+1,0)
-                self.layGSpecs.addWidget(self.qlineedit[i],i+1,1)
+                self.layGSpecs.addWidget(self.qlabels[i], i+1, 0)
+                self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
 
 # ------------------------------------------------------------------------------
     def sort_dict_freqs(self):
@@ -342,7 +346,7 @@ class FreqSpecs(QWidget):
         """
 
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
-                        for i in range(self.n_cur_labels)]
+                   for i in range(self.n_cur_labels)]
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
 
@@ -366,7 +370,7 @@ class FreqSpecs(QWidget):
         _, mult = unique_roots(f_specs, tol=MIN_FREQ_STEP)
         ident = [x for x in mult if x > 1]
         if ident:
-            logger.warning("Frequencies must differ by at least {0:.4g}"\
+            logger.warning("Frequencies must differ by at least {0:.4g}"
                            .format(MIN_FREQ_STEP * fb.fil[0]['f_S']))
 
         self.load_dict()
