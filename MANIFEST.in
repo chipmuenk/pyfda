@@ -9,7 +9,7 @@ include pyfda/fixpoint_widgets/*.png
 include pyfda/fixpoint_widgets/fir_df/*.png
 
 include pyfda/libs/pyfda_*.conf
-recursive-include pyfda *.md pyfda_icon.*
+recursive-include pyfda *.md pyfda_icon.* *.qrc
 include *.md
 include requirements.txt
 include pyfdax.spec
