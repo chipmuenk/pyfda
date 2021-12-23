@@ -24,7 +24,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval, to_html
-from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width
+from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width, qcmb_box_populate
 
 import logging
 logger = logging.getLogger(__name__)
@@ -47,6 +47,15 @@ class Plot_Hf(QWidget):
 
         self.log_bottom = -80
         self.lin_neg_bottom = -10
+
+        self.cmb_units_a_items = [
+            "<span>Set unit for y-axis</span>",
+            ("Auto", "Auto", "Use same setting as in Ripple specifications"),
+            ("dB", "dB", "Attenuation in dB"),
+            ("V", "V", "Linear gain"),
+            ("W", "W", "Power gain")
+        ]
+        self.cmb_units_a_default = "auto"  # default setting
 
         self._construct_ui()
 
@@ -85,16 +94,12 @@ class Plot_Hf(QWidget):
                                  "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
-        self.lblIn = QLabel("in", self)
+        self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
 
-        units = ['dB', 'V', 'W', 'Auto']
-        self.cmbUnitsA = QComboBox(self)
-        self.cmbUnitsA.addItems(units)
-        self.cmbUnitsA.setObjectName("cmbUnitsA")
-        self.cmbUnitsA.setToolTip(
-            "<span>Set unit for y-axis:\ndB is attenuation (positive values), "
-            "V and W are gain (less than 1).</span>")
-        self.cmbUnitsA.setCurrentIndex(0)
+        self.cmb_units_a = QComboBox(self)
+        qcmb_box_populate(self.cmb_units_a, self.cmb_units_a_items,
+                          self.cmb_units_a_default)
+        self.cmb_units_a.setObjectName("cmbUnitsA")
 
         self.lbl_log_bottom = QLabel(to_html("min =", 'bi'), self)
         self.led_log_bottom = QLineEdit(self)
@@ -105,7 +110,7 @@ class Plot_Hf(QWidget):
         self.lbl_log_unit = QLabel("dB", self)
 
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.but_zerophase = PushButton(" Zero phase ", checked=False)
         self.but_zerophase.setToolTip(
@@ -140,7 +145,7 @@ class Plot_Hf(QWidget):
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.cmbShowH)
         layHControls.addWidget(self.lblIn)
-        layHControls.addWidget(self.cmbUnitsA)
+        layHControls.addWidget(self.cmb_units_a)
         layHControls.addStretch(1)
         layHControls.addWidget(self.lbl_log_bottom)
         layHControls.addWidget(self.led_log_bottom)
@@ -184,7 +189,7 @@ class Plot_Hf(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmbUnitsA.currentIndexChanged.connect(self.draw)
+        self.cmb_units_a.currentIndexChanged.connect(self.draw)
         self.led_log_bottom.editingFinished.connect(self.update_view)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
@@ -592,10 +597,10 @@ class Plot_Hf(QWidget):
         if np.all(self.W) is None:  # H(f) has not been calculated yet
             self.calc_hf()
 
-        if self.cmbUnitsA.currentText() == 'Auto':
+        if self.cmb_units_a.currentText() == 'Auto':
             self.unitA = fb.fil[0]['amp_specs_unit']
         else:
-            self.unitA = self.cmbUnitsA.currentText()
+            self.unitA = self.cmb_units_a.currentText()
 
         # only display log bottom widget for unit dB
         self.lbl_log_bottom.setVisible(self.unitA == 'dB')
