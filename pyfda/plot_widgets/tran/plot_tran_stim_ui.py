@@ -48,8 +48,8 @@ class Plot_Tran_Stim_UI(QWidget):
         - qfft_win_select
         """
 
-        logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
+        #             .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
