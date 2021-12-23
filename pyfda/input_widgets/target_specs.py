@@ -63,7 +63,7 @@ class TargetSpecs(QWidget):
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title="Frequency")
         # subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Amplitude")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple")
         self.a_specs.setVisible(True)
         """
         LAYOUT
