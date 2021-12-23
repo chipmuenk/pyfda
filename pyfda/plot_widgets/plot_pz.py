@@ -10,15 +10,15 @@
 Widget for plotting poles and zeros
 """
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox)
+    QWidget, QLabel, QFrame, QDial, QHBoxLayout, pyqtSignal, QComboBox, QLineEdit)
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.plot_widgets import mpl_widget
 from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html
-from pyfda.libs.pyfda_qt_lib import PushButton, qcmb_box_populate, qget_cmb_box
+from pyfda.libs.pyfda_lib import unique_roots, H_mag, to_html, safe_eval
+from pyfda.libs.pyfda_qt_lib import (
+    PushButton, qcmb_box_populate, qget_cmb_box, qtext_width)
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
@@ -43,16 +43,22 @@ class Plot_PZ(QWidget):
         self.tool_tip = "Pole / zero plan"
         self.tab_label = "P / Z"
 
-        self.cmb_overlay_list = [
+        self.cmb_overlay_items = [
             "<span>Add various overlays to P/Z diagram.</span>",
             ("none", "None", ""),
             ("h(f)", "|H(f)|",
-             "<span>Show |H(f)|, wrapped around the unit circle.</span>"),
+             "<span>Show |H(f)| wrapped around the unit circle between 0 resp. -120 dB "
+             "and max(H(f)).</span>"),
             ("contour", "Contour", "<span>Show contour lines for |H(z)|</span>"),
             ("contourf", "Contourf", "<span>Show filled contours for |H(z)|</span>"),
             ]
-        self.cmb_overlay_item = "none"  # default setting
+        self.cmb_overlay_default = "none"  # default setting
         self.cmap = "viridis"  # colormap
+
+        self.zmin = 0
+        self.zmax = 2
+        self.zmin_dB = -80
+        self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -89,9 +95,11 @@ class Plot_PZ(QWidget):
         """
         self.lbl_overlay = QLabel(to_html("Overlay:", frmt='bi'), self)
         self.cmb_overlay = QComboBox(self)
-        qcmb_box_populate(self.cmb_overlay, self.cmb_overlay_list, self.cmb_overlay_item)
+        qcmb_box_populate(
+            self.cmb_overlay, self.cmb_overlay_items, self.cmb_overlay_default)
 
         self.but_log = PushButton(" Log.", checked=True)
+        self.but_log.setObjectName("but_log")
         self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
         self.diaRad_Hf = QDial(self)
@@ -105,6 +113,24 @@ class Plot_PZ(QWidget):
 
         self.lblRad_Hf = QLabel("Radius", self)
 
+        self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
+        self.ledBottom = QLineEdit(self)
+        self.ledBottom.setObjectName("ledBottom")
+        self.ledBottom.setText(str(self.zmin))
+        self.ledBottom.setMaximumWidth(qtext_width(N_x=8))
+        self.ledBottom.setToolTip("Minimum display value.")
+        self.lblBottomdB = QLabel("dB", self)
+        self.lblBottomdB.setVisible(self.but_log.isChecked())
+
+        self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
+        self.ledTop = QLineEdit(self)
+        self.ledTop.setObjectName("ledTop")
+        self.ledTop.setText(str(self.zmax))
+        self.ledTop.setToolTip("Maximum display value.")
+        self.ledTop.setMaximumWidth(qtext_width(N_x=8))
+        self.lblTopdB = QLabel("dB", self)
+        self.lblTopdB.setVisible(self.but_log.isChecked())
+
         self.but_fir_poles = PushButton(" FIR Poles ", checked=True)
         self.but_fir_poles.setToolTip("<span>Show FIR poles at the origin.</span>")
 
@@ -114,6 +140,12 @@ class Plot_PZ(QWidget):
         layHControls.addWidget(self.but_log)
         layHControls.addWidget(self.diaRad_Hf)
         layHControls.addWidget(self.lblRad_Hf)
+        layHControls.addWidget(self.lblTop)
+        layHControls.addWidget(self.ledTop)
+        layHControls.addWidget(self.lblTopdB)
+        layHControls.addWidget(self.lblBottom)
+        layHControls.addWidget(self.ledBottom)
+        layHControls.addWidget(self.lblBottomdB)
         layHControls.addStretch(10)
         layHControls.addWidget(self.but_fir_poles)
 
@@ -140,7 +172,7 @@ class Plot_PZ(QWidget):
 
         self.init_axes()
 
-        self.draw()  # calculate and draw poles and zeros
+        self._log_clicked()  # calculate and draw poles and zeros
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -151,11 +183,47 @@ class Plot_PZ(QWidget):
         # ----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.cmb_overlay.currentIndexChanged.connect(self.draw)
-        self.but_log.clicked.connect(self.draw)
+        self.but_log.clicked.connect(self._log_clicked)
+        self.ledBottom.editingFinished.connect(self._log_clicked)
+        self.ledTop.editingFinished.connect(self._log_clicked)
         self.diaRad_Hf.valueChanged.connect(self.draw)
         self.but_fir_poles.clicked.connect(self.draw)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    def _log_clicked(self):
+        """
+        Change scale and settings to log / lin when log setting is changed
+        Update min / max settings when lineEdits have been edited
+        """
+        # clicking but_log triggered the slot or initialization
+        if self.sender() is None or self.sender().objectName() == 'but_log':
+            if self.but_log.isChecked():
+                self.ledBottom.setText(str(self.zmin_dB))
+                self.zmax_dB = np.round(20 * np.log10(self.zmax), 2)
+                self.ledTop.setText(str(self.zmax_dB))
+            else:
+                self.ledBottom.setText(str(self.zmin))
+                self.zmax = np.round(10**(self.zmax_dB / 20), 2)
+                self.ledTop.setText(str(self.zmax))
+
+        else:  # finishing a lineEdit field triggered the slot
+            if self.but_log.isChecked():
+                self.zmin_dB = safe_eval(
+                    self.ledBottom.text(), self.zmin_dB, return_type='float')
+                self.ledBottom.setText(str(self.zmin_dB))
+                self.zmax_dB = safe_eval(
+                    self.ledTop.text(), self.zmax_dB, return_type='float')
+                self.ledTop.setText(str(self.zmax_dB))
+            else:
+                self.zmin = safe_eval(
+                    self.ledBottom.text(), self.zmin, return_type='float')
+                self.ledBottom.setText(str(self.zmin))
+                self.zmax = safe_eval(self.ledTop.text(), self.zmax, return_type='float')
+                self.ledTop.setText(str(self.zmax))
+
+        self.draw()
+
+    # --------------------------------------------------------------------------
     def init_axes(self):
         """
         Initialize and clear the axes (this is only run once)
@@ -166,7 +234,7 @@ class Plot_PZ(QWidget):
         self.ax.xaxis.tick_bottom()  # remove axis ticks on top
         self.ax.yaxis.tick_left()  # remove axis ticks right
 
-# -----------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_view(self):
         """
         Draw the figure with new limits, scale etcs without recalculating H(f)
@@ -174,14 +242,22 @@ class Plot_PZ(QWidget):
         """
         self.draw()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def draw(self):
         self.but_fir_poles.setVisible(fb.fil[0]['ft'] == 'FIR')
+        contour = qget_cmb_box(self.cmb_overlay) in {"contour", "contourf"}
+        self.ledBottom.setVisible(contour)
+        self.lblBottom.setVisible(contour)
+        self.lblBottomdB.setVisible(contour and self.but_log.isChecked())
+        self.ledTop.setVisible(contour)
+        self.lblTop.setVisible(contour)
+        self.lblTopdB.setVisible(contour and self.but_log.isChecked())
+
         if True:
             self.init_axes()
         self.draw_pz()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def draw_pz(self):
         """
         (re)draw P/Z plot
@@ -224,14 +300,14 @@ class Plot_PZ(QWidget):
 
         self.redraw()
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
                plt_ax=None, plt_poles=True, style='equal', anaCircleRad=0, lw=2,
                mps=10, mzs=10, mpc='r', mzc='b', plabel='', zlabel=''):
@@ -424,7 +500,7 @@ class Plot_PZ(QWidget):
 
         return z, p, k
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def draw_contours(self, overlay):
         if overlay not in {"contour", "contourf"}:
             return
@@ -440,11 +516,11 @@ class Plot_PZ(QWidget):
         z = x + 1j*y  # create coordinate grid for complex plane
 
         if self.but_log.isChecked():
-            H_max = 0
-            H_min = -100
+            H_max = self.zmax_dB
+            H_min = self.zmin_dB
         else:
-            H_max = 1
-            H_min = 0
+            H_max = self.zmax
+            H_min = self.zmin
         Hmag = H_mag(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], z, H_max, H_min=H_min,
                      log=self.but_log.isChecked())
 
@@ -463,7 +539,7 @@ class Plot_PZ(QWidget):
         self.ax.set_xlim(xl)
         self.ax.set_xlim(yl)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def draw_Hf(self, r=2, Hf_visible=True):
         """
         Draw the magnitude frequency response around the UC
