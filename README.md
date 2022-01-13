@@ -4,7 +4,6 @@ pyFDA
 
 [![PyPI version](https://badge.fury.io/py/pyfda.svg)](https://badge.fury.io/py/pyfda)
 [![Downloads/mo.](https://pepy.tech/badge/pyfda/month)](https://pepy.tech/project/pyfda)
-[![Conda pyfda version](https://img.shields.io/conda/v/chipmuenk/pyfda.svg)](https://anaconda.org/chipmuenk/pyfda)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Travis-CI](https://travis-ci.org/chipmuenk/pyFDA.svg?branch=master)](https://travis-ci.org/chipmuenk/pyFDA)
@@ -52,15 +51,15 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
   * [**Markdown**](https://github.com/Python-Markdown/markdown)
   
 ### Optional libraries:
-* [**migen**](https://github.com/m-labs/migen) for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
-* [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursorsd
+* [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
+* [**nMigen**](https://github.com/nmigen/nmigen/) for Verilog export. Due to packaging problems, this is not well supported by pyFDA at the moment.
 
 ## Installing pyFDA
 Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
-There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you don't need to install anything in principle: 
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you can install pyfda using one of the following options: 
 ### pip
 Installation from PyPI works the usual way, required libraries are installed automatically if missing:
 
@@ -153,14 +152,6 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 ## Release History / Roadmap
 
 For details, see [CHANGELOG.md](./CHANGELOG.md).
-
-### Upcoming release (0.4.0)
-* Matplotlib 3.3 compatibility
-* Define your own stimulus interactively (based on the [numexpr](https://github.com/pydata/numexpr) module)
-* Add cursor / annotations in plots using the [mplcursors](https://mplcursors.readthedocs.io/) module
-* Derive the name of the top level Verilog module from the name of the Verilog file
-* Improve setup of user and user log config files
-* State licensing conditions more clearly
 
 ### Planned features 
 
