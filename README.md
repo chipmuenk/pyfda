@@ -40,14 +40,14 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 
 ## Prerequisites
 
-* Python versions: **3.5 ... 3.8**
+* Python versions: **3.6 ... 3.9**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
   * [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) / [**Qt5**](https://qt.io/)
   * [**numpy**](https://numpy.org/)
   * [**numexpr**](https://github.com/pydata/numexpr)
   * [**scipy**](https://scipy.org/): **1.2.0** or higher
-  * [**matplotlib**](https://matplotlib.org/): **2.0** or higher (**3.3 supported in v0.4.0**) 
+  * [**matplotlib**](https://matplotlib.org/): **3.1** or higher
   * [**Markdown**](https://github.com/Python-Markdown/markdown)
   
 ### Optional libraries:
