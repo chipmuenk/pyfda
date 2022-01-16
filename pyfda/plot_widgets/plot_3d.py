@@ -22,9 +22,11 @@ from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
-from matplotlib import cm # Colormap
+from matplotlib import cm  # Colormap
 from matplotlib.pyplot import colormaps
 from matplotlib.colors import LightSource
+from mpl_toolkits.mplot3d import Axes3D  # needed for matplotlib < 3.2
+Axes3D = Axes3D  # prevent auto-deletion by IDE (Axes3D is never referenced)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ else:
     MLAB = False
 
 if mod_version('vispy'):
-    from vispy import plot # (?)
+    from vispy import plot  # (?)
     HAS_VISPY = True
 else:
     HAS_VISPY = False
@@ -472,7 +474,7 @@ class Plot_3D(QWidget):
 
             np.seterr(**old_settings_seterr)
 
-        else: # linear scale
+        else:  # linear scale
             bottom = max(self.zmin, H_min)  # min. display value
             top = self.zmax                 # max. display value
             top_bottom = top - bottom
@@ -481,7 +483,7 @@ class Plot_3D(QWidget):
             zlevel = bottom + top_bottom * zlevel_rel  # height of displayed zero position
 
             if self.cmbMode3D.currentText() == 'None':  # "Poleposition": H(f) plot only
-                #H_max = np.clip(max(H_abs), 0, self.zmax)
+                # H_max = np.clip(max(H_abs), 0, self.zmax)
                 # make height of displayed poles same to zeros
                 plevel_top = bottom + top_bottom * zlevel_rel
                 plevel_btm = bottom
@@ -513,10 +515,11 @@ class Plot_3D(QWidget):
 
             if stride < 10:  # plot thin vertical line every stride points on the UC
                 for k in range(len(self.xy_UC[::stride])):
-                    self.ax3d.plot([self.xy_UC.real[::stride][k], self.xy_UC.real[::stride][k]],
+                    self.ax3d.plot(
+                        [self.xy_UC.real[::stride][k], self.xy_UC.real[::stride][k]],
                         [self.xy_UC.imag[::stride][k], self.xy_UC.imag[::stride][k]],
                         [np.ones(len(self.xy_UC[::stride]))[k]*bottom, H_UC[::stride][k]],
-                         linewidth=1, color=(0.5, 0.5, 0.5))
+                        linewidth=1, color=(0.5, 0.5, 0.5))
 
         # ===============================================================
         # Plot Poles and Zeros
@@ -529,14 +532,14 @@ class Plot_3D(QWidget):
             self.ax3d.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
                markersize=PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
                 markerfacecolor='none')
-            for k in range(len(zz)): # plot zero "stems"
+            for k in range(len(zz)):  # plot zero "stems"
                 self.ax3d.plot([zz[k].real, zz[k].real], [zz[k].imag, zz[k].imag],
                             [bottom, zlevel], linewidth=1, color='b')
 
             # Plot the poles at |H(z_p)| = plevel with "stems":
             self.ax3d.plot(np.real(pp), np.imag(pp), plevel_top,
               'x', markersize=PN_SIZE, markeredgewidth=2.0, markeredgecolor='red')
-            for k in range(len(pp)): # plot pole "stems"
+            for k in range(len(pp)):  # plot pole "stems"
                 self.ax3d.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
                             [plevel_btm, plevel_top], linewidth=1, color='r')
 
@@ -586,9 +589,9 @@ class Plot_3D(QWidget):
     #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
     #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
     #            s.set_edgecolor('gray')
-                s = self.ax3d.plot_surface(self.x, self.y, Hmag,
-                        alpha=alpha, rstride=1, cstride=1,
-                        linewidth=0, antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
+                s = self.ax3d.plot_surface(
+                    self.x, self.y, Hmag, alpha=alpha, rstride=1, cstride=1, linewidth=0,
+                    antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
                 s.set_edgecolor(None)
         # ---------------------------------------------------------------
         # 3D-Contour plot
@@ -609,16 +612,16 @@ class Plot_3D(QWidget):
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-            s = self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='z',
-                               offset=bottom - (top - bottom) * 0.05,
-                                cmap=cmap, alpha=alpha)
+            s = self.ax3d.contourf(
+                self.x, self.y, Hmag, NL, zdir='z', offset=bottom - (top - bottom) * 0.05,
+                cmap=cmap, alpha=alpha)
 
         # plot colorbar for suitable plot modes
         if self.but_colbar.isChecked() and (self.but_contour_2d.isChecked() or
-                str(self.cmbMode3D.currentText()) in {'Contour', 'Surf'}):
-                            self.colb = self.mplwidget.fig.colorbar(m_cb,
-                                ax=self.ax3d, shrink=0.8, aspect=20,
-                                pad=0.02, fraction=0.08)
+                                            str(self.cmbMode3D.currentText())
+                                            in {'Contour', 'Surf'}):
+            self.colb = self.mplwidget.fig.colorbar(m_cb, ax=self.ax3d, shrink=0.8, 
+                                                    aspect=20, pad=0.02, fraction=0.08)
 
         # ----------------------------------------------------------------------
         # Set view limits and labels
@@ -630,8 +633,8 @@ class Plot_3D(QWidget):
         else:
             self._restore_axes()
 
-        self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
-        self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        self.ax3d.set_xlabel('Re')  # (fb.fil[0]['plt_fLabel'])
+        self.ax3d.set_ylabel('Im')  # (r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
 #        self.ax3d.set_zlabel(r'$|H(z)|\; \rightarrow $')
         self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
 
