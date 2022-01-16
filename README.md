@@ -40,7 +40,7 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 
 ## Prerequisites
 
-* Python versions: **3.6 ... 3.9**
+* Python versions: **3.6 ... 3.10**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
   * [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) / [**Qt5**](https://qt.io/)
@@ -54,7 +54,6 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 * [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
-* [**nMigen**](https://github.com/nmigen/nmigen/) for Verilog export. Due to packaging problems, this is not well supported by pyFDA at the moment.
 
 ## Installing pyFDA
 Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
@@ -159,7 +158,6 @@ For details, see [CHANGELOG.md](./CHANGELOG.md).
 * Distribution as Flatpak
 * Display filtered data as spectrogram plot
 * Move fixpoint library to [https://github.com/chipmuenk/pyfixp]
-* Simulate and synthesize IIR filters with [nMigen](https://github.com/nmigen/nmigen)
 * Dark mode
 
 #### Ideas (for the not so near future or for )
