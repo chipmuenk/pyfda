@@ -172,6 +172,11 @@ class Plot_Tran_Stim(QWidget):
                 self.title_str = (
                     r'PM / FM Stimulus: $A_1 \sin(2 \pi n f_1'
                     r'+ \varphi_1 + A_2 \sin(2 \pi n f_2 + \varphi_2))$')
+            elif self.ui.stim == "pwm":
+                self.title_str = (
+                    r'PWM Stimulus with Duty Cycle $\frac {1} {2}(1 + A_2\sin(2 \pi n f_2'
+                    r'+ \varphi_2 ))$')
+
             # ------------------------------------------------------------------
             elif self.ui.stim == "formula":
                 self.title_str = r'Formula Defined Stimulus'
@@ -292,6 +297,18 @@ class Plot_Tran_Stim(QWidget):
             self.xf = self.ui.A1 * np.sin(
                 2 * pi * n * self.ui.f1 + self.rad_phi1 +
                 self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
+        # ----------------------------------------------------------------------
+        elif self.ui.stim == "pwm":
+            if self.ui.but_stim_bl.isChecked():
+                self.xf = self.ui.A1 * rect_bl(
+                    2 * np.pi * n * self.ui.f1 + self.rad_phi1,
+                    duty=(1/2 + self.ui.A2 / 2 *
+                          np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
+            else:
+                self.xf = self.ui.A1 * sig.square(
+                    2 * np.pi * n * self.ui.f1 + self.rad_phi1,
+                    duty=(1/2 + self.ui.A2 / 2 *
+                          np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "formula":
             param_dict = {"A1": self.ui.A1, "A2": self.ui.A2,

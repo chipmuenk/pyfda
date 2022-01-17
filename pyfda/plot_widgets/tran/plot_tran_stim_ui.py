@@ -74,12 +74,13 @@ class Plot_Tran_Stim_UI(QWidget):
         # stimuli
         self.cmb_stim_item = "impulse"
         self.cmb_stim_periodic_item = 'square'
+        self.cmb_stim_modulation_item = 'am'
         self.stim = "dirac"
         self.impulse_type = 'dirac'
         self.sinusoid_type = 'sine'
 
         self.chirp_type = 'linear'
-        self.modulation_type = 'am'
+
         self.noise = "None"
 
         self.f1 = 0.02
@@ -123,6 +124,7 @@ class Plot_Tran_Stim_UI(QWidget):
             "comb":    {"dc", "a1", "phi1", "f1", "noise"},
             "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
+            "pwm":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise", "bl"},
             "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1",
                         "BW2", "noise"}
          })
@@ -179,6 +181,14 @@ class Plot_Tran_Stim_UI(QWidget):
             ("cos", "Cos", "Cosine signal"),
             ("exp", "Exp", "Complex exponential"),
             ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
+            ]
+
+        self.cmb_stim_modulation_items = [
+            "Modulated signals",
+            ("am", "AM", "<span>Sinusoidal amplitude modulation of a sine</span>"),
+            ("pmfm", "PM / FM", "<span>Sinusoidal phase or frequency modulation "
+             "of a sine</span>"),
+            ("pwm", "PWM", "sinusoidal pulse width modulation")
             ]
 
         # data / text / tooltip for noise stimulus combobox.
@@ -247,9 +257,9 @@ class Plot_Tran_Stim_UI(QWidget):
                           self.cmb_stim_periodic_item)
 
         self.cmbModulationType = QComboBox(self)
-        for t in [("AM", "am"), ("PM / FM", "pmfm")]:  # text, data
-            self.cmbModulationType.addItem(*t)
-        qset_cmb_box(self.cmbModulationType, self.modulation_type, data=True)
+        qcmb_box_populate(
+            self.cmbModulationType, self.cmb_stim_modulation_items,
+            self.cmb_stim_modulation_item)
 
         # -------------------------------------
         self.chk_step_err = QPushButton("Error", self)
