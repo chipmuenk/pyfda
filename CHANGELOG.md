@@ -1,4 +1,9 @@
 ## Changelog
+### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-xx-2xx)
+
+- Add new stimulus "PWM"
+
+- Fix crash with matplotlib 3.1 due to missing Axes3D import
 
 ### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-12-23)
 
