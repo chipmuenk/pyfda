@@ -309,19 +309,19 @@ class Input_PZ_UI(QWidget):
         """
         if params['CSV']['clipboard']:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
-            self.butFromTable.setToolTip("<span>"
-                    "Copy table to clipboard, SELECTED items are copied as "
-                    "displayed. When nothing is selected, the whole table "
-                    "is copied with full precision in decimal format.</span>")
+            self.butFromTable.setToolTip(
+                "<span>Copy table to clipboard, SELECTED items are copied as "
+                "displayed. When nothing is selected, the whole table "
+                "is copied with full precision in decimal format.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
-            self.butFromTable.setToolTip("<span>"
-                    "Save table to file, SELECTED items are copied as "
-                    "displayed. When nothing is selected, the whole table "
-                    "is copied with full precision in decimal format.</span>")
+            self.butFromTable.setToolTip(
+                "<span>Save table to file, SELECTED items are copied as "
+                "displayed. When nothing is selected, the whole table "
+                "is copied with full precision in decimal format.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
             self.butToTable.setToolTip("<span>Load table from file.</span>")
