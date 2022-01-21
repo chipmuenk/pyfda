@@ -1,9 +1,16 @@
 ## Changelog
 ### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-xx-2xx)
 
+### Bug fixes
+- Fix crash with matplotlib 3.1 due to missing Axes3D import
+
+### New features
+- Keyboard modifier `<ALT>` hides the plot title when saving a
+  figure or copying it to the clipboard
+
 - Add new stimulus "PWM"
 
-- Fix crash with matplotlib 3.1 due to missing Axes3D import
+- Verified functionality with Python 3.10
 
 ### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-12-23)
 
