@@ -419,17 +419,23 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
         # SAVE:
         # --------------------------------------
-        self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self.save_figure)
-        self.a_sv.setToolTip('Save the figure')
-
+        self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self._save_figure)
+        self.a_sv.setToolTip('<span>Save the figure in various file formats. '
+                             'Press &lt;ALT&gt; to hide title.</span>')
         self.cb = fb.clipboard
 
+        # --------------------------------------
+        # Copy to clipboard:
+        # --------------------------------------
         self.a_cb = self.addAction(
             QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(
-            '<span>Copy to clipboard in png format. Press &lt;SHIFT&gt; for base64 '
-            'encoded png format (e.g. for Jupyter Notebooks). Press &lt;SHIFT&gt; to '
-            'embed base64 encoded PNG in &lt;img&gt; tag.</span>')
+            '<span>Copy figure to clipboard in png format.'
+            '<ul><li>Press &lt;ALT&gt; to hide title.</li>'
+            '<li>Press &lt;SHIFT&gt; for base64 '
+            'encoded png format (e.g. for Jupyter Notebooks).</li> '
+            '<li>Press &lt;CTRL&gt; to '
+            'embed base64 encoded PNG in &lt;img&gt; tag.</li></ul></span>')
         self.a_cb.setShortcut("Ctrl+C")
 
         # --------------------------------------
@@ -641,15 +647,48 @@ class MplToolbar(NavigationToolbar):
 #
 # =============================================================================
 # ------------------------------------------------------------------------------
+    def _save_figure(self):
+        """
+        Save current figure using matplotlib's `save_figure()`. When <ALT> key is
+        pressed, remove the title before saving.
+        """
+        if QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier:
+            title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
+            self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
+            self.canvas.draw()  # redraw plot without title
+            self.save_figure()
+            self.mpl_widget.fig.get_axes()[0].set_title(title)  # restore title
+            self.canvas.draw()  # and redraw once more
+        else:
+            self.save_figure()
+
+# ------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
         Copy current figure to the clipboard, either directly as PNG file or as
         base64 encoded PNG file.
+
+        Qt.ShiftModifier = 0x02000000 # Shift key pressed
+        Qt.ControlModifier = 0x04000000 # Control key
+        Qt.AltModifier   = 0x08000000 # Alt key
+        Qt.MetaModifier  = 0x10000000 # Meta key
         """
         try:
-            img = QImage(self.canvas.grab())
-
             modifiers = QtWidgets.QApplication.keyboardModifiers()
+            title_info = ""
+            if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier:
+                # logger.warning(f"suptitle {self.mpl_widget.fig._suptitle.get_text()}")
+                modifiers = modifiers & ~QtCore.Qt.AltModifier  # blank out AltMod. bit
+                title_info = "(no title) "
+                title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
+                self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
+                self.canvas.draw()  # redraw plot without title
+                img = QImage(self.canvas.grab())  # and grab it
+                self.mpl_widget.fig.get_axes()[0].set_title(title)  # restore title
+                self.canvas.draw()  # and redraw once more
+            else:
+                img = QImage(self.canvas.grab())  # grab original screen
+
             if modifiers in {QtCore.Qt.ShiftModifier, QtCore.Qt.ControlModifier}:
                 ba = QtCore.QByteArray()
                 buffer = QtCore.QBuffer(ba)  # create buffer of ByteArray
@@ -660,16 +699,18 @@ class MplToolbar(NavigationToolbar):
                 # ... and copy as string to clipboard after removing b' ... '
                 if modifiers == QtCore.Qt.ShiftModifier:
                     self.cb.setText(base64_str)
-                    logger.info('Copied plot as base64 encoded PNG image to Clipboard.')
+                    logger.info(
+                        f'Copied plot {title_info}as base64 encoded PNG image '
+                        'to Clipboard.')
                 elif modifiers == QtCore.Qt.ControlModifier:
                     self.cb.setText(
                         '<img src="data:image/png;base64,' + base64_str + '"/>')
-                    logger.info('Copied plot as base64 encoded PNG image with <img> tag '
-                                'to Clipboard.')
+                    logger.info(f'Copied plot {title_info}as base64 encoded PNG image '
+                                'with <img> tag to Clipboard.')
                 # elif modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
                 #     logger.warning('Control+Shift+Click')
             else:
                 self.cb.setImage(img)
-                logger.info('Copied plot as PNG image to Clipboard.')
+                logger.info(f'Copied plot {title_info}as PNG image to Clipboard.')
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
