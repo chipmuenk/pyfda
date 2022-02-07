@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine, PushButton
 from pyfda.libs.pyfda_io_lib import CSV_option_box
-from pyfda.libs.pyfda_lib import pprint_log
+# from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 

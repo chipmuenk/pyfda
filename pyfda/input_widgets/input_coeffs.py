@@ -108,7 +108,7 @@ class ItemDelegate(QStyledItemDelegate):
             option.font.setBold(True)
             option.displayAlignment = Qt.AlignRight | Qt.AlignCenter
             # see http://zetcode.com/gui/pyqt5/painting/ :
-            option.backgroundBrush = QBrush(Qt.BDiagPattern)  # QColor(100, 200, 100, 200))
+            option.backgroundBrush = QBrush(Qt.BDiagPattern)  # QColor(100, 200, 100, 200)
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
             # don't continue with default initStyleOption... display routine ends here
         else:
@@ -255,7 +255,7 @@ class ItemDelegate(QStyledItemDelegate):
             self.parent.ba[1] = self.parent.ba[1].astype(complex)
         self.parent.ba[index.column()][index.row()] = data  # store in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
-        self.parent._refresh_table_item(index.row(), index.column())  # refresh table entry
+        self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
 
 ###############################################################################
 
@@ -342,12 +342,12 @@ class Input_Coeffs(QWidget):
 
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
-#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work like intended
+#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work
         self.tblCoeff.setItemDelegate(ItemDelegate(self))
 
         # ============== Main UI Layout =====================================
         layVMain = QVBoxLayout()
-        layVMain.setAlignment(Qt.AlignTop)  # this affects only the first widget (intended here)
+        layVMain.setAlignment(Qt.AlignTop)  # only affects the first widget (intended)
         layVMain.addWidget(self.ui)
         layVMain.addWidget(self.tblCoeff)
 
@@ -614,7 +614,8 @@ class Input_Coeffs(QWidget):
         Read data from clipboard / file and copy it to `self.ba` as float / cmplx
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")  # returns ndarray of str
+        # get data as ndarray of str
+        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
             return
 
