@@ -490,6 +490,10 @@ def safe_numexpr_eval(expr: str, fallback=None,
         np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
 
+    if type(expr) != str or expr == "None":
+        logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
+                       f"'{type(expr).__name__}'")
+        expr = "0.0"
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
