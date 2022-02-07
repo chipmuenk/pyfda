@@ -897,7 +897,7 @@ def import_data(parent, fkey=None, title="Import",
 
     logger.info('Try to import file \n\t"{0}"'.format(file_name))
 
-    file_type_err = False
+    err = False
     try:
         if file_type in {'.csv', '.txt'}:
             with open(file_name, 'r', newline=None) as f:
@@ -918,7 +918,7 @@ def import_data(parent, fkey=None, title="Import",
                 elif file_type == '.npz':
                     fdict = np.load(f)
                     if fkey not in fdict:
-                        file_type_err = True
+                        err = True
                         raise IOError(
                             "Key '{0}' not in file '{1}'.\nKeys found: {2}"
                             .format(fkey, file_name, fdict.files))
@@ -926,9 +926,9 @@ def import_data(parent, fkey=None, title="Import",
                         data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
+                    err = True
 
-        if not file_type_err:
+        if not err:
             logger.info(
                 "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
             dirs.save_dir = os.path.dirname(file_name)
@@ -1005,7 +1005,7 @@ def export_data(parent, data, fkey, title="Export"):
     # strip extension from returned file name (if any) + append suffix defined by
     # selected file type filter:
     file_name = os.path.splitext(file_name)[0] + file_type
-    file_type_err = False
+    err = False
 
     try:
         if file_type in {'.csv'}:
@@ -1081,10 +1081,10 @@ def export_data(parent, data, fkey, title="Export"):
 
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
+                    err = True
 
-        if not file_type_err:
-            logger.info('Filter saved as\n\t"{0}"'.format(file_name))
+        if not err:
+            logger.info(f'Filter saved as\n\t"{file_name}"')
             dirs.save_dir = os.path.dirname(file_name)  # save new dir
             dirs.last_file_filt = sel_filt  # save file filter selection
 
@@ -1359,7 +1359,7 @@ def load_filter(self):
         # strip extension from returned file name (if any) + append file type:
         file_name = os.path.splitext(file_name)[0] + file_type
 
-        file_type_err = False
+        err = False
         fb.fil[1] = fb.fil[0].copy()  # backup filter dict
         try:
             with io.open(file_name, 'rb') as f:
@@ -1387,12 +1387,11 @@ def load_filter(self):
                             # array objects are converted to list first
                             fb.fil[0][key] = a[key].tolist()
                 elif file_type == '.pkl':
-                    # this only works for python >= 3.3
                     fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
-                if not file_type_err:
+                    err = True
+                if not err:
                     # sanitize values in filter dictionary, keys are ok by now
                     for k in fb.fil[0]:
                         # Bytes need to be decoded for py3 to be used as keys later on
@@ -1437,7 +1436,7 @@ def save_filter(self):
         # strip extension from returned file name (if any) + append file type:
         file_name = os.path.splitext(file_name)[0] + file_type
 
-        file_type_err = False
+        err = False
         try:
             with io.open(file_name, 'wb') as f:
                 if file_type == '.npz':
@@ -1446,10 +1445,10 @@ def save_filter(self):
                     # save in default pickle version
                     pickle.dump(fb.fil[0], f)
                 else:
-                    file_type_err = True
+                    err = True
                     logger.error('Unknown file type "{0}"'.format(file_type))
 
-            if not file_type_err:
+            if not err:
                 logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
                 dirs.save_dir = os.path.dirname(file_name)  # save new dir
 
