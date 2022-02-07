@@ -880,9 +880,10 @@ def import_data(parent, fkey=None, title="Import",
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    dlg.setNameFilter(file_filters)
+    dlg.setNameFilter(file_filters)  # pass available file filters
     dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt)  # default filter selected in file dialog
+    if dirs.last_file_filt:
+        dlg.selectNameFilter(dirs.last_file_filt)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
@@ -932,7 +933,7 @@ def import_data(parent, fkey=None, title="Import",
             logger.info(
                 "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
             dirs.save_dir = os.path.dirname(file_name)
-            dirs.save_filt = sel_filt
+            dirs.last_file_filt = sel_filt
             return data_arr  # returns numpy array
 
     except IOError as e:
@@ -989,7 +990,8 @@ def export_data(parent, data, fkey, title="Export"):
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
     # dlg.setDefaultSuffix('csv') # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt)  # default file type selected in file dialog
+    if dirs.last_file_filt:
+        dlg.selectNameFilter(dirs.last_file_filt)  # previous file dialog filter selection
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
@@ -1085,7 +1087,7 @@ def export_data(parent, data, fkey, title="Export"):
         if not file_type_err:
             logger.info('Filter saved as\n\t"{0}"'.format(file_name))
             dirs.save_dir = os.path.dirname(file_name)  # save new dir
-            dirs.save_filt = sel_filt  # save new filter selection
+            dirs.last_file_filt = sel_filt  # save file filter selection
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))

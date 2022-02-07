@@ -317,7 +317,7 @@ copy_conf_files(force_copy=('r' in ARGV))
 # ------------------------------------------------------------------------------
 """ Place holder for storing the directory location where the last file was saved"""
 save_dir = HOME_DIR
-""" Place holder for default file filter in file dialog"""
-save_filt = ''
+""" Place holder for file filter selected in last file dialog"""
+last_file_filt = ''
 """ Global handle to pop-up window for CSV options """
 csv_options_handle = None
