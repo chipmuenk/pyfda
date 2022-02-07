@@ -493,21 +493,22 @@ def safe_numexpr_eval(expr: str, fallback=None,
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
-        logger.warning("Syntax error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Syntax error:\n\t{e}")
     except KeyError as e:
-        logger.warning("Unknown variable {0}".format(e))
+        logger.warning(f"numexpr: Unknown variable {e}")
     except TypeError as e:
-        logger.warning("Type error\n\t{0}".format(e))
+        logger.warning(f"numexpr: Type error\n\t{e}")
     except AttributeError as e:
-        logger.warning("Attribute error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Attribute error:\n\t{e}")
     except ValueError as e:
-        logger.warning("Value error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Value error:\n\t{e}")
     except ZeroDivisionError:
-        logger.warning("Zero division error in formula.")
+        logger.warning("numexpr: Zero division error in formula.")
 
     if np_expr is None:
         return None  # no fallback, no error checking!
-    # check if dimensions of converted string agree with expected dimensions
+
+    # check if dimensions of converted string agrees with expected dimensions
     elif np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
             # np_expr is scalar, return array with shape of fallback of constant values
@@ -515,13 +516,14 @@ def safe_numexpr_eval(expr: str, fallback=None,
         else:
             # return array of zeros in the shape of the fallback
             logger.warning(
-                "Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
+                f"numexpr: Expression has unexpected dimension {np.ndim(np_expr)}!")
             np_expr = np.zeros(fallback_shape)
 
     if np.shape(np_expr) != fallback_shape:
         logger.warning(
-            "Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+            f"numexpr: Expression has unsuitable length {np.shape(np_expr)[0]}!")
         np_expr = np.zeros(fallback_shape)
+
     if not type(np_expr.item(0)) in {float, complex}:
         np_expr = np_expr.astype(float)
 
