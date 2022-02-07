@@ -813,11 +813,11 @@ class Fixed(object):
                 y_float = np.float64(y)
             except ValueError:
                 try:
-                    y_float = np.complex(y).real
-                except Exception as e:
+                    y_float = np.complex(y)
+                except Exception:
                     y_float = None
-                    logger.warning("'y': type {0}, len {1}".format(type(y), len(y)))
-                    logger.warning("Can't convert {0}: {1}".format(y, e))
+                    logger.warning(f'Cannot convert "{y}" '
+                                   f'of type "{type(y).__name__}" to float or complex.')
             return y_float
 
         else:  # {'dec', 'bin', 'hex', 'csd'}
