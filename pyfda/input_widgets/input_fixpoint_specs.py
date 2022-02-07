@@ -15,7 +15,7 @@ import re
 import importlib
 
 from pyfda.libs.compat import (
-    Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
+    Qt, QWidget, QPushButton, QComboBox, QFileDialog, QSplitter, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import numpy as np
@@ -667,7 +667,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Synthesize HDL description of filter
         """
-        dlg = QFD(self)  # instantiate file dialog object
+        dlg = QFileDialog(self)  # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
         # needed for overwrite confirmation when name is entered without suffix:
@@ -676,9 +676,9 @@ class Input_Fixpoint_Specs(QWidget):
         dlg.setNameFilter(file_types)
         dlg.setDirectory(dirs.save_dir)
         # set mode "save file" instead "open file":
-        dlg.setAcceptMode(QFD.AcceptSave)
-        dlg.setOption(QFD.DontConfirmOverwrite, False)
-        if dlg.exec_() == QFD.Accepted:
+        dlg.setAcceptMode(QFileDialog.AcceptSave)
+        dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
+        if dlg.exec_() == QFileDialog.Accepted:
             hdl_file = qstr(dlg.selectedFiles()[0])
             # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))[0]
 

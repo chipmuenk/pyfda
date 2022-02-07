@@ -31,7 +31,7 @@ from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 
-from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFD,
+from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFileDialog,
                      QFileDialog, QVBoxLayout, QGridLayout, pyqtSignal)
 
 import logging
@@ -1340,7 +1340,7 @@ def load_filter(self):
     filter dictionary and update input and plot widgets
     """
     file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-    dlg = QFD(self)
+    dlg = QFileDialog(self)
     file_name, file_type = dlg.getOpenFileName_(
             caption="Load filter ", directory=dirs.save_dir,
             filter=file_filters)
@@ -1416,7 +1416,7 @@ def save_filter(self):
     Save filter as zipped binary numpy array or pickle object
     """
     file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-    dlg = QFD(self)
+    dlg = QFileDialog(self)
     # return selected file name (with or without extension) and filter (Linux: full text)
     file_name, file_type = dlg.getSaveFileName_(
             caption="Save filter as", directory=dirs.save_dir,

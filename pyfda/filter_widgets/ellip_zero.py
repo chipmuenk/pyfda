@@ -34,7 +34,7 @@ from pyfda.libs.pyfda_io_lib import extract_file_ext
 import pyfda.libs.pyfda_dirs as dirs
 
 from .common import Common
-from pyfda.libs.compat import (QWidget, QFrame, pyqtSignal, QFD,
+from pyfda.libs.compat import (QWidget, QFrame, pyqtSignal, QFileDialog,
                       QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton)
 
 import logging
@@ -346,7 +346,7 @@ to be complex (no real values).
 
     def save_filter(self):
         file_filters = ("Text file pole/residue (*.txt_rpk)")
-        dlg = QFD(self)
+        dlg = QFileDialog(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileName_(
                 caption = "Save filter as", directory = dirs.save_dir,
