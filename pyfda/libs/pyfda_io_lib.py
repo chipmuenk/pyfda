@@ -620,7 +620,10 @@ def csv2array(f):
         if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
             return f"Imported data is a scalar: '{data_arr}'"
         elif np.ndim(data_arr) == 1:
-            return data_arr
+            if len(data_arr) < 2:
+                return f"Not enough data: '{data_arr}'"
+            else:
+                return data_arr
         elif np.ndim(data_arr) == 2:
             cols, rows = np.shape(data_arr)
             logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
