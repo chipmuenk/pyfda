@@ -888,8 +888,7 @@ def import_data(parent, fkey=None, title="Import",
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[1]
-        sel_filt = '*' + file_type
-        # sel_filt = dlg.selectedNameFilter()
+        sel_filt = dlg.selectedNameFilter()  # return selected filter (text + extension)
     else:
         return -1  # operation cancelled
 
