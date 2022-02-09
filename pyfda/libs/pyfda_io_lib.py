@@ -173,6 +173,15 @@ class CSV_option_box(QDialog):
 
 
 # ##############################################################################
+file_filters_dict = {
+    'csv': 'Comma / Tab Separated Values',
+    'txt': 'Comma / Tab Separated Values',
+    'mat': 'Matlab-Workspace',
+    'npy': 'Binary Numpy Array',
+    'npz': 'Zipped Binary Numpy Array',
+    'wav': 'Audio WAV - Files'}
+
+
 def prune_file_ext(file_type):
     """
     Prune file extension, e.g. '(\*.txt)' from file type description returned
@@ -470,7 +479,8 @@ def qtext2table(parent, fkey, title="Import"):
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else:  # data from file
-        data_arr = import_data(parent, fkey, title=title)
+        data_arr = import_data(
+            parent, fkey, title=title, file_types=('csv', 'txt', 'mat', 'npy', 'npz'))
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                      .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -852,12 +862,13 @@ def csv2array_new(f):
 
 # ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
-                file_filters=(
-                    "Comma / Tab Separated Values (*.csv *.txt);;"
+                file_types=('csv', 'txt', 'mat', 'npy', 'npz')):
+    """
+    "Comma / Tab Separated Values (*.csv *.txt);;"
                     "Matlab-Workspace (*.mat);;"
                     "Binary Numpy Array (*.npy);;"
-                    "Zipped Binary Numpy Array(*.npz)")):
-    """
+                    "Zipped Binary Numpy Array(*.npz)"
+
     Import data from a file and convert it to a numpy array.
 
     Parameters
@@ -871,27 +882,40 @@ def import_data(parent, fkey=None, title="Import",
     title : str
         title string for the file dialog box (e.g. "filter coefficients ")
 
-    file_filter : tuple of str
-        list supported file types
+    file_types : tuple of str
+        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
+        of `file_filters_dict`
 
     Returns
     -------
     ndarray
         Data from the file
     """
+
+    # Create file filters like "Comma / Tab Separated Values (*.csv);;" from dict
+    file_filters = ""
+    for t in file_types:
+        if t in file_filters_dict:
+            file_filters += file_filters_dict[t] + f" (*.{t});;"
+        else:
+            logger.warning(f"Unknown file extension '.{t}'")
+    if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
+        last_file_filter = file_filters_dict[t] + f" (*.{t})"
+    else:
+        last_file_filter = ""
+
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
     dlg.setNameFilter(file_filters)  # pass available file filters
     dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    if dirs.last_file_filt:
-        dlg.selectNameFilter(dirs.last_file_filt)  # filter selected in last file dialog
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[1]
-        sel_filt = dlg.selectedNameFilter()  # return selected filter (text + extension)
     else:
         return -1  # operation cancelled
 
@@ -908,8 +932,7 @@ def import_data(parent, fkey=None, title="Import",
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
-                    logger.error(
-                        "Error loading file '{0}':\n{1}".format(file_name, data_arr))
+                    logger.error(f"Error loading file '{file_name}':\n{data_arr}")
                     return None
         else:
             with open(file_name, 'rb') as f:
@@ -935,7 +958,7 @@ def import_data(parent, fkey=None, title="Import",
             logger.info(
                 "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
             dirs.save_dir = os.path.dirname(file_name)
-            dirs.last_file_filt = sel_filt
+            dirs.last_file_filt = file_type
             return data_arr  # returns numpy array
 
     except IOError as e:

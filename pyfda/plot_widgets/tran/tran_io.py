@@ -81,6 +81,4 @@ class Tran_IO(QWidget):
 # ------------------------------------------------------------------------------
     def import_data(self):
         self.x = io.import_data(
-            self, title="Import Data",
-            file_filters="Comma / Tab Separated Values (*.csv *.txt);;")
-
+            self, title="Import Data", file_types=('csv', 'txt', 'wav'))
