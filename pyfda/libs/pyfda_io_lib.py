@@ -912,7 +912,8 @@ def import_data(parent, fkey=None, title="Import",
     file_filters = file_filters.rstrip(';;')
 
     if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
-        last_file_filter = file_filters_dict[t] + f" (*.{t})"
+        last_file_filter =\
+            file_filters_dict[dirs.last_file_filt] + f" (*.{dirs.last_file_filt})"
     else:
         last_file_filter = ""
 
@@ -1017,7 +1018,8 @@ def export_data(parent, data, fkey, title="Export",
     file_filters = file_filters.rstrip(';;')
 
     if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
-        last_file_filter = file_filters_dict[t] + f" (*.{t})"
+        last_file_filter =\
+            file_filters_dict[dirs.last_file_filt] + f" (*.{dirs.last_file_filt})"
     else:
         last_file_filter = ""
 
@@ -1053,7 +1055,7 @@ def export_data(parent, data, fkey, title="Export",
     err = False
 
     try:
-        if file_type in {'csv'}:
+        if file_type == 'csv':
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
         elif file_type in {'coe', 'txt', 'vhd'}:  # text / string format
