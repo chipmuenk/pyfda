@@ -514,6 +514,9 @@ def csv2array(f):
     io_error: str
         String with the error message when import was unsuccessful
     """
+    # throw an error (instead of a deprecation warning) when trying to create a numpy
+    # array from nested ragged sequences. This error can then be caught easily.
+    np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
@@ -590,11 +593,11 @@ def csv2array(f):
                 # "\n\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
                         quotechar))  # ,f.__class__.__name__))
-    # ------------------------------------------------
+    # --------------------------------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
                            lineterminator=lineterminator)  # returns an iterator
-    # ------------------------------------------------
+    # --------------------------------------------------------------------------
 # =============================================================================
 #     with open('/your/path/file') as f:
 #         for line in f:
@@ -626,7 +629,12 @@ def csv2array(f):
     try:
         if data_list is None:
             return "Imported data is None."
-        data_arr = np.array(data_list)
+        try:
+            data_arr = np.array(data_list)
+        except np.VisibleDeprecationWarning:
+            # prevent creation of numpy arrays from nested ragged sequences
+            return "Columns with different number of elements."
+
         if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
             return f"Imported data is a scalar: '{data_arr}'"
         elif np.ndim(data_arr) == 1:
