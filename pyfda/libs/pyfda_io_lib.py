@@ -976,7 +976,8 @@ def import_data(parent, fkey=None, title="Import",
 
 
 # ------------------------------------------------------------------------------
-def export_data(parent, data, fkey, title="Export"):
+def export_data(parent, data, fkey, title="Export",
+                file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
 
@@ -1001,15 +1002,21 @@ def export_data(parent, data, fkey, title="Export"):
         f"imported data: type{type(data)}|dim{np.ndim(data)}|"
         f"shape{np.shape(data)}\n{data}")
 
-    file_filters = (
-        "Comma / Tab Separated Values (*.csv);;"
-        "Matlab-Workspace (*.mat);;"
-        "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
-
+    file_filters = ""
     if fb.fil[0]['ft'] == 'FIR':
-        file_filters += (";;Xilinx FIR coefficient format (*.coe)"
-                         ";;Microsemi FIR coefficient format (*.txt)"
-                         ";;VHDL Package (*.vhd)")
+        file_types += ('coe', 'vhd', 'txt')
+    for t in file_types:
+        if t in file_filters_dict:
+            file_filters += file_filters_dict[t] + f" (*.{t});;"
+        else:
+            logger.warning(f"Unknown file extension '.{t}'")
+    # remove trailing ';;', otherwise file filter '*' is appended
+    file_filters = file_filters.rstrip(';;')
+
+    if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
+        last_file_filter = file_filters_dict[t] + f" (*.{t})"
+    else:
+        last_file_filter = ""
 
 #        # Add further file types when modules are available:
 #        if XLWT:
@@ -1024,33 +1031,33 @@ def export_data(parent, data, fkey, title="Export"):
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
     # dlg.setDefaultSuffix('csv') # default suffix when none is given
-    if dirs.last_file_filt:
-        dlg.selectNameFilter(dirs.last_file_filt)  # previous file dialog filter selection
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        sel_filt = dlg.selectedNameFilter()  # store file filter selection
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
     else:
         return -1
 
-    for t in extract_file_ext(file_filters):  # extract the list of file extensions
+    for t in file_types:  # extract the list of file extensions
         if t in str(sel_filt):
             file_type = t
 
     # strip extension from returned file name (if any) + append suffix defined by
     # selected file type filter:
-    file_name = os.path.splitext(file_name)[0] + file_type
+    file_name = os.path.splitext(file_name)[0] + '.' + file_type
     err = False
 
     try:
-        if file_type in {'.csv'}:
+        if file_type in {'csv'}:
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
-        elif file_type in {'.coe', '.txt', '.vhd'}:  # text / string format
+        elif file_type in {'coe', 'txt', 'vhd'}:  # text / string format
             with open(file_name, 'w', encoding="utf8") as f:
-                if file_type == '.coe':
+                if file_type == 'coe':
                     err = export_coe_xilinx(f)
-                elif file_type == '.txt':
+                elif file_type == 'txt':
                     err = export_coe_microsemi(f)
                 else:  # file_type == '.vhd':
                     err = export_coe_vhdl_package(f)
@@ -1064,18 +1071,18 @@ def export_data(parent, data, fkey, title="Export"):
                 return None
 
             with open(file_name, 'wb') as f:
-                if file_type == '.mat':
+                if file_type == 'mat':
                     savemat(f, mdict={fkey: np_data})
                     # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                elif file_type == '.npy':
+                elif file_type == 'npy':
                     # can only store one array in the file, no pickled data
                     # for Py2 <-> 3 compatibility
                     np.save(f, np_data, allow_pickle=False)
-                elif file_type == '.npz':
+                elif file_type == 'npz':
                     # would be possible to store multiple arrays in the file
                     fdict = {fkey: np_data}
                     np.savez(f, **fdict)  # unpack kw list (only one here)
-                elif file_type == '.xls':
+                elif file_type == 'xls':
                     # see
                     # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
                     # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
@@ -1090,7 +1097,7 @@ def export_data(parent, data, fkey, title="Export"):
                             worksheet.write(row+1, col, data[col][row])  # vertical
                     workbook.save(f)
 
-                elif file_type == '.xlsx':
+                elif file_type == 'xlsx':
                     # from https://pypi.python.org/pypi/XlsxWriter
                     # Create an new Excel file and add a worksheet.
                     workbook = xlsx.Workbook(f)
@@ -1121,7 +1128,7 @@ def export_data(parent, data, fkey, title="Export"):
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
             dirs.save_dir = os.path.dirname(file_name)  # save new dir
-            dirs.last_file_filt = sel_filt  # save file filter selection
+            dirs.last_file_filt = file_type  # save file type
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
