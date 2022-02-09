@@ -872,11 +872,6 @@ def csv2array_new(f):
 def import_data(parent, fkey=None, title="Import",
                 file_types=('csv', 'txt', 'mat', 'npy', 'npz')):
     """
-    "Comma / Tab Separated Values (*.csv *.txt);;"
-                    "Matlab-Workspace (*.mat);;"
-                    "Binary Numpy Array (*.npy);;"
-                    "Zipped Binary Numpy Array(*.npz)"
-
     Import data from a file and convert it to a numpy array.
 
     Parameters
@@ -888,7 +883,7 @@ def import_data(parent, fkey=None, title="Import",
         multiple entries.
 
     title : str
-        title string for the file dialog box (e.g. "filter coefficients ")
+        title string for the file dialog box (e.g. "Filter Coefficients")
 
     file_types : tuple of str
         supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
@@ -900,7 +895,8 @@ def import_data(parent, fkey=None, title="Import",
         Data from the file
     """
 
-    # Create file filters like "Comma / Tab Separated Values (*.csv);;" from dict
+    # Create string with file filters from `file_types` and `file_filters_dict`
+    # like "Comma / Tab Separated Values (*.csv);;"
     file_filters = ""
     for t in file_types:
         if t in file_filters_dict:
@@ -923,7 +919,7 @@ def import_data(parent, fkey=None, title="Import",
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[1]
+        file_type = os.path.splitext(file_name)[1].strip('.')
     else:
         return -1  # operation cancelled
 
@@ -934,7 +930,7 @@ def import_data(parent, fkey=None, title="Import",
 
     err = False
     try:
-        if file_type in {'.csv', '.txt'}:
+        if file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
@@ -944,12 +940,12 @@ def import_data(parent, fkey=None, title="Import",
                     return None
         else:
             with open(file_name, 'rb') as f:
-                if file_type == '.mat':
+                if file_type == 'mat':
                     data_arr = loadmat(f)[fkey]
-                elif file_type == '.npy':
+                elif file_type == 'npy':
                     data_arr = np.load(f)
                     # contains only one array
-                elif file_type == '.npz':
+                elif file_type == 'npz':
                     fdict = np.load(f)
                     if fkey not in fdict:
                         err = True
