@@ -173,13 +173,18 @@ class CSV_option_box(QDialog):
 
 
 # ##############################################################################
+
+# file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
     'csv': 'Comma / Tab Separated Values',
-    'txt': 'Comma / Tab Separated Values',
     'mat': 'Matlab-Workspace',
     'npy': 'Binary Numpy Array',
     'npz': 'Zipped Binary Numpy Array',
-    'wav': 'Audio WAV - Files'}
+    'wav': 'WAV audio format',
+    'vhd': 'VHDL package or architecture',
+    'coe': 'Xilinx FIR coefficients format',
+    'txt': 'Microsemi FIR coefficient format'
+    }
 
 
 def prune_file_ext(file_type):
@@ -480,7 +485,7 @@ def qtext2table(parent, fkey, title="Import"):
             return None
     else:  # data from file
         data_arr = import_data(
-            parent, fkey, title=title, file_types=('csv', 'txt', 'mat', 'npy', 'npz'))
+            parent, fkey, title=title, file_types=('csv', 'mat', 'npy', 'npz'))
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                      .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -870,7 +875,7 @@ def csv2array_new(f):
 
 # ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
-                file_types=('csv', 'txt', 'mat', 'npy', 'npz')):
+                file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Import data from a file and convert it to a numpy array.
 
