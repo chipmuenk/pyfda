@@ -628,7 +628,7 @@ def csv2array(f):
             logger.debug("{0}".format(row))
             data_list.append(row)
     except csv.Error as e:
-        io_error = "Error during CSV reading:\n{0}".format(e)
+        io_error = f"Error during CSV import:\n{e}"
         return io_error
 
     try:
@@ -908,6 +908,9 @@ def import_data(parent, fkey=None, title="Import",
             file_filters += file_filters_dict[t] + f" (*.{t});;"
         else:
             logger.warning(f"Unknown file extension '.{t}'")
+    # remove trailing ';;', otherwise file filter '*' is appended
+    file_filters = file_filters.rstrip(';;')
+
     if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
         last_file_filter = file_filters_dict[t] + f" (*.{t})"
     else:
