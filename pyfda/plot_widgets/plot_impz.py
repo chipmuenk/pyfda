@@ -565,9 +565,11 @@ class Plot_Impz(QWidget):
             self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
                 self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
 
-        # Test whether response or stimulus are complex
+        # Test whether response or stimulus or filter coefficients are complex
         # TODO: shouldn't stimulus and response be treated separately?
-        self.cmplx = bool(np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x)))
+        self.cmplx = bool(
+            np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
+            or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba']))))
         self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
