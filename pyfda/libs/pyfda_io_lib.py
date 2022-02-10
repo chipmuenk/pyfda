@@ -875,6 +875,53 @@ def csv2array_new(f):
 
 
 # ------------------------------------------------------------------------------
+def create_file_filters(file_types: tuple, file_filters: str = ""):
+    """
+    Create a string with file filters for QFileDialog object from `file_types`,
+    a tuple of file extensions and the global `file_filters_dict`.
+
+    When the file extension stored after last QFileDialog operation is in the tuple
+    of file types, return this file extension for e.g. preselecting the file type
+    in QFileDialog.
+
+    Parameters
+    ----------
+    file_types : tuple of str
+        list of file extensions which are used to create a file filter.
+
+    file_filters : str
+        String with file filters for QFileDialog object with the form
+        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
+        this string is empty, but it can be used to add file filters not contained
+        in the global `file_filters_dict`.
+
+    Returns
+    -------
+    file_filters : str
+        String containing file filters for a QFileDialog object
+
+    last_file_filter : str
+        Single file filter to setup the default file extension in QFileDialog
+
+    """
+    for t in file_types:
+        if t in file_filters_dict:
+            file_filters += file_filters_dict[t] + f" (*.{t});;"
+        else:
+            logger.warning(f"Unknown file extension '.{t}'")
+    # remove trailing ';;', otherwise file filter '*' is appended
+    file_filters = file_filters.rstrip(';;')
+
+    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
+        last_file_filter =\
+            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
+    else:
+        last_file_filter = ""
+
+    return file_filters, last_file_filter
+
+
+# ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
                 file_types=('csv', 'mat', 'npy', 'npz')):
     """
@@ -900,23 +947,7 @@ def import_data(parent, fkey=None, title="Import",
     ndarray
         Data from the file
     """
-
-    # Create string with file filters from `file_types` and `file_filters_dict`
-    # like "Comma / Tab Separated Values (*.csv);;"
-    file_filters = ""
-    for t in file_types:
-        if t in file_filters_dict:
-            file_filters += file_filters_dict[t] + f" (*.{t});;"
-        else:
-            logger.warning(f"Unknown file extension '.{t}'")
-    # remove trailing ';;', otherwise file filter '*' is appended
-    file_filters = file_filters.rstrip(';;')
-
-    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
-        last_file_filter =\
-            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
-    else:
-        last_file_filter = ""
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
@@ -1007,22 +1038,11 @@ def export_data(parent, data, fkey, title="Export",
         f"imported data: type{type(data)}|dim{np.ndim(data)}|"
         f"shape{np.shape(data)}\n{data}")
 
-    file_filters = ""
+    # add file types for FIR filter coefficients
     if fb.fil[0]['ft'] == 'FIR':
         file_types += ('coe', 'vhd', 'txt')
-    for t in file_types:
-        if t in file_filters_dict:
-            file_filters += file_filters_dict[t] + f" (*.{t});;"
-        else:
-            logger.warning(f"Unknown file extension '.{t}'")
-    # remove trailing ';;', otherwise file filter '*' is appended
-    file_filters = file_filters.rstrip(';;')
 
-    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
-        last_file_filter =\
-            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
-    else:
-        last_file_filter = ""
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
 #        # Add further file types when modules are available:
 #        if XLWT:
@@ -1036,7 +1056,7 @@ def export_data(parent, data, fkey, title="Export",
     dlg.setDirectory(dirs.save_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
-    # dlg.setDefaultSuffix('csv') # default suffix when none is given
+
     if last_file_filter:
         dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
@@ -1387,7 +1407,9 @@ def load_filter(self):
     Load filter from zipped binary numpy array or (c)pickled object to
     filter dictionary and update input and plot widgets
     """
-    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+    file_types = ("npz", "pkl")
+    file_filters, last_file_type = create_file_filters(file_types)
+
     dlg = QFileDialog(self)
     file_name, file_type = dlg.getOpenFileName_(
             caption="Load filter ", directory=dirs.save_dir,
