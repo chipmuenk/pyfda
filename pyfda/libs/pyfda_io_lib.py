@@ -176,14 +176,15 @@ class CSV_option_box(QDialog):
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
+    'coe': 'Xilinx FIR coefficients format',
     'csv': 'Comma / Tab Separated Values',
     'mat': 'Matlab-Workspace',
     'npy': 'Binary Numpy Array',
     'npz': 'Zipped Binary Numpy Array',
-    'wav': 'WAV audio format',
+    'pkl': 'Pickled data',
+    'txt': 'Microsemi FIR coefficient format',
     'vhd': 'VHDL package or architecture',
-    'coe': 'Xilinx FIR coefficients format',
-    'txt': 'Microsemi FIR coefficient format'
+    'wav': 'WAV audio format'
     }
 
 
