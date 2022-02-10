@@ -960,7 +960,7 @@ def import_data(parent, fkey=None, title="Import",
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[1].strip('.')
+        file_type = os.path.splitext(file_name)[-1].strip('.')
     else:
         return -1  # operation cancelled
 
@@ -1414,11 +1414,8 @@ def load_filter(self):
     file_name, file_type = dlg.getOpenFileName_(
             caption="Load filter ", directory=dirs.save_dir,
             filter=file_filters)
-    file_name = str(file_name)  # QString -> str
 
-    for t in extract_file_ext(file_filters):  # get a list of file extensions
-        if t in str(file_type):
-            file_type = t
+    file_type = os.path.splitext(file_name)[-1]  # .strip('.')
 
     if file_name != "":  # cancelled file operation returns empty string
         if os.stat(file_name).st_size == 0:
