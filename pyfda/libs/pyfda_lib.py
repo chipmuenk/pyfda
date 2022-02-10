@@ -402,7 +402,7 @@ def first_item(d: dict) -> str:
 
 
 # ------------------------------------------------------------------------------
-def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
+def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     """
     Provide pretty printed logging messages for dicts or lists.
 
@@ -410,11 +410,33 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
 
     If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
     truncate it to `N` items.
+
+    Parameters
+    ----------
+    d : iterable
+        A dict or an array-like object with one or two dimensions
+        to be pretty-printed
+
+    N : int
+        maximum number of items to be printed per dimension
+
+    tab : str
+        tabulator character / string, default: '\t'
+
+    debug : bool
+        add debug info to output string, default: False
+
+    Returns
+    -------
+    s : str
+        formatted and truncated iterable as a string
     """
     cr = os.linesep
     s = tab
     first = True
-    # logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
+    if debug:
+        logger.info(f"Data: {type(d).__name__}[{type(d[0]).__name__}], "
+                    f"ndim={np.ndim(d)}")
     if type(d) == dict:
         for k in d:
             if not first:
@@ -426,8 +448,6 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
                 s += k + ' : ' + str(d[k])
             first = False
     elif type(d) in {list, np.ndarray}:
-        # if type(d) == np.ndarray:
-        #    d = d.tolist()
         if np.ndim(d) == 1:
             s += ('Type: {0} of {1}, Shape =  ({2} x 1)' + cr + tab)\
                 .format(type(d).__name__, type(d[0]).__name__, len(d))
@@ -436,22 +456,20 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
-            s += ('Type: {0} of {1}({2}), Shape = ({3} x {4})' + cr + tab)\
-                .format(type(d).__name__, type(d[0][0])
-                        .__name__, d[0][0].dtype, rows, cols)
-            #  use x.dtype.kind for general kind of numpy data
-            logger.debug(s)
+            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__} '
+                  f'({d[0][0].dtype}), Shape = ({rows} x {cols})' + cr + tab)
+            #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
             for c in range(min(N-1, cols)):
                 if not first:
                     s += cr + tab
-                logger.debug('rows={0}; min(N-1, rows)={1}\nd={2}'
-                             .format(rows, min(N, rows), d[c][:min(N, rows)]))
-                s += str(d[c][: min(N, rows)])
+                # logger.warning(f'rows={rows}; min(N-1, rows)={min(N, rows)}\n'
+                #                f'd={d[c][:min(N, rows)]}')
+                s += str(d[c][:min(N, rows)])
                 if rows > N-1:
                     s += ' ...'
                 first = False
-            s = d
-
+        else:
+            logger.warning(f"Object with ndim = {np.ndim(d)} cannot be processed.")
     return s
 
 
