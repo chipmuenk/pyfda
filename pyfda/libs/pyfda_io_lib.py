@@ -967,7 +967,7 @@ def import_data(parent, fkey=None, title="Import",
     # strip extension from returned file name (if any) + append file type:
     # file_name = os.path.splitext(file_name)[0] + file_type
 
-    logger.info('Try to import file \n\t"{0}"'.format(file_name))
+    logger.info('Importing file \n\t"{0}"'.format(file_name))
 
     err = False
     try:
@@ -1294,9 +1294,9 @@ def export_coe_xilinx(f):
 # ------------------------------------------------------------------------------
 def export_coe_microsemi(f):
     """
-    Save FIR filter coefficients in Actel coefficient format as file '\*.txt'.
+    Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
-    For (anti)aymmetric filter only one half of the coefficients must be
+    For (anti)symmetric filter only one half of the coefficients must be
     specified?
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
