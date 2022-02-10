@@ -996,8 +996,7 @@ def import_data(parent, fkey=None, title="Import",
 
         if not err:
             logger.info(
-                f'Loaded file \n\t"{file_name}"\n\t'
-                f'with data format:\n{pprint_log(data_arr, N=3)}')
+                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
             dirs.save_dir = os.path.dirname(file_name)
             dirs.last_file_type = file_type
             return data_arr  # returns numpy array
