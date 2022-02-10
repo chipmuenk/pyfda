@@ -1029,7 +1029,6 @@ def export_data(parent, data, fkey, title="Export",
         title string for the file dialog box (e.g. "filter coefficients ")
 
     """
-
     logger.debug(
         f"imported data: type{type(data)}|dim{np.ndim(data)}|"
         f"shape{np.shape(data)}\n{data}")
@@ -1402,67 +1401,68 @@ def load_filter(self):
     filter dictionary and update input and plot widgets
     """
     file_types = ("npz", "pkl")
-    file_filters, last_file_type = create_file_filters(file_types)
+    file_filters, last_file_filter = create_file_filters(file_types)
 
     dlg = QFileDialog(self)
-    file_name, file_filter = dlg.getOpenFileName(
-            caption="Load filter ", directory=dirs.save_dir,
-            filter=file_filters)
+    dlg.setWindowTitle("Load Filter")
+    dlg.setDirectory(dirs.save_dir)
+    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    dlg.setNameFilter(file_filters)  # pass available file filters
+    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
-    file_type = os.path.splitext(file_name)[-1]  # .strip('.')
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        file_type = os.path.splitext(file_name)[-1].strip('.')
+    else:
+        return -1  # operation cancelled
 
-    if file_name != "":  # cancelled file operation returns empty string
-        if os.stat(file_name).st_size == 0:
-            dirs.save_dir = os.path.dirname(file_name)
-            logger.error('"{0}" has size zero, aborting.'.format(file_name))
-            return
+    err = False
+    fb.fil[1] = fb.fil[0].copy()  # backup filter dict
+    try:
+        with io.open(file_name, 'rb') as f:
+            if file_type == 'npz':
+                # array containing dict, dtype 'object':
+                a = np.load(f, allow_pickle=True)
 
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] + file_type
+                logger.debug(f"Entries in {file_name}:\n{a.files}")
+                for key in sorted(a):
+                    logger.debug(
+                        f"key: {key}|{type(key).__name__}|"
+                        f"{type(a[key]).__name__}|{a[key]}")
 
-        err = False
-        fb.fil[1] = fb.fil[0].copy()  # backup filter dict
-        try:
-            with io.open(file_name, 'rb') as f:
-                if file_type == '.npz':
-                    # array containing dict, dtype 'object':
-                    a = np.load(f, allow_pickle=True)
+                    if np.ndim(a[key]) == 0:
+                        # scalar objects may be extracted with the item() method
+                        fb.fil[0][key] = a[key].item()
+                    else:
+                        # array objects are converted to list first
+                        fb.fil[0][key] = a[key].tolist()
+            elif file_type == 'pkl':
+                fb.fil[0] = pickle.load(f)
+            else:
+                logger.error('Unknown file type "{0}"'.format(file_type))
+                err = True
+            if not err:
+                # sanitize values in filter dictionary, keys are ok by now
+                for k in fb.fil[0]:
+                    # Bytes need to be decoded for py3 to be used as keys later on
+                    if type(fb.fil[0][k]) == bytes:
+                        fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                    if fb.fil[0][k] is None:
+                        logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
 
-                    logger.debug(f"Entries in {file_name}:\n{a.files}")
-                    for key in sorted(a):
-                        logger.debug(
-                            f"key: {key}|{type(key).__name__}|"
-                            f"{type(a[key]).__name__}|{a[key]}")
+                logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
+                dirs.save_dir = os.path.dirname(file_name)  # update working dir
+                dirs.last_file_type = file_type  # save file type
+                # emit signal -> filter loaded
+                self.emit({'data_changed': 'filter_loaded'})
 
-                        if np.ndim(a[key]) == 0:
-                            # scalar objects may be extracted with the item() method
-                            fb.fil[0][key] = a[key].item()
-                        else:
-                            # array objects are converted to list first
-                            fb.fil[0][key] = a[key].tolist()
-                elif file_type == '.pkl':
-                    fb.fil[0] = pickle.load(f)
-                else:
-                    logger.error('Unknown file type "{0}"'.format(file_type))
-                    err = True
-                if not err:
-                    # sanitize values in filter dictionary, keys are ok by now
-                    for k in fb.fil[0]:
-                        # Bytes need to be decoded for py3 to be used as keys later on
-                        if type(fb.fil[0][k]) == bytes:
-                            fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-                        if fb.fil[0][k] is None:
-                            logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
-
-                    logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
-                    # emit signal -> InputTabWidgets.load_all:
-                    self.emit({'data_changed': 'filter_loaded'})
-                    dirs.save_dir = os.path.dirname(file_name)  # update working dir
-        except IOError as e:
-            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
-        except Exception as e:
-            logger.error("Unexpected error:\n{0}".format(e))
-            fb.fil[0] = fb.fil[1]  # restore backup
+    except IOError as e:
+        logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+    except Exception as e:
+        logger.error("Unexpected error:\n{0}".format(e))
+        fb.fil[0] = fb.fil[1]  # restore backup
 
 
 # ------------------------------------------------------------------------------
