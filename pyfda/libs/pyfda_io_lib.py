@@ -1434,15 +1434,8 @@ def load_filter(self):
         try:
             with io.open(file_name, 'rb') as f:
                 if file_type == '.npz':
-                    # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
-
-                    # What encoding to use when reading Py2 strings. Only
-                    # needed for loading py2 generated pickled files on py3.
-                    # fix_imports will try to map old py2 names to new py3
-                    # names when unpickling.
-
                     # array containing dict, dtype 'object':
-                    a = np.load(f, fix_imports=True, encoding='bytes', allow_pickle=True)
+                    a = np.load(f, allow_pickle=True)
 
                     logger.debug(f"Entries in {file_name}:\n{a.files}")
                     for key in sorted(a):
@@ -1457,7 +1450,7 @@ def load_filter(self):
                             # array objects are converted to list first
                             fb.fil[0][key] = a[key].tolist()
                 elif file_type == '.pkl':
-                    fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
+                    fb.fil[0] = pickle.load(f)
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
                     err = True
