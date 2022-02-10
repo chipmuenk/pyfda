@@ -911,9 +911,9 @@ def import_data(parent, fkey=None, title="Import",
     # remove trailing ';;', otherwise file filter '*' is appended
     file_filters = file_filters.rstrip(';;')
 
-    if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
+    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
         last_file_filter =\
-            file_filters_dict[dirs.last_file_filt] + f" (*.{dirs.last_file_filt})"
+            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
     else:
         last_file_filter = ""
 
@@ -971,7 +971,7 @@ def import_data(parent, fkey=None, title="Import",
             logger.info(
                 "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
             dirs.save_dir = os.path.dirname(file_name)
-            dirs.last_file_filt = file_type
+            dirs.last_file_type = file_type
             return data_arr  # returns numpy array
 
     except IOError as e:
@@ -1017,9 +1017,9 @@ def export_data(parent, data, fkey, title="Export",
     # remove trailing ';;', otherwise file filter '*' is appended
     file_filters = file_filters.rstrip(';;')
 
-    if dirs.last_file_filt and dirs.last_file_filt in file_filters_dict:
+    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
         last_file_filter =\
-            file_filters_dict[dirs.last_file_filt] + f" (*.{dirs.last_file_filt})"
+            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
     else:
         last_file_filter = ""
 
@@ -1133,7 +1133,7 @@ def export_data(parent, data, fkey, title="Export",
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
             dirs.save_dir = os.path.dirname(file_name)  # save new dir
-            dirs.last_file_filt = file_type  # save file type
+            dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
