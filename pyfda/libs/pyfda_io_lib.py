@@ -1411,7 +1411,7 @@ def load_filter(self):
     file_filters, last_file_type = create_file_filters(file_types)
 
     dlg = QFileDialog(self)
-    file_name, file_type = dlg.getOpenFileName_(
+    file_name, file_filter = dlg.getOpenFileName(
             caption="Load filter ", directory=dirs.save_dir,
             filter=file_filters)
 
@@ -1479,7 +1479,7 @@ def save_filter(self):
     file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
     dlg = QFileDialog(self)
     # return selected file name (with or without extension) and filter (Linux: full text)
-    file_name, file_type = dlg.getSaveFileName_(
+    file_name, file_type = dlg.getSaveFileName(
             caption="Save filter as", directory=dirs.save_dir,
             filter=file_filters)
 
