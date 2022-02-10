@@ -1470,44 +1470,44 @@ def save_filter(self):
     """
     Save filter as zipped binary numpy array or pickle object
     """
-    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+    file_types = ("npz", "pkl")
+    file_filters, last_file_filter = create_file_filters(file_types)
+
     dlg = QFileDialog(self)
-    # return selected file name (with or without extension) and filter (Linux: full text)
-    file_name, file_type = dlg.getSaveFileName(
-            caption="Save filter as", directory=dirs.save_dir,
-            filter=file_filters)
+    dlg.setWindowTitle("Save filter as")
+    dlg.setDirectory(dirs.save_dir)
+    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
+    dlg.setNameFilter(file_filters)
 
-    file_name = str(file_name)  # QString -> str() needed for Python 2.x
-    # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
-    # be extracted reproducibly across file systems, so it is done manually:
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
-    for t in extract_file_ext(file_filters):  # get a list of file extensions
-        if t in str(file_type):
-            file_type = t           # return the last matching extension
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        # sel_filt = dlg.selectedNameFilter()  # selected file filter
+    else:
+        return -1  # operation cancelled
 
-    if file_name != "":  # cancelled file operation returns empty string
+    file_type = os.path.splitext(file_name)[-1].strip('.')  # slice off file extension
 
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] + file_type
+    err = False
+    try:
+        with io.open(file_name, 'wb') as f:
+            if file_type == 'npz':
+                np.savez(f, **fb.fil[0])
+            elif file_type == 'pkl':
+                pickle.dump(fb.fil[0], f)  # save in default pickle version
+            else:
+                err = True
+                logger.error('Unknown file type "{0}"'.format(file_type))
 
-        err = False
-        try:
-            with io.open(file_name, 'wb') as f:
-                if file_type == '.npz':
-                    np.savez(f, **fb.fil[0])
-                elif file_type == '.pkl':
-                    # save in default pickle version
-                    pickle.dump(fb.fil[0], f)
-                else:
-                    err = True
-                    logger.error('Unknown file type "{0}"'.format(file_type))
+        if not err:
+            logger.info(f'Filter saved as\n\t"{file_name}"')
+            dirs.save_dir = os.path.dirname(file_name)  # save new dir
+            dirs.last_file_type = file_type  # save file type
 
-            if not err:
-                logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
-                dirs.save_dir = os.path.dirname(file_name)  # save new dir
-
-        except IOError as e:
-            logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
+    except IOError as e:
+        logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
 
 
 # ==============================================================================
