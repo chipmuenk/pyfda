@@ -964,11 +964,6 @@ def import_data(parent, fkey=None, title="Import",
     else:
         return -1  # operation cancelled
 
-    # strip extension from returned file name (if any) + append file type:
-    # file_name = os.path.splitext(file_name)[0] + file_type
-
-    logger.info('Importing file \n\t"{0}"'.format(file_name))
-
     err = False
     try:
         if file_type in {'csv', 'txt'}:
@@ -1001,7 +996,8 @@ def import_data(parent, fkey=None, title="Import",
 
         if not err:
             logger.info(
-                "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
+                f'Loaded file \n\t"{file_name}"\n\t'
+                f'with data format:\n{pprint_log(data_arr, N=3)}')
             dirs.save_dir = os.path.dirname(file_name)
             dirs.last_file_type = file_type
             return data_arr  # returns numpy array
@@ -1085,12 +1081,14 @@ def export_data(parent, data, fkey, title="Export",
                     err = export_coe_xilinx(f)
                 elif file_type == 'txt':
                     err = export_coe_microsemi(f)
-                else:  # file_type == '.vhd':
+                elif file_type == '.vhd':
                     err = export_coe_vhdl_package(f)
+                else:
+                    logger.error(f'Unknown file extension "{file_type}')
+                    return None
 
-        else:  # binary format
-            # convert csv data to numpy array
-            np_data = csv2array(io.StringIO(data))
+        else:  # binary formats, storing numpy arrays
+            np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
                 logger.error("Error converting coefficient data:\n{0}".format(np_data))
@@ -1101,9 +1099,7 @@ def export_data(parent, data, fkey, title="Export",
                     savemat(f, mdict={fkey: np_data})
                     # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
                 elif file_type == 'npy':
-                    # can only store one array in the file, no pickled data
-                    # for Py2 <-> 3 compatibility
-                    np.save(f, np_data, allow_pickle=False)
+                    np.save(f, np_data)  # can only store one array
                 elif file_type == 'npz':
                     # would be possible to store multiple arrays in the file
                     fdict = {fkey: np_data}
@@ -1166,7 +1162,10 @@ def export_data(parent, data, fkey, title="Export",
 
 # ------------------------------------------------------------------------------
 def generate_header(title):
-
+    """
+    Generate file header with filter informations for coefficient export to some
+    FPGA design flow.
+    """
     f_lbls = []
     f_vals = []
     a_lbls = []
