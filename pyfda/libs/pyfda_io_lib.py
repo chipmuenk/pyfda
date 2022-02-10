@@ -1058,17 +1058,12 @@ def export_data(parent, data, fkey, title="Export",
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        sel_filt = dlg.selectedNameFilter()  # selected file filter
+        # sel_filt = dlg.selectedNameFilter()  # selected file filter
     else:
         return -1
 
-    for t in file_types:  # extract the list of file extensions
-        if t in str(sel_filt):
-            file_type = t
-
-    # strip extension from returned file name (if any) + append suffix defined by
-    # selected file type filter:
-    file_name = os.path.splitext(file_name)[0] + '.' + file_type
+    # Slice off file extension
+    file_type = os.path.splitext(file_name)[-1].strip('.')
     err = False
 
     try:
