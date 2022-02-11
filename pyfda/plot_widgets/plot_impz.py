@@ -425,8 +425,17 @@ class Plot_Impz(QWidget):
             self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
             self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            self.y = np.empty_like(self.x)  # response
-            self.cmplx = False  # Flag for complex signal
+            # Test whether stimulus or filter coefficients are complex and set 
+            # flag and UI field correspondingly
+            self.cmplx = bool(
+                np.any(np.any(np.iscomplex(x_test))
+                       or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))))
+            if self.cmplx:
+                self.y = np.empty_like(self.x, dtype=complex)  # always complex
+            else:
+                self.y = np.empty_like(self.x)  # same as self.x
+            self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+
             # initialize progress bar
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
             self.ui.prg_wdg.setValue(0)
@@ -565,12 +574,6 @@ class Plot_Impz(QWidget):
             self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] = \
                 self.y[max(self.ui.N_start, self.stim_wdg.T1_idx):] - abs(dc[1])
 
-        # Test whether response or stimulus or filter coefficients are complex
-        # TODO: shouldn't stimulus and response be treated separately?
-        self.cmplx = bool(
-            np.any(np.iscomplex(self.y)) or np.any(np.iscomplex(self.x))
-            or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba']))))
-        self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
 
