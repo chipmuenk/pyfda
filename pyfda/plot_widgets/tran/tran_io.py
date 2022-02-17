@@ -7,18 +7,15 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for plotting impulse and general transient responses
+Widget for loading and storing stimulus data from / to transient plotting widget
 """
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
-#import numpy as np
-#from numpy import ndarray, pi
+# import numpy as np
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
-from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
@@ -40,7 +37,7 @@ class Tran_IO(QWidget):
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
         # initial settings
-
+        self.x = None
         self._construct_UI()
 
 # ------------------------------------------------------------------------------

@@ -11,8 +11,7 @@ Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, QProgressBar, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout,
-    QGridLayout, QTabWidget, QFrame)
+    QIcon, QProgressBar, pyqtSignal, QSize, QHBoxLayout, QVBoxLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
