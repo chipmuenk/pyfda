@@ -39,13 +39,6 @@ except ImportError:
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO:
-# when nmigen is present, instantiate the fixpoint widget
-if cmp_version("nmigen", "0.2") >= 0:
-    HAS_NMIGEN = True
-else:
-    HAS_NMIGEN = False
-
 # ------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : display name

@@ -97,12 +97,6 @@ try:
 except ImportError:
     pass
 
-try:
-    from nmigen import __version__ as V_NMG
-    MODULES.update({'nmigen': {'V_NMG': V_NMG}})
-except ImportError:
-    pass
-
 MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
 try:
