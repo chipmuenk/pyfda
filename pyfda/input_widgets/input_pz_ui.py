@@ -153,13 +153,6 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
         # ---------------------------------------------
-
-#        self.cmbFilterType = QComboBox(self)
-#        self.cmbFilterType.setObjectName("comboFilterType")
-#        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
-#        self.cmbFilterType.addItems(["FIR","IIR"])
-#        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.butAddCells = QPushButton(self)
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         self.butAddCells.setIconSize(q_icon_size)
