@@ -3,6 +3,13 @@
 
 ### Bug fixes
 - Fix crash with matplotlib 3.1 due to missing Axes3D import
+- When the filter is complex-valued, set data type to 'complex' for the response
+  signal in y[n] (was 'float' so only the real part was displayed)
+- Fix crash when entering a complex coefficient in a previously real-valued filter
+- Default file filters for QFileDialog objects could not be set in some cases, 
+  producing warning messages in the console
+- Remove module import and version display for module nmigen to avoid message
+  "KeyError: 'V_NMG'"
 
 ### New features
 - Keyboard modifier `<ALT>` hides the plot title when saving a
@@ -11,6 +18,9 @@
 - Add new stimulus "PWM"
 
 - Verified functionality with Python 3.10
+
+### Maintenance
+- move CSV_option_box to separate module 'csv_option_box.py'
 
 ### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-12-23)
 
