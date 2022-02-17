@@ -509,16 +509,13 @@ class Input_Coeffs(QWidget):
         else:
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
-        # logger.warning("np.shape(ba) = {0}".format(np.shape(self.ba)))
-
         params['FMT_ba'] = int(self.ui.spnDigits.text())
 
-        # When format is 'float', disable all fixpoint options
+        # When format is 'float', disable all fixpoint options and widgets:
         is_float = (qget_cmb_box(self.ui.cmbFormat, data=False).lower() == 'float')
-
-        self.ui.spnDigits.setVisible(is_float)  # number of digits can only be selected
-        self.ui.lblDigits.setVisible(is_float)  # for format = 'float'
-        self.ui.cmbQFrmt.setVisible(not is_float)  # hide unneeded widgets for format = 'float'
+        self.ui.spnDigits.setVisible(is_float)  # select number of float digits
+        self.ui.lblDigits.setVisible(is_float)
+        self.ui.cmbQFrmt.setVisible(not is_float)  # hide quantization widgets
         self.ui.lbl_W.setVisible(not is_float)
         self.ui.ledW.setVisible(not is_float)
 
@@ -711,7 +708,7 @@ class Input_Coeffs(QWidget):
     def qdict2ui(self):
         """
         Triggered by:
-        - process_sig_rx()  if self.fx_specs_changed or 
+        - process_sig_rx()  if self.fx_specs_changed or
                                 dict_sig['fx_sim'] == 'specs_changed'
 
         Set the UI from the quantization dict and update the fixpoint object.
