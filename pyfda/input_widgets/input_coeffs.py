@@ -338,7 +338,8 @@ class Input_Coeffs(QWidget):
         # ---------------------------------------------------------------------
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
-        self.tblCoeff.horizontalHeader().setHighlightSections(True)  # highlight when selected
+        # highlight section of header when a corresponding cell is selected
+        self.tblCoeff.horizontalHeader().setHighlightSections(True)
         self.tblCoeff.horizontalHeader().setFont(self.ui.bfont)
 
 #        self.tblCoeff.QItemSelectionModel.Clear
@@ -357,8 +358,9 @@ class Input_Coeffs(QWidget):
         self.setLayout(layVMain)
 
         self.myQ = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # initialize fixpoint object
-        self.load_dict()  # initialize + refresh table with default values from filter dict
-        # TODO: this needs to be optimized - self._refresh is being called in both routines
+        # initialize + refresh table with default values from filter dict
+        self.load_dict()
+        # TODO: needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
 
         # ----------------------------------------------------------------------
@@ -667,7 +669,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def _set_number_format(self, emit=True):
         """
-        Triggered by `contruct_UI()`, `qdict2ui()`and by `ui.cmbQFrmt.currentIndexChanged()`
+        Triggered by `contruct_UI()`, `qdict2ui()`and `ui.cmbQFrmt.currentIndexChanged()`
 
         Set one of three number formats: Integer, fractional, normalized fractional
         (triggered by self.ui.cmbQFrmt combobox)
@@ -710,8 +712,9 @@ class Input_Coeffs(QWidget):
     def qdict2ui(self):
         """
         Triggered by:
-        - process_sig_rx()  if self.fx_specs_changed or dict_sig['fx_sim'] == 'specs_changed'
-        -
+        - process_sig_rx()  if self.fx_specs_changed or 
+                                dict_sig['fx_sim'] == 'specs_changed'
+
         Set the UI from the quantization dict and update the fixpoint object.
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
@@ -879,9 +882,10 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not any(sel):  # nothing selected, append one row of zeros to table
-            self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)  # "insert" row after last
-        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':  # only complete rows selected
+        if not any(sel):  # nothing selected, "insert" row of zeros after last to table
+            self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
+        # only complete rows selected, insert a row of zeros after first selected row
+        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
             self.ba = np.insert(self.ba, sel[0], 0, axis=1)
 #        elif len(sel[0]) == len(sel[1]):
 #            self.ba = np.insert(self.ba, sel, 0, axis=1)
