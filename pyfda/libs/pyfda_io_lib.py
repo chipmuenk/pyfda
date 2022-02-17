@@ -21,155 +21,17 @@ import numpy as np
 from scipy.io import loadmat, savemat
 
 from .pyfda_lib import safe_eval, lin2unit, pprint_log
-from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
+from .pyfda_qt_lib import qget_selected
 
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 
-from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFileDialog,
-                     QVBoxLayout, QGridLayout, pyqtSignal)
+from .compat import QFileDialog
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-# ------------------------------------------------------------------------------
-class CSV_option_box(QDialog):
-    """
-    Create a pop-up widget for setting CSV options. This is needed when storing /
-    reading Comma-Separated Value (CSV) files containing coefficients or poles
-    and zeros.
-    """
-    sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
-    from pyfda.libs.pyfda_qt_lib import emit
-
-    def __init__(self, parent):
-        super(CSV_option_box, self).__init__(parent)
-        self._construct_UI()
-        qwindow_stay_on_top(self, True)
-
-# ------------------------------------------------------------------------------
-    def closeEvent(self, event):
-        """
-        Override closeEvent (user has tried to close the window) and send a
-        signal to parent where window closing is registered before actually
-        closing the window.
-        """
-        self.emit({'closeEvent': ''})
-        event.accept()
-
-# ------------------------------------------------------------------------------
-    def _construct_UI(self):
-        """ initialize the User Interface """
-        self.setWindowTitle("CSV Options")
-        lblDelimiter = QLabel("CSV-Delimiter:", self)
-        delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
-                 ('<SPACE>', ' '), ('< | >', '|')]
-        self.cmbDelimiter = QComboBox(self)
-        for d in delim:
-            self.cmbDelimiter.addItem(d[0], d[1])
-        self.cmbDelimiter.setToolTip("Delimiter between data fields.")
-
-        lblTerminator = QLabel("Line Terminator:", self)
-        terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
-                      ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
-        self.cmbLineTerminator = QComboBox(self)
-        self.cmbLineTerminator.setToolTip(
-            "<span>Terminator at the end of a data row."
-            " (depending on the operating system). 'None' can be used for a single "
-            "row of data with added line breaks.</span>")
-        for t in terminator:
-            self.cmbLineTerminator.addItem(t[0], t[1])
-
-        butClose = QPushButton(self)
-        butClose.setText("Close")
-
-        lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Horz.', 'auto'),
-                       ('Vertical', 'vert'), ('Horizontal', 'horiz')]
-        self.cmbOrientation = QComboBox(self)
-        self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
-        for o in orientation:
-            self.cmbOrientation.addItem(o[0], o[1])
-
-        lblHeader = QLabel("Enable header", self)
-        header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
-        self.cmbHeader = QComboBox(self)
-        self.cmbHeader.setToolTip("First row is a header.")
-        for h in header:
-            self.cmbHeader.addItem(h[0], h[1])
-
-        self.radClipboard = QRadioButton("Clipboard", self)
-        self.radClipboard.setChecked(False)
-        self.radFile = QRadioButton("File", self)
-        # setting is read later on from params['CSV']['clipboard']
-        self.radFile.setChecked(True)
-
-        lay_grid = QGridLayout()
-        lay_grid.addWidget(lblDelimiter, 1, 1)
-        lay_grid.addWidget(self.cmbDelimiter, 1, 2)
-        lay_grid.addWidget(lblTerminator, 2, 1)
-        lay_grid.addWidget(self.cmbLineTerminator, 2, 2)
-        lay_grid.addWidget(lblOrientation, 3, 1)
-        lay_grid.addWidget(self.cmbOrientation, 3, 2)
-        lay_grid.addWidget(lblHeader, 4, 1)
-        lay_grid.addWidget(self.cmbHeader, 4, 2)
-        lay_grid.addWidget(self.radClipboard, 5, 1)
-        lay_grid.addWidget(self.radFile, 5, 2)
-
-        layVMain = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
-        layVMain.addLayout(lay_grid)
-        layVMain.addWidget(butClose)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
-
-        self._load_settings()
-
-        # ============== Signals & Slots ================================
-        butClose.clicked.connect(self.close)
-        self.cmbOrientation.currentIndexChanged.connect(self._store_settings)
-        self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
-        self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
-        self.cmbHeader.currentIndexChanged.connect(self._store_settings)
-        self.radClipboard.clicked.connect(self._store_settings)
-        self.radFile.clicked.connect(self._store_settings)
-
-    def _store_settings(self):
-        """
-        Store settings of CSV options widget in ``pyfda_rc.params``.
-        """
-
-        try:
-            params['CSV']['orientation'] = qget_cmb_box(self.cmbOrientation, data=True)
-            params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
-            params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator,
-                                                           data=True)
-            params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
-            params['CSV']['clipboard'] = self.radClipboard.isChecked()
-
-            self.emit({'ui_changed': 'csv'})
-
-        except KeyError as e:
-            logger.error(e)
-
-    def _load_settings(self):
-        """
-        Load settings of CSV options widget from ``pyfda_rc.params``.
-        """
-        try:
-            qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
-            qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'],
-                         data=True)
-            qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
-            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
-            self.radClipboard.setChecked(params['CSV']['clipboard'])
-            self.radFile.setChecked(not params['CSV']['clipboard'])
-
-        except KeyError as e:
-            logger.error(e)
 
 
 # ##############################################################################
@@ -1230,13 +1092,17 @@ def generate_header(title):
         "-" * 85 + "\n\n"
         "{0}".format(title) + "\n"
         "Generated by pyFDA 0.6 (https://github.com/chipmuenk/pyfda)\n\n")
-    header += "Designed:\t{0}\n".format(datetime.datetime.fromtimestamp(int(fb.fil[0]['timestamp'])).strftime(date_frmt))
+    header += "Designed:\t{0}\n".format(
+        datetime.datetime.fromtimestamp(
+            int(fb.fil[0]['timestamp'])).strftime(date_frmt))
     header += "Saved:\t{0}\n\n".format(datetime.datetime.now().strftime(date_frmt))
-    header += "Filter type:\t{0}, {1} (Order = {2})\n".format(fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]["N"])
-    header += "Sample Frequency \tf_S = {0} {1}\n\n".format(f_S, unit)
+    header += f"Filter type:\t{fb.fil[0]['rt']}, {fb.fil[0]['fc']} "
+    header += f"(Order = {fb.fil[0]['N']})\n"
+    header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
     header += "Corner Frequencies:\n"
     for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB):
-        header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = " + str(a) + " dB\n"
+        header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = "
+        header += str(a) + " dB\n"
     header += "-" * 85 + "\n"
     return header
 

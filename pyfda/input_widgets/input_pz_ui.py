@@ -15,7 +15,7 @@ from pyfda.libs.compat import (
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
-from pyfda.libs.pyfda_io_lib import CSV_option_box
+from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
