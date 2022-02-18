@@ -9,8 +9,6 @@
 """
 Library with classes and functions for file and text IO
 """
-# TODO: import data from files doesn't update FIR / IIR and data changed
-
 import os, re, io
 import csv
 import datetime
@@ -18,7 +16,7 @@ import datetime
 import pickle
 
 import numpy as np
-from scipy.io import loadmat, savemat
+from scipy.io import loadmat, savemat, wavfile
 
 from .pyfda_lib import safe_eval, lin2unit, pprint_log
 from .pyfda_qt_lib import qget_selected
@@ -828,7 +826,10 @@ def import_data(parent, fkey=None, title="Import",
 
     err = False
     try:
-        if file_type in {'csv', 'txt'}:
+        if file_type == 'wav':
+            f_S, data_arr = wavfile.read(file_name, mmap=False)
+            fb.fil[0]['f_S_wav'] = f_S
+        elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
