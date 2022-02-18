@@ -288,7 +288,6 @@ class Plot_Tran_Stim_UI(QWidget):
         layHStimDC = QHBoxLayout()
         layHStimDC.addWidget(self.lblDC)
         layHStimDC.addWidget(self.ledDC)
-
         # ======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -387,63 +386,63 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledNoi.setObjectName("stimNoi")
 
         layGStim = QGridLayout()
-
-        layGStim.addLayout(layHCmbStim, 0, 1)
-        layGStim.addLayout(layHStimDC, 1, 1)
-
-        layGStim.addWidget(self.lblAmp1, 0, 2)
-        layGStim.addWidget(self.lblAmp2, 1, 2)
-
-        layGStim.addWidget(self.ledAmp1, 0, 3)
-        layGStim.addWidget(self.ledAmp2, 1, 3)
-
-        layGStim.addWidget(self.lblPhi1, 0, 4)
-        layGStim.addWidget(self.lblPhi2, 1, 4)
-
-        layGStim.addWidget(self.ledPhi1, 0, 5)
-        layGStim.addWidget(self.ledPhi2, 1, 5)
-
-        layGStim.addWidget(self.lblPhU1, 0, 6)
-        layGStim.addWidget(self.lblPhU2, 1, 6)
-
-        layGStim.addWidget(self.lbl_T1, 0, 7)
-        layGStim.addWidget(self.lbl_T2, 1, 7)
-
-        layGStim.addWidget(self.led_T1, 0, 8)
-        layGStim.addWidget(self.led_T2, 1, 8)
-
-        layGStim.addWidget(self.lbl_TU1, 0, 9)
-        layGStim.addWidget(self.lbl_TU2, 1, 9)
-
-        layGStim.addWidget(self.lbl_TW1, 0, 10)
-        layGStim.addWidget(self.lbl_TW2, 1, 10)
-
-        layGStim.addWidget(self.led_TW1, 0, 11)
-        layGStim.addWidget(self.led_TW2, 1, 11)
-
-        layGStim.addWidget(self.lbl_TWU1, 0, 12)
-        layGStim.addWidget(self.lbl_TWU2, 1, 12)
-
-        layGStim.addWidget(self.lblFreq1, 0, 13)
-        layGStim.addWidget(self.lblFreq2, 1, 13)
-
-        layGStim.addWidget(self.ledFreq1, 0, 14)
-        layGStim.addWidget(self.ledFreq2, 1, 14)
-
-        layGStim.addWidget(self.lblFreqUnit1, 0, 15)
-        layGStim.addWidget(self.lblFreqUnit2, 1, 15)
-
-        layGStim.addWidget(self.lbl_BW1, 0, 16)
-        layGStim.addWidget(self.lbl_BW2, 1, 16)
-
-        layGStim.addWidget(self.led_BW1, 0, 17)
-        layGStim.addWidget(self.led_BW2, 1, 17)
-
-        layGStim.addWidget(self.lblNoise, 0, 18)
-        layGStim.addWidget(self.lblNoi, 1, 18)
-
-        layGStim.addWidget(self.cmbNoise, 0, 19)
-        layGStim.addWidget(self.ledNoi, 1, 19)
+        i = 1
+        layGStim.addLayout(layHCmbStim, 0, i)
+        layGStim.addLayout(layHStimDC, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblAmp1, 0, i)
+        layGStim.addWidget(self.lblAmp2, 1, i)
+        i += 1
+        layGStim.addWidget(self.ledAmp1, 0, i)
+        layGStim.addWidget(self.ledAmp2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblPhi1, 0, i)
+        layGStim.addWidget(self.lblPhi2, 1, i)
+        i += 1
+        layGStim.addWidget(self.ledPhi1, 0, i)
+        layGStim.addWidget(self.ledPhi2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblPhU1, 0, i)
+        layGStim.addWidget(self.lblPhU2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lbl_T1, 0, i)
+        layGStim.addWidget(self.lbl_T2, 1, i)
+        i += 1
+        layGStim.addWidget(self.led_T1, 0, i)
+        layGStim.addWidget(self.led_T2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lbl_TU1, 0, i)
+        layGStim.addWidget(self.lbl_TU2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lbl_TW1, 0, i)
+        layGStim.addWidget(self.lbl_TW2, 1, i)
+        i += 1
+        layGStim.addWidget(self.led_TW1, 0, i)
+        layGStim.addWidget(self.led_TW2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lbl_TWU1, 0, i)
+        layGStim.addWidget(self.lbl_TWU2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblFreq1, 0, i)
+        layGStim.addWidget(self.lblFreq2, 1, i)
+        i += 1
+        layGStim.addWidget(self.ledFreq1, 0, i)
+        layGStim.addWidget(self.ledFreq2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblFreqUnit1, 0, i)
+        layGStim.addWidget(self.lblFreqUnit2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lbl_BW1, 0, i)
+        layGStim.addWidget(self.lbl_BW2, 1, i)
+        i += 1
+        layGStim.addWidget(self.led_BW1, 0, i)
+        layGStim.addWidget(self.led_BW2, 1, i)
+        i += 1
+        layGStim.addWidget(self.lblNoise, 0, i)
+        layGStim.addWidget(self.lblNoi, 1, i)
+        i += 1
+        layGStim.addWidget(self.cmbNoise, 0, i)
+        layGStim.addWidget(self.ledNoi, 1, i)
 
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
