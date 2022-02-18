@@ -96,22 +96,22 @@ class Tran_IO_UI(QWidget):
 
 
 # ------------------------------------------------------------------------------
-def main():
-    import sys
-    from pyfda.libs.compat import QApplication
+# def main():
+#     import sys
+#     from pyfda.libs.compat import QApplication
 
-    app = QApplication(sys.argv)
+#     app = QApplication(sys.argv)
 
-    mainw = Tran_IO_UI(None)
-    layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
-    layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+#     mainw = Tran_IO_UI(None)
+#     layVMain = QVBoxLayout()
+#     layVMain.addWidget(mainw.wdg_stim)
+#     layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
-    mainw.setLayout(layVMain)
+#     mainw.setLayout(layVMain)
 
-    app.setActiveWindow(mainw)
-    mainw.show()
-    sys.exit(app.exec_())
+#     app.setActiveWindow(mainw)
+#     mainw.show()
+#     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
@@ -132,4 +132,3 @@ if __name__ == "__main__":
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-
