@@ -73,15 +73,13 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # stimuli
         self.cmb_stim_item = "impulse"
-        self.cmb_stim_periodic_item = 'square'
-        self.cmb_stim_modulation_item = 'am'
+        self.cmb_stim_periodic_item = "square"
+        self.cmb_stim_modulation_item = "am"
         self.stim = "dirac"
-        self.impulse_type = 'dirac'
-        self.sinusoid_type = 'sine'
+        self.impulse_type = "dirac"
+        self.sinusoid_type = "sine"
 
-        self.chirp_type = 'linear'
-
-        self.noise = "None"
+        self.chirp_type = "linear"
 
         self.f1 = 0.02
         self.f2 = 0.03
@@ -92,7 +90,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.TW1 = self.TW2 = 1
         self.BW1 = self.BW2 = 0.5
         self.noi = 0.1
-        self.noise = 'none'
+        self.noise = "none"
         self.DC = 0.0
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * n))"
         self.stim_par1 = 0.5
