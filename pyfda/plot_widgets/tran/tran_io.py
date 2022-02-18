@@ -10,13 +10,13 @@
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
-# import numpy as np
+import numpy as np
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval
-from pyfda.libs.pyfda_qt_lib import emit
+from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
@@ -38,7 +38,8 @@ class Tran_IO(QWidget):
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
         # initial settings
-        self.x = None
+        self.x = None  # array for file data
+        self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -80,5 +81,8 @@ class Tran_IO(QWidget):
     def import_data(self):
         self.x = io.import_data(
             self, title="Import Data", file_types=('csv', 'wav'))
-        logger.info(f"Shape = {x.shape()}")
-        emit({'data_changed': 'file_io'})
+        if self.x is not None and type(self.x) not in {np.ScalarType}:
+            qstyle_widget(self.ui.butLoad, "active")
+            self.file_load_status = "loaded"
+            logger.info(f"Shape = {self.x.shape}")
+            self.emit({'data_changed': 'file_io'})

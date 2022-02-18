@@ -71,9 +71,10 @@ class Tran_IO_UI(QWidget):
                                   checkable=False)
         # self.butLoad.setIconSize(q_icon_size)
         self.butLoad.setToolTip("Load data from file.")
-        self.butLoad.setEnabled(False)
+        self.butLoad.setEnabled(True)
 
-        self.lbl_info = QLabel(to_html("  coming soon ...", frmt="b"))
+        self.lbl_info = QLabel(to_html("File:", frmt="b"))
+
 
         # ----------------------------------------------------------------------
         # Main Widget
