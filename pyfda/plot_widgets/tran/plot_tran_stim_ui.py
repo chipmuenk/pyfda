@@ -13,14 +13,13 @@ import collections
 
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QFrame,
     pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
-    PushButton)
+    qcmb_box_populate, qget_cmb_box, qtext_width, QVLine)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -80,6 +79,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.sinusoid_type = "sine"
 
         self.chirp_type = "linear"
+        self.cmb_file_io_default = "none"
 
         self.f1 = 0.02
         self.f2 = 0.03
@@ -139,6 +139,14 @@ class Plot_Tran_Stim_UI(QWidget):
              "either band-limited or with aliasing.</span>"),
             ("modulation", "Modulat.", "<span>Modulated waveforms.</span>"),
             ("formula", "Formula", "<span>Formula defined stimulus.</span>")
+            ]
+
+        # combobox tooltip + data / text / tooltip for file I/O usage
+        self.cmb_file_io_items = [
+            ("<span>Select data from File I/O widget/span>"),
+            ("none", "None", "<span>Don't use file I/O data.</span>"),
+            ("use", "Use", "<span><b>Use></b> file I/O data as stimuli.</span>"),
+            ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli")
             ]
 
         # combobox tooltip + data / text / tooltip for periodic signals items
@@ -218,6 +226,21 @@ class Plot_Tran_Stim_UI(QWidget):
         # =====================================================================
         # Controls for stimuli
         # =====================================================================
+        self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
+        self.cmb_file_io = QComboBox(self)
+        qcmb_box_populate(
+            self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
+        line1 = QVLine()
+        line2 = QVLine(width=5)
+        layH_stim_io = QHBoxLayout()
+        layH_stim_io.setContentsMargins(0, 0, 0, 0)
+        layV_stim_io = QVBoxLayout()
+        layV_stim_io.setContentsMargins(0, 0, 0, 0)
+        layV_stim_io.addWidget(self.lbl_file_io)
+        layV_stim_io.addWidget(self.cmb_file_io)
+        layH_stim_io.addLayout(layV_stim_io)
+        layH_stim_io.addWidget(line1)
+        # -------------------------------------
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
@@ -288,6 +311,7 @@ class Plot_Tran_Stim_UI(QWidget):
         layHStimDC = QHBoxLayout()
         layHStimDC.addWidget(self.lblDC)
         layHStimDC.addWidget(self.ledDC)
+
         # ======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
@@ -385,64 +409,69 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
 
-        layGStim = QGridLayout()
+        self.layGStim = QGridLayout()
+        self.layGStim.setContentsMargins(0, 0, 0, 0)
         i = 1
-        layGStim.addLayout(layHCmbStim, 0, i)
-        layGStim.addLayout(layHStimDC, 1, i)
+        self.layGStim.addLayout(layHCmbStim, 0, i)
+        self.layGStim.addLayout(layHStimDC, 1, i)
         i += 1
-        layGStim.addWidget(self.lblAmp1, 0, i)
-        layGStim.addWidget(self.lblAmp2, 1, i)
+        self.layGStim.addWidget(self.lblAmp1, 0, i)
+        self.layGStim.addWidget(self.lblAmp2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledAmp1, 0, i)
-        layGStim.addWidget(self.ledAmp2, 1, i)
+        self.layGStim.addWidget(self.ledAmp1, 0, i)
+        self.layGStim.addWidget(self.ledAmp2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblPhi1, 0, i)
-        layGStim.addWidget(self.lblPhi2, 1, i)
+        self.layGStim.addWidget(self.lblPhi1, 0, i)
+        self.layGStim.addWidget(self.lblPhi2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledPhi1, 0, i)
-        layGStim.addWidget(self.ledPhi2, 1, i)
+        self.layGStim.addWidget(self.ledPhi1, 0, i)
+        self.layGStim.addWidget(self.ledPhi2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblPhU1, 0, i)
-        layGStim.addWidget(self.lblPhU2, 1, i)
+        self.layGStim.addWidget(self.lblPhU1, 0, i)
+        self.layGStim.addWidget(self.lblPhU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_T1, 0, i)
-        layGStim.addWidget(self.lbl_T2, 1, i)
+        self.layGStim.addWidget(self.lbl_T1, 0, i)
+        self.layGStim.addWidget(self.lbl_T2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_T1, 0, i)
-        layGStim.addWidget(self.led_T2, 1, i)
+        self.layGStim.addWidget(self.led_T1, 0, i)
+        self.layGStim.addWidget(self.led_T2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TU1, 0, i)
-        layGStim.addWidget(self.lbl_TU2, 1, i)
+        self.layGStim.addWidget(self.lbl_TU1, 0, i)
+        self.layGStim.addWidget(self.lbl_TU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TW1, 0, i)
-        layGStim.addWidget(self.lbl_TW2, 1, i)
+        self.layGStim.addWidget(self.lbl_TW1, 0, i)
+        self.layGStim.addWidget(self.lbl_TW2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_TW1, 0, i)
-        layGStim.addWidget(self.led_TW2, 1, i)
+        self.layGStim.addWidget(self.led_TW1, 0, i)
+        self.layGStim.addWidget(self.led_TW2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TWU1, 0, i)
-        layGStim.addWidget(self.lbl_TWU2, 1, i)
+        self.layGStim.addWidget(self.lbl_TWU1, 0, i)
+        self.layGStim.addWidget(self.lbl_TWU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblFreq1, 0, i)
-        layGStim.addWidget(self.lblFreq2, 1, i)
+        self.layGStim.addWidget(self.lblFreq1, 0, i)
+        self.layGStim.addWidget(self.lblFreq2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledFreq1, 0, i)
-        layGStim.addWidget(self.ledFreq2, 1, i)
+        self.layGStim.addWidget(self.ledFreq1, 0, i)
+        self.layGStim.addWidget(self.ledFreq2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblFreqUnit1, 0, i)
-        layGStim.addWidget(self.lblFreqUnit2, 1, i)
+        self.layGStim.addWidget(self.lblFreqUnit1, 0, i)
+        self.layGStim.addWidget(self.lblFreqUnit2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_BW1, 0, i)
-        layGStim.addWidget(self.lbl_BW2, 1, i)
+        self.layGStim.addWidget(self.lbl_BW1, 0, i)
+        self.layGStim.addWidget(self.lbl_BW2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_BW1, 0, i)
-        layGStim.addWidget(self.led_BW2, 1, i)
+        self.layGStim.addWidget(self.led_BW1, 0, i)
+        self.layGStim.addWidget(self.led_BW2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblNoise, 0, i)
-        layGStim.addWidget(self.lblNoi, 1, i)
+        self.layGStim.addWidget(self.lblNoise, 0, i)
+        self.layGStim.addWidget(self.lblNoi, 1, i)
         i += 1
-        layGStim.addWidget(self.cmbNoise, 0, i)
-        layGStim.addWidget(self.ledNoi, 1, i)
+        self.layGStim.addWidget(self.cmbNoise, 0, i)
+        self.layGStim.addWidget(self.ledNoi, 1, i)
+
+        self.frmGStim = QFrame(self)
+        self.frmGStim.setContentsMargins(0, 0, 0, 0)
+        self.frmGStim.setLayout(self.layGStim)
 
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
@@ -460,7 +489,8 @@ class Plot_Tran_Stim_UI(QWidget):
         # Main Widget
         # ----------------------------------------------------------------------
         layH_stim_par = QHBoxLayout()
-        layH_stim_par.addLayout(layGStim)
+        layH_stim_par.addLayout(layH_stim_io)
+        layH_stim_par.addWidget(self.frmGStim)
 
         layV_stim = QVBoxLayout()
         layV_stim.addLayout(layH_stim_par)
@@ -506,6 +536,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_BW1.editingFinished.connect(self._update_BW1)
         self.led_BW2.editingFinished.connect(self._update_BW2)
 
+        self.cmb_file_io.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbImpulseType.currentIndexChanged.connect(self._update_impulse_type)
         self.cmbSinusoidType.currentIndexChanged.connect(self._update_sinusoid_type)
         self.cmbChirpType.currentIndexChanged.connect(self._update_chirp_type)
@@ -724,6 +755,9 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
+        use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
+        self.frmGStim.setVisible(use_file_io)
+
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
         if self.cmb_stim == "impulse":
             self.stim = qget_cmb_box(self.cmbImpulseType)
@@ -785,8 +819,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblFreqUnit2.setVisible("f2" in stim_wdg)
         self.lbl_BW2.setVisible("BW2" in stim_wdg)
         self.led_BW2.setVisible("BW2" in stim_wdg)
-        self.lblStimFormula.setVisible(self.stim == "formula")
-        self.ledStimFormula.setVisible(self.stim == "formula")
+        self.lblStimFormula.setVisible(self.stim == "formula" and use_file_io)
+        self.ledStimFormula.setVisible(self.stim == "formula" and use_file_io)
 
         self.cmbImpulseType.setVisible(self.cmb_stim == 'impulse')
         self.cmbSinusoidType.setVisible(self.cmb_stim == 'sinusoid')
