@@ -91,6 +91,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.BW1 = self.BW2 = 0.5
         self.noi = 0.1
         self.noise = "none"
+        self.mls_b = 8
         self.DC = 0.0
         self.stim_formula = "A1 * abs(sin(2 * pi * f1 * n))"
         self.stim_par1 = 0.5
@@ -207,12 +208,11 @@ class Plot_Tran_Stim_UI(QWidget):
             ("uniform", "Uniform",
              "<span>Uniformly distributed process in the range &plusmn; &Delta;/2."
              "</span>"),
-            ("prbs", "PRBS",
-             "<span>Pseudo-Random Binary Sequence with values &plusmn; A.</span>"),
+            ("randint", "RandInt",
+             "<span>Random integer sequence in the interval [0, <i>I</i>]</span>"),
             ("mls", "MLS",
-             "<span>Maximum Length Sequence with values &plusmn; A. The sequence is "
-             "always the same as the state is not stored for the next sequence start."
-             "</span>"),
+             "<span>Maximum Length Sequence with amplitude <i>A</i> and maximum length "
+             "2<sup><i>b</i></sup> - 1 after which the sequence is repeated.</span>"),
             ("brownian", "Brownian",
              "<span>Brownian (cumulated sum) process based on Gaussian noise with"
              " std. deviation &sigma;.</span>")
@@ -400,12 +400,22 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmbNoise = QComboBox(self)
         qcmb_box_populate(self.cmbNoise, self.cmb_stim_noise_items, self.noise)
+        # layH_cmb_noise = QHBoxLayout()
+        # layH_cmb_noise.addWidget(self.cmbNoise)
 
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
+        self.ledNoi.setMaximumWidth(self.cmbNoise.width())
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
+        self.lblNoi_par = QLabel("not initialized", self)
+        self.ledNoi_par = QLineEdit(self)
+        self.ledNoi_par.setMaximumWidth(qtext_width(N_x=4))
+        layH_noi_params = QHBoxLayout()
+        layH_noi_params.addWidget(self.ledNoi)
+        layH_noi_params.addWidget(self.lblNoi_par)
+        layH_noi_params.addWidget(self.ledNoi_par)
 
         self.layGStim = QGridLayout()
         self.layGStim.setContentsMargins(0, 0, 0, 0)
@@ -466,8 +476,9 @@ class Plot_Tran_Stim_UI(QWidget):
         self.layGStim.addWidget(self.lblNoise, 0, i)
         self.layGStim.addWidget(self.lblNoi, 1, i)
         i += 1
+        # self.layGStim.addLayout(layH_cmb_noise, 0, i)
         self.layGStim.addWidget(self.cmbNoise, 0, i)
-        self.layGStim.addWidget(self.ledNoi, 1, i)
+        self.layGStim.addLayout(layH_noi_params, 1, i)
 
         self.frmGStim = QFrame(self)
         self.frmGStim.setContentsMargins(0, 0, 0, 0)
@@ -529,6 +540,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
+        self.ledNoi_par.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledPhi1.editingFinished.connect(self._update_phi1)
@@ -915,13 +927,15 @@ class Plot_Tran_Stim_UI(QWidget):
         self.noise = qget_cmb_box(self.cmbNoise)
         self.lblNoi.setVisible(self.noise != 'none')
         self.ledNoi.setVisible(self.noise != 'none')
+        self.lblNoi_par.setVisible(self.noise == 'mls')
+        self.ledNoi_par.setVisible(self.noise == 'mls')
         if self.noise != 'none':
             self.noi = safe_eval(self.ledNoi.text(), 0, return_type='cmplx')
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
                 self.lblNoi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
                 self.ledNoi.setToolTip(
-                    "<span>Standard deviation of statistical process,"
+                    "<span>Standard deviation, "
                     "noise power is <i>P</i> = &sigma;<sup>2</sup></span>")
             elif self.noise == 'uniform':
                 self.lblNoi.setText(to_html("&nbsp;&Delta; =", frmt='bi'))
@@ -929,16 +943,26 @@ class Plot_Tran_Stim_UI(QWidget):
                     "<span>Interval size for uniformly distributed process (e.g. "
                     "quantization step size for quantization noise), centered around 0. "
                     "Noise power is <i>P</i> = &Delta;<sup>2</sup>/12.</span>")
-            elif self.noise == 'prbs':
-                self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
+            elif self.noise == 'randint':
+                self.lblNoi.setText(to_html("&nbsp;I =", frmt='bi'))
                 self.ledNoi.setToolTip(
-                    "<span>Amplitude of bipolar Pseudorandom Binary Sequence. "
-                    "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
-
+                    "<span>Max. integer value <i>I</i> of random integer process."
+                    "</span>")
             elif self.noise == 'mls':
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Amplitude of Maximum Length Sequence. "
-                                       "Noise power is <i>P</i> = A<sup>2</sup>.</span>")
+                                       "Noise power is <i>P</i> = A<sup>2</sup>/2.</span>")
+                self.lblNoi_par.setText(to_html("&nbsp;b =", frmt='bi'))
+                self.mls_b = safe_eval(
+                    self.ledNoi_par.text(), self.mls_b, return_type='int', sign='pos')
+                if self.mls_b < 2:
+                    self.mls_b = 2
+                if self.mls_b > 32:
+                    self.mls_b = 32
+                self.ledNoi_par.setText(str(self.mls_b))
+                self.ledNoi_par.setToolTip("<span>Length of sequence will be "
+                                           "2<sup><i>b</i></sup> - 1 with <i>b</i> "
+                                           "in the range 2 ... 32./span>")
             elif self.noise == 'brownian':
                 self.lblNoi.setText(to_html("&nbsp;&sigma; =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Standard deviation of the Gaussian process "

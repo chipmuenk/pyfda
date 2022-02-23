@@ -185,8 +185,8 @@ class Plot_Tran_Stim(QWidget):
                 self.title_str += r' + Gaussian Noise'
             elif self.ui.noise == "uniform":
                 self.title_str += r' + Uniform Noise'
-            elif self.ui.noise == "prbs":
-                self.title_str += r' + PRBS Noise'
+            elif self.ui.noise == "randint":
+                self.title_str += r' + random int. sequence'
             elif self.ui.noise == "mls":
                 self.title_str += r' + max. length sequence'
             elif self.ui.noise == "brownian":
@@ -330,13 +330,17 @@ class Plot_Tran_Stim(QWidget):
             noi = self.ui.noi * np.random.randn(N_frame)
         elif self.ui.noise == "uniform":
             noi = self.ui.noi * (np.random.rand(N_frame)-0.5)
-        elif self.ui.noise == "prbs":
-            noi = self.ui.noi * 2 * (np.random.randint(0, 2, N_frame)-0.5)
+        elif self.ui.noise == "randint":
+            noi = np.random.randint(np.abs(np.int(self.ui.noi)) + 1, size=N_frame)
         elif self.ui.noise == "mls":
-            # max_len_seq returns `sequence, state`. The state is not stored here,
-            # hence, an identical sequence is created every time.
-            noi = self.ui.noi * 2 * (sig.max_len_seq(int(np.ceil(np.log2(N_frame))),
-                                     length=N_frame, state=None)[0] - 0.5)
+            seed = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
+                    0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0][:self.ui.mls_b]
+            # seed = np.random.randint(2, size=self.ui.mls_b)
+            #
+            # max_len_seq returns `sequence, state`. The state is initialized with a
+            # fixed seed, hence, an identical sequence is created every time.
+            noi = self.ui.noi * sig.max_len_seq(
+                self.ui.mls_b, length=N_frame, state=seed)[0]
         elif self.ui.noise == "brownian":
             # brownian noise
             noi = np.cumsum(self.ui.noi * np.random.randn(N_frame))
