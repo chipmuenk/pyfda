@@ -16,6 +16,9 @@
   figure or copying it to the clipboard
 
 - Add new stimulus "PWM"
+- New stimulus Randint process
+- Add sequence length parameter to MLS process, remove PRBS (which was a Randint
+  process with values 0 and 1)
 
 - Verified functionality with Python 3.10
 
