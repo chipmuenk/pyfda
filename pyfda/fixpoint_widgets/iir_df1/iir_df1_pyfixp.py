@@ -83,8 +83,8 @@ class IIR_DF1_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        self.b = self.p['b']  # coefficients
-        self.a = self.p['a']  # coefficients
+        self.b = self.p['b']  # transversal coefficients
+        self.a = self.p['a']  # recursive coefficients
         self.L = max(len(self.b), len(self.a))  # filter length = number of taps
         # create various quantizers
         self.Q_mul = fx.Fixed(q_mul)  # partial products
@@ -107,6 +107,9 @@ class IIR_DF1_pyfixp(object):
         if zi_a is not None:
             if len(zi_a) == self.L - 1:   # use zi_a as it is
                 self.zi_a = zi_a
+            else:
+                logger.warning(f"length of zi_a is {len(zi_a)} != {len(self.L)-1}")
+                self.zi_a = np.zeros(self.L - 1)
         else:
             self.zi_a = np.zeros(self.L - 1)
 
@@ -214,11 +217,10 @@ class IIR_DF1_pyfixp(object):
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b)] * self.b)
-            xa_q = self.Q_mul.fixp(-self.zi_a[1:] * self.a)
+            xa_q = self.Q_mul.fixp(self.zi_a * self.a[1:])
             # sum up x_bq and x_aq to get accu[k]
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q) + np.sum(xa_q))
+            y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[0] = y_q[k]
-            logger.warning(self.zi_a)
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one 
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
