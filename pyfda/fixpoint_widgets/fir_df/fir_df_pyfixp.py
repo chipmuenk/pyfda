@@ -83,9 +83,6 @@ class FIR_DF_pyfixp(object):
         self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
-        # Initialize vectors (also speeds up calculation for large arrays)
-        self.xbq = np.zeros(len(self.b))  # partial products
-
         if zi is None:
             self.zi = np.zeros(self.L - 1)
         else:  # initialize filter memory and fill up with zeros
