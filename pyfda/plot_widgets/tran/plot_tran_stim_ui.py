@@ -230,15 +230,12 @@ class Plot_Tran_Stim_UI(QWidget):
         self.cmb_file_io = QComboBox(self)
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
-        # layH_stim_io = QHBoxLayout()
-        # layH_stim_io.setContentsMargins(0, 0, 0, 0)
         layV_stim_io = QVBoxLayout()
         layV_stim_io.setContentsMargins(0, 0, 0, 0)
         layV_stim_io.addWidget(self.lbl_file_io)
         layV_stim_io.addWidget(self.cmb_file_io)
-        # layH_stim_io.addLayout(layV_stim_io)
         # -------------------------------------
-        line1 = QVLine(width=5)  # width = 5
+        line1 = QVLine()
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus, self.cmb_stim_items, self.cmb_stim_item)
 
@@ -401,6 +398,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.cmbNoise = QComboBox(self)
         qcmb_box_populate(self.cmbNoise, self.cmb_stim_noise_items, self.noise)
 
+        line2 = QVLine()
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setMaximumWidth(self.cmbNoise.width())
@@ -470,6 +468,8 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         layGStim.addWidget(self.led_BW1, 0, i)
         layGStim.addWidget(self.led_BW2, 1, i)
+        i += 1
+        layGStim.addWidget(line2, 0, i, 2, 1)
         i += 1
         layGStim.addWidget(self.lblNoise, 0, i)
         layGStim.addWidget(self.lblNoi, 1, i)
