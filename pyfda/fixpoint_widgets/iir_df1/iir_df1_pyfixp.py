@@ -186,8 +186,6 @@ class IIR_DF1_pyfixp(object):
         if zi_a is not None:
             if len(zi_a) == self.L - 1:   # use zi_a as it is
                 self.zi_a = zi_a
-        else:
-            self.zi_a = zi_a = np.zeros(self.L - 1)
 
         if np.isscalar(x):
             A = x
