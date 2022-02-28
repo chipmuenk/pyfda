@@ -217,7 +217,7 @@ class IIR_DF1_pyfixp(object):
             xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b)] * self.b)
             xa_q = self.Q_mul.fixp(self.zi_a * self.a[1:])
             # sum up x_bq and x_aq to get accu[k]
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
+            y_q[k] = self.Q_acc.fixp(np.sum(xb_q) + np.sum(xa_q))
             self.zi_a[0] = y_q[k]
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one 
 
