@@ -239,7 +239,8 @@ if __name__ == '__main__':
          'QO': {'Q': '5.3', 'ovfl': 'wrap', 'quant': 'round'}
          }
     dut = IIR_DF1_pyfixp(p)
-    x = np.ones(4)
+    x = np.zeros(5)
+    x[0] = 1
     y = dut.fxfilter(x=x)
     print(y)
     y = dut.fxfilter(x=np.zeros(5))
