@@ -218,8 +218,8 @@ class IIR_DF1_pyfixp(object):
             xa_q = self.Q_mul.fixp(self.zi_a * self.a[1:])
             # sum up x_bq and x_aq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) + np.sum(xa_q))
+            self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
             self.zi_a[0] = y_q[k]
-            self.zi_a[1:] = self.zi_a[:-1]  # shift right by one 
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
