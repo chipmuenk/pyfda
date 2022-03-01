@@ -60,12 +60,19 @@ class IIR_DF1_pyfixp_UI(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
                           {'WI': 0, 'WF': 30, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
 
-        self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff',
+        self.wdg_w_coeffs_b = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
                                  label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
                                  tip_WI='Number of integer bits - edit in "b,a" tab',
                                  tip_WF='Number of fractional bits - edit in "b,a" tab',
                                  WI=fb.fil[0]['fxqc']['QCB']['WI'],
                                  WF=fb.fil[0]['fxqc']['QCB']['WF'])
+
+        self.wdg_w_coeffs_a = UI_W(self, fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
+                                 label='Coeff. Format <i>A<sub>I.F&nbsp;</sub></i>:',
+                                 tip_WI='Number of integer bits - edit in "b,a" tab',
+                                 tip_WF='Number of fractional bits - edit in "b,a" tab',
+                                 WI=fb.fil[0]['fxqc']['QCA']['WI'],
+                                 WF=fb.fil[0]['fxqc']['QCA']['WF'])
 
 
 #        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
@@ -88,7 +95,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
-        self.wdg_w_coeffs.sig_tx.connect(self.update_q_coeff)
+        self.wdg_w_coeffs_b.sig_tx.connect(self.update_q_coeff)
+        self.wdg_w_coeffs_a.sig_tx.connect(self.update_q_coeff)
         self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
         self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
 # ------------------------------------------------------------------------------
@@ -96,7 +104,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0, 0, 0, 0)
 
-        layVWdg.addWidget(self.wdg_w_coeffs)
+        layVWdg.addWidget(self.wdg_w_coeffs_b)
+        layVWdg.addWidget(self.wdg_w_coeffs_a)
 #        layVWdg.addWidget(self.wdg_q_coeffs)
         layVWdg.addWidget(self.wdg_q_accu)
         layVWdg.addWidget(self.wdg_w_accu)
@@ -112,7 +121,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         # if not, just emit the dict.
         if 'ui' in dict_sig:
-            if dict_sig['wdg_name'] == 'w_coeff':  # coefficient format updated
+            if dict_sig['wdg_name'] in {'w_coeff_b', 'w_coeff_a'}:  # coeff. format updated
                 """
                 Update coefficient quantization settings and coefficients.
 
@@ -227,8 +236,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if 'QCB' not in fxqc_dict:
             fxqc_dict.update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
+        if 'QCA' not in fxqc_dict:
+            fxqc_dict.update({'QCA': {}})  # no coefficient settings in dict yet
+            logger.warning("QCA key missing")
 
-        self.wdg_w_coeffs.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
+        self.wdg_w_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
+        self.wdg_w_coeffs_a.dict2ui(fxqc_dict['QCA'])  # update coefficient wordlength
+
         self.update_accu_settings()                  # update accumulator settings
 
 # ------------------------------------------------------------------------------
@@ -259,7 +273,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         - 'QA': dictionary with accumulator quantization settings
 
         - 'b' : list of quantized b coefficients in format WI.WF
-        
+
         - 'a' : list of quantized a coefficients in format WI.WF
         TODO: This is still the same format as 'b'
 
@@ -274,15 +288,23 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         if 'QCB' not in fxqc_dict:
             # no coefficient settings in dict yet
-            fxqc_dict.update({'QCB': self.wdg_w_coeffs.q_dict})
+            fxqc_dict.update({'QCB': self.wdg_w_coeffs_b.q_dict})
             logger.warning("Empty dict 'fxqc['QCB]'!")
         else:
-            fxqc_dict['QCB'].update(self.wdg_w_coeffs.q_dict)
+            fxqc_dict['QCB'].update(self.wdg_w_coeffs_b.q_dict)
 
-        fxqc_dict.update({'b': self.wdg_w_coeffs.quant_coeffs(
-            self.wdg_w_coeffs.q_dict, fb.fil[0]['ba'][0])})
-        fxqc_dict.update({'a': self.wdg_w_coeffs.quant_coeffs(
-            self.wdg_w_coeffs.q_dict, fb.fil[0]['ba'][1])})
+        if 'QCA' not in fxqc_dict:
+            # no coefficient settings in dict yet
+            fxqc_dict.update({'QCA': self.wdg_w_coeffs_a.q_dict})
+            logger.warning("Empty dict 'fxqc['QCA]'!")
+        else:
+            fxqc_dict['QCA'].update(self.wdg_w_coeffs_a.q_dict)
+
+
+        fxqc_dict.update({'b': self.wdg_w_coeffs_b.quant_coeffs(
+            self.wdg_w_coeffs_b.q_dict, fb.fil[0]['ba'][0])})
+        fxqc_dict.update({'a': self.wdg_w_coeffs_b.quant_coeffs(
+            self.wdg_w_coeffs_a.q_dict, fb.fil[0]['ba'][1])})
         return fxqc_dict
 
 # ------------------------------------------------------------------------------

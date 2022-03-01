@@ -116,11 +116,11 @@ class ItemDelegate(QStyledItemDelegate):
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
             # test whether fixpoint conversion during displayText() created an overflow:
-            if self.parent.myQ.ovr_flag > 0:
+            if self.parent.myQ_b.ovr_flag > 0:
                 # Color item backgrounds with pos. Overflows red
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
-            elif self.parent.myQ.ovr_flag < 0:
+            elif self.parent.myQ_b.ovr_flag < 0:
                 # Color item backgrounds with neg. Overflows blue
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
@@ -133,7 +133,7 @@ class ItemDelegate(QStyledItemDelegate):
 #         option:  instance of QStyleOptionViewItemV4
 #         index:   instance of QModelIndex
 #         """
-#         logger.debug("Ovr_flag:".format(self.parent.myQ.ovr_flag))
+#         logger.debug("Ovr_flag:".format(self.parent.myQ_b.ovr_flag))
 #         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
 #             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
 #         # continue with the original `paint()` method
@@ -158,22 +158,22 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
 
-        The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
+        The instance parameter myQ_b.ovr_flag is set to +1 or -1 for positive /
         negative overflows, else it is 0.
         """
         data_str = qstr(text)  # convert to "normal" string
 
-        if self.parent.myQ.frmt == 'float':
+        if self.parent.myQ_b.frmt == 'float':
             data = safe_eval(data_str, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif self.parent.myQ.frmt == 'dec' and self.parent.myQ.WF > 0:
+        elif self.parent.myQ_b.frmt == 'dec' and self.parent.myQ_b.WF > 0:
             # decimal fixpoint representation with fractional part
-            return "{0:.{1}g}".format(self.parent.myQ.float2frmt(data_str),
+            return "{0:.{1}g}".format(self.parent.myQ_b.float2frmt(data_str),
                                       params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
-                                     self.parent.myQ.places)
+            return "{0:>{1}}".format(self.parent.myQ_b.float2frmt(data_str),
+                                     self.parent.myQ_b.places)
 
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -213,14 +213,14 @@ class ItemDelegate(QStyledItemDelegate):
         data_str = qstr(safe_eval(self.parent.ba[index.column()][index.row()],
                                   return_type="auto"))
 
-        if self.parent.myQ.frmt == 'float':
+        if self.parent.myQ_b.frmt == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
             # fixpoint format with base:
             # pass requantized data with required number of places
-            editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
-                                             self.parent.myQ.places))
+            editor.setText("{0:>{1}}".format(self.parent.myQ_b.float2frmt(data_str),
+                                             self.parent.myQ_b.places))
 
     def setModelData(self, editor, model, index):
         """
@@ -241,13 +241,13 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.parent.myQ.frmt == 'float':
+        if self.parent.myQ_b.frmt == 'float':
             data = safe_eval(qstr(editor.text()),
                              self.parent.ba[index.column()][index.row()],
                              return_type='auto')  # raw data without fixpoint formatting
         else:
-            data = self.parent.myQ.frmt2float(
-                qstr(editor.text()), self.parent.myQ.frmt)  # transform back to float
+            data = self.parent.myQ_b.frmt2float(
+                qstr(editor.text()), self.parent.myQ_b.frmt)  # transform back to float
 
         model.setData(index, data)                          # store in QTableWidget
         # if data is complex, convert whole ba (list of arrays) to complex type
@@ -356,7 +356,7 @@ class Input_Coeffs(QWidget):
 
         self.setLayout(layVMain)
 
-        self.myQ = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # initialize fixpoint object
+        self.myQ_b = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # initialize fixpoint object
         # initialize + refresh table with default values from filter dict
         self.load_dict()
         # TODO: needs to be optimized - self._refresh is being called in both routines
@@ -375,7 +375,7 @@ class Input_Coeffs(QWidget):
         self.ui.butEnable.clicked.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
 
-        self.ui.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self._set_number_format)
         self.ui.butFromTable.clicked.connect(self._copy_from_table)
         self.ui.butToTable.clicked.connect(self._copy_to_table)
 
@@ -391,15 +391,15 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmbFormat.currentIndexChanged.connect(self.ui2qdict)
-        self.ui.cmbQOvfl.currentIndexChanged.connect(self.ui2qdict)
-        self.ui.cmbQuant.currentIndexChanged.connect(self.ui2qdict)
-        self.ui.ledWF.editingFinished.connect(self.ui2qdict)
-        self.ui.ledWI.editingFinished.connect(self.ui2qdict)
-        self.ui.ledW.editingFinished.connect(self._W_changed)
+        self.ui.cmbQOvfl_b.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmbQuant_b.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.led_WF_b.editingFinished.connect(self.ui2qdict)
+        self.ui.led_WI_b.editingFinished.connect(self.ui2qdict)
+        self.ui.led_W_b.editingFinished.connect(self._W_changed)
 
-        self.ui.ledScale.editingFinished.connect(self._set_scale)
+        self.ui.ledScale_b.editingFinished.connect(self._set_scale)
 
-        self.ui.butQuant.clicked.connect(self.quant_coeffs)
+        self.ui.butQuant_b.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
 
@@ -442,37 +442,37 @@ class Input_Coeffs(QWidget):
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
-        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
+        W_b = safe_eval(self.ui.led_W_b.text(), self.myQ_b.W, return_type='int', sign='pos')
 
-        if W < 2:
+        if W_b < 2:
             logger.warn("W must be > 1, restoring previous value.")
-            W = self.myQ.W  # fall back to previous value
-        self.ui.ledW.setText(str(W))
+            W_b = self.myQ_b.W  # fall back to previous value
+        self.ui.led_W_b.setText(str(W_b))
 
-        if qget_cmb_box(self.ui.cmbQFrmt) == 'qint':  # integer format, preserve WI bits
-            WI = W - self.myQ.WF - 1
-            self.ui.ledWI.setText(str(WI))
-            self.ui.ledScale.setText(str(1 << (W-1)))
+        if qget_cmb_box(self.ui.cmb_q_frmt) == 'qint':  # integer format, preserve WI bits
+            WI = W_b - self.myQ_b.WF - 1
+            self.ui.led_WI_b.setText(str(WI))
+            self.ui.ledScale_b.setText(str(1 << (W_b - 1)))
         else:  # fractional format, preserve WF bit setting
-            WF = W - self.myQ.WI - 1
+            WF = W_b - self.myQ_b.WI - 1
             if WF < 0:
-                self.ui.ledWI.setText(str(W - 1))
+                self.ui.led_WI_b.setText(str(W_b - 1))
                 WF = 0
-            self.ui.ledWF.setText(str(WF))
+            self.ui.led_WF_b.setText(str(WF))
 
         self.ui2qdict()
 
     # --------------------------------------------------------------------------
     def _set_scale(self):
         """
-        Triggered by `ui.ledScale`
+        Triggered by `ui.ledScale_b`
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
-        # if self.ui.ledScale.isModified() ... self.ui.ledScale.setModified(False)
+        # if self.ui.ledScale_b.isModified() ... self.ui.ledScale_b.setModified(False)
         scale = safe_eval(
-            self.ui.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
-        self.ui.ledScale.setText(str(scale))
+            self.ui.ledScale_b.text(), self.myQ_b.scale, return_type='float', sign='pos')
+        self.ui.ledScale_b.setText(str(scale))
         self.ui2qdict()
 
 # ------------------------------------------------------------------------------
@@ -515,11 +515,11 @@ class Input_Coeffs(QWidget):
         is_float = (qget_cmb_box(self.ui.cmbFormat, data=False).lower() == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
-        self.ui.cmbQFrmt.setVisible(not is_float)  # hide quantization widgets
-        self.ui.lbl_W.setVisible(not is_float)
-        self.ui.ledW.setVisible(not is_float)
+        self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
+        self.ui.lbl_W_b.setVisible(not is_float)
+        self.ui.led_W_b.setVisible(not is_float)
 
-        self.ui.frmQSettings.setVisible(not is_float)  # hide all q-settings for float
+        self.ui.frmQSettings_b.setVisible(not is_float)  # hide all q-settings for float
 
         if self.ui.butEnable.isChecked():
             self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
@@ -604,7 +604,7 @@ class Input_Coeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ.frmt,
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ_b.frmt,
                     title="Export Filter Coefficients")
 
     # --------------------------------------------------------------------------
@@ -622,8 +622,8 @@ class Input_Coeffs(QWidget):
             "importing data: dim - shape = {0} - {1} - {2}\n{3}"
             .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
-        conv = self.myQ.frmt2float  # frmt2float_vec?
-        frmt = self.myQ.frmt
+        conv = self.myQ_b.frmt2float  # frmt2float_vec?
+        frmt = self.myQ_b.frmt
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
@@ -668,29 +668,33 @@ class Input_Coeffs(QWidget):
         Triggered by `contruct_UI()`, `qdict2ui()`and `ui.cmbQFrmt.currentIndexChanged()`
 
         Set one of three number formats: Integer, fractional, normalized fractional
-        (triggered by self.ui.cmbQFrmt combobox)
+        (triggered by self.ui.cmb_q_frmt combobox)
         """
 
-        qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
-        is_qfrac = False
-        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
+        qfrmt = qget_cmb_box(self.ui.cmb_q_frmt)
+        en_WIWF = qfrmt == 'qfrac'  # enable WI and WF lineedit widgets
+        en_W = qfrmt in {'qint', 'qnfrac'}  # enable W lineedit widget
+        W_b = safe_eval(self.ui.led_W_b.text(), self.myQ_b.W, return_type='int', sign='pos')
         if qfrmt == 'qint':
-            self.ui.ledWI.setText(str(W - 1))
-            self.ui.ledWF.setText("0")
+            self.ui.led_WI_b.setText(str(W_b - 1))
+            self.ui.led_WF_b.setText("0")
         elif qfrmt == 'qnfrac':  # normalized fractional format
-            self.ui.ledWI.setText("0")
-            self.ui.ledWF.setText(str(W - 1))
-        else:  # qfrmt == 'qfrac':
-            is_qfrac = True
+            self.ui.led_WI_b.setText("0")
+            self.ui.led_WF_b.setText(str(W_b - 1))
+        elif qfrmt == 'qfrac':
+            pass
+        elif qfrmt == 'q31':
+            self.ui.led_WI_b.setText("0")
+            self.ui.led_WF_b.setText("31")
 
-        WI = safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int')
+        WI_b = safe_eval(self.ui.led_WI_b.text(), self.myQ_b.WI, return_type='int')
 
-        self.ui.ledScale.setText(str(1 << WI))
-        self.ui.ledWI.setEnabled(is_qfrac)
-        self.ui.lblDot.setEnabled(is_qfrac)
-        self.ui.ledWF.setEnabled(is_qfrac)
-        self.ui.ledW.setEnabled(not is_qfrac)
-        self.ui.ledScale.setEnabled(False)
+        self.ui.ledScale_b.setText(str(1 << WI_b))
+        self.ui.led_WI_b.setEnabled(en_WIWF)
+        self.ui.lbl_dot_b.setEnabled(en_WIWF)
+        self.ui.led_WF_b.setEnabled(en_WIWF)
+        self.ui.led_W_b.setEnabled(en_W)
+        self.ui.ledScale_b.setEnabled(False)
 
         # save UI to dict and to class attributes and fire `{'view_changed': 'q_coeff'}``
         self.ui2qdict(emit)
@@ -700,9 +704,9 @@ class Input_Coeffs(QWidget):
         """
         Update the infos (LSB, MSB, Max)
         """
-        self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.ui.lblMAX.setText("{0:.6g}".format(self.myQ.MAX))
+        self.ui.lblLSB_b.setText("{0:.{1}g}".format(self.myQ_b.LSB, params['FMT_ba']))
+        self.ui.lblMSB_b.setText("{0:.{1}g}".format(self.myQ_b.MSB, params['FMT_ba']))
+        # self.ui.lblMAX.setText("{0:.6g}".format(self.myQ_b.MAX))
 
     # --------------------------------------------------------------------------
     def qdict2ui(self):
@@ -715,17 +719,17 @@ class Input_Coeffs(QWidget):
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
         """
-        self.ui.ledWI.setText(qstr(fb.fil[0]['fxqc']['QCB']['WI']))
-        self.ui.ledWF.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
-        self.ui.ledW.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
+        self.ui.led_WI_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['WI']))
+        self.ui.led_WF_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
+        self.ui.led_W_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
-            qset_cmb_box(self.ui.cmbQFrmt, 'qfrac', data=True)
+            qset_cmb_box(self.ui.cmb_q_frmt, 'qfrac', data=True)
 
-        self.ui.ledScale.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))
-        qset_cmb_box(self.ui.cmbQuant, fb.fil[0]['fxqc']['QCB']['quant'])
-        qset_cmb_box(self.ui.cmbQOvfl, fb.fil[0]['fxqc']['QCB']['ovfl'])
+        self.ui.ledScale_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))
+        qset_cmb_box(self.ui.cmbQuant_b, fb.fil[0]['fxqc']['QCB']['quant'])
+        qset_cmb_box(self.ui.cmbQOvfl_b, fb.fil[0]['fxqc']['QCB']['ovfl'])
 
-        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])  # update class attributes
+        self.myQ_b.setQobj(fb.fil[0]['fxqc']['QCB'])  # update class attributes
 
         # quant format has been changed, update display but don't fire signal
         self._set_number_format(emit=False)
@@ -737,30 +741,32 @@ class Input_Coeffs(QWidget):
         Read out the settings of the quantization comboboxes.
 
         - Store them in the filter dict `fb.fil[0]['fxqc']['QCB']` and as class
-            attributes in the fixpoint object `self.myQ`
+            attributes in the fixpoint object `self.myQ_b`
         - Emit signal `'view_changed':'q_coeff'`
         - Refresh the table
 
         Triggered by modifying
-        `ui.cmbFormat`, `ui.cmbQOvfl`, `ui.cmbQuant`, `ui.ledWF`, `ui.ledWI`
-        or `ui.ledW` (via `_W_changed()`)
+        `ui.cmbFormat`, `ui.cmbQOvfl_b`, `ui.cmbQuant_b`, `ui.led_WF_b`, `ui.led_WI_b`
+        or `ui.led_W_b` (via `_W_changed()`)
         or `ui.cmbQFrmt` (via `_set_number_format()`)
-        or `ui.ledScale()` (via `_set_scale()`)
+        or `ui.ledScale_b()` (via `_set_scale()`)
         or 'qdict2ui()' via `_set_number_format()`
         """
         fb.fil[0]['fxqc']['QCB'] = {
-                'WI': safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
+                'WI': safe_eval(self.ui.led_WI_b.text(), self.myQ_b.WI, return_type='int'),
                 'WF': safe_eval(
-                    self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='poszero'),
+                    self.ui.led_WF_b.text(), self.myQ_b.WF, return_type='int', sign='poszero'),
                 'W': safe_eval(
-                    self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos'),
-                'quant': qstr(self.ui.cmbQuant.currentText()),
-                'ovfl': qstr(self.ui.cmbQOvfl.currentText()),
+                    self.ui.led_W_b.text(), self.myQ_b.W, return_type='int', sign='pos'),
+                'quant': qstr(self.ui.cmbQuant_b.currentText()),
+                'ovfl': qstr(self.ui.cmbQOvfl_b.currentText()),
                 'frmt': qstr(self.ui.cmbFormat.currentText().lower()),
-                'scale': qstr(self.ui.ledScale.text())
+                'scale': qstr(self.ui.ledScale_b.text())
                 }
 
-        self.myQ.setQobj(fb.fil[0]['fxqc']['QCB'])  # update fixpoint object
+        fb.fil[0]['fxqc']['QCA'] = fb.fil[0]['fxqc']['QCB']  # TODO
+
+        self.myQ_b.setQobj(fb.fil[0]['fxqc']['QCB'])  # update fixpoint object
 
         if emit:
             self.emit({'view_changed': 'q_coeff'})
@@ -960,12 +966,12 @@ class Input_Coeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         if not idx:  # nothing selected, quantize all elements
-            self.ba[0] = self.myQ.fixp(self.ba, scaling='multdiv')[0]
+            self.ba[0] = self.myQ_b.fixp(self.ba, scaling='multdiv')[0]
             if fb.fil[0]['ft'] == "IIR":
-                self.ba[1] = self.myQ.fixp(self.ba, scaling='multdiv')[0]
+                self.ba[1] = self.myQ_b.fixp(self.ba, scaling='multdiv')[0]
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]],
+                self.ba[i[0]][i[1]] = self.myQ_b.fixp(self.ba[i[0]][i[1]],
                                                     scaling='multdiv')
 
         qstyle_widget(self.ui.butSave, 'changed')

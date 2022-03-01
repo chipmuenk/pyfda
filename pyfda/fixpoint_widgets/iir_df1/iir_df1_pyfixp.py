@@ -33,7 +33,7 @@ class IIR_DF1_pyfixp(object):
         the following keys : values
 
         - 'b', value: array of transversal coefficients as floats, scaled as `WI:WF`
-        
+
         - 'a', value: array of recursive coefficients as floats, scaled as `WI:WF`
 
         - 'QA', value: dict with quantizer settings for the accumulator
@@ -63,7 +63,7 @@ class IIR_DF1_pyfixp(object):
             When `len(zi_b) != len(b)`, truncate or fill up with zeros.
             When `zi_b == None`, all registers are filled with zeros.
             When `len(b) != len(a)` throw an error
-            
+
         zi_a : array-like
             Initialize `L = len(b) - 1` filter registers. Strictly speaking,
              `zi_b[0]` is not a register but the current input value.
@@ -139,7 +139,7 @@ class IIR_DF1_pyfixp(object):
         b :  array-like
              transversal filter coefficients as quantized floats scaled as `WI.WF`
              When `b == None`, the old coefficients are left untouched
-             
+
         a :  array-like
              recursive filter coefficients as quantized floats scaled as `WI.WF`
              When `a == None`, the old coefficients are left untouched
@@ -147,7 +147,7 @@ class IIR_DF1_pyfixp(object):
         zi_b : array-like
              initial conditions for transversal registers; when `zi_b == None`,
              the register contents from the last run are used.
-             
+
         zi_a : array-like
              initial conditions for recursive registers; when `zi_a == None`,
              the register contents from the last run are used.
@@ -164,11 +164,11 @@ class IIR_DF1_pyfixp(object):
         if b is not None and np.any(b != self.b):  # update transversal coefficients
             self.p['b'] = self.b = b
             coeff_changed = True
-            
+
         if a is not None and np.any(a != self.a):  # update recursive coefficients
             self.p['a'] = self.a = a
             coeff_changed = True
-            
+
         if coeff_changed:
             self.init(self.p)  # reset filter
 
@@ -233,10 +233,10 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
     """
 
-    p = {'b': [1, 1, 1], 'QA': {'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'},
-         'a': [1, -0.81, 1],
-         'QI': {'Q': '2.3', 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'Q': '5.3', 'ovfl': 'wrap', 'quant': 'round'}
+    p = {'b': [-0.2, 0.2, 0], 'QA': {'Q': '3.6', 'ovfl': 'wrap', 'quant': 'round'},
+         'a': [1, 0, -0.81],
+         'QI': {'Q': '1.3', 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'Q': '3.3', 'ovfl': 'sat', 'quant': 'round'}
          }
     dut = IIR_DF1_pyfixp(p)
     x = np.zeros(5)
