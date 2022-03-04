@@ -60,19 +60,21 @@ class IIR_DF1_pyfixp_UI(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
                           {'WI': 0, 'WF': 30, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
 
-        self.wdg_w_coeffs_b = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
-                                 label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
-                                 tip_WI='Number of integer bits - edit in "b,a" tab',
-                                 tip_WF='Number of fractional bits - edit in "b,a" tab',
-                                 WI=fb.fil[0]['fxqc']['QCB']['WI'],
-                                 WF=fb.fil[0]['fxqc']['QCB']['WF'])
+        self.wdg_w_coeffs_b = UI_W(
+            self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
+            label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
+            tip_WI='Number of integer bits - edit in "b,a" tab',
+            tip_WF='Number of fractional bits - edit in "b,a" tab',
+            WI=fb.fil[0]['fxqc']['QCB']['WI'],
+            WF=fb.fil[0]['fxqc']['QCB']['WF'])
 
-        self.wdg_w_coeffs_a = UI_W(self, fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
-                                 label='Coeff. Format <i>A<sub>I.F&nbsp;</sub></i>:',
-                                 tip_WI='Number of integer bits - edit in "b,a" tab',
-                                 tip_WF='Number of fractional bits - edit in "b,a" tab',
-                                 WI=fb.fil[0]['fxqc']['QCA']['WI'],
-                                 WF=fb.fil[0]['fxqc']['QCA']['WF'])
+        self.wdg_w_coeffs_a = UI_W(
+            self, fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
+            label='Coeff. Format <i>A<sub>I.F&nbsp;</sub></i>:',
+            tip_WI='Number of integer bits - edit in "b,a" tab',
+            tip_WF='Number of fractional bits - edit in "b,a" tab',
+            WI=fb.fil[0]['fxqc']['QCA']['WI'],
+            WF=fb.fil[0]['fxqc']['QCA']['WF'])
 
 
 #        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
@@ -85,7 +87,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                                fractional=True, combo_visible=True)
 
         self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
-                               label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
+                               label='Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:')
 
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
@@ -299,7 +301,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("Empty dict 'fxqc['QCA]'!")
         else:
             fxqc_dict['QCA'].update(self.wdg_w_coeffs_a.q_dict)
-
 
         fxqc_dict.update({'b': self.wdg_w_coeffs_b.quant_coeffs(
             self.wdg_w_coeffs_b.q_dict, fb.fil[0]['ba'][0])})
