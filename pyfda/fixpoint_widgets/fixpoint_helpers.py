@@ -327,7 +327,8 @@ class UI_Q(QWidget):
                    'cmb_q': ['round', 'fix', 'floor'], 'cur_q': 'round',
                    'label_ov': 'Ovfl.', 'tip_ov': 'Select overflow behaviour.',
                    'cmb_ov': ['wrap', 'sat'], 'cur_ov': 'wrap',
-                   'enabled': True, 'visible': True
+                   'enabled': True, 'visible': True,
+                   'dict_ui_w': {}
                    }  #: default widget settings
 
         if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q']:
@@ -359,6 +360,9 @@ class UI_Q(QWidget):
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
+        self.dict_ui_w = dict_ui['dict_ui_w']
+#        self.wdg_ui_w = UI_W(**self.dict_ui_w)
+
         # layH = QHBoxLayout()
         # if dict_ui['label'] != "":
         #     lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
@@ -375,6 +379,7 @@ class UI_Q(QWidget):
         # if dict_ui['label'] != "":
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
         layG.addWidget(lblW, 0, 0)
+        # layG.addWidget(self.wdg_ui_w)
         # layH.addStretch()
         layG.addWidget(lblOvfl, 0, 1)
         layG.addWidget(self.cmbOvfl, 0, 2)
