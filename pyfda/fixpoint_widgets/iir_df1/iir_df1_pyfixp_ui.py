@@ -85,7 +85,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_w_accu = UI_W(fb.fil[0]['fxqc']['QA'], label='', wdg_name='w_accu',
                                fractional=True, combo_visible=True)
 
-        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
+        self.wdg_q_accu = UI_Q(fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
                                label='Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:')
 
         # initial setting for accumulator

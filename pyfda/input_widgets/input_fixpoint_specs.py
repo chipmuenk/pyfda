@@ -283,16 +283,14 @@ class Input_Fixpoint_Specs(QWidget):
                                  wdg_name='w_output', label='')
         self.wdg_w_output.sig_tx.connect(self.process_sig_rx_local)
 
-        self.wdg_q_output = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QO'],
-                                 wdg_name='q_output',
+        self.wdg_q_output = UI_Q(q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='q_output',
                                  label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
                                  cmb_q=cmb_q, cmb_ov=['wrap', 'sat'])
         self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
 
         if HAS_DS:
             cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QI'],
-                                wdg_name='q_input',
+        self.wdg_q_input = UI_Q(q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='q_input',
                                 label='Input Format <i>Q<sub>X&nbsp;</sub></i>:',
                                 cmb_q=cmb_q)
         self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
