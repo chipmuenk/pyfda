@@ -63,8 +63,8 @@ class UI_W(QWidget):
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, q_dict, **kwargs):
-        super(UI_W, self).__init__(parent)
+    def __init__(self, q_dict, **kwargs):
+        super().__init__()
         self.q_dict = q_dict  # pass a dict with initial settings for construction
         self._construct_UI(**kwargs)
         self.ui2dict(s='init')  # initialize the class attributes

@@ -273,13 +273,13 @@ class Input_Fixpoint_Specs(QWidget):
 #       - pass the quantization (sub-?) dictionary to the constructor
 # ------------------------------------------------------------------------------
 
-        self.wdg_w_input = UI_W(self, q_dict=fb.fil[0]['fxqc']['QI'],
+        self.wdg_w_input = UI_W(q_dict=fb.fil[0]['fxqc']['QI'],
                                 wdg_name='w_input', label='', lock_visible=True)
         self.wdg_w_input.sig_tx.connect(self.process_sig_rx_local)
 
         cmb_q = ['round', 'floor', 'fix']
 
-        self.wdg_w_output = UI_W(self, q_dict=fb.fil[0]['fxqc']['QO'],
+        self.wdg_w_output = UI_W(q_dict=fb.fil[0]['fxqc']['QO'],
                                  wdg_name='w_output', label='')
         self.wdg_w_output.sig_tx.connect(self.process_sig_rx_local)
 

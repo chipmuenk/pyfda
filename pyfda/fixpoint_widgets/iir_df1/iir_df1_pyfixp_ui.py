@@ -61,7 +61,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                           {'WI': 0, 'WF': 30, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
 
         self.wdg_w_coeffs_b = UI_W(
-            self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
+            fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
             label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
             tip_WI='Number of integer bits - edit in "b,a" tab',
             tip_WF='Number of fractional bits - edit in "b,a" tab',
@@ -69,7 +69,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
             WF=fb.fil[0]['fxqc']['QCB']['WF'])
 
         self.wdg_w_coeffs_a = UI_W(
-            self, fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
+            fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
             label='Coeff. Format <i>A<sub>I.F&nbsp;</sub></i>:',
             tip_WI='Number of integer bits - edit in "b,a" tab',
             tip_WF='Number of fractional bits - edit in "b,a" tab',
@@ -82,8 +82,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 #                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
 #        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
 
-        self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
-                               label='', wdg_name='w_accu',
+        self.wdg_w_accu = UI_W(fb.fil[0]['fxqc']['QA'], label='', wdg_name='w_accu',
                                fractional=True, combo_visible=True)
 
         self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
