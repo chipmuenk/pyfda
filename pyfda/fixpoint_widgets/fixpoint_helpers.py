@@ -284,26 +284,28 @@ class UI_W(QWidget):
 # ==============================================================================
 class UI_Q(QWidget):
     """
-    Widget for selecting quantization / overflow options. The result can be read out
-    via the attributes `self.ovfl` and `self.quant`.
+    Widget for selecting quantization / overflow options.
 
-    The constructor accepts a reference to the quantization dictionary for
-    initial widget settings and for (re-)storing values.
+    The constructor accepts a reference to the quantization dictionary `q_dict`.
+    This widget only reads and writes values for the keys `quant` and `ovfl`.
+    These quantization settings are also stored in the attributes `self.ovfl` and
+    `self.quant`.
 
-    The following keys are defined; default values are used for missing keys:
+    The internal `dict_ui` with widget settings consists of the following keys and their
+    default settings which can be overwritten with keyword parameters: 
 
     'wdg_name'  : 'ui_q'                            # widget name
-    'label'     : ''                                # widget text label
+    'label'     : ''                                # widget text label (usually set )
 
     'label_q'   : 'Quant.'                          # subwidget text label
     'tip_q'     : 'Select kind of quantization.'    # Mouse-over tooltip
     'cmb_q'     : [round', 'fix', 'floor']          # combo-box choices
-    'cur_q'     : 'round'                           # initial / current setting
+    'quant'     : 'round'                           # initial / current setting
 
     'label_ov'  : 'Ovfl.'                           # subwidget text label
     'tip_ov'    : 'Select overflow behaviour.'      # Mouse-over tooltip
     'cmb_ov'    : ['wrap', 'sat']                   # combo-box choices
-    'cur_ov'    : 'wrap'                            # initial / current setting
+    'ovfl'      : 'wrap'                            # initial / current setting
 
     'enabled'   : True                              # Is widget enabled?
     'visible'   : True                              # Is widget visible?
@@ -323,19 +325,21 @@ class UI_Q(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
 
+        # default widget settings:
         dict_ui = {'wdg_name': 'ui_q', 'label': '',
                    'label_q': 'Quant.', 'tip_q': 'Select the kind of quantization.',
-                   'cmb_q': ['round', 'fix', 'floor'], 'cur_q': 'round',
+                   'cmb_q': ['round', 'fix', 'floor'], 'quant': 'round',
                    'label_ov': 'Ovfl.', 'tip_ov': 'Select overflow behaviour.',
-                   'cmb_ov': ['wrap', 'sat'], 'cur_ov': 'wrap',
+                   'cmb_ov': ['wrap', 'sat'], 'ovfl': 'wrap',
                    'enabled': True, 'visible': True,
                    'dict_ui_w': {}
-                   }  #: default widget settings
-
+                   }
+        # test whether quantization and overflow parameters in self.q_dict are
+        # in the lists of combobox entries and assign them when True
         if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q']:
-            dict_ui['cur_q'] = self.q_dict['quant']
+            dict_ui['quant'] = self.q_dict['quant']
         if 'ovfl' in self.q_dict and self.q_dict['ovfl'] in dict_ui['cmb_ov']:
-            dict_ui['cur_ov'] = self.q_dict['ovfl']
+            dict_ui['quant'] = self.q_dict['ovfl']
 
         for key, val in kwargs.items():
             dict_ui.update({key: val})
@@ -346,14 +350,14 @@ class UI_Q(QWidget):
         lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
         self.cmbQuant.addItems(dict_ui['cmb_q'])
-        qset_cmb_box(self.cmbQuant, dict_ui['cur_q'])
+        qset_cmb_box(self.cmbQuant, dict_ui['quant'])
         self.cmbQuant.setToolTip(dict_ui['tip_q'])
         self.cmbQuant.setObjectName('quant')
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         self.cmbOvfl.addItems(dict_ui['cmb_ov'])
-        qset_cmb_box(self.cmbOvfl, dict_ui['cur_ov'])
+        qset_cmb_box(self.cmbOvfl, dict_ui['ovfl'])
         self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
         self.cmbOvfl.setObjectName('ovfl')
 
