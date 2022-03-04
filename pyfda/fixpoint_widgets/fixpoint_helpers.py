@@ -437,10 +437,15 @@ class UI_Q(QWidget):
 
 # ==============================================================================
 if __name__ == '__main__':
+    """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fixpoint_helpers` """
 
     from pyfda.libs.compat import QApplication
-    app = QApplication(sys.argv)
-    mainw = UI_W(None)
-    mainw.show()
+    from pyfda import pyfda_rc as rc
 
-    app.exec_()
+    app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+
+    mainw = UI_Q({}, label='demo')
+    app.setActiveWindow(mainw)
+    mainw.show()
+    sys.exit(app.exec_())
