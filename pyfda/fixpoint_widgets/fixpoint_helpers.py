@@ -436,7 +436,18 @@ class UI_Q(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict):
         """ Update UI from passed dictionary """
-        pass
+        if q_dict is None:
+            q_dict = self.q_dict
+
+        if 'quant' in q_dict:
+            qset_cmb_box(self.cmbQuant, q_dict['quant'])
+        else:
+            logger.warning("No key 'quant' in dict!")
+
+        if 'ovfl' in q_dict:
+            qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+        else:
+            logger.warning("No key 'ovfl' in dict!")
 
 
 # ==============================================================================
