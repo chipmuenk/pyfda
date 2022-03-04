@@ -17,7 +17,7 @@ import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
-    QVBoxLayout, QHBoxLayout, QFrame, pyqtSignal)
+    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 # from pyfda.pyfda_rc import params
@@ -359,20 +359,32 @@ class UI_Q(QWidget):
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        layH = QHBoxLayout()
-        if dict_ui['label'] != "":
-            lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
-            layH.addWidget(lblW)
-        layH.addStretch()
-        layH.addWidget(lblOvfl)
-        layH.addWidget(self.cmbOvfl)
+        # layH = QHBoxLayout()
+        # if dict_ui['label'] != "":
+        #     lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        #     layH.addWidget(lblW)
+        # layH.addStretch()
+        # layH.addWidget(lblOvfl)
+        # layH.addWidget(self.cmbOvfl)
+        # # layH.addStretch(1)
+        # layH.addWidget(lblQuant)
+        # layH.addWidget(self.cmbQuant)
+        # layH.setContentsMargins(0, 0, 0, 0)
+
+        layG = QGridLayout()
+        # if dict_ui['label'] != "":
+        lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        layG.addWidget(lblW, 0, 0)
+        # layH.addStretch()
+        layG.addWidget(lblOvfl, 0, 1)
+        layG.addWidget(self.cmbOvfl, 0, 2)
         # layH.addStretch(1)
-        layH.addWidget(lblQuant)
-        layH.addWidget(self.cmbQuant)
-        layH.setContentsMargins(0, 0, 0, 0)
+        layG.addWidget(lblQuant, 1, 1)
+        layG.addWidget(self.cmbQuant, 1, 2)
+        layG.setContentsMargins(0, 0, 0, 0)
 
         frmMain = QFrame(self)
-        frmMain.setLayout(layH)
+        frmMain.setLayout(layG)
 
         layVMain = QVBoxLayout()  # Widget main layout
         layVMain.addWidget(frmMain)
