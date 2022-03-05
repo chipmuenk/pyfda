@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box
 # from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 
@@ -171,7 +171,6 @@ class UI_W(QWidget):
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.butLock.clicked.connect(self.butLock_clicked)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
-
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
@@ -292,7 +291,7 @@ class UI_Q(QWidget):
     `self.quant`.
 
     The internal `dict_ui` with widget settings consists of the following keys and their
-    default settings which can be overwritten with keyword parameters: 
+    default settings which can be overwritten with keyword parameters:
 
     'wdg_name'  : 'ui_q'                            # widget name
     'label'     : ''                                # widget text label (usually set )
@@ -451,6 +450,327 @@ class UI_Q(QWidget):
 
 
 # ==============================================================================
+class UI_WQ(QWidget):
+    """
+    Widget for selecting quantization / overflow options.
+
+    The constructor accepts a reference to the quantization dictionary `q_dict`.
+    This widget only reads and writes values for the keys `quant` and `ovfl`.
+    These quantization settings are also stored in the attributes `self.ovfl` and
+    `self.quant`.
+
+    The internal `dict_ui` with widget settings consists of the following keys and their
+    default settings which can be overwritten with keyword parameters:
+
+    'wdg_name'  : 'ui_q'                            # widget name
+    'label'     : ''                                # widget text label (usually set )
+
+    'label_q'   : 'Quant.'                          # subwidget text label
+    'tip_q'     : 'Select kind of quantization.'    # Mouse-over tooltip
+    'cmb_q'     : [round', 'fix', 'floor']          # combo-box choices
+    'quant'     : 'round'                           # initial / current setting
+
+    'label_ov'  : 'Ovfl.'                           # subwidget text label
+    'tip_ov'    : 'Select overflow behaviour.'      # Mouse-over tooltip
+    'cmb_ov'    : ['wrap', 'sat']                   # combo-box choices
+    'ovfl'      : 'wrap'                            # initial / current setting
+
+    'enabled'   : True                              # Is widget enabled?
+    'visible'   : True                              # Is widget visible?
+    """
+    # incoming,
+    # sig_rx = pyqtSignal(object)
+    # outcgoing
+    sig_tx = pyqtSignal(object)
+    from pyfda.libs.pyfda_qt_lib import emit
+
+    def __init__(self, q_dict, **kwargs):
+        super().__init__()
+
+        self.q_dict = q_dict
+        self._construct_UI(**kwargs)
+
+    def _construct_UI(self, **kwargs):
+        """ Construct widget """
+        cmb_q = ["Select the kind of quantization.",
+                 ("round", "Round", ""),
+                 ("fix", "Fix", ""),
+                 ("floor", "Floor", "")]
+        cmb_ov = ["<span>Select overflow behaviour.</span>",
+                  ("wrap", "Wrap", "Two's complement wrap around"),
+                  ("sat", "Sat", "Saturation")]
+        cmb_w = ["<span>Set Accumulator word format</span>",
+                 ("auto", "Auto",
+                  "<span>Automatic calculation from coefficients and input word formats "
+                  "taking coefficients area into account.</span>"),
+                 ("full", "Full",
+                  "<span>Automatic calculation from coefficients and input word formats "
+                  "for arbitrary coefficients.</span>"),
+                 ("man", "Man", "<span>Manual entry of word format.</span>")]
+        # default widget settings:
+        dict_ui = {'wdg_name': 'ui_wq', 'label': '',
+                   'label_q': 'Quant.', 'cmb_q': cmb_q, 'quant': 'round',
+                   'label_ov': 'Ovfl.', 'cmb_ov': cmb_ov, 'ovfl': 'wrap',
+                   'enabled': True, 'visible': True,
+                   #
+                   'label_w': '<i>WI.WF</i>&nbsp;:', 'lbl_sep': '.', 'max_led_width': 30,
+                   'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
+                   'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
+                   'fractional': True,  # 'enabled': True, 'visible': True,
+                   'combo_visible': False, 'cmb_w_items': cmb_w,
+                   'lock_visible': False, 'tip_lock': 'Lock input/output quantization.'
+                   }
+        # test whether quantization and overflow parameters in self.q_dict are
+        # in the lists of combobox entries and assign them when True
+        if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q']:
+            dict_ui['quant'] = self.q_dict['quant']
+        if 'ovfl' in self.q_dict and self.q_dict['ovfl'] in dict_ui['cmb_ov']:
+            dict_ui['quant'] = self.q_dict['ovfl']
+
+        for key, val in kwargs.items():
+            dict_ui.update({key: val})
+        # dict_ui.update(map(kwargs)) # same as above?
+
+        self.wdg_name = dict_ui['wdg_name']
+        lbl_wdg = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+
+        lblQuant = QLabel(dict_ui['label_q'], self)
+        self.cmbQuant = QComboBox(self)
+        qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q'], dict_ui['quant'])
+        self.cmbQuant.setObjectName('quant')
+
+        lblOvfl = QLabel(dict_ui['label_ov'], self)
+        self.cmbOvfl = QComboBox(self)
+        qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov'], dict_ui['ovfl'])
+        self.cmbOvfl.setObjectName('ovfl')
+
+        # ComboBox size is adjusted automatically to fit the longest element
+        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        lbl_W = QLabel(to_html(dict_ui['label_w']), self)
+
+        self.cmbW = QComboBox(self)
+        qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], 'auto')
+        self.cmbW.setVisible(dict_ui['combo_visible'])
+        self.cmbW.setObjectName("cmbW")
+
+        self.butLock = QPushButton(self)
+        self.butLock.setCheckable(True)
+        self.butLock.setChecked(False)
+        self.butLock.setVisible(dict_ui['lock_visible'])
+        self.butLock.setToolTip(dict_ui['tip_lock'])
+
+        self.ledWI = QLineEdit(self)
+        self.ledWI.setToolTip(dict_ui['tip_WI'])
+        self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.ledWI.setObjectName("WI")
+
+        lblDot = QLabel(dict_ui['lbl_sep'], self)
+        lblDot.setVisible(dict_ui['fractional'])
+
+        self.ledWF = QLineEdit(self)
+        self.ledWF.setToolTip(dict_ui['tip_WF'])
+        self.ledWF.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.ledWF.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.ledWF.setVisible(dict_ui['fractional'])
+        self.ledWF.setObjectName("WF")
+
+
+        # layH = QHBoxLayout()
+        # if dict_ui['label'] != "":
+        #     lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        #     layH.addWidget(lblW)
+        # layH.addStretch()
+        # layH.addWidget(lblOvfl)
+        # layH.addWidget(self.cmbOvfl)
+        # # layH.addStretch(1)
+        # layH.addWidget(lblQuant)
+        # layH.addWidget(self.cmbQuant)
+        # layH.setContentsMargins(0, 0, 0, 0)
+        lay_W = QHBoxLayout()
+        lay_W.addStretch()
+        lay_W.addWidget(lbl_W)
+        # lay_W.addStretch()
+        lay_W.addWidget(self.cmbW)
+        lay_W.addWidget(self.butLock)
+        lay_W.addWidget(self.ledWI)
+        lay_W.addWidget(lblDot)
+        lay_W.addWidget(self.ledWF)
+        lay_W.setContentsMargins(0, 0, 0, 0)
+
+        layG = QGridLayout()
+        # if dict_ui['label'] != "":
+        layG.addWidget(lbl_wdg, 0, 0)
+        layG.addLayout(lay_W, 1, 0)
+        # lay_W.addStretch()
+        layG.addWidget(lblOvfl, 0, 1)
+        layG.addWidget(self.cmbOvfl, 0, 2)
+        # layH.addStretch(1)
+        layG.addWidget(lblQuant, 1, 1)
+        layG.addWidget(self.cmbQuant, 1, 2)
+        layG.setContentsMargins(0, 0, 0, 0)
+
+        frmMain = QFrame(self)
+        frmMain.setLayout(layG)
+
+        layVMain = QVBoxLayout()  # Widget main layout
+        layVMain.addWidget(frmMain)
+        layVMain.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
+
+        self.setLayout(layVMain)
+
+        # ----------------------------------------------------------------------
+        # INITIAL SETTINGS
+        # ----------------------------------------------------------------------
+        self.ovfl = qget_cmb_box(self.cmbOvfl)
+        self.quant = qget_cmb_box(self.cmbQuant)
+
+        self.WI = int(dict_ui['WI'])
+        self.WF = int(dict_ui['WF'])
+        self.W = self.WI + self.WF + 1
+        self.ledWI.setText(qstr(self.WI))
+        self.ledWF.setText(qstr(self.WF))
+
+        # initialize button icon
+        self.butLock_clicked(self.butLock.isChecked())
+
+        frmMain.setEnabled(dict_ui['enabled'])
+        frmMain.setVisible(dict_ui['visible'])
+
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
+        self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
+
+        self.ledWI.editingFinished.connect(self.ui2dict)
+        self.ledWF.editingFinished.connect(self.ui2dict)
+        self.butLock.clicked.connect(self.butLock_clicked)
+        self.cmbW.currentIndexChanged.connect(self.ui2dict)
+
+    # --------------------------------------------------------------------------
+    def quant_coeffs(self, q_dict: dict, coeffs: iterable, to_int: bool = False) -> list:
+        """
+        Quantize the coefficients, scale and convert them to integer and return them
+        as a list of integers
+
+        This is called every time one of the coefficient subwidgets is edited or changed.
+
+        Parameters:
+        -----------
+        q_dict: dict
+           Dictionary with quantizer settings for coefficients
+
+        coeffs: iterable
+           a list or ndarray of coefficients to be quantized
+
+        Returns:
+        --------
+        A list of integer coeffcients, quantized and scaled with the settings
+        of the passed quantization dict
+
+        """
+        # Create coefficient quantizer instance using the passed quantization parameters
+        # dict from `input_widgets/input_coeffs.py` (and stored in the central
+        # filter dict)
+        Q_coeff = fx.Fixed(q_dict)
+        Q_coeff.frmt = 'dec'  # always use decimal format for coefficients
+
+        if coeffs is None:
+            logger.error("Coeffs empty!")
+        # quantize floating point coefficients with the selected scale (WI.WF),
+        # next convert array float  -> array of fixp
+        #                           -> list of int (scaled by 2^WF) when `to_int == True`
+        if to_int:
+            return list(Q_coeff.float2frmt(coeffs) * (1 << Q_coeff.WF))
+        else:
+            return list(Q_coeff.fixp(coeffs))
+    # --------------------------------------------------------------------------
+
+    def butLock_clicked(self, clicked):
+        """
+        Update the icon of the push button depending on its state
+        """
+        if clicked:
+            self.butLock.setIcon(QIcon(':/lock-locked.svg'))
+        else:
+            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
+
+        # TODO: WTF?!
+        q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
+        self.butLock.setIconSize(q_icon_size)
+
+        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
+        self.emit(dict_sig)
+
+    # --------------------------------------------------------------------------
+    def ui2dict(self):
+        """
+        Update the attributes `self.ovfl`, `self.quant`, `self.WI`, `self.WF`,
+        `self.W` and the corresponding entries in the quantization dict from the UI
+        when one of the widgets has been edited.
+
+        Emit a signal with `{'ui':objectName of the sender}`.
+        """
+        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
+                                sign='poszero'))
+        self.ledWI.setText(qstr(self.WI))
+        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
+                                sign='poszero'))
+        self.ledWF.setText(qstr(self.WF))
+        self.W = int(self.WI + self.WF + 1)
+
+        self.ovfl = qget_cmb_box(self.cmbOvfl)
+        self.quant = qget_cmb_box(self.cmbQuant)
+
+        self.q_dict.update({'ovfl': self.ovfl, 'quant': self.quant,
+                            'WI': self.WI, 'WF': self.WF, 'W': self.W})
+
+        if self.sender():
+            obj_name = self.sender().objectName()
+            dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
+            self.emit(dict_sig)
+        else:
+            logger.error("sender without name!")
+
+    # --------------------------------------------------------------------------
+    def dict2ui(self, q_dict):
+        """
+        Update the widgets `WI`, `WF` `quant` and `ovfl` and the corresponding
+        attributes from the dict passed as the argument
+        """
+
+        if q_dict is None:
+            q_dict = self.q_dict
+
+        if 'quant' in q_dict:
+            qset_cmb_box(self.cmbQuant, q_dict['quant'])
+        else:
+            logger.warning("No key 'quant' in dict!")
+
+        if 'ovfl' in q_dict:
+            qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+        else:
+            logger.warning("No key 'ovfl' in dict!")
+
+        if 'WI' in q_dict:
+            self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
+            self.ledWI.setText(qstr(self.WI))
+        else:
+            logger.warning("No key 'WI' in dict!")
+
+        if 'WF' in q_dict:
+            self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
+            self.ledWF.setText(qstr(self.WF))
+        else:
+            logger.warning("No key 'WF' in dict!")
+
+        self.W = self.WF + self.WI + 1
+
+
+# ==============================================================================
 if __name__ == '__main__':
     """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fixpoint_helpers` """
 
@@ -460,7 +780,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
 
-    mainw = UI_Q({}, label='demo')
+    mainw = UI_WQ({}, label='demo')
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
