@@ -511,12 +511,15 @@ class UI_WQ(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
-                 ("round", "Round", ""),
-                 ("fix", "Fix", ""),
-                 ("floor", "Floor", "")]
+                 ("round", "Round",
+                  "<span>Round towards nearest representable number</span>"),
+                 ("fix", "Fix", "Round towards zero"),
+                 ("floor", "Floor", "<span>Round towards negative infinity / "
+                  "two's complement truncation.</span>")]
         cmb_ov = ["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
-                  ("sat", "Sat", "Saturation")]
+                  ("sat", "Sat",
+                   "<span>Saturation, i.e. limit at min. / max. value</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
                  ("auto", "Auto",
                   "<span>Automatic calculation from coefficients and input word formats "
@@ -608,13 +611,11 @@ class UI_WQ(QWidget):
         lay_W.setContentsMargins(0, 0, 0, 0)
 
         layG = QGridLayout()
-        # if dict_ui['label'] != "":
         layG.addWidget(lbl_wdg, 0, 0)
         layG.addLayout(lay_W, 1, 0)
         # lay_W.addStretch()
         layG.addWidget(lblOvfl, 0, 1)
         layG.addWidget(self.cmbOvfl, 0, 2)
-        # layH.addStretch(1)
         layG.addWidget(lblQuant, 1, 1)
         layG.addWidget(self.cmbQuant, 1, 2)
         layG.setContentsMargins(0, 0, 0, 0)
