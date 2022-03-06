@@ -292,6 +292,8 @@ class UI_Q(QWidget):
 
     The internal `dict_ui` with widget settings consists of the following keys and their
     default settings which can be overwritten with keyword parameters:
+    
+    All labels support HTML formatting.
 
     'wdg_name'  : 'ui_q'                            # widget name
     'label'     : ''                                # widget text label (usually set )
@@ -330,8 +332,7 @@ class UI_Q(QWidget):
                    'cmb_q': ['round', 'fix', 'floor'], 'quant': 'round',
                    'label_ov': 'Ovfl.', 'tip_ov': 'Select overflow behaviour.',
                    'cmb_ov': ['wrap', 'sat'], 'ovfl': 'wrap',
-                   'enabled': True, 'visible': True,
-                   'dict_ui_w': {}
+                   'enabled': True, 'visible': True
                    }
         # test whether quantization and overflow parameters in self.q_dict are
         # in the lists of combobox entries and assign them when True
@@ -364,7 +365,6 @@ class UI_Q(QWidget):
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.dict_ui_w = dict_ui['dict_ui_w']
 #        self.wdg_ui_w = UI_W(**self.dict_ui_w)
 
         # layH = QHBoxLayout()
@@ -383,7 +383,6 @@ class UI_Q(QWidget):
         # if dict_ui['label'] != "":
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
         layG.addWidget(lblW, 0, 0)
-        # layG.addWidget(self.wdg_ui_w)
         # layH.addStretch()
         layG.addWidget(lblOvfl, 0, 1)
         layG.addWidget(self.cmbOvfl, 0, 2)
