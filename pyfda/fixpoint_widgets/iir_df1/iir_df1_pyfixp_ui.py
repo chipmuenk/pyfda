@@ -90,7 +90,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # ----------------------------------------------------------------------
         self.wdg_w_coeffs_b.sig_tx.connect(self.update_q_coeff)
         self.wdg_w_coeffs_a.sig_tx.connect(self.update_q_coeff)
-
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 # ------------------------------------------------------------------------------
 
@@ -99,7 +98,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         layVWdg.addWidget(self.wdg_w_coeffs_b)
         layVWdg.addWidget(self.wdg_w_coeffs_a)
-#        layVWdg.addWidget(self.wdg_q_coeffs)
+
         layVWdg.addWidget(self.wdg_wq_accu)
 
         layVWdg.addStretch()
@@ -182,6 +181,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxqc']['QA']`.
+
+        TODO: Calculation of WI is incorrect for negative intermediate results?
         """
         try:
             if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
