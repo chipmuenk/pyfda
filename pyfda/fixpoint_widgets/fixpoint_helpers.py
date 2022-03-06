@@ -459,24 +459,43 @@ class UI_WQ(QWidget):
     These quantization settings are also stored in the attributes `self.ovfl` and
     `self.quant`.
 
+    All labels support HTML formatting.
+
     The internal `dict_ui` with widget settings consists of the following keys and their
-    default settings which can be overwritten with keyword parameters:
+    default settings which can be overwritten with corresponding keyword parameters
+    while constructing an instance of `UI_WQ`:
 
-    'wdg_name'  : 'ui_q'                            # widget name
-    'label'     : ''                                # widget text label (usually set )
+    'wdg_name'      : 'ui_q'                    # widget name
+    'label'         : ''                        # widget text label (usually set )
 
-    'label_q'   : 'Quant.'                          # subwidget text label
-    'tip_q'     : 'Select kind of quantization.'    # Mouse-over tooltip
-    'cmb_q'     : [round', 'fix', 'floor']          # combo-box choices
-    'quant'     : 'round'                           # initial / current setting
+    'label_q'       : 'Quant.'                  # subwidget text label
+    'cmb_q'     : List with tooltip and combo box choices (default: 'round', 'fix',
+                  'floor'), see `pyfda_qt_lib.qcmb_box_populate` or belowfor the structure
+    'quant'         : 'round'                   # initial / current setting
 
-    'label_ov'  : 'Ovfl.'                           # subwidget text label
-    'tip_ov'    : 'Select overflow behaviour.'      # Mouse-over tooltip
-    'cmb_ov'    : ['wrap', 'sat']                   # combo-box choices
-    'ovfl'      : 'wrap'                            # initial / current setting
+    'label_ov'      : 'Ovfl.'                   # subwidget text label
+    'cmb_ov'        : List with tooltip and combo box choices (default: 'wrap', 'sat')
+    'ovfl'          : 'wrap'                    # initial / current setting
 
-    'enabled'   : True                              # Is widget enabled?
-    'visible'   : True                              # Is widget visible?
+    'fractional'    : True                      # Display WF, otherwise WF=0
+    'lbl_sep'       : '.'                       # label between WI and WF field
+    'max_led_width' : 30                        # max. length of lineedit field
+    'WI'            : 0                         # number of frac. *bits*
+    'WI_len'        : 2                         # max. number of integer *digits*
+    'tip_WI'        : 'Number of integer bits'  # Mouse-over tooltip
+    'WF'            : 15                        # number of frac. *bits*
+    'WF_len'        : 2                         # max. number of frac. *digits*
+    'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
+
+    'lock_visible'  : False                     # Pushbutton for locking visible
+    'tip_lock'      : 'Lock input/output quant.'# Tooltip for  lock push button
+
+    'combo_visible' : False                     # Enable integrated combo widget
+    'combo_items'   : ['auto', 'full', 'man']   # Combo selection
+    'tip_combo'     : 'Acc. width.'   # tooltip for combo
+
+    'enabled'       : True                      # Is widget enabled?
+    'visible'       : True                      # Is widget visible?
     """
     # incoming,
     # sig_rx = pyqtSignal(object)
@@ -509,8 +528,8 @@ class UI_WQ(QWidget):
                  ("man", "Man", "<span>Manual entry of word format.</span>")]
         # default widget settings:
         dict_ui = {'wdg_name': 'ui_wq', 'label': '',
-                   'label_q': 'Quant.', 'cmb_q': cmb_q, 'quant': 'round',
-                   'label_ov': 'Ovfl.', 'cmb_ov': cmb_ov, 'ovfl': 'wrap',
+                   'label_q': 'Quant.', 'cmb_q_items': cmb_q, 'quant': 'round',
+                   'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov, 'ovfl': 'wrap',
                    'enabled': True, 'visible': True,
                    #
                    'label_w': '<i>WI.WF</i>&nbsp;:', 'lbl_sep': '.', 'max_led_width': 30,
@@ -522,26 +541,27 @@ class UI_WQ(QWidget):
                    }
         # test whether quantization and overflow parameters in self.q_dict are
         # in the lists of combobox entries and assign them when True
-        if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q']:
-            dict_ui['quant'] = self.q_dict['quant']
-        if 'ovfl' in self.q_dict and self.q_dict['ovfl'] in dict_ui['cmb_ov']:
-            dict_ui['quant'] = self.q_dict['ovfl']
+        # TODO: doesn't work at the moment, dict_ui['cmb_q_items'] is not a simple list
+        # if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q_items']:
+        #     dict_ui['quant'] = self.q_dict['quant']
+        # if 'ovfl' in self.q_dict and self.q_dict['ovfl'] in dict_ui['cmb_ov_items']:
+        #     dict_ui['quant'] = self.q_dict['ovfl']
 
         for key, val in kwargs.items():
             dict_ui.update({key: val})
         # dict_ui.update(map(kwargs)) # same as above?
 
         self.wdg_name = dict_ui['wdg_name']
-        lbl_wdg = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        lbl_wdg = QLabel(dict_ui['label'], self)
 
         lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
-        qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q'], dict_ui['quant'])
+        qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q_items'], dict_ui['quant'])
         self.cmbQuant.setObjectName('quant')
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
-        qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov'], dict_ui['ovfl'])
+        qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov_items'], dict_ui['ovfl'])
         self.cmbOvfl.setObjectName('ovfl')
 
         # ComboBox size is adjusted automatically to fit the longest element
@@ -577,18 +597,6 @@ class UI_WQ(QWidget):
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
 
-
-        # layH = QHBoxLayout()
-        # if dict_ui['label'] != "":
-        #     lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
-        #     layH.addWidget(lblW)
-        # layH.addStretch()
-        # layH.addWidget(lblOvfl)
-        # layH.addWidget(self.cmbOvfl)
-        # # layH.addStretch(1)
-        # layH.addWidget(lblQuant)
-        # layH.addWidget(self.cmbQuant)
-        # layH.setContentsMargins(0, 0, 0, 0)
         lay_W = QHBoxLayout()
         lay_W.addStretch()
         lay_W.addWidget(lbl_W)

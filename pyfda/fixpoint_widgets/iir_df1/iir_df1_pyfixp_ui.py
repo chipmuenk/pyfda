@@ -18,7 +18,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
+from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q, UI_WQ
 from .iir_df1_pyfixp import IIR_DF1_pyfixp
 
 import logging
@@ -76,30 +76,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
             WI=fb.fil[0]['fxqc']['QCA']['WI'],
             WF=fb.fil[0]['fxqc']['QCA']['WF'])
 
-
-#        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
-#                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'],
-#                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
-#        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
-
-        self.wdg_w_accu = UI_W(fb.fil[0]['fxqc']['QA'], label='', wdg_name='w_accu',
-                               fractional=True, combo_visible=True)
-
-        self.wdg_q_accu = UI_Q(fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
-                               label='Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:')
+        self.wdg_wq_accu = UI_WQ(fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
+                                 label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
+                                 combo_visible=True,  fractional=True)
 
         # initial setting for accumulator
-        cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-        self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
-        self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
+        cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
+        self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
+        self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
         self.wdg_w_coeffs_b.sig_tx.connect(self.update_q_coeff)
         self.wdg_w_coeffs_a.sig_tx.connect(self.update_q_coeff)
-        self.wdg_w_accu.sig_tx.connect(self.process_sig_rx)
-        self.wdg_q_accu.sig_tx.connect(self.process_sig_rx)
+
+        self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 # ------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -108,8 +100,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layVWdg.addWidget(self.wdg_w_coeffs_b)
         layVWdg.addWidget(self.wdg_w_coeffs_a)
 #        layVWdg.addWidget(self.wdg_q_coeffs)
-        layVWdg.addWidget(self.wdg_q_accu)
-        layVWdg.addWidget(self.wdg_w_accu)
+        layVWdg.addWidget(self.wdg_wq_accu)
 
         layVWdg.addStretch()
 
@@ -122,30 +113,32 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         # if not, just emit the dict.
         if 'ui' in dict_sig:
-            if dict_sig['wdg_name'] in {'w_coeff_b', 'w_coeff_a'}:  # coeff. format updated
+            if dict_sig['wdg_name'] in {'w_coeff_b', 'w_coeff_a'}:  # coeff. format update
                 """
                 Update coefficient quantization settings and coefficients.
 
                 The new values are written to the fixpoint coefficient dict as
-                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
+                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
+                `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']`.
                 """
 
                 fb.fil[0]['fxqc'].update(self.ui2dict())
 
-            elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
-                cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-                self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
-                self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
+            elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
+                cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
+                self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
+                self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
                 if cmbW in {'full', 'auto'}\
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     pass
 
                 elif cmbW == 'man':  # switched to manual, don't do anything
                     return
+                # TODO: process quantization settings here?
 
             # Accu quantization or overflow settings have been changed
-            elif dict_sig['wdg_name'] == 'q_accu':
-                pass
+            # elif dict_sig['wdg_name'] == 'q_accu':
+            #    pass
 
             else:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -167,8 +160,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         Update coefficient quantization settings and coefficients.
 
         The new values are written to the fixpoint coefficient dict as
-        `fb.fil[0]['fxqc']['QCB']` and
-        `fb.fil[0]['fxqc']['b']`.
+        `fb.fil[0]['fxqc']['QCB']`, `fb.fil[0]['fxqc']['b']`,
+        `fb.fil[0]['fxqc']['QCA']` and `fb.fil[0]['fxqc']['a']`.
         """
         logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
         # dict_sig.update({'ui':'C'+dict_sig['ui']})
@@ -191,16 +184,16 @@ class IIR_DF1_pyfixp_UI(QWidget):
         `fb.fil[0]['fxqc']['QA']`.
         """
         try:
-            if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
+            if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
                 A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
-            elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
         except Exception as e:
             logger.error(e)
             return
 
-        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full" or\
-                qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full" or\
+                qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
             fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
             fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
@@ -213,10 +206,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
             + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
 
         # update quantization settings
-        fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)
+        fb.fil[0]['fxqc']['QA'].update(self.wdg_wq_accu.q_dict)
 
         # update UI
-        self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
+        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
 
 # ------------------------------------------------------------------------------
     def dict2ui(self):
@@ -233,7 +226,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if 'QA' not in fxqc_dict:
             fxqc_dict.update({'QA': {}})  # no accumulator settings in dict yet
             logger.warning("QA key missing")
-
         if 'QCB' not in fxqc_dict:
             fxqc_dict.update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
@@ -282,10 +274,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
         fxqc_dict = fb.fil[0]['fxqc']
         if 'QA' not in fxqc_dict:
             # no accumulator settings in dict yet:
-            fxqc_dict.update({'QA': self.wdg_w_accu.q_dict})
+            fxqc_dict.update({'QA': self.wdg_wq_accu.q_dict})
             logger.warning("Empty dict 'fxqc['QA]'!")
         else:
-            fxqc_dict['QA'].update(self.wdg_w_accu.q_dict)
+            fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
 
         if 'QCB' not in fxqc_dict:
             # no coefficient settings in dict yet
