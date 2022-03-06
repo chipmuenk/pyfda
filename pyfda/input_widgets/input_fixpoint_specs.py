@@ -22,11 +22,11 @@ import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log, first_item
+from pyfda.libs.pyfda_lib import qstr, pprint_log, first_item
 # import pyfda.libs.pyfda_fix_lib as fx
 # from pyfda.libs.pyfda_io_lib import extract_file_ext
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
+from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
 from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
@@ -105,34 +105,34 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
                 return
 
-            elif dict_sig['wdg_name'] == 'w_input':
+            elif dict_sig['wdg_name'] == 'wq_input':
                 """
                 Input fixpoint format has been changed or butLock has been clicked.
                 When I/O lock is active, copy input fixpoint word format to output
                 word format.
                 """
                 if dict_sig['ui'] == 'butLock'\
-                        and not self.wdg_w_input.butLock.isChecked():
+                        and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return
-                elif self.wdg_w_input.butLock.isChecked():
+                elif self.wdg_wq_input.butLock.isChecked():
                     # but lock was activated or wordlength setting have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
 
-            elif dict_sig['wdg_name'] == 'w_output':
+            elif dict_sig['wdg_name'] == 'wq_output':
                 """
                 Output fixpoint format has been changed. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
-                if self.wdg_w_input.butLock.isChecked():
+                if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
                     fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
 
-            elif dict_sig['wdg_name'] in {'q_output', 'q_input'}:
-                pass
+            # elif dict_sig['wdg_name'] in {'q_output', 'q_input'}:
+            #    pass
             else:
                 logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
                              .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
@@ -232,11 +232,8 @@ class Input_Fixpoint_Specs(QWidget):
         Intitialize the main GUI, consisting of:
 
         - A combo box to select the filter topology and an image of the topology
-
         - The input quantizer
-
         - The UI of the fixpoint filter widget
-
         - Simulation and export buttons
         """
 # ------------------------------------------------------------------------------
@@ -273,32 +270,24 @@ class Input_Fixpoint_Specs(QWidget):
 #       - pass the quantization (sub-?) dictionary to the constructor
 # ------------------------------------------------------------------------------
 
-        self.wdg_w_input = UI_W(q_dict=fb.fil[0]['fxqc']['QI'],
-                                wdg_name='w_input', label='', lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_local)
+        self.wdg_wq_input = UI_WQ(q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='wq_input', 
+                                  label='<b>Input Quant. <i>Q<sub>X&nbsp;</sub></i>:</b>',
+                                  lock_visible=True)
+        # if HAS_DS:
+        self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
+        self.wdg_wq_input.cmbQuant.setItemData(
+            self.wdg_wq_input.cmbQuant.count() - 1,
+            self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
+        self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)  #(self.process_sig_rx_local)
 
-        cmb_q = ['round', 'floor', 'fix']
-
-        self.wdg_w_output = UI_W(q_dict=fb.fil[0]['fxqc']['QO'],
-                                 wdg_name='w_output', label='')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_local)
-
-        self.wdg_q_output = UI_Q(q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='q_output',
-                                 label='Output Quant. <i>Q<sub>Y&nbsp;</sub></i>:',
-                                 cmb_q=cmb_q, cmb_ov=['wrap', 'sat'])
-        self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
-
-        if HAS_DS:
-            cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='q_input',
-                                label='Input Quant. <i>Q<sub>X&nbsp;</sub></i>:',
-                                cmb_q=cmb_q)
-        self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
+        self.wdg_wq_output = UI_WQ(
+            q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
+            label='<b>Output Quant. <i>Q<sub>Y&nbsp;</sub></i>:</b>')
+        self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 
         # Layout and frame for input quantization
         layVQiWdg = QVBoxLayout()
-        layVQiWdg.addWidget(self.wdg_q_input)
-        layVQiWdg.addWidget(self.wdg_w_input)
+        layVQiWdg.addWidget(self.wdg_wq_input)
         frmQiWdg = QFrame(self)
         # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQiWdg.setLayout(layVQiWdg)
@@ -306,8 +295,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # Layout and frame for output quantization
         layVQoWdg = QVBoxLayout()
-        layVQoWdg.addWidget(self.wdg_q_output)
-        layVQoWdg.addWidget(self.wdg_w_output)
+        layVQoWdg.addWidget(self.wdg_wq_output)
         frmQoWdg = QFrame(self)
         # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQoWdg.setLayout(layVQoWdg)
@@ -629,10 +617,10 @@ class Input_Fixpoint_Specs(QWidget):
         Set the RUN button to "changed".
         """
 #        fb.fil[0]['fxqc']['QCB'].update({'scale':(1 << fb.fil[0]['fxqc']['QCB']['W'])})
-        self.wdg_q_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_q_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+        self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+        #self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        # self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
             self.fx_filt_ui.dict2ui()
 #            dict_sig = {'fx_sim':'specs_changed'}
