@@ -245,6 +245,7 @@ class Input_Fixpoint_Specs(QWidget):
         frmHDL_wdg = QFrame(self)
         frmHDL_wdg.setLayout(self.layH_fx_wdg)
         # frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        frmHDL_wdg.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
@@ -283,7 +284,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_wq_output = UI_WQ(
             q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
-            label='<b>Output Quant. <i>Q<sub>Y&nbsp;</sub></i>:</b>')
+            label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 
         # Layout and frame for input quantization
@@ -351,18 +352,18 @@ class Input_Fixpoint_Specs(QWidget):
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(frmHDL_wdg)
-        splitter.addWidget(frmQoWdg)
         splitter.addWidget(self.frmImg)
 
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
-        splitter.setSizes([3000, 3000, 5000])
+        splitter.setSizes([3000, 5000])
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
         layVMain.addWidget(frmQiWdg)
+        layVMain.addWidget(frmQoWdg)
         layVMain.addWidget(splitter)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
