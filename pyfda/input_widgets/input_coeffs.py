@@ -702,11 +702,10 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def _update_MSB_LSB(self):
         """
-        Update the infos (LSB, MSB, Max)
+        Update the infos (LSB, MSB)
         """
         self.ui.lblLSB_b.setText("{0:.{1}g}".format(self.myQ_b.LSB, params['FMT_ba']))
         self.ui.lblMSB_b.setText("{0:.{1}g}".format(self.myQ_b.MSB, params['FMT_ba']))
-        # self.ui.lblMAX.setText("{0:.6g}".format(self.myQ_b.MAX))
 
     # --------------------------------------------------------------------------
     def qdict2ui(self):
