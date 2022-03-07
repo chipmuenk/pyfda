@@ -328,7 +328,7 @@ class Input_Coeffs_UI(QWidget):
         # -------------------------------------------------------------------
         # layGQOpt_b
         #
-        # Quantization / Overflow / MSB / LSB settings for b coefficients
+        # Quantization / Overflow / MSB / LSB settings for coefficients
         # ---------------------------------------------------------------------
         lblQOvfl_b = QLabel("Ovfl.:", self)
         lblQOvfl_b.setFont(self.bifont)
