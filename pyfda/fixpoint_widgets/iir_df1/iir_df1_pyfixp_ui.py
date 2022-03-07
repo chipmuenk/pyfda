@@ -18,7 +18,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q, UI_WQ
+from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
 from .iir_df1_pyfixp import IIR_DF1_pyfixp
 
 import logging
@@ -58,27 +58,20 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if 'QA' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QA'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
-                          {'WI': 0, 'WF': 30, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
+                          {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
 
-        self.wdg_w_coeffs_b = UI_W(
-            fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff_b',
-            label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
-            tip_WI='Number of integer bits - edit in "b,a" tab',
-            tip_WF='Number of fractional bits - edit in "b,a" tab',
-            WI=fb.fil[0]['fxqc']['QCB']['WI'],
-            WF=fb.fil[0]['fxqc']['QCB']['WF'])
+        self.wdg_wq_coeffs_b = UI_WQ(
+            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
 
-        self.wdg_w_coeffs_a = UI_W(
-            fb.fil[0]['fxqc']['QCA'], wdg_name='w_coeff_a',
-            label='Coeff. Format <i>A<sub>I.F&nbsp;</sub></i>:',
-            tip_WI='Number of integer bits - edit in "b,a" tab',
-            tip_WF='Number of fractional bits - edit in "b,a" tab',
-            WI=fb.fil[0]['fxqc']['QCA']['WI'],
-            WF=fb.fil[0]['fxqc']['QCA']['WF'])
+        self.wdg_wq_coeffs_a = UI_WQ(
+            fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
+            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>')
 
-        self.wdg_wq_accu = UI_WQ(fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
-                                 label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-                                 combo_visible=True,  fractional=True)
+        self.wdg_wq_accu = UI_WQ(
+            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
+            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
+            combo_visible=True,  fractional=True)
 
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
@@ -88,21 +81,17 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
-        self.wdg_w_coeffs_b.sig_tx.connect(self.update_q_coeff)
-        self.wdg_w_coeffs_a.sig_tx.connect(self.update_q_coeff)
+        self.wdg_wq_coeffs_b.sig_tx.connect(self.update_q_coeff)
+        self.wdg_wq_coeffs_a.sig_tx.connect(self.update_q_coeff)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
-# ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0, 0, 0, 0)
-
-        layVWdg.addWidget(self.wdg_w_coeffs_b)
-        layVWdg.addWidget(self.wdg_w_coeffs_a)
-
+        layVWdg.addWidget(self.wdg_wq_coeffs_b)
+        layVWdg.addWidget(self.wdg_wq_coeffs_a)
         layVWdg.addWidget(self.wdg_wq_accu)
-
         layVWdg.addStretch()
-
         self.setLayout(layVWdg)
 
 # ------------------------------------------------------------------------------
@@ -112,7 +101,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         # if not, just emit the dict.
         if 'ui' in dict_sig:
-            if dict_sig['wdg_name'] in {'w_coeff_b', 'w_coeff_a'}:  # coeff. format update
+            if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a'}:  # coeffs format
                 """
                 Update coefficient quantization settings and coefficients.
 
@@ -120,7 +109,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
                 `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']`.
                 """
-
                 fb.fil[0]['fxqc'].update(self.ui2dict())
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
@@ -134,10 +122,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 elif cmbW == 'man':  # switched to manual, don't do anything
                     return
                 # TODO: process quantization settings here?
-
-            # Accu quantization or overflow settings have been changed
-            # elif dict_sig['wdg_name'] == 'q_accu':
-            #    pass
 
             else:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -186,6 +170,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         """
         try:
             if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
+                # calculate word growth from number of b coefficients
                 A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
             elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
@@ -234,8 +219,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fxqc_dict.update({'QCA': {}})  # no coefficient settings in dict yet
             logger.warning("QCA key missing")
 
-        self.wdg_w_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
-        self.wdg_w_coeffs_a.dict2ui(fxqc_dict['QCA'])  # update coefficient wordlength
+        self.wdg_wq_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
+        self.wdg_wq_coeffs_a.dict2ui(fxqc_dict['QCA'])  # update coefficient wordlength
 
         self.update_accu_settings()                  # update accumulator settings
 
@@ -253,7 +238,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         Parameters
         ----------
-
         None
 
         Returns
@@ -263,14 +247,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
            containing the following keys and values:
 
         - 'QCB': dictionary with b coefficients quantization settings
-
+        - 'QCA': dictionary with a coefficients quantization settings
         - 'QA': dictionary with accumulator quantization settings
-
         - 'b' : list of quantized b coefficients in format WI.WF
-
         - 'a' : list of quantized a coefficients in format WI.WF
-        TODO: This is still the same format as 'b'
-
         """
         fxqc_dict = fb.fil[0]['fxqc']
         if 'QA' not in fxqc_dict:
@@ -282,22 +262,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         if 'QCB' not in fxqc_dict:
             # no coefficient settings in dict yet
-            fxqc_dict.update({'QCB': self.wdg_w_coeffs_b.q_dict})
+            fxqc_dict.update({'QCB': self.wdg_wq_coeffs_b.q_dict})
             logger.warning("Empty dict 'fxqc['QCB]'!")
         else:
-            fxqc_dict['QCB'].update(self.wdg_w_coeffs_b.q_dict)
+            fxqc_dict['QCB'].update(self.wdg_wq_coeffs_b.q_dict)
 
         if 'QCA' not in fxqc_dict:
             # no coefficient settings in dict yet
-            fxqc_dict.update({'QCA': self.wdg_w_coeffs_a.q_dict})
+            fxqc_dict.update({'QCA': self.wdg_wq_coeffs_a.q_dict})
             logger.warning("Empty dict 'fxqc['QCA]'!")
         else:
-            fxqc_dict['QCA'].update(self.wdg_w_coeffs_a.q_dict)
+            fxqc_dict['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
 
-        fxqc_dict.update({'b': self.wdg_w_coeffs_b.quant_coeffs(
-            self.wdg_w_coeffs_b.q_dict, fb.fil[0]['ba'][0])})
-        fxqc_dict.update({'a': self.wdg_w_coeffs_b.quant_coeffs(
-            self.wdg_w_coeffs_a.q_dict, fb.fil[0]['ba'][1])})
+        fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(
+            self.wdg_wq_coeffs_b.q_dict, fb.fil[0]['ba'][0])})
+        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(
+            self.wdg_wq_coeffs_a.q_dict, fb.fil[0]['ba'][1])})
         return fxqc_dict
 
 # ------------------------------------------------------------------------------
