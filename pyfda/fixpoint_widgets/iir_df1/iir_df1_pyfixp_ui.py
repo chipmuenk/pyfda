@@ -193,12 +193,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.error(e)
             return
 
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full" or\
-                qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
             fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
-            fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
-                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
+            fb.fil[0]['fxqc']['QA']['WI'] = min(
+                fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff,
+                0)
 
         # calculate total accumulator word length and 'Q' format
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
