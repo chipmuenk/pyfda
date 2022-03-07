@@ -270,15 +270,16 @@ class Input_Fixpoint_Specs(QWidget):
 #       - pass the quantization (sub-?) dictionary to the constructor
 # ------------------------------------------------------------------------------
 
-        self.wdg_wq_input = UI_WQ(q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='wq_input', 
-                                  label='<b>Input Quant. <i>Q<sub>X&nbsp;</sub></i>:</b>',
-                                  lock_visible=True)
-        # if HAS_DS:
-        self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
-        self.wdg_wq_input.cmbQuant.setItemData(
-            self.wdg_wq_input.cmbQuant.count() - 1,
-            self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
-        self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)  #(self.process_sig_rx_local)
+        self.wdg_wq_input = UI_WQ(
+            q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='wq_input',
+            label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
+            lock_visible=True)
+        if HAS_DS:
+            self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
+            self.wdg_wq_input.cmbQuant.setItemData(
+                self.wdg_wq_input.cmbQuant.count() - 1,
+                self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
+        self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
         self.wdg_wq_output = UI_WQ(
             q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
