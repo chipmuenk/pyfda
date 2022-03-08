@@ -7,14 +7,12 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for specifying the parameters of a direct-form DF1 FIR filter
+Widget for specifying the parameters of a direct-form DF1 IIR filter
 """
 import sys
 
-import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -71,13 +69,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         self.wdg_wq_accu = UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
-            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-            combo_visible=True,  fractional=True)
-
-        # initial setting for accumulator
-        cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-        self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
-        self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
+            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -110,18 +102,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
                 `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']`.
                 """
-                fb.fil[0]['fxqc'].update(self.ui2dict())
+                # fb.fil[0]['fxqc'].update(self.ui2dict())
+                pass
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
-                cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
-                self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
-                if cmbW in {'full', 'auto'}\
-                        or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
-                    pass
-
-                elif cmbW == 'man':  # switched to manual, don't do anything
-                    return
+                pass
                 # TODO: process quantization settings here?
 
             else:
@@ -156,49 +141,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.process_sig_rx(dict_sig)
 
 # ------------------------------------------------------------------------------
-    def update_accu_settings(self):
-        """
-        Calculate number of extra integer bits needed in the accumulator (bit
-        growth) depending on the coefficient area (sum of absolute coefficient
-        values) for `cmbW == 'auto'` or depending on the number of coefficients
-        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
-        requires more bits.
-
-        The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxqc']['QA']`.
-
-        TODO: Calculation of WI is incorrect for negative intermediate results?
-        """
-        try:
-            if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
-                # calculate word growth from number of b coefficients
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
-            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
-                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
-        except Exception as e:
-            logger.error(e)
-            return
-
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
-            fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
-                + fb.fil[0]['fxqc']['QCB']['WF']
-            fb.fil[0]['fxqc']['QA']['WI'] = min(
-                fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff,
-                0)
-
-        # calculate total accumulator word length and 'Q' format
-        fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
-            + fb.fil[0]['fxqc']['QA']['WF'] + 1
-        fb.fil[0]['fxqc']['QA']['Q'] = str(fb.fil[0]['fxqc']['QA']['WI'])\
-            + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
-
-        # update quantization settings
-        fb.fil[0]['fxqc']['QA'].update(self.wdg_wq_accu.q_dict)
-
-        # update UI
-        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
-
-# ------------------------------------------------------------------------------
     def dict2ui(self):
         """
         Update all parts of the UI that need to be updated when specs have been
@@ -220,10 +162,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fxqc_dict.update({'QCA': {}})  # no coefficient settings in dict yet
             logger.warning("QCA key missing")
 
-        self.wdg_wq_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
-        self.wdg_wq_coeffs_a.dict2ui(fxqc_dict['QCA'])  # update coefficient wordlength
-
-        self.update_accu_settings()                  # update accumulator settings
+        self.wdg_wq_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient quantization
+        self.wdg_wq_coeffs_a.dict2ui(fxqc_dict['QCA'])  # settings
 
 # ------------------------------------------------------------------------------
     def ui2dict(self):
