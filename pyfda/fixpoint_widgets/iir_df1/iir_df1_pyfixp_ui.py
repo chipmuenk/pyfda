@@ -41,8 +41,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.title = ("<b>Direct-Form 1 (DF1) IIR Filter</b><br />"
-                      "Canonical IIR topology.")
+        self.title = ("<b>Direct-Form 1 (DF1) IIR Filter</b>")
+        self.description = ("Topology with one accumulator, more robust against "
+                            "overflows than DF2. Only suitable for low-order filters.")
         self.img_name = "iir_df1.png"
 
         self._construct_UI()

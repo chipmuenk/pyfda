@@ -41,8 +41,8 @@ class FIR_DF_pyfixp_UI(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
-                      "Standard FIR topology.")
+        self.title = ("<b>Direct-Form (DF) FIR Filter</b>")
+        self.description = "Standard FIR topology, suitable for most use cases."
         self.img_name = "fir_df.png"
 
         self._construct_UI()

@@ -256,12 +256,20 @@ class Input_Fixpoint_Specs(QWidget):
         self.lblTitle = QLabel("not set", self)
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        self.lbl_descr = QLabel("", self)
+        self.lbl_descr.setWordWrap(True)
+
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(self.cmb_fx_wdg)
         layHTitle.addWidget(self.lblTitle)
 
+        layVTitle = QVBoxLayout()
+        layVTitle.addLayout(layHTitle)
+        layVTitle.addWidget(self.lbl_descr)
+
         self.frmTitle = QFrame(self)
-        self.frmTitle.setLayout(layHTitle)
+        self.frmTitle.setLayout(layVTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
@@ -600,6 +608,11 @@ class Input_Fixpoint_Specs(QWidget):
 
             # ---- set title and description for filter
             self.lblTitle.setText(self.fx_filt_ui.title)
+            if hasattr(self.fx_filt_ui, "description"):
+                self.lbl_descr.setVisible(True)
+                self.lbl_descr.setText(self.fx_filt_ui.description)
+            else:
+                self.lbl_descr.setVisible(False)
 
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
@@ -621,7 +634,7 @@ class Input_Fixpoint_Specs(QWidget):
 #        fb.fil[0]['fxqc']['QCB'].update({'scale':(1 << fb.fil[0]['fxqc']['QCB']['W'])})
         self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        #self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        # self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         # self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
             self.fx_filt_ui.dict2ui()
@@ -778,7 +791,7 @@ class Input_Fixpoint_Specs(QWidget):
         if fb.fx_results is None:
             qstyle_widget(self.butSimFx, "error")
         else:
-            pass # everything ok, return 
+            pass # everything ok, return
             # logger.debug("Sending fixpoint results")
         return
 
