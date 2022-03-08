@@ -489,9 +489,9 @@ class UI_WQ(QWidget):
     'lock_visible'  : False                     # Pushbutton for locking visible
     'tip_lock'      : 'Lock input/output quant.'# Tooltip for  lock push button
 
-    'combo_visible' : False                     # Enable integrated combo widget
-    'combo_items'   : ['auto', 'full', 'man']   # Combo selection
-    'tip_combo'     : 'Acc. width.'   # tooltip for combo
+    'cmb_w_vis'     : False                     # Integrated combo widget visible?
+    'cmb_w_items'   : List with tooltip and combo box choices
+    'cmb_w_init'    : 'man'                     # initial setting
 
     'enabled'       : True                      # Is widget enabled?
     'visible'       : True                      # Is widget visible?
@@ -521,13 +521,14 @@ class UI_WQ(QWidget):
                   ("sat", "Sat",
                    "<span>Saturation, i.e. limit at min. / max. value</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
+                 ("man", "Man", "<span>Manual entry of word format.</span>"),
                  ("auto", "Auto",
                   "<span>Automatic calculation from coefficients and input word formats "
                   "taking coefficients area into account.</span>"),
                  ("full", "Full",
                   "<span>Automatic calculation from coefficients and input word formats "
-                  "for arbitrary coefficients.</span>"),
-                 ("man", "Man", "<span>Manual entry of word format.</span>")]
+                  "for arbitrary coefficients.</span>")
+                 ]
         # default widget settings:
         dict_ui = {'wdg_name': 'ui_wq', 'label': '',
                    'label_q': 'Quant.', 'cmb_q_items': cmb_q, 'quant': 'round',
@@ -537,8 +538,8 @@ class UI_WQ(QWidget):
                    'label_w': '<i>WI.WF</i>&nbsp;:', 'lbl_sep': '.', 'max_led_width': 30,
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
-                   'fractional': True,  # 'enabled': True, 'visible': True,
-                   'combo_visible': False, 'cmb_w_items': cmb_w,
+                   'fractional': True,
+                   'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
                    'lock_visible': False, 'tip_lock': 'Lock input/output quantization.'
                    }
         # test whether quantization and overflow parameters in self.q_dict are
@@ -550,7 +551,10 @@ class UI_WQ(QWidget):
         #     dict_ui['quant'] = self.q_dict['ovfl']
 
         for key, val in kwargs.items():
-            dict_ui.update({key: val})
+            if key not in dict_ui:
+                logger.warning(f"Unknown key '{key}'")
+            else:
+                dict_ui.update({key: val})
         # dict_ui.update(map(kwargs)) # same as above?
 
         self.wdg_name = dict_ui['wdg_name']
@@ -573,8 +577,8 @@ class UI_WQ(QWidget):
         lbl_W = QLabel(to_html(dict_ui['label_w']), self)
 
         self.cmbW = QComboBox(self)
-        qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], 'auto')
-        self.cmbW.setVisible(dict_ui['combo_visible'])
+        qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
+        self.cmbW.setVisible(dict_ui['cmb_w_vis'])
         self.cmbW.setObjectName("cmbW")
 
         self.butLock = QPushButton(self)
