@@ -399,7 +399,7 @@ class Input_Coeffs(QWidget):
 
         self.ui.ledScale_b.editingFinished.connect(self._set_scale)
 
-        self.ui.butQuant_b.clicked.connect(self.quant_coeffs)
+        self.ui.butQuant.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
 
@@ -520,6 +520,7 @@ class Input_Coeffs(QWidget):
         self.ui.led_W_b.setVisible(not is_float)
 
         self.ui.frmQSettings_b.setVisible(not is_float)  # hide all q-settings for float
+        self.ui.butQuant.setVisible(not is_float)  # hide all q-settings for float
 
         if self.ui.butEnable.isChecked():
             self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))

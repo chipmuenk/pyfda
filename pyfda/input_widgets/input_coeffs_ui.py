@@ -48,10 +48,10 @@ class Input_Coeffs_UI(QWidget):
             "<span>Number format for displaying signed fixpoint coefficients.</span>",
             ("qint", "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
-            ("qfrac", "Fractional", 
+            ("qfrac", "Fractional",
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>"),
-            ("qnfrac", "Norm. Frac.", 
+            ("qnfrac", "Norm. Frac.",
              "<span>Normalized fractional format with <i>WF</i> + 1 bits "
              "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
             ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
@@ -150,6 +150,14 @@ class Input_Coeffs_UI(QWidget):
         self.led_W_b.setMaxLength(2)  # maximum of 2 digits
         self.led_W_b.setFixedWidth(30)  # width of lineedit in points(?)
 
+        self.butQuant = QPushButton(self)
+        self.butQuant.setToolTip(
+            "<span>Quantize selected coefficients / "
+            "whole table with specified settings.</span>")
+        self.butQuant.setIcon(QIcon(':/quantize.svg'))
+        self.butQuant.setIconSize(q_icon_size)
+        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
@@ -159,6 +167,7 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.cmb_q_frmt)
         layHDisplay.addWidget(self.lbl_W_b)
         layHDisplay.addWidget(self.led_W_b)
+        layHDisplay.addWidget(self.butQuant)
         layHDisplay.addStretch()
 
         #######################################################################
@@ -360,14 +369,6 @@ class Input_Coeffs_UI(QWidget):
         layHQuantOpt_b.addWidget(self.cmbQuant_b)
         layHQuantOpt_b.addStretch()
 
-        self.butQuant_b = QPushButton(self)
-        self.butQuant_b.setToolTip(
-            "<span>Quantize selected coefficients / "
-            "whole table with specified settings.</span>")
-        self.butQuant_b.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant_b.setIconSize(q_icon_size)
-        self.butQuant_b.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
         lblMSBtxt_b = QLabel(self)
         lblMSBtxt_b.setText("<b><i>MSB</i><sub>b,10</sub> =</b>")
         self.lblMSB_b = QLabel(self)
@@ -387,21 +388,8 @@ class Input_Coeffs_UI(QWidget):
         layGQOpt_b = QGridLayout()
         layGQOpt_b.addLayout(layHQOvflOpt_b, 0, 0)
         layGQOpt_b.addLayout(layHQuantOpt_b, 0, 1)
-        layGQOpt_b.addWidget(self.butQuant_b, 0, 2, Qt.AlignCenter)
         layGQOpt_b.addLayout(layHMSB_b, 1, 0)
         layGQOpt_b.addLayout(layHLSB_b, 1, 1)
-
-        # -------------------------------------------------------------------
-        #   Display MAX
-        # ---------------------------------------------------------------------
-        # lblMAXtxt = QLabel(self)
-        # lblMAXtxt.setText("<b><i>Max =</i></b>")
-        # self.lblMAX = QLabel(self)
-
-        # layHCoeffs_MAX = QHBoxLayout()
-        # layHCoeffs_MAX.addWidget(lblMAXtxt)
-        # layHCoeffs_MAX.addWidget(self.lblMAX)
-        # layHCoeffs_MAX.addStretch()
 
         #######################################################################
         # Now put all the coefficient HBoxes into frmQSettings_b
