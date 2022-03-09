@@ -399,6 +399,8 @@ class Input_Coeffs(QWidget):
 
         self.ui.ledScale_b.editingFinished.connect(self._set_scale)
 
+        self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
+
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
@@ -533,11 +535,14 @@ class Input_Coeffs(QWidget):
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
                 qset_cmb_box(self.ui.cmbFilterType, 'FIR')
+                self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
             else:
                 self.num_cols = 2
                 self.tblCoeff.setColumnCount(2)
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 qset_cmb_box(self.ui.cmbFilterType, 'IIR')
+                # hide all q-settings for float:
+                self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
 
                 self.ba[1][0] = 1.0  # restore fa[0] = 1 of denonimator polynome
 
