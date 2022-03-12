@@ -19,7 +19,7 @@ from pyfda.libs.pyfda_qt_lib import (
 from pyfda.libs.csv_option_box import CSV_option_box
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
@@ -406,7 +406,11 @@ class Input_Coeffs_UI(QWidget):
         self.frmQSettings_b.setLayout(layVButtonsQ_b)
 
         # -------------------
-        self.wdg_wq_coeffs_a = UI_WQ(
+        self.wdg_wq_coeffs_b = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
+        # -------------------
+        self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>')
 
@@ -419,6 +423,7 @@ class Input_Coeffs_UI(QWidget):
         layVMainF.addWidget(self.frmButtonsCoeffs)
         layVMainF.addWidget(QHLine())
         layVMainF.addWidget(self.frmQSettings_b)
+        layVMainF.addWidget(self.wdg_wq_coeffs_b)
         layVMainF.addWidget(self.wdg_wq_coeffs_a)
 
         # This frame encompasses all UI elements

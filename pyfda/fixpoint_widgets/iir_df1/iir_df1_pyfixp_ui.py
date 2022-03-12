@@ -16,7 +16,7 @@ from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from .iir_df1_pyfixp import IIR_DF1_pyfixp
 
 import logging
@@ -59,17 +59,25 @@ class IIR_DF1_pyfixp_UI(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
 
-        self.wdg_wq_coeffs_b = UI_WQ(
+        if 'QCB' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
+            logger.warning("QCB key missing")
+        if 'QCA' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc'].update({'QCA': {}})  # no coefficient settings in dict yet
+            logger.warning("QCA key missing")
+
+        self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
 
-        self.wdg_wq_coeffs_a = UI_WQ(
+        self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>')
 
-        self.wdg_wq_accu = UI_WQ(
+        self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
-            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
+            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
+            cmb_w_vis=True)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
