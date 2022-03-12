@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,
                              QFileDialog, QInputDialog, QPlainTextEdit, QProgressBar,
                              QTableWidget, QTableWidgetItem, QHeaderView, QTextBrowser,
-                             QSizePolicy, QAbstractItemView,
+                             QSizePolicy, QAbstractItemView, QSpacerItem,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
                              QStyledItemDelegate, QStyle, QStyleOption)
 from PyQt5.QtTest import QTest, QSignalSpy
