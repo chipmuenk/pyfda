@@ -12,7 +12,7 @@ Widget for specifying the parameters of a direct-form DF1 IIR filter
 import sys
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
+from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -80,10 +80,15 @@ class IIR_DF1_pyfixp_UI(QWidget):
             cmb_w_vis=True)
 
         # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
+        # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
-        self.wdg_wq_coeffs_b.sig_tx.connect(self.update_q_coeff)
-        self.wdg_wq_coeffs_a.sig_tx.connect(self.update_q_coeff)
+        self.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)  # self.update_q_coeff)
+        self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)  # self.update_q_coeff)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
 # ------------------------------------------------------------------------------
@@ -126,27 +131,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
             # - emit {'fx_sim': 'specs_changed'}
             fb.fil[0]['fxqc'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'\
+                or 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.dict2ui()
 
         else:
-            logger.error(f"Unknown key '{dict_sig['wdg_name']}' (should be 'ui')"
+            logger.error(f"Unknown key '{first_item(dict_sig)}' (should be 'ui')"
                          f"in '{__name__}' !")
-
-# ------------------------------------------------------------------------------
-    def update_q_coeff(self, dict_sig):
-        """
-        Update coefficient quantization settings and coefficients.
-
-        The new values are written to the fixpoint coefficient dict as
-        `fb.fil[0]['fxqc']['QCB']`, `fb.fil[0]['fxqc']['b']`,
-        `fb.fil[0]['fxqc']['QCA']` and `fb.fil[0]['fxqc']['a']`.
-        """
-        logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
-        # dict_sig.update({'ui':'C'+dict_sig['ui']})
-        fb.fil[0]['fxqc'].update(self.ui2dict())
-        logger.warning("b = {0}".format(pprint_log(fb.fil[0]['fxqc']['b'])))
-        logger.warning("a = {0}".format(pprint_log(fb.fil[0]['fxqc']['a'])))
-
-        self.process_sig_rx(dict_sig)
 
 # ------------------------------------------------------------------------------
     def dict2ui(self):
@@ -159,19 +150,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxqc_dict = fb.fil[0]['fxqc']
-        if 'QA' not in fxqc_dict:
-            fxqc_dict.update({'QA': {}})  # no accumulator settings in dict yet
-            logger.warning("QA key missing")
-        if 'QCB' not in fxqc_dict:
-            fxqc_dict.update({'QCB': {}})  # no coefficient settings in dict yet
-            logger.warning("QCB key missing")
-        if 'QCA' not in fxqc_dict:
-            fxqc_dict.update({'QCA': {}})  # no coefficient settings in dict yet
-            logger.warning("QCA key missing")
-
-        self.wdg_wq_coeffs_b.dict2ui(fxqc_dict['QCB'])  # update coefficient quantization
-        self.wdg_wq_coeffs_a.dict2ui(fxqc_dict['QCA'])  # settings
+        logger.warning("called dict2ui")
+        self.wdg_wq_coeffs_b.dict2ui()  # update coefficient quantization
+        self.wdg_wq_coeffs_a.dict2ui()  # settings
+        self.wdg_wq_accu.dict2ui()
 
 # ------------------------------------------------------------------------------
     def ui2dict(self):
@@ -223,10 +205,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         else:
             fxqc_dict['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
 
-        fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(
-            self.wdg_wq_coeffs_b.q_dict, fb.fil[0]['ba'][0])})
-        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(
-            self.wdg_wq_coeffs_a.q_dict, fb.fil[0]['ba'][1])})
+        fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
+        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1])})
         return fxqc_dict
 
 # ------------------------------------------------------------------------------
