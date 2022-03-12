@@ -447,17 +447,18 @@ class Fixed(object):
 
     def setQobj(self, q_obj):
         """
-        Analyze quantization dict, complete and transform it if needed and
-        store it as instance attribute.
+        Use passed quantization dict `q_obj` to update the instance quantization
+        dict `self.q_obj` resp. create it if it doesn't using default data
+        `q_obj_default` for missing keys:value pairs.
 
         Check the docstring of class `Fixed()` for  details.
         """
+        q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
+                         'frmt': 'float', 'scale': 1}
+
         for key in q_obj.keys():
             if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'scale']:
                 raise Exception(u'Unknown Key "{0:s}"!'.format(key))
-
-        q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
-                         'frmt': 'float', 'scale': 1}
 
         if 'WI' in q_obj and 'WF' in q_obj:
             pass  # everything's defined already
