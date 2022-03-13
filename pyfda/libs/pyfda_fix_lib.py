@@ -454,10 +454,11 @@ class Fixed(object):
         Check the docstring of class `Fixed()` for  details.
         """
         q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
-                         'frmt': 'float', 'scale': 1}
+                         'frmt': 'float', 'qfrmt': 'qfrac', 'scale': 1}
 
         for key in q_obj.keys():
-            if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'scale']:
+            if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'qfrmt',
+                           'scale']:
                 raise Exception(u'Unknown Key "{0:s}"!'.format(key))
 
         if 'WI' in q_obj and 'WF' in q_obj:
@@ -527,7 +528,7 @@ class Fixed(object):
             self.places = 4
             self.base = 0
         else:
-            raise Exception(u'Unknown format "{0:s}"!'.format(self.frmt))
+            raise Exception(u'Unknown number format "{0:s}"!'.format(self.frmt))
 
         self.ovr_flag = 0  # initialize to allow reading when freshly initialized
 
