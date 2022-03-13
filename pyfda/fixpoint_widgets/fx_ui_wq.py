@@ -278,7 +278,7 @@ class FX_UI_WQ(QWidget):
         of the local quantization dict
 
         """
-        self.QObj.frmt = 'dec'  # always use decimal format for coefficients
+        self.QObj.frmt = 'dec'  # always use decimal format for coefficient quantization
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -329,7 +329,7 @@ class FX_UI_WQ(QWidget):
 
         self.q_dict.update({'ovfl': self.ovfl, 'quant': self.quant,
                             'WI': self.WI, 'WF': self.WF, 'W': self.W})
-        
+
         self.QObj.setQobj(self.q_dict)
 
         if self.sender():
@@ -342,9 +342,14 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
         """
-        Update the widgets `WI`, `WF` `quant` and `ovfl` and the corresponding
-        attributes from `q_dict`. If `q_dict is None`, use the quantization dict
-        passed during construction.
+        Update
+
+        * widgets `WI`, `WF` `quant` and `ovfl`
+        * corresponding attributes
+        * quantization object `self.QObj`
+
+        from `q_dict`. If `q_dict is None`, use the instance quantization dict
+        `self.q_dict`
         """
 
         if q_dict is None:
