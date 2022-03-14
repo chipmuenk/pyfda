@@ -377,7 +377,6 @@ class Input_Coeffs(QWidget):
         # initialize + refresh table with default values from filter dict
         self.load_dict()
         # TODO: needs to be optimized - self._refresh is being called in both routines
-        self._set_number_format()
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -392,7 +391,7 @@ class Input_Coeffs(QWidget):
         self.ui.butEnable.clicked.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
 
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self._set_number_format)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
         self.ui.butFromTable.clicked.connect(self._copy_from_table)
         self.ui.butToTable.clicked.connect(self._copy_to_table)
 
@@ -701,7 +700,7 @@ class Input_Coeffs(QWidget):
         or `ui.ledScale_b()` (via `_set_scale()`)
         or 'qdict2ui()' via `_set_number_format()`
         """
-        logger.warning("ui2qdict")
+        logger.warning("called ui2qdict")
 
         fb.fil[0]['fxqc']['QCB'].update(
             {'frmt': str(self.ui.cmbFormat.currentText().lower()),
