@@ -143,15 +143,6 @@ class Input_Coeffs_UI(QWidget):
         qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
 
-        self.lbl_W_b = QLabel("W = ", self)
-        self.lbl_W_b.setFont(self.bifont)
-
-        self.led_W_b = QLineEdit(self)
-        self.led_W_b.setToolTip("Total wordlength of <i>b</i> coefficients.")
-        self.led_W_b.setText("16")
-        self.led_W_b.setMaxLength(2)  # maximum of 2 digits
-        self.led_W_b.setFixedWidth(30)  # width of lineedit in points(?)
-
         self.butQuant = QPushButton(self)
         self.butQuant.setToolTip(
             "<span>Quantize selected coefficients / "
@@ -167,8 +158,6 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
         layHDisplay.addWidget(self.cmb_q_frmt)
-        layHDisplay.addWidget(self.lbl_W_b)
-        layHDisplay.addWidget(self.led_W_b)
         layHDisplay.addWidget(self.butQuant)
         layHDisplay.addStretch()
 
@@ -284,93 +273,9 @@ class Input_Coeffs_UI(QWidget):
         self.frmButtonsCoeffs = QFrame(self)
         self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
 
-        # ######################################################################
-        # frmQSettings_b
-        #
-        # This frame contains all quantization settings
-        # ######################################################################
         # -------------------------------------------------------------------
-        # layHW_Scale_b
-        #
-        # QFormat and scale settings
+        # MSB / LSB size
         # ---------------------------------------------------------------------
-#         lbl_Q_b = QLabel("Q =", self)
-#         lbl_Q_b.setFont(self.bifont)
-
-#         self.led_WI_b = QLineEdit(self)
-#         self.led_WI_b.setToolTip("Specify number of integer bits.")
-#         self.led_WI_b.setText("0")
-#         self.led_WI_b.setMaxLength(2)  # maximum of 2 digits
-#         self.led_WI_b.setFixedWidth(30)  # width of lineedit in points(?)
-
-#         self.lbl_dot_b = QLabel(".", self)  # class attribute, visibility is toggled
-#         self.lbl_dot_b.setFont(self.bfont)
-
-#         self.led_WF_b = QLineEdit(self)
-#         self.led_WF_b.setToolTip("Specify number of fractional bits.")
-#         self.led_WF_b.setText("15")
-#         self.led_WF_b.setMaxLength(2)  # maximum of 2 digits
-# #        self.led_WF_b.setFixedWidth(30) # width of lineedit in points(?)
-#         self.led_WF_b.setMaximumWidth(30)
-
-#         self.lblScale_b = QLabel("<b><i>Scale</i> =</b>", self)
-#         self.ledScale_b = QLineEdit(self)
-#         self.ledScale_b.setToolTip(
-#             "Set the scale for converting float to fixpoint representation.")
-#         self.ledScale_b.setText(str(1))
-#         self.ledScale_b.setEnabled(False)
-
-#         layHWI_WF_b = QHBoxLayout()
-#         layHWI_WF_b.addWidget(lbl_Q_b)
-#         layHWI_WF_b.addWidget(self.led_WI_b)
-#         layHWI_WF_b.addWidget(self.lbl_dot_b)
-#         layHWI_WF_b.addWidget(self.led_WF_b)
-#         layHWI_WF_b.addStretch()
-
-#         layHScale_b = QHBoxLayout()
-#         layHScale_b.addWidget(self.lblScale_b)
-#         layHScale_b.addWidget(self.ledScale_b)
-#         layHScale_b.addStretch()
-
-#         layHW_Scale_b = QHBoxLayout()
-#         layHW_Scale_b.addLayout(layHWI_WF_b)
-#         layHW_Scale_b.addLayout(layHScale_b)
-
-#         # -------------------------------------------------------------------
-#         # layGQOpt_b
-#         #
-#         # Quantization / Overflow / MSB / LSB settings for coefficients
-#         # ---------------------------------------------------------------------
-#         lblQOvfl_b = QLabel("Ovfl.:", self)
-#         lblQOvfl_b.setFont(self.bifont)
-#         lblQuant_b = QLabel("Quant.:", self)
-#         lblQuant_b.setFont(self.bifont)
-
-#         self.cmbQOvfl_b = QComboBox(self)
-#         qOvfl_b = ['wrap', 'sat']
-#         self.cmbQOvfl_b.addItems(qOvfl_b)
-#         qset_cmb_box(self.cmbQOvfl_b, 'sat')
-#         self.cmbQOvfl_b.setToolTip("Select overflow behaviour.")
-#         # ComboBox size is adjusted automatically to fit the longest element
-#         self.cmbQOvfl_b.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-#         layHQOvflOpt_b = QHBoxLayout()
-#         layHQOvflOpt_b.addWidget(lblQOvfl_b)
-#         layHQOvflOpt_b.addWidget(self.cmbQOvfl_b)
-#         layHQOvflOpt_b.addStretch()
-
-#         self.cmbQuant_b = QComboBox(self)
-#         qQuant_b = ['none', 'round', 'fix', 'floor']
-#         self.cmbQuant_b.addItems(qQuant_b)
-#         qset_cmb_box(self.cmbQuant_b, 'round')
-#         self.cmbQuant_b.setToolTip("Select the kind of quantization.")
-#         self.cmbQuant_b.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-#         layHQuantOpt_b = QHBoxLayout()
-#         layHQuantOpt_b.addWidget(lblQuant_b)
-#         layHQuantOpt_b.addWidget(self.cmbQuant_b)
-#         layHQuantOpt_b.addStretch()
-
         lblMSBtxt_b = QLabel(self)
         lblMSBtxt_b.setText("<b><i>MSB</i><sub>b,10</sub> =</b>")
         self.lblMSB_b = QLabel(self)
@@ -387,16 +292,16 @@ class Input_Coeffs_UI(QWidget):
         layHLSB_b.addWidget(self.lblLSB_b)
         layHLSB_b.addStretch()
 
-        layGQMSB_LSB_b = QGridLayout()
-        layGQMSB_LSB_b.addLayout(layHMSB_b, 0, 0)
-        layGQMSB_LSB_b.addLayout(layHLSB_b, 0, 1)
+        layG_MSB_LSB_b = QGridLayout()
+        layG_MSB_LSB_b.addLayout(layHMSB_b, 0, 0)
+        layG_MSB_LSB_b.addLayout(layHLSB_b, 0, 1)
 
         #######################################################################
         # Now put all the coefficient HBoxes into frmQSettings_b
         # ---------------------------------------------------------------------
         layVButtonsQ_b = QVBoxLayout()
 #        layVButtonsQ_b.addLayout(layHW_Scale_b)
-        layVButtonsQ_b.addLayout(layGQMSB_LSB_b)
+        layVButtonsQ_b.addLayout(layG_MSB_LSB_b)
         # layVButtonsQ_b.addLayout(layHCoeffs_MAX)
         layVButtonsQ_b.setContentsMargins(0, 0, 0, 0)
         # This frame encompasses all Quantization Settings

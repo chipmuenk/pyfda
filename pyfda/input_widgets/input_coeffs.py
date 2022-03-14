@@ -104,6 +104,10 @@ class ItemDelegate(QStyledItemDelegate):
         Afterwards, check whether an fixpoint overflow has occured and color item
         background accordingly.
         """
+        self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
+                     self.parent.ui.wdg_wq_coeffs_a.QObj]
+
+        # (Re-)establish reference to coefficient quantization objects
         if index.row() == 0 and index.column() == 1:  # a[0]: always 1
             option.text = "1"  # QString object
             option.font.setBold(True)
@@ -116,11 +120,11 @@ class ItemDelegate(QStyledItemDelegate):
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
             # test whether fixpoint conversion during displayText() created an overflow:
-            if self.parent.myQ_b.ovr_flag > 0:
+            if self.QObj[index.column()].ovr_flag > 0:
                 # Color item backgrounds with pos. Overflows red
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
-            elif self.parent.myQ_b.ovr_flag < 0:
+            elif self.QObj[index.column()].ovr_flag < 0:
                 # Color item backgrounds with neg. Overflows blue
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
@@ -144,12 +148,16 @@ class ItemDelegate(QStyledItemDelegate):
 #
 # ==============================================================================
 
-    def text(self, item):
+    def text(self, item, c=0):
         """
         Return item text as string transformed by self.displayText()
         """
         # return qstr(item.text()) # convert to "normal" string
-        return qstr(self.displayText(item.text(), QtCore.QLocale()))
+        logger.warning(f"text={item.text()}")
+        dtext = qstr(self.displayText(item.text(), QtCore.QLocale()))
+        logger.warning(f"dtext={dtext}")
+        #return qstr(self.displayText(item.text(), QtCore.QLocale()))
+        return dtext
 
     def displayText(self, text, locale):
         """
@@ -163,17 +171,22 @@ class ItemDelegate(QStyledItemDelegate):
         """
         data_str = qstr(text)  # convert to "normal" string
 
-        if self.parent.myQ_b.frmt == 'float':
+        # TODO: a coefficients a, b have a different quantization
+
+        if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             data = safe_eval(data_str, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif self.parent.myQ_b.frmt == 'dec' and self.parent.myQ_b.WF > 0:
+        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
+                and self.parent.ui.wdg_wq_coeffs_b.QObj.WF > 0:
             # decimal fixpoint representation with fractional part
-            return "{0:.{1}g}".format(self.parent.myQ_b.float2frmt(data_str),
-                                      params['FMT_ba'])
+            return "{0:.{1}g}".format(
+                self.parent.ui.wdg_wq_coeffs_b.QObj.float2frmt(data_str),
+                params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ_b.float2frmt(data_str),
-                                     self.parent.myQ_b.places)
+            return "{0:>{1}}".format(
+                self.parent.ui.wdg_wq_coeffs_b.QObj.float2frmt(data_str),
+                self.parent.ui.wdg_wq_coeffs_b.QObj.places)
 
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -212,15 +225,15 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data_str = qstr(safe_eval(self.parent.ba[index.column()][index.row()],
                                   return_type="auto"))
-
-        if self.parent.myQ_b.frmt == 'float':
+        if self.QObj[index.column()].frmt == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
             # fixpoint format with base:
             # pass requantized data with required number of places
-            editor.setText("{0:>{1}}".format(self.parent.myQ_b.float2frmt(data_str),
-                                             self.parent.myQ_b.places))
+            editor.setText(
+                "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
+                                  self.QObj[index.column()].places))
 
     def setModelData(self, editor, model, index):
         """
@@ -241,13 +254,13 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.parent.myQ_b.frmt == 'float':
+        if self.QObj[index.column()].frmt == 'float':
             data = safe_eval(qstr(editor.text()),
                              self.parent.ba[index.column()][index.row()],
                              return_type='auto')  # raw data without fixpoint formatting
         else:
-            data = self.parent.myQ_b.frmt2float(
-                qstr(editor.text()), self.parent.myQ_b.frmt)  # transform back to float
+            data = self.QObj[index.column()].frmt2float(
+                qstr(editor.text()), self.QObj[index.column()].frmt)  # transform to float
 
         model.setData(index, data)                          # store in QTableWidget
         # if data is complex, convert whole ba (list of arrays) to complex type
@@ -309,10 +322,10 @@ class Input_Coeffs(QWidget):
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
-            dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
-                logger.warning(f"{dict_sig['wdg_name']} - {dict_sig['ui']}")
-                self.emit({'view_changed': 'q_coeff'})
-                return
+                dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
+            logger.warning(f"{dict_sig['wdg_name']} - {dict_sig['ui']}")
+            self.emit({'view_changed': 'q_coeff'})
+            return
 
         elif self.isVisible():
             if self.data_changed or 'data_changed' in dict_sig:
@@ -361,8 +374,6 @@ class Input_Coeffs(QWidget):
 
         self.setLayout(layVMain)
 
-        self.myQ_b = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # initialize fixpoint object
-        self.myQ_a = fx.Fixed(fb.fil[0]['fxqc']['QCA'])
         # initialize + refresh table with default values from filter dict
         self.load_dict()
         # TODO: needs to be optimized - self._refresh is being called in both routines
@@ -397,13 +408,6 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmbFormat.currentIndexChanged.connect(self.ui2qdict)
-        self.ui.led_W_b.editingFinished.connect(self._W_changed)
-        
-        # self.ui.cmbQOvfl_b.currentIndexChanged.connect(self.ui2qdict)
-        # self.ui.cmbQuant_b.currentIndexChanged.connect(self.ui2qdict)
-        # self.ui.led_WF_b.editingFinished.connect(self.ui2qdict)
-        # self.ui.led_WI_b.editingFinished.connect(self.ui2qdict)
-        # self.ui.ledScale_b.editingFinished.connect(self._set_scale)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -445,34 +449,6 @@ class Input_Coeffs(QWidget):
         self._refresh_table()
 
     # --------------------------------------------------------------------------
-    def _W_changed(self):
-        """
-        Set fractional and integer length `WF` and `WI` when wordlength `W` has
-        been changed. Try to preserve `WI` or `WF` settings depending on the
-        number format (integer or fractional).
-        """
-        W_b = safe_eval(self.ui.led_W_b.text(), self.myQ_b.W, return_type='int',
-                        sign='pos')
-
-        if W_b < 2:
-            logger.warn("W must be > 1, restoring previous value.")
-            W_b = self.myQ_b.W  # fall back to previous value
-        self.ui.led_W_b.setText(str(W_b))
-
-        if qget_cmb_box(self.ui.cmb_q_frmt) == 'qint':  # integer format, preserve WI bits
-            WI = W_b - self.myQ_b.WF - 1
-            self.ui.led_WI_b.setText(str(WI))
-            self.ui.ledScale_b.setText(str(1 << (W_b - 1)))
-        else:  # fractional format, preserve WF bit setting
-            WF = W_b - self.myQ_b.WI - 1
-            if WF < 0:
-                self.ui.led_WI_b.setText(str(W_b - 1))
-                WF = 0
-            self.ui.led_WF_b.setText(str(WF))
-
-        self.ui2qdict()
-
-    # --------------------------------------------------------------------------
     def _set_scale(self):
         """
         Triggered by `ui.ledScale_b`
@@ -480,9 +456,9 @@ class Input_Coeffs(QWidget):
         and vice versa
         """
         # if self.ui.ledScale_b.isModified() ... self.ui.ledScale_b.setModified(False)
-        scale = safe_eval(
-            self.ui.ledScale_b.text(), self.myQ_b.scale, return_type='float', sign='pos')
-        self.ui.ledScale_b.setText(str(scale))
+#        scale = safe_eval(
+#            self.ui.ledScale_b.text(), self.myQ_b.scale, return_type='float', sign='pos')
+#        self.ui.ledScale_b.setText(str(scale))
         self.ui2qdict()
 
 # ------------------------------------------------------------------------------
@@ -526,8 +502,6 @@ class Input_Coeffs(QWidget):
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
         self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
-        self.ui.lbl_W_b.setVisible(not is_float)
-        self.ui.led_W_b.setVisible(not is_float)
 
         # hide all q-settings for float
         self.ui.frmQSettings_b.setVisible(not is_float)
@@ -678,48 +652,16 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
-    def _set_number_format(self, emit=True):
-        """
-        Triggered by `contruct_UI()`, `qdict2ui()`and `ui.cmbQFrmt.currentIndexChanged()`
-
-        Set one of three number formats: Integer, fractional, normalized fractional
-        (triggered by self.ui.cmb_q_frmt combobox)
-        """
-        qfrmt = qget_cmb_box(self.ui.cmb_q_frmt)
-
-        W_b = safe_eval(self.ui.led_W_b.text(), self.myQ_b.W, return_type='int',
-                        sign='pos')
-        self.ui.led_W_b.setEnabled(qfrmt in {'qint', 'qnfrac'})
-        W_a = int(fb.fil[0]['fxqc']['QCA']['W'])
-
-        if qfrmt == 'qint':
-            self.ui.wdg_wq_coeffs_a.dict2ui({'WI': W_a - 1, 'WF': 0})
-            self.ui.wdg_wq_coeffs_b.dict2ui({'WI': W_b - 1, 'WF': 0})
-        elif qfrmt == 'qnfrac':  # normalized fractional format
-            self.ui.wdg_wq_coeffs_a.dict2ui({'WI': 0, 'WF': W_a - 1})
-            self.ui.wdg_wq_coeffs_b.dict2ui({'WI': 0, 'WF': W_b - 1})
-        elif qfrmt == 'qfrac':
-            pass
-        elif qfrmt == 'q31':
-            self.ui.wdg_wq_coeffs_a.dict2ui({'WI': 0, 'WF': 31})
-            self.ui.wdg_wq_coeffs_b.dict2ui({'WI': 0, 'WF': 31})
-
-        # self.ui.ledScale_b.setText(str(1 << WI_b))
-        # self.ui.led_WI_b.setEnabled(en_WIWF)
-        # self.ui.lbl_dot_b.setEnabled(en_WIWF)
-        # self.ui.led_WF_b.setEnabled(en_WIWF)
-
-        # save UI to dict and to class attributes and fire `{'view_changed': 'q_coeff'}``
-        self.ui2qdict(emit)
-
     # --------------------------------------------------------------------------
     def _update_MSB_LSB(self):
         """
         Update the infos (LSB, MSB)
         """
-        self.ui.lblLSB_b.setText("{0:.{1}g}".format(self.myQ_b.LSB, params['FMT_ba']))
-        self.ui.lblMSB_b.setText("{0:.{1}g}".format(self.myQ_b.MSB, params['FMT_ba']))
+        # TODO: Wdg for a is missing
+        self.ui.lblLSB_b.setText(
+            f"{self.ui.wdg_wq_coeffs_b.QObj.LSB:.{params['FMT_ba']}g}")
+        self.ui.lblMSB_b.setText(
+            f"{self.ui.wdg_wq_coeffs_b.QObj.MSB:.{params['FMT_ba']}g}")
 
     # --------------------------------------------------------------------------
     def qdict2ui(self):
@@ -732,24 +674,14 @@ class Input_Coeffs(QWidget):
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
         """
-        # self.ui.led_WI_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['WI']))
-        # self.ui.led_WF_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['WF']))
-        self.ui.led_W_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['W']))
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
             qset_cmb_box(self.ui.cmb_q_frmt, 'qfrac', data=True)
 
-        # self.ui.ledScale_b.setText(qstr(fb.fil[0]['fxqc']['QCB']['scale']))
-        # qset_cmb_box(self.ui.cmbQuant_b, fb.fil[0]['fxqc']['QCB']['quant'])
-        # qset_cmb_box(self.ui.cmbQOvfl_b, fb.fil[0]['fxqc']['QCB']['ovfl'])
-
         # update quantizer objects and widgets
-        self.myQ_b.setQobj(fb.fil[0]['fxqc']['QCB'])
-        self.myQ_a.setQobj(fb.fil[0]['fxqc']['QCA'])
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
         # quant format has been changed, update display but don't fire signal
-        self._set_number_format(emit=False)
         self._update_MSB_LSB()
 
 # ------------------------------------------------------------------------------
@@ -770,30 +702,17 @@ class Input_Coeffs(QWidget):
         or 'qdict2ui()' via `_set_number_format()`
         """
         logger.warning("ui2qdict")
-        # fb.fil[0]['fxqc']['QCB'] = {
-        #         'WI': safe_eval(
-        #             self.ui.led_WI_b.text(), self.myQ_b.WI, return_type='int'),
-        #         'WF': safe_eval(
-        #             self.ui.led_WF_b.text(), self.myQ_b.WF, return_type='int',
-        #             sign='poszero'),
-        #         'W': safe_eval(
-        #             self.ui.led_W_b.text(), self.myQ_b.W, return_type='int', sign='pos'),
-        #         'quant': qstr(self.ui.cmbQuant_b.currentText()),
-        #         'ovfl': qstr(self.ui.cmbQOvfl_b.currentText()),
-        #         'frmt': qstr(self.ui.cmbFormat.currentText().lower()),
-        #         'scale': qstr(self.ui.ledScale_b.text())
-        #         }
 
         fb.fil[0]['fxqc']['QCB'].update(
-            {'frmt': qstr(self.ui.cmbFormat.currentText().lower())})
+            {'frmt': str(self.ui.cmbFormat.currentText().lower()),
+             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'frmt': qstr(self.ui.cmbFormat.currentText().lower())})
+            {'frmt': str(self.ui.cmbFormat.currentText().lower()),
+             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         # self.ui.wdg_wq_coeffs_a aself.ui.wdg_wq_coeffs_b update the quantization dicts
         # themselves
-
-        # update quantizers
-        self.myQ_a.setQobj(fb.fil[0]['fxqc']['QCA'])
-        self.myQ_b.setQobj(fb.fil[0]['fxqc']['QCB'])
+        self.ui.wdg_wq_coeffs_a.dict2ui()
+        self.ui.wdg_wq_coeffs_b.dict2ui()
 
         if emit:
             self.emit({'view_changed': 'q_coeff'})

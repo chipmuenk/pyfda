@@ -356,24 +356,53 @@ class FX_UI_WQ(QWidget):
             q_dict = self.q_dict
         else:
             for k in q_dict:
-                if k not in {'quant', 'ovfl', 'WI', 'WF'}:
-                    logger.mumpf(f"Unknown key '{k}'")
+                if k not in {'quant', 'ovfl', 'WI', 'WF', 'qfrmt'}:
+                    logger.warning(f"Unknown quantization key '{k}'")
+
+        if 'qfrmt' in q_dict:
+            err = False
+            qfrmt = q_dict['qfrmt']
+
+            if qfrmt == 'qint':  # integer format
+                self.q_dict.update({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0})
+            elif qfrmt == 'qnfrac':  # normalized fractional format
+                self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0})
+            elif qfrmt in {'qfrac', 'float'}:
+                pass
+            elif qfrmt == 'q31':
+                self.q_dict.update({'WI': 0, 'WF': 31})
+            else:
+                logger.warning(f"Unknown quantization format '{qfrmt}'")
+                err = True
+
+            if not err:
+                self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'})
+                self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'})
+                self.ledWF.setText(str(self.q_dict['WF']))
+                self.ledWI.setText(str(self.q_dict['WI']))
+                self.q_dict.update({'qfrmt': qfrmt})
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
+            self.q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
 
         if 'ovfl' in q_dict:
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
+            self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if 'WI' in q_dict:
             self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(qstr(self.WI))
+            self.ledWI.setText(str(self.WI))
+            self.q_dict.update({'WI': self.WI})
 
         if 'WF' in q_dict:
             self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(qstr(self.WF))
+            self.ledWF.setText(str(self.WF))
+            self.q_dict.update({'WF': self.WF})
 
         self.W = self.WF + self.WI + 1
+
+        self.QObj.setQobj(self.q_dict)
 
 
 # ==============================================================================
