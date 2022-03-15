@@ -180,15 +180,13 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
-                and self.parent.ui.wdg_wq_coeffs_b.QObj.WF > 0:
+                and self.QObj[0].WF > 0:
             # decimal fixpoint representation with fractional part
             return "{0:.{1}g}".format(
-                self.parent.ui.wdg_wq_coeffs_b.QObj.float2frmt(data_str),
-                params['FMT_ba'])
+                self.QObj[0].float2frmt(data_str), params['FMT_ba'])
         else:
             return "{0:>{1}}".format(
-                self.parent.ui.wdg_wq_coeffs_b.QObj.float2frmt(data_str),
-                self.parent.ui.wdg_wq_coeffs_b.QObj.places)
+                self.QObj[0].float2frmt(data_str), self.QObj[0].places)
 
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -306,6 +304,10 @@ class Input_Coeffs(QWidget):
         self.fx_specs_changed = True  # fixpoint specs have been changed outside
 
         self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
+
+        self.QObj = [self.ui.wdg_wq_coeffs_b.QObj,
+                     self.ui.wdg_wq_coeffs_a.QObj]
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -458,7 +460,7 @@ class Input_Coeffs(QWidget):
         """
         # if self.ui.ledScale_b.isModified() ... self.ui.ledScale_b.setModified(False)
 #        scale = safe_eval(
-#            self.ui.ledScale_b.text(), self.myQ_b.scale, return_type='float', sign='pos')
+#            self.ui.ledScale_b.text(), QObj[c].scale, return_type='float', sign='pos')
 #        self.ui.ledScale_b.setText(str(scale))
         self.ui2qdict()
 
@@ -595,7 +597,7 @@ class Input_Coeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ_b.frmt,
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].frmt,
                     title="Export Filter Coefficients")
 
     # --------------------------------------------------------------------------
@@ -613,8 +615,7 @@ class Input_Coeffs(QWidget):
             "importing data: dim - shape = {0} - {1} - {2}\n{3}"
             .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
-        conv = self.myQ_b.frmt2float  # frmt2float_vec?
-        frmt = self.myQ_b.frmt
+        frmt = self.QObj[0].frmt
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
@@ -630,17 +631,21 @@ class Input_Coeffs(QWidget):
         if orientation_horiz:
             self.ba = [[], []]
             for c in range(num_cols):
-                self.ba[0].append(conv(data_str[c][0], frmt))
+                self.ba[0].append(
+                    self.QObj[0].frmt2float(data_str[c][0], frmt))
                 if num_rows > 1:
-                    self.ba[1].append(conv(data_str[c][1], frmt))
+                    self.ba[1].append(
+                        self.QObj[1].frmt2float(data_str[c][1], frmt))
             if num_rows > 1:
                 self._filter_type(ftype='IIR')
             else:
                 self._filter_type(ftype='FIR')
         else:
-            self.ba[0] = [conv(s, frmt) for s in data_str[0]]
+            self.ba[0] =\
+                [self.QObj[0].frmt2float(s, frmt) for s in data_str[0]]
             if num_cols > 1:
-                self.ba[1] = [conv(s, frmt) for s in data_str[1]]
+                self.ba[1] =\
+                    [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
                 self._filter_type(ftype='IIR')
             else:
                 self.ba[1] = [1]
@@ -914,15 +919,14 @@ class Input_Coeffs(QWidget):
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g.         logger.warning(idx)
         if not idx:  # nothing selected, quantize all elements
-            self.ba[0] = self.myQ_b.fixp(self.ba, scaling='multdiv')[0]
+            # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
+            self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
             if fb.fil[0]['ft'] == "IIR":
-                self.ba[1] = self.myQ_a.fixp(self.ba, scaling='multdiv')[1]
+                self.ba[1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
         else:
-            # TODO?
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ_b.fixp(self.ba[i[0]][i[1]],
-                                                    scaling='multdiv')
-
+                self.ba[i[0]][i[1]] = self.QObj[i[0]].fixp(self.ba[i[0]][i[1]],
+                                                           scaling='multdiv')
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
