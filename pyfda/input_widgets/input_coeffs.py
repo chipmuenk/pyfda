@@ -66,6 +66,7 @@ class ItemDelegate(QStyledItemDelegate):
     a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
     Additionally, a signal is emitted with `'view_changed':'q_coeff'` by `ui2qdict()`?!
     """
+
     def __init__(self, parent):
         """
         Pass instance `parent` of parent class (Input_Coeffs)
@@ -137,7 +138,7 @@ class ItemDelegate(QStyledItemDelegate):
 #         option:  instance of QStyleOptionViewItemV4
 #         index:   instance of QModelIndex
 #         """
-#         logger.debug("Ovr_flag:".format(self.parent.myQ_b.ovr_flag))
+#         logger.debug("Ovr_flag:".format(self.parent.self.QObj[0].ovr_flag))
 #         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
 #             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
 #         # continue with the original `paint()` method
@@ -156,7 +157,7 @@ class ItemDelegate(QStyledItemDelegate):
         logger.warning(f"text={item.text()}")
         dtext = qstr(self.displayText(item.text(), QtCore.QLocale()))
         logger.warning(f"dtext={dtext}")
-        #return qstr(self.displayText(item.text(), QtCore.QLocale()))
+        # return qstr(self.displayText(item.text(), QtCore.QLocale()))
         return dtext
 
     def displayText(self, text, locale):
@@ -166,9 +167,10 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
 
-        The instance parameter myQ_b.ovr_flag is set to +1 or -1 for positive /
-        negative overflows, else it is 0.
+        The instance parameter `QObj[c].ovr_flag` is set to +1 or -1 for
+         positive / negative overflows, else it is 0.
         """
+        logger.warning("displayText!")
         data_str = qstr(text)  # convert to "normal" string
 
         # TODO: a coefficients a, b have a different quantization
