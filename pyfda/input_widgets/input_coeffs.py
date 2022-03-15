@@ -121,14 +121,20 @@ class ItemDelegate(QStyledItemDelegate):
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
             # test whether fixpoint conversion during displayText() created an overflow:
-            if self.QObj[index.column()].ovr_flag > 0:
-                # Color item backgrounds with pos. Overflows red
-                option.backgroundBrush = QBrush(Qt.SolidPattern)
-                option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
-            elif self.QObj[index.column()].ovr_flag < 0:
-                # Color item backgrounds with neg. Overflows blue
-                option.backgroundBrush = QBrush(Qt.SolidPattern)
-                option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
+            logger.error(
+                f"{index.column()}: {self.QObj[index.column()].ovr_flag}")
+            # logger.error(f"{type(option)}:{option}")
+            option.backgroundBrush = QBrush(Qt.SolidPattern)
+            option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
+
+            # if self.QObj[index.column()].ovr_flag > 0:
+            #     # Color item backgrounds with pos. Overflows red
+            #     option.backgroundBrush = QBrush(Qt.SolidPattern)
+            #     option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
+            # elif self.QObj[index.column()].ovr_flag < 0:
+            #     # Color item backgrounds with neg. Overflows blue
+            #     option.backgroundBrush = QBrush(Qt.SolidPattern)
+            #     option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
 
 # ==============================================================================
 #     def paint(self, painter, option, index):
