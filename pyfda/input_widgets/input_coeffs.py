@@ -924,18 +924,28 @@ class Input_Coeffs(QWidget):
         Quantize selected / all coefficients in self.ba and refresh QTableWidget
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
-        # returns e.g.         logger.warning(idx)
+        # returns e.g. [[0, 0], [0, 6]]      
+        logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
             # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
-            self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
-            if fb.fil[0]['ft'] == "IIR":
-                self.ba[1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
-        else:
-            for i in idx:
-                self.ba[i[0]][i[1]] = self.QObj[i[0]].fixp(self.ba[i[0]][i[1]],
-                                                           scaling='multdiv')
+            # self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
+            # if fb.fil[0]['ft'] == "IIR":
+            #     self.ba1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
+            idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
+        # else:
+        for i in idx:
+            self.ba[i[0]][i[1]] = self.QObj[i[0]].fixp(self.ba[i[0]][i[1]],
+                                                        scaling='multdiv')
+            self._refresh_table_item(i[1], i[0])  # row, col
+
+        #     # make a[0] selectable but not editable
+            if fb.fil[0]['ft'] == 'IIR':
+                item = self.tblCoeff.item(0, 1)
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        self.tblCoeff.blockSignals(False)
         qstyle_widget(self.ui.butSave, 'changed')
-        self._refresh_table()
+#         self._refresh_table()
 
 
 # ------------------------------------------------------------------------------
