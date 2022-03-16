@@ -107,6 +107,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
                      self.parent.ui.wdg_wq_coeffs_a.QObj]
 
+        logger.warning(f"index = {index.row()}")
         # (Re-)establish reference to coefficient quantization objects
         if index.row() == 0 and index.column() == 1:  # a[0]: always 1
             option.text = "1"  # QString object
