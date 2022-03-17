@@ -128,15 +128,16 @@ class ItemDelegate(QStyledItemDelegate):
             # option.backgroundBrush = QBrush(Qt.SolidPattern)
             # option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
-            if self.QObj[index.column()].ovr_flag > 0:
+            """
+            if self.parent.ba_q[index.column][index.row] > 0:
                 # Color item backgrounds with pos. Overflows red
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
-            elif self.QObj[index.column()].ovr_flag < 0:
+            elif self.parent.ba_q[index.column][index.row] < 0:
                 # Color item backgrounds with neg. Overflows blue
                 option.backgroundBrush = QBrush(Qt.SolidPattern)
                 option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
-
+            """
 # ==============================================================================
 #     def paint(self, painter, option, index):
 #
@@ -156,18 +157,19 @@ class ItemDelegate(QStyledItemDelegate):
 #
 # ==============================================================================
 
-    def text(self, item, c=0):
+    def text(self, item, idx=None):
         """
         Return item text as string transformed by self.displayText()
         """
         # return qstr(item.text()) # convert to "normal" string
         logger.warning(f"text={item.text()}")
-        dtext = qstr(self.displayText(item.text(), QtCore.QLocale()))
+
+        dtext = qstr(self.displayText(item.text(), QtCore.QLocale(), idx))
         logger.warning(f"dtext={dtext}")
         # return qstr(self.displayText(item.text(), QtCore.QLocale()))
         return dtext
 
-    def displayText(self, text, locale):
+    def displayText(self, text, locale, idx=None):
         """
         Display `text` with selected fixpoint base and number of places
 
@@ -181,7 +183,9 @@ class ItemDelegate(QStyledItemDelegate):
         data_str = qstr(text)  # convert to "normal" string
 
         # TODO: a coefficients a, b have a different quantization
-
+        # TODO: where does index info come from?
+        if not idx:
+            idx =(0, 0)
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             data = safe_eval(data_str, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
@@ -335,6 +339,8 @@ class Input_Coeffs(QWidget):
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
             logger.warning(f"{dict_sig['wdg_name']} - {dict_sig['ui']}")
+            self.quant_coeffs_view()
+            logger.warning(self.ba_q)
             self.emit({'view_changed': 'q_coeff'})
             return
 
@@ -387,6 +393,7 @@ class Input_Coeffs(QWidget):
 
         # initialize + refresh table with default values from filter dict
         self.load_dict()
+        self.quant_coeffs_view()
         # TODO: needs to be optimized - self._refresh is being called in both routines
 
         # ----------------------------------------------------------------------
@@ -425,6 +432,57 @@ class Input_Coeffs(QWidget):
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
+
+# ------------------------------------------------------------------------------
+    def quant_coeffs_view(self):
+        """
+        This method only influences the view on the coefficients, stored in 
+        `self.ba_q`, not the actual coefficients in `self.ba`!
+        
+        Quantize filter coefficients `self.ba` with separate quantizer objects
+        `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
+        and store them in the array `self.ba_q`. Overflow flags are stored in the 3rd
+        and 4th column.
+        
+        Refresh the table.
+        """
+        self.ba_q = [self.QObj[0].fixp(self.ba[0]), # scaling='multdiv' ?
+            self.QObj[1].fixp(self.ba[1]),
+            self.QObj[0].ovr_flag,
+            self.QObj[1].ovr_flag
+            ]
+        self._refresh_table()
+        
+# ------------------------------------------------------------------------------
+    def quant_coeffs(self):
+        """
+        Store selected / all quantized coefficients in self.ba and refresh table
+        """
+        idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
+        # returns e.g. [[0, 0], [0, 6]]      
+        logger.warning(f"\nindex = {idx}\n")
+        if not idx:  # nothing selected, quantize all elements
+            # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
+            # self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
+            # if fb.fil[0]['ft'] == "IIR":
+            #     self.ba1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
+            self.ba[0] = self.ba_q[0]
+            self.ba[1] = self.ba_q[1]
+            # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
+        else:
+            for i in idx:
+                self.ba[i[0]][i[1]] = self.ba_q[i[0]][i[1]]
+                
+                # self._refresh_table_item(i[1], i[0])  # row, col
+
+        #     # make a[0] selectable but not editable
+        if fb.fil[0]['ft'] == 'IIR':
+            item = self.tblCoeff.item(0, 1)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        self.tblCoeff.blockSignals(False)
+        qstyle_widget(self.ui.butSave, 'changed')
+#         self._refresh_table()
 
     # --------------------------------------------------------------------------
     def _filter_type(self, ftype=None):
@@ -816,12 +874,14 @@ class Input_Coeffs(QWidget):
 
         if not any(sel) and len(self.ba[0]) > 0:  # delete last row
             self.ba = np.delete(self.ba, -1, axis=1)
+            self.ba_q = np.delete(self.ba_q, -1, axis=1)
         elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
             # only complete rows selected or FIR -> delete row
             self.ba = np.delete(self.ba, sel[0], axis=1)
+            self.ba_q = np.delete(self.ba_q, sel[0], axis=1)
         else:
-            self.ba[0][sel[0]] = 0
-            self.ba[1][sel[1]] = 0
+            self.ba[0][sel[0]] = self.ba_q[0][sel[0]] = self.ba_q[2][sel[0]] = 0
+            self.ba[1][sel[1]] = self.ba_q[1][sel[1]] = self.ba_q[3][sel[1]] = 0
             # self.ba[0] = np.delete(self.ba[0], sel[0])
             # self.ba[1] = np.delete(self.ba[1], sel[1])
         # test and equalize if b and a array have different lengths:
@@ -891,11 +951,14 @@ class Input_Coeffs(QWidget):
         changed = False
 
         if not idx:  # nothing selected, check whole table
+            # When entry is close to zero (but not = 0), mark as "b_close"
+            # and set all marked entries and the corresponding overflow flags = 0
             b_close = np.logical_and(
                 np.isclose(self.ba[0], test_val, rtol=0, atol=self.ui.eps),
                 (self.ba[0] != targ_val))
             if np.any(b_close):  # found at least one coeff where condition was true
-                self.ba[0] = np.where(b_close, targ_val, self.ba[0])
+                self.ba[0] = self.ba_q[0] = self.ba_q[2]\
+                    = np.where(b_close, targ_val, self.ba[0])
                 changed = True
 
             if fb.fil[0]['ft'] == 'IIR':
@@ -903,7 +966,8 @@ class Input_Coeffs(QWidget):
                     np.isclose(self.ba[1], test_val, rtol=0, atol=self.ui.eps),
                     (self.ba[1] != targ_val))
                 if np.any(a_close):
-                    self.ba[1] = np.where(a_close, targ_val, self.ba[1])
+                    self.ba[1] = self.ba_q[1] = self.ba_q[3]\
+                        = np.where(a_close, targ_val, self.ba[1])
                     changed = True
 
         else:  # only check selected cells
@@ -911,41 +975,13 @@ class Input_Coeffs(QWidget):
                 if np.logical_and(
                     np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.ui.eps),
                         (self.ba[i[0]][i[1]] != targ_val)):
-                    self.ba[i[0]][i[1]] = targ_val
+                    self.ba[i[0]][i[1]] = self.ba_q[i[0]][i[1]]\
+                        = self.ba_q[i[0] + 2][i[1]] = targ_val
                     changed = True
         if changed:
             qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
 
         self._refresh_table()
-
-# ------------------------------------------------------------------------------
-    def quant_coeffs(self):
-        """
-        Quantize selected / all coefficients in self.ba and refresh QTableWidget
-        """
-        idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
-        # returns e.g. [[0, 0], [0, 6]]      
-        logger.warning(f"\nindex = {idx}\n")
-        if not idx:  # nothing selected, quantize all elements
-            # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
-            # self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
-            # if fb.fil[0]['ft'] == "IIR":
-            #     self.ba1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
-            idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
-        # else:
-        for i in idx:
-            self.ba[i[0]][i[1]] = self.QObj[i[0]].fixp(self.ba[i[0]][i[1]],
-                                                        scaling='multdiv')
-            self._refresh_table_item(i[1], i[0])  # row, col
-
-        #     # make a[0] selectable but not editable
-            if fb.fil[0]['ft'] == 'IIR':
-                item = self.tblCoeff.item(0, 1)
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-
-        self.tblCoeff.blockSignals(False)
-        qstyle_widget(self.ui.butSave, 'changed')
-#         self._refresh_table()
 
 
 # ------------------------------------------------------------------------------
