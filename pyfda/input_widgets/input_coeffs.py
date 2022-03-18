@@ -73,6 +73,9 @@ class ItemDelegate(QStyledItemDelegate):
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent  # instance of the parent (not the base) class
+        # reference quantization object of coefficient widgets
+        self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
+                     self.parent.ui.wdg_wq_coeffs_a.QObj]
 
 # ==============================================================================
 #     def paint(self, painter, option, index):
@@ -105,11 +108,7 @@ class ItemDelegate(QStyledItemDelegate):
         Afterwards, check whether an fixpoint overflow has occured and color item
         background accordingly.
         """
-        self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
-                     self.parent.ui.wdg_wq_coeffs_a.QObj]
 
-        logger.warning(f"index = {index.row()}")
-        # (Re-)establish reference to coefficient quantization objects
         if index.row() == 0 and index.column() == 1:  # a[0]: always 1
             option.text = "1"  # QString object
             option.font.setBold(True)
@@ -121,9 +120,6 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
-            # test whether fixpoint conversion during displayText() created an overflow:
-            logger.error(
-                f"col = {index.column()}: ovr = {self.QObj[index.column()].ovr_flag}")
 
 # ==============================================================================
 #     def paint(self, painter, option, index):
@@ -147,11 +143,13 @@ class ItemDelegate(QStyledItemDelegate):
     def text(self, item):
         """
         Return item text as string transformed by self.displayText()
+
+        Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
+        
+        TODO: Still needed?
         """
         # return qstr(item.text()) # convert to "normal" string
-        logger.warning(f"text={item.text()}")
-
-        dtext = qstr(self.displayText(item.text(), QtCore.QLocale()))
+        dtext = str(self.displayText(item.text(), QtCore.QLocale()))
         logger.warning(f"dtext={dtext}")
         return dtext
 
@@ -178,17 +176,6 @@ class ItemDelegate(QStyledItemDelegate):
 
         else:
             return data_str
-            # super(ItemDelegate, self).displayText(data_str, locale)
-
-    """         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
-                    and self.QObj[0].WF > 0:
-                # decimal fixpoint representation with fractional part
-                return "{0:.{1}g}".format(
-                    self.QObj[0].float2frmt(data_str), params['FMT_ba'])
-            else:
-                return "{0:>{1}}".format(
-                    self.QObj[0].float2frmt(data_str), self.QObj[0].places)
-    """
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -330,9 +317,8 @@ class Input_Coeffs(QWidget):
             self.ui._set_load_save_icons()
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
-            logger.warning(f"{dict_sig['wdg_name']} - {dict_sig['ui']}")
             self.refresh_table()
-            logger.warning(self.ba_q)
+            # logger.warning(self.ba_q)
             self.emit({'view_changed': 'q_coeff'})
             return
 
@@ -346,6 +332,7 @@ class Input_Coeffs(QWidget):
                 self.qdict2ui()
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view
+            # TODO: what is emitted when fixpoint formats are changed?
             if 'data_changed' in dict_sig:
                 self.data_changed = True
             elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
@@ -383,10 +370,8 @@ class Input_Coeffs(QWidget):
 
         self.setLayout(layVMain)
 
-        # initialize + refresh table with default values from filter dict
+        # initialize, quantize + refresh table with default values from filter dict
         self.load_dict()
-        self.refresh_table()
-        # TODO: needs to be optimized - self.refresh_table is being called in both routines
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -436,7 +421,6 @@ class Input_Coeffs(QWidget):
         and store them in the array `self.ba_q`. Overflow flags are stored in the 3rd
         and 4th column.
         """
-        logger.warning(params['FMT_ba'])
         len_b = len(self.ba[0])
         len_a = len(self.ba[1])
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
@@ -484,14 +468,11 @@ class Input_Coeffs(QWidget):
         """
         Store selected / all quantized coefficients in self.ba and refresh table
         """
+        # TODO: All selected / nothing selected makes a big difference
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
         logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
-            # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
-            # self.ba[0] = self.QObj[0].fixp(self.ba, scaling='multdiv')[0]
-            # if fb.fil[0]['ft'] == "IIR":
-            #     self.ba1] = self.QObj[1].fixp(self.ba, scaling='multdiv')[1]
             self.ba[0] = self.ba_q[0]
             self.ba[1] = self.ba_q[1]
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
@@ -504,6 +485,7 @@ class Input_Coeffs(QWidget):
             item = self.tblCoeff.item(0, 1)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
+        self.refresh_table()
         # self.tblCoeff.blockSignals(False)
         qstyle_widget(self.ui.butSave, 'changed')
 
@@ -550,12 +532,13 @@ class Input_Coeffs(QWidget):
 #        scale = safe_eval(
 #            self.ui.ledScale_b.text(), QObj[c].scale, return_type='float', sign='pos')
 #        self.ui.ledScale_b.setText(str(scale))
+# TODO: !
         self.ui2qdict()
 
 # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
         """
-        Refresh the table item with the index `row, col` from self.ba
+        Refresh the table item with the index `row, col` from `self.ba_q`
         """
         item = self.tblCoeff.item(row, col)
 
