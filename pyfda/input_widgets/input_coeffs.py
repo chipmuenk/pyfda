@@ -124,20 +124,7 @@ class ItemDelegate(QStyledItemDelegate):
             # test whether fixpoint conversion during displayText() created an overflow:
             logger.error(
                 f"col = {index.column()}: ovr = {self.QObj[index.column()].ovr_flag}")
-            # logger.error(f"{type(option)}:{option}")
-            # option.backgroundBrush = QBrush(Qt.SolidPattern)
-            # option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
-            """
-            if self.parent.ba_q[index.column][index.row] > 0:
-                # Color item backgrounds with pos. Overflows red
-                option.backgroundBrush = QBrush(Qt.SolidPattern)
-                option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
-            elif self.parent.ba_q[index.column][index.row] < 0:
-                # Color item backgrounds with neg. Overflows blue
-                option.backgroundBrush = QBrush(Qt.SolidPattern)
-                option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
-            """
 # ==============================================================================
 #     def paint(self, painter, option, index):
 #
@@ -157,19 +144,18 @@ class ItemDelegate(QStyledItemDelegate):
 #
 # ==============================================================================
 
-    def text(self, item, idx=None):
+    def text(self, item):
         """
         Return item text as string transformed by self.displayText()
         """
         # return qstr(item.text()) # convert to "normal" string
         logger.warning(f"text={item.text()}")
 
-        dtext = qstr(self.displayText(item.text(), QtCore.QLocale(), idx))
+        dtext = qstr(self.displayText(item.text(), QtCore.QLocale()))
         logger.warning(f"dtext={dtext}")
-        # return qstr(self.displayText(item.text(), QtCore.QLocale()))
         return dtext
 
-    def displayText(self, text, locale, idx=None):
+    def displayText(self, text, locale):
         """
         Display `text` with selected fixpoint base and number of places
 
@@ -182,10 +168,6 @@ class ItemDelegate(QStyledItemDelegate):
         logger.warning("displayText!")
         data_str = qstr(text)  # convert to "normal" string
 
-        # TODO: a coefficients a, b have a different quantization
-        # TODO: where does index info come from?
-        if not idx:
-            idx =(0, 0)
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             data = safe_eval(data_str, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
@@ -241,7 +223,7 @@ class ItemDelegate(QStyledItemDelegate):
             editor.setText(data_str)
         else:
             # fixpoint format with base:
-            # pass requantized data with required number of places
+            # pass requantized data with required number of decimal places
             editor.setText(
                 "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
                                   self.QObj[index.column()].places))
@@ -459,7 +441,7 @@ class Input_Coeffs(QWidget):
         Store selected / all quantized coefficients in self.ba and refresh table
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
-        # returns e.g. [[0, 0], [0, 6]]      
+        # returns e.g. [[0, 0], [0, 6]]
         logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
             # TODO: quantize *all* of ba (IIR) or only ba[0] (FIR)
@@ -472,8 +454,6 @@ class Input_Coeffs(QWidget):
         else:
             for i in idx:
                 self.ba[i[0]][i[1]] = self.ba_q[i[0]][i[1]]
-                
-                # self._refresh_table_item(i[1], i[0])  # row, col
 
         #     # make a[0] selectable but not editable
         if fb.fil[0]['ft'] == 'IIR':
@@ -668,7 +648,10 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def _copy_to_table(self):
         """
-        Read data from clipboard / file and copy it to `self.ba` as float / cmplx
+        Read data from clipboard / file and copy it to `self.ba` as float / cmplx.
+
+        Quantize data to `self.ba_q` and refresh table.
+
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
@@ -841,7 +824,8 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def _equalize_ba_length(self):
         """
-        test and equalize if b and a subarray have different lengths:
+        test and equalize if b and a subarray have different lengths and copy to
+        `self.ba_q`:
         """
         try:
             a_len = len(self.ba[1])
@@ -868,7 +852,7 @@ class Input_Coeffs(QWidget):
         - equalizing the lengths of b and a array by appending the required
           number of zeros.
         When nothing is selected, delete the last row.
-        Finally, the QTableWidget is refreshed from self.ba.
+        Finally, refresh the table
         """
         sel = qget_selected(self.tblCoeff)['sel']  # get indices of all selected cells
 
