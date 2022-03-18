@@ -228,7 +228,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
                 for r in sel[0]:
                     item = table.item(r, 0)
                     if item and item.text() != "":
-                        text += table.itemDelegate().text(item, c=0).lstrip(" ") + delim
+                        text += table.itemDelegate().text(item).lstrip(" ") + delim
                 text = text.rstrip(delim)  # remove last tab delimiter again
 
             if sel[1]:  # returns False for []
@@ -238,7 +238,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
                 for r in sel[1]:
                     item = table.item(r, 1)
                     if item and item.text() != "":
-                        text += table.itemDelegate().text(item, c=1) + delim
+                        text += table.itemDelegate().text(item) + delim
                 text = text.rstrip(delim)  # remove last tab delimiter again
         else:  # vertical orientation, one or two columns
             sel_c = []
@@ -259,7 +259,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
                         item = table.item(r, c)
                         # print(c,r)
                         if item and item.text() != "":
-                            text += table.itemDelegate().text(item, c=c).lstrip(" ") + delim
+                            text += table.itemDelegate().text(item).lstrip(" ") + delim
                 text = text.rstrip(delim) + cr
             text.rstrip(cr)
 
