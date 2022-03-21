@@ -145,7 +145,7 @@ class ItemDelegate(QStyledItemDelegate):
         Return item text as string transformed by self.displayText()
 
         Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
-        
+
         TODO: Still needed?
         """
         # return qstr(item.text()) # convert to "normal" string
@@ -164,18 +164,16 @@ class ItemDelegate(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
         logger.warning("displayText!")
-        data_str = qstr(text)  # convert to "normal" string
 
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
-            data = safe_eval(data_str, return_type='auto')  # convert to float
+            data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
-            return "{0:>{1}}".format(
-                    data_str, self.QObj[0].places)
+        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
+            return "{0:>{1}}".format(text, self.QObj[0].places)
 
         else:
-            return data_str
+            return text
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -227,7 +225,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         When editor has finished, read the updated data from the editor,
         convert it back to floating point format and store it in both the model
-        (= QTableWidget) and in self.ba. Finally, refresh the table item to
+        (= QTableWidget) and in self.ba_q. Finally, refresh the table item to
         display it in the selected format (via `float2frmt()`).
 
         editor: instance of e.g. QLineEdit
@@ -250,12 +248,12 @@ class ItemDelegate(QStyledItemDelegate):
             data = self.QObj[index.column()].frmt2float(
                 qstr(editor.text()), self.QObj[index.column()].frmt)  # transform to float
 
-        model.setData(index, data)                          # store in QTableWidget
+        # model.setData(index, data)                          # store in QTableWidget
         # if data is complex, convert whole ba (list of arrays) to complex type
         if isinstance(data, complex):
             self.parent.ba = self.parent.ba.astype(complex)
         # store new data in self.ba and ba_q
-        self.parent.ba[index.column()][index.row()]\
+        self.parent.ba_q[index.column()][index.row()]\
             = self.parent.ba[index.column()][index.row()] = data
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
