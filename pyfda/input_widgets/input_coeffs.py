@@ -145,7 +145,7 @@ class ItemDelegate(QStyledItemDelegate):
         Return item text as string transformed by self.displayText()
 
         Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
-        
+
         TODO: Still needed?
         """
         # return qstr(item.text()) # convert to "normal" string
