@@ -575,6 +575,7 @@ class Input_Coeffs(QWidget):
 
         Called at the end of nearly every method.
         """
+        logger.error("refresh table")
         params['FMT_ba'] = int(self.ui.spnDigits.text())
         self.quant_coeffs_view()  # quantize coefficients for display
         if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
@@ -620,8 +621,9 @@ class Input_Coeffs(QWidget):
             # Create strings for index column (vertical header), starting with "0"
             idx_str = [str(n) for n in range(self.num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
-
+            #----------------------------------
             self.tblCoeff.blockSignals(True)
+
             for col in range(self.num_cols):
                 for row in range(self.num_rows):
                     self._refresh_table_item(row, col)
@@ -633,7 +635,7 @@ class Input_Coeffs(QWidget):
                 item.setFont(self.ui.bfont)
 
             self.tblCoeff.blockSignals(False)
-
+            #----------------------------------
             self.tblCoeff.resizeColumnsToContents()
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
