@@ -225,7 +225,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         When editor has finished, read the updated data from the editor,
         convert it back to floating point format and store it in both the model
-        (= QTableWidget) and in self.ba. Finally, refresh the table item to
+        (= QTableWidget) and in self.ba_q. Finally, refresh the table item to
         display it in the selected format (via `float2frmt()`).
 
         editor: instance of e.g. QLineEdit
@@ -248,12 +248,12 @@ class ItemDelegate(QStyledItemDelegate):
             data = self.QObj[index.column()].frmt2float(
                 qstr(editor.text()), self.QObj[index.column()].frmt)  # transform to float
 
-        model.setData(index, data)                          # store in QTableWidget
+        # model.setData(index, data)                          # store in QTableWidget
         # if data is complex, convert whole ba (list of arrays) to complex type
         if isinstance(data, complex):
             self.parent.ba = self.parent.ba.astype(complex)
         # store new data in self.ba and ba_q
-        self.parent.ba[index.column()][index.row()]\
+        self.parent.ba_q[index.column()][index.row()]\
             = self.parent.ba[index.column()][index.row()] = data
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
