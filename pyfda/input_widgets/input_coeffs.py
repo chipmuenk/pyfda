@@ -164,18 +164,16 @@ class ItemDelegate(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
         logger.warning("displayText!")
-        data_str = qstr(text)  # convert to "normal" string
 
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
-            data = safe_eval(data_str, return_type='auto')  # convert to float
+            data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
-            return "{0:>{1}}".format(
-                    data_str, self.QObj[0].places)
+        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
+            return "{0:>{1}}".format(text, self.QObj[0].places)
 
         else:
-            return data_str
+            return text
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
