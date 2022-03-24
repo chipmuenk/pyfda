@@ -250,7 +250,6 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
         self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
-
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
@@ -362,12 +361,17 @@ class FX_UI_WQ(QWidget):
 
             if qfrmt == 'qint':  # integer format
                 self.q_dict.update({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0})
+                self.QObj.setQobj({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0,
+                                   'scale': 1 << (self.q_dict['WI'] + self.q_dict['WF'])})
             elif qfrmt == 'qnfrac':  # normalized fractional format
                 self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0})
+                self.QObj.setQobj({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0,
+                                   'scale': 1})
             elif qfrmt in {'qfrac', 'float'}:
-                pass
+                self.QObj.setQobj({'scale': 1})
             elif qfrmt == 'q31':
                 self.q_dict.update({'WI': 0, 'WF': 31})
+                self.QObj.setQobj({'WI':0, 'WF': 31, 'scale': 1})
             else:
                 logger.warning(f"Unknown quantization format '{qfrmt}'")
                 err = True
