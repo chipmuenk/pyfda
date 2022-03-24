@@ -486,6 +486,7 @@ class Fixed(object):
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
+        self.qfrmt = str(q_obj['qfrmt']).lower()
 
         q_obj['W'] = int(self.WF + self.WI + 1)
         self.W     = q_obj['W']
@@ -495,15 +496,16 @@ class Fixed(object):
         try:
             self.scale = np.float64(q_obj['scale'])
         except ValueError:
-            if q_obj['scale'] == 'int':
-                self.scale = 1 << self.WF
-            elif q_obj['scale'] == 'norm':
-                self.scale = 2.**(-self.WI)
-            else:
-                raise ValueError
+            # if q_obj['scale'] == 'int':
+            #     self.scale = 1 << self.WF
+            # elif q_obj['scale'] == 'norm':
+            #     self.scale = 2.**(-self.WI)
+            # else:
+            raise ValueError
 
         self.q_obj = q_obj  # store quant. dict in instance
 
+        # calculate and set some useful class attributes
         self.LSB = 2. ** -self.WF  # value of LSB
         self.MSB = 2. ** (self.WI - 1)   # value of MSB
 
