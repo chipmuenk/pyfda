@@ -421,6 +421,7 @@ class Input_Coeffs(QWidget):
         """
         len_b = len(self.ba[0])
         len_a = len(self.ba[1])
+        logger.warning(f"scale = {self.QObj[0].scale}, {self.QObj[1].scale} ")
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             # data = safe_eval(data_str, return_type='auto')  # convert to float
             # return "{0:.{1}g}".format(data, params['FMT_ba'])
