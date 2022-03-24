@@ -203,15 +203,13 @@ class FX_UI_WQ(QWidget):
         layH_W.addWidget(self.ledWI)
         layH_W.addWidget(lblDot)
         layH_W.addWidget(self.ledWF)
-        layH_W.addWidget(self.cmbW)
         layH_W.addWidget(self.butLock)
         layH_W.setContentsMargins(0, 0, 0, 0)
-        
-        layH_Q = QHBoxLayout()
 
         layG = QGridLayout()
         layG.addWidget(lbl_wdg, 0, 0)
         layG.addLayout(layH_W, 0, 2)
+        layG.addWidget(self.cmbW, 0, 3)
         # lay_W.addStretch()
         # layG.addWidget(lblOvfl, 1, 1)
         layG.addLayout(lay_H_stretch, 1, 1)
@@ -357,7 +355,7 @@ class FX_UI_WQ(QWidget):
         else:
             for k in q_dict:
                 if k not in {'quant', 'ovfl', 'WI', 'WF', 'qfrmt'}:
-                    logger.warning(f"Unknown quantization key '{k}'")
+                    logger.warning(f"Unknown quantization option '{k}'")
 
         if 'qfrmt' in q_dict:
             err = False
