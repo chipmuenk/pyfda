@@ -258,7 +258,7 @@ class FX_UI_WQ(QWidget):
         self.butLock.clicked.connect(self.butLock_clicked)
 
     # --------------------------------------------------------------------------
-    def quant_coeffs(self, coeffs: iterable, to_int: bool = False) -> list:
+    def quant_coeffs(self, coeffs: iterable) -> list:
         """
         Quantize the coefficients, scale and convert them to a list of integers,
         using the quantization settings of `self.q_dict`.
@@ -283,10 +283,9 @@ class FX_UI_WQ(QWidget):
         # quantize floating point coefficients with the selected scale (WI.WF),
         # next convert array float  -> array of fixp
         #                           -> list of int (scaled by 2^WF) when `to_int == True`
-        if to_int:
-            return list(self.QObj.float2frmt(coeffs) * (1 << self.QObj.WF))
-        else:
-            return list(self.QObj.fixp(coeffs))
+        if self.QObj.qfrmt == 'int':
+            self.QObj.scale = 1 << self.QObj.WF
+        return list(self.QObj.fixp(coeffs))
     # --------------------------------------------------------------------------
 
     def butLock_clicked(self, clicked):
