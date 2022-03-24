@@ -32,14 +32,14 @@ class FX_UI_WQ(QWidget):
     """
     Widget for selecting quantization / overflow options.
 
-    The constructor accepts a reference to the global quantization dictionary `q_dict`.
-    This widget modifies values for the following keys:
+    A reference to a quantization dictionary `q_dict` is passed to the constructor.
+    This widget allows the user to modify the values for the following keys:
 
-    - `quant`
-    - `ovfl`
-    - `WI`
-    - `WF`
-    - `scale`
+    - `quant`   : quantization behaviour
+    - `ovfl`    : overflow behaviour
+    - `WI`      : number of integer bits
+    - `WF`      : number of fractional bits
+    - `scale`   : scaling factor between real world value and integer representation
 
     These quantization settings are also stored in the corresponding attributes
     `self.quant` etc.
