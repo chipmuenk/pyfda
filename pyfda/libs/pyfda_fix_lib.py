@@ -432,6 +432,9 @@ class Fixed(object):
         """
         Initialize Fixed object with dict q_obj
         """
+        # define default keys and values for quantizaion dict
+        self.q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
+                              'frmt': 'float', 'qfrmt': 'qfrac', 'scale': 1}
         # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
         self.resetN()  # initialize overflow-counter
@@ -449,13 +452,10 @@ class Fixed(object):
         """
         Use passed quantization dict `q_obj` to update the instance quantization
         dict `self.q_obj` resp. create it if it doesn't using default data
-        `q_obj_default` for missing keys:value pairs.
+        `self.q_obj_default` for missing keys:value pairs.
 
         Check the docstring of class `Fixed()` for  details.
         """
-        q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
-                         'frmt': 'float', 'qfrmt': 'qfrac', 'scale': 1}
-
         for key in q_obj.keys():
             if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'qfrmt',
                            'scale']:
@@ -473,12 +473,12 @@ class Fixed(object):
 
         # missing key-value pairs are either taken from default dict or from
         # instance attributes
-        for k in q_obj_default.keys():  # loop over all defined keys
+        for k in self.q_obj_default.keys():  # loop over all defined keys
             if k not in q_obj.keys():  # key is not in passed dict, get k:v pair from ...
                 if hasattr(self, k):
                     q_obj[k] = getattr(self, k)  # ... class attribute
                 else:
-                    q_obj[k] = q_obj_default[k]  # ... default dict
+                    q_obj[k] = self.q_obj_default[k]  # ... default dict
 
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
@@ -531,6 +531,14 @@ class Fixed(object):
             raise Exception(u'Unknown number format "{0:s}"!'.format(self.frmt))
 
         self.ovr_flag = 0  # initialize to allow reading when freshly initialized
+
+    def get_Qobj(self):
+        """
+        Return quantization dict `q_obj`.
+
+        Check the docstring of class `Fixed()` for  details.
+        """
+        pass
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
