@@ -1,8 +1,9 @@
 ## Changelog
-### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-xx-2xx)
+### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-03-28)
 
 ### Bug fixes
 - Fix crash with matplotlib 3.1 due to missing Axes3D import
+- Fix crash with scipy 1.8.0 by providing local copy of `validate_sos()` (#214)
 
 ### New features
 - Keyboard modifier `<ALT>` hides the plot title when saving a
