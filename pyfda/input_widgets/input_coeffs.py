@@ -316,7 +316,6 @@ class Input_Coeffs(QWidget):
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
             self.refresh_table()
-            # logger.warning(self.ba_q)
             self.emit({'view_changed': 'q_coeff'})
             return
 
@@ -416,8 +415,11 @@ class Input_Coeffs(QWidget):
 
         Quantize filter coefficients `self.ba` with separate quantizer objects
         `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
-        and store them in the array `self.ba_q`. Overflow flags are stored in the 3rd
-        and 4th column.
+        and store them in the array `self.ba_q`. Depending on the number base
+        (float, dec, hex, ...) this can be of type float or string.
+
+        Overflow flags are stored in the 3rdand 4th column of  `self.ba_q` as 0
+        or +/- 1..
         """
         len_b = len(self.ba[0])
         len_a = len(self.ba[1])
@@ -465,7 +467,8 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Store selected / all quantized coefficients in self.ba and refresh table
+        Store selected / all quantized coefficients in self.ba, reset overflow
+        flags and refresh table
         """
         # TODO: All selected / nothing selected makes a big difference
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
@@ -622,7 +625,7 @@ class Input_Coeffs(QWidget):
             # Create strings for index column (vertical header), starting with "0"
             idx_str = [str(n) for n in range(self.num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
-            #----------------------------------
+            # ----------------------------------
             self.tblCoeff.blockSignals(True)
 
             for col in range(self.num_cols):
@@ -636,7 +639,7 @@ class Input_Coeffs(QWidget):
                 item.setFont(self.ui.bfont)
 
             self.tblCoeff.blockSignals(False)
-            #----------------------------------
+            # ---------------------------------
             self.tblCoeff.resizeColumnsToContents()
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
@@ -895,7 +898,7 @@ class Input_Coeffs(QWidget):
         """
         sel = qget_selected(self.tblCoeff)['sel']  # get indices of all selected cells
 
-        if not any(sel) and len(self.ba[0]) > 0:  # delete last row
+        if not any(sel) and len(self.ba[0]) > 0:  # nothing selected, delete last row
             self.ba = np.delete(self.ba, -1, axis=1)
         elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
             # only complete rows selected or FIR -> delete row
