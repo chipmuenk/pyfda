@@ -447,6 +447,7 @@ class Fixed(object):
                 'dec': r'[^0-9|.|,|\-]',
                 'hex': r'[^0-9A-Fa-f|.|,|\-]'
                         }
+        self.frmt2float_vec = np.vectorize(self.frmt2float_scalar, excluded='self')
 
     def setQobj(self, q_obj):
         """
@@ -772,8 +773,8 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
         """
-        Return floating point representation for fixpoint scalar `y` given in
-        format `frmt`.
+        Return floating point representation for fixpoint `y` (scalar or array)
+        given in format `frmt`.
 
         When input format is float, return unchanged.
 
@@ -789,8 +790,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or string
-            to be quantized with the numeric base specified by `frmt`.
+        y: scalar or string or array of scalars or strings in number format 'frmt'
 
         frmt: string (optional)
             any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
@@ -798,18 +798,27 @@ class Fixed(object):
 
         Returns
         -------
-        quantized floating point (`dtype=np.float64`) representation of input string
+        Quantized floating point (`dtype=np.float64`) representation of input string
+        of same shape as `y`.
         """
-        if y == "":
-            return 0
 
+        # ----------------------------------------------------------------------
+        if frmt is None:
+            frmt = self.frmt
+        frmt = frmt.lower()
+
+        if y is None:
+            return 0
+        elif np.isscalar(y):
+            if not y:
+                return 0
+            else:
+                if np.all((y == "")):
+                    return np.zeros_like(y)
         if isinstance(y, np.str_):
             # logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
             y = str(y)
 
-        if frmt is None:
-            frmt = self.frmt
-        frmt = frmt.lower()
         y_float = y_dec = None
 
         if frmt == 'float32':
@@ -832,31 +841,41 @@ class Fixed(object):
                                    f'of type "{type(y).__name__}" to float or complex.')
             return y_float
 
-        else:  # {'dec', 'bin', 'hex', 'csd'}
-            # Find the number of places before the first radix point (if there is one)
-            # and join integer and fractional parts
-            # when returned string is empty, skip general conversions and rely on
-            # error handling of individual routines
-            # remove illegal characters and trailing zeros
-            val_str = re.sub(self.FRMT_REGEX[frmt], r'', qstr(y)).lstrip('0')
-            if len(val_str) > 0:
-                val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
-                if val_str[0] == '.':  # prepend '0' when the number starts with '.'
-                    val_str = '0' + val_str
+        elif np.isscalar(y):
+            return self.frmt2float_scalar(y, frmt=frmt)
+        else:
+            return self.frmt2float_vec(y, frmt=frmt)
 
-                # count number of fractional places in string
-                try:
-                    # split into integer and fractional places
-                    _, frc_str = val_str.split('.')
-                    frc_places = len(frc_str)
-                except ValueError:  # no fractional part
-                    frc_places = 0
+    # --------------------------------------------------------------------------
+    def frmt2float_scalar(self, y, frmt=None):
+        """
+        Convert the formats 'dec', 'bin', 'hex', 'csd' to float
 
-                raw_str = val_str.replace('.', '')  # join integer and fractional part
+        Find the number of places before the first radix point (if there is one)
+        and join integer and fractional parts
+        when returned string is empty, skip general conversions and rely on
+        error handling of individual routines,
+        remove illegal characters and trailing zeros
+        """
+        val_str = re.sub(self.FRMT_REGEX[frmt], r'', qstr(y)).lstrip('0')
+        if len(val_str) > 0:
+            val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
+            if val_str[0] == '.':  # prepend '0' when the number starts with '.'
+                val_str = '0' + val_str
 
-                # logger.debug(f"y={y}, val_str={val_str}, raw_str={raw_str}")
-            else:
-                return 0.0
+            # count number of fractional places in string
+            try:
+                # split into integer and fractional places
+                _, frc_str = val_str.split('.')
+                frc_places = len(frc_str)
+            except ValueError:  # no fractional part
+                frc_places = 0
+
+            raw_str = val_str.replace('.', '')  # join integer and fractional part
+
+            # logger.debug(f"y={y}, val_str={val_str}, raw_str={raw_str}")
+        else:
+            return 0.0
 
         # (1) calculate the decimal value of the input string using np.float64()
         #     which takes the number of decimal places into account.
