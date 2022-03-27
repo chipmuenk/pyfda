@@ -162,6 +162,24 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
 
 
 # ------------------------------------------------------------------------------
+def validate_sos(sos):
+    """
+    Helper to validate a SOS input
+
+    Copied from `scipy.signal._filter_design._validate_sos()`
+    """
+    sos = np.atleast_2d(sos)
+    if sos.ndim != 2:
+        raise ValueError('sos array must be 2D')
+    n_sections, m = sos.shape
+    if m != 6:
+        raise ValueError('sos array must be shape (n_sections, 6)')
+    if not (sos[:, 3] == 1).all():
+        raise ValueError('sos[:, 3] should be all ones')
+    return sos, n_sections
+
+
+# ------------------------------------------------------------------------------
 def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True,
                 fs=2.*pi, sos=False, alg="scipy", n_eps=100):
     """
@@ -705,7 +723,7 @@ def sos_group_delayz(sos, w, plot=None, fs=2*np.pi):
     gd : ndarray
         The group delay in seconds.
     """
-    sos, n_sections = sig.filter_design._validate_sos(sos)
+    sos, n_sections = validate_sos(sos)
     if n_sections == 0:
         raise ValueError('Cannot compute group delay with no sections')
     gd = 0
