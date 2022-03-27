@@ -241,20 +241,22 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.QObj[index.column()].frmt == 'float':
-            data = safe_eval(qstr(editor.text()),
-                             self.parent.ba[index.column()][index.row()],
-                             return_type='auto')  # raw data without fixpoint formatting
+            data = safe_eval(
+                qstr(editor.text()), self.parent.ba[index.column()][index.row()],
+                return_type='auto')  # raw data without fixpoint formatting
+            data_q = data  # TODO: complex data
         else:
             data = self.QObj[index.column()].frmt2float(
                 qstr(editor.text()), self.QObj[index.column()].frmt)  # transform to float
+            data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
         # if data is complex, convert whole ba (list of arrays) to complex type
         if isinstance(data, complex):
-            self.parent.ba = self.parent.ba.astype(complex)
+            self.parent.ba[index.column()] = self.parent.ba[index.column()].astype(complex)
         # store new data in self.ba and ba_q
-        self.parent.ba_q[index.column()][index.row()]\
-            = self.parent.ba[index.column()][index.row()] = data
+        self.parent.ba[index.column()][index.row()] = data
+        self.parent.ba_q[index.column()][index.row()] = data_q
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
 
@@ -421,8 +423,14 @@ class Input_Coeffs(QWidget):
         Overflow flags are stored in the 3rdand 4th column of  `self.ba_q` as 0
         or +/- 1..
         """
-        len_b = len(self.ba[0])
-        len_a = len(self.ba[1])
+        if np.isscalar(self.ba[0]):
+            len_b = 1
+        else:
+            len_b = len(self.ba[0])
+        if np.isscalar(self.ba[1]):
+            len_a = 1
+        else:
+            len_a = len(self.ba[1])
         logger.warning(f"scale = {self.QObj[0].scale}, {self.QObj[1].scale} ")
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             # data = safe_eval(data_str, return_type='auto')  # convert to float
@@ -475,13 +483,15 @@ class Input_Coeffs(QWidget):
         # returns e.g. [[0, 0], [0, 6]]
         logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
-            self.ba[0] = self.ba_q[0]
-            self.ba[1] = self.ba_q[1]
+            self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
+            self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
+            self.ba_q[2] = np.zeros(len(self.ba_q[2]))
+            self.ba_q[3] = np.zeros(len(self.ba_q[3]))
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.ba_q[i[0]][i[1]]
-
+                self.ba[i[0]][i[1]] = self.QObj[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
+                self.ba_q[i[0] + 2][i[1]] = 0
         #     # make a[0] selectable but not editable
         if fb.fil[0]['ft'] == 'IIR':
             item = self.tblCoeff.item(0, 1)
