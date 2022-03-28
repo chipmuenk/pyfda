@@ -183,18 +183,22 @@ The first steps are described in ["Building your first Flatpak"](https://docs.fl
 <https://docs.flatpak.org/en/latest/python.html> w.r.t. python.
     
 Next, you need a manifest file `org.flatpak.pyfda.json` or `...yaml` with information 
-and build instructions for the app. This file also contains the dependencies which 
+and build instructions for the app. 
+
+This file also contains the dependencies which 
 can be collected for pip / PyPI projects with the python helper file
 `flatpak-pip-generator` from <https://github.com/flatpak/flatpak-builder-tools/tree/master/pip> 
 by running
 
     > python flatpak-pip-generator pyfda 
+	
+generating the file `python3-pyfda.json`
     
 You can also get the dependencies from pip's `requirements.txt`:
 
     > python flatpak-pip-generator --requirements-file=requirements.txt
     
-The created file `python3-pyfda.json` resp. `python3-requirements.json` has to 
+The created file `python3-pyfda.json` or `python3-requirements.json` has to 
 be included in the manifest (JSON or YaML) file as
 
     "modules": [
