@@ -112,21 +112,20 @@ If you can provide a MacOS executable, please help, for building instructions se
 
 Under Linux, flatpak installation should be preferred (currently working on that).
 
-### flatpak
-[flatpak](https://www.flatpak.org/) was developed to build and distribute apps for
-all Linux desktop distributions. flatpak provides containers which also contain 
-runtime libraries to be independent of individual Linux distributions. 
+### Flatpak
+"[Flatpak](https://flatpak.org/) is a framework for distributing desktop applications across various Linux distributions." 
+Flatpak provides containers which also contain runtime libraries to be independent of individual Linux distributions. 
 
-In contrast to snap, flatpak is a community based project encouraging multiple servers
-for distributing the flatpaks. The most popular is <https://flathub.org/>, a situation
+In contrast to snap, Flatpak is a community based project encouraging multiple servers
+for distributing the Flatpaks. The most popular is <https://flathub.org/>, a situation
 similar to git and GitHub.
 
-Some Linux distributions (like Mint) include flatpak, otherwise you need to install flatpak (see
+Some Linux distributions (like Mint) include Flatpak, otherwise you need to install flatpak (see
 <https://flatpak.org/setup/>), e.g. for Ubuntu
 
     > sudo apt install flatpak
     
-Once flatpak is installed, you should add the Flathub repo with
+Once Flatpak is installed, you should add the Flathub repo with
 
     > flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     
@@ -147,9 +146,10 @@ Local installation:
 Pip packages (source only) are created using the `setuptools` flow:
 
     > python setup.py clean
-    > python setup.py sdist
+    > python setup.py bdist_wheel sdist
     
-which creates a `dist` directory containing a `pyfda-<VERSION>.tar.gz` archive.
+which creates a `dist` directory containing a python wheel `pyfda-<VERSION>.whl` and the source archive `pyfda-<VERSION>.tar.gz`. 
+Creating a source archive (and hence the `sdist` option) is optional, wheels are the standard format for distributing python modules.
 
 Non-python files to be included in the package have to be declared in 
 `MANIFEST.in`, see 
@@ -158,12 +158,13 @@ Non-python files to be included in the package have to be declared in
 Beware of an [old bug](https://github.com/pypa/setuptools/issues/436) where updates
 to the `MANIFEST.in` file are ignored.
 
-As a workaround, delete the directory after each change to the file structure or MANIFEST.in, the directory `pyfda.egg-info` containing `SOURCES.txt`. It seems
-this file is not updated if it exists.
+As a workaround, delete the directory `pyfda.egg-info` containing `SOURCES.txt` after each change to the file structure or `MANIFEST.in`. It seems
+that an existing file `SOURCES.txt` is not updated.
 
-This package is uploaded to <https://pypi.org/project/pyfda/> using twine by
+Check the integrity of this package and upload it to <https://pypi.org/project/pyfda/> using twine by
 
-    > twine upload dist/*
+	> twine check dist/*
+    > twine upload dist/pyfda-<VERSION>-py3-none-any.whl
 
 
 ### pyInstaller
@@ -172,18 +173,14 @@ in the directory `ressource`. Hopefully, this works out of the box across operat
 systems with
 
     > pyinstaller pyfdax.spec
-    
-Pyinstaller 4.0 does not support matplotlib 3.3 yet, the generated binaries fail 
-with "RuntimeError: Could not find the matplotlib data files" when executed.
 
-### flatpak
-The basic build process is described in 
-["Building your first Flatpak"](https://docs.flatpak.org/en/latest/first-build.html) and
-<https://docs.flatpak.org/en/latest/python.html> w.r.t. python.
-
-In addition to flatpak itself, you need to install `flatpak-builder` with
+### Flatpak
+It is only possible to build flatpaks under Linux. In addition to Flatpak itself, you need to install `flatpak-builder` to build your own flatpaks:
 
     > sudo apt install flatpak-builder
+
+The first steps are described in ["Building your first Flatpak"](https://docs.flatpak.org/en/latest/first-build.html) and
+<https://docs.flatpak.org/en/latest/python.html> w.r.t. python.
     
 Next, you need a manifest file `org.flatpak.pyfda.json` or `...yaml` with information 
 and build instructions for the app. This file also contains the dependencies which 
