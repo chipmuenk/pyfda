@@ -1,5 +1,5 @@
 ## Changelog
-### [v0.7](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-xxx)
+### [v0.7](https://github.com/chipmuenk/pyfda/tree/v0.7.0) (2022-xxx)
 
 ### Bugfixes
 - When the filter is complex-valued, set data type to 'complex' for the response

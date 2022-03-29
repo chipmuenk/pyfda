@@ -314,7 +314,9 @@ class Input_Coeffs(QWidget):
             return
 
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            # CSV options have been changed, update icons (file vs. clipboard)
             self.ui._set_load_save_icons()
+
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
             self.refresh_table()
@@ -821,11 +823,11 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
-        if emit:
-            self.emit({'view_changed': 'q_coeff'})
-
         self._update_MSB_LSB()
         self.refresh_table()
+
+        if emit:
+            self.emit({'view_changed': 'q_coeff'})
 
 # ------------------------------------------------------------------------------
     def _save_dict(self):
