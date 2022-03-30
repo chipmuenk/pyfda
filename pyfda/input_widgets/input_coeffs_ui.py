@@ -59,7 +59,7 @@ class Input_Coeffs_UI(QWidget):
             ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
              "(31 fractional bits).</span>")
             ]
-        self.cmb_q_frmt_default = 'qnfrac'
+        self.cmb_q_frmt_default = 'qfrac'
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
