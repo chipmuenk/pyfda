@@ -174,7 +174,7 @@ class Input_Coeffs_UI(QWidget):
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip(
-            "<span>Select between IIR and FIR filter for manual entry."
+            "<span>Select between IIR and FIR filter for manual entry. "
             "Changing the type reloads the filter from the filter dict.</span>")
         self.cmbFilterType.addItems(["FIR", "IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
