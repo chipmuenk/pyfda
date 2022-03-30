@@ -178,9 +178,11 @@ class FX_UI_WQ(QWidget):
         self.butLock.setChecked(False)
         self.butLock.setVisible(dict_ui['lock_vis'])
         self.butLock.setToolTip(dict_ui['tip_lock'])
+        self.butLock.setFixedWidth(self.butLock.height())
 
         lay_H_stretch = QHBoxLayout()
         lay_H_stretch.addStretch()
+
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
@@ -204,18 +206,18 @@ class FX_UI_WQ(QWidget):
         layH_W.addWidget(self.ledWI)
         layH_W.addWidget(lblDot)
         layH_W.addWidget(self.ledWF)
-        layH_W.addWidget(self.butLock)
         layH_W.setContentsMargins(0, 0, 0, 0)
 
         layG = QGridLayout()
         layG.addWidget(lbl_wdg, 0, 0)
-        layG.addLayout(layH_W, 0, 2)
-        layG.addWidget(self.cmbW, 0, 3)
+        layG.addWidget(self.butLock, 0, 2)
+        layG.addLayout(layH_W, 0, 3)
+        layG.addWidget(self.cmbW, 0, 4)
         # lay_W.addStretch()
         # layG.addWidget(lblOvfl, 1, 1)
         layG.addLayout(lay_H_stretch, 1, 1)
-        layG.addWidget(self.cmbQuant, 1, 2)
-        layG.addWidget(self.cmbOvfl, 1, 3)
+        layG.addWidget(self.cmbQuant, 1, 3)
+        layG.addWidget(self.cmbOvfl, 1, 4)
         # layG.addWidget(lblQuant, 1, 3)
         layG.setContentsMargins(0, 0, 0, 0)
 
