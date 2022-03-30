@@ -479,10 +479,8 @@ class Input_Coeffs(QWidget):
         Store selected / all quantized coefficients in self.ba, reset overflow
         flags and refresh table
         """
-        # TODO: All selected / nothing selected makes a big difference
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
-        logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
