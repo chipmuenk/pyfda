@@ -535,14 +535,6 @@ class Fixed(object):
 
         self.ovr_flag = 0  # initialize to allow reading when freshly initialized
 
-    def get_Qobj(self):
-        """
-        Return quantization dict `q_obj`.
-
-        Check the docstring of class `Fixed()` for  details.
-        """
-        pass
-
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
         """
