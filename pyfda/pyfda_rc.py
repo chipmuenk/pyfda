@@ -401,6 +401,9 @@ qss_tab_bar_ovlp = """
 
 # Common qss settings for all themes
 qss_common = """
+                * [state="changed"]{background-color: yellow}
+                * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
+
                 QWidget{font-size:10pt; font-family: Tahoma;}
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
