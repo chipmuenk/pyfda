@@ -88,11 +88,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
-        self.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)  # self.update_q_coeff)
-        self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)  # self.update_q_coeff)
+        self.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
+        self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
-# ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0, 0, 0, 0)
         layVWdg.addWidget(self.wdg_wq_coeffs_b)
@@ -101,7 +101,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layVWdg.addStretch()
         self.setLayout(layVWdg)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
@@ -111,12 +111,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
             if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a'}:  # coeffs format
                 """
                 Update coefficient quantization settings and coefficients.
+                This is performed inside the quantization widgets `FX_UI_WQ`
 
                 The new values are written to the fixpoint coefficient dict as
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
                 `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']`.
                 """
-                # fb.fil[0]['fxqc'].update(self.ui2dict())
                 pass
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
@@ -132,15 +132,15 @@ class IIR_DF1_pyfixp_UI(QWidget):
             # - emit {'fx_sim': 'specs_changed'}
             fb.fil[0]['fxqc'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'\
-                or 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
         else:
             logger.error(f"Unknown key '{first_item(dict_sig)}' (should be 'ui')"
                          f"in '{__name__}' !")
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def dict2ui(self):
         """
         Update all parts of the UI that need to be updated when specs have been
@@ -156,7 +156,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_a.dict2ui()  # settings
         self.wdg_wq_accu.dict2ui()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def ui2dict(self):
         """
         Read out the quantization subwidgets and store their settings in the central
@@ -191,9 +191,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
         fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1])})
+
         return fxqc_dict
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
@@ -202,16 +203,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         self.fx_filt = IIR_DF1_pyfixp(p)
 
-# ------------------------------------------------------------------------------
-    # def to_hdl(self, **kwargs):
-    #     """
-    #     Convert the migen description to Verilog
-    #     """
-    #     return verilog.convert(self.fixp_filter,
-    #                            ios={self.fixp_filter.i, self.fixp_filter.o},
-    #                            **kwargs)
-
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):
 
         return self.fx_filt.fxfilter(x=stimulus)[0]
