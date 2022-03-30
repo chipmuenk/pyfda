@@ -173,15 +173,8 @@ class Input_Fixpoint_Specs(QWidget):
             self._update_filter_cmb()
             return
 
-        elif 'data_changed' in dict_sig or\
-             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
-            # Filter data has changed (but not the filter type) or the coefficient
-            # format / wordlength have been changed in `input_coeffs`. The latter means
-            # the view / display has been changed (wordlength) but not the actual
-            # coefficients in the `input_coeffs` widget. However, the wordlength setting
-            # is copied to the fxqc dict and from there to the fixpoint widget.
-            # - update fields in the fixpoint filter widget - wordlength may have
-            #   been changed.
+        elif 'data_changed' in dict_sig:
+            # Filter data has changed (but not the filter type)
             # - Set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
 
@@ -208,8 +201,8 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             elif dict_sig['fx_sim'] == 'specs_changed':
-                # fixpoint specification have been changed somewhere, update ui
-                # and set run button to "changed" in wdg_dict2ui()
+                # fixpoint specifications / quantization settings have been changed
+                # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
                 qstyle_widget(self.butSimFx, "normal")
