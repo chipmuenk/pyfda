@@ -47,33 +47,34 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
-# ------------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization
         """
-        if 'QA' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc']['QA'] = {}
-        set_dict_defaults(fb.fil[0]['fxqc']['QA'],
-                          {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
-
+        # widget for quantization of coefficients 'b'
         if 'QCB' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
-            logger.warning("QCB key missing")
-        if 'QCA' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc'].update({'QCA': {}})  # no coefficient settings in dict yet
-            logger.warning("QCA key missing")
-
+            logger.warning("Empty dict / missing key 'fxqc['QCB]'!")
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
 
+        # widget for quantization of coefficients 'a'
+        if 'QCA' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc'].update({'QCA': {}})  # no coefficient settings in dict yet
+            logger.warning("Empty dict / missing key 'fxqc['QCA]'!")
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>')
 
+        # widget for accumulator quantization
+        if 'QA' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc']['QA'] = {}
+        set_dict_defaults(fb.fil[0]['fxqc']['QA'],
+                          {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
@@ -184,26 +185,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
         - 'a' : list of quantized a coefficients in format WI.WF
         """
         fxqc_dict = fb.fil[0]['fxqc']
-        if 'QA' not in fxqc_dict:
-            # no accumulator settings in dict yet:
-            fxqc_dict.update({'QA': self.wdg_wq_accu.q_dict})
-            logger.warning("Empty dict 'fxqc['QA]'!")
-        else:
-            fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
-
-        if 'QCB' not in fxqc_dict:
-            # no coefficient settings in dict yet
-            fxqc_dict.update({'QCB': self.wdg_wq_coeffs_b.q_dict})
-            logger.warning("Empty dict 'fxqc['QCB]'!")
-        else:
-            fxqc_dict['QCB'].update(self.wdg_wq_coeffs_b.q_dict)
-
-        if 'QCA' not in fxqc_dict:
-            # no coefficient settings in dict yet
-            fxqc_dict.update({'QCA': self.wdg_wq_coeffs_a.q_dict})
-            logger.warning("Empty dict 'fxqc['QCA]'!")
-        else:
-            fxqc_dict['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
+        # fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
+        # fxqc_dict['QCB'].update(self.wdg_wq_coeffs_b.q_dict)
+        # fxqc_dict['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
 
         fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
         fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1])})
