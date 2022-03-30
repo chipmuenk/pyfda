@@ -17,9 +17,10 @@ import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon, QSpacerItem,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
+    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal, QColor)
 
-from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import (
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget)
 # from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 
@@ -137,7 +138,8 @@ class FX_UI_WQ(QWidget):
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
                    'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
-                   'lock_vis': False, 'tip_lock': 'Sync input and output quantization.'
+                   'lock_vis': False, 'tip_lock': 'Sync input and output quantization.',
+                   'cntr_ovfl_vis': False
                    }
 
         # update local `dict_ui` with keyword arguments passed during construction
@@ -152,12 +154,10 @@ class FX_UI_WQ(QWidget):
         lbl_wdg = QLabel(dict_ui['label'], self)
         lbl_wdg_2 = QLabel(dict_ui['label_2'], self)
 
-        lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
         qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q_items'], dict_ui['quant'])
         self.cmbQuant.setObjectName('quant')
 
-        lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov_items'], dict_ui['ovfl'])
         self.cmbOvfl.setObjectName('ovfl')
@@ -199,9 +199,15 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
 
+        self.lbl_ovfl_cntr = QLabel(to_html("N_ov = 0", frmt='i'))
+        self.lbl_ovfl_cntr.setAutoFillBackground(True)
+        color = QColor(233, 10, 150)
+        alpha = 140
+        # values = "{r}, {g}, {b}, {a}".format(
+        #     r=color.red(), g=color.green(), b=color.blue(), a=alpha)
+        # self.lbl_ovfl_cntr.setStyleSheet("QLabel { background-color: rgba("+values+"); }")
+
         layH_W = QHBoxLayout()
-        # lay_W.addStretch()
-        # lay_W.addWidget(lbl_W)
         layH_W.addStretch()
         layH_W.addWidget(self.ledWI)
         layH_W.addWidget(lblDot)
@@ -209,16 +215,16 @@ class FX_UI_WQ(QWidget):
         layH_W.setContentsMargins(0, 0, 0, 0)
 
         layG = QGridLayout()
+        # first row
         layG.addWidget(lbl_wdg, 0, 0)
         layG.addWidget(self.butLock, 0, 2)
         layG.addLayout(layH_W, 0, 3)
         layG.addWidget(self.cmbW, 0, 4)
-        # lay_W.addStretch()
-        # layG.addWidget(lblOvfl, 1, 1)
+        # second row
+        layG.addWidget(self.lbl_ovfl_cntr, 1, 0)
         layG.addLayout(lay_H_stretch, 1, 1)
         layG.addWidget(self.cmbQuant, 1, 3)
         layG.addWidget(self.cmbOvfl, 1, 4)
-        # layG.addWidget(lblQuant, 1, 3)
         layG.setContentsMargins(0, 0, 0, 0)
 
         frmMain = QFrame(self)
@@ -282,6 +288,7 @@ class FX_UI_WQ(QWidget):
 
         """
         self.QObj.frmt = 'dec'  # always use decimal format for coefficient quantization
+        self.QObj.resetN()
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -402,6 +409,13 @@ class FX_UI_WQ(QWidget):
             WF = safe_eval(q_dict['WF'], self.QObj.WF, return_type="int", sign='poszero')
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
+
+        self.lbl_ovfl_cntr.setText(
+            to_html("N_ov = {0}".format(self.QObj.N_over), frmt='i'))
+        if self.QObj.N_over == 0:
+            qstyle_widget(self.lbl_ovfl_cntr, "normal")
+        else:
+            qstyle_widget(self.lbl_ovfl_cntr, "changed")
 
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
         self.QObj.setQobj(self.q_dict)
