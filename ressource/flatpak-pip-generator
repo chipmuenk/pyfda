@@ -30,8 +30,15 @@ parser.add_argument('--requirements-file', '-r',
 parser.add_argument('--build-only', action='store_const',
                     dest='cleanup', const='all',
                     help='Clean up all files after build')
-parser.add_argument('--no-build-isolation',
-                    help='https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support')
+parser.add_argument('--build-isolation', action='store_true',
+                    default=False,
+                    help=(
+                        'Do not disable build isolation. '
+                        'Mostly useful on pip that does\'t '
+                        'support the feature.'
+                    ))
+parser.add_argument('--checker-data', action='store_true',
+                    help='Include x-checker-data in output for the "Flatpak External Data Checker"')
 parser.add_argument('--output', '-o',
                     help='Specify output file name')
 parser.add_argument('--runtime',
@@ -55,7 +62,7 @@ def get_tar_package_url_pypi(name: str, version: str) -> str:
     url = 'https://pypi.org/pypi/{}/{}/json'.format(name, version)
     with urllib.request.urlopen(url) as response:
         body = json.loads(response.read().decode('utf-8'))
-        for ext in ['gz', 'zip']:
+        for ext in ['bz2', 'gz', 'xz', 'zip']:
             for source in body['urls']:
                 if source['url'].endswith(ext):
                     return source['url']
@@ -176,7 +183,8 @@ if opts.output:
     output_package = opts.output
 elif opts.requirements_file:
     output_package = 'python{}-{}'.format(
-        python_version, opts.requirements_file.replace('.txt', ''),
+        python_version,
+        os.path.basename(opts.requirements_file).replace('.txt', ''),
     )
 elif len(packages) == 1:
     output_package = 'python{}-{}'.format(
@@ -190,7 +198,7 @@ modules = []
 vcs_modules = []
 sources = {}
 
-tempdir_prefix = 'pip-generator-{}'.format(output_filename.replace('.json', ''))
+tempdir_prefix = 'pip-generator-{}'.format(os.path.basename(output_package))
 with tempfile.TemporaryDirectory(prefix=tempdir_prefix) as tempdir:
     pip_download = flatpak_cmd + [
         'download',
@@ -220,7 +228,7 @@ with tempfile.TemporaryDirectory(prefix=tempdir_prefix) as tempdir:
 
     fprint('Downloading arch independent packages')
     for filename in os.listdir(tempdir):
-        if not filename.endswith(('gz', 'any.whl', 'zip')):
+        if not filename.endswith(('bz2', 'any.whl', 'gz', 'xz', 'zip')):
             version = get_file_version(filename)
             name = get_package_name(filename)
             url = get_tar_package_url_pypi(name, version)
@@ -284,11 +292,17 @@ with tempfile.TemporaryDirectory(prefix=tempdir_prefix) as tempdir:
                 ('type', 'file'),
                 ('url', url),
                 ('sha256', sha256)])
+            if opts.checker_data:
+                source['x-checker-data'] = {
+                    'type': 'pypi',
+                    'name': name}
+                if url.endswith(".whl"):
+                    source['x-checker-data']['packagetype'] = 'bdist_wheel'
             is_vcs = False
         sources[name] = {'source': source, 'vcs': is_vcs}
 
 # Python3 packages that come as part of org.freedesktop.Sdk.
-system_packages = ['Mako', 'Markdown', 'meson', 'pip', 'setuptools', 'six']
+system_packages = ['cython', 'easy_install', 'mako', 'markdown', 'meson', 'pip', 'pygments', 'setuptools', 'six', 'wheel']
 
 fprint('Generating dependencies')
 for package in packages:
@@ -297,7 +311,7 @@ for package in packages:
         print('Warning: skipping invalid requirement specification {} because it is missing a name'.format(package.line), file=sys.stderr)
         print('Append #egg=<pkgname> to the end of the requirement line to fix', file=sys.stderr)
         continue
-    elif package.name in system_packages:
+    elif package.name.casefold() in system_packages:
         continue
 
     if len(package.extras) > 0:
@@ -331,17 +345,28 @@ for package in packages:
             print('Generating dependencies for {}'.format(package.name))
             subprocess.run(pip_download + [pkg], check=True, stdout=subprocess.DEVNULL)
             for filename in os.listdir(tempdir):
-                dependencies.append(get_package_name(filename))
+                dep_name = get_package_name(filename)
+                if dep_name.casefold() in system_packages:
+                    continue
+                dependencies.append(dep_name)
 
         except subprocess.CalledProcessError:
             print('Failed to download {}'.format(package.name))
 
     is_vcs = True if package.vcs else False
-    package_sources = [sources[x]['source']
-                       for x in dependencies
-                       if x in sources
-                       # Add vcs source only if package is vcs
-                       and (not sources[x]['vcs'] or is_vcs)]
+    package_sources = []
+    for dependency in dependencies:
+        if dependency in sources:
+            source = sources[dependency]
+        elif dependency.replace('_', '-') in sources:
+            source = sources[dependency.replace('_', '-')]
+        else:
+            continue
+
+        if not (not source['vcs'] or is_vcs):
+            continue
+
+        package_sources.append(source['source'])
 
     if package.vcs:
         name_for_pip = '.'
@@ -353,13 +378,14 @@ for package in packages:
     pip_command = [
         pip_executable,
         'install',
+        '--verbose',
         '--exists-action=i',
         '--no-index',
         '--find-links="file://${PWD}"',
         '--prefix=${FLATPAK_DEST}',
         '"{}"'.format(name_for_pip)
     ]
-    if opts.no_build_isolation:
+    if not opts.build_isolation:
         pip_command.append('--no-build-isolation')
 
     module = OrderedDict([
