@@ -17,9 +17,10 @@ import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon, QSpacerItem,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
+    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal, QColor)
 
-from pyfda.libs.pyfda_qt_lib import qcmb_box_populate, qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import (
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget)
 # from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import qstr, safe_eval, to_html
 
@@ -33,6 +34,9 @@ class FX_UI_WQ(QWidget):
     Widget for selecting quantization / overflow options.
 
     A reference to a quantization dictionary `q_dict` is passed to the constructor.
+    This can be a global quantization dict like `fb.fil[0]['fxqc']['QCB']` or a local
+    dict.
+
     This widget allows the user to modify the values for the following keys:
 
     - `quant`   : quantization behaviour
@@ -41,13 +45,13 @@ class FX_UI_WQ(QWidget):
     - `WF`      : number of fractional bits
     - `scale`   : scaling factor between real world value and integer representation
 
-    These quantization settings are also stored in the corresponding attributes
-    `self.quant` etc.
+    These quantization settings are also stored in the instance quantizer object
+    `self.QObj`.
 
     Widget settings are stored in the local `dict_ui` dictionary with the keys and their
     default settings described below. When instantiating the widget, these settings can
-    be modified by corresponing keyword parameters, e.g.
-    
+    be modified by corresponding keyword parameters, e.g.
+
     ```
         self.wdg_wq_accu = UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
@@ -134,7 +138,8 @@ class FX_UI_WQ(QWidget):
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
                    'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
-                   'lock_vis': False, 'tip_lock': 'Sync input and output quantization.'
+                   'lock_vis': False, 'tip_lock': 'Sync input and output quantization.',
+                   'cntr_ovfl_vis': False
                    }
 
         # update local `dict_ui` with keyword arguments passed during construction
@@ -145,18 +150,14 @@ class FX_UI_WQ(QWidget):
                 dict_ui.update({key: val})
         # dict_ui.update(map(kwargs)) # same as above?
 
-        self.QObj = fx.Fixed(self.q_dict)  # initialize fixpoint object
-
         self.wdg_name = dict_ui['wdg_name']
         lbl_wdg = QLabel(dict_ui['label'], self)
         lbl_wdg_2 = QLabel(dict_ui['label_2'], self)
 
-        lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
         qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q_items'], dict_ui['quant'])
         self.cmbQuant.setObjectName('quant')
 
-        lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         qcmb_box_populate(self.cmbOvfl, dict_ui['cmb_ov_items'], dict_ui['ovfl'])
         self.cmbOvfl.setObjectName('ovfl')
@@ -177,9 +178,11 @@ class FX_UI_WQ(QWidget):
         self.butLock.setChecked(False)
         self.butLock.setVisible(dict_ui['lock_vis'])
         self.butLock.setToolTip(dict_ui['tip_lock'])
+        self.butLock.setFixedWidth(self.butLock.height())
 
         lay_H_stretch = QHBoxLayout()
         lay_H_stretch.addStretch()
+
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
@@ -196,26 +199,32 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
 
+        self.lbl_ovfl_cntr = QLabel(to_html("N_ov = 0", frmt='i'))
+        self.lbl_ovfl_cntr.setAutoFillBackground(True)
+        color = QColor(233, 10, 150)
+        alpha = 140
+        # values = "{r}, {g}, {b}, {a}".format(
+        #     r=color.red(), g=color.green(), b=color.blue(), a=alpha)
+        # self.lbl_ovfl_cntr.setStyleSheet("QLabel { background-color: rgba("+values+"); }")
+
         layH_W = QHBoxLayout()
-        # lay_W.addStretch()
-        # lay_W.addWidget(lbl_W)
         layH_W.addStretch()
         layH_W.addWidget(self.ledWI)
         layH_W.addWidget(lblDot)
         layH_W.addWidget(self.ledWF)
-        layH_W.addWidget(self.butLock)
         layH_W.setContentsMargins(0, 0, 0, 0)
 
         layG = QGridLayout()
+        # first row
         layG.addWidget(lbl_wdg, 0, 0)
-        layG.addLayout(layH_W, 0, 2)
-        layG.addWidget(self.cmbW, 0, 3)
-        # lay_W.addStretch()
-        # layG.addWidget(lblOvfl, 1, 1)
+        layG.addWidget(self.butLock, 0, 2)
+        layG.addLayout(layH_W, 0, 3)
+        layG.addWidget(self.cmbW, 0, 4)
+        # second row
+        layG.addWidget(self.lbl_ovfl_cntr, 1, 0)
         layG.addLayout(lay_H_stretch, 1, 1)
-        layG.addWidget(self.cmbQuant, 1, 2)
-        layG.addWidget(self.cmbOvfl, 1, 3)
-        # layG.addWidget(lblQuant, 1, 3)
+        layG.addWidget(self.cmbQuant, 1, 3)
+        layG.addWidget(self.cmbOvfl, 1, 4)
         layG.setContentsMargins(0, 0, 0, 0)
 
         frmMain = QFrame(self)
@@ -228,16 +237,19 @@ class FX_UI_WQ(QWidget):
         self.setLayout(layVMain)
 
         # ----------------------------------------------------------------------
-        # INITIAL SETTINGS
+        # INITIAL SETTINGS OF UI AND FIXPOINT QUANTIZATION OBJECT
         # ----------------------------------------------------------------------
-        self.ovfl = qget_cmb_box(self.cmbOvfl)
-        self.quant = qget_cmb_box(self.cmbQuant)
+        WI = int(dict_ui['WI'])
+        WF = int(dict_ui['WF'])
+        W = WI + WF + 1
+        self.ledWI.setText(str(WI))
+        self.ledWF.setText(str(WF))
+        ovfl = qget_cmb_box(self.cmbOvfl)
+        quant = qget_cmb_box(self.cmbQuant)
 
-        self.WI = int(dict_ui['WI'])
-        self.WF = int(dict_ui['WF'])
-        self.W = self.WI + self.WF + 1
-        self.ledWI.setText(str(self.WI))
-        self.ledWF.setText(str(self.WF))
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
+        # create fixpoint quantization object from passed quantization dict
+        self.QObj = fx.Fixed(self.q_dict)
 
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
@@ -276,6 +288,7 @@ class FX_UI_WQ(QWidget):
 
         """
         self.QObj.frmt = 'dec'  # always use decimal format for coefficient quantization
+        self.QObj.resetN()
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -306,26 +319,23 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Update the attributes `self.ovfl`, `self.quant`, `self.WI`, `self.WF`,
-        `self.W` and the corresponding entries in the quantization dict from the UI
-        when one of the widgets has been edited.
+        Update the entries in the quantization dict from the UI for `ovfl`, `quant`,
+        `WI`, `WF`, `W` when one of the widgets has been edited.
 
-        Emit a signal with `{'ui':objectName of the sender}`.
+        Emit a signal with `{'ui'<objectName of the sender>}`.
         """
-        self.WI = int(safe_eval(self.ledWI.text(), self.WI, return_type="int",
-                                sign='poszero'))
-        self.ledWI.setText(qstr(self.WI))
-        self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int",
-                                sign='poszero'))
-        self.ledWF.setText(qstr(self.WF))
-        self.W = int(self.WI + self.WF + 1)
+        WI = int(safe_eval(self.ledWI.text(), self.QObj.WI, return_type="int",
+                           sign='poszero'))
+        self.ledWI.setText(str(WI))
+        WF = int(safe_eval(self.ledWF.text(), self.QObj.WF, return_type="int",
+                           sign='poszero'))
+        self.ledWF.setText(str(WF))
+        W = int(WI + WF + 1)
 
-        self.ovfl = qget_cmb_box(self.cmbOvfl)
-        self.quant = qget_cmb_box(self.cmbQuant)
+        ovfl = qget_cmb_box(self.cmbOvfl)
+        quant = qget_cmb_box(self.cmbQuant)
 
-        self.q_dict.update({'ovfl': self.ovfl, 'quant': self.quant,
-                            'WI': self.WI, 'WF': self.WF, 'W': self.W})
-
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
         self.QObj.setQobj(self.q_dict)
 
         if self.sender():
@@ -338,14 +348,16 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
         """
-        Update
+        Use the passed dict `q_dict` to update
 
-        * widgets `WI`, `WF` `quant` and `ovfl`
-        * corresponding attributes
-        * quantization object `self.QObj`
+        * UI widgets `WI`, `WF` `quant` and `ovfl`
+        * the instance quantization dict `self.q_dict` (usually a reference to some
+          global quantization dict like `fb.fil[0]['fxqc']['QCB']`)
+        * the `scale` setting of the instance quantization dict if WF / WI require this
+        * the instance quantization object `self.QObj` from the instance quantization dict
 
-        from `q_dict`. If `q_dict is None`, use the instance quantization dict
-        `self.q_dict`
+        If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
+        instead.
         """
 
         if q_dict is None:
@@ -360,18 +372,15 @@ class FX_UI_WQ(QWidget):
             qfrmt = q_dict['qfrmt']
 
             if qfrmt == 'qint':  # integer format
-                self.q_dict.update({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0})
-                self.QObj.setQobj({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0,
+                self.q_dict.update({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0,
                                    'scale': 1 << (self.q_dict['WI'] + self.q_dict['WF'])})
             elif qfrmt == 'qnfrac':  # normalized fractional format
-                self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0})
-                self.QObj.setQobj({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0,
-                                   'scale': 1})
+                self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0,
+                                    'scale': 1})
             elif qfrmt in {'qfrac', 'float'}:
-                self.QObj.setQobj({'scale': 1})
+                self.q_dict.update({'scale': 1})
             elif qfrmt == 'q31':
-                self.q_dict.update({'WI': 0, 'WF': 31})
-                self.QObj.setQobj({'WI':0, 'WF': 31, 'scale': 1})
+                self.q_dict.update({'WI': 0, 'WF': 31, 'scale': 1})
             else:
                 logger.warning(f"Unknown quantization format '{qfrmt}'")
                 err = True
@@ -392,17 +401,23 @@ class FX_UI_WQ(QWidget):
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if 'WI' in q_dict:
-            self.WI = safe_eval(q_dict['WI'], self.WI, return_type="int", sign='poszero')
-            self.ledWI.setText(str(self.WI))
-            self.q_dict.update({'WI': self.WI})
+            WI = safe_eval(q_dict['WI'], self.QObj.WI, return_type="int", sign='poszero')
+            self.ledWI.setText(str(WI))
+            self.q_dict.update({'WI': WI})
 
         if 'WF' in q_dict:
-            self.WF = safe_eval(q_dict['WF'], self.WF, return_type="int", sign='poszero')
-            self.ledWF.setText(str(self.WF))
-            self.q_dict.update({'WF': self.WF})
+            WF = safe_eval(q_dict['WF'], self.QObj.WF, return_type="int", sign='poszero')
+            self.ledWF.setText(str(WF))
+            self.q_dict.update({'WF': WF})
 
-        self.W = self.WF + self.WI + 1
+        self.lbl_ovfl_cntr.setText(
+            to_html("N_ov = {0}".format(self.QObj.N_over), frmt='i'))
+        if self.QObj.N_over == 0:
+            qstyle_widget(self.lbl_ovfl_cntr, "normal")
+        else:
+            qstyle_widget(self.lbl_ovfl_cntr, "changed")
 
+        self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
         self.QObj.setQobj(self.q_dict)
 
 

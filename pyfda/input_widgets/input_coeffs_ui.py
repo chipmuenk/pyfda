@@ -59,7 +59,7 @@ class Input_Coeffs_UI(QWidget):
             ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
              "(31 fractional bits).</span>")
             ]
-        self.cmb_q_frmt_default = 'qnfrac'
+        self.cmb_q_frmt_default = 'qfrac'
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ class Input_Coeffs_UI(QWidget):
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip(
-            "<span>Select between IIR and FIR filter for manual entry."
+            "<span>Select between IIR and FIR filter for manual entry. "
             "Changing the type reloads the filter from the filter dict.</span>")
         self.cmbFilterType.addItems(["FIR", "IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -199,13 +199,13 @@ class Input_Coeffs_UI(QWidget):
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
         self.butSave.setToolTip(
-            "<span>Copy coefficient table to filter dict and update all plots"
+            "<span>Copy coefficient table to filter dict and update all plots "
             "and widgets.</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("Reload coefficient table from filter dict.")
+        self.butLoad.setToolTip("<span>Reload coefficient table from filter dict.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -394,22 +394,29 @@ class Input_Coeffs_UI(QWidget):
         if params['CSV']['clipboard']:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard, SELECTED items are copied as "
-                "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "<span>Copy table to clipboard.<br>For float format, SELECTED items "
+                "are copied as displayed. When nothing is selected, the whole table "
+                "is copied with full precision.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-            self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
+            self.butToTable.setToolTip(
+                "<span>Copy clipboard to table. Table data format (e.g. 'Hex') has to "
+                "match the clipboard data format, otherwise data may be imported "
+                "incorrectly without warning.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
                 "<span>"
-                "Save table to file, SELECTED items are copied as "
+                "Save table to file.<br>"
+                "For float format,  SELECTED items are copied as "
                 "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "is copied with full precision.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
-            self.butToTable.setToolTip("<span>Load table from file.</span>")
+            self.butToTable.setToolTip(
+                "<span>Load table from file. Table data format (e.g. 'Hex') has to "
+                "match the data format in the file, otherwise data may be imported "
+                "incorrectly without warning.</span>")
 
         if dirs.csv_options_handle is None:
             qstyle_widget(self.but_csv_options, "normal")

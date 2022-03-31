@@ -64,7 +64,7 @@ class ItemDelegate(QStyledItemDelegate):
     Editing the table triggers `setModelData()` but does not emit a signal outside
     this class, only the `ui.butSave` button is highlighted. When it is pressed,
     a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
-    Additionally, a signal is emitted with `'view_changed':'q_coeff'` by `ui2qdict()`?!
+    Additionally, a signal is emitted with `'fx_sim': 'specs_changed'` by `ui2qdict()`
     """
 
     def __init__(self, parent):
@@ -163,7 +163,7 @@ class ItemDelegate(QStyledItemDelegate):
         The instance parameter `QObj[c].ovr_flag` is set to +1 or -1 for
          positive / negative overflows, else it is 0.
         """
-        logger.warning("displayText!")
+        # logger.warning("displayText!")
 
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             data = safe_eval(text, return_type='auto')  # convert to float
@@ -314,11 +314,13 @@ class Input_Coeffs(QWidget):
             return
 
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            # CSV options have been changed, update icons (file vs. clipboard)
             self.ui._set_load_save_icons()
+
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
             self.refresh_table()
-            self.emit({'view_changed': 'q_coeff'})
+            self.emit({'fx_sim': 'specs_changed'})
             return
 
         elif self.isVisible():
@@ -385,7 +387,6 @@ class Input_Coeffs(QWidget):
         self.ui.butEnable.clicked.connect(self.refresh_table)
         self.ui.spnDigits.editingFinished.connect(self.refresh_table)
 
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
         self.ui.butFromTable.clicked.connect(self._copy_from_table)
         self.ui.butToTable.clicked.connect(self._copy_to_table)
 
@@ -401,6 +402,7 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmbFormat.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -462,7 +464,6 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].ovr_flag,
                 self.QObj[1].ovr_flag
                         ]
-                # [x for x in self.QObj[0].float2frmt(self.ba[0])],
     """         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
                     and self.QObj[0].WF > 0:
                 # decimal fixpoint representation with fractional part
@@ -478,10 +479,8 @@ class Input_Coeffs(QWidget):
         Store selected / all quantized coefficients in self.ba, reset overflow
         flags and refresh table
         """
-        # TODO: All selected / nothing selected makes a big difference
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
-        logger.warning(f"\nindex = {idx}\n")
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
@@ -532,20 +531,6 @@ class Input_Coeffs(QWidget):
         self._equalize_ba_length()
         self.refresh_table()
         qstyle_widget(self.ui.butSave, 'changed')
-
-    # --------------------------------------------------------------------------
-    def _set_scale(self):
-        """
-        Triggered by `ui.ledScale_b`
-        Set scale for calculating floating point value from fixpoint representation
-        and vice versa
-        """
-        # if self.ui.ledScale_b.isModified() ... self.ui.ledScale_b.setModified(False)
-#        scale = safe_eval(
-#            self.ui.ledScale_b.text(), QObj[c].scale, return_type='float', sign='pos')
-#        self.ui.ledScale_b.setText(str(scale))
-# TODO: !
-        self.ui2qdict()
 
 # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -774,10 +759,11 @@ class Input_Coeffs(QWidget):
     def qdict2ui(self):
         """
         Triggered by:
-        - process_sig_rx()  if self.fx_specs_changed or
+        - `process_sig_rx()`: self.fx_specs_changed == True or
                                 dict_sig['fx_sim'] == 'specs_changed'
+        - `self.ui2qdict()`
 
-        Set the UI from the quantization dict and update the fixpoint object.
+        Set the UI from the quantization dict and update the fixpoint quant. object.
         When neither WI == 0 nor WF == 0, set the quantization format to general
         fractional format qfrac.
         """
@@ -788,25 +774,25 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
-        # quant format has been changed, update display but don't fire signal
         self._update_MSB_LSB()
+        self.refresh_table()
 
 # ------------------------------------------------------------------------------
-    def ui2qdict(self, emit=True):
+    def ui2qdict(self):
         """
-        Read out the settings of the quantization comboboxes.
+        Read out the UI settings of `self.ui.cmbFormat` and `self.ui.cmb_q_frmt`
+        (those two trigger this method)
 
-        - Store them in the filter dict `fb.fil[0]['fxqc']['QCB']` and as class
-            attributes in the fixpoint object `self.myQ_b`
-        - Emit signal `'view_changed':'q_coeff'`
-        - Refresh the table
+        It is also triggered by `_save_dict()`.
+        TODO: Is this neccessary?
 
-        Triggered by modifying
-        `ui.cmbFormat`, `ui.cmbQOvfl_b`, `ui.cmbQuant_b`, `ui.led_WF_b`, `ui.led_WI_b`
-        or `ui.led_W_b` (via `_W_changed()`)
-        or `ui.cmbQFrmt` (via `_set_number_format()`)
-        or `ui.ledScale_b()` (via `_set_scale()`)
-        or 'qdict2ui()' via `_set_number_format()`
+        The coefficient quantization settings are copied to the quantization dicts
+        fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
+        instances of `FX_UI_WQ` every time something is updated there. This information
+        is also kept in the quantization objects `QObj` of the quantization widgets.
+
+        - Refresh the table, update quantization widgets, MSB and LSB display
+        - Emit signal `'fx_sim': 'specs_changed'`
         """
         logger.warning("called ui2qdict")
 
@@ -816,16 +802,10 @@ class Input_Coeffs(QWidget):
         fb.fil[0]['fxqc']['QCA'].update(
             {'frmt': str(self.ui.cmbFormat.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
-        # self.ui.wdg_wq_coeffs_a aself.ui.wdg_wq_coeffs_b update the quantization dicts
-        # themselves
-        self.ui.wdg_wq_coeffs_a.dict2ui()
-        self.ui.wdg_wq_coeffs_b.dict2ui()
 
-        if emit:
-            self.emit({'view_changed': 'q_coeff'})
+        self.qdict2ui()  # update quant. widgets, table, MSB / LSB display
 
-        self._update_MSB_LSB()
-        self.refresh_table()
+        self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
     def _save_dict(self):

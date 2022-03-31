@@ -19,6 +19,7 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from .fir_df_pyfixp import FIR_DF_pyfixp
 
 import logging
@@ -48,23 +49,27 @@ class FIR_DF_pyfixp_UI(QWidget):
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
-# ------------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the UI with widgets for coefficient format and input and
         output quantization
         """
+        # widget for quantization of coefficients 'b'
+        if 'QCB' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
+            logger.warning("QCB key missing")
+        self.wdg_wq_coeffs = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
+            label='<b>Coeff. Quantization <i>B<sub>I.F&nbsp;</sub></i>:</b>')
+
+        # widget for accumulator quantization
         if 'QA' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QA'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
-
-        self.wdg_wq_coeffs = UI_WQ(
-            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
-            label='<b>Coeff. Quantization <i>B<sub>I.F&nbsp;</sub></i>:</b>')
-
-        self.wdg_wq_accu = UI_WQ(
+        self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu', cmb_w_vis=True,
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
 
@@ -76,10 +81,10 @@ class FIR_DF_pyfixp_UI(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
-        self.wdg_wq_coeffs.sig_tx.connect(self.update_q_coeff)
+        self.wdg_wq_coeffs.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
-# ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0, 0, 0, 0)
         layVWdg.addWidget(self.wdg_wq_coeffs)
@@ -87,7 +92,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         layVWdg.addStretch()
         self.setLayout(layVWdg)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         # check whether anything needs to be done locally
@@ -101,7 +106,6 @@ class FIR_DF_pyfixp_UI(QWidget):
                 The new values are written to the fixpoint coefficient dict as
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
                 """
-                # fb.fil[0]['fxqc'].update(self.ui2dict())
                 pass
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
@@ -129,7 +133,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.error(f"Unknown key '{dict_sig['wdg_name']}' (should be 'ui')"
                          f"in '{__name__}' !")
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_q_coeff(self, dict_sig):
         """
         Update coefficient quantization settings and coefficients.
@@ -145,7 +149,7 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         self.process_sig_rx(dict_sig)
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def update_accu_settings(self):
         """
         Calculate number of extra integer bits needed in the accumulator (bit
@@ -184,9 +188,9 @@ class FIR_DF_pyfixp_UI(QWidget):
         fb.fil[0]['fxqc']['QA'].update(self.wdg_wq_accu.q_dict)
 
         # update UI
-        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
+        self.wdg_wq_accu.dict2ui()
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def dict2ui(self):
         """
         Update all parts of the UI that need to be updated when specs have been
@@ -206,10 +210,10 @@ class FIR_DF_pyfixp_UI(QWidget):
             fxqc_dict.update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
 
-        self.wdg_wq_coeffs.dict2ui(fxqc_dict['QCB'])  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui()  # update coefficient wordlength
         self.update_accu_settings()                  # update accumulator settings
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def ui2dict(self):
         """
         Read out the quantization subwidgets and store their settings in the central
@@ -233,32 +237,19 @@ class FIR_DF_pyfixp_UI(QWidget):
            containing the following keys and values:
 
         - 'QCB': dictionary with b coefficients quantization settings
-
         - 'QA': dictionary with accumulator quantization settings
-
         - 'b' : list of quantized b coefficients in format WI.WF
 
         """
         fxqc_dict = fb.fil[0]['fxqc']
-        if 'QA' not in fxqc_dict:
-            # no accumulator settings in dict yet:
-            fxqc_dict.update({'QA': self.wdg_wq_accu.q_dict})
-            logger.warning("Empty dict 'fxqc['QA]'!")
-        else:
-            fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
+        # fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
+        # fxqc_dict['QCB'].update(self.wdg_wq_coeffs.q_dict)
 
-        if 'QCB' not in fxqc_dict:
-            # no coefficient settings in dict yet
-            fxqc_dict.update({'QCB': self.wdg_wq_coeffs.q_dict})
-            logger.warning("Empty dict 'fxqc['QCB]'!")
-        else:
-            fxqc_dict['QCB'].update(self.wdg_wq_coeffs.q_dict)
+        fxqc_dict.update({'b': self.wdg_wq_coeffs.quant_coeffs(fb.fil[0]['ba'][0])})
 
-        fxqc_dict.update({'b': self.wdg_wq_coeffs.quant_coeffs(
-            self.wdg_wq_coeffs.q_dict, fb.fil[0]['ba'][0])})
         return fxqc_dict
 
-# ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
@@ -267,16 +258,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         self.fx_filt = FIR_DF_pyfixp(p)
 
-# ------------------------------------------------------------------------------
-    # def to_hdl(self, **kwargs):
-    #     """
-    #     Convert the migen description to Verilog
-    #     """
-    #     return verilog.convert(self.fixp_filter,
-    #                            ios={self.fixp_filter.i, self.fixp_filter.o},
-    #                            **kwargs)
-
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):
 
         return self.fx_filt.fxfilter(x=stimulus)[0]

@@ -26,7 +26,7 @@ from pyfda.libs.pyfda_lib import qstr, pprint_log, first_item
 # import pyfda.libs.pyfda_fix_lib as fx
 # from pyfda.libs.pyfda_io_lib import extract_file_ext
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
@@ -173,15 +173,8 @@ class Input_Fixpoint_Specs(QWidget):
             self._update_filter_cmb()
             return
 
-        elif 'data_changed' in dict_sig or\
-             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
-            # Filter data has changed (but not the filter type) or the coefficient
-            # format / wordlength have been changed in `input_coeffs`. The latter means
-            # the view / display has been changed (wordlength) but not the actual
-            # coefficients in the `input_coeffs` widget. However, the wordlength setting
-            # is copied to the fxqc dict and from there to the fixpoint widget.
-            # - update fields in the fixpoint filter widget - wordlength may have
-            #   been changed.
+        elif 'data_changed' in dict_sig:
+            # Filter data has changed (but not the filter type)
             # - Set RUN button to "changed" in wdg_dict2ui()
             self.wdg_dict2ui()
 
@@ -199,6 +192,9 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
+                    # Reset overflow counter for input and output quantization
+                    self.wdg_wq_input.QObj.resetN()
+                    self.wdg_wq_output.QObj.resetN()
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
 
@@ -208,8 +204,8 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             elif dict_sig['fx_sim'] == 'specs_changed':
-                # fixpoint specification have been changed somewhere, update ui
-                # and set run button to "changed" in wdg_dict2ui()
+                # fixpoint specifications / quantization settings have been changed
+                # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
             elif dict_sig['fx_sim'] == 'finish':
                 qstyle_widget(self.butSimFx, "normal")
@@ -276,10 +272,10 @@ class Input_Fixpoint_Specs(QWidget):
 #       - pass the quantization (sub-?) dictionary to the constructor
 # ------------------------------------------------------------------------------
 
-        self.wdg_wq_input = UI_WQ(
-            q_dict=fb.fil[0]['fxqc']['QI'], wdg_name='wq_input',
+        self.wdg_wq_input = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QI'], wdg_name='wq_input',
             label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
-            lock_visible=True)
+            lock_vis=True)
         if HAS_DS:
             self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
             self.wdg_wq_input.cmbQuant.setItemData(
@@ -287,8 +283,8 @@ class Input_Fixpoint_Specs(QWidget):
                 self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
         self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
-        self.wdg_wq_output = UI_WQ(
-            q_dict=fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
+        self.wdg_wq_output = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
             label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 
@@ -628,11 +624,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         Set the RUN button to "changed".
         """
-#        fb.fil[0]['fxqc']['QCB'].update({'scale':(1 << fb.fil[0]['fxqc']['QCB']['W'])})
-        self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        # self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        # self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+        self.wdg_wq_input.dict2ui()
+        self.wdg_wq_output.dict2ui()
+
         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
             self.fx_filt_ui.dict2ui()
 #            dict_sig = {'fx_sim':'specs_changed'}
