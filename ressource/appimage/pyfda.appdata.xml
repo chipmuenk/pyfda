@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>pyfda</id>
+	<metadata_license>MIT</metadata_license>
+	<project_license>MIT</project_license>
+	<name>pyFDA</name>
+	<summary>GUI based tool for analysing and designing discrete time filters</summary>
+	<description>
+		<p>Design and analyse discrete time DSP filters with a user-friendly GUI tool. Fixpoint filters in time and frequency domain, too.</p>
+	</description>
+	<launchable type="desktop-id">pyfda.desktop</launchable>
+	<url type="homepage">https://github.com/chipmuenk/pyfda</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://github.com/chipmuenk/pyfda/blob/develop/img/pyfda_screenshot_3.png</image>
+		</screenshot>
+	</screenshots>
+	<provides>
+		<id>pyfda.desktop</id>
+	</provides>
+</component>
