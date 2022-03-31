@@ -18,7 +18,7 @@ finish-args:
   - --filesystem=home # where can files be stored
 
 modules:
-  - python3-requirements.json
+  - python3-pyfda.json
   
 rename-icon: pyfda_icon # Image will renamed to match the app-id konvention
 rename-appdata-file: pyfda.appdata.xml
