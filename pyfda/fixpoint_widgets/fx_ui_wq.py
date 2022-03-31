@@ -90,9 +90,7 @@ class FX_UI_WQ(QWidget):
     'cmb_w_vis'     : False                     # Integrated combo widget visible?
     'cmb_w_items'   : List with tooltip and combo box choices
     'cmb_w_init'    : 'man'                     # initial setting
-
-    'enabled'       : True                      # Is widget enabled?
-    'visible'       : True                      # Is widget visible?
+    'count_ovfl_vis': True                      # Is overflow counter visible?
     """
     # incoming,
     # sig_rx = pyqtSignal(object)
@@ -139,7 +137,7 @@ class FX_UI_WQ(QWidget):
                    'fractional': True,
                    'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
                    'lock_vis': False, 'tip_lock': 'Sync input and output quantization.',
-                   'cntr_ovfl_vis': False
+                   'count_ovfl_vis': True
                    }
 
         # update local `dict_ui` with keyword arguments passed during construction
@@ -199,8 +197,9 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
 
-        self.lbl_ovfl_cntr = QLabel(to_html("N_ov = 0", frmt='i'))
-        self.lbl_ovfl_cntr.setAutoFillBackground(True)
+        self.lbl_ovfl_count = QLabel(to_html("N_ov = 0", frmt='i'))
+        self.lbl_ovfl_count.setAutoFillBackground(True)
+        self.lbl_ovfl_count.setVisible(dict_ui['count_ovfl_vis'])
         color = QColor(233, 10, 150)
         alpha = 140
         # values = "{r}, {g}, {b}, {a}".format(
@@ -221,7 +220,7 @@ class FX_UI_WQ(QWidget):
         layG.addLayout(layH_W, 0, 3)
         layG.addWidget(self.cmbW, 0, 4)
         # second row
-        layG.addWidget(self.lbl_ovfl_cntr, 1, 0)
+        layG.addWidget(self.lbl_ovfl_count, 1, 0)
         layG.addLayout(lay_H_stretch, 1, 1)
         layG.addWidget(self.cmbQuant, 1, 3)
         layG.addWidget(self.cmbOvfl, 1, 4)
@@ -274,7 +273,8 @@ class FX_UI_WQ(QWidget):
         Quantize the coefficients, scale and convert them to a list of integers,
         using the quantization settings of `self.q_dict`.
 
-        This is called every time one of the coefficient subwidgets is edited or changed.
+        This is called every time one of the coefficient subwidgets is edited
+        or changed,that's why overflow counters are reset.
 
         Parameters
         ----------
@@ -288,7 +288,7 @@ class FX_UI_WQ(QWidget):
 
         """
         self.QObj.frmt = 'dec'  # always use decimal format for coefficient quantization
-        self.QObj.resetN()
+        self.QObj.resetN()  # reset all overflow counters
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -343,7 +343,7 @@ class FX_UI_WQ(QWidget):
             dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
             self.emit(dict_sig)
         else:
-            logger.error("sender without name!")
+            logger.error("Sender has no object name!")
 
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
@@ -410,12 +410,13 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        self.lbl_ovfl_cntr.setText(
-            to_html("N_ov = {0}".format(self.QObj.N_over), frmt='i'))
-        if self.QObj.N_over == 0:
-            qstyle_widget(self.lbl_ovfl_cntr, "normal")
-        else:
-            qstyle_widget(self.lbl_ovfl_cntr, "changed")
+        if self.lbl_ovfl_count.isVisible():
+            self.lbl_ovfl_count.setText(
+                to_html("<i>N_ov</i> = {0}".format(self.QObj.N_over)))
+            if self.QObj.N_over == 0:
+                qstyle_widget(self.lbl_ovfl_count, "normal")
+            else:
+                qstyle_widget(self.lbl_ovfl_count, "changed")
 
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
         self.QObj.setQobj(self.q_dict)
