@@ -432,9 +432,11 @@ class Fixed(object):
         """
         Initialize Fixed object with dict q_obj
         """
-        # define default keys and values for quantizaion dict
-        self.q_obj_default = {'WI': 0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat',
-                              'frmt': 'float', 'qfrmt': 'qfrac', 'scale': 1}
+        # define default keys and values for quantization dict
+        self.q_obj_default = {
+            'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round', 'ovfl': 'sat',
+            'frmt': 'float', 'qfrmt': 'qfrac',
+            'scale': 1, 'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0}
         # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
         self.resetN()  # initialize overflow-counter
@@ -458,8 +460,7 @@ class Fixed(object):
         Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
-            if key not in ['Q', 'WF', 'WI', 'W', 'quant', 'ovfl', 'frmt', 'qfrmt',
-                           'scale']:
+            if key not in self.q_obj_default.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(key))
 
         if 'WI' in q_obj and 'WF' in q_obj:
@@ -493,6 +494,11 @@ class Fixed(object):
         self.W     = q_obj['W']
         q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
         self.Q     = q_obj['Q']
+
+        self.N = q_obj['N']
+        self.N_over = q_obj['N_over']
+        self.N_over_neg = q_obj['N_over_neg']
+        self.N_over_pos = q_obj['N_over_pos']
 
         try:
             self.scale = np.float64(q_obj['scale'])
@@ -760,6 +766,7 @@ class Fixed(object):
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
+        logger.error("Reset")
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
