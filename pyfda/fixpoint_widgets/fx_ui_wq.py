@@ -129,7 +129,6 @@ class FX_UI_WQ(QWidget):
         dict_ui = {'wdg_name': 'fx_ui_wq', 'label': '', 'label_2': '',
                    'label_q': 'Quant.', 'cmb_q_items': cmb_q, 'quant': 'round',
                    'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov, 'ovfl': 'wrap',
-                   'enabled': True, 'visible': True,
                    #
                    'label_w': '<i>WI.WF</i>&nbsp;:', 'lbl_sep': '.', 'max_led_width': 30,
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
@@ -253,8 +252,6 @@ class FX_UI_WQ(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-        frmMain.setEnabled(dict_ui['enabled'])
-        frmMain.setVisible(dict_ui['visible'])
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
