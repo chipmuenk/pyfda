@@ -495,6 +495,7 @@ class Fixed(object):
         q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
         self.Q     = q_obj['Q']
 
+        # TODO: is it neccessary to store counters in quant. object?
         self.N = q_obj['N']
         self.N_over = q_obj['N_over']
         self.N_over_neg = q_obj['N_over_neg']
