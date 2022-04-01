@@ -90,7 +90,8 @@ class FX_UI_WQ(QWidget):
     'cmb_w_vis'     : False                     # Integrated combo widget visible?
     'cmb_w_items'   : List with tooltip and combo box choices
     'cmb_w_init'    : 'man'                     # initial setting
-    'count_ovfl_vis': True                      # Is overflow counter visible?
+    'count_ovfl_vis': 'on'                      # Is overflow counter visible?
+                                                #   ['on', 'off', 'auto']
     """
     # incoming,
     # sig_rx = pyqtSignal(object)
@@ -136,7 +137,7 @@ class FX_UI_WQ(QWidget):
                    'fractional': True,
                    'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
                    'lock_vis': False, 'tip_lock': 'Sync input and output quantization.',
-                   'count_ovfl_vis': True
+                   'count_ovfl_vis': 'auto'
                    }
 
         # update local `dict_ui` with keyword arguments passed during construction
@@ -196,11 +197,11 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(dict_ui['fractional'])
         self.ledWF.setObjectName("WF")
 
+        self.count_ovfl_vis = dict_ui['count_ovfl_vis']
         self.lbl_ovfl_count = QLabel(to_html("N_ov = 0", frmt='i'))
         self.lbl_ovfl_count.setAutoFillBackground(True)
-        self.lbl_ovfl_count.setVisible(dict_ui['count_ovfl_vis'])
-        color = QColor(233, 10, 150)
-        alpha = 140
+        # color = QColor(233, 10, 150)
+        # alpha = 140
         # values = "{r}, {g}, {b}, {a}".format(
         #     r=color.red(), g=color.green(), b=color.blue(), a=alpha)
         # self.lbl_ovfl_cntr.setStyleSheet("QLabel { background-color: rgba("+values+"); }")
@@ -252,6 +253,8 @@ class FX_UI_WQ(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
+        # initialize counter display
+        self.update_ovfl()
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -312,6 +315,25 @@ class FX_UI_WQ(QWidget):
 
         dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
         self.emit(dict_sig)
+
+    # --------------------------------------------------------------------------
+    def update_ovfl(self):
+        """
+        Update the overflow counter display (if visible)
+        """
+        if self.count_ovfl_vis == 'off' or\
+                self.count_ovfl_vis == 'auto' and self.QObj.N_over == 0:
+            self.lbl_ovfl_count.setVisible(False)
+        else:
+            self.lbl_ovfl_count.setVisible(True)
+
+            self.lbl_ovfl_count.setText(
+                to_html("<i>N</i>_ov = {0}".format(self.QObj.N_over)))
+            if self.QObj.N_over == 0:
+                qstyle_widget(self.lbl_ovfl_count, "normal")
+            else:
+                qstyle_widget(self.lbl_ovfl_count, "changed")
+        return
 
     # --------------------------------------------------------------------------
     def ui2dict(self):
@@ -407,13 +429,7 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        if self.lbl_ovfl_count.isVisible():
-            self.lbl_ovfl_count.setText(
-                to_html("<i>N_ov</i> = {0}".format(self.QObj.N_over)))
-            if self.QObj.N_over == 0:
-                qstyle_widget(self.lbl_ovfl_count, "normal")
-            else:
-                qstyle_widget(self.lbl_ovfl_count, "changed")
+        self.update_ovfl()
 
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
         self.QObj.setQobj(self.q_dict)
