@@ -42,8 +42,8 @@ logger = logging.getLogger(__name__)
 # TODO: Filters need to be scaled properly, see e.g.
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
+#       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter 
 
-# TODO: convert to a proper Model-View-Architecture using QTableView?
 
 classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
 
@@ -329,8 +329,8 @@ class Input_Coeffs(QWidget):
                 self.data_changed = False
             if self.fx_specs_changed or\
                     ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
-                self.fx_specs_changed = False
                 self.qdict2ui()
+                self.fx_specs_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view
             # TODO: what is emitted when fixpoint formats are changed?
