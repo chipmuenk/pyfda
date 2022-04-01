@@ -757,7 +757,6 @@ class Fixed(object):
     def resetN(self):
         """ Reset counter and overflow-counters of Fixed object"""
         self.N = 0
-        self.N_points = 0
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
