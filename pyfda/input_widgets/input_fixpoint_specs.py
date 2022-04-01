@@ -154,10 +154,7 @@ class Input_Fixpoint_Specs(QWidget):
         1. ``fx_sim': 'init'``: Start fixpoint simulation by sending
            'fx_sim':'start_fx_response_calculation'
 
-        2. ``fx_sim_calc_response()``: Receive stimulus from widget in
-            'fx_sim':'calc_frame_fx_response' and pass it to fixpoint simulation method
-
-        3. Store fixpoint response in `fb.fx_result` and return to initiating routine
+        2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
         # logger.info(
@@ -198,15 +195,11 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
 
-            elif dict_sig['fx_sim'] == 'calc_frame_fx_response':
-                self.fx_sim_calc_response(dict_sig)
-                # return to the routine collecting the response frame by frame
-                return
-
             elif dict_sig['fx_sim'] == 'specs_changed':
                 # fixpoint specifications / quantization settings have been changed
                 # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
                 self.wdg_dict2ui()
+
             elif dict_sig['fx_sim'] == 'finish':
                 qstyle_widget(self.butSimFx, "normal")
             else:
