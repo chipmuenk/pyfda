@@ -70,7 +70,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu', cmb_w_vis=True,
+            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu', cmb_w_vis='on',
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
 
         # initial setting for accumulator

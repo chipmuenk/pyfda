@@ -60,7 +60,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("Empty dict / missing key 'fxqc['QCB]'!")
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
-            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
+            MSB_LSB_vis='on')
 
         # widget for quantization of coefficients 'a'
         if 'QCA' not in fb.fil[0]['fxqc']:
@@ -68,7 +69,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("Empty dict / missing key 'fxqc['QCA]'!")
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
-            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>')
+            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
+            MSB_LSB_vis='max')
 
         # widget for accumulator quantization
         if 'QA' not in fb.fil[0]['fxqc']:
@@ -78,7 +80,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-            cmb_w_vis=True)
+            cmb_w_vis='max')
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS

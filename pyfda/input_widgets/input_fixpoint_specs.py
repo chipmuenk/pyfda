@@ -271,7 +271,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_wq_input = FX_UI_WQ(
             fb.fil[0]['fxqc']['QI'], wdg_name='wq_input',
             label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
-            lock_vis=True)
+            lock_vis='on')
         if HAS_DS:
             self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
             self.wdg_wq_input.cmbQuant.setItemData(

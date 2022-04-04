@@ -578,7 +578,7 @@ class UI_WQ(QWidget):
 
         self.cmbW = QComboBox(self)
         qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
-        self.cmbW.setVisible(dict_ui['cmb_w_vis'])
+        self.cmbW.setVisible(dict_ui['cmb_w_vis'] == 'on')
         self.cmbW.setObjectName("cmbW")
 
         self.butLock = QPushButton(self)

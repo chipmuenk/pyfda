@@ -21,7 +21,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget)
-# from pyfda.pyfda_rc import params
+from pyfda.pyfda_rc import params
 from pyfda.libs.pyfda_lib import safe_eval, to_html
 
 import logging
@@ -84,14 +84,15 @@ class FX_UI_WQ(QWidget):
     'WF_len'        : 2                         # max. number of frac. *digits*
     'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
 
-    'lock_vis'      : False                     # Pushbutton for locking visible
+    'lock_vis'      : 'off''                    # Pushbutton for locking visible
     'tip_lock'      : 'Sync input/output quant.'# Tooltip for  lock push button
 
-    'cmb_w_vis'     : False                     # Integrated combo widget visible?
+    'cmb_w_vis'     : 'off'                     # Integrated combo widget visible?
     'cmb_w_items'   : List with tooltip and combo box choices
     'cmb_w_init'    : 'man'                     # initial setting
     'count_ovfl_vis': 'on'                      # Is overflow counter visible?
                                                 #   ['on', 'off', 'auto']
+    'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
     """
     # incoming,
     # sig_rx = pyqtSignal(object)
@@ -135,9 +136,9 @@ class FX_UI_WQ(QWidget):
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
-                   'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
-                   'lock_vis': False, 'tip_lock': 'Sync input and output quantization.',
-                   'count_ovfl_vis': 'auto'
+                   'cmb_w_vis': 'off', 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
+                   'lock_vis': 'off', 'tip_lock': 'Sync input and output quantization.',
+                   'count_ovfl_vis': 'auto', 'MSB_LSB_vis': 'off'
                    }
 
         # update local `dict_ui` with keyword arguments passed during construction
@@ -168,13 +169,13 @@ class FX_UI_WQ(QWidget):
 
         self.cmbW = QComboBox(self)
         qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
-        self.cmbW.setVisible(dict_ui['cmb_w_vis'])
+        self.cmbW.setVisible(dict_ui['cmb_w_vis'] == 'on')
         self.cmbW.setObjectName("cmbW")
 
         self.butLock = QPushButton(self)
         self.butLock.setCheckable(True)
         self.butLock.setChecked(False)
-        self.butLock.setVisible(dict_ui['lock_vis'])
+        self.butLock.setVisible(dict_ui['lock_vis'] == 'on')
         self.butLock.setToolTip(dict_ui['tip_lock'])
         self.butLock.setFixedWidth(self.butLock.height())
 
@@ -200,11 +201,22 @@ class FX_UI_WQ(QWidget):
         self.count_ovfl_vis = dict_ui['count_ovfl_vis']
         self.lbl_ovfl_count = QLabel(to_html("N_ov = 0", frmt='i'))
         self.lbl_ovfl_count.setAutoFillBackground(True)
+
+        self.MSB_LSB_vis = dict_ui['MSB_LSB_vis']
         # color = QColor(233, 10, 150)
         # alpha = 140
         # values = "{r}, {g}, {b}, {a}".format(
         #     r=color.red(), g=color.green(), b=color.blue(), a=alpha)
         # self.lbl_ovfl_cntr.setStyleSheet("QLabel { background-color: rgba("+values+"); }")
+
+        # -------------------------------------------------------------------
+        # MSB / LSB size
+        # ---------------------------------------------------------------------
+        self.lbl_MSB = QLabel(self)
+        self.lbl_MSB.setText("undefined")
+
+        self.lbl_LSB = QLabel(self)
+        self.lbl_LSB.setText("undefined")
 
         layH_W = QHBoxLayout()
         layH_W.addStretch()
@@ -224,6 +236,9 @@ class FX_UI_WQ(QWidget):
         layG.addLayout(lay_H_stretch, 1, 1)
         layG.addWidget(self.cmbQuant, 1, 3)
         layG.addWidget(self.cmbOvfl, 1, 4)
+        # third row - MSB / LSB
+        layG.addWidget(self.lbl_MSB, 2, 0, 1, 2)
+        layG.addWidget(self.lbl_LSB, 2, 3, 1, 2)
         layG.setContentsMargins(0, 0, 0, 0)
 
         frmMain = QFrame(self)
@@ -428,6 +443,26 @@ class FX_UI_WQ(QWidget):
             WF = safe_eval(q_dict['WF'], self.QObj.WF, return_type="int", sign='poszero')
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
+
+        # Update MSB / LSB
+        if self.MSB_LSB_vis == 'off':
+            self.lbl_MSB.setVisible(False)
+            self.lbl_LSB.setVisible(False)
+        elif self.MSB_LSB_vis == 'max':
+            self.lbl_MSB.setVisible(True)
+            self.lbl_LSB.setVisible(True)
+            self.lbl_MSB.setText(
+                f"<b><i>Max</i><sub>10</sub> = </b>{self.QObj.MAX:.{params['FMT_ba']}g}")
+            self.lbl_LSB.setText(
+                f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+        elif self.MSB_LSB_vis == 'msb':
+            self.lbl_MSB.setVisible(True)
+            self.lbl_LSB.setVisible(True)
+            self.lbl_MSB.setText(
+                f"<b><i>MSB</i><sub>10</sub> = </b>{self.QObj.MSB:.{params['FMT_ba']}g}")
+            self.lbl_LSB.setText(
+                f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+
 
         self.update_ovfl()
 
