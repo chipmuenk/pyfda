@@ -745,17 +745,6 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
 
     # --------------------------------------------------------------------------
-    def _update_MSB_LSB(self):
-        """
-        Update the infos (LSB, MSB)
-        """
-        # TODO: Wdg for a is missing
-        self.ui.lblLSB_b.setText(
-            f"{self.ui.wdg_wq_coeffs_b.QObj.LSB:.{params['FMT_ba']}g}")
-        self.ui.lblMSB_b.setText(
-            f"{self.ui.wdg_wq_coeffs_b.QObj.MSB:.{params['FMT_ba']}g}")
-
-    # --------------------------------------------------------------------------
     def qdict2ui(self):
         """
         Triggered by:
@@ -774,7 +763,6 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
-        self._update_MSB_LSB()
         self.refresh_table()
 
 # ------------------------------------------------------------------------------
@@ -791,7 +779,7 @@ class Input_Coeffs(QWidget):
         instances of `FX_UI_WQ` every time something is updated there. This information
         is also kept in the quantization objects `QObj` of the quantization widgets.
 
-        - Refresh the table, update quantization widgets, MSB and LSB display
+        - Refresh the table, update quantization widgets
         - Emit signal `'fx_sim': 'specs_changed'`
         """
         logger.warning("called ui2qdict")
@@ -803,7 +791,7 @@ class Input_Coeffs(QWidget):
             {'frmt': str(self.ui.cmbFormat.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
-        self.qdict2ui()  # update quant. widgets, table, MSB / LSB display
+        self.qdict2ui()  # update quant. widgets, table
 
         self.emit({'fx_sim': 'specs_changed'})
 

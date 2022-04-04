@@ -273,40 +273,17 @@ class Input_Coeffs_UI(QWidget):
         self.frmButtonsCoeffs = QFrame(self)
         self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
 
-        # -------------------------------------------------------------------
-        # MSB / LSB size
-        # ---------------------------------------------------------------------
-        lblMSBtxt_b = QLabel(self)
-        lblMSBtxt_b.setText("<b><i>MSB</i><sub>b,10</sub> =</b>")
-        self.lblMSB_b = QLabel(self)
-        layHMSB_b = QHBoxLayout()
-        layHMSB_b.addWidget(lblMSBtxt_b)
-        layHMSB_b.addWidget(self.lblMSB_b)
-        layHMSB_b.addStretch()
-
-        lblLSBtxt_b = QLabel(self)
-        lblLSBtxt_b.setText("<b><i>LSB</i><sub>b,10</sub> =</b>")
-        self.lblLSB_b = QLabel(self)
-        layHLSB_b = QHBoxLayout()
-        layHLSB_b.addWidget(lblLSBtxt_b)
-        layHLSB_b.addWidget(self.lblLSB_b)
-        layHLSB_b.addStretch()
-
-        layG_MSB_LSB_b = QGridLayout()
-        layG_MSB_LSB_b.addLayout(layHMSB_b, 0, 0)
-        layG_MSB_LSB_b.addLayout(layHLSB_b, 0, 1)
-
-        #######################################################################
-        # Now put all the coefficient HBoxes into frmQSettings_b
-        # ---------------------------------------------------------------------
-        layVButtonsQ_b = QVBoxLayout()
-#        layVButtonsQ_b.addLayout(layHW_Scale_b)
-        layVButtonsQ_b.addLayout(layG_MSB_LSB_b)
-        # layVButtonsQ_b.addLayout(layHCoeffs_MAX)
-        layVButtonsQ_b.setContentsMargins(0, 0, 0, 0)
-        # This frame encompasses all Quantization Settings
-        self.frmQSettings_b = QFrame(self)
-        self.frmQSettings_b.setLayout(layVButtonsQ_b)
+#         #######################################################################
+#         # Now put all the coefficient HBoxes into frmQSettings_b
+#         # ---------------------------------------------------------------------
+#         layVButtonsQ_b = QVBoxLayout()
+# #        layVButtonsQ_b.addLayout(layHW_Scale_b)
+#         layVButtonsQ_b.addLayout(layG_MSB_LSB_b)
+#         # layVButtonsQ_b.addLayout(layHCoeffs_MAX)
+#         layVButtonsQ_b.setContentsMargins(0, 0, 0, 0)
+#         # This frame encompasses all Quantization Settings
+#         self.frmQSettings_b = QFrame(self)
+#         self.frmQSettings_b.setLayout(layVButtonsQ_b)
 
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
