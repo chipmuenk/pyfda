@@ -589,7 +589,6 @@ class Input_Coeffs(QWidget):
         self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
 
         # hide all q-settings for float
-        self.ui.frmQSettings_b.setVisible(not is_float)
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
         self.ui.butQuant.setVisible(not is_float)
 

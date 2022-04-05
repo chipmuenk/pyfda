@@ -273,18 +273,6 @@ class Input_Coeffs_UI(QWidget):
         self.frmButtonsCoeffs = QFrame(self)
         self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
 
-#         #######################################################################
-#         # Now put all the coefficient HBoxes into frmQSettings_b
-#         # ---------------------------------------------------------------------
-#         layVButtonsQ_b = QVBoxLayout()
-# #        layVButtonsQ_b.addLayout(layHW_Scale_b)
-#         layVButtonsQ_b.addLayout(layG_MSB_LSB_b)
-#         # layVButtonsQ_b.addLayout(layHCoeffs_MAX)
-#         layVButtonsQ_b.setContentsMargins(0, 0, 0, 0)
-#         # This frame encompasses all Quantization Settings
-#         self.frmQSettings_b = QFrame(self)
-#         self.frmQSettings_b.setLayout(layVButtonsQ_b)
-
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
@@ -304,7 +292,6 @@ class Input_Coeffs_UI(QWidget):
         layVMainF.addLayout(layHDisplay)
         layVMainF.addWidget(self.frmButtonsCoeffs)
         layVMainF.addWidget(QHLine())
-        layVMainF.addWidget(self.frmQSettings_b)
         layVMainF.addWidget(self.wdg_wq_coeffs_b)
         layVMainF.addWidget(self.wdg_wq_coeffs_a)
 
@@ -358,7 +345,6 @@ class Input_Coeffs_UI(QWidget):
         self.emit({'ui_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
-
     def _close_csv_win(self):
         dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
