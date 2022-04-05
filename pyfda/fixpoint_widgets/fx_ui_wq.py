@@ -359,18 +359,22 @@ class FX_UI_WQ(QWidget):
         """
         Update the overflow counter display (if visible)
         """
-        if self.count_ovfl_vis == 'off' or\
-                self.count_ovfl_vis == 'auto' and self.QObj.N_over == 0:
+        if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
-        else:
-            self.lbl_ovfl_count.setVisible(True)
+        elif self.count_ovfl_vis == 'auto' and self.QObj.N_over == 0:
+            self.lbl_ovfl_count.setVisible(False)
+        elif self.count_ovfl_vis == 'on' or\
+                self.count_ovfl_vis == 'auto' and self.QObj.N_over > 0:
 
+            self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setText(
-                to_html("<i>N</i>_ov = {0}".format(self.QObj.N_over)))
+                to_html("<b><i>&nbsp;&nbsp;N</i>_ov = </b>{0}".format(self.QObj.N_over)))
             if self.QObj.N_over == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:
                 qstyle_widget(self.lbl_ovfl_count, "changed")
+        else:
+            logger.error(f"Unknown option count_ovfl_vis = '{self.count_ovfl_vis}'")
         return
 
     # --------------------------------------------------------------------------
@@ -394,6 +398,7 @@ class FX_UI_WQ(QWidget):
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
         self.QObj.setQobj(self.q_dict)
+
         self.update_MSB_LSB()  # update MSB / LSB info
 
         if self.sender():
