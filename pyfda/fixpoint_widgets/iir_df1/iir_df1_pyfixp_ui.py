@@ -61,7 +61,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='on')
+            MSB_LSB_vis='msb')
 
         # widget for quantization of coefficients 'a'
         if 'QCA' not in fb.fil[0]['fxqc']:
