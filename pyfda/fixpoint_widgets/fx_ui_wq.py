@@ -308,7 +308,11 @@ class FX_UI_WQ(QWidget):
         #                           -> list of int (scaled by 2^WF) when `to_int == True`
         if self.QObj.qfrmt == 'int':
             self.QObj.scale = 1 << self.QObj.WF
-        return list(self.QObj.fixp(coeffs))
+
+        coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
+        self.update_ovfl()  # update display of overflow counter
+        return coeff_q
+
 
     # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
