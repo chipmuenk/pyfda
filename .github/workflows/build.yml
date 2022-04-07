@@ -95,6 +95,6 @@ jobs:
           prerelease: true
           title: "Latest Build"
           files: |
-            **/artifacts/Gittyup Flatpak/com.github.chipmuenk.pyFDA.yml
-            **/com.github.Murmele.Gittyup-x86_64/*.flatpak
+            **/artifacts/pyFDA Flatpak/com.github.chipmuenk.pyFDA.yml
+            **/com.github.chipmuenk.pyFDA-x86_64/*.flatpak
 ...
