@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>com.github.chipmuenk.pyFDA</id>
   <metadata_license>FSFAP</metadata_license>
-  <project_license>OSMC-PL 1.2</project_license>
+  <project_license>GPL-3.0-or-later</project_license>
   <name>pyFDA</name>
   <summary>Python Filter Design Analysis Tool</summary>
 
