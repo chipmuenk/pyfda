@@ -22,7 +22,7 @@ jobs:
       uses: GuillaumeFalourd/clone-github-repo-action@v1
       with:
         owner: 'flathub'
-        repository: 'org.github.chipmuenk.pyFDA'
+        repository: 'com.github.chipmuenk.pyFDA'
 
     - name: Replace git tag by the commit id on which it runs
       if: github.ref_type != 'tag'
