@@ -1,0 +1,100 @@
+---
+name: PyFDA
+on:
+  push:
+  pull_request:
+  page_build:
+  workflow_dispatch:
+
+
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:kde-5.15-21.08
+      options: --privileged
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Clone flatpak manifest from Flathub
+      uses: GuillaumeFalourd/clone-github-repo-action@v1
+      with:
+        owner: 'flathub'
+        repository: 'org.github.chipmuenk.pyFDA'
+
+    - name: Replace git tag by the commit id on which it runs
+      if: github.ref_type != 'tag'
+      run: >
+        sed -i 's@tag: v[0-9]*.[0-9]*.[0-9]*@commit: "${{ github.sha }}"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+
+    - name: Use correct git tag
+      if: github.ref_type == 'tag'
+      run: >
+        sed -i 's@tag: .*$@tag: "${{ github.ref_name }}"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+
+    - name: Replace source url
+      run: >
+        sed -i "s@url: .*pyFDA.git@url: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+
+    - name: Add dev build marker to cmake options
+      if: github.ref_type != 'tag'
+      run: >
+        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA
+
+    - name: Replace desktop file name suffix
+      if: github.ref_type != 'tag'
+      run: >
+        sed -i 's@desktop-file-name-suffix: ""@desktop-file-name-suffix: " (Development)"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+
+    - name: Show Flatpak manifest
+      run: cat com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+
+    - name: Build package
+      uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v4
+      with:
+        bundle: com.github.chipmuenk.pyFDA.flatpak
+        manifest-path: com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        cache: false
+        branch: development
+
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        path: com.github.chipmuenk.pyFDA/*
+        name: pyFDA Flatpak
+
+  prerelease:
+    # https://github.com/marvinpinto/actions/issues/177
+    needs: [flatpak]
+    runs-on: ubuntu-latest # does not matter which
+    if: ${{ github.ref == 'refs/heads/master' }}
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: list artifacts folder
+        run: |
+          echo "Show artifacts folder:"
+          ls artifacts
+          echo "Show artifacts/pyFDA Flatpak folder:"
+          ls "artifacts/pyFDA Flatpak"
+          echo "Show artifacts/com.github.chipmuenk.pyFDA-x86_64:"
+          ls "artifacts/com.github.chipmuenk.pyFDA-x86_64"
+
+      - name: Update GitHub prerelease
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: latest
+          prerelease: true
+          title: "Latest Build"
+          files: |
+            **/artifacts/Gittyup Flatpak/com.github.chipmuenk.pyFDA.yml
+            **/com.github.Murmele.Gittyup-x86_64/*.flatpak
+...
