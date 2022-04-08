@@ -1,4 +1,4 @@
-pyFDA
+pyfda
 ======
 ## Python Filter Design Analysis Tool
 
@@ -8,7 +8,7 @@ pyFDA
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 
-pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. When the migen module is installed, fixpoint implementations (for some filter types) can be simulated and exported as synthesizable Verilog netlists.
+pyfda is a GUI based tool in Python / Qt for analysing and designing discrete time filters. Fixpoint implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
 ![Screenshot](img/pyfda_screenshot_3.png)
 
@@ -54,7 +54,7 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
-## Installing pyFDA
+## Installing pyfda
 Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you can install pyfda using one of the following options: 
@@ -96,7 +96,7 @@ installed locally using either
 
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
-## Starting pyFDA
+## Starting pyfda
 In any case, a start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
