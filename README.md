@@ -8,7 +8,7 @@ pyfda
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 
-pyfda is a GUI based tool in Python / Qt for analysing and designing discrete time filters. Fixpoint implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
+**pyfda** is tool written in Python / Qt for analysing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
 ![Screenshot](img/pyfda_screenshot_3.png)
 
@@ -67,6 +67,10 @@ or upgrade using
 
     > pip3 install pyfda -U
     
+If you have cloned `pyfda` to your local drive you can install it (i.e. create local config files and the `pyfdax` starter script) via
+
+    > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
+
 For more details and options see [INSTALLATION.md](INSTALLATION.md).
 
 ### setup.py   
@@ -86,9 +90,9 @@ For development purposes, you should fork the latest version of pyfda from https
 This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it.
 
 The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point. As described above, pyfda can be 
-installed locally using either 
+installed from local files using either 
 
-    > pip3 install -e <YOUR_PATH_TO_PYFDA>
+    > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
  or
  
