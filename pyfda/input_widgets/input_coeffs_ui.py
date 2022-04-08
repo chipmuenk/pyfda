@@ -287,13 +287,25 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
         # ########################  Main UI Layout ############################
         #######################################################################
+        # Layout and frame for a coefficients quantization
+        # Layout and frame for output quantization
+        layVQbWdg = QVBoxLayout()
+        layVQbWdg.addWidget(self.wdg_wq_coeffs_b)
+        self.frm_wq_coeffs_b = QFrame(self)
+        self.frm_wq_coeffs_b.setLayout(layVQbWdg)
+        self.frm_wq_coeffs_b.setContentsMargins(*params['wdg_margins'])
+
+        layVQaWdg = QVBoxLayout()
+        layVQaWdg.addWidget(self.wdg_wq_coeffs_a)
+        self.frm_wq_coeffs_a = QFrame(self)
+        self.frm_wq_coeffs_a.setLayout(layVQaWdg)
+        self.frm_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
+
         # layout for frame (UI widget)
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHDisplay)
         layVMainF.addWidget(self.frmButtonsCoeffs)
-        layVMainF.addWidget(QHLine())
-        layVMainF.addWidget(self.wdg_wq_coeffs_b)
-        layVMainF.addWidget(self.wdg_wq_coeffs_a)
+        # layVMainF.addWidget(QHLine())
 
         # This frame encompasses all UI elements
         frmMain = QFrame(self)
@@ -303,6 +315,8 @@ class Input_Coeffs_UI(QWidget):
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.frm_wq_coeffs_b)
+        layVMain.addWidget(self.frm_wq_coeffs_a)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         #######################################################################
