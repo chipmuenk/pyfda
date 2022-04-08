@@ -1,5 +1,5 @@
 ---
-name: PyFDA
+name: pyfda
 on:
   push:
   pull_request:
@@ -22,48 +22,48 @@ jobs:
       uses: GuillaumeFalourd/clone-github-repo-action@v1
       with:
         owner: 'flathub'
-        repository: 'com.github.chipmuenk.pyFDA'
+        repository: 'com.github.chipmuenk.pyfda'
 
     - name: Replace git tag by the commit id on which it runs
       if: github.ref_type != 'tag'
       run: >
-        sed -i 's@tag: v[0-9]*.[0-9]*.[0-9]*@commit: "${{ github.sha }}"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        sed -i 's@tag: v[0-9]*.[0-9]*.[0-9]*@commit: "${{ github.sha }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
 
     - name: Use correct git tag
       if: github.ref_type == 'tag'
       run: >
-        sed -i 's@tag: .*$@tag: "${{ github.ref_name }}"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        sed -i 's@tag: .*$@tag: "${{ github.ref_name }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
 
     - name: Replace source url
       run: >
-        sed -i "s@url: .*pyFDA.git@url: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        sed -i "s@url: .*pyfda.git@url: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
 
     - name: Add dev build marker to cmake options
       if: github.ref_type != 'tag'
       run: >
-        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA
+        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda
 
     - name: Replace desktop file name suffix
       if: github.ref_type != 'tag'
       run: >
-        sed -i 's@desktop-file-name-suffix: ""@desktop-file-name-suffix: " (Development)"@' com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        sed -i 's@desktop-file-name-suffix: ""@desktop-file-name-suffix: " (Development)"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
 
     - name: Show Flatpak manifest
-      run: cat com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+      run: cat com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
 
     - name: Build package
       uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v4
       with:
-        bundle: com.github.chipmuenk.pyFDA.flatpak
-        manifest-path: com.github.chipmuenk.pyFDA/com.github.chipmuenk.pyFDA.yml
+        bundle: com.github.chipmuenk.pyfda.flatpak
+        manifest-path: com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yml
         cache: false
         branch: development
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v2
       with:
-        path: com.github.chipmuenk.pyFDA/*
-        name: pyFDA Flatpak
+        path: com.github.chipmuenk.pyfda/*
+        name: pyfda Flatpak
 
   prerelease:
     # https://github.com/marvinpinto/actions/issues/177
@@ -81,10 +81,10 @@ jobs:
         run: |
           echo "Show artifacts folder:"
           ls artifacts
-          echo "Show artifacts/pyFDA Flatpak folder:"
-          ls "artifacts/pyFDA Flatpak"
-          echo "Show artifacts/com.github.chipmuenk.pyFDA-x86_64:"
-          ls "artifacts/com.github.chipmuenk.pyFDA-x86_64"
+          echo "Show artifacts/pyfda Flatpak folder:"
+          ls "artifacts/pyfda Flatpak"
+          echo "Show artifacts/com.github.chipmuenk.pyfda-x86_64:"
+          ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
 
       - name: Update GitHub prerelease
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -95,6 +95,6 @@ jobs:
           prerelease: true
           title: "Latest Build"
           files: |
-            **/artifacts/pyFDA Flatpak/com.github.chipmuenk.pyFDA.yml
-            **/com.github.chipmuenk.pyFDA-x86_64/*.flatpak
+            **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yml
+            **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 ...

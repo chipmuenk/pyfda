@@ -1,1 +1,1 @@
-Checkout the [pyFDA flathub repository](https://github.com/flathub/com.github.chipmuenk.pyFDA) for the flatpak manifest
+Checkout the [pyfda flathub repository](https://github.com/flathub/com.github.chipmuenk.pyfda) for the flatpak manifest

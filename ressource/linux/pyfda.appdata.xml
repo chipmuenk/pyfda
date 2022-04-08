@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.github.chipmuenk.pyFDA</id>
+  <id>com.github.chipmuenk.pyfda</id>
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <name>pyFDA</name>
+  <name>pyfda</name>
   <summary>Python Filter Design Analysis Tool</summary>
 
   <description>
@@ -65,7 +65,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">com.github.chipmuenk.pyFDA.desktop</launchable>
+  <launchable type="desktop-id">com.github.chipmuenk.pyfda.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
@@ -81,11 +81,11 @@
     </screenshot>
   </screenshots>
 
-  <url type="homepage">https://github.com/chipmuenk/pyFDA</url>
+  <url type="homepage">https://github.com/chipmuenk/pyfda</url>
 
   <provides>
     <binary>pyfdax</binary>
-    <id>com.github.chipmuenk.pyFDA</id>
+    <id>com.github.chipmuenk.pyfda</id>
   </provides>
 
   <releases>
