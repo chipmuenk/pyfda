@@ -264,8 +264,8 @@ class FX_UI_WQ(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-        # initialize counter display
-        self.update_ovfl()
+        # initialize overflow counter and MSB / LSB display
+        self.update()
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -310,7 +310,7 @@ class FX_UI_WQ(QWidget):
             self.QObj.scale = 1 << self.QObj.WF
 
         coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
-        self.update_ovfl()  # update display of overflow counter
+        self.update()  # update display of overflow counter and MSB / LSB
         return coeff_q
 
 
@@ -332,9 +332,36 @@ class FX_UI_WQ(QWidget):
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
-    def update_MSB_LSB(self):
+    # def update_MSB_LSB(self):
+    #     """
+    #     Update MSB / LSB display (if visible)
+    #     """
+    #     if self.MSB_LSB_vis == 'off':
+    #         self.lbl_MSB.setVisible(False)
+    #         self.lbl_LSB.setVisible(False)
+    #     elif self.MSB_LSB_vis == 'max':
+    #         self.lbl_MSB.setVisible(True)
+    #         self.lbl_LSB.setVisible(True)
+    #         self.lbl_MSB.setText(
+    #             "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
+    #             f"{self.QObj.MAX:.{params['FMT_ba']}g}")
+    #         self.lbl_LSB.setText(
+    #             f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+    #     elif self.MSB_LSB_vis == 'msb':
+    #         self.lbl_MSB.setVisible(True)
+    #         self.lbl_LSB.setVisible(True)
+    #         self.lbl_MSB.setText(
+    #             "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
+    #             f"{self.QObj.MSB:.{params['FMT_ba']}g}")
+    #         self.lbl_LSB.setText(
+    #             f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+    #     else:
+    #         logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
+
+    # --------------------------------------------------------------------------
+    def update(self):
         """
-        Update MSB / LSB display (if visible)
+        Update the overflow counter and MSB / LSB display (if visible)
         """
         if self.MSB_LSB_vis == 'off':
             self.lbl_MSB.setVisible(False)
@@ -357,12 +384,7 @@ class FX_UI_WQ(QWidget):
                 f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
-
-    # --------------------------------------------------------------------------
-    def update_ovfl(self):
-        """
-        Update the overflow counter display (if visible)
-        """
+        # -------
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'auto' and self.QObj.N_over == 0:
@@ -403,7 +425,7 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
         self.QObj.setQobj(self.q_dict)
 
-        self.update_MSB_LSB()  # update MSB / LSB info
+        self.update()  # update MSB / LSB and overflow counter info
 
         if self.sender():
             obj_name = self.sender().objectName()
@@ -477,8 +499,7 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        self.update_MSB_LSB()
-        self.update_ovfl()
+        self.update()
 
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
         self.QObj.setQobj(self.q_dict)
