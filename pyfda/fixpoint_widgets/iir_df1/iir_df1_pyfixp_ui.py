@@ -14,9 +14,11 @@ import sys
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 
-from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
+from pyfda.libs.compat import QWidget, QVBoxLayout, QFrame, pyqtSignal
 
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.pyfda_rc import params
+
 from .iir_df1_pyfixp import IIR_DF1_pyfixp
 
 import logging
@@ -62,6 +64,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='msb')
+        layV_wq_coeffs_b = QVBoxLayout()
+        layV_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
+        self.frm_wq_coeffs_b = QFrame(self)
+        self.frm_wq_coeffs_b.setLayout(layV_wq_coeffs_b)
+        self.frm_wq_coeffs_b.setContentsMargins(*params['wdg_margins'])
 
         # widget for quantization of coefficients 'a'
         if 'QCA' not in fb.fil[0]['fxqc']:
@@ -71,6 +78,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
+        self.wdg_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
+        layV_wq_coeffs_a = QVBoxLayout()
+        layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
+        self.frm_wq_coeffs_a = QFrame(self)
+        self.frm_wq_coeffs_a.setLayout(layV_wq_coeffs_a)
+        self.frm_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
 
         # widget for accumulator quantization
         if 'QA' not in fb.fil[0]['fxqc']:
@@ -81,6 +94,20 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
             cmb_w_vis='max')
+        layV_wq_accu = QVBoxLayout()
+        layV_wq_accu.addWidget(self.wdg_wq_accu)
+        self.frm_accu = QFrame(self)
+        self.frm_accu.setLayout(layV_wq_accu)
+        self.frm_accu.setContentsMargins(*params['wdg_margins'])
+
+        # ----------------------------------------------------------------------
+        layVWdg = QVBoxLayout()
+        layVWdg.setContentsMargins(0, 0, 0, 0)
+        layVWdg.addWidget(self.frm_wq_coeffs_b)
+        layVWdg.addWidget(self.frm_wq_coeffs_a)
+        layVWdg.addWidget(self.frm_accu)
+        layVWdg.addStretch()
+        self.setLayout(layVWdg)
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -94,14 +121,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
-        # ----------------------------------------------------------------------
-        layVWdg = QVBoxLayout()
-        layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addWidget(self.wdg_wq_coeffs_b)
-        layVWdg.addWidget(self.wdg_wq_coeffs_a)
-        layVWdg.addWidget(self.wdg_wq_accu)
-        layVWdg.addStretch()
-        self.setLayout(layVWdg)
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

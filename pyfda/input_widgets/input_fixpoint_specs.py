@@ -232,6 +232,7 @@ class Input_Fixpoint_Specs(QWidget):
         # `self._update_fixp_widget()` later on
 
         self.layH_fx_wdg = QHBoxLayout()
+        # left and right: Zero margin, top and bottom: default margin
         self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
         frmHDL_wdg = QWidget(self)
         frmHDL_wdg.setStyleSheet(".QWidget { background-color:none; }")
