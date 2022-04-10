@@ -227,7 +227,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
 # ------------------------------------------------------------------------------
         # Define frame and layout for the dynamically updated filter widget
-        # The actual filter widget is instantiated in self.set_fixp_widget() later on
+        # The actual filter widget is instantiated / deleted in
+        # `self._update_fixp_widget()` later on
 
         self.layH_fx_wdg = QHBoxLayout()
         # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
