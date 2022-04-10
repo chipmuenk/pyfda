@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 # TODO: Filters need to be scaled properly, see e.g.
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
-#       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter 
+#       https://stackoverflow.com/questions/68206713/scipy-filter-force-minimal-value-of-sos-coefficient-to-prepare-integer-filter
 
 
 classes = {'Input_Coeffs': 'b,a'}  #: Dict containing class name : display name
@@ -319,6 +319,7 @@ class Input_Coeffs(QWidget):
 
         elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
+            # local events from ui, trigger requant and refresh table
             self.refresh_table()
             self.emit({'fx_sim': 'specs_changed'})
             return
@@ -329,6 +330,7 @@ class Input_Coeffs(QWidget):
                 self.data_changed = False
             if self.fx_specs_changed or\
                     ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
+                # global event, update widget dicts and table
                 self.qdict2ui()
                 self.fx_specs_changed = False
         else:
@@ -464,6 +466,10 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].ovr_flag,
                 self.QObj[1].ovr_flag
                         ]
+
+        self.ui.wdg_wq_coeffs_b.update()
+        self.ui.wdg_wq_coeffs_a.update()
+
     """         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
                     and self.QObj[0].WF > 0:
                 # decimal fixpoint representation with fractional part
@@ -561,8 +567,10 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def refresh_table(self):
         """
-        Update `self.ba_q` from `self.ba` (list with 2 one-dimensional numpy arrays)
-        and refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
+        Update `self.ba_q` from `self.ba` (list with 2 one-dimensional numpy arrays),
+        i.e. requantize displayed values (not `self.ba`) and overflow counters.
+
+        Refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
         the number format set by `self.frmt`.
 
         - self.ba[0] -> b coefficients
@@ -576,7 +584,8 @@ class Input_Coeffs(QWidget):
         """
         logger.error("refresh table")
         params['FMT_ba'] = int(self.ui.spnDigits.text())
-        self.quant_coeffs_view()  # quantize coefficients for display
+        # quantize coefficients for display, update overflow counter
+        self.quant_coeffs_view()
         if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
             self.num_rows = len(self.ba[0])
         else:
