@@ -1,4 +1,4 @@
-pyFDA
+pyfda
 ======
 ## Python Filter Design Analysis Tool
 
@@ -8,7 +8,7 @@ pyFDA
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 
-pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. When the migen module is installed, fixpoint implementations (for some filter types) can be simulated and exported as synthesizable Verilog netlists.
+**pyfda** is tool written in Python / Qt for analysing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
 ![Screenshot](img/pyfda_screenshot_3.png)
 
@@ -35,7 +35,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ## Binaries / Bundles
 Currently, binaries (created with [pyInstaller](https://www.pyinstaller.org/)) are provided for 64 bit Win 7 ... 10 and for 64 bit Ubuntu (created with 2020.04). The binaries may work with other systems, too (untested). The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
 
-pyFDA source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
+pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ pyFDA source code ist distributed under a permissive MIT license, binaries / bun
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
-## Installing pyFDA
+## Installing pyfda
 Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you can install pyfda using one of the following options: 
@@ -67,6 +67,10 @@ or upgrade using
 
     > pip3 install pyfda -U
     
+If you have cloned `pyfda` to your local drive you can install it (i.e. create local config files and the `pyfdax` starter script) via
+
+    > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
+
 For more details and options see [INSTALLATION.md](INSTALLATION.md).
 
 ### setup.py   
@@ -86,9 +90,9 @@ For development purposes, you should fork the latest version of pyfda from https
 This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it.
 
 The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point. As described above, pyfda can be 
-installed locally using either 
+installed from local files using either 
 
-    > pip3 install -e <YOUR_PATH_TO_PYFDA>
+    > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
  or
  
@@ -96,7 +100,7 @@ installed locally using either
 
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
-## Starting pyFDA
+## Starting pyfda
 In any case, a start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
