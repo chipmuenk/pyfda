@@ -225,17 +225,18 @@ class Input_Fixpoint_Specs(QWidget):
         - The UI of the fixpoint filter widget
         - Simulation and export buttons
         """
+        margins = params['wdg_margins']
 # ------------------------------------------------------------------------------
         # Define frame and layout for the dynamically updated filter widget
         # The actual filter widget is instantiated / deleted in
         # `self._update_fixp_widget()` later on
 
         self.layH_fx_wdg = QHBoxLayout()
-        # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
-        frmHDL_wdg = QFrame(self)
+        self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
+        frmHDL_wdg = QWidget(self)
+        frmHDL_wdg.setStyleSheet(".QWidget { background-color:none; }")
         frmHDL_wdg.setLayout(self.layH_fx_wdg)
         # frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        frmHDL_wdg.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description

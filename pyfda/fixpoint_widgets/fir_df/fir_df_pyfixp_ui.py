@@ -16,9 +16,11 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
-from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
+from pyfda.libs.compat import QWidget, QVBoxLayout, QFrame, pyqtSignal
 
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
+from pyfda.pyfda_rc import params
+
 from .fir_df_pyfixp import FIR_DF_pyfixp
 
 import logging
@@ -62,6 +64,11 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
             label='<b>Coeff. Quantization <i>B<sub>I.F&nbsp;</sub></i>:</b>')
+        layV_wq_coeffs = QVBoxLayout()
+        layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
+        self.frm_wq_coeffs = QFrame(self)
+        self.frm_wq_coeffs.setLayout(layV_wq_coeffs)
+        self.frm_wq_coeffs.setContentsMargins(*params['wdg_margins'])
 
         # widget for accumulator quantization
         if 'QA' not in fb.fil[0]['fxqc']:
@@ -71,6 +78,11 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu', cmb_w_vis='on',
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
+        layV_wq_accu = QVBoxLayout()
+        layV_wq_accu.addWidget(self.wdg_wq_accu)
+        self.frm_wq_accu = QFrame(self)
+        self.frm_wq_accu.setLayout(layV_wq_accu)
+        self.frm_wq_accu.setContentsMargins(*params['wdg_margins'])
 
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
@@ -85,10 +97,10 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
+        # margins are created in input_fixpoint_specs
         layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addWidget(self.wdg_wq_coeffs)
-        layVWdg.addWidget(self.wdg_wq_accu)
-        layVWdg.addStretch()
+        layVWdg.addWidget(self.frm_wq_coeffs)
+        layVWdg.addWidget(self.frm_wq_accu)
         self.setLayout(layVWdg)
 
     # --------------------------------------------------------------------------
