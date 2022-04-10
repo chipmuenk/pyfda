@@ -18,7 +18,6 @@ from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_WQ
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from .fir_df_pyfixp import FIR_DF_pyfixp
 
