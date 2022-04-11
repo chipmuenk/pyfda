@@ -360,15 +360,15 @@ class FX_UI_WQ(QWidget):
         # -------
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
-        elif self.count_ovfl_vis == 'auto' and self.QObj.N_over == 0:
+        elif self.count_ovfl_vis == 'auto' and self.q_dict['N_over'] == 0:
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'on' or\
-                self.count_ovfl_vis == 'auto' and self.QObj.N_over > 0:
+                self.count_ovfl_vis == 'auto' and self.q_dict['N_over'] > 0:
 
             self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setText(
-                to_html("<b><i>&nbsp;&nbsp;N</i>_ov = </b>{0}".format(self.QObj.N_over)))
-            if self.QObj.N_over == 0:
+                to_html("<b><i>&nbsp;&nbsp;N</i>_ov = </b>{0}".format(self.q_dict['N_over'])))
+            if self.q_dict['N_over'] == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:
                 qstyle_widget(self.lbl_ovfl_count, "changed")
