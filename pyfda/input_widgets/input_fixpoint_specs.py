@@ -202,8 +202,8 @@ class Input_Fixpoint_Specs(QWidget):
                 self.wdg_dict2ui()
 
             elif dict_sig['fx_sim'] == 'finish':
-                self.wdg_wq_input.update_ovfl()
-                self.wdg_wq_output.update_ovfl()
+                self.wdg_wq_input.update()
+                self.wdg_wq_output.update()
                 qstyle_widget(self.butSimFx, "normal")
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
