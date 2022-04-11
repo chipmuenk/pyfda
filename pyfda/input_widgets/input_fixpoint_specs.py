@@ -15,7 +15,7 @@ import re
 import importlib
 
 from pyfda.libs.compat import (
-    Qt, QWidget, QPushButton, QComboBox, QFileDialog, QSplitter, QLabel, QPixmap,
+    Qt, QWidget, QPushButton, QComboBox, QFileDialog, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import numpy as np
@@ -23,8 +23,6 @@ import numpy as np
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import qstr, pprint_log, first_item
-# import pyfda.libs.pyfda_fix_lib as fx
-# from pyfda.libs.pyfda_io_lib import extract_file_ext
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
@@ -349,22 +347,13 @@ class Input_Fixpoint_Specs(QWidget):
 # -------------------------------------------------------------------
 #       Top level layout
 # -------------------------------------------------------------------
-        splitter = QSplitter(self)
-        splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(frmHDL_wdg)
-        splitter.addWidget(self.frmImg)
-
-        # setSizes uses absolute pixel values, but can be "misused" by specifying values
-        # that are way too large: in this case, the space is distributed according
-        # to the _ratio_ of the values:
-        splitter.setSizes([3000, 5000])
-
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
         layVMain.addWidget(frmQiWdg)
+        layVMain.addWidget(frmHDL_wdg)
         layVMain.addWidget(frmQoWdg)
-        layVMain.addWidget(splitter)
+        layVMain.addWidget(self.frmImg)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
