@@ -332,33 +332,6 @@ class FX_UI_WQ(QWidget):
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
-    # def update_MSB_LSB(self):
-    #     """
-    #     Update MSB / LSB display (if visible)
-    #     """
-    #     if self.MSB_LSB_vis == 'off':
-    #         self.lbl_MSB.setVisible(False)
-    #         self.lbl_LSB.setVisible(False)
-    #     elif self.MSB_LSB_vis == 'max':
-    #         self.lbl_MSB.setVisible(True)
-    #         self.lbl_LSB.setVisible(True)
-    #         self.lbl_MSB.setText(
-    #             "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
-    #             f"{self.QObj.MAX:.{params['FMT_ba']}g}")
-    #         self.lbl_LSB.setText(
-    #             f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
-    #     elif self.MSB_LSB_vis == 'msb':
-    #         self.lbl_MSB.setVisible(True)
-    #         self.lbl_LSB.setVisible(True)
-    #         self.lbl_MSB.setText(
-    #             "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
-    #             f"{self.QObj.MSB:.{params['FMT_ba']}g}")
-    #         self.lbl_LSB.setText(
-    #             f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
-    #     else:
-    #         logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
-
-    # --------------------------------------------------------------------------
     def update(self):
         """
         Update the overflow counter and MSB / LSB display (if visible)
