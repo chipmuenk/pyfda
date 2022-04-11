@@ -63,7 +63,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
-            label='<b>Coeff. Quantization <i>B<sub>I.F&nbsp;</sub></i>:</b>')
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
         layV_wq_coeffs = QVBoxLayout()
         layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
         self.frm_wq_coeffs = QFrame(self)
