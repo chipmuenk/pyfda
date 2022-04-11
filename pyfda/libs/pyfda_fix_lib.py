@@ -294,14 +294,14 @@ class Fixed(object):
 
     Define a dictionary with the format options and pass it to the constructor:
 
-    >>> q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} # or
-    >>> q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
-    >>> myQ = Fixed(q_obj)
+    >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} # or
+    >>> q_dict = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
+    >>> myQ = Fixed(q_dict)
 
 
     Parameters
     ----------
-    q_obj : dict
+    q_dict : dict
         define quantization options with the following keys
 
     * **'WI'** : integer word length, default: 0
@@ -346,14 +346,14 @@ class Fixed(object):
             representation and its floating point value. If ``scale`` is a float,
             this value is used. Alternatively, if:
 
-                - ``q_obj['scale'] == 'int'``:   scale = 1 << self.WF
+                - ``q_dict['scale'] == 'int'``:   scale = 1 << self.WF
 
-                - ``q_obj['scale'] == 'norm'``:  scale = 2.**(-self.WI)
+                - ``q_dict['scale'] == 'norm'``:  scale = 2.**(-self.WI)
 
 
     Attributes
     ----------
-    q_obj : dict
+    q_dict : dict
         A copy of the quantization dictionary (see above)
 
     WI : integer
@@ -428,17 +428,17 @@ class Fixed(object):
 
     """
 
-    def __init__(self, q_obj):
+    def __init__(self, q_dict):
         """
-        Initialize Fixed object with dict q_obj
+        Initialize Fixed object with dict `q_dict`
         """
         # define default keys and values for quantization dict
-        self.q_obj_default = {
+        self.q_dict_default = {
             'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round', 'ovfl': 'sat',
             'frmt': 'float', 'qfrmt': 'qfrac',
             'scale': 1, 'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0}
         # test if all passed keys of quantizer object are defined
-        self.setQobj(q_obj)
+        self.setQobj(q_dict)
         self.resetN()  # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
@@ -451,67 +451,67 @@ class Fixed(object):
                         }
         self.frmt2float_vec = np.vectorize(self.frmt2float_scalar, excluded='self')
 
-    def setQobj(self, q_obj):
+    def setQobj(self, q_dict):
         """
-        Use passed quantization dict `q_obj` to update the instance quantization
-        dict `self.q_obj` resp. create it if it doesn't using default data
-        `self.q_obj_default` for missing keys:value pairs.
+        Use passed quantization dict `q_dict` to update the instance quantization
+        dict `self.q_dict` resp. create it if it doesn't using default data
+        `self.q_dict_default` for missing keys:value pairs.
 
         Check the docstring of class `Fixed()` for  details.
         """
-        for key in q_obj.keys():
-            if key not in self.q_obj_default.keys():
+        for key in q_dict.keys():
+            if key not in self.q_dict_default.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(key))
 
-        if 'WI' in q_obj and 'WF' in q_obj:
+        if 'WI' in q_dict and 'WF' in q_dict:
             pass  # everything's defined already
-        elif 'W' in q_obj:
-            q_obj['WI'] = int(q_obj['W']) - 1
-            q_obj['WF'] = 0
-        elif 'Q' in q_obj:
-            Q_str = str(q_obj['Q']).split('.', 1)  # split 'Q':'1.4'
-            q_obj['WI'] = int(Q_str[0])
-            q_obj['WF'] = abs(int(Q_str[1]))
+        elif 'W' in q_dict:
+            q_dict['WI'] = int(q_dict['W']) - 1
+            q_dict['WF'] = 0
+        elif 'Q' in q_dict:
+            Q_str = str(q_dict['Q']).split('.', 1)  # split 'Q':'1.4'
+            q_dict['WI'] = int(Q_str[0])
+            q_dict['WF'] = abs(int(Q_str[1]))
 
         # missing key-value pairs are either taken from default dict or from
         # instance attributes
-        for k in self.q_obj_default.keys():  # loop over all defined keys
-            if k not in q_obj.keys():  # key is not in passed dict, get k:v pair from ...
+        for k in self.q_dict_default.keys():  # loop over all defined keys
+            if k not in q_dict.keys():  # key is not in passed dict, get k:v pair from ...
                 if hasattr(self, k):
-                    q_obj[k] = getattr(self, k)  # ... class attribute
+                    q_dict[k] = getattr(self, k)  # ... class attribute
                 else:
-                    q_obj[k] = self.q_obj_default[k]  # ... default dict
+                    q_dict[k] = self.q_dict_default[k]  # ... default dict
 
         # store parameters as class attributes
-        self.WI    = int(q_obj['WI'])
-        self.WF    = int(abs(q_obj['WF']))
-        self.quant = str(q_obj['quant']).lower()
-        self.ovfl  = str(q_obj['ovfl']).lower()
-        self.frmt  = str(q_obj['frmt']).lower()
-        self.qfrmt = str(q_obj['qfrmt']).lower()
+        self.WI    = int(q_dict['WI'])
+        self.WF    = int(abs(q_dict['WF']))
+        self.quant = str(q_dict['quant']).lower()
+        self.ovfl  = str(q_dict['ovfl']).lower()
+        self.frmt  = str(q_dict['frmt']).lower()
+        self.qfrmt = str(q_dict['qfrmt']).lower()
 
-        q_obj['W'] = int(self.WF + self.WI + 1)
-        self.W     = q_obj['W']
-        q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
-        self.Q     = q_obj['Q']
+        q_dict['W'] = int(self.WF + self.WI + 1)
+        self.W     = q_dict['W']
+        q_dict['Q'] = str(self.WI) + '.' + str(self.WF)
+        self.Q     = q_dict['Q']
 
         # TODO: is it neccessary to store counters in quant. object?
-        self.N = q_obj['N']
-        self.N_over = q_obj['N_over']
-        self.N_over_neg = q_obj['N_over_neg']
-        self.N_over_pos = q_obj['N_over_pos']
+        self.N = q_dict['N']
+        self.N_over = q_dict['N_over']
+        self.N_over_neg = q_dict['N_over_neg']
+        self.N_over_pos = q_dict['N_over_pos']
 
         try:
-            self.scale = np.float64(q_obj['scale'])
+            self.scale = np.float64(q_dict['scale'])
         except ValueError:
-            # if q_obj['scale'] == 'int':
+            # if q_dict['scale'] == 'int':
             #     self.scale = 1 << self.WF
-            # elif q_obj['scale'] == 'norm':
+            # elif q_dict['scale'] == 'norm':
             #     self.scale = 2.**(-self.WI)
             # else:
             raise ValueError
 
-        self.q_obj = q_obj  # store quant. dict in instance
+        self.q_obj = q_dict  # store quant. dict in instance
 
         # calculate and set some useful class attributes
         self.LSB = 2. ** -self.WF  # value of LSB
@@ -731,6 +731,9 @@ class Fixed(object):
             self.N_over_pos += np.sum(over_pos)
             self.N_over = self.N_over_neg + self.N_over_pos
 
+            self.q_obj.update({'N_over': self.N_over, 'N_over_neg': self.N_over_neg,
+                               'N_over_pos': self.N_over_pos})
+
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
                 yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
@@ -767,6 +770,7 @@ class Fixed(object):
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
+        self.q_obj.update({'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0})
         logger.error("Reset")
 
     # --------------------------------------------------------------------------
@@ -1057,21 +1061,21 @@ if __name__ == '__main__':
     """
     import pprint
 
-    q_obj = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 1}
-    myQ = Fixed(q_obj)  # instantiate fixpoint object with settings above
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 1}
+    myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
-    myQ.setQobj(q_obj)
+    myQ.setQobj(q_dict)
 
     print("\nTesting float2frmt()\n====================")
-    pprint.pprint(q_obj)
+    pprint.pprint(q_dict)
     for y in y_list:
         print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
     print("\nTesting frmt2float()\n====================")
-    q_obj = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 2}
-    pprint.pprint(q_obj)
-    myQ.setQobj(q_obj)
+    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 2}
+    pprint.pprint(q_dict)
+    myQ.setQobj(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
         print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
