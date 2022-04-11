@@ -494,30 +494,31 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
         the image inside QLabel to completely fill the label while keeping
-        the aspect ratio. An offset of some pixels is needed, otherwise the image
-        is clipped.
+        the aspect ratio.
+
+        The parent `InputTabWidget` defines the available width (minus some offset
+        due to margins etc.), unfortunately `self.width()` cannot be used as a measure
+        as it expands with the parent but doesn't shrink.
         """
-        # logger.warning(f"resize_img(): img_fixp = {self.img_fixp.__class__.__name__}")
-
-        if self.parent is None:  # parent is QApplication, has no width or height
-            par_w, par_h = 300, 700  # fixed size for module level test
+        # Module level test: Parent is QApplication which has no width:
+        if self.parent is None:
+            wdg_w = 300  # set fixed size for module level test
         else:  # widget parent is InputTabWidget()
-            par_w, par_h = self.parent.width(), self.parent.height()
+            wdg_w = self.parent.width()
 
-        img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
+        # img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
+        # if img_w > 20:
+        #     max_h = int(max(np.floor(img_h * scale) - 5, 20))
+        # else:
+        #     max_h = 200
+        # logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}"
+        #              .format(img_w, img_h, par_w, par_h, max_h))
 
-        if img_w > 10:
-            max_h = int(max(np.floor(img_h * par_w/img_w) - 5, 20))
-        else:
-            max_h = 200
-        logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}"
-                     .format(img_w, img_h, par_w, par_h, max_h))
-
-        # The following doesn't work because the width of the parent widget can grow
-        # with the image size
+        # The following doesn't work because the width of the parent widget can
+        # grow with the image size:
         # img_scaled = self.img_fixp.scaled(self.lbl_fixp_img.size(),
         # Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaledToWidth(wdg_w - 15, Qt.SmoothTransformation)
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
