@@ -13,7 +13,7 @@ import sys
 
 import numpy as np
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log
+from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, QFrame, pyqtSignal
@@ -90,18 +90,23 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
 
         # ----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs & EVENTFILTERS
-        # ----------------------------------------------------------------------
-        self.wdg_wq_coeffs.sig_tx.connect(self.process_sig_rx)
-        self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
-
-        # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         # margins are created in input_fixpoint_specs
         layVWdg.setContentsMargins(0, 0, 0, 0)
         layVWdg.addWidget(self.frm_wq_coeffs)
         layVWdg.addWidget(self.frm_wq_accu)
         self.setLayout(layVWdg)
+
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
+        # ----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs & EVENTFILTERS
+        # ----------------------------------------------------------------------
+        self.wdg_wq_coeffs.sig_tx.connect(self.process_sig_rx)
+        self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -140,8 +145,11 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
 
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.dict2ui()
+
         else:
-            logger.error(f"Unknown key '{dict_sig['wdg_name']}' (should be 'ui')"
+            logger.error(f"Unknown key '{first_item(dict_sig)}' (should be 'ui')"
                          f"in '{__name__}' !")
 
     # --------------------------------------------------------------------------
