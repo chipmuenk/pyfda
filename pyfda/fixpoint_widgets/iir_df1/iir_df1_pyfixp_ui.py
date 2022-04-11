@@ -106,7 +106,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layVWdg.addWidget(self.frm_wq_coeffs_b)
         layVWdg.addWidget(self.frm_wq_coeffs_a)
         layVWdg.addWidget(self.frm_accu)
-        layVWdg.addStretch()
         self.setLayout(layVWdg)
 
         # ----------------------------------------------------------------------
@@ -120,7 +119,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
-
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
