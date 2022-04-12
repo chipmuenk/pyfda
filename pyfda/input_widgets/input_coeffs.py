@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
+# TODO: QObj.format and QObj.places need to be accessible globally, i.e. as ui.format
+# TODO: str(save_eval(...)) needed?
 #
 # TODO: Filters need to be scaled properly, see e.g.
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
@@ -114,7 +116,7 @@ class ItemDelegate(QStyledItemDelegate):
             option.font.setBold(True)
             option.displayAlignment = Qt.AlignRight | Qt.AlignCenter
             # see http://zetcode.com/gui/pyqt5/painting/ :
-            option.backgroundBrush = QBrush(Qt.BDiagPattern)  # QColor(100, 200, 100, 200)
+            option.backgroundBrush = QBrush(Qt.BDiagPattern)
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
             # don't continue with default initStyleOption... display routine ends here
         else:
@@ -140,6 +142,7 @@ class ItemDelegate(QStyledItemDelegate):
 #
 # ==============================================================================
 
+    # -------------------------------------------------------------------------
     def text(self, item):
         """
         Return item text as string transformed by self.displayText()
@@ -148,11 +151,11 @@ class ItemDelegate(QStyledItemDelegate):
 
         TODO: Still needed?
         """
-        # return qstr(item.text()) # convert to "normal" string
         dtext = str(self.displayText(item.text(), QtCore.QLocale()))
         logger.warning(f"dtext={dtext}")
         return dtext
 
+    # -------------------------------------------------------------------------
     def displayText(self, text, locale):
         """
         Display `text` with selected fixpoint base and number of places
@@ -177,6 +180,7 @@ class ItemDelegate(QStyledItemDelegate):
 # see:
 # http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
+    # -------------------------------------------------------------------------
     def createEditor(self, parent, options, index):
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
@@ -198,6 +202,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        """
 #        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
 
+    # -------------------------------------------------------------------------
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
@@ -283,6 +288,7 @@ class Input_Coeffs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming from input_tab_widgets
     from pyfda.libs.pyfda_qt_lib import emit
 
+    # -------------------------------------------------------------------------
     def __init__(self, parent=None):
         super(Input_Coeffs, self).__init__(parent)
 
@@ -300,7 +306,7 @@ class Input_Coeffs(QWidget):
 
         self._construct_UI()
 
-# ------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
@@ -761,8 +767,6 @@ class Input_Coeffs(QWidget):
         - `self.ui2qdict()`
 
         Set the UI from the quantization dict and update the fixpoint quant. object.
-        When neither WI == 0 nor WF == 0, set the quantization format to general
-        fractional format qfrac.
         """
         if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
             qset_cmb_box(self.ui.cmb_q_frmt, 'qfrac', data=True)
