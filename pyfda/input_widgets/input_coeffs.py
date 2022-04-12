@@ -426,14 +426,19 @@ class Input_Coeffs(QWidget):
         This method only influences the view on the coefficients, stored in
         `self.ba_q`, not the actual coefficients in `self.ba`!
 
-        Quantize filter coefficients `self.ba` with separate quantizer objects
-        `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
-        and store them in the array `self.ba_q`. Depending on the number base
-        (float, dec, hex, ...) this can be of type float or string.
+        * Reset overflow counters
+        
+        * Quantize filter coefficients `self.ba` with separate quantizer objects
+          `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
+          and store them in the array `self.ba_q`. Depending on the number base
+          (float, dec, hex, ...) this can be of type float or string.
 
-        Overflow flags are stored in the 3rdand 4th column of  `self.ba_q` as 0
-        or +/- 1..
+        *  Store overflow flags in the 3rd and 4th column of `self.ba_q` as 0
+           or +/- 1.
         """
+        self.QObj[0].resetN()
+        self.QObj[1].resetN()
+
         if np.isscalar(self.ba[0]):
             len_b = 1
         else:
