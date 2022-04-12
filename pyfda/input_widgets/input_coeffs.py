@@ -214,7 +214,7 @@ class ItemDelegate(QStyledItemDelegate):
         index:  instance of QModelIndex
         """
 #        data = qstr(index.data()) # get data from QTableWidget
-        data_str = qstr(safe_eval(self.parent.ba[index.column()][index.row()],
+        data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                   return_type="auto"))
         if self.QObj[index.column()].frmt == 'float':
             # floating point format: pass data with full resolution
@@ -226,6 +226,7 @@ class ItemDelegate(QStyledItemDelegate):
                 "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
                                   self.QObj[index.column()].places))
 
+    # -------------------------------------------------------------------------
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
@@ -247,12 +248,12 @@ class ItemDelegate(QStyledItemDelegate):
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.QObj[index.column()].frmt == 'float':
             data = safe_eval(
-                qstr(editor.text()), self.parent.ba[index.column()][index.row()],
+                str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
             data_q = data  # TODO: complex data
         else:
             data = self.QObj[index.column()].frmt2float(
-                qstr(editor.text()), self.QObj[index.column()].frmt)  # transform to float
+                str(editor.text()), self.QObj[index.column()].frmt)  # transform to float
             data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
