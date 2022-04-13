@@ -515,9 +515,9 @@ class Fixed(object):
         self.q_dict['MIN'] = -2. * self.q_dict['MSB']
 
         # store parameters as class attributes
-        self.quant = str(self.q_dict['quant']).lower()
-        self.ovfl  = str(self.q_dict['ovfl']).lower()
-        self.frmt  = str(self.q_dict['frmt']).lower()
+        # self.quant = str(self.q_dict['quant']).lower()
+        # self.ovfl  = str(self.q_dict['ovfl']).lower()
+        # self.frmt  = str(self.q_dict['frmt']).lower()
         self.qfrmt = str(self.q_dict['qfrmt']).lower()
 
         try:
@@ -725,7 +725,8 @@ class Fixed(object):
         elif self.q_dict['quant'] == 'none':
             yq = y  # return unquantized value
         else:
-            raise Exception(f'Unknown Requantization type "{self.quant:s}"!')
+            raise Exception(
+                f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
         yq = yq * self.q_dict['LSB']
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
@@ -813,7 +814,8 @@ class Fixed(object):
 
         frmt: string (optional)
             any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
-            When `frmt` is unspecified, the instance parameter `self.frmt` is used
+            When `frmt` is unspecified, the instance parameter `self.q_dict['frmt']`
+            is used.
 
         Returns
         -------

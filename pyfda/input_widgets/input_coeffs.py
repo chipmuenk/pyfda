@@ -216,7 +216,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                   return_type="auto"))
-        if self.QObj[index.column()].frmt == 'float':
+        if self.QObj[index.column()].q_dict['frmt'] == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
@@ -575,7 +575,7 @@ class Input_Coeffs(QWidget):
         i.e. requantize displayed values (not `self.ba`) and overflow counters.
 
         Refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
-        the number format set by `self.frmt`.
+        the number format set by `self.q_dict['frmt']`.
 
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
@@ -692,7 +692,7 @@ class Input_Coeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].frmt,
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['frmt'],
                     title="Export Filter Coefficients")
 
     # --------------------------------------------------------------------------
@@ -713,7 +713,7 @@ class Input_Coeffs(QWidget):
             "importing data: dim - shape = {0} - {1} - {2}\n{3}"
             .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
-        frmt = self.QObj[0].frmt
+        frmt = self.QObj[0].q_dict['frmt']
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
