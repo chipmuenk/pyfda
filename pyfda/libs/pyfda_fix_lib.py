@@ -346,15 +346,17 @@ class Fixed(object):
             representation and its floating point value. If ``scale`` is a float,
             this value is used. Alternatively, if:
 
-                - ``q_dict['scale'] == 'int'``:   scale = 1 << self.WF
+                - ``q_dict['scale'] == 'int'``:   scale = 1 << self.q_dict['WF']
 
-                - ``q_dict['scale'] == 'norm'``:  scale = 2.**(-self.WI)
+                - ``q_dict['scale'] == 'norm'``:  scale = 2.**(-self.q_dict['WI'])
 
 
     Attributes
     ----------
     q_dict : dict
-        A copy of the quantization dictionary (see above)
+        A reference to the quantization dictionary passed during construction
+        (see above). This dictionary is updated here and can be accessed from
+        outside.
 
     WI : integer
         number of integer bits
@@ -430,15 +432,26 @@ class Fixed(object):
 
     def __init__(self, q_dict):
         """
-        Initialize Fixed object with dict `q_dict`
+        Construct `Fixed` object with dict `q_dict`
         """
-        # define default keys and values for quantization dict
+        # define valid keys and default values for quantization dict
         self.q_dict_default = {
             'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round', 'ovfl': 'sat',
-            'frmt': 'float', 'qfrmt': 'qfrac',
-            'scale': 1, 'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0}
-        # test if all passed keys of quantizer object are defined
-        self.setQobj(q_dict)
+            'frmt': 'float', 'qfrmt': 'qfrac', 'places': 4,
+            'scale': 1, 'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0,
+            'MSB': 1, 'LSB': 6, 'MAX': 2, 'MIN': -2}
+
+        # test if all passed keys of quantizer object are valid
+        self.verify_q_dict_keys(q_dict)
+
+        # missing key-value pairs are taken from the default dict
+        for k in self.q_dict_default.keys():  # loop over all defined keys
+            if k not in q_dict.keys():  # key is not in passed dict, get k:v pair from ...
+                q_dict[k] = self.q_dict_default[k]  # ... default dict
+
+        # create a reference to the dict passed during construction as instance attribute
+        self.q_dict = q_dict
+
         self.resetN()  # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
@@ -449,90 +462,88 @@ class Fixed(object):
                 'dec': r'[^0-9|.|,|\-]',
                 'hex': r'[^0-9A-Fa-f|.|,|\-]'
                         }
+        # provide frmt2float function for arrays, swallow the `self` argument
         self.frmt2float_vec = np.vectorize(self.frmt2float_scalar, excluded='self')
 
-    def setQobj(self, q_dict):
+    def verify_q_dict_keys(self, q_dict: dict) -> None:
+        """
+        Check against the `self.q_dict_default` dictionary if all keys
+        in the passed `q_dict` dictionary are valid.
+
+        Unknown keys raise an exception.
+        """
+        for k in q_dict.keys():
+            if k not in self.q_dict_default.keys():
+                raise Exception(u'Unknown Key "{0:s}"!'.format(k))
+
+    def setQobj(self, q_dict: dict) -> None:
         """
         Use passed quantization dict `q_dict` to update the instance quantization
-        dict `self.q_dict` resp. create it if it doesn't using default data
-        `self.q_dict_default` for missing keys:value pairs.
+        dict `self.q_dict`
 
-        Check the docstring of class `Fixed()` for  details.
+        Check the docstring of class `Fixed()` for details.
         """
-        for key in q_dict.keys():
-            if key not in self.q_dict_default.keys():
-                raise Exception(u'Unknown Key "{0:s}"!'.format(key))
+        self.verify_q_dict_keys(q_dict)  # check whether all keys are valid
 
+        # Transform `WI`, `WF`, `W` and `Q` parameters into each other
         if 'WI' in q_dict and 'WF' in q_dict:
-            pass  # everything's defined already
+            q_dict['WI'] = int(q_dict['WI'])  # sanitize WI
+            q_dict['WF'] = abs(int(q_dict['WF']))  # and WF
+            q_dict['W'] = q_dict['WI'] + q_dict['WF'] + 1
+            q_dict['Q'] = str(q_dict['WI']) + "." + str(q_dict['WF'])
         elif 'W' in q_dict:
+            q_dict['W'] = int(q_dict['W'])  # sanitize W
             q_dict['WI'] = int(q_dict['W']) - 1
             q_dict['WF'] = 0
+            q_dict['Q'] = str(q_dict['WI']) + ".0"
         elif 'Q' in q_dict:
             Q_str = str(q_dict['Q']).split('.', 1)  # split 'Q':'1.4'
             q_dict['WI'] = int(Q_str[0])
             q_dict['WF'] = abs(int(Q_str[1]))
+            q_dict['W'] = q_dict['WI'] + q_dict['WF'] + 1
 
-        # missing key-value pairs are either taken from default dict or from
-        # instance attributes
-        for k in self.q_dict_default.keys():  # loop over all defined keys
-            if k not in q_dict.keys():  # key is not in passed dict, get k:v pair from ...
-                if hasattr(self, k):
-                    q_dict[k] = getattr(self, k)  # ... class attribute
-                else:
-                    q_dict[k] = self.q_dict_default[k]  # ... default dict
+        self.q_dict.update(q_dict)
+
+        self.q_dict['LSB'] = 2. ** -self.q_dict['WF']  # value of LSB
+        self.q_dict['MSB'] = 2. ** (self.q_dict['WI'] - 1)   # value of MSB
+
+        self.q_dict['MAX'] =  2. * self.q_dict['MSB'] - self.q_dict['MSB']
+        self.q_dict['MIN'] = -2. * self.q_dict['MSB']
 
         # store parameters as class attributes
-        self.WI    = int(q_dict['WI'])
-        self.WF    = int(abs(q_dict['WF']))
-        self.quant = str(q_dict['quant']).lower()
-        self.ovfl  = str(q_dict['ovfl']).lower()
-        self.frmt  = str(q_dict['frmt']).lower()
-        self.qfrmt = str(q_dict['qfrmt']).lower()
+        self.quant = str(self.q_dict['quant']).lower()
+        self.ovfl  = str(self.q_dict['ovfl']).lower()
+        self.frmt  = str(self.q_dict['frmt']).lower()
+        self.qfrmt = str(self.q_dict['qfrmt']).lower()
 
-        q_dict['W'] = int(self.WF + self.WI + 1)
-        self.W     = q_dict['W']
-        q_dict['Q'] = str(self.WI) + '.' + str(self.WF)
-        self.Q     = q_dict['Q']
-
-        # TODO: is it neccessary to store counters in quant. object?
-        self.N = q_dict['N']
-        self.N_over = q_dict['N_over']
-        self.N_over_neg = q_dict['N_over_neg']
-        self.N_over_pos = q_dict['N_over_pos']
+        # self.N = q_dict['N']
+        # self.N_over = q_dict['N_over']
+        # self.N_over_neg = q_dict['N_over_neg']
+        # self.N_over_pos = q_dict['N_over_pos']
 
         try:
-            self.scale = np.float64(q_dict['scale'])
+            self.scale = np.float64(self.q_dict['scale'])
         except ValueError:
             # if q_dict['scale'] == 'int':
-            #     self.scale = 1 << self.WF
+            #     self.scale = 1 << self.q_dict['WF']
             # elif q_dict['scale'] == 'norm':
-            #     self.scale = 2.**(-self.WI)
+            #     self.scale = 2.**(-self.q_dict['WI'])
             # else:
             raise ValueError
-
-        self.q_obj = q_dict  # store quant. dict in instance
-
-        # calculate and set some useful class attributes
-        self.LSB = 2. ** -self.WF  # value of LSB
-        self.MSB = 2. ** (self.WI - 1)   # value of MSB
-
-        self.MAX =  2. * self.MSB - self.LSB
-        self.MIN = -2. * self.MSB
 
         # Calculate required number of places for different bases from total
         # number of bits:
         if self.frmt == 'dec':
-            self.places = int(np.ceil(np.log10(self.W) * np.log10(2.))) + 1
+            self.places = int(np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
             self.base = 10
         elif self.frmt == 'bin':
-            self.places = self.W + 1
+            self.places = self.q_dict['W'] + 1
             self.base = 2
         elif self.frmt == 'csd':
-            self.places = self.W + 1
+            self.places = self.q_dict['W'] + 1
             self.base = 2
         elif self.frmt == 'hex':
-            self.places = int(np.ceil(self.W / 4.)) + 1
+            self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
         elif self.frmt == 'float':
             self.places = 4
@@ -572,7 +583,7 @@ class Fixed(object):
         -------
         float scalar or ndarray
             with the same shape as `y`, in the range
-            `-2*self.MSB` ... `2*self.MSB-self.LSB`
+            `-2*self.q_dict['MSB']` ... `2*self.q_dict['MSB']-self.q_dict['LSB']`
 
         Examples
         --------
@@ -602,6 +613,10 @@ class Fixed(object):
         #       arrays and initialize flags
         # ======================================================================
         scaling = scaling.lower()
+        N_over_neg = self.q_dict['N_over_neg']
+        N_over_pos = self.q_dict['N_over_pos']
+        N = self.q_dict['N']
+
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
@@ -613,21 +628,21 @@ class Fixed(object):
             self.ovr_flag = np.zeros(y.shape, dtype=int)
 
             if np.issubdtype(y.dtype, np.number):  # numpy number type
-                self.N += y.size
+                N += y.size
             elif y.dtype.kind in {'U', 'S'}:  # string or unicode
                 try:
                     y = y.astype(np.float64)  # try to convert to float
-                    self.N += y.size
+                    N += y.size
                 except (TypeError, ValueError):
                     try:
                         np.char.replace(y, ' ', '')  # remove all whitespace
                         y = y.astype(complex)  # try to convert to complex
-                        self.N += y.size * 2
+                        N += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError):
                         y = np.asarray(list(map(lambda y_scalar:
                                             self.fixp(y_scalar, scaling=scaling), y)))
-                        self.N += y.size
+                        N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
@@ -641,7 +656,7 @@ class Fixed(object):
             # If y is not a number, remove whitespace and try to convert to
             # to float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
-                y = qstr(y)
+                y = str(y)
                 y = y.replace(' ', '')  # remove all whitespace
                 try:
                     y = float(y)
@@ -653,7 +668,7 @@ class Fixed(object):
                         y = 0.0
             over_pos = over_neg = yq = 0
             self.ovr_flag = 0
-            self.N += 1
+            N += 1
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
@@ -669,7 +684,7 @@ class Fixed(object):
         #       when `scaling=='mult'`or 'multdiv'
         # ======================================================================
         if scaling in {'mult', 'multdiv'}:
-            y = y * self.scale
+            y = y * self.q_dict['scale']
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -679,7 +694,7 @@ class Fixed(object):
         #       floating point inputs to "fixpoint integers".
         #       Finally, multiply by LSB to restore original scale.
         # ======================================================================
-        y = y / self.LSB
+        y = y / self.q_dict['LSB']
 
         if self.quant == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -698,7 +713,7 @@ class Fixed(object):
                 H = synthesizeNTF(order=3, osr=64, opt=1)
                 # Calculate DSM stream and shift/scale it from -1 ... +1 to
                 # 0 ... 1 sequence
-                yq = (simulateDSM(y*self.LSB, H)[0]+1)/(2*self.LSB)
+                yq = (simulateDSM(y*self.q_dict['LSB'], H)[0]+1)/(2*self.q_dict['LSB'])
                 # returns four ndarrays:
                 # v: quantizer output (-1 or 1)
                 # xn: modulator states.
@@ -711,7 +726,7 @@ class Fixed(object):
             yq = y  # return unquantized value
         else:
             raise Exception(f'Unknown Requantization type "{self.quant:s}"!')
-        yq = yq * self.LSB
+        yq = yq * self.q_dict['LSB']
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         # ======================================================================
@@ -722,27 +737,28 @@ class Fixed(object):
             pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < self.MIN)
-            over_pos = (yq > self.MAX)
+            over_neg = (yq < self.q_dict['MIN'])
+            over_pos = (yq > self.q_dict['MAX'])
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
-            self.N_over_neg += np.sum(over_neg)
-            self.N_over_pos += np.sum(over_pos)
-            self.N_over = self.N_over_neg + self.N_over_pos
+            N_over_neg += np.sum(over_neg)
+            N_over_pos += np.sum(over_pos)
+            N_over = N_over_neg + N_over_pos
 
-            self.q_obj.update({'N_over': self.N_over, 'N_over_neg': self.N_over_neg,
-                               'N_over_pos': self.N_over_pos})
+            self.q_dict.update(
+               {'N_over_pos': N_over_pos, 'N_over_neg': N_over_neg,
+                'N_over': N_over, 'LSB': self.q_dict['LSB'], 'MSB': self.q_dict['MSB']})
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
-                yq = np.where(over_neg, self.MIN, yq)
+                yq = np.where(over_pos, self.q_dict['MAX'], yq)  # (cond, true, false)
+                yq = np.where(over_neg, self.q_dict['MIN'], yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                              yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)
-                                                        / (4*self.MSB)), yq)
+                              yq - 4. * self.q_dict['MSB']*np.fix((np.sign(yq) * 2 * self.q_dict['MSB']+yq)
+                                                        / (4*self.q_dict['MSB'])), yq)
             else:
                 raise Exception(f'Unknown overflow type "{self.ovfl:s}"!')
 
@@ -766,11 +782,7 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def resetN(self):
         """ Reset counter and overflow-counters of Fixed object"""
-        self.N = 0
-        self.N_over = 0
-        self.N_over_neg = 0
-        self.N_over_pos = 0
-        self.q_obj.update({'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0})
+        self.q_dict.update({'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0})
         logger.error("Reset")
 
     # --------------------------------------------------------------------------
@@ -912,11 +924,11 @@ class Fixed(object):
 
                 int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # When number is outside fixpoint range, discard MSBs:
-                if int_bits > self.WI + 1:
+                if int_bits > self.q_dict['WI'] + 1:
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
                     # discard the upper bits outside the valid range
-                    raw_str = raw_str[int_bits - self.WI - 1:]
+                    raw_str = raw_str[int_bits - self.q_dict['WI'] - 1:]
 
                     # recalculate y_dec for truncated string
                     y_dec = int(raw_str, 2) / self.base**frc_places
@@ -926,9 +938,9 @@ class Fixed(object):
 
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # now, y_dec is in the correct range:
-                if int_bits <= self.WI:  # positive number
+                if int_bits <= self.q_dict['WI']:  # positive number
                     pass
-                elif int_bits == self.WI + 1:  # negative, calculate 2's complement
+                elif int_bits == self.q_dict['WI'] + 1:  # negative, calculate 2's complement
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
                 if neg_sign:
@@ -938,7 +950,7 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            # logger.debug(f"MSB={self.MSB} | LSB={self.LSB} | scale={self.scale}")
+            # logger.debug(f"MSB={self.q_dict['MSB']} | LSB={self.q_dict['LSB']} | scale={self.scale}")
             # logger.debug(f"y_in={y} | y_dec={y_dec}")
         # ----
         elif frmt == 'csd':
@@ -955,7 +967,7 @@ class Fixed(object):
 
         # if frmt != "float":
             # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
-            #             .format(self.MSB, self.scale, raw_str, val_str))
+            #             .format(self.q_dict['MSB'], self.scale, raw_str, val_str))
             # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
 
         if y_float is not None:
@@ -968,7 +980,7 @@ class Fixed(object):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
-        with numeric format `self.frmt` and `self.W` bits. The result has the
+        with numeric format `self.frmt` and `self.q_dict['W']` bits. The result has the
         same shape as `y`.
 
         The float is multiplied by `self.scale` and quantized / saturated
@@ -985,7 +997,7 @@ class Fixed(object):
         -------
         A string, a float or an ndarray of float or string is returned in the
         numeric format set in `self.frmt`. It has the same shape as `y`. For all
-        formats except `float` a fixpoint representation with `self.W` binary
+        formats except `float` a fixpoint representation with `self.q_dict['W']` binary
         digits is returned.
         """
 
@@ -1017,7 +1029,7 @@ class Fixed(object):
             y_fix = self.fixp(y, scaling='mult')
 
             if self.frmt == 'dec':
-                if self.WF == 0:
+                if self.q_dict['WF'] == 0:
                     y_str = np.int64(y_fix)  # get rid of trailing zero
                     # y_str = np.char.mod('%d', y_fix)
                     # elementwise conversion from integer (%d) to string
@@ -1026,21 +1038,21 @@ class Fixed(object):
                     # y_str = np.char.mod('%f',y_fix)
                     y_str = y_fix
             elif self.frmt == 'csd':
-                y_str = dec2csd_vec(y_fix, self.WF)  # convert with WF fractional bits
+                y_str = dec2csd_vec(y_fix, self.q_dict['WF'])  # convert with WF fractional bits
 
             else:  # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
-                y_fix_int = np.int64(np.round(y_fix / self.LSB))
+                y_fix_int = np.int64(np.round(y_fix / self.q_dict['LSB']))
                 # convert to (array of) string with 2's complement binary
-                y_bin_str = binary_repr_vec(y_fix_int, self.W)
+                y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
 
                 if self.frmt == 'hex':
-                    y_str = bin2hex_vec(y_bin_str, self.WI)
+                    y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])
 
                 else:  # self.frmt == 'bin':
                     # insert radix point if required
-                    if self.WF > 0:
-                        y_str = insert_binary_point(y_bin_str, self.WI)
+                    if self.q_dict['WF'] > 0:
+                        y_str = insert_binary_point(y_bin_str, self.q_dict['WI'])
                     else:
                         y_str = y_bin_str
 

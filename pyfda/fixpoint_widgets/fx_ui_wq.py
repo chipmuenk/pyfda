@@ -307,7 +307,7 @@ class FX_UI_WQ(QWidget):
         # next convert array float  -> array of fixp
         #                           -> list of int (scaled by 2^WF) when `to_int == True`
         if self.QObj.qfrmt == 'int':
-            self.QObj.scale = 1 << self.QObj.WF
+            self.QObj.scale = 1 << self.QObj.q_dict['WF']
 
         coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
         self.update()  # update display of overflow counter and MSB / LSB
@@ -344,17 +344,19 @@ class FX_UI_WQ(QWidget):
             self.lbl_LSB.setVisible(True)
             self.lbl_MSB.setText(
                 "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
-                f"{self.QObj.MAX:.{params['FMT_ba']}g}")
+                f"{self.QObj.q_dict['MAX']:.{params['FMT_ba']}g}")
             self.lbl_LSB.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+                "<b><i>LSB</i><sub>10</sub> = </b>"
+                f"{self.QObj.q_dict['LSB']:.{params['FMT_ba']}g}")
         elif self.MSB_LSB_vis == 'msb':
             self.lbl_MSB.setVisible(True)
             self.lbl_LSB.setVisible(True)
             self.lbl_MSB.setText(
                 "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
-                f"{self.QObj.MSB:.{params['FMT_ba']}g}")
+                f"{self.QObj.q_dict['MSB']:.{params['FMT_ba']}g}")
             self.lbl_LSB.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{self.QObj.LSB:.{params['FMT_ba']}g}")
+                "<b><i>LSB</i><sub>10</sub> = </b>"
+                f"{self.QObj.q_dict['MSB']:.{params['FMT_ba']}g}")
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
@@ -384,10 +386,10 @@ class FX_UI_WQ(QWidget):
 
         Emit a signal with `{'ui'<objectName of the sender>}`.
         """
-        WI = int(safe_eval(self.ledWI.text(), self.QObj.WI, return_type="int",
+        WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'], return_type="int",
                            sign='poszero'))
         self.ledWI.setText(str(WI))
-        WF = int(safe_eval(self.ledWF.text(), self.QObj.WF, return_type="int",
+        WF = int(safe_eval(self.ledWF.text(), self.QObj.q_dict['WF'], return_type="int",
                            sign='poszero'))
         self.ledWF.setText(str(WF))
         W = int(WI + WF + 1)
@@ -463,12 +465,12 @@ class FX_UI_WQ(QWidget):
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if 'WI' in q_dict:
-            WI = safe_eval(q_dict['WI'], self.QObj.WI, return_type="int", sign='poszero')
+            WI = safe_eval(q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
             self.ledWI.setText(str(WI))
             self.q_dict.update({'WI': WI})
 
         if 'WF' in q_dict:
-            WF = safe_eval(q_dict['WF'], self.QObj.WF, return_type="int", sign='poszero')
+            WF = safe_eval(q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 

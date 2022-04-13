@@ -1115,11 +1115,11 @@ def export_coe_xilinx(f):
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    logger.debug("scale = {0}, WF = {1}".format(qc.scale, qc.WF))
+    logger.debug("scale = {0}, WF = {1}".format(qc.scale, qc.q_dict['WF']))
 
-    if qc.WF != 0:
+    if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.frmt == 'hex':  # select hex format
@@ -1139,7 +1139,7 @@ def export_coe_xilinx(f):
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file").replace("\n", "\n; ")
 
     exp_str += "\nRadix = {0};\n".format(coe_radix)
-    exp_str += "Coefficient_width = {0};\n".format(qc.W)  # quantized wordlength
+    exp_str += f"Coefficient_width = {qc.q_dict['W']};\n"  # quantized wordlength
     coeff_str = "CoefData = "
     for b in bq:
         coeff_str += str(b) + ",\n"
@@ -1160,9 +1160,9 @@ def export_coe_microsemi(f):
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
 
-    if qc.WF != 0:
+    if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength:
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.frmt != 'dec':
@@ -1189,9 +1189,9 @@ def export_coe_vhdl_package(f):
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    if not qc.frmt == 'float' and qc.WF != 0:
+    if not qc.frmt == 'float' and qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     WO = fb.fil[0]['fxqc']['QO']['W']
