@@ -222,7 +222,8 @@ class IIR_DF1_pyfixp(object):
             self.zi_a[0] = y_q[k]
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
-        #self.N_over_filt = self.Q_acc.N_over + self.Q_mul.N_over
+        # TODO: Process overflows in QMul?!
+        self.N_over_filt = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
         return self.Q_O.fixp(y_q[:len(x)]), self.zi_b, self.zi_a
 
 

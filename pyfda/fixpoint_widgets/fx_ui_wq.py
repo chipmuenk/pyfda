@@ -325,8 +325,8 @@ class FX_UI_WQ(QWidget):
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         # TODO: WTF?!
-        q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
-        self.butLock.setIconSize(q_icon_size)
+        # q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
+        # self.butLock.setIconSize(q_icon_size)
 
         dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
         self.emit(dict_sig)
