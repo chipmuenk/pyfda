@@ -465,8 +465,8 @@ class Input_Coeffs(QWidget):
                     for x in self.QObj[0].float2frmt(self.ba[0])],
                 ["{0:>{1}}".format(x, self.QObj[0].places)
                     for x in np.nditer(self.QObj[1].float2frmt(self.ba[1]))],
-                self.QObj[0].ovr_flag,
-                self.QObj[1].ovr_flag
+                self.QObj[0].q_dict['ovr_flag'],
+                self.QObj[1].q_dict['ovr_flag']
                         ]
         else:
             self.ba_q = [
@@ -475,8 +475,8 @@ class Input_Coeffs(QWidget):
                 # for i in range(len_b)]),  # scaling='multdiv' ?
                 self.QObj[0].float2frmt(self.ba[0]),
                 self.QObj[1].float2frmt(self.ba[1]),
-                self.QObj[0].ovr_flag,
-                self.QObj[1].ovr_flag
+                self.QObj[0].q_dict['ovr_flag'],
+                self.QObj[1].q_dict['ovr_flag']
                         ]
 
         self.ui.wdg_wq_coeffs_b.update()
