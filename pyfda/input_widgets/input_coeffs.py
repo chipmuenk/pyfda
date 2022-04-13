@@ -482,20 +482,12 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.update()
         self.ui.wdg_wq_coeffs_a.update()
 
-    """         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec'\
-                    and self.QObj[0].WF > 0:
-                # decimal fixpoint representation with fractional part
-                return "{0:.{1}g}".format(
-                    self.QObj[0].float2frmt(data_str), params['FMT_ba'])
-            else:
-                return "{0:>{1}}".format(
-                    self.QObj[0].float2frmt(data_str), self.QObj[0].places)
-                    """
 # ------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Store selected / all quantized coefficients in self.ba, reset overflow
-        flags and refresh table
+        Store selected / all quantized coefficients in `self.ba` and refresh table
+        
+        Overflow counters are not reset!
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
