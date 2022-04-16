@@ -78,8 +78,9 @@ class IIR_DF1_pyfixp(object):
         # logger.error(p)
         self.p = p  # parameter dictionary with coefficients etc.
 
+        # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+            q_mul = p['QA']
         else:
             q_mul = p['q_mul']
 
@@ -222,8 +223,11 @@ class IIR_DF1_pyfixp(object):
             self.zi_a[0] = y_q[k]
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
-        # TODO: Process overflows in QMul?!
-        self.N_over_filt = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
+        # Overflows in Q_mul are added to overflows in QA
+        logger.warning(f"{self.Q_acc.q_dict['N_over']} - {self.Q_mul.q_dict['N_over']}")
+        self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
+        self.Q_mul.resetN()
+
         return self.Q_O.fixp(y_q[:len(x)]), self.zi_b, self.zi_a
 
 
