@@ -80,7 +80,7 @@ class IIR_DF1_pyfixp(object):
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = p['QA']
+            q_mul = p['QA'].copy()
         else:
             q_mul = p['q_mul']
 
