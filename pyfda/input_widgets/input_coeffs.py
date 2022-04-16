@@ -38,8 +38,6 @@ logger = logging.getLogger(__name__)
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
-# TODO: QObj.format and QObj.places need to be accessible globally, i.e. as ui.format
-# TODO: str(save_eval(...)) needed?
 #
 # TODO: Filters need to be scaled properly, see e.g.
 #       http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
@@ -173,7 +171,7 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
-            return "{0:>{1}}".format(text, self.QObj[0].places)
+            return "{0:>{1}}".format(text, self.QObj[0].q_dict['places'])
 
         else:
             return text
@@ -224,7 +222,7 @@ class ItemDelegate(QStyledItemDelegate):
             # pass requantized data with required number of decimal places
             editor.setText(
                 "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
-                                  self.QObj[index.column()].places))
+                                  self.QObj[index.column()].q_dict['places']))
 
     # -------------------------------------------------------------------------
     def setModelData(self, editor, model, index):
@@ -447,7 +445,8 @@ class Input_Coeffs(QWidget):
             len_a = 1
         else:
             len_a = len(self.ba[1])
-        logger.warning(f"scale = {self.QObj[0].scale}, {self.QObj[1].scale} ")
+        logger.warning(
+            f"scale = {self.QObj[0].q_dict['scale']}, {self.QObj[1].q_dict['scale']} ")
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             # data = safe_eval(data_str, return_type='auto')  # convert to float
             # return "{0:.{1}g}".format(data, params['FMT_ba'])
@@ -459,11 +458,11 @@ class Input_Coeffs(QWidget):
         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
             self.ba_q = [
                 # np.array(["{0:>{1}}".format(self.QObj[0].float2frmt(self.ba[0][i]),
-                #                  self.QObj[0].places)
+                #                  self.QObj[0].q_dict['places'])
                 # for i in range(len_b)]),  # scaling='multdiv' ?
-                ["{0:>{1}}".format(x, self.QObj[0].places)
+                ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
                     for x in self.QObj[0].float2frmt(self.ba[0])],
-                ["{0:>{1}}".format(x, self.QObj[0].places)
+                ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
                     for x in np.nditer(self.QObj[1].float2frmt(self.ba[1]))],
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
@@ -471,7 +470,7 @@ class Input_Coeffs(QWidget):
         else:
             self.ba_q = [
                 # np.array(["{0:>{1}}".format(self.QObj[0].float2frmt(self.ba[0][i]),
-                #                  self.QObj[0].places)
+                #                  self.QObj[0].q_dict['places'])
                 # for i in range(len_b)]),  # scaling='multdiv' ?
                 self.QObj[0].float2frmt(self.ba[0]),
                 self.QObj[1].float2frmt(self.ba[1]),

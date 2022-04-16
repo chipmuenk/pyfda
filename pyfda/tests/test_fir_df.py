@@ -57,17 +57,17 @@ class TestSequenceFunctions(unittest.TestCase):
         # self.assertEqual(q_dict2, self.myQ.q_obj)
 
         self.myQ.setQobj({'W': 13})
-        self.assertEqual(12, self.myQ.WI)
-        self.assertEqual(0, self.myQ.WF)
-        self.assertEqual('12.0', self.myQ.Q)
+        self.assertEqual(12, self.myQ.q_dict['WI'])
+        self.assertEqual(0, self.myQ.q_dict['WF'])
+        self.assertEqual('12.0', self.myQ.q_dict['Q'])
 
 
         # check whether option 'norm' sets the correct scale
         self.myQ.setQobj({'scale':'norm'})
-        self.assertEqual(2**(-self.myQ.WI), self.myQ.scale)
+        self.assertEqual(2**(-self.myQ.q_dict['WI']), self.myQ.q_dict['scale'])
         # check whether option 'int' sets the correct scale
         self.myQ.setQobj({'scale':'int'})
-        self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
+        self.assertEqual(1<<self.myQ.q_dict['WF'], self.myQ.q_dict['scale'])
 
     def test_fix_no_ovfl(self):
         """

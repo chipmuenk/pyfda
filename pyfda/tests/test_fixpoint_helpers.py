@@ -86,10 +86,10 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # check whether option 'norm' sets the correct scale
         self.myQ.setQobj({'scale':'norm'})
-        self.assertEqual(2**(-self.myQ.WI), self.myQ.scale)
+        self.assertEqual(2**(-self.myQ.q_dict['WI']), self.myQ.q_dict['scale'])
         # check whether option 'int' sets the correct scale
         self.myQ.setQobj({'scale':'int'})
-        self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
+        self.assertEqual(1<<self.myQ.q_dict['WF']), self.myQ.q_dict['scale'])
 
     #==========================================================================
     # Test requant routine, this needs a migen class (DUT)

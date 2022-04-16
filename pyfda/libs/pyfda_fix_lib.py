@@ -356,9 +356,24 @@ class Fixed(object):
                 - ``q_dict['scale'] == 'int'``:   scale = 1 << self.q_dict['WF']
 
                 - ``q_dict['scale'] == 'norm'``:  scale = 2.**(-self.q_dict['WI'])
+    * **quant** : str
+        Quantization behaviour ('floor', 'round', ...)
 
-    The following key: value pairs are calculated and can / should not be considered
-    as read-only.
+    * **'ovfl'**  : str
+        Overflow behaviour ('wrap', 'sat', ...)
+
+    * **'frmt'** : str
+        target output format ('float', 'dec', 'bin', 'hex', 'csd')
+
+
+    The following key: value pairs are calculated from other parameters and
+    can / should be considered as read-only.
+
+    * **'places'** : integer
+        number of places required for printing in the selected number format.
+        For binary formats, this is the same as the wordlength. Calculated
+        from the numeric base 'self.base' (not used outside this class) and
+        the total word length 'W'.
 
     * **'LSB'** : float
         value of LSB (smallest quantization step), calculated from `WI` and `WF`
@@ -385,6 +400,9 @@ class Fixed(object):
 
         has occured during last fixpoint conversion.
 
+    * **'N'** : integer
+        total number of simulation data points
+
     * **'N_over'** : integer
         total number of overflows
 
@@ -400,20 +418,6 @@ class Fixed(object):
         A reference to the quantization dictionary passed during construction
         (see above). This dictionary is updated here and can be accessed from
         outside.
-
-    quant : string
-        Quantization behaviour ('floor', 'round', ...)
-
-    ovfl  : string
-        Overflow behaviour ('wrap', 'sat', ...)
-
-    frmt : string
-        target output format ('float', 'dec', 'bin', 'hex', 'csd')
-
-    places : integer
-        number of places required for printing in the selected number format.
-        For binary formats, this is the same as the wordlength.
-
 
     Example
     -------
@@ -514,38 +518,23 @@ class Fixed(object):
         self.q_dict['MAX'] =  2. * self.q_dict['MSB'] - self.q_dict['LSB']
         self.q_dict['MIN'] = -2. * self.q_dict['MSB']
 
-        # store parameters as class attributes
-        # self.quant = str(self.q_dict['quant']).lower()
-        # self.ovfl  = str(self.q_dict['ovfl']).lower()
-        # self.frmt  = str(self.q_dict['frmt']).lower()
-        self.qfrmt = str(self.q_dict['qfrmt']).lower()
-
-        try:
-            self.scale = np.float64(self.q_dict['scale'])
-        except ValueError:
-            # if q_dict['scale'] == 'int':
-            #     self.scale = 1 << self.q_dict['WF']
-            # elif q_dict['scale'] == 'norm':
-            #     self.scale = 2.**(-self.q_dict['WI'])
-            # else:
-            raise ValueError
-
         # Calculate required number of places for different bases from total
         # number of bits:
         if self.q_dict['frmt'] == 'dec':
-            self.places = int(np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
+            self.q_dict['places'] = int(
+                np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
             self.base = 10
         elif self.q_dict['frmt'] == 'bin':
-            self.places = self.q_dict['W'] + 1
+            self.q_dict['places'] = self.q_dict['W'] + 1
             self.base = 2
         elif self.q_dict['frmt'] == 'csd':
-            self.places = self.q_dict['W'] + 1
+            self.q_dict['places'] = self.q_dict['W'] + 1
             self.base = 2
         elif self.q_dict['frmt'] == 'hex':
-            self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
+            self.q_dict['places'] = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
         elif self.q_dict['frmt'] == 'float':
-            self.places = 4
+            self.q_dict['places'] = 4
             self.base = 0
         else:
             raise Exception(
@@ -571,9 +560,9 @@ class Fixed(object):
             Determine the scaling before and after quantizing / saturation
 
             *'mult'* float in, int out:
-                `y` is multiplied by `self.scale` *before* quantizing / saturating
+                `y` is multiplied by `self.q_dict['scale'])` *before* quantizing / saturating
             **'div'**: int in, float out:
-                `y` is divided by `self.scale` *after* quantizing / saturating.
+                `y` is divided by `scale` *after* quantizing / saturating.
             **'multdiv'**: float in, float out (default):
                 both of the above
 
@@ -595,7 +584,7 @@ class Fixed(object):
 
         >>> aq = myQa.fixed(a) # quantize input signal
         >>> plt.plot(a, aq) # plot quantized vs. original signal
-        >>> print(myQa.N_over, "overflows!") # print number of overflows
+        >>> print(myQa.q_dict('N_over'), "overflows!") # print number of overflows
 
         >>> # Convert output to same format as input:
         >>> b = np.arange(200, dtype = np.int16)
@@ -613,6 +602,7 @@ class Fixed(object):
         #       arrays and initialize flags
         # ======================================================================
         scaling = scaling.lower()
+        # use values from dict for initialization
         N_over_neg = self.q_dict['N_over_neg']
         N_over_pos = self.q_dict['N_over_pos']
         N = self.q_dict['N']
@@ -788,7 +778,6 @@ class Fixed(object):
         """ Reset counters and overflow-flag of Fixed object """
         self.q_dict.update(
             {'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0, 'ovr_flag' : 0})
-        logger.error("Reset")
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
@@ -956,7 +945,7 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            # logger.debug(f"MSB={self.q_dict['MSB']} | LSB={self.q_dict['LSB']} | scale={self.scale}")
+            # logger.debug(f"MSB={self.q_dict['MSB']} | LSB={self.q_dict['LSB']} | scale={self.q_dict['scale'])}")
             # logger.debug(f"y_in={y} | y_dec={y_dec}")
         # ----
         elif frmt == 'csd':
@@ -973,7 +962,7 @@ class Fixed(object):
 
         # if frmt != "float":
             # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
-            #             .format(self.q_dict['MSB'], self.scale, raw_str, val_str))
+            #             .format(self.q_dict['MSB'], self.q_dict['scale']), raw_str, val_str))
             # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
 
         if y_float is not None:
@@ -989,8 +978,8 @@ class Fixed(object):
         with numeric format `self.frmt` and `self.q_dict['W']` bits. The result has the
         same shape as `y`.
 
-        The float is multiplied by `self.scale` and quantized / saturated
-        using fixp() for all formats before it is converted to different number
+        The float is multiplied by `self.q_dict['scale'])` and quantized / saturated
+        using `self.fixp()` for all formats before it is converted to different number
         formats.
 
         Parameters
@@ -1002,12 +991,11 @@ class Fixed(object):
         Returns
         -------
         A string, a float or an ndarray of float or string is returned in the
-        numeric format set in `self.frmt`. It has the same shape as `y`. For all
-        formats except `float` a fixpoint representation with `self.q_dict['W']` binary
-        digits is returned.
-        """
+        numeric format set in `self.q_dict['frmt'])`. It has the same shape as `y`.
+         For all formats except `float` a fixpoint representation with
+         `self.q_dict['W']` binary digits is returned.
 
-        """
+
         Define vectorized functions using numpys automatic type casting:
         Vectorized functions for inserting binary point in string `bin_str`
         after position `pos`.

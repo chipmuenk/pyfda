@@ -306,8 +306,8 @@ class FX_UI_WQ(QWidget):
         # quantize floating point coefficients with the selected scale (WI.WF),
         # next convert array float  -> array of fixp
         #                           -> list of int (scaled by 2^WF) when `to_int == True`
-        if self.QObj.qfrmt == 'int':
-            self.QObj.scale = 1 << self.QObj.q_dict['WF']
+        if self.QObj.q_dict['qfrmt'] == 'int':
+            self.QObj.q_dict['scale'] = 1 << self.QObj.q_dict['WF']
 
         coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
         self.update()  # update display of overflow counter and MSB / LSB
