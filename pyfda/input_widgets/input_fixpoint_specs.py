@@ -175,7 +175,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
-            logger.error(dict_sig['fx_sim'])
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
                 # `impz.impz_init()`, return a handle to the fixpoint filter function
@@ -200,8 +199,11 @@ class Input_Fixpoint_Specs(QWidget):
                 self.wdg_dict2ui()
 
             elif dict_sig['fx_sim'] == 'finish':
+                # update I/O widgets and dynamically instantiated filter widget
                 self.wdg_wq_input.update()
                 self.wdg_wq_output.update()
+                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'dict2ui'):
+                    self.fx_filt_ui.dict2ui()
                 qstyle_widget(self.butSimFx, "normal")
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
