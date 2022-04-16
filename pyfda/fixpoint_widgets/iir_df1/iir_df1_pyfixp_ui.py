@@ -127,20 +127,17 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
         # if not, just emit the dict.
         if 'ui' in dict_sig:
-            if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a'}:  # coeffs format
+            if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
                 """
                 Update coefficient quantization settings and coefficients.
                 This is performed inside the quantization widgets `FX_UI_WQ`
 
                 The new values are written to the fixpoint coefficient dict as
                 `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
-                `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']`.
+                `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']` and
+                `fb.fil[0]['fxqc']['QA']`
                 """
                 pass
-
-            elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
-                pass
-                # TODO: process quantization settings here?
 
             else:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -204,9 +201,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         - 'a' : list of quantized a coefficients in format WI.WF
         """
         fxqc_dict = fb.fil[0]['fxqc']
-        # fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
-        # fxqc_dict['QCB'].update(self.wdg_wq_coeffs_b.q_dict)
-        # fxqc_dict['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
 
         fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
         fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1])})
