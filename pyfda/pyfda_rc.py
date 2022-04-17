@@ -402,7 +402,13 @@ qss_tab_bar_ovlp = """
 # Common qss settings for all themes
 qss_common = """
                 * [state="changed"]{background-color: yellow}
+                /* fully transparent background using white and alpha = 0 */
                 * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
+                * [state="running"]{background-color: orange; color: white;}
+                * [state="highlight"]{background-color: rgba(173, 216, 230, 50%)}
+                * [state="unused"], *[state="u"]{background-color: white; color:darkgrey}
+                /* semi-transparent red */
+                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
                 /* Frame with control elements of all plot widgets */
@@ -459,8 +465,6 @@ qss_common = """
                     stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
                     color: black;}
 
-                QPushButton[state="running"]{background-color: orange; color: white;}
-
                 QPushButton[state="changed"]{background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
@@ -471,14 +475,10 @@ qss_common = """
                     stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
                     color: white;}
 
-                QPushButton[state="failed"]{background-color:pink; color:black}
-
                 QPushButton[state="ok"]{background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
                     color: white;}
-
-                *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
 
                 QPushButton:pressed {background-color:black; color:white}
 
