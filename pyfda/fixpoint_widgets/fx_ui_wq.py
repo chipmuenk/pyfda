@@ -200,11 +200,6 @@ class FX_UI_WQ(QWidget):
         self.lbl_ovfl_count.setAutoFillBackground(True)
 
         self.MSB_LSB_vis = dict_ui['MSB_LSB_vis']
-        # color = QColor(233, 10, 150)
-        # alpha = 140
-        # values = "{r}, {g}, {b}, {a}".format(
-        #     r=color.red(), g=color.green(), b=color.blue(), a=alpha)
-        # self.lbl_ovfl_cntr.setStyleSheet("QLabel { background-color: rgba("+values+"); }")
 
         # -------------------------------------------------------------------
         # MSB / LSB size

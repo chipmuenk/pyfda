@@ -585,7 +585,6 @@ class Input_Coeffs(QWidget):
 
         Called at the end of nearly every method.
         """
-        logger.error("refresh table")
         params['FMT_ba'] = int(self.ui.spnDigits.text())
         # quantize coefficients for display, update overflow counter
         self.quant_coeffs_view()

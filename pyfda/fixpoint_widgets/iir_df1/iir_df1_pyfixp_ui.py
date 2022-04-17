@@ -167,7 +167,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        logger.warning("called dict2ui")
         self.wdg_wq_coeffs_b.dict2ui()  # update coefficient quantization
         self.wdg_wq_coeffs_a.dict2ui()  # settings
         self.wdg_wq_accu.dict2ui()
