@@ -564,6 +564,9 @@ class Input_Fixpoint_Specs(QWidget):
                         f"{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
+            # set lightblue background with transparency for fixpoint widget
+            self.fx_filt_ui.setStyleSheet(
+                ".QFrame { background-color: rgba(173, 216, 230, 50%)}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
