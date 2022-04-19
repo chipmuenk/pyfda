@@ -244,14 +244,14 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.QObj[index.column()].frmt == 'float':
+        if self.QObj[index.column()].q_dict['frmt'] == 'float':
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
             data_q = data  # TODO: complex data
-        else:
+        else:   # transform to float
             data = self.QObj[index.column()].frmt2float(
-                str(editor.text()), self.QObj[index.column()].frmt)  # transform to float
+                str(editor.text()), self.QObj[index.column()].q_dict['frmt'])
             data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
@@ -372,9 +372,7 @@ class Input_Coeffs(QWidget):
         layVMain.setAlignment(Qt.AlignTop)  # only affects the first widget (intended)
         layVMain.addWidget(self.ui)
         layVMain.addWidget(self.tblCoeff)
-
         layVMain.setContentsMargins(*params['wdg_margins'])
-
         self.setLayout(layVMain)
 
         # initialize, quantize + refresh table with default values from filter dict
@@ -763,7 +761,8 @@ class Input_Coeffs(QWidget):
 
         Set the UI from the quantization dict and update the fixpoint quant. object.
         """
-        if fb.fil[0]['fxqc']['QCB']['WI'] != 0 and fb.fil[0]['fxqc']['QCB']['WF'] != 0:
+        if self.ui.wdg_wq_coeffs_b.q_dict['WI'] != 0\
+                and self.ui.wdg_wq_coeffs_b.q_dict['WF'] != 0:
             qset_cmb_box(self.ui.cmb_q_frmt, 'qfrac', data=True)
 
         # update quantizer objects and widgets
