@@ -63,7 +63,6 @@ class FX_UI_WQ(QWidget):
     'wdg_name'      : 'fx_ui_wq'                # widget name, used to discern between
                                                 # multiple instances
     'label'         : ''                        # widget text label, usually set by the
-    'label_2'       : ''                        # instance, and part 2 (below part 1)
 
     'label_q'       : 'Quant.'                  # subwidget text label
     'cmb_q'         : List with tooltip and combo box choices (default: 'round', 'fix',
@@ -128,11 +127,11 @@ class FX_UI_WQ(QWidget):
                   "for arbitrary coefficients.</span>")
                  ]
         # default widget settings:
-        dict_ui = {'wdg_name': 'fx_ui_wq', 'label': '', 'label_2': '',
+        dict_ui = {'wdg_name': 'fx_ui_wq', 'label': '',
                    'label_q': 'Quant.', 'cmb_q_items': cmb_q, 'quant': 'round',
                    'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov, 'ovfl': 'wrap',
                    #
-                   'label_w': '<i>WI.WF</i>&nbsp;:', 'lbl_sep': '.', 'max_led_width': 30,
+                   'lbl_sep': '.', 'max_led_width': 30,
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
@@ -151,7 +150,6 @@ class FX_UI_WQ(QWidget):
 
         self.wdg_name = dict_ui['wdg_name']
         lbl_wdg = QLabel(dict_ui['label'], self)
-        lbl_wdg_2 = QLabel(dict_ui['label_2'], self)
 
         self.cmbQuant = QComboBox(self)
         qcmb_box_populate(self.cmbQuant, dict_ui['cmb_q_items'], dict_ui['quant'])
@@ -164,8 +162,6 @@ class FX_UI_WQ(QWidget):
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        lbl_W = QLabel(to_html(dict_ui['label_w']), self)
 
         self.cmbW = QComboBox(self)
         qcmb_box_populate(self.cmbW, dict_ui['cmb_w_items'], dict_ui['cmb_w_init'])
@@ -308,7 +304,6 @@ class FX_UI_WQ(QWidget):
         self.update()  # update display of overflow counter and MSB / LSB
         return coeff_q
 
-
     # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
         """
@@ -318,10 +313,6 @@ class FX_UI_WQ(QWidget):
             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
-
-        # TODO: WTF?!
-        # q_icon_size = self.butLock.iconSize()  # <- uncomment this for manual sizing
-        # self.butLock.setIconSize(q_icon_size)
 
         dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
         self.emit(dict_sig)
