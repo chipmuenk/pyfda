@@ -44,7 +44,7 @@ jobs:
     - name: Add dev build marker to cmake options
       if: github.ref_type != 'tag'
       run: >
-        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda
+        sed -i 's@config-opts: \["\(.*\)"\]@config-opts: ["\1", "-DDEV_BUILD=${{ github.ref_name }}"]@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Replace desktop file name suffix
       if: github.ref_type != 'tag'
