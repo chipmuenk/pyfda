@@ -114,7 +114,7 @@ class Input_Fixpoint_Specs(QWidget):
                     # butLock was deactivitated, don't do anything
                     return
                 elif self.wdg_wq_input.butLock.isChecked():
-                    # but lock was activated or wordlength setting have been changed
+                    # button lock was activated or wordlength settings have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
@@ -188,6 +188,8 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'error'})
                 else:
                     # Reset overflow counter for input and output quantization
+                    # Trigger fixpoint response calculation, passing the fixpoint
+                    # filter function
                     self.wdg_wq_input.QObj.resetN()
                     self.wdg_wq_output.QObj.resetN()
                     self.emit({'fx_sim': 'start_fx_response_calculation',
@@ -234,10 +236,10 @@ class Input_Fixpoint_Specs(QWidget):
         self.layH_fx_wdg = QHBoxLayout()
         # left and right: Zero margin, top and bottom: default margin
         self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
-        frmHDL_wdg = QWidget(self)
-        frmHDL_wdg.setStyleSheet(".QWidget { background-color:none; }")
-        frmHDL_wdg.setLayout(self.layH_fx_wdg)
-        # frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
+        wdg_fx = QWidget(self)
+        wdg_fx.setStyleSheet(".QWidget { background-color:none; }")
+        wdg_fx.setLayout(self.layH_fx_wdg)
 
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
@@ -268,7 +270,7 @@ class Input_Fixpoint_Specs(QWidget):
 #       Input and Output Quantizer
 # ------------------------------------------------------------------------------
 #       - instantiate widgets for input and output quantizer
-#       - pass the quantization (sub-?) dictionary to the constructor
+#       - pass the quantization dictionary to the constructor
 # ------------------------------------------------------------------------------
 
         self.wdg_wq_input = FX_UI_WQ(
@@ -286,22 +288,6 @@ class Input_Fixpoint_Specs(QWidget):
             fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
             label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
-
-        # Layout and frame for input quantization
-        layVQiWdg = QVBoxLayout()
-        layVQiWdg.addWidget(self.wdg_wq_input)
-        frmQiWdg = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQiWdg.setLayout(layVQiWdg)
-        frmQiWdg.setContentsMargins(*params['wdg_margins'])
-
-        # Layout and frame for output quantization
-        layVQoWdg = QVBoxLayout()
-        layVQoWdg.addWidget(self.wdg_wq_output)
-        frmQoWdg = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQoWdg.setLayout(layVQoWdg)
-        frmQoWdg.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
 #       Dynamically updated image of filter topology (label as placeholder)
@@ -342,7 +328,6 @@ class Input_Fixpoint_Specs(QWidget):
         self.layHHdlBtns.addWidget(self.butExportHDL)
         # This frame encompasses the HDL buttons sim and convert
         frmHdlBtns = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmHdlBtns.setLayout(self.layHHdlBtns)
         frmHdlBtns.setContentsMargins(*params['wdg_margins'])
 
@@ -352,9 +337,9 @@ class Input_Fixpoint_Specs(QWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
-        layVMain.addWidget(frmQiWdg)
-        layVMain.addWidget(frmHDL_wdg)
-        layVMain.addWidget(frmQoWdg)
+        layVMain.addWidget(self.wdg_wq_input)
+        layVMain.addWidget(wdg_fx)
+        layVMain.addWidget(self.wdg_wq_output)
         layVMain.addWidget(self.frmImg)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
@@ -476,8 +461,6 @@ class Input_Fixpoint_Specs(QWidget):
             img_file = self.default_fx_img
 
         self.img_fixp = QPixmap(img_file)
-        # logger.warning(f"img_fixp = {img_file}")
-        # logger.warning(f"_embed_fixp_img(): {self.img_fixp.__class__.__name__}")
         return self.img_fixp
 
 # ------------------------------------------------------------------------------
@@ -509,7 +492,7 @@ class Input_Fixpoint_Specs(QWidget):
         # grow with the image size:
         # img_scaled = self.img_fixp.scaled(self.lbl_fixp_img.size(),
         # Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        img_scaled = self.img_fixp.scaledToWidth(wdg_w - 15, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaledToWidth(wdg_w - 20, Qt.SmoothTransformation)
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
@@ -543,7 +526,6 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_wdg_found = False
             self.butSimFx.setEnabled(False)
             self.butExportHDL.setVisible(False)
-            # self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
             self.lblTitle.setText("")

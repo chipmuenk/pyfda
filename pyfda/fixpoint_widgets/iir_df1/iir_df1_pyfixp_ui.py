@@ -66,9 +66,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
             MSB_LSB_vis='msb')
         layV_wq_coeffs_b = QVBoxLayout()
         layV_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
-        self.frm_wq_coeffs_b = QFrame(self)
-        self.frm_wq_coeffs_b.setLayout(layV_wq_coeffs_b)
-        self.frm_wq_coeffs_b.setContentsMargins(*params['wdg_margins'])
 
         # widget for quantization of coefficients 'a'
         if 'QCA' not in fb.fil[0]['fxqc']:
@@ -78,12 +75,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
-        self.wdg_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
         layV_wq_coeffs_a = QVBoxLayout()
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
-        self.frm_wq_coeffs_a = QFrame(self)
-        self.frm_wq_coeffs_a.setLayout(layV_wq_coeffs_a)
-        self.frm_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
 
         # widget for accumulator quantization
         if 'QA' not in fb.fil[0]['fxqc']:
@@ -96,16 +89,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
             cmb_w_vis='max')
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
-        self.frm_accu = QFrame(self)
-        self.frm_accu.setLayout(layV_wq_accu)
-        self.frm_accu.setContentsMargins(*params['wdg_margins'])
 
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0, 0, 0, 0)
-        layVWdg.addWidget(self.frm_wq_coeffs_b)
-        layVWdg.addWidget(self.frm_wq_coeffs_a)
-        layVWdg.addWidget(self.frm_accu)
+        layVWdg.addLayout(layV_wq_coeffs_b)
+        layVWdg.addLayout(layV_wq_coeffs_a)
+        layVWdg.addLayout(layV_wq_accu)
         self.setLayout(layVWdg)
 
         # ----------------------------------------------------------------------
@@ -151,7 +141,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
-
 
     # --------------------------------------------------------------------------
     def dict2ui(self):

@@ -226,14 +226,14 @@ class FX_UI_WQ(QWidget):
         # third row - MSB / LSB
         layG.addWidget(self.lbl_MSB, 2, 0, 1, 2)
         layG.addWidget(self.lbl_LSB, 2, 3, 1, 3)
-        layG.setContentsMargins(0, 0, 0, 0)
+        layG.setContentsMargins(5, 5, 5, 5)
 
         frmMain = QFrame(self)
         frmMain.setLayout(layG)
 
         layVMain = QVBoxLayout()  # Widget main layout
         layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(0, 0, 0, 0)  # *params['wdg_margins'])
+        layVMain.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(layVMain)
 

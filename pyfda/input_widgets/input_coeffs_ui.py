@@ -287,26 +287,17 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
         # ########################  Main UI Layout ############################
         #######################################################################
-        # Layout and frame for a coefficients quantization
-        # Layout and frame for output quantization
-        layVQbWdg = QVBoxLayout()
-        layVQbWdg.addWidget(self.wdg_wq_coeffs_b)
-        self.frm_wq_coeffs_b = QFrame(self)
-        self.frm_wq_coeffs_b.setLayout(layVQbWdg)
-        self.frm_wq_coeffs_b.setContentsMargins(*params['wdg_margins'])
+        # Layout for coefficients quantization
+        layV_wdg_wq_coeffs_b = QVBoxLayout()
+        layV_wdg_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
 
-        layVQaWdg = QVBoxLayout()
-        layVQaWdg.addWidget(self.wdg_wq_coeffs_a)
-        self.frm_wq_coeffs_a = QFrame(self)
-        self.frm_wq_coeffs_a.setLayout(layVQaWdg)
-        self.frm_wq_coeffs_a.setContentsMargins(*params['wdg_margins'])
+        layV_wdg_wq_coeffs_a = QVBoxLayout()
+        layV_wdg_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
 
-        # layout for frame (UI widget)
+        # Construct frame encompassing all UI elements
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHDisplay)
         layVMainF.addWidget(self.frmButtonsCoeffs)
-
-        # This frame encompasses all UI elements
         frmMain = QFrame(self)
         frmMain.setLayout(layVMainF)
 
@@ -314,8 +305,8 @@ class Input_Coeffs_UI(QWidget):
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addWidget(frmMain)
-        layVMain.addWidget(self.frm_wq_coeffs_b)
-        layVMain.addWidget(self.frm_wq_coeffs_a)
+        layVMain.addLayout(layV_wdg_wq_coeffs_b)
+        layVMain.addLayout(layV_wdg_wq_coeffs_a)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         #######################################################################
