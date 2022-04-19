@@ -89,7 +89,7 @@
   </provides>
 
   <releases>
-    <release version="2018.03.23" date="2018-03-23">
+    <release version="0.1.5" date="2018-06-17">
       <description>
         <p>Initial Flathub release</p>
       </description>
