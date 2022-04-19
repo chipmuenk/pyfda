@@ -213,7 +213,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
-                                  return_type="auto"))
+                                 return_type="auto"))
         if self.QObj[index.column()].q_dict['frmt'] == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
@@ -444,8 +444,8 @@ class Input_Coeffs(QWidget):
             len_a = 1
         else:
             len_a = len(self.ba[1])
-        logger.warning(
-            f"scale = {self.QObj[0].q_dict['scale']}, {self.QObj[1].q_dict['scale']} ")
+#        logger.warning(
+#            f"scale = {self.QObj[0].q_dict['scale']}, {self.QObj[1].q_dict['scale']} ")
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
             # data = safe_eval(data_str, return_type='auto')  # convert to float
             # return "{0:.{1}g}".format(data, params['FMT_ba'])

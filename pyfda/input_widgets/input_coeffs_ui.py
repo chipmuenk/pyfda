@@ -38,13 +38,6 @@ class Input_Coeffs_UI(QWidget):
     def __init__(self, parent=None):
         super(Input_Coeffs_UI, self).__init__(parent)
         self.eps = 1.e-6  # initialize tolerance value
-        self.cmb_time_spgr_items = [
-            "<span>Show Spectrogram for selected signal.</span>",
-            ("none", "None", ""),
-            ("xn", "x[n]", "input"),
-            ("xqn", "x_q[n]", "quantized input"),
-            ("yn", "y[n]", "output")
-            ]
 
         self.cmb_q_frmt_items = [
             "<span>Number format for displaying signed fixpoint coefficients.</span>",
