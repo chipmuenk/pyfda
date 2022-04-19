@@ -314,8 +314,7 @@ class Input_Coeffs(QWidget):
         #             .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{dict_sig}"') #{first_item(dict_sig)}"')
-            # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
