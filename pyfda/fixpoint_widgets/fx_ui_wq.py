@@ -289,7 +289,9 @@ class FX_UI_WQ(QWidget):
         of the local quantization dict
 
         """
-        self.QObj.q_dict['frmt'] = 'dec'  # always use decimal format for coefficient quantization
+        # always use decimal display format for coefficient quantization
+        disp_frmt_tmp = self.QObj.q_dict['frmt']
+        self.QObj.q_dict['frmt'] = 'dec'
         self.QObj.resetN()  # reset all overflow counters
 
         if coeffs is None:
@@ -302,6 +304,8 @@ class FX_UI_WQ(QWidget):
 
         coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
         self.update()  # update display of overflow counter and MSB / LSB
+
+        self.QObj.q_dict['frmt'] = disp_frmt_tmp  # restore previous setting
         return coeff_q
 
     # --------------------------------------------------------------------------
