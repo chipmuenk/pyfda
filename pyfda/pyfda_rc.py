@@ -405,7 +405,7 @@ qss_common = """
                 /* fully transparent background using white and alpha = 0 */
                 * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
                 * [state="running"]{background-color: orange; color: white;}
-                * [state="highlight"]{background-color: rgba(173, 216, 230, 50%)}
+                * [state="highlight"]{background-color: rgba(173, 216, 230, 25%)}
                 * [state="unused"], *[state="u"]{background-color: white; color:darkgrey}
                 /* semi-transparent red */
                 * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
