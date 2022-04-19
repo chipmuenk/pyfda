@@ -287,12 +287,6 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
         # ########################  Main UI Layout ############################
         #######################################################################
-        # Layout for coefficients quantization
-        layV_wdg_wq_coeffs_b = QVBoxLayout()
-        layV_wdg_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
-
-        layV_wdg_wq_coeffs_a = QVBoxLayout()
-        layV_wdg_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
 
         # Construct frame encompassing all UI elements
         layVMainF = QVBoxLayout()
@@ -305,8 +299,8 @@ class Input_Coeffs_UI(QWidget):
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addWidget(frmMain)
-        layVMain.addLayout(layV_wdg_wq_coeffs_b)
-        layVMain.addLayout(layV_wdg_wq_coeffs_a)
+        layVMain.addWidget(self.wdg_wq_coeffs_b)
+        layVMain.addWidget(self.wdg_wq_coeffs_a)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         #######################################################################
