@@ -407,7 +407,7 @@ class Input_Coeffs(QWidget):
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # store new settings and refresh table
-        self.ui.cmbFormat.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmb_disp_frmt.currentIndexChanged.connect(self.ui2qdict)
         self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
@@ -484,7 +484,7 @@ class Input_Coeffs(QWidget):
     def quant_coeffs(self):
         """
         Store selected / all quantized coefficients in `self.ba` and refresh table
-        
+
         Overflow counters are not reset!
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
@@ -593,7 +593,7 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = (qget_cmb_box(self.ui.cmbFormat, data=False).lower() == 'float')
+        is_float = (qget_cmb_box(self.ui.cmb_disp_frmt, data=False).lower() == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
         self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
@@ -775,7 +775,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the UI settings of `self.ui.cmbFormat` and `self.ui.cmb_q_frmt`
+        Read out the UI settings of `self.ui.cmb_disp_frmt` and `self.ui.cmb_q_frmt`
         (those two trigger this method)
 
         It is also triggered by `_save_dict()`.
@@ -789,13 +789,11 @@ class Input_Coeffs(QWidget):
         - Refresh the table, update quantization widgets
         - Emit signal `'fx_sim': 'specs_changed'`
         """
-        logger.warning("called ui2qdict")
-
         fb.fil[0]['fxqc']['QCB'].update(
-            {'frmt': str(self.ui.cmbFormat.currentText().lower()),
+            {'frmt': str(self.ui.cmb_disp_frmt.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'frmt': str(self.ui.cmbFormat.currentText().lower()),
+            {'frmt': str(self.ui.cmb_disp_frmt.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         self.qdict2ui()  # update quant. widgets, table
