@@ -305,7 +305,6 @@ class Input_Coeffs_UI(QWidget):
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHDisplay)
         layVMainF.addWidget(self.frmButtonsCoeffs)
-        # layVMainF.addWidget(QHLine())
 
         # This frame encompasses all UI elements
         frmMain = QFrame(self)

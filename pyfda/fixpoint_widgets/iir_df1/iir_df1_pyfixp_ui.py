@@ -123,9 +123,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
-        # check whether anything needs to be done locally
-        # could also check here for 'quant', 'ovfl', 'WI', 'WF' (not needed at the moment)
-        # if not, just emit the dict.
+        # check whether a signal was generated locally (key = 'ui'). If so:
+        # - update the referenced quantization dictionary
+        # - emit `{'fx_sim': 'specs_changed'}`
+        # Update the ui when the quantization dictionary has been updated outside
+        # (signal `{'fx_sim': 'specs_changed'}` received)
         if 'ui' in dict_sig:
             if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
                 """
@@ -144,17 +146,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
                              f"in '{__name__}' !")
                 return
 
-            # - update fixpoint accu and coefficient quantization dict
-            # - emit {'fx_sim': 'specs_changed'}
             fb.fil[0]['fxqc'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
-        else:
-            logger.error(f"Unknown key '{first_item(dict_sig)}' (should be 'ui')"
-                         f"in '{__name__}' !")
 
     # --------------------------------------------------------------------------
     def dict2ui(self):
