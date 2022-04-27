@@ -89,9 +89,15 @@
   </provides>
 
   <releases>
-    <release version="2018.03.23" date="2018-03-23">
+    <release version="0.6.1" date="2022-03-27">
       <description>
-        <p>Initial Flathub release</p>
+        <p>This release mainly fixes crashes with matplotlib 3.1 and scipy 1.8.0</p>
+      </description>
+    </release>
+	<release version="0.6.0" date="2021-12-24">
+      <description>
+        <p>This release deals mainly with the "y[n]" tab for simulating impulse and transient response and a better integration of the FFT pop-up widget. The internals of fixpoint and floating point simulations have been rewritten as a frame-based simulation.
+		</p>
       </description>
     </release>
   </releases>
