@@ -39,19 +39,25 @@ logger = logging.getLogger(__name__)
 
 V_NP = np.__version__
 V_NUM = numexpr.__version__
-
-# redirect stdio output of show_config to string
-f = io.StringIO()
-with redirect_stdout(f):
-    np.show_config()
-INFO_NP = f.getvalue()
-
-if 'mkl_info' in INFO_NP:
-    MKL = " (mkl)"
+V_NUM_MKL = numexpr.get_vml_version()
+if V_NUM_MKL:
+    MKL = f" (mkl: {V_NUM_MKL:s})"
 else:
-    MKL = ""
+    MKL = " (no mkl)"
 
-# logger.warning(INFO_NP)
+# # redirect stdio output of show_config to string
+# f = io.StringIO()
+# with redirect_stdout(f):
+#     np.show_config()
+# INFO_NP = f.getvalue()
+
+
+# if 'mkl_info' in INFO_NP:
+#     MKL = " (mkl)"
+# else:
+#     MKL = ""
+
+# # logger.warning(INFO_NP)
 
 
 __all__ = ['cmp_version', 'mod_version',
