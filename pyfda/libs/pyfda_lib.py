@@ -84,13 +84,6 @@ MODULES = {'python':       {'V_PY': V_PY},
            }
 
 # ================ Optional Modules ============================
-
-try:
-    from pyfixp import __version__ as V_FX
-    MODULES.update({'pyfixp': {'V_FX': V_FX}})
-except ImportError:
-    MODULES.update({'pyfixp': {'V_FX': None}})
-
 try:
     from docutils import __version__ as V_DOC
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
