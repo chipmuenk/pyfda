@@ -482,7 +482,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
     if type(expr) != str or expr == "None":
         logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
-                       f"'{type(expr).__name__}'")
+                       f"'{type(expr).__name__}', replacing with zero.")
         expr = "0.0"
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
