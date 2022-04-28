@@ -846,9 +846,10 @@ class Fixed(object):
                 try:
                     y_float = np.complex(y)
                 except Exception:
-                    y_float = None
-                    logger.warning(f'Cannot convert "{y}" '
-                                   f'of type "{type(y).__name__}" to float or complex.')
+                    y_float = 0.0
+                    logger.warning(
+                        f'\n\tCannot convert "{y}" of type "{type(y).__name__}" '
+                        f'to float or complex, setting to zero.')
             return y_float
 
         elif np.isscalar(y):
