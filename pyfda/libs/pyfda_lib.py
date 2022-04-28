@@ -472,7 +472,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         `expr` converted to a numpy array or scalar
 
     """
-    local_dict.update({'j': 1j})
+    local_dict.update({'j': 1j, 'None': 0})
     if type(fallback) == tuple:
         np_expr = np.zeros(fallback)  # fallback defines the shape
         fallback_shape = fallback
