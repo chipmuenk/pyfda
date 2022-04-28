@@ -321,27 +321,6 @@ def qstr(text):
     """
     return str(text)  # this should be sufficient for Python 3 ?!
 
-    text_type = str(type(text)).lower()
-
-    if "qstring" in text_type:
-        # Python 3: convert QString -> str
-        # string = str(text)
-        # Convert QString -> Utf8
-        string = text.toUtf8()
-    elif "qvariant" in text_type:
-        # Python 2: convert QVariant -> QString
-        string = text.toString()
-        # string = QVariant(text).toString()
-        # string = str(text.toString())
-    elif "unicode" in text_type:
-        return text
-    else:
-        # `text` is numeric or of type str
-        string = str(text)
-
-    return str(string)  # convert QString -> str
-
-
 ###############################################################################
 # General functions ###########################################################
 ###############################################################################
