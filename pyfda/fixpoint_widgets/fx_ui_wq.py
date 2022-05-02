@@ -270,7 +270,7 @@ class FX_UI_WQ(QWidget):
         self.butLock.clicked.connect(self.butLock_clicked)
 
     # --------------------------------------------------------------------------
-    def quant_coeffs(self, coeffs: iterable) -> list:
+    def quant_coeffs(self, coeffs: iterable, recursive: bool = False) -> list:
         """
         Quantize the coefficients, scale and convert them to a list of integers,
         using the quantization settings of `self.q_dict`.
@@ -282,6 +282,10 @@ class FX_UI_WQ(QWidget):
         ----------
         coeffs: iterable
            a list or ndarray of coefficients to be quantized
+
+        recursive: bool
+            When `False` (default), process all coefficients. When `True`,
+            The first coefficient is ignored (must be 1)
 
         Returns
         -------
@@ -301,8 +305,13 @@ class FX_UI_WQ(QWidget):
         #                           -> list of int (scaled by 2^WF) when `to_int == True`
         if self.QObj.q_dict['qfrmt'] == 'int':
             self.QObj.q_dict['scale'] = 1 << self.QObj.q_dict['WF']
+        if recursive:
+            # quantize coefficients except for first
+            coeff_q = [1] + list(self.QObj.fixp(coeffs[1:]))
+        else:
+            # quantize all coefficients
+            coeff_q = list(self.QObj.fixp(coeffs))
 
-        coeff_q = list(self.QObj.fixp(coeffs))  # quantize coefficients
         self.update()  # update display of overflow counter and MSB / LSB
 
         self.QObj.q_dict['frmt'] = disp_frmt_tmp  # restore previous setting

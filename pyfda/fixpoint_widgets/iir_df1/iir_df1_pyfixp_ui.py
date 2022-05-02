@@ -189,7 +189,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         fxqc_dict = fb.fil[0]['fxqc']
 
         fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
-        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1])})
+        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1],
+                                                                 recursive=True)})
 
         return fxqc_dict
 

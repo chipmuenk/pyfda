@@ -422,7 +422,7 @@ class Input_Coeffs(QWidget):
         `self.ba_q`, not the actual coefficients in `self.ba`!
 
         * Reset overflow counters
-        
+
         * Quantize filter coefficients `self.ba` with separate quantizer objects
           `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
           and store them in the array `self.ba_q`. Depending on the number base
@@ -434,43 +434,35 @@ class Input_Coeffs(QWidget):
         self.QObj[0].resetN()
         self.QObj[1].resetN()
 
-        if np.isscalar(self.ba[0]):
-            len_b = 1
-        else:
-            len_b = len(self.ba[0])
-        if np.isscalar(self.ba[1]):
-            len_a = 1
-        else:
-            len_a = len(self.ba[1])
-#        logger.warning(
-#            f"scale = {self.QObj[0].q_dict['scale']}, {self.QObj[1].q_dict['scale']} ")
+        if np.isscalar(self.ba[0]) or np.isscalar(self.ba[1]):
+            logger.error("No proper filter, coefficients are scalar!")
+            return
+
+        len_b = len(self.ba[0])
+        len_a = len(self.ba[1])
+
+        # don't quantize '1' of recursive coeffs
+        a = np.concatenate(([0], self.ba[1][1:]))
+
         if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
-            # data = safe_eval(data_str, return_type='auto')  # convert to float
-            # return "{0:.{1}g}".format(data, params['FMT_ba'])
-            self.ba_q = [self.ba[0],  # scaling='multdiv' ?
+            self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
                          np.zeros(len_a),
                         ]
         elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
             self.ba_q = [
-                # np.array(["{0:>{1}}".format(self.QObj[0].float2frmt(self.ba[0][i]),
-                #                  self.QObj[0].q_dict['places'])
-                # for i in range(len_b)]),  # scaling='multdiv' ?
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
                     for x in self.QObj[0].float2frmt(self.ba[0])],
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
-                    for x in np.nditer(self.QObj[1].float2frmt(self.ba[1]))],
+                    for x in self.QObj[1].float2frmt(a)],
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
                         ]
         else:
             self.ba_q = [
-                # np.array(["{0:>{1}}".format(self.QObj[0].float2frmt(self.ba[0][i]),
-                #                  self.QObj[0].q_dict['places'])
-                # for i in range(len_b)]),  # scaling='multdiv' ?
                 self.QObj[0].float2frmt(self.ba[0]),
-                self.QObj[1].float2frmt(self.ba[1]),
+                self.QObj[1].float2frmt(a),
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
                         ]
@@ -494,6 +486,10 @@ class Input_Coeffs(QWidget):
             self.ba_q[3] = np.zeros(len(self.ba_q[3]))
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
+            try:
+                idx.remove([1,0])  # don't process '1' of recursive filters
+            except ValueError:
+                pass
             for i in idx:
                 self.ba[i[0]][i[1]] = self.QObj[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
                 self.ba_q[i[0] + 2][i[1]] = 0
