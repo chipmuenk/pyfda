@@ -776,6 +776,7 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def resetN(self):
         """ Reset counters and overflow-flag of Fixed object """
+        logger.warning("reset_N")
         self.q_dict.update(
             {'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0, 'ovr_flag' : 0})
 

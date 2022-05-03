@@ -293,6 +293,7 @@ class FX_UI_WQ(QWidget):
         of the local quantization dict
 
         """
+        logger.warning("quant_coeffs")
         # always use decimal display format for coefficient quantization
         disp_frmt_tmp = self.QObj.q_dict['frmt']
         self.QObj.q_dict['frmt'] = 'dec'
@@ -359,6 +360,7 @@ class FX_UI_WQ(QWidget):
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
+        logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} : {self.q_dict['N_over']}")
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'auto' and self.q_dict['N_over'] == 0:
@@ -404,6 +406,7 @@ class FX_UI_WQ(QWidget):
         if self.sender():
             obj_name = self.sender().objectName()
             dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
+            logger.warning(f"uidict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
             logger.error("Sender has no object name!")
@@ -453,6 +456,7 @@ class FX_UI_WQ(QWidget):
                 self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'})
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
+
                 self.q_dict.update({'qfrmt': qfrmt})
 
         if 'quant' in q_dict:
