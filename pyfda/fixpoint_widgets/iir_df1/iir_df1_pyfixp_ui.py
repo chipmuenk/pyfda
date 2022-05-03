@@ -113,32 +113,39 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        if dict_sig['id'] == id(self):
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            return
 
         # check whether a signal was generated locally (key = 'ui'). If so:
         # - update the referenced quantization dictionary
         # - emit `{'fx_sim': 'specs_changed'}`
         # Update the ui when the quantization dictionary has been updated outside
         # (signal `{'fx_sim': 'specs_changed'}` received)
+        """
+        Update coefficient quantization settings and coefficients.
+        This is performed inside the quantization widgets `FX_UI_WQ`
+
+        The new values are written to the fixpoint coefficient dict as
+        `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
+        `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']` and
+        `fb.fil[0]['fxqc']['QA']`
+        """
         if 'ui' in dict_sig:
-            if dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
-                """
-                Update coefficient quantization settings and coefficients.
-                This is performed inside the quantization widgets `FX_UI_WQ`
-
-                The new values are written to the fixpoint coefficient dict as
-                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
-                `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']` and
-                `fb.fil[0]['fxqc']['QA']`
-                """
-                pass
-
-            else:
+            if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
+            else:
+                if dict_sig['wdg_name'] == 'wq_coeffs_b':
+                    fb.fil[0]['fxqc'].update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
+                elif  dict_sig['wdg_name'] == 'wq_coeffs_a':
+                    fb.fil[0]['fxqc'].update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1],
+                                        recursive=True)})
+                elif dict_sig['wdg_name'] == 'wq_accu':
+                    pass
 
-            fb.fil[0]['fxqc'].update(self.ui2dict())
-            self.emit({'fx_sim': 'specs_changed'})
+                self.emit({'fx_sim': 'specs_changed'})
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
@@ -159,7 +166,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
-    def ui2dict(self):
+    def ui2dict_bak(self):
         """
         Read out the quantization subwidgets and store their settings in the central
         fixpoint dictionary `fb.fil[0]['fxqc']` using the keys described below.
