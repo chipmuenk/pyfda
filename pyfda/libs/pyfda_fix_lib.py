@@ -486,8 +486,9 @@ class Fixed(object):
         Use passed quantization dict `q_dict` to update the instance quantization
         dict `self.q_dict`
 
-        Calculate parameters like MSB, LSB etc. from the dictionary and reset
-        all counters and error flags.
+        Calculate parameters like MSB, LSB etc. from the dictionary.
+
+        Error flags have to be reset manually if required.
 
         Check the docstring of class `Fixed()` for details.
         """
@@ -539,8 +540,12 @@ class Fixed(object):
         else:
             raise Exception(
                 u'Unknown number format "{0:s}"!'.format(self.q_dict['frmt']))
+        for k in {'N_over', 'N_over_pos', 'N_over_neg', 'N', 'ovr_flag'}:
+            if not k in self.q_dict:
+                self.resetN()
+                break
 
-        self.resetN()  # initialize all counters and error flags
+        # self.resetN()  # initialize all counters and error flags
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
