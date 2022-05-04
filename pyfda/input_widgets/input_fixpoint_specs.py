@@ -60,6 +60,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                          " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
+        self.fx_specs_changed = True  # fixpoint specs have been changed outside
         self.fx_path = os.path.realpath(
             os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
 
