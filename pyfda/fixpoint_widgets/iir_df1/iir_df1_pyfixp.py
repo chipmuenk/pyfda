@@ -115,7 +115,7 @@ class IIR_DF1_pyfixp(object):
 
     # ---------------------------------------------------------
     def reset(self):
-        """ reset overflow counters of quantizers """
+        """ reset overflow counters of filter quantizers """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
@@ -190,9 +190,6 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = np.concatenate((self.zi_b, x))
 
-        logger.error(f"{self.zi_b}, {self.zi_a}")
-        logger.error(f"{self.L}, {self.a}")
-
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b)] * self.b)
@@ -204,7 +201,7 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         # Overflows in Q_mul are added to overflows in QA
-        logger.warning(f"{self.Q_acc.q_dict['N_over']} - {self.Q_mul.q_dict['N_over']}")
+        logger.error(f"\n{self.Q_acc.q_dict['N_over']} - {self.Q_mul.q_dict['N_over']}")
         self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
 
