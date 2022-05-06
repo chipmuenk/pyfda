@@ -11,7 +11,9 @@ Fixpoint class for calculating direct-form DF1 IIR filter using pyfixp routines
 """
 import numpy as np
 from numpy.lib.function_base import iterable
+import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
+from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,17 +31,17 @@ class IIR_DF1_pyfixp(object):
     Parameters
     ----------
     p : dict
-        Dictionary with coefficients and quantizer settings with a.o.
-        the following keys : values
+        Dictionary with quantizer settings with a.o. the following key: value pairs:
 
-        - 'b', value: array of transversal coefficients as floats, scaled as `WI:WF`
+        - 'QCB', value: dict with quantizer settings for transversal coefficients
 
-        - 'a', value: array of recursive coefficients as floats, scaled as `WI:WF`
+        - 'QCA', value: dict with quantizer settings for recursive coefficients
 
-        - 'QA', value: dict with quantizer settings for the accumulator
+        - 'QA', value: dict with accumulator quantizer settings
 
-        - 'q_mul', value: dict with quantizer settings for the partial products
-           optional, 'quant' and 'sat' are both be set to 'none' if there is none
+        - 'q_mul', value: dict with partial product quantizer settings
+           optional, 'quant' and 'sat' are both be set to 'none' if there is none, word
+           lengths are copied from the QA dict settings
     """
     def __init__(self, p):
         self.init(p)
@@ -83,13 +85,18 @@ class IIR_DF1_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        self.b = self.p['b']  # transversal coefficients
-        self.a = self.p['a']  # recursive coefficients
-        self.L = max(len(self.b), len(self.a))  # filter length = number of taps
         # create various quantizers
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
+        self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
         self.Q_mul = fx.Fixed(q_mul)  # partial products
         self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
+
+        # quantize coefficients
+        self.b = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.a = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a)
+        self.L = max(len(self.b), len(self.a))  # filter length = number of taps
+
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
         if zi_b is None:

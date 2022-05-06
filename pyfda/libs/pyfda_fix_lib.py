@@ -14,6 +14,7 @@ numpy values and formatting reals in various formats
 import re
 
 import numpy as np
+from numpy.lib.function_base import iterable
 try:
     import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
@@ -1063,6 +1064,58 @@ class Fixed(object):
             return y_str
         else:
             raise Exception(f"""Unknown number format "{self.q_dict['frmt']}"!""")
+
+########################################
+
+# --------------------------------------------------------------------------
+def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
+    """
+    Quantize the coefficients, scale and convert them to a list of integers,
+    using the quantization settings of `Fixed()` instance QObj.
+
+    Parameters
+    ----------
+    coeffs: iterable
+        a list or ndarray of coefficients to be quantized
+
+    QObj: dict
+        instance of Fixed object containing quantization dict qdict
+
+    recursive: bool
+        When `False` (default), process all coefficients. When `True`,
+        The first coefficient is ignored (must be 1)
+
+    Returns
+    -------
+    A list of integer coeffcients, quantized and scaled with the settings
+    of the quantization object dict
+
+    """
+    logger.warning("quant_coeffs")
+    # always use decimal display format for coefficient quantization
+    disp_frmt_tmp = QObj.q_dict['frmt']
+    QObj.q_dict['frmt'] = 'dec'
+    QObj.resetN()  # reset all overflow counters
+
+    if coeffs is None:
+        logger.error("Coeffs empty!")
+    # quantize floating point coefficients with the selected scale (WI.WF),
+    # next convert array float  -> array of fixp
+    #                           -> list of int (scaled by 2^WF) when `to_int == True`
+    if QObj.q_dict['qfrmt'] == 'int':
+        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
+    if recursive:
+        # quantize coefficients except for first
+        coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
+    else:
+        # quantize all coefficients
+        coeff_q = list(QObj.fixp(coeffs))
+
+    # TODO: Does this need fixing?
+    # self.update()  # update display of overflow counter and MSB / LSB
+
+    QObj.q_dict['frmt'] = disp_frmt_tmp  # restore previous display setting
+    return coeff_q
 
 
 ########################################

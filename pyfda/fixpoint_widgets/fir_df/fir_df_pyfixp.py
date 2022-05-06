@@ -11,11 +11,12 @@ Fixpoint class for calculating direct-form DF1 FIR filter using pyfixp routines
 """
 import numpy as np
 from numpy.lib.function_base import iterable
+import pyfda.filterbroker as fb
+# from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
+from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 import logging
-
-# from pyfda.libs.pyfda_lib import pprint_log
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +40,7 @@ class FIR_DF_pyfixp(object):
         - 'QA', value: dict with quantizer settings for the accumulator
 
         - 'q_mul', value: dict with quantizer settings for the partial products
-           optional, 'quant' and 'sat' are both be set to 'none' if there is none
+           optional, 'quant' and 'sat' are both set to 'none' if there is none
     """
     def __init__(self, p):
         self.init(p)
@@ -75,12 +76,16 @@ class FIR_DF_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        self.b = self.p['b']  # coefficients
-        self.L = len(self.b)  # filter length = number of taps
+        # self.b = self.p['b']  # coefficients
+
         # create various quantizers
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         self.Q_mul = fx.Fixed(q_mul)  # partial products
         self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
+        self.b = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.L = len(self.b)  # filter length = number of taps
+
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
         if zi is None:
