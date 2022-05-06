@@ -659,8 +659,10 @@ class Input_Coeffs(QWidget):
         """
 
         self.ba = [0., 0.]  # initial list with two elements
-        self.ba[0] = np.array(fb.fil[0]['ba'][0])  # deep copy from filter dict to
-        self.ba[1] = np.array(fb.fil[0]['ba'][1])  # coefficient register
+        # self.ba[0] = np.array(fb.fil[0]['ba'][0])  # deep copy from filter dict to
+        # self.ba[1] = np.array(fb.fil[0]['ba'][1])  # coefficient register
+        self.ba[0] = fb.fil[0]['ba'][0]  # deep copy from filter dict to
+        self.ba[1] = fb.fil[0]['ba'][1]  # coefficient register
 
         self.qdict2ui()  # set quantization ui from dictionary
 
