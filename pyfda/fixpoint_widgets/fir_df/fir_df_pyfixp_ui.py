@@ -113,12 +113,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         # (signal `{'fx_sim': 'specs_changed'}` received)
         if 'ui' in dict_sig:
             if dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
-                """
-                Update coefficient quantization settings and coefficients.
-
-                The new values are written to the fixpoint coefficient dict as
-                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
-                """
                 pass
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
@@ -137,27 +131,10 @@ class FIR_DF_pyfixp_UI(QWidget):
                              f"in '{__name__}' !")
                 return
 
-            fb.fil[0]['fxqc'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
-
-    # --------------------------------------------------------------------------
-    def update_q_coeff(self, dict_sig):
-        """
-        Update coefficient quantization settings and coefficients.
-
-        The new values are written to the fixpoint coefficient dict as
-        `fb.fil[0]['fxqc']['QCB']` and
-        `fb.fil[0]['fxqc']['b']`.
-        """
-        logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
-        # dict_sig.update({'ui':'C'+dict_sig['ui']})
-        fb.fil[0]['fxqc'].update(self.ui2dict())
-        logger.debug("b = {0}".format(pprint_log(fb.fil[0]['fxqc']['b'])))
-
-        self.process_sig_rx(dict_sig)
 
     # --------------------------------------------------------------------------
     def update_accu_settings(self):
@@ -224,40 +201,15 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.update_accu_settings()                  # update accumulator settings
 
     # --------------------------------------------------------------------------
-    def ui2dict(self):
+    def update(self):
         """
-        Read out the quantization subwidgets and store their settings in the central
-        fixpoint dictionary `fb.fil[0]['fxqc']` using the keys described below.
+        Update the overflow counters etc. of the UI after simulation has finished.
 
-        Coefficients are quantized with these settings in the subdictionary under
-        the key 'b'.
-
-        Additionally, these subdictionaries are returned  to the caller
-        (``input_fixpoint_specs``) where they are used to update ``fb.fil[0]['fxqc']``
-
-        Parameters
-        ----------
-
-        None
-
-        Returns
-        -------
-        fxqc_dict : dict
-
-           containing the following keys and values:
-
-        - 'QCB': dictionary with b coefficients quantization settings
-        - 'QA': dictionary with accumulator quantization settings
-        - 'b' : list of quantized b coefficients in format WI.WF
-
+        This is usually called from one level above by
+        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxqc_dict = fb.fil[0]['fxqc']
-        # fxqc_dict['QA'].update(self.wdg_wq_accu.q_dict)
-        # fxqc_dict['QCB'].update(self.wdg_wq_coeffs.q_dict)
-
-        fxqc_dict.update({'b': self.wdg_wq_coeffs.quant_coeffs(fb.fil[0]['ba'][0])})
-
-        return fxqc_dict
+        self.wdg_wq_coeffs.update()
+        self.wdg_wq_accu.update()
 
     # --------------------------------------------------------------------------
     def init_filter(self):

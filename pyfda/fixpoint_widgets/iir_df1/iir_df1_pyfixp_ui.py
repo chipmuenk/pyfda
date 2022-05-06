@@ -166,42 +166,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
-    def ui2dict_bak(self):
-        """
-        Read out the quantization subwidgets and store their settings in the central
-        fixpoint dictionary `fb.fil[0]['fxqc']` using the keys described below.
-
-        Coefficients are quantized with these settings in the subdictionary under
-        the keys 'b' and 'a'.
-
-        Additionally, these subdictionaries are returned  to the caller
-        (``input_fixpoint_specs``) where they are used to update ``fb.fil[0]['fxqc']``
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        fxqc_dict : dict
-
-           containing the following keys and values:
-
-        - 'QCB': dictionary with b coefficients quantization settings
-        - 'QCA': dictionary with a coefficients quantization settings
-        - 'QA': dictionary with accumulator quantization settings
-        - 'b' : list of quantized b coefficients in format WI.WF
-        - 'a' : list of quantized a coefficients in format WI.WF
-        """
-        fxqc_dict = fb.fil[0]['fxqc']
-
-        fxqc_dict.update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
-        fxqc_dict.update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1],
-                                                                 recursive=True)})
-
-        return fxqc_dict
-
-    # --------------------------------------------------------------------------
     def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
