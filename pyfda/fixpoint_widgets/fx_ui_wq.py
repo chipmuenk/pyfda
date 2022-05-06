@@ -16,8 +16,8 @@ from numpy.lib.function_base import iterable
 import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon, QSpacerItem,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal, QColor)
+    QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
+    QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qstyle_widget)
