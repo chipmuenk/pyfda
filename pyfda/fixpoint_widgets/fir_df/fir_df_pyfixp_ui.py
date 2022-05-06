@@ -110,10 +110,15 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         # check whether a signal was generated locally (key = 'ui'). If so:
         # - update the referenced quantization dictionary
-        # - emit `{'fx_sim': 'specs_changed'}`
-        # Update the ui when the quantization dictionary has been updated outside
-        # (signal `{'fx_sim': 'specs_changed'}` received)
+
         if 'ui' in dict_sig:
+            # Some settings in the local UI have been changed. Coefficient and accu
+            # quantization settings have already been updated in the referenced dicts 
+            # `fb.fil[0]['fxqc']['QCB']` and `fb.fil[0]['fxqc']['QA']` by the
+            # corresponding subwidgets `FX_UI_WQ`
+            #
+            # - update accu wordlengths for 'auto' or 'full' settings
+            # - emit `{'fx_sim': 'specs_changed'}`
             if dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
                 pass
 
