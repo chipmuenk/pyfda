@@ -102,8 +102,7 @@ class FIR_DF_pyfixp(object):
         self.N_over_filt = 0
 
     # ---------------------------------------------------------
-    def fxfilter(self, x: iterable = None, b: iterable = None, zi: iterable = None)\
-            -> np.ndarray:
+    def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
         """
         Calculate FIR filter (direct form) response via difference equation with
         quantization. Registers can be initialized with `zi`.
@@ -116,10 +115,6 @@ class FIR_DF_pyfixp(object):
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
 
-        b :  array-like
-             filter coefficients as quantized floats scaled as `WI.WF`
-             When `b == None`, the old coefficients are left untouched
-
         zi : array-like
              initial conditions; when `zi == None`, the register contents are used from
              the last run.
@@ -130,10 +125,6 @@ class FIR_DF_pyfixp(object):
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` (impulse response).
         """
-
-        if b is not None and np.any(b != self.b):  # update coefficients, reset filter
-            self.p['b'] = self.b = b
-            self.init(self.p)
         # When `zi` is specified, initialize filter memory with it and pad with zeros
         # When `zi == None`, use register contents from last run
         if zi is not None:

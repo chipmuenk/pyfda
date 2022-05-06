@@ -122,7 +122,7 @@ class IIR_DF1_pyfixp(object):
         self.N_over_filt = 0
 
     # ---------------------------------------------------------
-    def fxfilter(self, x: iterable = None, b: iterable = None, a: iterable = None,
+    def fxfilter(self, x: iterable = None,
                  zi_b: iterable = None, zi_a: iterable = None) -> np.ndarray:
         """
         Calculate IIR filter (direct form 1) response via difference equation with
@@ -136,14 +136,6 @@ class IIR_DF1_pyfixp(object):
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
 
-        b :  array-like
-             transversal filter coefficients as quantized floats scaled as `WI.WF`
-             When `b == None`, the old coefficients are left untouched
-
-        a :  array-like
-             recursive filter coefficients as quantized floats scaled as `WI.WF`
-             When `a == None`, the old coefficients are left untouched
-
         zi_b : array-like
              initial conditions for transversal registers; when `zi_b == None`,
              the register contents from the last run are used.
@@ -152,26 +144,12 @@ class IIR_DF1_pyfixp(object):
              initial conditions for recursive registers; when `zi_a == None`,
              the register contents from the last run are used.
 
-
         Returns
         -------
         yq : ndarray
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` or `a`(impulse response).
         """
-        coeff_changed = False
-
-        if b is not None and np.any(b != self.b):  # update transversal coefficients
-            self.p['b'] = self.b = b
-            coeff_changed = True
-
-        if a is not None and np.any(a != self.a):  # update recursive coefficients
-            self.p['a'] = self.a = a
-            coeff_changed = True
-
-        if coeff_changed:
-            self.init(self.p)  # reset filter
-
         # When `zi_b` is specified, initialize filter memory with it and pad with zeros
         # When `zi_b == None`, use register contents from last run
         if zi_b is not None:
