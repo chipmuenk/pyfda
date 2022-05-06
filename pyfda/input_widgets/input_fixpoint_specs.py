@@ -588,7 +588,7 @@ class Input_Fixpoint_Specs(QWidget):
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
             self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
-            self.update_fxqc_dict()
+            # self.update_fxqc_dict()
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
@@ -611,18 +611,19 @@ class Input_Fixpoint_Specs(QWidget):
 
         qstyle_widget(self.butSimFx, "changed")
 
-# ------------------------------------------------------------------------------
-    def update_fxqc_dict(self):
-        """
-        Update the fxqc dictionary before simulation / HDL generation starts.
-        """
-        if self.fx_wdg_found:
-            # get a dict with the coefficients and fixpoint settings from fixpoint widget
-            if hasattr(self.fx_filt_ui, "ui2dict"):
-                fb.fil[0]['fxqc'].update(self.fx_filt_ui.ui2dict())
-                logger.debug("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
-        else:
-            logger.error("No fixpoint widget found!")
+# # ------------------------------------------------------------------------------
+#     def update_fxqc_dict(self):
+#         """
+#         Update the fxqc dictionary before simulation / HDL generation starts.
+#         """
+#         if self.fx_wdg_found:
+#             # get a dict with the coefficients and fixpoint settings from fixpoint widget
+#             # TODO: This is obsolete ?!
+#             if hasattr(self.fx_filt_ui, "ui2dict"):
+#                 fb.fil[0]['fxqc'].update(self.fx_filt_ui.ui2dict())
+#                 logger.debug("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
+#         else:
+#             logger.error("No fixpoint widget found!")
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
@@ -669,7 +670,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info('Creating hdl_file "{0}"\n\twith top level module "{1}"'
                         .format(hdl_full_name, vlog_mod_name))
             try:
-                self.update_fxqc_dict()
+                # self.update_fxqc_dict()
                 self.fx_filt_ui.construct_fixp_filter()
                 code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
@@ -695,7 +696,7 @@ class Input_Fixpoint_Specs(QWidget):
             0 for sucessful fx widget construction, -1 for error
         """
         try:
-            self.update_fxqc_dict()
+            # self.update_fxqc_dict()
             self.fx_filt_ui.init_filter()   # setup filter instance
             return 0
 
