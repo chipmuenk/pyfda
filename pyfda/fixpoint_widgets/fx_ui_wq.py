@@ -293,7 +293,7 @@ class FX_UI_WQ(QWidget):
         of the local quantization dict
 
         """
-        logger.warning("quant_coeffs")
+        logger.warning("quant_coeffs @ FX_UI_WQ")
         # always use decimal display format for coefficient quantization
         disp_frmt_tmp = self.QObj.q_dict['frmt']
         self.QObj.q_dict['frmt'] = 'dec'

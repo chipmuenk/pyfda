@@ -112,7 +112,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return

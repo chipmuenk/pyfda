@@ -104,7 +104,7 @@ class FIR_DF_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        # logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
 
         # check whether a signal was generated locally (key = 'ui'). If so:
         # - update the referenced quantization dictionary
