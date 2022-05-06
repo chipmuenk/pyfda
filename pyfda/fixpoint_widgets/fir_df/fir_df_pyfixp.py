@@ -138,10 +138,10 @@ class FIR_DF_pyfixp(object):
 
         if np.isscalar(x):
             A = x
-            x = np.zeros(len(self.b))
+            x = np.zeros(self.L)
             x[0] = A
         elif x is None:  # calculate impulse response
-            x = np.zeros(len(self.b))
+            x = np.zeros(self.L)
             x[0] = 1
         # else:  # don't change x, it is integer anyway
         #    x = x
@@ -161,7 +161,7 @@ class FIR_DF_pyfixp(object):
 
         for k in range(len(x)):
             # weighted state-vector x at time k:
-            xb_q = self.Q_mul.fixp(self.zi[k:k + len(self.b)] * self.b)
+            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b)
             # sum up x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
