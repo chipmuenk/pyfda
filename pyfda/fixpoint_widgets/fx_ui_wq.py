@@ -94,7 +94,7 @@ class FX_UI_WQ(QWidget):
     'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
     """
     # incoming,
-    # sig_rx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object)
     # outcgoing
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
@@ -105,6 +105,17 @@ class FX_UI_WQ(QWidget):
         self.q_dict = q_dict
         self._construct_UI(**kwargs)
 
+    # --------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """ Update the ui when the quantization dictionary has been updated outside
+            (signal `{'fx_sim': 'specs_changed'}` received)"""
+
+        logger.warning("sig_rx:\n{0}".format(dict_sig))
+
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.dict2ui()
+
+    # --------------------------------------------------------------------------
     def _construct_UI(self, **kwargs):
         """ Construct widget """
         cmb_q = ["Select the kind of quantization.",
@@ -258,6 +269,10 @@ class FX_UI_WQ(QWidget):
         # initialize overflow counter and MSB / LSB display
         self.update()
 
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------

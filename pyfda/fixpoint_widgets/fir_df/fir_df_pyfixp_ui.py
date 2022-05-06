@@ -95,6 +95,8 @@ class FIR_DF_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
+        self.sig_rx.connect(self.wdg_wq_coeffs.sig_rx)
+        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
