@@ -212,6 +212,9 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = np.concatenate((self.zi_b, x))
 
+        logger.error(f"{self.zi_b}, {self.zi_a}")
+        logger.error(f"{self.L}, {self.a}")
+
         for k in range(len(x)):
             # weighted state-vector x at time k:
             xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b)] * self.b)
