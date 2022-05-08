@@ -110,6 +110,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
+        self.update()  # initial setting of overflow counters
+
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -144,6 +146,18 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
+
+    # --------------------------------------------------------------------------
+    def update(self):
+        """
+        Update the overflow counters etc. of the UI after simulation has finished.
+
+        This is usually called from one level above by
+        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+        """
+        self.wdg_wq_coeffs_b.update()
+        self.wdg_wq_coeffs_a.update()
+        self.wdg_wq_accu.update()
 
     # --------------------------------------------------------------------------
     def dict2ui(self):
