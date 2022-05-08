@@ -13,6 +13,7 @@ import sys
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
+from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -133,16 +134,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
-            else:
-                if dict_sig['wdg_name'] == 'wq_coeffs_b':
-                    fb.fil[0]['fxqc'].update({'b': self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])})
-                elif  dict_sig['wdg_name'] == 'wq_coeffs_a':
-                    fb.fil[0]['fxqc'].update({'a': self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1],
-                                        recursive=True)})
-                elif dict_sig['wdg_name'] == 'wq_accu':
-                    pass
 
-                self.emit({'fx_sim': 'specs_changed'})
+            elif dict_sig['wdg_name'] == 'wq_coeffs_b':
+                quant_coeffs(self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])
+            elif  dict_sig['wdg_name'] == 'wq_coeffs_a':
+                self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1], recursive=True)
+
+            self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
