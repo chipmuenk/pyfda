@@ -102,9 +102,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        self.sig_rx.connect(self.wdg_wq_coeffs_b.sig_rx)
-        self.sig_rx.connect(self.wdg_wq_coeffs_a.sig_rx)
-        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------

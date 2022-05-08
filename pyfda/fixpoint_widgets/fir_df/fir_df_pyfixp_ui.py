@@ -95,8 +95,8 @@ class FIR_DF_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-        self.sig_rx.connect(self.wdg_wq_coeffs.sig_rx)
-        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
+#        self.sig_rx.connect(self.wdg_wq_coeffs.sig_rx)
+#        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -131,7 +131,7 @@ class FIR_DF_pyfixp_UI(QWidget):
                     self.update_accu_settings()
 
                 elif cmbW == 'man':  # switched to manual, don't do anything
-                    pass
+                    return
 
             else:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -141,6 +141,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            # Update the ui when the quantization dictionary has been updated outside
+            # (signal `{'fx_sim': 'specs_changed'}` received)
             self.dict2ui()
 
     # --------------------------------------------------------------------------

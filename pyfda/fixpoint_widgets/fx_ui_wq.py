@@ -93,10 +93,8 @@ class FX_UI_WQ(QWidget):
                                                 #   ['on', 'off', 'auto']
     'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
     """
-    # incoming,
-    sig_rx = pyqtSignal(object)
-    # outcgoing
-    sig_tx = pyqtSignal(object)
+    # sig_rx = pyqtSignal(object)  # incoming
+    sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, q_dict: dict, **kwargs) -> None:
@@ -105,15 +103,15 @@ class FX_UI_WQ(QWidget):
         self.q_dict = q_dict
         self._construct_UI(**kwargs)
 
-    # --------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """ Update the ui when the quantization dictionary has been updated outside
-            (signal `{'fx_sim': 'specs_changed'}` received)"""
+    # # --------------------------------------------------------------------------
+    # def process_sig_rx(self, dict_sig=None):
+    #     """ Update the ui when the quantization dictionary has been updated outside
+    #         (signal `{'fx_sim': 'specs_changed'}` received)"""
 
-        logger.warning("sig_rx:\n{0}".format(dict_sig))
+    #     logger.warning("sig_rx:\n{0}".format(dict_sig))
 
-        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.dict2ui()
+    #     if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+    #         self.dict2ui()
 
     # --------------------------------------------------------------------------
     def _construct_UI(self, **kwargs):
@@ -272,7 +270,7 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
+        # self.sig_rx.connect(self.process_sig_rx)
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -414,9 +412,9 @@ class FX_UI_WQ(QWidget):
         quant = qget_cmb_box(self.cmbQuant)
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
-        self.QObj.setQobj(self.q_dict)
+        self.QObj.setQobj(self.q_dict)  # set quant. object and reset counter
 
-        self.update()  # update MSB / LSB and overflow counter info
+        # self.update()  # update MSB / LSB and overflow counter info
 
         if self.sender():
             obj_name = self.sender().objectName()
