@@ -17,7 +17,7 @@ from pyfda.libs.compat import (
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, first_item
+from pyfda.libs.pyfda_lib import fil_save, safe_eval, first_item
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table

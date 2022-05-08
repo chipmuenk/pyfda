@@ -14,7 +14,7 @@ import sys
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
 
-from pyfda.libs.compat import QWidget, QVBoxLayout, QFrame, pyqtSignal
+from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
