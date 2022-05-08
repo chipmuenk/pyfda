@@ -84,24 +84,27 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in from input and output quantizer subwidget and the
-        dynamically instantiated subwidget and emit {'fx_sim': 'specs_changed'} in
-        the end.
+        Process signals coming in from input and output quantizer subwidget and 
+        emit {'fx_sim': 'specs_changed'} in the end.
         """
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
-            dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
-            self.emit(dict_sig)
-            return
+        # elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+        #     self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+        #     dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
+        #     self.emit(dict_sig)
+        #     return
 
         # ---- Process input and output quantizer settings ('ui' in dict_sig) --
         elif 'ui' in dict_sig:
             if 'wdg_name' not in dict_sig:
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
+                return
+
+            elif dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
                 return
 
             elif dict_sig['wdg_name'] == 'wq_input':
@@ -134,14 +137,12 @@ class Input_Fixpoint_Specs(QWidget):
                              .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
                 return
 
-            if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
-
+        # --------------------------------------------------------------------------------
         else:
             logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
+        return
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
@@ -195,19 +196,24 @@ class Input_Fixpoint_Specs(QWidget):
                     self.wdg_wq_output.QObj.resetN()
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
-
-            elif dict_sig['fx_sim'] == 'specs_changed':
-                # fixpoint specifications / quantization settings have been changed
-                # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
-                self.wdg_dict2ui()
-
             elif dict_sig['fx_sim'] == 'finish':
-                # update I/O widgets and dynamically instantiated filter widget
+                # update I/O widgets and dynamically instantiated filter widget with
+                # number of overflows etc.
                 self.wdg_wq_input.update()
                 self.wdg_wq_output.update()
-                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'dict2ui'):
-                    self.fx_filt_ui.dict2ui()
+                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update'):
+                    self.fx_filt_ui.update()
                 qstyle_widget(self.butSimFx, "normal")
+            # fixpoint specifications / quantization settings have been changed
+            # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
+            elif self.fx_specs_changed or\
+                (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
+                self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+                self.fx_specs_changed = False
+                # self.emit(dict_sig)  # TODO: ???
+                return
+            elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
+                self.fx_specs_changed = True
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
@@ -513,7 +519,6 @@ class Input_Fixpoint_Specs(QWidget):
         - emit {'fx_sim': 'specs_changed'} when successful
         """
         def _disable_fx_wdg(self) -> None:
-
             if hasattr(self, "fx_filt_ui") and self.fx_filt_ui is not None:
                 # is a fixpoint widget loaded?
                 try:
@@ -560,7 +565,7 @@ class Input_Fixpoint_Specs(QWidget):
             if hasattr(self.fx_filt_ui, "sig_rx"):
                 self.sig_rx.connect(self.fx_filt_ui.sig_rx)
             if hasattr(self.fx_filt_ui, "sig_tx"):
-                self.fx_filt_ui.sig_tx.connect(self.sig_rx_local)
+                self.fx_filt_ui.sig_tx.connect(self.sig_rx)
 
             # ---- get name of new fixpoint filter image ----
             if not (hasattr(self.fx_filt_ui, "img_name") and self.fx_filt_ui.img_name):
@@ -588,7 +593,6 @@ class Input_Fixpoint_Specs(QWidget):
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
             self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
-            # self.update_fxqc_dict()
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
