@@ -93,8 +93,9 @@ class IIR_DF1_pyfixp(object):
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         # quantize coefficients
+        self.a = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
         self.b = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-        self.a = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a)
+
         self.L = max(len(self.b), len(self.a))  # filter length = number of taps
 
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
