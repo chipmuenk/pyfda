@@ -598,20 +598,19 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def wdg_dict2ui(self):
         """
-        Trigger an update of the fixpoint widget UI when view (i.e. fixpoint
-        coefficient format) or data have been changed outside this class. Additionally,
-        pass the fixpoint quantization widget to update / restore other subwidget
-        settings.
+        Trigger an update of the input, output and fixpoint widgets UI when view
+        (i.e. fixpoint coefficient format) or data have been changed outside this
+        class.
 
         Set the RUN button to "changed".
         """
+        logger.warning("fx_specs.dict2ui")
         self.wdg_wq_input.dict2ui()
         self.wdg_wq_output.dict2ui()
 
-        if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
-            self.fx_filt_ui.dict2ui()
-#            dict_sig = {'fx_sim':'specs_changed'}
-#            self.emit(dict_sig)
+#       The following should be connected via signal-slot
+#         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
+#             self.fx_filt_ui.dict2ui()
 
         qstyle_widget(self.butSimFx, "changed")
 
