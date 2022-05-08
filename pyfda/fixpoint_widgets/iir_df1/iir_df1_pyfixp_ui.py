@@ -111,24 +111,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
+        """
+        Check whether a signal was generated locally (key = 'ui'). If so:
+        - update the referenced quantization dictionary
+        - emit `{'fx_sim': 'specs_changed'}` with local id
+
+        When a `{'fx_sim': 'specs_changed'}` signal is received, update the ui.
+        """
         logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        # check whether a signal was generated locally (key = 'ui'). If so:
-        # - update the referenced quantization dictionary
-        # - emit `{'fx_sim': 'specs_changed'}`
-        # Update the ui when the quantization dictionary has been updated outside
-        # (signal `{'fx_sim': 'specs_changed'}` received)
-        """
-        Update coefficient quantization settings and coefficients.
-        This is performed inside the quantization widgets `FX_UI_WQ`
 
-        The new values are written to the fixpoint coefficient dict as
-        `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']` and
-        `fb.fil[0]['fxqc']['QCA']` and  `fb.fil[0]['fxqc']['a']` and
-        `fb.fil[0]['fxqc']['QA']`
+        """
+        Update of coefficient quantization settings has been performed inside
+        the quantization widgets `FX_UI_WQ`. Now, update the quantization counters
         """
         if 'ui' in dict_sig:
             if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
@@ -170,6 +168,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         Construct an instance of the fixpoint filter object using the settings from
         the 'fxqc' quantizer dict
         """
+        logger.error("init filter")
         p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         self.fx_filt = IIR_DF1_pyfixp(p)
 
