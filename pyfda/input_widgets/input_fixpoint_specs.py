@@ -684,10 +684,11 @@ class Input_Fixpoint_Specs(QWidget):
             0 for sucessful fx widget construction, -1 for error
         """
         try:
-            self.fx_filt_ui.init_filter()   # setup filter instance
+            # self.fx_filt_ui.init_filter()   # setup filter instance
+            self.fx_filt_ui.fx_filt.reset()
             return 0
 
-        except ValueError as e:
+        except (ValueError, AttributeError) as e:
             logger.error('Fixpoint stimulus generation failed during "init"'
                          '\nwith "{0} "'.format(e))
         return -1

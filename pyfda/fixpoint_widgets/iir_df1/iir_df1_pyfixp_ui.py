@@ -48,6 +48,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.img_name = "iir_df1.png"
 
         self._construct_UI()
+        self.init_filter()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
 
@@ -125,7 +126,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
-
 
         """
         Update of coefficient quantization settings has been performed inside

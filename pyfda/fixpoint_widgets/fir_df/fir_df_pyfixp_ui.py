@@ -48,6 +48,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.img_name = "fir_df.png"
 
         self._construct_UI()
+        self.init_filter()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
 
