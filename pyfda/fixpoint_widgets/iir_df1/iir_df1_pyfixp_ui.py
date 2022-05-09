@@ -138,8 +138,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 return
 
             elif dict_sig['wdg_name'] == 'wq_coeffs_b':
-                quant_coeffs(self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])
-            elif  dict_sig['wdg_name'] == 'wq_coeffs_a':
+                quant_coeffs(self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0]))
+            elif dict_sig['wdg_name'] == 'wq_coeffs_a':
                 self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1], recursive=True)
 
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
