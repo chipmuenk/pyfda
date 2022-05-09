@@ -73,7 +73,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent  # instance of the parent (not the base) class
-        # reference quantization object of coefficient widgets
+        # handles to quantization objects (fx.Fixed() instance) of coefficient widgets
         self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
                      self.parent.ui.wdg_wq_coeffs_a.QObj]
 
@@ -300,6 +300,7 @@ class Input_Coeffs(QWidget):
 
         self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
 
+        # handles to quantization objects (fx.Fixed() instance) of coefficient widgets
         self.QObj = [self.ui.wdg_wq_coeffs_b.QObj,
                      self.ui.wdg_wq_coeffs_a.QObj]
 
@@ -650,19 +651,14 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def load_dict(self):
         """
-        Load all entries from filter dict `fb.fil[0]['ba']` into the coefficient
-        list `self.ba` and update the display via `self.refresh_table()`.
+        Create a reference from filter dict `fb.fil[0]['ba']` to the coefficient list
+        `self.ba` and update the display via `self.refresh_table()`.
 
         The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
-        while the coefficient register `self.ba` is a list of two float ndarrays to allow
+        while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-
-        self.ba = [0., 0.]  # initial list with two elements
-        # self.ba[0] = np.array(fb.fil[0]['ba'][0])  # deep copy from filter dict to
-        # self.ba[1] = np.array(fb.fil[0]['ba'][1])  # coefficient register
-        self.ba[0] = fb.fil[0]['ba'][0]  # deep copy from filter dict to
-        self.ba[1] = fb.fil[0]['ba'][1]  # coefficient register
+        self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
         self.qdict2ui()  # set quantization ui from dictionary
 
