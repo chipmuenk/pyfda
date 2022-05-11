@@ -335,7 +335,7 @@ class Fixed(object):
     Additionally, the following keys define the base / display format for the
     fixpoint number:
 
-    * **'frmt'** : Output format, optional; default = 'float'
+    * **'fx_base'** : Output format, optional; default = 'float'
 
       - 'float' : (default)
       - 'dec'  : decimal integer, scaled by :math:`2^{WF}`
@@ -363,7 +363,7 @@ class Fixed(object):
     * **'ovfl'**  : str
         Overflow behaviour ('wrap', 'sat', ...)
 
-    * **'frmt'** : str
+    * **'fx_base'** : str
         target output format ('float', 'dec', 'bin', 'hex', 'csd')
 
 
@@ -441,7 +441,7 @@ class Fixed(object):
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
             'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round', 'ovfl': 'sat',
-            'frmt': 'float', 'qfrmt': 'qfrac', 'scale': 1}
+            'fx_base': 'float', 'qfrmt': 'qfrac', 'scale': 1}
         # these keys are calculated and should not be regarded as read-only
         self.q_dict_default_ro = {
             'N': 0, 'ovr_flag': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0,
@@ -522,25 +522,25 @@ class Fixed(object):
 
         # Calculate required number of places for different bases from total
         # number of bits:
-        if self.q_dict['frmt'] == 'dec':
+        if self.q_dict['fx_base'] == 'dec':
             self.q_dict['places'] = int(
                 np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
             self.base = 10
-        elif self.q_dict['frmt'] == 'bin':
+        elif self.q_dict['fx_base'] == 'bin':
             self.q_dict['places'] = self.q_dict['W'] + 1
             self.base = 2
-        elif self.q_dict['frmt'] == 'csd':
+        elif self.q_dict['fx_base'] == 'csd':
             self.q_dict['places'] = self.q_dict['W'] + 1
             self.base = 2
-        elif self.q_dict['frmt'] == 'hex':
+        elif self.q_dict['fx_base'] == 'hex':
             self.q_dict['places'] = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
-        elif self.q_dict['frmt'] == 'float':
+        elif self.q_dict['fx_base'] == 'float':
             self.q_dict['places'] = 4
             self.base = 0
         else:
             raise Exception(
-                u'Unknown number format "{0:s}"!'.format(self.q_dict['frmt']))
+                u'Unknown number format "{0:s}"!'.format(self.q_dict['fx_base']))
         # for k in {'N_over', 'N_over_pos', 'N_over_neg', 'N', 'ovr_flag'}:
         #     if not k in self.q_dict:
         #         self.resetN()
@@ -806,11 +806,11 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or string or array of scalars or strings in number format 'frmt'
+        y: scalar or string or array of scalars or strings in number format 'fx_base'
 
         frmt: string (optional)
             any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
-            When `frmt` is unspecified, the instance parameter `self.q_dict['frmt']`
+            When `frmt` is unspecified, the instance parameter `self.q_dict['fx_base']`
             is used.
 
         Returns
@@ -821,7 +821,7 @@ class Fixed(object):
 
         # ----------------------------------------------------------------------
         if frmt is None:
-            frmt = self.q_dict['frmt']
+            frmt = self.q_dict['fx_base']
         frmt = frmt.lower()
 
         if y is None:
@@ -999,7 +999,7 @@ class Fixed(object):
         Returns
         -------
         A string, a float or an ndarray of float or string is returned in the
-        numeric format set in `self.q_dict['frmt'])`. It has the same shape as `y`.
+        numeric format set in `self.q_dict['fx_base'])`. It has the same shape as `y`.
          For all formats except `float` a fixpoint representation with
          `self.q_dict['W']` binary digits is returned.
 
@@ -1019,18 +1019,18 @@ class Fixed(object):
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         # ======================================================================
 
-        if self.q_dict['frmt'] == 'float':  # return float input value unchanged (no string)
+        if self.q_dict['fx_base'] == 'float':  # return float input value unchanged (no string)
             return y
-        elif self.q_dict['frmt'] == 'float32':
+        elif self.q_dict['fx_base'] == 'float32':
             return np.float32(y)
-        elif self.q_dict['frmt'] == 'float16':
+        elif self.q_dict['fx_base'] == 'float16':
             return np.float16(y)
 
-        elif self.q_dict['frmt'] in {'hex', 'bin', 'dec', 'csd'}:
+        elif self.q_dict['fx_base'] in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
             y_fix = self.fixp(y, scaling='mult')
 
-            if self.q_dict['frmt'] == 'dec':
+            if self.q_dict['fx_base'] == 'dec':
                 if self.q_dict['WF'] == 0:
                     y_str = np.int64(y_fix)  # get rid of trailing zero
                     # y_str = np.char.mod('%d', y_fix)
@@ -1039,7 +1039,7 @@ class Fixed(object):
                 else:
                     # y_str = np.char.mod('%f',y_fix)
                     y_str = y_fix
-            elif self.q_dict['frmt'] == 'csd':
+            elif self.q_dict['fx_base'] == 'csd':
                 y_str = dec2csd_vec(y_fix, self.q_dict['WF'])  # convert with WF fractional bits
 
             else:  # bin or hex
@@ -1048,10 +1048,10 @@ class Fixed(object):
                 # convert to (array of) string with 2's complement binary
                 y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
 
-                if self.q_dict['frmt'] == 'hex':
+                if self.q_dict['fx_base'] == 'hex':
                     y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])
 
-                else:  # self.q_dict['frmt']t == 'bin':
+                else:  # self.q_dict['fx_base']t == 'bin':
                     # insert radix point if required
                     if self.q_dict['WF'] > 0:
                         y_str = insert_binary_point(y_bin_str, self.q_dict['WI'])
@@ -1063,7 +1063,7 @@ class Fixed(object):
 
             return y_str
         else:
-            raise Exception(f"""Unknown number format "{self.q_dict['frmt']}"!""")
+            raise Exception(f"""Unknown number format "{self.q_dict['fx_base']}"!""")
 
 ########################################
 
@@ -1093,8 +1093,8 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     """
     logger.warning("quant_coeffs")
     # always use decimal display format for coefficient quantization
-    disp_frmt_tmp = QObj.q_dict['frmt']
-    QObj.q_dict['frmt'] = 'dec'
+    disp_frmt_tmp = QObj.q_dict['fx_base']
+    QObj.q_dict['fx_base'] = 'dec'
     QObj.resetN()  # reset all overflow counters
 
     if coeffs is None:
@@ -1114,7 +1114,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     # TODO: Does this need fixing?
     # self.update()  # update display of overflow counter and MSB / LSB
 
-    QObj.q_dict['frmt'] = disp_frmt_tmp  # restore previous display setting
+    QObj.q_dict['fx_base'] = disp_frmt_tmp  # restore previous display setting
     return coeff_q
 
 
@@ -1127,7 +1127,7 @@ if __name__ == '__main__':
     """
     import pprint
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 1}
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 1}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
@@ -1139,7 +1139,7 @@ if __name__ == '__main__':
         print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
     print("\nTesting frmt2float()\n====================")
-    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'frmt': 'dec', 'scale': 2}
+    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 2}
     pprint.pprint(q_dict)
     myQ.setQobj(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]

@@ -94,7 +94,7 @@ class IIR_DF1(QWidget):
         """
         # setup input and output quantizers
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
+        self.q_i.setQobj({'fx_base':'dec'})#, 'scale':'int'}) # use integer decimal format
         self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
 
         b = [ int(x) for x in self.hdl_dict['b']] # convert np.int64 to python int

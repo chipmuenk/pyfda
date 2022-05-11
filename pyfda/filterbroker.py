@@ -255,9 +255,9 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
                  'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor'},
                  'QA': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'},
                  'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 1, 'frmt': 'float'},
+                         'scale': 1, 'fx_base': 'float'},
                  'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 1, 'frmt': 'float'}
+                         'scale': 1, 'fx_base': 'float'}
                 },
                 # 'b': [32768, 32768, 32768],
                 # 'a': [65536, 6553, 0]

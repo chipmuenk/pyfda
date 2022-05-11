@@ -166,11 +166,11 @@ class ItemDelegate(QStyledItemDelegate):
         """
         # logger.warning("displayText!")
 
-        if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
+        if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
             data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
+        elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
             return "{0:>{1}}".format(text, self.QObj[0].q_dict['places'])
 
         else:
@@ -214,7 +214,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                  return_type="auto"))
-        if self.QObj[index.column()].q_dict['frmt'] == 'float':
+        if self.QObj[index.column()].q_dict['fx_base'] == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
@@ -244,14 +244,14 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.QObj[index.column()].q_dict['frmt'] == 'float':
+        if self.QObj[index.column()].q_dict['fx_base'] == 'float':
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
             data_q = data  # TODO: complex data
         else:   # transform to float
             data = self.QObj[index.column()].frmt2float(
-                str(editor.text()), self.QObj[index.column()].q_dict['frmt'])
+                str(editor.text()), self.QObj[index.column()].q_dict['fx_base'])
             data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
@@ -445,13 +445,13 @@ class Input_Coeffs(QWidget):
         # don't quantize '1' of recursive coeffs
         a = np.concatenate(([0], self.ba[1][1:]))
 
-        if fb.fil[0]['fxqc']['QCB']['frmt'] == 'float':
+        if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
                          np.zeros(len_a),
                         ]
-        elif fb.fil[0]['fxqc']['QCB']['frmt'] == 'dec':
+        elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
             self.ba_q = [
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
                     for x in self.QObj[0].float2frmt(self.ba[0])],
@@ -568,7 +568,7 @@ class Input_Coeffs(QWidget):
         i.e. requantize displayed values (not `self.ba`) and overflow counters.
 
         Refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
-        the number format set by `self.q_dict['frmt']`.
+        the number format set by `self.q_dict['fx_base']`.
 
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
@@ -681,7 +681,7 @@ class Input_Coeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['frmt'],
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['fx_base'],
                     title="Export Filter Coefficients")
 
     # --------------------------------------------------------------------------
@@ -702,7 +702,7 @@ class Input_Coeffs(QWidget):
             "importing data: dim - shape = {0} - {1} - {2}\n{3}"
             .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
-        frmt = self.QObj[0].q_dict['frmt']
+        frmt = self.QObj[0].q_dict['fx_base']
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
@@ -764,7 +764,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
         # qset_cmb_box(self.ui.cmb_q_frmt, self.ui.wdg_wq_coeffs_b.q_dict['qfrmt'])
-        # qset_cmb_box(self.ui.cmb_disp_frmt, self.ui.wdg_wq_coeffs_b.q_dict['frmt'])
+        # qset_cmb_box(self.ui.cmb_disp_frmt, self.ui.wdg_wq_coeffs_b.q_dict['fx_base'])
 
         self.refresh_table()
 
@@ -786,10 +786,10 @@ class Input_Coeffs(QWidget):
         - Emit signal `'fx_sim': 'specs_changed'`
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'frmt': str(self.ui.cmb_disp_frmt.currentText().lower()),
+            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'frmt': str(self.ui.cmb_disp_frmt.currentText().lower()),
+            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         self.qdict2ui()  # update quant. widgets, table

@@ -33,7 +33,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.stim = np.array([0,1,15,64,32767,-1,-64,0]) # last zero isn't tested due to latency of 1
 
         # initialize a pyfda fixpoint quantizer
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'fx_base': 'dec', 'scale': 1}
         self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
@@ -81,7 +81,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Check whether parameters are written correctly to the fixpoint instance
         """
 
-        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
+        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
         self.myQ.setQobj(q_obj)
 
         # check whether option 'norm' sets the correct scale

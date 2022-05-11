@@ -19,7 +19,7 @@ from pyfda.fixpoint_widgets.fir_df import FIR_DF_wdg
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        q_dict = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
+        q_dict = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'fx_base': 'dec', 'scale': 1}
         self.myQ = fx.Fixed(q_dict) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
@@ -48,7 +48,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
-        q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
+        q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
         self.myQ.setQobj(q_dict)
         # self.assertEqual(q_dict, self.myQ.q_obj)
         # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
@@ -71,11 +71,11 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_fix_no_ovfl(self):
         """
-        Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
+        Test the actual fixpoint quantization without saturation / wrap-around. The 'fx_base'
         keyword is not regarded here.
         """
         # return fixpoint numbers as float (no saturation, no quantization)
-        q_dict = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
+        q_dict = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'fx_base': 'dec', 'scale': 1}
         self.myQ.setQobj(q_dict)
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.myQ.fixp, self.y_list_validate))
@@ -110,14 +110,14 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # wrap around behaviour with 'fix' quantization; fractional representation
-        q_dict = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix', 'frmt': 'dec', 'scale': 8}
+        q_dict = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix', 'fx_base': 'dec', 'scale': 8}
         self.myQ.setQobj(q_dict)
         yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as integer (rounding), overflow 'none'
-        q_dict = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        q_dict = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'fx_base': 'dec', 'scale': 8}
         self.myQ.setQobj(q_dict)
         yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
@@ -130,7 +130,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        q_dict = {'frmt': 'float'}
+        q_dict = {'fx_base': 'float'}
         self.myQ.setQobj(q_dict)
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
