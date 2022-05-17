@@ -136,14 +136,6 @@ class Input_Coeffs_UI(QWidget):
         qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
 
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip(
-            "<span>Quantize selected coefficients / "
-            "whole table with specified settings.</span>")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
@@ -151,7 +143,6 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
         layHDisplay.addWidget(self.cmb_q_frmt)
-        layHDisplay.addWidget(self.butQuant)
         layHDisplay.addStretch()
 
         #######################################################################
@@ -187,6 +178,14 @@ class Input_Coeffs_UI(QWidget):
             "<span>Delete selected cell(s) from the table. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
+        
+        self.butQuant = QPushButton(self)
+        self.butQuant.setToolTip(
+            "<span>Quantize selected coefficients / whole table with specified "
+            "settings. This affects the data, not only the view.</span>")
+        self.butQuant.setIcon(QIcon(':/quantize.svg'))
+        self.butQuant.setIconSize(q_icon_size)
+        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
@@ -225,6 +224,7 @@ class Input_Coeffs_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
+        layHButtonsCoeffs1.addWidget(self.butQuant)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butLoad)
         layHButtonsCoeffs1.addWidget(self.butFromTable)
