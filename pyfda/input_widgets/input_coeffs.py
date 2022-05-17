@@ -258,6 +258,8 @@ class ItemDelegate(QStyledItemDelegate):
         # if data is complex, convert whole ba (list of arrays) to complex type
         if isinstance(data, complex):
             self.parent.ba[index.column()] = self.parent.ba[index.column()].astype(complex)
+            self.parent.ba_q[index.column()] = self.parent.ba_q[index.column()].astype(complex)
+
         # store new data in self.ba and ba_q
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
