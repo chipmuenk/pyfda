@@ -52,7 +52,19 @@ class Input_Coeffs_UI(QWidget):
             ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
              "(31 fractional bits).</span>")
             ]
-        self.cmb_q_frmt_default = 'qfrac'
+        self.cmb_q_frmt_default = "qfrac"
+
+        self.cmb_disp_frmt_items = [
+            "<span>Select the coefficient display format.</span>",
+            ("float", "Float", "<span>Coefficients with full precision in floating "
+             "point format</span>"),
+            ("dec", "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
+            ("hex", "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
+            ("bin", "Bin", "<span>Fixpoint coefficients in binary format</span>"),
+            ("csd", "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
+             "(ternary logic) format</span>")
+            ]
+        self.cmb_disp_frmt_default = "float"
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -102,28 +114,19 @@ class Input_Coeffs_UI(QWidget):
             "<span>Show / hide filter coefficients in an editable table."
             " For high order systems, table display might be slow.</span>")
 
-        fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
         self.cmb_disp_frmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_disp_frmt, self.cmb_disp_frmt_items,
+                          self.cmb_disp_frmt_default)
+
         model = self.cmb_disp_frmt.model()
-        item = QtGui.QStandardItem('Float')
-        item.setData('child', Qt.AccessibleDescriptionRole)
-        model.appendRow(item)
-
-        item = QtGui.QStandardItem('Fixp.:')
+        # create header "Fixpoint:" between separators
+        item = QtGui.QStandardItem('Fixpoint:')
         item.setData('parent', Qt.AccessibleDescriptionRole)
-        item.setData(0, QtGui.QFont.Bold)
-        item.setFlags(item.flags() & ~Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
-        model.appendRow(item)
-
-        for idx in range(len(fix_formats)):
-            item = QtGui.QStandardItem(fix_formats[idx])
-#            item.setForeground(QtGui.QColor('red'))
-            model.appendRow(item)
-
+        item.setData(0, role=QtGui.QFont.Bold)
+        item.setFlags(item.flags() & Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
+        model.insertRow(1, item)
         self.cmb_disp_frmt.insertSeparator(1)
-        qset_cmb_box(self.cmb_disp_frmt, 'float')
-        self.cmb_disp_frmt.setToolTip('Set the display format.')
-        self.cmb_disp_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_disp_frmt.insertSeparator(3)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
@@ -178,7 +181,7 @@ class Input_Coeffs_UI(QWidget):
             "<span>Delete selected cell(s) from the table. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
-        
+
         self.butQuant = QPushButton(self)
         self.butQuant.setToolTip(
             "<span>Quantize selected coefficients / whole table with specified "
