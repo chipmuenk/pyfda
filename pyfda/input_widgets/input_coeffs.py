@@ -407,7 +407,7 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmb_disp_frmt.currentIndexChanged.connect(self.ui2qdict)
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict_emit)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -776,8 +776,7 @@ class Input_Coeffs(QWidget):
         instances of `FX_UI_WQ` every time something is updated there. This information
         is also kept in the quantization objects `QObj` of the quantization widgets.
 
-        - Refresh the table, update quantization widgets
-        - Emit signal `'fx_sim': 'specs_changed'`
+        Refresh the table and update quantization widgets
         """
         fb.fil[0]['fxqc']['QCB'].update(
             {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
@@ -786,8 +785,16 @@ class Input_Coeffs(QWidget):
             {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
-        self.qdict2ui()  # update quant. widgets, table
+        # update quant. widgets and table with the new `fx_base` and`qfrmt`settings
+        self.qdict2ui()
 
+# ------------------------------------------------------------------------------
+    def ui2qdict_emit(self):
+        """
+        Do all the things of `self.ui2qdict()`
+        plus emit signal `'fx_sim': 'specs_changed'`
+        """
+        self.ui2qdict()
         self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
