@@ -763,9 +763,6 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
-        # qset_cmb_box(self.ui.cmb_q_frmt, self.ui.wdg_wq_coeffs_b.q_dict['qfrmt'])
-        # qset_cmb_box(self.ui.cmb_disp_frmt, self.ui.wdg_wq_coeffs_b.q_dict['fx_base'])
-
         self.refresh_table()
 
 # ------------------------------------------------------------------------------
