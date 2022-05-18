@@ -774,9 +774,6 @@ class Input_Coeffs(QWidget):
         Read out the UI settings of `self.ui.cmb_disp_frmt` and `self.ui.cmb_q_frmt`
         (those two trigger this method)
 
-        It is also triggered by `_save_dict()`.
-        TODO: Is this neccessary?
-
         The coefficient quantization settings are copied to the quantization dicts
         fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
         instances of `FX_UI_WQ` every time something is updated there. This information
@@ -805,7 +802,7 @@ class Input_Coeffs(QWidget):
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
-        self.ui2qdict()
+        # self.ui2qdict()
 
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
