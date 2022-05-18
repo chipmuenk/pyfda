@@ -13,6 +13,7 @@ Create the UI for the FilterCoeffs class
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
+from pyfda.libs.pyfda_lib import to_html
 
 from pyfda.libs.pyfda_qt_lib import (
     qset_cmb_box, qstyle_widget, qcmb_box_populate, QHLine, PushButton)
@@ -135,24 +136,19 @@ class Input_Coeffs_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
-        self.cmb_q_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
-                          self.cmb_q_frmt_default)
-
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmb_disp_frmt)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.cmb_q_frmt)
+        # layHDisplay.addWidget(self.cmb_q_frmt)
         layHDisplay.addStretch()
 
         #######################################################################
         # frmButtonsCoeffs
         #
         # This frame contains all buttons for manipulating coefficients
-        #######################################################################
         # -----------------------------------------------------------------
         # layHButtonsCoeffs1
         #
@@ -268,6 +264,19 @@ class Input_Coeffs_UI(QWidget):
         # This frame encompasses all Quantization Settings
         self.frmButtonsCoeffs = QFrame(self)
         self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
+        #######################################################################
+        self.cmb_q_frmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
+                          self.cmb_q_frmt_default)
+        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        lbl_q_frmt = QLabel(to_html("Quant. Format:", frmt='b'))
+
+        layH_q_frmt = QHBoxLayout()
+        layH_q_frmt.addWidget(lbl_q_frmt)
+        layH_q_frmt.addWidget(self.cmb_q_frmt)
+        self.frm_q_frmt = QFrame(self)
+        self.frm_q_frmt.setLayout(layH_q_frmt)
 
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
@@ -295,6 +304,7 @@ class Input_Coeffs_UI(QWidget):
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.frm_q_frmt)
         layVMain.addWidget(self.wdg_wq_coeffs_b)
         layVMain.addWidget(self.wdg_wq_coeffs_a)
         layVMain.setContentsMargins(*params['wdg_margins'])

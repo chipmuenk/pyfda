@@ -591,7 +591,7 @@ class Input_Coeffs(QWidget):
         is_float = (qget_cmb_box(self.ui.cmb_disp_frmt, data=False).lower() == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
-        self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
+        self.ui.frm_q_frmt.setVisible(not is_float)  # hide quantization widgets
 
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
