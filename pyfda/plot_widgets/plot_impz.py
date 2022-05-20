@@ -458,6 +458,7 @@ class Plot_Impz(QWidget):
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])  # setup quantizer
                 self.q_i.setQobj({'fx_base': 'dec'})  # always use integer decimal format
                 # initialize FX filter and get a handle for `fxfilter()` function
+                logger.warning("emit init")
                 self.emit({'fx_sim': 'init'})
                 return  # process_sig_rx() switches directly to impz() in next step
             else:
