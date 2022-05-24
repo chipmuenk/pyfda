@@ -90,12 +90,14 @@ class Input_Fixpoint_Specs(QWidget):
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
+        # ---------------------------------------------------------------------
+        # Updated fixpoint specs in filter widget, update ui + emit with self id
 
-        # elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-        #     self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
-        #     dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
-        #     self.emit(dict_sig)
-        #     return
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
+            self.emit(dict_sig)
+            return
 
         # ---- Process input and output quantizer settings ('ui' in dict_sig) --
         elif 'ui' in dict_sig:
@@ -565,7 +567,7 @@ class Input_Fixpoint_Specs(QWidget):
             if hasattr(self.fx_filt_ui, "sig_rx"):
                 self.sig_rx.connect(self.fx_filt_ui.sig_rx)
             if hasattr(self.fx_filt_ui, "sig_tx"):
-                self.fx_filt_ui.sig_tx.connect(self.sig_rx)
+                self.fx_filt_ui.sig_tx.connect(self.sig_rx_local)
 
             # ---- get name of new fixpoint filter image ----
             if not (hasattr(self.fx_filt_ui, "img_name") and self.fx_filt_ui.img_name):
