@@ -55,6 +55,8 @@ class Input_Fixpoint_Specs(QWidget):
 
     def __init__(self, parent=None):
         super(Input_Fixpoint_Specs, self).__init__(parent)
+    # def __init__(self) -> None:
+    #    super().__init__()
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
@@ -84,9 +86,11 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in from input and output quantizer subwidget and 
+        Process signals coming in from input and output quantizer subwidget and
         emit {'fx_sim': 'specs_changed'} in the end.
         """
+        logger.info(
+            "SIG_RX_LOCAL(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
@@ -142,6 +146,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
+
         else:
             logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
         return
@@ -207,7 +212,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.fx_filt_ui.update()
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
-            # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
+            # somewhere else, update ui and set run button to "changed" in wdg_dict2ui()
             elif self.fx_specs_changed or\
                 (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
                 self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
