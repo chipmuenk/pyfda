@@ -125,7 +125,9 @@ class FX_UI_WQ(QWidget):
         cmb_ov = ["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
-                   "<span>Saturation, i.e. limit at min. / max. value</span>")]
+                   "<span>Saturation, i.e. limit at min. / max. value</span>"),
+                  ("none", "None",
+                   "<span>No overflow behaviour (only for debugging)</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
                  ("man", "Man", "<span>Manual entry of word format.</span>"),
                  ("auto", "Auto",
