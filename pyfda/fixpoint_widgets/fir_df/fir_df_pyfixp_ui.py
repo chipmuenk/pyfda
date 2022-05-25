@@ -120,8 +120,13 @@ class FIR_DF_pyfixp_UI(QWidget):
             #
             # - update accu wordlengths for 'auto' or 'full' settings
             # - emit `{'fx_sim': 'specs_changed'}`
-            if dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
-                pass
+            if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
+                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
+                             f"in '{__name__}' !")
+                return
+
+            elif dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
+                self.wdg_wq_coeffs.quant_coeffs(fb.fil[0]['ba'][0])
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
@@ -131,13 +136,8 @@ class FIR_DF_pyfixp_UI(QWidget):
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     self.update_accu_settings()
 
-                elif cmbW == 'man':  # switched to manual, don't do anything
-                    return
-
-            else:
-                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
-                             f"in '{__name__}' !")
-                return
+                # elif cmbW == 'man':  # switched to manual, don't do anything
+                #   pass
 
             # emit signal with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
