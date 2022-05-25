@@ -143,8 +143,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
             elif dict_sig['wdg_name'] == 'wq_coeffs_a':
                 self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1], recursive=True)
 
+            # emit signal with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
+        # Update the ui when the quantization dictionary has been updated outside
+        # the widget (signal `{'fx_sim': 'specs_changed'}` received)
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
