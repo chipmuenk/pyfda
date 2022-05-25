@@ -139,7 +139,8 @@ class FIR_DF_pyfixp_UI(QWidget):
                              f"in '{__name__}' !")
                 return
 
-            self.emit({'fx_sim': 'specs_changed'})
+            # emit signal with id of *this* widget
+            self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
         # Update the ui when the quantization dictionary has been updated outside
         # the widget (signal `{'fx_sim': 'specs_changed'}` received)
