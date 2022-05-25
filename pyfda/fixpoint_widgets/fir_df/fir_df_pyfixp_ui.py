@@ -96,8 +96,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-#        self.sig_rx.connect(self.wdg_wq_coeffs.sig_rx)
-#        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -105,6 +103,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
+        # self.update()  # initial setting of overflow counters
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
