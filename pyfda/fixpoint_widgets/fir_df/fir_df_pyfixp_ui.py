@@ -141,9 +141,9 @@ class FIR_DF_pyfixp_UI(QWidget):
 
             self.emit({'fx_sim': 'specs_changed'})
 
+        # Update the ui when the quantization dictionary has been updated outside
+        # the widget (signal `{'fx_sim': 'specs_changed'}` received)
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            # Update the ui when the quantization dictionary has been updated outside
-            # (signal `{'fx_sim': 'specs_changed'}` received)
             self.dict2ui()
 
     # --------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning("QCB key missing")
 
         self.wdg_wq_coeffs.dict2ui()  # update coefficient wordlength
-        self.update_accu_settings()                  # update accumulator settings
+        self.update_accu_settings()   # update accumulator settings and ui
 
     # --------------------------------------------------------------------------
     def update(self):
