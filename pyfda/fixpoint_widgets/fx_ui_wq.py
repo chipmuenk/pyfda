@@ -414,7 +414,7 @@ class FX_UI_WQ(QWidget):
         quant = qget_cmb_box(self.cmbQuant)
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
-        self.QObj.setQobj(self.q_dict)  # set quant. object and reset counter
+        self.QObj.set_qdict(self.q_dict)  # set quant. object and reset counter
 
         if self.sender():
             obj_name = self.sender().objectName()
@@ -494,7 +494,7 @@ class FX_UI_WQ(QWidget):
 
         self.update()  # update overflow counter and MSB / LSB (both modified externally)
 
-        self.QObj.setQobj(self.q_dict)  # TODO: This issues resetN and updates q_dict?!
+        self.QObj.set_qdict(self.q_dict)  # TODO: This issues resetN and updates q_dict?!
 
 
 # ==============================================================================

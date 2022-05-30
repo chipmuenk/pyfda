@@ -458,7 +458,7 @@ class Fixed(object):
         # create a reference to the dict passed during construction as instance attribute
         self.q_dict = q_dict
 
-        self.setQobj({})  # trigger calculation of parameters and initialize overflow-counter
+        self.set_qdict({})  # trigger calculation of parameters and initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
@@ -482,10 +482,10 @@ class Fixed(object):
             if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(k))
 
-    def setQobj(self, q_dict: dict) -> None:
+    def set_qdict(self, q_dict: dict) -> None:
         """
-        Use passed quantization dict `q_dict` to update the instance quantization
-        dict `self.q_dict`
+        Use quantization dict `q_dict` (passed as reference) to update the instance
+        quantization dict `self.q_dict`.
 
         Calculate parameters like MSB, LSB etc. from the dictionary.
 
@@ -1131,7 +1131,7 @@ if __name__ == '__main__':
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
-    myQ.setQobj(q_dict)
+    myQ.set_qdict(q_dict)
 
     print("\nTesting float2frmt()\n====================")
     pprint.pprint(q_dict)
@@ -1141,7 +1141,7 @@ if __name__ == '__main__':
     print("\nTesting frmt2float()\n====================")
     q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 2}
     pprint.pprint(q_dict)
-    myQ.setQobj(q_dict)
+    myQ.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
         print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
