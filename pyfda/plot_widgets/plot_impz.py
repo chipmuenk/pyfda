@@ -252,8 +252,8 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        # logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
-        #                .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
+        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}"
+                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig)))
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
@@ -281,6 +281,7 @@ class Plot_Impz(QWidget):
                     self.update_fx_ui_settings("Fixpoint")  # set fixpoint mode
 
                 self.needs_calc_fx = True   # fx sim needs recalculation
+
                 if self.fx_sim:             # fixpoint mode is set
                     self.error = False      # reset error flag
                     self.needs_calc = True  # force recalculation
@@ -448,7 +449,7 @@ class Plot_Impz(QWidget):
             if self.fx_sim:
                 # - update plot title string
                 # - setup input quantizer self.q_i
-                # - emit {'fx_sim': 'init'} to listening widgets
+                # - emit {'fx_sim': 'init'} to listening widgets (input_fixpoint_specs)
                 self.title_str = r'$Fixpoint$ ' + self.title_str
                 self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
                 if np.any(np.iscomplex(x_test)):

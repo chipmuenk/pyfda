@@ -122,7 +122,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         When a `{'fx_sim': 'specs_changed'}` signal is received, update the ui.
         """
-        logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return

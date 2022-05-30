@@ -312,7 +312,7 @@ class FX_UI_WQ(QWidget):
         # always use decimal display format for coefficient quantization
         disp_frmt_tmp = self.QObj.q_dict['fx_base']
         self.QObj.q_dict['fx_base'] = 'dec'
-        self.QObj.resetN()  # reset all overflow counters
+        self.QObj.resetN()  # reset overflow counters
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -416,12 +416,10 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
         self.QObj.setQobj(self.q_dict)  # set quant. object and reset counter
 
-        # self.update()  # update MSB / LSB and overflow counter info
-
         if self.sender():
             obj_name = self.sender().objectName()
             dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
-            logger.warning(f"uidict:emit {dict_sig}")
+            logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
             logger.error("Sender has no object name!")
@@ -429,7 +427,7 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
         """
-        Use the passed dict `q_dict` to update
+        Use the passed dict `q_dict` to update:
 
         * UI widgets `WI`, `WF` `quant` and `ovfl`
         * the instance quantization dict `self.q_dict` (usually a reference to some
@@ -492,10 +490,11 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        self.update()
-
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
-        self.QObj.setQobj(self.q_dict)
+
+        self.update()  # update overflow counter and MSB / LSB (both modified externally)
+
+        self.QObj.setQobj(self.q_dict)  # TODO: This issues resetN and updates q_dict?!
 
 
 # ==============================================================================
