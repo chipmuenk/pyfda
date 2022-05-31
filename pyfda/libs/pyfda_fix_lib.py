@@ -482,7 +482,7 @@ class Fixed(object):
             if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(k))
 
-    def set_qdict(self, q_dict: dict) -> None:
+    def set_qdict(self, d: dict, reset: bool = True) -> None:
         """
         Update the instance quantization dict `self.q_dict` from parameter `d`:
 
@@ -550,8 +550,8 @@ class Fixed(object):
         #     if not k in self.q_dict:
         #         self.resetN()
         #         break
-
-        self.resetN()  # initialize all counters and error flags
+        if reset:
+            self.resetN()  # reset all counters and error flags
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
