@@ -290,8 +290,8 @@ class FX_UI_WQ(QWidget):
         Quantize the coefficients, scale and convert them to a list of integers,
         using the quantization settings of `self.q_dict`.
 
-        This is called every time one of the coefficient subwidgets is edited
-        or changed,that's why overflow counters are reset.
+        This is called every time one of the coefficient quantization subwidgets is
+        edited or changed externally, that's why overflow counters are reset.
 
         Parameters
         ----------
@@ -408,6 +408,7 @@ class FX_UI_WQ(QWidget):
         WF = int(safe_eval(self.ledWF.text(), self.QObj.q_dict['WF'], return_type="int",
                            sign='poszero'))
         self.ledWF.setText(str(WF))
+
         W = int(WI + WF + 1)
 
         ovfl = qget_cmb_box(self.cmbOvfl)
