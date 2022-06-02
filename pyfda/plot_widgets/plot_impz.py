@@ -456,10 +456,12 @@ class Plot_Impz(QWidget):
                     logger.warning(
                         "Complex stimulus: Only its real part is used for the "
                         "fixpoint filter!")
-                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])  # setup quantizer
-                self.q_i.set_qdict({'fx_base': 'dec'})  # always use integer decimal format
-                # initialize FX filter and get a handle for `fxfilter()` function
+                # setup and initialize input quantizer
+                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
+                # always use integer decimal format for input quantizer
+                self.q_i.set_qdict({'fx_base': 'dec'})
                 logger.warning("emit init")
+                # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})
                 return  # process_sig_rx() switches directly to impz() in next step
             else:
