@@ -458,7 +458,8 @@ class Fixed(object):
         # create a reference to the dict passed during construction as instance attribute
         self.q_dict = q_dict
 
-        self.set_qdict({})  # trigger calculation of parameters and initialize overflow-counter
+        self.set_qdict({})  # trigger calculation of parameters
+        self.resetN()       # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
