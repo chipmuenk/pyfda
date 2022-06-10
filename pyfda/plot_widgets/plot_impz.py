@@ -261,6 +261,7 @@ class Plot_Impz(QWidget):
             return
 
         if 'fx_sim' in dict_sig:
+            # --------------- START / SPECS_CHANGED ------------
             if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
                 """
                 'start' : Fixpoint simulation started from widget 'input_fixpoint_specs' 
@@ -295,6 +296,7 @@ class Plot_Impz(QWidget):
                             self.impz_init()
                 return
 
+            # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
                 """
                 The fixpoint widget has been initialized and starts the fx simulation
@@ -306,6 +308,7 @@ class Plot_Impz(QWidget):
                     self.impz()
                 return
 
+            # --------------- ERROR -------------------
             elif dict_sig['fx_sim'] == 'error':
                 self.needs_calc = True
                 self.error = True
@@ -315,6 +318,7 @@ class Plot_Impz(QWidget):
                     logger.error(dict_sig['err_msg'])
                 return
 
+            # ---------------
             elif not dict_sig['fx_sim']:
                 logger.error('Missing value for key "fx_sim".')
 
