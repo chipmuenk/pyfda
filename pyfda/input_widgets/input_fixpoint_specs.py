@@ -184,6 +184,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
+            # --------------- INIT -------------------
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
                 # `impz.impz_init()`, return a handle to the fixpoint filter function
@@ -201,8 +202,11 @@ class Input_Fixpoint_Specs(QWidget):
                     # filter function
                     self.wdg_wq_input.QObj.resetN()
                     self.wdg_wq_output.QObj.resetN()
+                    # start fx response calculation in plot_impz
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
+
+            # --------------- FINISH --------------
             elif dict_sig['fx_sim'] == 'finish':
                 # update I/O widgets and dynamically instantiated filter widget with
                 # number of overflows etc.
@@ -213,6 +217,8 @@ class Input_Fixpoint_Specs(QWidget):
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
             # somewhere else, update ui and set run button to "changed" in wdg_dict2ui()
+
+            # --------------- SPECS_CHANGED ------------
             elif self.fx_specs_changed or\
                 (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
                 self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
