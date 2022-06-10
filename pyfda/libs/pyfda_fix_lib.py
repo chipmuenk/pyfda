@@ -483,7 +483,7 @@ class Fixed(object):
             if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(k))
 
-    def set_qdict(self, d: dict, reset: bool = False) -> None:
+    def set_qdict(self, d: dict) -> None:
         """
         Update the instance quantization dict `self.q_dict` from parameter `d`:
 
@@ -492,8 +492,6 @@ class Fixed(object):
         * Calculate parameters `MSB`, `LSB`, `MIN` and `MAX` from quantization params
 
         * Calculate number of places required for printing from `fx_base` and `W`
-
-        * Reset error flags and counters when `reset == True`
 
         Check the docstring of class `Fixed()` for details on quantization
         """
@@ -547,14 +545,6 @@ class Fixed(object):
         else:
             raise Exception(
                 u'Unknown number format "{0:s}"!'.format(self.q_dict['fx_base']))
-        # for k in {'N_over', 'N_over_pos', 'N_over_neg', 'N', 'ovr_flag'}:
-        #     if not k in self.q_dict:
-        #         self.resetN()
-        #         break
-        if reset:
-            self.resetN()  # reset all counters and error flags
-        else:
-            logger.info("Reset = False in set_qdict")
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
