@@ -128,6 +128,8 @@ class IIR_DF1_pyfixp(object):
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
+        self.zi_a = np.zeros(self.L - 1)
+        self.zi_b = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
     def fxfilter(self, x: iterable = None,
