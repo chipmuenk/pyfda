@@ -178,13 +178,14 @@ class IIR_DF1_pyfixp(object):
             if len(zi_a) == self.L - 1:   # use zi_a as it is
                 self.zi_a = zi_a
 
-        if np.isscalar(x):
-            A = x
-            x = np.zeros(len(self.b))
-            x[0] = A
-        elif x is None:  # calculate impulse response
-            x = np.zeros(len(self.b))
-            x[0] = 1
+        # This hasn't been used, delete it
+        # if np.isscalar(x):
+        #     A = x
+        #     x = np.zeros(len(self.b))
+        #     x[0] = A
+        # elif x is None:  # calculate impulse response
+        #     x = np.zeros(len(self.b))
+        #     x[0] = 1
         # else:  # don't change x, it is integer anyway
         #    x = x
 

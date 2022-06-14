@@ -76,7 +76,6 @@ class FIR_DF_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        # self.b = self.p['b']  # coefficients
 
         # create various quantizers
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
@@ -102,7 +101,7 @@ class FIR_DF_pyfixp(object):
     def reset(self):
         """
         Reset register and overflow counters of quantizers
-        (except for coefficient quant.)
+        (but don't reset coefficient quantizers)
         """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
@@ -147,11 +146,14 @@ class FIR_DF_pyfixp(object):
 
         if np.isscalar(x):
             A = x
-            x = np.zeros(self.L)
-            x[0] = A
-        elif x is None:  # calculate impulse response
-            x = np.zeros(self.L)
-            x[0] = 1
+        # This hasn't been used, delete it
+        # if np.isscalar(x): # calculate impulse response
+        #     A = x
+        #     x = np.zeros(self.L)
+        #     x[0] = A
+        # elif x is None:  # calculate impulse response
+        #     x = np.zeros(self.L)
+        #     x[0] = 1
         # else:  # don't change x, it is integer anyway
         #    x = x
 
