@@ -121,7 +121,9 @@ class FX_UI_WQ(QWidget):
                   "<span>Round towards nearest representable number</span>"),
                  ("fix", "Fix", "Round towards zero"),
                  ("floor", "Floor", "<span>Round towards negative infinity / "
-                  "two's complement truncation.</span>")]
+                  "two's complement truncation.</span>"),
+                 ("none", "None",
+                  "<span>No quantization (only for debugging)</span>")]
         cmb_ov = ["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
