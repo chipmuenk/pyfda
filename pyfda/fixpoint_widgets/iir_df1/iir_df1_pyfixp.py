@@ -123,7 +123,10 @@ class IIR_DF1_pyfixp(object):
 
     # ---------------------------------------------------------
     def reset(self):
-        """ reset overflow counters of filter quantizers """
+        """
+        Reset registers and overflow counters of quantizers
+        (except for coefficient quant.)
+        """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()

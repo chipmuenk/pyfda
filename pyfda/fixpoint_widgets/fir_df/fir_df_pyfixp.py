@@ -100,7 +100,10 @@ class FIR_DF_pyfixp(object):
 
     # ---------------------------------------------------------
     def reset(self):
-        """ reset overflow counters of quantizers """
+        """
+        Reset register and overflow counters of quantizers
+        (except for coefficient quant.)
+        """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
