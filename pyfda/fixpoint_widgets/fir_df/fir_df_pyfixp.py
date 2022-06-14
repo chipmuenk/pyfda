@@ -108,6 +108,7 @@ class FIR_DF_pyfixp(object):
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
+        self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
     def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
