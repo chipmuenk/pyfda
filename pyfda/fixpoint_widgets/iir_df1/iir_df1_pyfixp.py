@@ -211,7 +211,8 @@ class IIR_DF1_pyfixp(object):
             # sum up x_bq and x_aq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
-            self.zi_a[0] = y_q[k] # and insert last output value
+            # and insert last output value quantized to output format
+            self.zi_a[0] = self.Q_O.fixp(y_q[k])
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         # Overflows in Q_mul are added to overflows in QA
