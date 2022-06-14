@@ -71,8 +71,10 @@ class FIR_DF_pyfixp(object):
         # logger.error(p)
         self.p = p  # parameter dictionary with coefficients etc.
 
+        # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+            q_mul = p['QA'].copy()
+            # q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
         else:
             q_mul = p['q_mul']
 
