@@ -139,7 +139,7 @@ class IIR_DF1_pyfixp(object):
                  zi_b: iterable = None, zi_a: iterable = None) -> np.ndarray:
         """
         Calculate IIR filter (direct form 1) response via difference equation with
-        quantization. Registers can be initialized with `zi`.
+        quantization. Registers can be initialized by passing `zi_a` and `zi_b`.
 
         Parameters
         ----------
@@ -163,8 +163,6 @@ class IIR_DF1_pyfixp(object):
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` or `a`(impulse response).
         """
-        # When `zi_b` is specified, initialize filter memory with it and pad with zeros
-        # When `zi_b == None`, use register contents from last run
         if zi_b is not None:
             if len(zi_b) == self.L - 1:   # use zi_b as it is
                 self.zi_b = zi_b
