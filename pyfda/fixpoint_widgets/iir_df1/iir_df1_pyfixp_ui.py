@@ -120,7 +120,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
         - update the referenced quantization dictionary
         - emit `{'fx_sim': 'specs_changed'}` with local id
 
-        When a `{'fx_sim': 'specs_changed'}` signal is received, update the ui.
+        When a `{'fx_sim': 'specs_changed'}` or `{'data_changed': xxx}`
+        signal is received, update the ui via `self.dict_ui`.
+
+        Ignore all other signals
         """
         logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
@@ -132,6 +135,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         the quantization widgets `FX_UI_WQ`. Now, update the quantization counters
         """
         if 'ui' in dict_sig:
+            # signal generated locally
             if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
@@ -143,7 +147,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
             elif dict_sig['wdg_name'] == 'wq_coeffs_a':
                 self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1], recursive=True)
 
-            # emit signal with id of *this* widget
+            # emit signal, replace ui id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
         # Update the ui when the quantization dictionary has been updated outside
@@ -154,7 +158,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self):
         """
-        Update all parts of the UI that need to be updated when specs have been
+        Update all parts of the UI that need to be updated when specs or data have been
         changed outside this class, e.g. coefficients and coefficient quantization
         settings. This also provides the initial setting for the widgets when
         the filter has been changed.

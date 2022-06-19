@@ -139,7 +139,7 @@ class FIR_DF_pyfixp_UI(QWidget):
                 # elif cmbW == 'man':  # switched to manual, don't do anything
                 #   pass
 
-            # emit signal with id of *this* widget
+            # emit signal, replace id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
         # Update the ui when the quantization dictionary has been updated outside

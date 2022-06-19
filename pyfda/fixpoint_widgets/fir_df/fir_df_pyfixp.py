@@ -145,17 +145,6 @@ class FIR_DF_pyfixp(object):
                 self.zi = zi[:self.L - 1]
                 logger.warning("len(zi) > len(b) - 1, zi was truncated")
 
-        # This hasn't been used, delete it
-        # if np.isscalar(x): # calculate impulse response
-        #     A = x
-        #     x = np.zeros(self.L)
-        #     x[0] = A
-        # elif x is None:  # calculate impulse response
-        #     x = np.zeros(self.L)
-        #     x[0] = 1
-        # else:  # don't change x, it is integer anyway
-        #    x = x
-
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
 
