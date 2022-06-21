@@ -262,6 +262,7 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
                 # 'b': [32768, 32768, 32768],
                 # 'a': [65536, 6553, 0]
                 # },
+            'fx_sim': False,  # fixpoint simulation mode 
             'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit': 'dB',
 
