@@ -409,9 +409,8 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmb_fx_base.currentIndexChanged.connect(self._cmb_fx_base_updated)
-	# TODO
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict) xxx
-	self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict_emit) xxx
+        # self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict_emit)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
