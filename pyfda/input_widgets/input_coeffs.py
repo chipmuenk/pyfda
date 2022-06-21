@@ -406,7 +406,7 @@ class Input_Coeffs(QWidget):
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # store new settings and refresh table
-        self.ui.cmb_disp_frmt.currentIndexChanged.connect(self.ui2qdict)
+        self.ui.cmb_fx_base.currentIndexChanged.connect(self._cmb_fx_base_updated)
         self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
@@ -588,7 +588,7 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = (qget_cmb_box(self.ui.cmb_disp_frmt, data=False).lower() == 'float')
+        is_float = (qget_cmb_box(self.ui.cmb_fx_base, data=False).lower() == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
         self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
@@ -764,15 +764,30 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.dict2ui()
 
         # qset_cmb_box(self.ui.cmb_q_frmt, self.ui.wdg_wq_coeffs_b.q_dict['qfrmt'])
-        # qset_cmb_box(self.ui.cmb_disp_frmt, self.ui.wdg_wq_coeffs_b.q_dict['fx_base'])
+        # qset_cmb_box(self.ui.cmb_fx_base, self.ui.wdg_wq_coeffs_b.q_dict['fx_base'])
 
         self.refresh_table()
 
 # ------------------------------------------------------------------------------
+    def _cmb_fx_base_updated(self):
+        """
+        Read out the setting of combo box `self.ui.cmb_fx_base` (triggered by
+        a change) and store it in the quantization dicts
+        fb.fil[0]['fxqc']['QCB']` and `...['QCA']`.
+
+        No signal is emitted because this setting should only influence the display
+        of coefficient data but not the data itself.
+        """
+        fb.fil[0]['fxqc']['QCB'].update(
+            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower())})
+        fb.fil[0]['fxqc']['QCA'].update(
+            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower())})
+        self.qdict2ui()  # update quant. widgets, table
+
+# ------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the UI settings of `self.ui.cmb_disp_frmt` and `self.ui.cmb_q_frmt`
-        (those two trigger this method)
+        Read out the combo box `self.ui.cmb_q_frmt` (method was triggered by this)
 
         It is also triggered by `_save_dict()`.
         TODO: Is this neccessary?
@@ -785,12 +800,8 @@ class Input_Coeffs(QWidget):
         - Refresh the table, update quantization widgets
         - Emit signal `'fx_sim': 'specs_changed'`
         """
-        fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
-             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
-        fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
-             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        fb.fil[0]['fxqc']['QCB'].update({'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        fb.fil[0]['fxqc']['QCA'].update({'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         self.qdict2ui()  # update quant. widgets, table
 

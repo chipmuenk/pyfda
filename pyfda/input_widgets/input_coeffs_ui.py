@@ -103,8 +103,8 @@ class Input_Coeffs_UI(QWidget):
             " For high order systems, table display might be slow.</span>")
 
         fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
-        self.cmb_disp_frmt = QComboBox(self)
-        model = self.cmb_disp_frmt.model()
+        self.cmb_fx_base = QComboBox(self)
+        model = self.cmb_fx_base.model()
         item = QtGui.QStandardItem('Float')
         item.setData('child', Qt.AccessibleDescriptionRole)
         model.appendRow(item)
@@ -120,10 +120,10 @@ class Input_Coeffs_UI(QWidget):
 #            item.setForeground(QtGui.QColor('red'))
             model.appendRow(item)
 
-        self.cmb_disp_frmt.insertSeparator(1)
-        qset_cmb_box(self.cmb_disp_frmt, 'float')
-        self.cmb_disp_frmt.setToolTip('Set the display format.')
-        self.cmb_disp_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_fx_base.insertSeparator(1)
+        qset_cmb_box(self.cmb_fx_base, 'float')
+        self.cmb_fx_base.setToolTip('Set the display format.')
+        self.cmb_fx_base.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
@@ -147,7 +147,7 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
-        layHDisplay.addWidget(self.cmb_disp_frmt)
+        layHDisplay.addWidget(self.cmb_fx_base)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
         layHDisplay.addWidget(self.cmb_q_frmt)
