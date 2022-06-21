@@ -909,29 +909,23 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not any(sel):  # nothing selected, "insert" row of zeros after last to table
+        # merge selections in both columns, remove duplicates and sort
+        sel_01 = sorted(list(set(sel[0]).union(set(sel[1]))))
+
+        if not any(sel):  # nothing selected, append row of zeros after last row
             self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
-        # only complete rows selected, insert a row of zeros after first selected row
-        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
-            self.ba = np.insert(self.ba, sel[0], 0, axis=1)
-#        elif len(sel[0]) == len(sel[1]):
-#            self.ba = np.insert(self.ba, sel, 0, axis=1)
-#       not allowed, sel needs to be a scalar or one-dimensional
+        # elif fb.fil[0]['ft'] == 'IIR':
         else:
-            logger.warning("It is only possible to insert complete rows!")
-            # The following doesn't work because the subarrays wouldn't have
-            # the same length for a moment
-            # self.ba[0] = np.insert(self.ba[0], sel[0], 0)
-            # self.ba[1] = np.insert(self.ba[1], sel[1], 0)
-            return
+            self.ba = np.insert(self.ba, sel_01, 0, axis=1)
+        # else:
         # insert 'sel' contiguous rows  before 'row':
         # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
 
         self._equalize_ba_length()
         self.refresh_table()
 
-        # don't tag as 'changed' when only zeros have been added at the end
-        if any(sel):
+        # don't tag as 'changed' when only zeros have been appended to end of table
+        if any(sel_01):
             qstyle_widget(self.ui.butSave, 'changed')
 
 # ------------------------------------------------------------------------------
