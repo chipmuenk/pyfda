@@ -175,6 +175,12 @@ class IIR_DF1_pyfixp(object):
         if zi_a is not None:
             if len(zi_a) == self.L - 1:   # use zi_a as it is
                 self.zi_a = zi_a
+            elif len(zi_a) < self.L - 1:  # append zeros
+                self.zi_a = np.concatenate((zi_a, np.zeros(self.L - 1 - len(zi_a))))
+            else:                         # truncate zi_b
+                self.zi_a = zi_a[:self.L - 1]
+                logger.warning("len(zi_a) > len(coeff) - 1, zi_a was truncated")
+
 
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
