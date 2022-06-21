@@ -77,6 +77,7 @@ class IIR_DF1_pyfixp(object):
         -------
         None.
         """
+        logger.error("Initializing filter!")
         self.p = p  # parameter dictionary with coefficients etc.
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
@@ -92,11 +93,11 @@ class IIR_DF1_pyfixp(object):
         self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
-        # quantize coefficients
-        self.a = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
-        self.b = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        # quantize coefficients and store them in local attributes
+        self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
+        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
-        self.L = max(len(self.b), len(self.a))  # filter length = number of taps
+        self.L = max(len(self.b_q), len(self.a_q))  # filter length = number of taps
 
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
@@ -138,8 +139,11 @@ class IIR_DF1_pyfixp(object):
     def fxfilter(self, x: iterable = None,
                  zi_b: iterable = None, zi_a: iterable = None) -> np.ndarray:
         """
-        Calculate IIR filter (direct form 1) response via difference equation with
-        quantization. Registers can be initialized by passing `zi_a` and `zi_b`.
+        Calculate quantized IIR filter (direct form 1) response via difference equation
+        with quantized coefficient values `self.a_q` and `self.b_q` and quantized
+        arithmetics.
+
+        Registers can be initialized by passing `zi_a` and `zi_b`.
 
         Parameters
         ----------
@@ -168,7 +172,7 @@ class IIR_DF1_pyfixp(object):
                 self.zi_b = zi_b
             elif len(zi_b) < self.L - 1:  # append zeros
                 self.zi_b = np.concatenate((zi_b, np.zeros(self.L - 1 - len(zi_b))))
-            else:                       # truncate zi_b
+            else:                         # truncate zi_b
                 self.zi_b = zi_b[:self.L - 1]
                 logger.warning("len(zi_b) > len(coeff) - 1, zi_b was truncated")
 
@@ -198,14 +202,19 @@ class IIR_DF1_pyfixp(object):
         self.zi_b = np.concatenate((self.zi_b, x))
 
         for k in range(len(x)):
-            # weighted state-vector x at time k:
-            xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b)] * self.b)
-            xa_q = self.Q_mul.fixp(self.zi_a * self.a[1:])
-            # sum up x_bq and x_aq to get accu[k]
+            # partial products xa_q and xb_q at time k:
+            xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            xa_q = self.Q_mul.fixp(self.zi_a * self.a_q[1:])
+
+            # accumutlate partial products x_bq and x_aq and quantize them (Q_acc)
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
+
             # and insert last output value quantized to output format
             self.zi_a[0] = self.Q_O.fixp(y_q[k])
+
+            logger.warning(f"zi_a = {self.zi_a}\n"
+                           f"zi_b = {self.zi_b}")
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         # Overflows in Q_mul are added to overflows in QA

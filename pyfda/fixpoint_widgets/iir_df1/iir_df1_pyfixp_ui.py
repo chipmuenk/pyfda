@@ -169,6 +169,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_b.dict2ui()  # update coefficient quantization
         self.wdg_wq_coeffs_a.dict2ui()  # settings
         self.wdg_wq_accu.dict2ui()
+        logger.warning(f"dict2ui: b_q = {fb.fil[0]['fxqc']['QCB']}")
 
     # --------------------------------------------------------------------------
     def update(self):
