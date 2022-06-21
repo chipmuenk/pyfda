@@ -64,7 +64,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
-            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>')
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
+            MSB_LSB_vis='max')
         layV_wq_coeffs = QVBoxLayout()
         layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
@@ -96,8 +97,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-#        self.sig_rx.connect(self.wdg_wq_coeffs.sig_rx)
-#        self.sig_rx.connect(self.wdg_wq_accu.sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -105,9 +104,10 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
 
+        # self.update()  # initial setting of overflow counters
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.error("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
 
         # check whether a signal was generated locally (key = 'ui'). If so:
         # - update the referenced quantization dictionary
@@ -120,8 +120,13 @@ class FIR_DF_pyfixp_UI(QWidget):
             #
             # - update accu wordlengths for 'auto' or 'full' settings
             # - emit `{'fx_sim': 'specs_changed'}`
-            if dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
-                pass
+            if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
+                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
+                             f"in '{__name__}' !")
+                return
+
+            elif dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
+                self.wdg_wq_coeffs.quant_coeffs(fb.fil[0]['ba'][0])
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
@@ -131,19 +136,15 @@ class FIR_DF_pyfixp_UI(QWidget):
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     self.update_accu_settings()
 
-                elif cmbW == 'man':  # switched to manual, don't do anything
-                    return
+                # elif cmbW == 'man':  # switched to manual, don't do anything
+                #   pass
 
-            else:
-                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
-                             f"in '{__name__}' !")
-                return
+            # emit signal, replace id with id of *this* widget
+            self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
-            self.emit({'fx_sim': 'specs_changed'})
-
+        # Update the ui when the quantization dictionary has been updated outside
+        # the widget (signal `{'fx_sim': 'specs_changed'}` received)
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            # Update the ui when the quantization dictionary has been updated outside
-            # (signal `{'fx_sim': 'specs_changed'}` received)
             self.dict2ui()
 
     # --------------------------------------------------------------------------
@@ -208,7 +209,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning("QCB key missing")
 
         self.wdg_wq_coeffs.dict2ui()  # update coefficient wordlength
-        self.update_accu_settings()                  # update accumulator settings
+        self.update_accu_settings()   # update accumulator settings and ui
 
     # --------------------------------------------------------------------------
     def update(self):

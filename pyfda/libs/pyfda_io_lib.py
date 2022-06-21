@@ -1119,7 +1119,7 @@ def export_coe_xilinx(f):
 
     if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.q_dict['fx_base'] == 'hex':  # select hex format
@@ -1129,7 +1129,7 @@ def export_coe_xilinx(f):
     else:
         logger.warning('Coefficients in "{0}" format are not supported in COE files, '
                        'using decimal format.')
-        qc.setQobj({'fx_base': 'dec'})  # select decimal format in all other cases
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         coe_radix = 10
 
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
@@ -1162,11 +1162,11 @@ def export_coe_microsemi(f):
 
     if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength:
-        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.q_dict['fx_base'] != 'dec':
-        qc.setQobj({'fx_base': 'dec'})  # select decimal format in all other cases
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         logger.warning('Only coefficients in "dec" format are supported,'
                        'using decimal format.')
 
@@ -1191,7 +1191,7 @@ def export_coe_vhdl_package(f):
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
     if not qc.q_dict['fx_base'] == 'float' and qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     WO = fb.fil[0]['fxqc']['QO']['W']
@@ -1206,7 +1206,7 @@ def export_coe_vhdl_package(f):
         pre = ""
         post = ""
     else:
-        qc.setQobj({'fx_base': 'dec'})  # select decimal format in all other cases
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         pre = ""
         post = ""
         logger.warning('Coefficients in "{0}" format are currently not supported, '

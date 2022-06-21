@@ -258,6 +258,8 @@ class ItemDelegate(QStyledItemDelegate):
         # if data is complex, convert whole ba (list of arrays) to complex type
         if isinstance(data, complex):
             self.parent.ba[index.column()] = self.parent.ba[index.column()].astype(complex)
+            self.parent.ba_q[index.column()] = self.parent.ba_q[index.column()].astype(complex)
+
         # store new data in self.ba and ba_q
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
@@ -407,7 +409,9 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmb_fx_base.currentIndexChanged.connect(self._cmb_fx_base_updated)
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict)
+	# TODO
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict) xxx
+	self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict_emit) xxx
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -591,7 +595,7 @@ class Input_Coeffs(QWidget):
         is_float = (qget_cmb_box(self.ui.cmb_fx_base, data=False).lower() == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
-        self.ui.cmb_q_frmt.setVisible(not is_float)  # hide quantization widgets
+        self.ui.frm_q_frmt.setVisible(not is_float)  # hide quantization widgets
 
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
@@ -787,24 +791,33 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the combo box `self.ui.cmb_q_frmt` (method was triggered by this)
-
-        It is also triggered by `_save_dict()`.
-        TODO: Is this neccessary?
+        Read out the UI settings of `self.ui.cmb_disp_frmt` and `self.ui.cmb_q_frmt`
+        (those two trigger this method)
 
         The coefficient quantization settings are copied to the quantization dicts
         fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
         instances of `FX_UI_WQ` every time something is updated there. This information
         is also kept in the quantization objects `QObj` of the quantization widgets.
 
-        - Refresh the table, update quantization widgets
-        - Emit signal `'fx_sim': 'specs_changed'`
+        Refresh the table and update quantization widgets
         """
-        fb.fil[0]['fxqc']['QCB'].update({'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
-        fb.fil[0]['fxqc']['QCA'].update({'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        fb.fil[0]['fxqc']['QCB'].update(
+            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
+             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        fb.fil[0]['fxqc']['QCA'].update(
+            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
+             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
-        self.qdict2ui()  # update quant. widgets, table
+        # update quant. widgets and table with the new `fx_base` and`qfrmt`settings
+        self.qdict2ui()
 
+# ------------------------------------------------------------------------------
+    def ui2qdict_emit(self):
+        """
+        Do all the things of `self.ui2qdict()`
+        plus emit signal `'fx_sim': 'specs_changed'`
+        """
+        self.ui2qdict()
         self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
@@ -816,7 +829,7 @@ class Input_Coeffs(QWidget):
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
-        self.ui2qdict()
+        # self.ui2qdict()
 
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
@@ -917,29 +930,23 @@ class Input_Coeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not any(sel):  # nothing selected, "insert" row of zeros after last to table
+        # merge selections in both columns, remove duplicates and sort
+        sel_01 = sorted(list(set(sel[0]).union(set(sel[1]))))
+
+        if not any(sel):  # nothing selected, append row of zeros after last row
             self.ba = np.insert(self.ba, len(self.ba[0]), 0, axis=1)
-        # only complete rows selected, insert a row of zeros after first selected row
-        elif np.all(sel[0] == sel[1]) or fb.fil[0]['ft'] == 'FIR':
-            self.ba = np.insert(self.ba, sel[0], 0, axis=1)
-#        elif len(sel[0]) == len(sel[1]):
-#            self.ba = np.insert(self.ba, sel, 0, axis=1)
-#       not allowed, sel needs to be a scalar or one-dimensional
+        # elif fb.fil[0]['ft'] == 'IIR':
         else:
-            logger.warning("It is only possible to insert complete rows!")
-            # The following doesn't work because the subarrays wouldn't have
-            # the same length for a moment
-            # self.ba[0] = np.insert(self.ba[0], sel[0], 0)
-            # self.ba[1] = np.insert(self.ba[1], sel[1], 0)
-            return
+            self.ba = np.insert(self.ba, sel_01, 0, axis=1)
+        # else:
         # insert 'sel' contiguous rows  before 'row':
         # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
 
         self._equalize_ba_length()
         self.refresh_table()
 
-        # don't tag as 'changed' when only zeros have been added at the end
-        if any(sel):
+        # don't tag as 'changed' when only zeros have been appended to end of table
+        if any(sel_01):
             qstyle_widget(self.ui.butSave, 'changed')
 
 # ------------------------------------------------------------------------------

@@ -442,7 +442,7 @@ class Fixed(object):
         self.q_dict_default = {
             'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round', 'ovfl': 'sat',
             'fx_base': 'float', 'qfrmt': 'qfrac', 'scale': 1}
-        # these keys are calculated and should not be regarded as read-only
+        # these keys are calculated and should be regarded as read-only
         self.q_dict_default_ro = {
             'N': 0, 'ovr_flag': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0,
             'MSB': 1, 'LSB': 6, 'MAX': 2, 'MIN': -2, 'places': 4}
@@ -458,7 +458,8 @@ class Fixed(object):
         # create a reference to the dict passed during construction as instance attribute
         self.q_dict = q_dict
 
-        self.setQobj({})  # trigger calculation of parameters and initialize overflow-counter
+        self.set_qdict({})  # trigger calculation of parameters
+        self.resetN()       # initialize overflow-counter
 
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
@@ -482,37 +483,40 @@ class Fixed(object):
             if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
                 raise Exception(u'Unknown Key "{0:s}"!'.format(k))
 
-    def setQobj(self, q_dict: dict) -> None:
+    def set_qdict(self, d: dict) -> None:
         """
-        Use passed quantization dict `q_dict` to update the instance quantization
-        dict `self.q_dict`
+        Update the instance quantization dict `self.q_dict` from parameter `d`:
 
-        Calculate parameters like MSB, LSB etc. from the dictionary.
+        * Transform dict entries for `WF`, `WI`, `W` and `Q` into each other
 
-        Error flags have to be reset manually if required.
+        * Calculate parameters `MSB`, `LSB`, `MIN` and `MAX` from quantization params
 
-        Check the docstring of class `Fixed()` for details.
+        * Calculate number of places required for printing from `fx_base` and `W`
+
+        Check the docstring of class `Fixed()` for details on quantization
         """
-        self.verify_q_dict_keys(q_dict)  # check whether all keys are valid
+        q_d = d.copy()  # create local copy to avoid modification of passed dict
+
+        self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
         # Transform `WI`, `WF`, `W` and `Q` parameters into each other
-        if 'WI' in q_dict and 'WF' in q_dict:
-            q_dict['WI'] = int(q_dict['WI'])  # sanitize WI
-            q_dict['WF'] = abs(int(q_dict['WF']))  # and WF
-            q_dict['W'] = q_dict['WI'] + q_dict['WF'] + 1
-            q_dict['Q'] = str(q_dict['WI']) + "." + str(q_dict['WF'])
-        elif 'W' in q_dict:
-            q_dict['W'] = int(q_dict['W'])  # sanitize W
-            q_dict['WI'] = int(q_dict['W']) - 1
-            q_dict['WF'] = 0
-            q_dict['Q'] = str(q_dict['WI']) + ".0"
-        elif 'Q' in q_dict:
-            Q_str = str(q_dict['Q']).split('.', 1)  # split 'Q':'1.4'
-            q_dict['WI'] = int(Q_str[0])
-            q_dict['WF'] = abs(int(Q_str[1]))
-            q_dict['W'] = q_dict['WI'] + q_dict['WF'] + 1
+        if 'WI' in q_d and 'WF' in q_d:
+            q_d['WI'] = int(q_d['WI'])  # sanitize WI
+            q_d['WF'] = abs(int(q_d['WF']))  # and WF
+            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
+            q_d['Q'] = str(q_d['WI']) + "." + str(q_d['WF'])
+        elif 'W' in q_d:
+            q_d['W'] = int(q_d['W'])  # sanitize W
+            q_d['WI'] = int(q_d['W']) - 1
+            q_d['WF'] = 0
+            q_d['Q'] = str(q_d['WI']) + ".0"
+        elif 'Q' in q_d:
+            Q_str = str(q_d['Q']).split('.', 1)  # split 'Q':'1.4'
+            q_d['WI'] = int(Q_str[0])
+            q_d['WF'] = abs(int(Q_str[1]))
+            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
 
-        self.q_dict.update(q_dict)
+        self.q_dict.update(q_d)  # merge q_d into self.q_dict
 
         self.q_dict['LSB'] = 2. ** -self.q_dict['WF']  # value of LSB
         self.q_dict['MSB'] = 2. ** (self.q_dict['WI'] - 1)   # value of MSB
@@ -541,12 +545,6 @@ class Fixed(object):
         else:
             raise Exception(
                 u'Unknown number format "{0:s}"!'.format(self.q_dict['fx_base']))
-        # for k in {'N_over', 'N_over_pos', 'N_over_neg', 'N', 'ovr_flag'}:
-        #     if not k in self.q_dict:
-        #         self.resetN()
-        #         break
-
-        self.resetN()  # initialize all counters and error flags
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
@@ -1131,7 +1129,7 @@ if __name__ == '__main__':
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
-    myQ.setQobj(q_dict)
+    myQ.set_qdict(q_dict)
 
     print("\nTesting float2frmt()\n====================")
     pprint.pprint(q_dict)
@@ -1141,7 +1139,7 @@ if __name__ == '__main__':
     print("\nTesting frmt2float()\n====================")
     q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 2}
     pprint.pprint(q_dict)
-    myQ.setQobj(q_dict)
+    myQ.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
         print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))

@@ -55,6 +55,8 @@ class Input_Fixpoint_Specs(QWidget):
 
     def __init__(self, parent=None):
         super(Input_Fixpoint_Specs, self).__init__(parent)
+    # def __init__(self) -> None:
+    #    super().__init__()
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
@@ -84,18 +86,22 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in from input and output quantizer subwidget and 
+        Process signals coming in from input and output quantizer subwidget and
         emit {'fx_sim': 'specs_changed'} in the end.
         """
+        logger.info(
+            "SIG_RX_LOCAL(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
+        # ---------------------------------------------------------------------
+        # Updated fixpoint specs in filter widget, update ui + emit with self id
 
-        # elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-        #     self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
-        #     dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
-        #     self.emit(dict_sig)
-        #     return
+        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
+            self.emit(dict_sig)
+            return
 
         # ---- Process input and output quantizer settings ('ui' in dict_sig) --
         elif 'ui' in dict_sig:
@@ -140,6 +146,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
+
         else:
             logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
         return
@@ -177,6 +184,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # --------------- FX Simulation -------------------------------------------
         elif 'fx_sim' in dict_sig:
+            # --------------- INIT -------------------
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
                 # `impz.impz_init()`, return a handle to the fixpoint filter function
@@ -185,17 +193,23 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
+                    return
                 elif self.fx_sim_init() != 0:  # returned an error
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    # Reset overflow counter for input and output quantization
+                    # Reset overflow counter for input and output quantization,
+                    # initialize fixpoint filter
                     # Trigger fixpoint response calculation, passing the fixpoint
-                    # filter function
+                    # filter function in the emitted dict
                     self.wdg_wq_input.QObj.resetN()
                     self.wdg_wq_output.QObj.resetN()
+                    self.fx_filt_ui.init_filter()
+                    # start fx response calculation in plot_impz
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
+
+            # --------------- FINISH --------------
             elif dict_sig['fx_sim'] == 'finish':
                 # update I/O widgets and dynamically instantiated filter widget with
                 # number of overflows etc.
@@ -205,7 +219,9 @@ class Input_Fixpoint_Specs(QWidget):
                     self.fx_filt_ui.update()
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
-            # somewhere, update ui and set run button to "changed" in wdg_dict2ui()
+            # somewhere else, update ui and set run button to "changed" in wdg_dict2ui()
+
+            # --------------- SPECS_CHANGED ------------
             elif self.fx_specs_changed or\
                 (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
                 self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
@@ -370,7 +386,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFx.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
+        self.butSimFx.clicked.connect(self._start_fx_sim)
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -379,6 +395,14 @@ class Input_Fixpoint_Specs(QWidget):
         # # ... then redraw image when resized
         # self.sig_resize.connect(self.resize_img)
 
+# ------------------------------------------------------------------------------
+    def _start_fx_sim(self) -> None:
+        """
+        Start fixpoint simulation by setting the global fixpoint flag
+        `fb.fil[0]['fx_sim'] = True`and emitting `{'fx_sim': 'start'}`.
+        """
+        fb.fil[0]['fx_sim'] = True
+        self.emit({'fx_sim': 'start'})
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
         """
@@ -565,7 +589,7 @@ class Input_Fixpoint_Specs(QWidget):
             if hasattr(self.fx_filt_ui, "sig_rx"):
                 self.sig_rx.connect(self.fx_filt_ui.sig_rx)
             if hasattr(self.fx_filt_ui, "sig_tx"):
-                self.fx_filt_ui.sig_tx.connect(self.sig_rx)
+                self.fx_filt_ui.sig_tx.connect(self.sig_rx_local)
 
             # ---- get name of new fixpoint filter image ----
             if not (hasattr(self.fx_filt_ui, "img_name") and self.fx_filt_ui.img_name):

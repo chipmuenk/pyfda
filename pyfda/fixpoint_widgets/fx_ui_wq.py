@@ -121,11 +121,15 @@ class FX_UI_WQ(QWidget):
                   "<span>Round towards nearest representable number</span>"),
                  ("fix", "Fix", "Round towards zero"),
                  ("floor", "Floor", "<span>Round towards negative infinity / "
-                  "two's complement truncation.</span>")]
+                  "two's complement truncation.</span>"),
+                 ("none", "None",
+                  "<span>No quantization (only for debugging)</span>")]
         cmb_ov = ["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
-                   "<span>Saturation, i.e. limit at min. / max. value</span>")]
+                   "<span>Saturation, i.e. limit at min. / max. value</span>"),
+                  ("none", "None",
+                   "<span>No overflow behaviour (only for debugging)</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
                  ("man", "Man", "<span>Manual entry of word format.</span>"),
                  ("auto", "Auto",
@@ -288,8 +292,8 @@ class FX_UI_WQ(QWidget):
         Quantize the coefficients, scale and convert them to a list of integers,
         using the quantization settings of `self.q_dict`.
 
-        This is called every time one of the coefficient subwidgets is edited
-        or changed,that's why overflow counters are reset.
+        This is called every time one of the coefficient quantization subwidgets is
+        edited or changed externally, that's why overflow counters are reset.
 
         Parameters
         ----------
@@ -310,7 +314,7 @@ class FX_UI_WQ(QWidget):
         # always use decimal display format for coefficient quantization
         disp_frmt_tmp = self.QObj.q_dict['fx_base']
         self.QObj.q_dict['fx_base'] = 'dec'
-        self.QObj.resetN()  # reset all overflow counters
+        self.QObj.resetN()  # reset overflow counters
 
         if coeffs is None:
             logger.error("Coeffs empty!")
@@ -406,20 +410,19 @@ class FX_UI_WQ(QWidget):
         WF = int(safe_eval(self.ledWF.text(), self.QObj.q_dict['WF'], return_type="int",
                            sign='poszero'))
         self.ledWF.setText(str(WF))
+
         W = int(WI + WF + 1)
 
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
-        self.QObj.setQobj(self.q_dict)  # set quant. object and reset counter
-
-        # self.update()  # update MSB / LSB and overflow counter info
+        self.QObj.set_qdict(self.q_dict)  # set quant. object and reset counter
 
         if self.sender():
             obj_name = self.sender().objectName()
             dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
-            logger.warning(f"uidict:emit {dict_sig}")
+            logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
             logger.error("Sender has no object name!")
@@ -427,7 +430,7 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
         """
-        Use the passed dict `q_dict` to update
+        Use the passed dict `q_dict` to update:
 
         * UI widgets `WI`, `WF` `quant` and `ovfl`
         * the instance quantization dict `self.q_dict` (usually a reference to some
@@ -490,10 +493,11 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        self.update()
-
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
-        self.QObj.setQobj(self.q_dict)
+
+        self.update()  # update overflow counter and MSB / LSB (both modified externally)
+
+        self.QObj.set_qdict(self.q_dict)  # TODO: This issues resetN and updates q_dict?!
 
 
 # ==============================================================================

@@ -82,13 +82,13 @@ class TestSequenceFunctions(unittest.TestCase):
         """
 
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
-        self.myQ.setQobj(q_obj)
+        self.myQ.set_qdict(q_obj)
 
         # check whether option 'norm' sets the correct scale
-        self.myQ.setQobj({'scale':'norm'})
+        self.myQ.set_qdict({'scale':'norm'})
         self.assertEqual(2**(-self.myQ.q_dict['WI']), self.myQ.q_dict['scale'])
         # check whether option 'int' sets the correct scale
-        self.myQ.setQobj({'scale':'int'})
+        self.myQ.set_qdict({'scale':'int'})
         self.assertEqual(1<<self.myQ.q_dict['WF']), self.myQ.q_dict['scale'])
 
     #==========================================================================
@@ -126,7 +126,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'scale':'int'}) 
-        self.myQ.setQobj(q_out_pyfda)      
+        self.myQ.set_qdict(q_out_pyfda)      
 
         self.dut = DUT(q_in, q_out) # pass quantization dicts
         response = self.run_sim(self.stim)
@@ -147,7 +147,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'WI':6, 'WF':0, 'W':7}) # use integer representation
-        self.myQ.setQobj(q_out_pyfda)
+        self.myQ.set_qdict(q_out_pyfda)
       
         self.dut = DUT(q_in, q_out)
         response = self.run_sim(self.stim)

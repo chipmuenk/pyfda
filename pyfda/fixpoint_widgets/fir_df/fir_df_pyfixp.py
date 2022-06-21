@@ -71,20 +71,20 @@ class FIR_DF_pyfixp(object):
         # logger.error(p)
         self.p = p  # parameter dictionary with coefficients etc.
 
+        # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
+            q_mul = p['QA'].copy()
+            # q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
         else:
             q_mul = p['q_mul']
-
-        # self.b = self.p['b']  # coefficients
 
         # create various quantizers
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         self.Q_mul = fx.Fixed(q_mul)  # partial products
         self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
-        self.b = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-        self.L = len(self.b)  # filter length = number of taps
+        self.bq = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b) # quantized coeffs
+        self.L = len(self.bq)  # filter length = number of taps
 
         self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
 
@@ -100,11 +100,15 @@ class FIR_DF_pyfixp(object):
 
     # ---------------------------------------------------------
     def reset(self):
-        """ reset overflow counters of quantizers """
+        """
+        Reset register and overflow counters of quantizers
+        (but don't reset coefficient quantizers)
+        """
         self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
+        self.zi = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
     def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
@@ -141,16 +145,6 @@ class FIR_DF_pyfixp(object):
                 self.zi = zi[:self.L - 1]
                 logger.warning("len(zi) > len(b) - 1, zi was truncated")
 
-        if np.isscalar(x):
-            A = x
-            x = np.zeros(self.L)
-            x[0] = A
-        elif x is None:  # calculate impulse response
-            x = np.zeros(self.L)
-            x[0] = 1
-        # else:  # don't change x, it is integer anyway
-        #    x = x
-
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
 
@@ -165,9 +159,9 @@ class FIR_DF_pyfixp(object):
         self.zi = np.concatenate((self.zi, x))
 
         for k in range(len(x)):
-            # weighted state-vector x at time k:
-            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b)
-            # sum up x_bq to get accu[k]
+            # weighted state-vector x at time k, quantized with Q_mul:
+            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.bq)
+            # accumulate x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
