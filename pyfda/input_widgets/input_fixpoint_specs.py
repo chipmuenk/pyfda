@@ -193,15 +193,18 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
+                    return
                 elif self.fx_sim_init() != 0:  # returned an error
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    # Reset overflow counter for input and output quantization
+                    # Reset overflow counter for input and output quantization,
+                    # initialize fixpoint filter
                     # Trigger fixpoint response calculation, passing the fixpoint
-                    # filter function
+                    # filter function in the emitted dict
                     self.wdg_wq_input.QObj.resetN()
                     self.wdg_wq_output.QObj.resetN()
+                    self.fx_filt_ui.init_filter()
                     # start fx response calculation in plot_impz
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
@@ -383,7 +386,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFx.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
+        self.butSimFx.clicked.connect(self._start_fx_sim)
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -392,6 +395,14 @@ class Input_Fixpoint_Specs(QWidget):
         # # ... then redraw image when resized
         # self.sig_resize.connect(self.resize_img)
 
+# ------------------------------------------------------------------------------
+    def _start_fx_sim(self) -> None:
+        """
+        Start fixpoint simulation by setting the global fixpoint flag
+        `fb.fil[0]['fx_sim'] = True`and emitting `{'fx_sim': 'start'}`.
+        """
+        fb.fil[0]['fx_sim'] = True
+        self.emit({'fx_sim': 'start'})
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
         """
