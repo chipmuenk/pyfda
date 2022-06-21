@@ -166,9 +166,9 @@ class Input_Coeffs_UI(QWidget):
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         self.butAddCells.setIconSize(q_icon_size)
         self.butAddCells.setToolTip(
-            "<span>Select cells to insert a new cell above each selected cell. "
+            "<span>Insert a row above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-            "When nothing is selected, add a row at the end.</span>")
+            "When nothing is selected, append a row to the end.</span>")
 
         self.butDelCells = QPushButton(self)
         self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
