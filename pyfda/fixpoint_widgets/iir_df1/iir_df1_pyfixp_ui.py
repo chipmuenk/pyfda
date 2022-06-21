@@ -150,9 +150,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
             # emit signal, replace ui id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
-        # Update the ui when the quantization dictionary has been updated outside
-        # the widget (signal `{'fx_sim': 'specs_changed'}` received)
-        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+        # quantization dictionary has been updated outside the widget
+        # (signal `{data_changed: xxx}` or `{'fx_sim': 'specs_changed'}` received)
+        elif 'data_changed' in dict_sig or\
+            'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
     # --------------------------------------------------------------------------
