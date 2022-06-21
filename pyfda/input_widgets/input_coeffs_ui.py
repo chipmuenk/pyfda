@@ -55,7 +55,7 @@ class Input_Coeffs_UI(QWidget):
             ]
         self.cmb_q_frmt_default = "qfrac"
 
-        self.cmb_disp_frmt_items = [
+        self.cmb_fx_base_items = [
             "<span>Select the coefficient display format.</span>",
             ("float", "Float", "<span>Coefficients with full precision in floating "
              "point format</span>"),
@@ -65,7 +65,7 @@ class Input_Coeffs_UI(QWidget):
             ("csd", "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
              "(ternary logic) format</span>")
             ]
-        self.cmb_disp_frmt_default = "float"
+        self.cmb_fx_base_default = "float"
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -115,19 +115,19 @@ class Input_Coeffs_UI(QWidget):
             "<span>Show / hide filter coefficients in an editable table."
             " For high order systems, table display might be slow.</span>")
 
-        self.cmb_disp_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_disp_frmt, self.cmb_disp_frmt_items,
-                          self.cmb_disp_frmt_default)
+        self.cmb_fx_base = QComboBox(self)
+        qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
+                          self.cmb_fx_base_default)
 
-        model = self.cmb_disp_frmt.model()
+        model = self.cmb_fx_base.model()
         # create header "Fixpoint:" between separators
         item = QtGui.QStandardItem('Fixpoint:')
         item.setData('parent', Qt.AccessibleDescriptionRole)
         item.setData(0, role=QtGui.QFont.Bold)
         item.setFlags(item.flags() & Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
         model.insertRow(1, item)
-        self.cmb_disp_frmt.insertSeparator(1)
-        self.cmb_disp_frmt.insertSeparator(3)
+        self.cmb_fx_base.insertSeparator(1)
+        self.cmb_fx_base.insertSeparator(3)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
