@@ -193,7 +193,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
     fireSignals: bool (default: False)
         When True, fire a signal if the index is changed (useful for GUI testing)
 
-    caseInsensitive: bool (default: False)
+    caseSensitive: bool (default: False)
         When true, perform case sensitive search.
 
     Returns
