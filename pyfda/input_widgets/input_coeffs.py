@@ -415,7 +415,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
 
-        self.ui.butQuant.clicked.connect(self.quant_coeffs)
+        self.ui.but_quant.clicked.connect(self.quant_coeffs)
 
         self.ui.sig_tx.connect(self.sig_tx)
 
@@ -598,7 +598,6 @@ class Input_Coeffs(QWidget):
 
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
-        self.ui.butQuant.setVisible(not is_float)
 
         if self.ui.butEnable.isChecked():
             self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))

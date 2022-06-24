@@ -178,14 +178,6 @@ class Input_Coeffs_UI(QWidget):
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
 
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip(
-            "<span>Quantize selected coefficients / whole table with specified "
-            "settings. This affects the data, not only the view.</span>")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
@@ -223,7 +215,6 @@ class Input_Coeffs_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butQuant)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butLoad)
         layHButtonsCoeffs1.addWidget(self.butFromTable)
@@ -265,16 +256,26 @@ class Input_Coeffs_UI(QWidget):
         self.frmButtonsCoeffs = QFrame(self)
         self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
         #######################################################################
+
+        lbl_q_frmt = QLabel(to_html("Quant. Format:", frmt='b'))
+
         self.cmb_q_frmt = QComboBox(self)
         qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
         self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        lbl_q_frmt = QLabel(to_html("Quant. Format:", frmt='b'))
+        
+        self.but_quant = QPushButton(self)
+        self.but_quant.setToolTip(
+            "<span>Quantize selected coefficients / whole table with specified "
+            "settings. This affects the data, not only the view.</span>")
+        self.but_quant.setIcon(QIcon(':/quantize.svg'))
+        self.but_quant.setIconSize(q_icon_size)
+        self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         layH_q_frmt = QHBoxLayout()
         layH_q_frmt.addWidget(lbl_q_frmt)
         layH_q_frmt.addWidget(self.cmb_q_frmt)
+        layH_q_frmt.addWidget(self.but_quant)
         self.frm_q_frmt = QFrame(self)
         self.frm_q_frmt.setLayout(layH_q_frmt)
 
