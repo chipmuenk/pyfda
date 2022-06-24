@@ -635,9 +635,6 @@ class Plot_Impz(QWidget):
         else:
             qset_cmb_box(self.ui.cmb_sim_select, "Float")
 
-        fb.fil[0]['fx_sim'] =\
-            qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint'
-
         # plot styles for quantized stimulus signal
         self.ui.cmb_plt_freq_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box freq. domain
         self.ui.lbl_plt_freq_stmq.setVisible(fb.fil[0]['fx_sim'])  # label freq. domain
