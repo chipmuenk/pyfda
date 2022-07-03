@@ -213,8 +213,8 @@ class IIR_DF1_pyfixp(object):
             # and insert last output value quantized to output format
             self.zi_a[0] = self.Q_O.fixp(y_q[k])
 
-            logger.warning(f"zi_a = {self.zi_a}\n"
-                           f"zi_b = {self.zi_b}")
+            # logger.warning(f"zi_a = {self.zi_a}\n"
+            #                f"zi_b = {self.zi_b}")
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         # Overflows in Q_mul are added to overflows in QA
