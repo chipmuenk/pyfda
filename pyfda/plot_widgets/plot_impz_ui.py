@@ -86,6 +86,9 @@ class PlotImpz_UI(QWidget):
         self.N_frame_user = 0
         self.N_frame = 0
 
+        # run
+        self.cmb_sim_select_init = "float"
+
         # time
         self.plt_time_resp = "stem"
         self.plt_time_stim = "line"
@@ -125,6 +128,13 @@ class PlotImpz_UI(QWidget):
             self, self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
+
+        # combobox fixpoint / floating point simulation
+        self.cmb_sim_select_items = [
+            "<span>Simulate floating-point or fixpoint response.</span>",
+            ("float", "Float", "floating point simulation"),
+            ("fixpoint", "Fixpoint", "fixpoint simulation")
+        ]
 
         # data / icon / tooltipp (none) for plotting styles
         self.plot_styles_list = [
@@ -194,10 +204,7 @@ class PlotImpz_UI(QWidget):
         self.but_run.setEnabled(True)
 
         self.cmb_sim_select = QComboBox(self)
-        self.cmb_sim_select.addItems(["Float", "Fixpoint"])
-        qset_cmb_box(self.cmb_sim_select, "Float")
-        self.cmb_sim_select.setToolTip("<span>Simulate floating-point or "
-                                       "fixpoint response.</span>")
+        qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items, self.cmb_sim_select_init)
 
         self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
@@ -592,10 +599,10 @@ class PlotImpz_UI(QWidget):
 
         # total number of points to be calculated: N + N_start
         self.N_end = self.N + self.N_start
-        
+
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
                                  return_type='int', sign='poszero')
-        
+
         if self.N_frame_user == 0:
             self.N_frame = self.N_end  # use N_end for frame length
             self.led_N_frame.setText("0")  # update widget with "0" as set by user
