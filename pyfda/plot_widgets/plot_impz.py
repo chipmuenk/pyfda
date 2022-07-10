@@ -290,15 +290,14 @@ class Plot_Impz(QWidget):
                 if dict_sig['fx_sim'] == 'start':
                     self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
                     if self.isVisible():
+                        self.impz_init(True)  # force running simulation
 
                 if fb.fil[0]['fx_sim']:     # fixpoint mode is set
                     qstyle_widget(self.ui.but_run, "changed")
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     if self.isVisible():
                         # run button clicked in input_fixpoint_specs
-                        if dict_sig['fx_sim'] == 'start':
-                            self.impz_init(True)  # force running simulation
-                        else:
+                        if dict_sig['fx_sim'] == 'init':
                             self.impz_init()
                 return
 
