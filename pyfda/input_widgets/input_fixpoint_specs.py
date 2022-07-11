@@ -399,10 +399,11 @@ class Input_Fixpoint_Specs(QWidget):
     def _start_fx_sim(self) -> None:
         """
         Start fixpoint simulation by setting the global fixpoint flag
-        `fb.fil[0]['fx_sim'] = True`and emitting `{'fx_sim': 'start'}`.
+        `fb.fil[0]['fx_sim'] = True` and emitting `{'fx_sim': 'start_fx_sim'}`.
         """
         fb.fil[0]['fx_sim'] = True
-        self.emit({'fx_sim': 'start'})
+        self.emit({'fx_sim': 'start_fx_sim'})
+
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
         """

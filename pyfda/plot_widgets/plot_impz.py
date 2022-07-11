@@ -265,41 +265,48 @@ class Plot_Impz(QWidget):
             return
 
         if 'fx_sim' in dict_sig:
-            # --------------- START / SPECS_CHANGED ------------
-            if dict_sig['fx_sim'] in {'start', 'specs_changed'}:
+            # --------------- START (ext. widget) ------------
+            if dict_sig['fx_sim'] == 'start_fx_sim':
                 """
-                'start' : Fixpoint simulation started from widget 'input_fixpoint_specs'
-                      by pressing the "Sim FX" button
-                    - Set fixpoint mode
-                    - continue with actions for 'specs_changed'
+                Fixpoint simulation started from external widget, e.g.
+                from 'input_fixpoint_specs' by pressing the "Sim FX" button
+                - Reset error flag and set 'needs_calc' flags
+                - Set fixpoint mode
+                - Update run button to "changed"
+                - Force-start simulation with `self.impz_init(True)`
+                """
 
-                'specs_changed': Fixpoint widget specs have been updated,
-                                  set `self.needs_calc_fx = True`.
-                    If fixpoint is active:
-                    - reset error flag
-                    - force recalculation (`self.needs_calc = True`)
-                    - update run button style to "changed"
-                    - if widget is visible, initialize fixpoint widget and
-                      start simulation via `self.impz_init()`
+                self.needs_calc = True      # force recalculation
+                self.needs_calc_fx = True   # force fx recalculation
+                self.error = False          # reset error flag
+
+                self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
+                qstyle_widget(self.ui.but_run, "changed")
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
+                self.impz_init(True)  # force run independent of "auto" setting
+                return
+            # --------------- specs changed ------------
+            elif dict_sig['fx_sim'] == 'specs_changed':
+                """
+                Fixpoint widget specs have been updated.
+                - set `self.needs_calc_fx = True`.
+                If fixpoint mode is active:
+                - Reset error flag
+                - Force recalculation (`self.needs_calc = True`)
+                - Update run button style to "changed"
+                - If widget is visible, initialize fixpoint widget and
+                    start simulation via `self.impz_init()`
                 """
                 self.needs_calc_fx = True   # fx sim needs recalculation
-                self.error = False      # reset error flag
-                self.needs_calc = True  # force recalculation
 
+                if fb.fil[0]['fx_sim']:     # fixpoint mode is active
+                    self.error = False      # reset error flag
+                    self.needs_calc = True  # force recalculation
 
-                if dict_sig['fx_sim'] == 'start':
-                    self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
-                    if self.isVisible():
-                        self.impz_init(True)  # force running simulation
-
-                if fb.fil[0]['fx_sim']:     # fixpoint mode is set
                     qstyle_widget(self.ui.but_run, "changed")
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     if self.isVisible():
-                        # run button clicked in input_fixpoint_specs
-                        if dict_sig['fx_sim'] == 'init':
-                            self.impz_init()
-                return
+                        self.impz_init()
 
             # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
