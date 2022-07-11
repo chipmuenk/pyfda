@@ -431,8 +431,8 @@ class Plot_Impz(QWidget):
         # check for fixpoint setting (fb.fil[0]['fx_sim']) and update ui if needed
         self.update_fx_ui_settings()
 
-        if type(arg) == bool:  # but_run has been pressed
-            self.needs_calc = True  # but_run has been clicked -> force recalculation
+        if type(arg) == bool:
+            self.needs_calc = True  # but_run has been pressed -> force run
         elif not self.ui.but_auto_run.isChecked():  # "Auto" is not active, return
             return
 
