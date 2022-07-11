@@ -306,7 +306,7 @@ class Plot_Impz(QWidget):
                 """
                 The fixpoint widget has been initialized and starts the fx simulation
                 when the widget is visible via `self.impz()` and the handle to the
-                fixpoint simulation method `self.fxfilter = dict_sig['fxfilter_func']`
+                fixpoint simulation method handle passed in `dict_sig['fxfilter_func']`
                 """
                 self.fxfilter = dict_sig['fxfilter_func']
                 if self.isVisible():
@@ -610,7 +610,7 @@ class Plot_Impz(QWidget):
 
 # =============================================================================
     def toggle_fx_setting(self):
-        """ Triggered by updating ` self.ui.cmb_sim_select` """
+        """ Triggered by changing `self.ui.cmb_sim_select` """
 
         fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == "fixpoint")
         self.update_fx_ui_settings()

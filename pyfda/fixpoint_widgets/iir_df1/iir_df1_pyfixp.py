@@ -86,7 +86,7 @@ class IIR_DF1_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        # create various quantizers
+        # create various quantizers and initialize / reset them
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
         self.Q_mul = fx.Fixed(q_mul)  # partial products
@@ -94,6 +94,8 @@ class IIR_DF1_pyfixp(object):
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         # quantize coefficients and store them in local attributes
+        # this resets the overflow counters a second time (too complicated /
+        # not important enough to fix)
         self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
         self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
