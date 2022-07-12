@@ -48,9 +48,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.img_name = "iir_df1.png"
 
         self._construct_UI()
-        self.init_filter()
         # Construct an instance of the fixpoint filter using the settings from
-        # the 'fxqc' quantizer dict
+        # the 'fxqc' quantizer dict:
+        self.fx_filt = IIR_DF1_pyfixp(fb.fil[0]['fxqc'])
+        self.update()  # initial setting of overflow counter display
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):
@@ -94,6 +95,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
+        # margins are created in input_fixpoint_specs widget
         layVWdg.setContentsMargins(0, 0, 0, 0)
         layVWdg.addLayout(layV_wq_coeffs_b)
         layVWdg.addLayout(layV_wq_coeffs_a)
@@ -110,8 +112,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.wdg_wq_accu.sig_tx.connect(self.process_sig_rx)
-
-        self.update()  # initial setting of overflow counters
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -187,12 +187,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def init_filter(self):
         """
-        Construct an instance of the fixpoint filter object using the settings from
-        the 'fxqc' quantizer dict
+        Initialize filter instance with fixpoint coefficient / parameter dict
         """
-        logger.error("init filter")
-        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
-        self.fx_filt = IIR_DF1_pyfixp(p)
+        logger.error("fx.init_filter()")
+        self.fx_filt.init(fb.fil[0]['fxqc'])
 
     # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):

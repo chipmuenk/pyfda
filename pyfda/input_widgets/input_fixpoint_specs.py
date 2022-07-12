@@ -172,7 +172,15 @@ class Input_Fixpoint_Specs(QWidget):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
+        #  =================== UI_CHANGED =======================================
+        elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
+                and self.isVisible():
+            # Widget size has changed / "Fixpoint" tab has been selected -> resize image
+            self.resize_img()
+
+        # =================== DATA CHANGED =====================================
+        elif 'data_changed' in dict_sig and\
+            dict_sig['data_changed'] == "filter_designed":
             # New filter has been designed, update list of available filter topologies
             self._update_filter_cmb()
             return
@@ -195,22 +203,23 @@ class Input_Fixpoint_Specs(QWidget):
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                     return
-                elif self.fx_sim_init() != 0:  # returned an error
+                # initialize fixpoint filter and check for error during initialization
+                err = self.fx_filt_init()
+                if err != 0:  # returned an error
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
                     # Reset overflow counter for input and output quantization,
-                    # initialize fixpoint filter
-                    # Trigger fixpoint response calculation, passing the fixpoint
-                    # filter function in the emitted dict
                     logger.warning("reset wq_input")
                     self.wdg_wq_input.QObj.resetN()
                     logger.warning("reset wq_output")
                     self.wdg_wq_output.QObj.resetN()
-                    self.fx_filt_ui.init_filter()
-                    # start fx response calculation in plot_impz
+                    # Trigger fixpoint response calculation, passing a handle to the
+                    # fixpoint filter function in the emitted dict
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
+                    # next, start fx response calculation in `plot_impz()`
+                    return
 
             # --------------- finish --------------
             elif dict_sig['fx_sim'] == 'finish':
@@ -238,11 +247,6 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
                              .format(dict_sig['fx_sim'], dict_sig['class']))
-
-        # ---- resize image when "Fixpoint" tab is selected or widget size is changed:
-        elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
-                and self.isVisible():
-            self.resize_img()
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -699,13 +703,12 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.warning(e)
 
     # --------------------------------------------------------------------------
-    def fx_sim_init(self):
+    def fx_filt_init(self):
         """
-        Initialize fix-point simulation:
+        Wrapper around `self.fx_filt_ui.init_filter()` to catch errors.
+        Initialize fix-point filter, reset registers and overflow counters
 
-        - Update the `fxqc_dict` containing all quantization information
-        - Setup a filter instance for fixpoint simulation
-        - Request a stimulus signal
+        TODO: - Update the `fxqc_dict` containing all quantization information
 
         Returns
         -------
@@ -713,8 +716,10 @@ class Input_Fixpoint_Specs(QWidget):
             0 for sucessful fx widget construction, -1 for error
         """
         try:
-            # self.fx_filt_ui.init_filter()   # setup filter instance
-            self.fx_filt_ui.fx_filt.reset()
+            # initialize fixpoint filter instance with fixpoint quantizer
+            #self.fx_filt_ui.init_filter()
+            self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
+
             return 0
 
         except (ValueError, AttributeError) as e:

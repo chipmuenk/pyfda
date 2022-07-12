@@ -40,10 +40,19 @@ class IIR_DF1_pyfixp(object):
         - 'QA', value: dict with accumulator quantizer settings
 
         - 'q_mul', value: dict with partial product quantizer settings
-           optional, 'quant' and 'sat' are both be set to 'none' if there is none, word
-           lengths are copied from the QA dict settings
+            currently unused, create a copy of the QA dict
     """
     def __init__(self, p):
+        self.p = p
+
+        logger.info("Instantiating filter")
+        # create various quantizers and initialize / reset them
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
+        self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
+        self.Q_mul = fx.Fixed(self.p['QA'].copy())  # partial products
+        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
+        self.Q_O = fx.Fixed(self.p['QO'])  # output
+
         self.init(p)
 
     # ---------------------------------------------------------
@@ -77,8 +86,9 @@ class IIR_DF1_pyfixp(object):
         -------
         None.
         """
-        logger.error("Initializing filter!")
-        self.p = p  # parameter dictionary with coefficients etc.
+
+        logger.error("INITIALIZING filter!")
+        self.p = p  # update parameter dictionary with coefficients etc.
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
@@ -86,28 +96,25 @@ class IIR_DF1_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        # create various quantizers and initialize / reset them
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
-        self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
-        self.Q_mul = fx.Fixed(q_mul)  # partial products
-        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
-        self.Q_O = fx.Fixed(self.p['QO'])  # output
+        # update the quantizers
+        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.
+        self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs
+        self.Q_mul.set_qdict(q_mul)  # partial products
+        self.Q_acc.set_qdict(self.p['QA'])  # accumulator
+        self.Q_O.set_qdict(self.p['QO'])  # output
 
-        # quantize coefficients and store them in local attributes
-        # this resets the overflow counters a second time (too complicated /
-        # not important enough to fix)
+        # Quantize coefficients and store them in local attributes
+        # This also resets the overflow counters.
         self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
         self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
         self.L = max(len(self.b_q), len(self.a_q))  # filter length = number of taps
 
-        self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
+        self.reset() # reset overflow counters (except coeffs) and registers
 
-        if zi_b is None:
-            self.zi_b = np.zeros(self.L - 1)
-        # initialize filter memory and fill up with zeros (except for first element
-        # which is the input)
-        else:
+        # Initialize filter memory with passed values zi_b, zi_a and fill up with zeros
+        # or truncate
+        if zi_b is not None:
             if len(zi_b) == self.L - 1:
                 self.zi_b = zi_b
             elif len(zi_b) < self.L - 1:
@@ -121,8 +128,6 @@ class IIR_DF1_pyfixp(object):
             else:
                 logger.warning(f"length of zi_a is {len(zi_a)} != {len(self.L)-1}")
                 self.zi_a = np.zeros(self.L - 1)
-        else:
-            self.zi_a = np.zeros(self.L - 1)
 
     # ---------------------------------------------------------
     def reset(self):

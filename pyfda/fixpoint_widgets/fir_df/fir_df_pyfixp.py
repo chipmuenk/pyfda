@@ -43,6 +43,15 @@ class FIR_DF_pyfixp(object):
            optional, 'quant' and 'sat' are both set to 'none' if there is none
     """
     def __init__(self, p):
+        self.p = p
+
+        logger.info("Instantiating filter")
+        # create various quantizers and initialize / reset them
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
+        self.Q_mul = fx.Fixed(self.p['QA'].copy())  # partial products
+        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
+        self.Q_O = fx.Fixed(self.p['QO'])  # output
+
         self.init(p)
 
     # ---------------------------------------------------------
@@ -68,7 +77,7 @@ class FIR_DF_pyfixp(object):
         -------
         None.
         """
-        # logger.error(p)
+
         self.p = p  # parameter dictionary with coefficients etc.
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
@@ -78,19 +87,21 @@ class FIR_DF_pyfixp(object):
         else:
             q_mul = p['q_mul']
 
-        # create various quantizers
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
-        self.Q_mul = fx.Fixed(q_mul)  # partial products
-        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
-        self.Q_O = fx.Fixed(self.p['QO'])  # output
-        self.bq = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b) # quantized coeffs
+        # update the quantizers
+        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
+        self.Q_mul.set_qdict(q_mul)  # partial products
+        self.Q_acc.set_qdict(self.p['QA'])  # accumulator
+        self.Q_O.set_qdict(self.p['QO'])  # output
+
+        # Quantize coefficients and store them in local attributes
+        # This also resets the overflow counters.
+        self.bq = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+
         self.L = len(self.bq)  # filter length = number of taps
 
-        self.N_over_filt = 0  # initialize overflow counter TODO: not used yet?
+        self.reset() # reset overflow counters (except coeffs) and registers
 
-        if zi is None:
-            self.zi = np.zeros(self.L - 1)
-        else:  # initialize filter memory and fill up with zeros
+        if zi is not None:
             if len(zi) == self.L - 1:
                 self.zi = zi
             elif len(zi) < self.L - 1:
