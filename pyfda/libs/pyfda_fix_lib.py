@@ -781,13 +781,10 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def resetN(self):
         """ Reset counters and overflow-flag of Fixed object """
-        # logger.warning("reset_N")
-        # logger.info("\t«{}»\tLine number in which the function is defined.".
-        #       format(inspect.getsourcelines(Fixed)[1]))
         frm = inspect.stack()[1]
-        logger.info("'reset_N' called from {0}.{1}() «{2}».".
-                    format(inspect.getmodule(frm[0]).__name__,  frm[3], frm[2],))
-        # logger.info("\t«{}»\tModule in which it is contained.\n".format(Fixed.__module__))
+        logger.info("'reset_N' called from {0}.{1}():{2}.".
+                    format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
+                           frm[3], frm[2]))
         self.q_dict.update(
             {'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0, 'ovr_flag' : 0})
 

@@ -178,13 +178,14 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         elif 'data_changed' in dict_sig:
-            # Filter data has changed (but not the filter type)
-            # - Set RUN button to "changed" in wdg_dict2ui()
+            # Filter data has changed (but not the filter type):
+            # - reload ui from dict and set RUN button to "changed"
             self.wdg_dict2ui()
 
-        # --------------- FX Simulation -------------------------------------------
+        # =================== FX SIM ============================================
         elif 'fx_sim' in dict_sig:
-            # --------------- INIT -------------------
+
+            # --------------- init -------------------
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
                 # `impz.impz_init()`, return a handle to the fixpoint filter function
@@ -211,7 +212,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'start_fx_response_calculation',
                                'fxfilter_func': self.fx_filt_ui.fxfilter})
 
-            # --------------- FINISH --------------
+            # --------------- finish --------------
             elif dict_sig['fx_sim'] == 'finish':
                 # update I/O widgets and dynamically instantiated filter widget with
                 # number of overflows etc.
@@ -223,7 +224,7 @@ class Input_Fixpoint_Specs(QWidget):
             # fixpoint specifications / quantization settings have been changed
             # somewhere else, update ui and set run button to "changed" in wdg_dict2ui()
 
-            # --------------- SPECS_CHANGED ------------
+            # --------------- fx specs_changed ------------
             elif self.fx_specs_changed or\
                 (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
                 self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
@@ -232,6 +233,7 @@ class Input_Fixpoint_Specs(QWidget):
                 return
             elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                 self.fx_specs_changed = True
+
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
@@ -716,7 +718,7 @@ class Input_Fixpoint_Specs(QWidget):
             return 0
 
         except (ValueError, AttributeError) as e:
-            logger.error('Fixpoint stimulus generation failed during "init"'
+            logger.error('Fixpoint filter reset or instantiation failed.'
                          '\nwith "{0} "'.format(e))
         return -1
 

@@ -283,7 +283,7 @@ class Plot_Impz(QWidget):
                 self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
                 qstyle_widget(self.ui.but_run, "changed")
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                self.impz_init(True)  # force run independent of "auto" setting
+                self.impz_init(True)
                 return
             # --------------- specs changed ------------
             elif dict_sig['fx_sim'] == 'specs_changed':
@@ -412,7 +412,9 @@ class Plot_Impz(QWidget):
             - Enable energy scaling for impulse stimuli when requirements are met
             - check for and enable fixpoint settings
             - when triggered by `but_run` or when `Auto`== pressed and
-              `self.needs_calc == True`, continue with calculating stimulus and response
+              `self.needs_calc == True`, continue with calculating stimulus / response
+            - When in fixpoint mode, initialize quantized stimulus `x_q` and input
+              quantizer and emit {'fx_sim':'init'}
         """
 
         # allow scaling the frequency response from pure impulse (no DC, no noise)
@@ -461,7 +463,7 @@ class Plot_Impz(QWidget):
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
 
-            # logger.info(f"Started transient {self.fx_str}response calculation")
+            # logger.info(f"Started transient {self.fx_str} response calculation")
             self.t_start = time.process_time()  # store starting time
 
             if fb.fil[0]['fx_sim']:
@@ -481,7 +483,7 @@ class Plot_Impz(QWidget):
                 logger.warning("emit init")
                 # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})
-                return  # process_sig_rx() switches directly to impz() in next step
+                return  # process_sig_rx() directly calls impz() in next step
             else:
                 # Initialize filter memory with zeros, for either cascaded structure (sos)
                 # or direct form
