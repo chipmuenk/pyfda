@@ -185,14 +185,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu.update()
 
     # --------------------------------------------------------------------------
-    def init_filter(self):
-        """
-        Initialize filter instance with fixpoint coefficient / parameter dict
-        """
-        logger.error("fx.init_filter()")
-        self.fx_filt.init(fb.fil[0]['fxqc'])
-
-    # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):
 
         return self.fx_filt.fxfilter(x=stimulus)[0]
