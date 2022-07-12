@@ -202,7 +202,9 @@ class Input_Fixpoint_Specs(QWidget):
                     # initialize fixpoint filter
                     # Trigger fixpoint response calculation, passing the fixpoint
                     # filter function in the emitted dict
+                    logger.warning("reset wq_input")
                     self.wdg_wq_input.QObj.resetN()
+                    logger.warning("reset wq_output")
                     self.wdg_wq_output.QObj.resetN()
                     self.fx_filt_ui.init_filter()
                     # start fx response calculation in plot_impz

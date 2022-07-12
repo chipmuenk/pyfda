@@ -12,6 +12,7 @@ numpy values and formatting reals in various formats
 """
 # ===========================================================================
 import re
+import inspect
 
 import numpy as np
 from numpy.lib.function_base import iterable
@@ -780,7 +781,13 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def resetN(self):
         """ Reset counters and overflow-flag of Fixed object """
-        logger.warning("reset_N")
+        # logger.warning("reset_N")
+        # logger.info("\t«{}»\tLine number in which the function is defined.".
+        #       format(inspect.getsourcelines(Fixed)[1]))
+        frm = inspect.stack()[1]
+        logger.info("'reset_N' called from {0}.{1}() «{2}».".
+                    format(inspect.getmodule(frm[0]).__name__,  frm[3], frm[2],))
+        # logger.info("\t«{}»\tModule in which it is contained.\n".format(Fixed.__module__))
         self.q_dict.update(
             {'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0, 'ovr_flag' : 0})
 
