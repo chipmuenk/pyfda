@@ -479,9 +479,10 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Store selected / all quantized coefficients in `self.ba` and refresh table
+        Store selected / all quantized coefficients in `self.ba` (but not yet in the
+        central dict) and refresh table
 
-        Overflow counters are not reset!
+        Overflow counters are reset!
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
@@ -748,12 +749,13 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def qdict2ui(self):
         """
+        Set the UI from the quantization dict and update the fixpoint quant. object.
+
         Triggered by:
         - `process_sig_rx()`: self.fx_specs_changed == True or
                                 dict_sig['fx_sim'] == 'specs_changed'
         - `self.ui2qdict()`
 
-        Set the UI from the quantization dict and update the fixpoint quant. object.
         """
         if self.ui.wdg_wq_coeffs_b.q_dict['WI'] != 0\
                 and self.ui.wdg_wq_coeffs_b.q_dict['WF'] != 0:
@@ -843,8 +845,7 @@ class Input_Coeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
 
-        self.emit({'data_changed': 'input_coeffs'})
-        # -> input_tab_widgets
+        self.emit({'data_changed': 'input_coeffs'})  # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
 
