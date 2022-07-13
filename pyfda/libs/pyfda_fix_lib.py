@@ -1113,7 +1113,6 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
         # quantize all coefficients
         coeff_q = list(QObj.fixp(coeffs))
 
-    # TODO: Does this need fixing?
     # self.update()  # update display of overflow counter and MSB / LSB
 
     QObj.q_dict['fx_base'] = disp_frmt_tmp  # restore previous display setting
