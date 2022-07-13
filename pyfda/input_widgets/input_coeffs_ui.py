@@ -188,7 +188,8 @@ class Input_Coeffs_UI(QWidget):
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("<span>Reload coefficient table from filter dict.</span>")
+        self.butLoad.setToolTip(
+            "<span>Reload coefficient table from filter dict.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -267,7 +268,8 @@ class Input_Coeffs_UI(QWidget):
         self.but_quant = QPushButton(self)
         self.but_quant.setToolTip(
             "<span>Quantize selected coefficients / whole table with specified "
-            "settings. This affects the data, not only the view.</span>")
+            "settings and save to dict. This modifies the data, not only the view."
+            "</span>")
         self.but_quant.setIcon(QIcon(':/quantize.svg'))
         self.but_quant.setIconSize(q_icon_size)
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
