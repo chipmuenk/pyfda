@@ -499,10 +499,6 @@ class Input_Coeffs(QWidget):
             for i in idx:
                 self.ba[i[0]][i[1]] = self.QObj[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
                 self.ba_q[i[0] + 2][i[1]] = 0
-        #     # make a[0] selectable but not editable
-        if fb.fil[0]['ft'] == 'IIR':
-            item = self.tblCoeff.item(0, 1)
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         self.refresh_table()
         qstyle_widget(self.ui.butSave, 'changed')
