@@ -415,7 +415,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
 
-        self.ui.but_quant.clicked.connect(self.quant_coeffs)
+        self.ui.but_quant.clicked.connect(self.quant_coeffs_save)
 
         self.ui.sig_tx.connect(self.sig_tx)
 
@@ -477,7 +477,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.update()
 
 # ------------------------------------------------------------------------------
-    def quant_coeffs(self):
+    def quant_coeffs_save(self):
         """
         Store selected / all quantized coefficients in `self.ba` (but not yet in the
         central dict) and refresh table
