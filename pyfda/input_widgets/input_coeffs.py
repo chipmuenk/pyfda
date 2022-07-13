@@ -422,12 +422,12 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs_view(self):
         """
-        This method only creates a view on the coefficients, stored in
-        `self.ba_q`, not the actual coefficients in `self.ba`!
+        This method only creates a view on the quantized coefficients and stores
+        it in `self.ba_q`, the actual coefficients in `self.ba` remain unchanged!
 
         * Reset overflow counters
 
-        * Quantize filter coefficients `self.ba` with separate quantizer objects
+        * Quantize filter coefficients `self.ba` with quantizer objects
           `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
           and store them in the array `self.ba_q`. Depending on the number base
           (float, dec, hex, ...) the result can be of type float or string.
@@ -479,10 +479,11 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs_save(self):
         """
-        Store selected / all quantized coefficients in `self.ba` (but not yet in the
-        central dict) and refresh table
-
-        Overflow counters are reset!
+        - Store selected / all quantized coefficients in `self.ba`
+        - Refresh table (for the case that anything weird happens during quantization)
+        - Reset Overflow counters
+        - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
+          {'data_changed': 'input_coeffs'}
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
@@ -502,7 +503,8 @@ class Input_Coeffs(QWidget):
                 self.ba_q[i[0] + 2][i[1]] = 0
 
         self.refresh_table()
-        qstyle_widget(self.ui.butSave, 'changed')
+        # qstyle_widget(self.ui.butSave, 'changed')
+        self._save_dict()
 
     # --------------------------------------------------------------------------
     def _filter_type(self, ftype=None):
@@ -826,8 +828,6 @@ class Input_Coeffs(QWidget):
         logger.debug("_save_dict called")
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
-
-        # self.ui2qdict()
 
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
