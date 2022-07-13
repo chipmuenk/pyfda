@@ -278,7 +278,7 @@ class Input_Coeffs(QWidget):
     - `self.ba[0]` contains the numerator coefficients ("b")
     - `self.ba[1]` contains the denominator coefficients ("a")
 
-    The list don't neccessarily have the same length but they are always defined.
+    The lists don't neccessarily have the same length but they are always defined.
     For FIR filters, `self.ba[1][0] = 1`, all other elements are zero.
 
     The length of both lists can be egalized with `self._equalize_ba_length()`.
@@ -302,7 +302,7 @@ class Input_Coeffs(QWidget):
 
         self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
 
-        # handles to quantization objects (fx.Fixed() instance) of coefficient widgets
+        # handles to quantization objects (`fx.Fixed()` instances) of coefficient widgets
         self.QObj = [self.ui.wdg_wq_coeffs_b.QObj,
                      self.ui.wdg_wq_coeffs_a.QObj]
 
@@ -422,7 +422,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs_view(self):
         """
-        This method only influences the view on the coefficients, stored in
+        This method only creates a view on the coefficients, stored in
         `self.ba_q`, not the actual coefficients in `self.ba`!
 
         * Reset overflow counters
@@ -430,10 +430,10 @@ class Input_Coeffs(QWidget):
         * Quantize filter coefficients `self.ba` with separate quantizer objects
           `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
           and store them in the array `self.ba_q`. Depending on the number base
-          (float, dec, hex, ...) this can be of type float or string.
+          (float, dec, hex, ...) the result can be of type float or string.
 
-        *  Store overflow flags in the 3rd and 4th column of `self.ba_q` as 0
-           or +/- 1.
+        *  Store pos. / neg. overflows in the 3rd and 4th column of `self.ba_q` as
+           0 or +/- 1.
         """
         self.QObj[0].resetN()
         self.QObj[1].resetN()
@@ -445,7 +445,9 @@ class Input_Coeffs(QWidget):
         len_b = len(self.ba[0])
         len_a = len(self.ba[1])
 
-        # don't quantize '1' of recursive coeffs
+        # Create a copy of the a coefficients without the "1" as this could create
+        # false overflows during quantization. The "1" is always printed though
+        # by the `ItemDelegate.initStyleOption()` method
         a = np.concatenate(([0], self.ba[1][1:]))
 
         if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
@@ -503,7 +505,6 @@ class Input_Coeffs(QWidget):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         self.refresh_table()
-        # self.tblCoeff.blockSignals(False)
         qstyle_widget(self.ui.butSave, 'changed')
 
     # --------------------------------------------------------------------------
@@ -542,6 +543,7 @@ class Input_Coeffs(QWidget):
     def _refresh_table_item(self, row, col):
         """
         Refresh the table item with the index `row, col` from `self.ba_q`
+        and color it according to overflow conditions
         """
         item = self.tblCoeff.item(row, col)
 
@@ -583,7 +585,7 @@ class Input_Coeffs(QWidget):
         Called at the end of nearly every method.
         """
         params['FMT_ba'] = int(self.ui.spnDigits.text())
-        # quantize coefficients for display, update overflow counter
+        # quantize coefficient display and update overflow counter
         self.quant_coeffs_view()
         if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
             self.num_rows = len(self.ba[0])
@@ -619,7 +621,7 @@ class Input_Coeffs(QWidget):
                 # hide all q-settings for float:
                 self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
 
-                self.ba[1][0] = 1.0  # restore fa[0] = 1 of denonimator polynome
+                self.ba[1][0] = 1.0  # restore a[0] = 1 of denominator polynome
 
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
