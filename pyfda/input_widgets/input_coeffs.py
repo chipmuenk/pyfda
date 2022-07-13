@@ -470,7 +470,7 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
                         ]
-
+        logger.warning("update coeffs (input_coeffs)")
         self.ui.wdg_wq_coeffs_b.update()
         self.ui.wdg_wq_coeffs_a.update()
 

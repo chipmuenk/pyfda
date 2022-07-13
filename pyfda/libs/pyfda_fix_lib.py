@@ -1093,7 +1093,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     of the quantization object dict
 
     """
-    logger.warning("quant_coeffs")
+    logger.warning("quant_coeffs (fix_lib)")
     # always use decimal display format for coefficient quantization
     disp_frmt_tmp = QObj.q_dict['fx_base']
     QObj.q_dict['fx_base'] = 'dec'

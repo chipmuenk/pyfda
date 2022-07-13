@@ -10,6 +10,7 @@
 Helper classes and functions for generating and simulating fixpoint filters
 """
 import sys
+import inspect
 
 from numpy.lib.function_base import iterable
 
@@ -377,7 +378,13 @@ class FX_UI_WQ(QWidget):
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
-        logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} : {self.q_dict['N_over']}")
+        frm = inspect.stack()[1]
+        logger.info("'reset_N' called from {0}.{1}():{2}.".
+                    format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
+                           frm[3], frm[2]))
+        logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
+                       f"{self.q_dict['N_over']} "
+                       f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}.{frm[3]}:{frm[2]}")
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'auto' and self.q_dict['N_over'] == 0:
