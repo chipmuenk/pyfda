@@ -331,7 +331,7 @@ class FX_UI_WQ(QWidget):
             # quantize all coefficients
             coeff_q = list(self.QObj.fixp(coeffs))
 
-        self.update()  # update display of overflow counter and MSB / LSB
+        # self.update()  # update display of overflow counter and MSB / LSB
 
         self.QObj.q_dict['fx_base'] = disp_frmt_tmp  # restore previous setting
         return coeff_q
