@@ -437,6 +437,7 @@ class FX_UI_WQ(QWidget):
           global quantization dict like `fb.fil[0]['fxqc']['QCB']`)
         * the `scale` setting of the instance quantization dict if WF / WI require this
         * the instance quantization object `self.QObj` from the instance quantization dict
+        * overflow counters need to be updated from calling instance
 
         If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
         instead.
@@ -495,9 +496,7 @@ class FX_UI_WQ(QWidget):
 
         self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
-        self.update()  # update overflow counter and MSB / LSB (both modified externally)
-
-        self.QObj.set_qdict(self.q_dict)  # TODO: This issues resetN and updates q_dict?!
+        self.QObj.set_qdict(self.q_dict)  # update instance q_dict
 
 
 # ==============================================================================
