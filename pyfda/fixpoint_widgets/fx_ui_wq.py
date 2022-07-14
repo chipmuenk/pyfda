@@ -330,10 +330,7 @@ class FX_UI_WQ(QWidget):
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
         frm = inspect.stack()[1]
-        logger.info("'reset_N' called from {0}.{1}():{2}.".
-                    format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
-                           frm[3], frm[2]))
-        logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
+        logger.debug(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
                        f"{self.q_dict['N_over']} "
                        f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}.{frm[3]}:{frm[2]}")
         if self.count_ovfl_vis == 'off':

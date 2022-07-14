@@ -86,8 +86,6 @@ class IIR_DF1_pyfixp(object):
         -------
         None.
         """
-
-        logger.error("INITIALIZING filter!")
         self.p = p  # update parameter dictionary with coefficients etc.
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:

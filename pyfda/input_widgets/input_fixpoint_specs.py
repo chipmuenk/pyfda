@@ -210,9 +210,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.emit({'fx_sim': 'error'})
                 else:
                     # Reset overflow counter for input and output quantization,
-                    logger.warning("reset wq_input")
                     self.wdg_wq_input.QObj.resetN()
-                    logger.warning("reset wq_output")
                     self.wdg_wq_output.QObj.resetN()
                     # Trigger fixpoint response calculation, passing a handle to the
                     # fixpoint filter function in the emitted dict
