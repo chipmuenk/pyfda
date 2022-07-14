@@ -288,55 +288,6 @@ class FX_UI_WQ(QWidget):
         self.butLock.clicked.connect(self.butLock_clicked)
 
     # --------------------------------------------------------------------------
-    def quant_coeffs(self, coeffs: iterable, recursive: bool = False) -> list:
-        """
-        Quantize the coefficients, scale and convert them to a list of integers,
-        using the quantization settings of `self.q_dict`.
-
-        This is called every time one of the coefficient quantization subwidgets is
-        edited or changed externally, that's why overflow counters are reset.
-
-        Parameters
-        ----------
-        coeffs: iterable
-           a list or ndarray of coefficients to be quantized
-
-        recursive: bool
-            When `False` (default), process all coefficients. When `True`,
-            The first coefficient is ignored (must be 1)
-
-        Returns
-        -------
-        A list of integer coeffcients, quantized and scaled with the settings
-        of the local quantization dict
-
-        """
-        logger.warning("quant_coeffs @ FX_UI_WQ")
-        # always use decimal display format for coefficient quantization
-        disp_frmt_tmp = self.QObj.q_dict['fx_base']
-        self.QObj.q_dict['fx_base'] = 'dec'
-        self.QObj.resetN()  # reset overflow counters
-
-        if coeffs is None:
-            logger.error("Coeffs empty!")
-        # quantize floating point coefficients with the selected scale (WI.WF),
-        # next convert array float  -> array of fixp
-        #                           -> list of int (scaled by 2^WF) when `to_int == True`
-        if self.QObj.q_dict['qfrmt'] == 'int':
-            self.QObj.q_dict['scale'] = 1 << self.QObj.q_dict['WF']
-        if recursive:
-            # quantize coefficients except for first
-            coeff_q = [1] + list(self.QObj.fixp(coeffs[1:]))
-        else:
-            # quantize all coefficients
-            coeff_q = list(self.QObj.fixp(coeffs))
-
-        # self.update()  # update display of overflow counter and MSB / LSB
-
-        self.QObj.q_dict['fx_base'] = disp_frmt_tmp  # restore previous setting
-        return coeff_q
-
-    # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
         """
         Update the icon of the push button depending on its state

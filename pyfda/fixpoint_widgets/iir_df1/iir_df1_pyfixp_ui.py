@@ -133,17 +133,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
         the quantization widgets `FX_UI_WQ`. Now, update the quantization counters
         """
         if 'ui' in dict_sig:
-            # signal generated locally
-            if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:  # coeffs format
+            # signal generated locally by modifying coefficient format
+            if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
-
-            elif dict_sig['wdg_name'] == 'wq_coeffs_b':
-                self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0])
-                # TODO: quant_coeffs(self.wdg_wq_coeffs_b.quant_coeffs(fb.fil[0]['ba'][0]))
-            elif dict_sig['wdg_name'] == 'wq_coeffs_a':
-                self.wdg_wq_coeffs_a.quant_coeffs(fb.fil[0]['ba'][1], recursive=True)
 
             # emit signal, replace ui id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})

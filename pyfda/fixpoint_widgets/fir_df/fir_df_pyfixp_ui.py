@@ -105,10 +105,17 @@ class FIR_DF_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
-        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        """
+        Check whether a signal was generated locally (key = 'ui'). If so:
+        - update the referenced quantization dictionary
+        - emit `{'fx_sim': 'specs_changed'}` with local id
 
-        # check whether a signal was generated locally (key = 'ui'). If so:
-        # - update the referenced quantization dictionary
+        When a `{'fx_sim': 'specs_changed'}` or `{'data_changed': xxx}`
+        signal is received, update the ui via `self.dict_ui`.
+
+        Ignore all other signals
+        """
+        logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
 
         if 'ui' in dict_sig:
             # Some settings in the local UI have been changed. Coefficient and accu
@@ -122,9 +129,6 @@ class FIR_DF_pyfixp_UI(QWidget):
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
-
-            elif dict_sig['wdg_name'] == 'wq_coeffs':  # coefficient format updated
-                self.wdg_wq_coeffs.quant_coeffs(fb.fil[0]['ba'][0])
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
