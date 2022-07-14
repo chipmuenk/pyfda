@@ -106,25 +106,23 @@ class FIR_DF_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        Check whether a signal was generated locally (key = 'ui'). If so:
-        - update the referenced quantization dictionary
-        - emit `{'fx_sim': 'specs_changed'}` with local id
+        - For locally generated signals (key = 'ui'), emit
+          `{'fx_sim': 'specs_changed'}` with local id.
+          Update accu wordlengths for 'auto' or 'full' settings
 
-        When a `{'fx_sim': 'specs_changed'}` or `{'data_changed': xxx}`
-        signal is received, update the ui via `self.dict_ui`.
+        - For external changes, i.e. `{'fx_sim': 'specs_changed'}` or
+          `{'data_changed': xxx}` update the ui via `self.dict_ui`.
 
         Ignore all other signals
+
+        Note: If coefficient / accu quantization settings have been changed in the UI,
+        the referenced dicts `fb.fil[0]['fxqc']['QCB']` and `...['QA']` have already
+        been updated by the corresponding subwidgets `FX_UI_WQ`
         """
         logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
 
         if 'ui' in dict_sig:
-            # Some settings in the local UI have been changed. Coefficient and accu
-            # quantization settings have already been updated in the referenced dicts 
-            # `fb.fil[0]['fxqc']['QCB']` and `fb.fil[0]['fxqc']['QA']` by the
-            # corresponding subwidgets `FX_UI_WQ`
-            #
-            # - update accu wordlengths for 'auto' or 'full' settings
-            # - emit `{'fx_sim': 'specs_changed'}`
+            # signal generated locally by modifying coefficient / accu format
             if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
@@ -144,8 +142,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             # emit signal, replace id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
-        # Update the ui when the quantization dictionary has been updated outside
-        # the widget (signal `{'fx_sim': 'specs_changed'}` received)
+        # quantization dictionary has been updated outside the widget, update ui
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
@@ -226,7 +223,11 @@ class FIR_DF_pyfixp_UI(QWidget):
 
     # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):
-
+        """
+        Provide wrapper around fixpoint filter simulation method:
+        * takes stimulus (iterable or float or None) as parameter
+        * returns fixpoint response (ndarray of float)
+        """
         return self.fx_filt.fxfilter(x=stimulus)[0]
 
 
