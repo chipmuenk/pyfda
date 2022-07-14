@@ -216,8 +216,15 @@ class Input_Fixpoint_Specs(QWidget):
                     self.wdg_wq_output.QObj.resetN()
                     # Trigger fixpoint response calculation, passing a handle to the
                     # fixpoint filter function in the emitted dict
-                    self.emit({'fx_sim': 'start_fx_response_calculation',
-                               'fxfilter_func': self.fx_filt_ui.fxfilter})
+                    if hasattr(self.fx_filt_ui, 'fxfilter'):
+                        self.emit({'fx_sim': 'start_fx_response_calculation',
+                                   'fxfilter_func': self.fx_filt_ui.fxfilter})
+                    else:
+                        logger.error(
+                            "Couldn't find fixpoint filter definition\n"
+                            f"\t'{self.fx_filt_ui.__class__.__name__}.fxfilter'!")
+                        self.emit({'fx_sim': 'error'})
+
                     # next, start fx response calculation in `plot_impz()`
                     return
 
