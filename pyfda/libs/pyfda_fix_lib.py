@@ -1081,7 +1081,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
         a list or ndarray of coefficients to be quantized
 
     QObj: dict
-        instance of Fixed object containing quantization dict qdict
+        instance of Fixed object containing quantization dict `q_dict`
 
     recursive: bool
         When `False` (default), process all coefficients. When `True`,

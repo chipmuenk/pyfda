@@ -80,7 +80,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
-        # initial setting for accumulator
+        # initial setting for accumulator mode
         cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
         self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
         self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
@@ -97,7 +97,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
-
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         # ----------------------------------------------------------------------
