@@ -120,6 +120,9 @@ class FIR_DF_pyfixp_UI(QWidget):
         been updated by the corresponding subwidgets `FX_UI_WQ`
         """
         logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        if dict_sig['id'] == id(self):
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            return
 
         if 'ui' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
@@ -135,7 +138,6 @@ class FIR_DF_pyfixp_UI(QWidget):
                 if cmbW in {'full', 'auto'}\
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     self.update_accu_settings()
-
                 # elif cmbW == 'man':  # switched to manual, don't do anything
                 #   pass
 
