@@ -659,7 +659,7 @@ class Fixed(object):
                     try:
                         y = complex(y)
                     except (TypeError, ValueError) as e:
-                        logger.error("Argument '{0}' yields \n {1}".format(y, e))
+                        logger.error(f"'{y}' cannot be converted to a number.")
                         y = 0.0
             over_pos = over_neg = yq = 0
             ovr_flag = 0
