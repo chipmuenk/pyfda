@@ -467,7 +467,7 @@ class Fixed(object):
         self.FRMT_REGEX = {
                 'bin': r'[^0|1|.|,|\-]',
                 'csd': r'[^0|\+|\-|.|,]',
-                'dec': r'[^0-9|.|,|\-]',
+                'dec': r'[^0-9Ee|.|,|\-]',
                 'hex': r'[^0-9A-Fa-f|.|,|\-]'
                         }
         # provide frmt2float function for arrays, swallow the `self` argument
