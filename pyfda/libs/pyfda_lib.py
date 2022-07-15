@@ -484,6 +484,14 @@ def safe_numexpr_eval(expr: str, fallback=None,
         logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
                        f"'{type(expr).__name__}', replacing with zero.")
         expr = "0.0"
+
+    expr = expr.lstrip('0')  # remove trailing zeros which cannot be processed
+    if len(expr) == 0:
+        expr = "0"
+    else:
+        expr = expr.replace(',', '.')  # ',' -> '.' for German-style numbers
+        if expr[0] == '.':  # prepend '0' when the number starts with '.'
+            expr = "0" + expr
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
