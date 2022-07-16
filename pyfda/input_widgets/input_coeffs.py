@@ -472,7 +472,6 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
                         ]
-        logger.warning("update coeffs (input_coeffs)")
         self.ui.wdg_wq_coeffs_b.update()
         self.ui.wdg_wq_coeffs_a.update()
 
@@ -791,7 +790,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the UI settings of `self.ui.cmb_disp_frmt` and `self.ui.cmb_q_frmt`
+        Read out the UI settings of `self.ui.cmb_fx_base` and `self.ui.cmb_q_frmt`
         (those two trigger this method)
 
         The coefficient quantization settings are copied to the quantization dicts
@@ -802,10 +801,10 @@ class Input_Coeffs(QWidget):
         Refresh the table and update quantization widgets
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
+            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': str(self.ui.cmb_disp_frmt.currentText().lower()),
+            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower()),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         # update quant. widgets and table with the new `fx_base` and`qfrmt`settings
