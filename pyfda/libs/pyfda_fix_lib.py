@@ -782,7 +782,7 @@ class Fixed(object):
     def resetN(self):
         """ Reset counters and overflow-flag of Fixed object """
         frm = inspect.stack()[1]
-        logger.info("'reset_N' called from {0}.{1}():{2}.".
+        logger.debug("'reset_N' called from {0}.{1}():{2}.".
                     format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
                            frm[3], frm[2]))
         self.q_dict.update(

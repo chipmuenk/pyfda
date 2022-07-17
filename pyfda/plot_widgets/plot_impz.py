@@ -454,7 +454,7 @@ class Plot_Impz(QWidget):
             if self.cmplx:
                 self.y = np.empty_like(self.x, dtype=complex)  # always complex
             else:
-                self.y = np.empty_like(self.x)  # same as self.x
+                self.y = np.empty_like(self.x)  # same type as self.x
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
             # initialize progress bar
@@ -463,7 +463,6 @@ class Plot_Impz(QWidget):
             self.ui.but_run.setIcon(QIcon(":/stop.svg"))
             qstyle_widget(self.ui.but_run, "running")
 
-            # logger.info(f"Started transient {self.fx_str} response calculation")
             self.t_start = time.process_time()  # store starting time
 
             if fb.fil[0]['fx_sim']:
@@ -480,7 +479,7 @@ class Plot_Impz(QWidget):
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 # always use integer decimal format for input quantizer
                 self.q_i.set_qdict({'fx_base': 'dec'})
-                logger.info("emit {'fx_sim': 'init'}")
+
                 # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})
                 return  # process_sig_rx() directly calls impz() in next step
@@ -573,7 +572,6 @@ class Plot_Impz(QWidget):
         # -------------------------------------------------------------
         # ----------------------- finish ------------------------------
         # -------------------------------------------------------------
-        logger.error('finish')
         self.impz_finish()
 
     # --------------------------------------------------------------------------
