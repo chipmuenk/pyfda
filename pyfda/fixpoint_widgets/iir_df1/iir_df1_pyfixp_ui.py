@@ -80,12 +80,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
 
         # widget for accumulator quantization
-        if 'QA' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc']['QA'] = {}
-        set_dict_defaults(fb.fil[0]['fxqc']['QA'],
+        if 'QACC' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc']['QACC'] = {}
+        set_dict_defaults(fb.fil[0]['fxqc']['QACC'],
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
+            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
             cmb_w_vis='max')
         layV_wq_accu = QVBoxLayout()
@@ -122,7 +122,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         Ignore all other signals
 
         Note: If coefficient / accu quantization settings have been changed in the UI,
-        the referenced dicts `fb.fil[0]['fxqc']['QCB']`, `['QCA']` and `...['QA']`
+        the referenced dicts `fb.fil[0]['fxqc']['QCB']`, `['QCA']` and `...['QACC']`
         have already been updated by the corresponding subwidgets `FX_UI_WQ`
         """
         logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))

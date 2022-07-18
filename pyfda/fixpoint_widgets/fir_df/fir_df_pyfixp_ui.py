@@ -70,12 +70,12 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
         # widget for accumulator quantization
-        if 'QA' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc']['QA'] = {}
-        set_dict_defaults(fb.fil[0]['fxqc']['QA'],
+        if 'QACC' not in fb.fil[0]['fxqc']:
+            fb.fil[0]['fxqc']['QACC'] = {}
+        set_dict_defaults(fb.fil[0]['fxqc']['QACC'],
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu', cmb_w_vis='on',
+            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu', cmb_w_vis='on',
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
@@ -116,7 +116,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         Ignore all other signals
 
         Note: If coefficient / accu quantization settings have been changed in the UI,
-        the referenced dicts `fb.fil[0]['fxqc']['QCB']` and `...['QA']` have already
+        the referenced dicts `fb.fil[0]['fxqc']['QCB']` and `...['QACC']` have already
         been updated by the corresponding subwidgets `FX_UI_WQ`
         """
         logger.info("sig_rx:\n{0}".format(pprint_log(dict_sig)))
@@ -158,7 +158,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxqc']['QA']`.
+        `fb.fil[0]['fxqc']['QACC']`.
         """
         try:
             if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
@@ -172,19 +172,19 @@ class FIR_DF_pyfixp_UI(QWidget):
             return
 
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
-            fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
+            fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
-            fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
+            fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
         # calculate total accumulator word length and 'Q' format
-        fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
-            + fb.fil[0]['fxqc']['QA']['WF'] + 1
-        fb.fil[0]['fxqc']['QA']['Q'] = str(fb.fil[0]['fxqc']['QA']['WI'])\
-            + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
+        fb.fil[0]['fxqc']['QACC']['W'] = fb.fil[0]['fxqc']['QACC']['WI']\
+            + fb.fil[0]['fxqc']['QACC']['WF'] + 1
+        fb.fil[0]['fxqc']['QACC']['Q'] = str(fb.fil[0]['fxqc']['QACC']['WI'])\
+            + '.' + str(fb.fil[0]['fxqc']['QACC']['WF'])
 
         # update quantization settings
-        fb.fil[0]['fxqc']['QA'].update(self.wdg_wq_accu.q_dict)
+        fb.fil[0]['fxqc']['QACC'].update(self.wdg_wq_accu.q_dict)
 
         # update UI
         self.wdg_wq_accu.dict2ui()
@@ -201,8 +201,8 @@ class FIR_DF_pyfixp_UI(QWidget):
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
         fxqc_dict = fb.fil[0]['fxqc']
-        if 'QA' not in fxqc_dict:
-            fxqc_dict.update({'QA': {}})  # no accumulator settings in dict yet
+        if 'QACC' not in fxqc_dict:
+            fxqc_dict.update({'QACC': {}})  # no accumulator settings in dict yet
             logger.warning("QA key missing")
 
         if 'QCB' not in fxqc_dict:

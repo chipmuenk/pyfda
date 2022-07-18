@@ -55,7 +55,7 @@ class FX_UI_WQ(QWidget):
 
     ```
         self.wdg_wq_accu = UI_WQ(
-            fb.fil[0]['fxqc']['QA'], wdg_name='wq_accu',
+            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
 

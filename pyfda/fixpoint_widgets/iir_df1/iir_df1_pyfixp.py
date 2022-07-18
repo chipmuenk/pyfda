@@ -37,7 +37,7 @@ class IIR_DF1_pyfixp(object):
 
         - 'QCA', value: dict with quantizer settings for recursive coefficients
 
-        - 'QA', value: dict with accumulator quantizer settings
+        - 'QACC', value: dict with accumulator quantizer settings
 
         - 'q_mul', value: dict with partial product quantizer settings
             currently unused, create a copy of the QA dict
@@ -49,8 +49,8 @@ class IIR_DF1_pyfixp(object):
         # create various quantizers and initialize / reset them
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
-        self.Q_mul = fx.Fixed(self.p['QA'].copy())  # partial products
-        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
+        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
@@ -90,7 +90,7 @@ class IIR_DF1_pyfixp(object):
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = p['QA'].copy()
+            q_mul = p['QACC'].copy()
         else:
             q_mul = p['q_mul']
 
@@ -98,7 +98,7 @@ class IIR_DF1_pyfixp(object):
         self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.
         self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs
         self.Q_mul.set_qdict(q_mul)  # partial products
-        self.Q_acc.set_qdict(self.p['QA'])  # accumulator
+        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
 
         # Quantize coefficients and store them in local attributes
@@ -222,7 +222,7 @@ class IIR_DF1_pyfixp(object):
             #                f"zi_b = {self.zi_b}")
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
-        # Overflows in Q_mul are added to overflows in QA
+        # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         logger.error(f"\n{self.Q_acc.q_dict['N_over']} - {self.Q_mul.q_dict['N_over']}")
         self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
     """
 
-    p = {'b': [-0.2, 0.2, 0], 'QA': {'Q': '3.6', 'ovfl': 'wrap', 'quant': 'round'},
+    p = {'b': [-0.2, 0.2, 0], 'QACC': {'Q': '3.6', 'ovfl': 'wrap', 'quant': 'round'},
          'a': [1, 0, -0.81],
          'QI': {'Q': '1.3', 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'Q': '3.3', 'ovfl': 'sat', 'quant': 'round'}

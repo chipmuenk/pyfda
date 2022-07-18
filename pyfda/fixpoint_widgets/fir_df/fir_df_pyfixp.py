@@ -37,7 +37,7 @@ class FIR_DF_pyfixp(object):
 
         - 'b', value: array of coefficients as floats, scaled as `WI:WF`
 
-        - 'QA', value: dict with quantizer settings for the accumulator
+        - 'QACC', value: dict with quantizer settings for the accumulator
 
         - 'q_mul', value: dict with quantizer settings for the partial products
            optional, 'quant' and 'sat' are both set to 'none' if there is none
@@ -48,8 +48,8 @@ class FIR_DF_pyfixp(object):
         logger.info("Instantiating filter")
         # create various quantizers and initialize / reset them
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
-        self.Q_mul = fx.Fixed(self.p['QA'].copy())  # partial products
-        self.Q_acc = fx.Fixed(self.p['QA'])  # accumulator
+        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
@@ -82,7 +82,7 @@ class FIR_DF_pyfixp(object):
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
         if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = p['QA'].copy()
+            q_mul = p['QACC'].copy()
             # q_mul = {'Q': '0.15', 'ovfl': 'none', 'quant': 'none'}
         else:
             q_mul = p['q_mul']
@@ -90,7 +90,7 @@ class FIR_DF_pyfixp(object):
         # update the quantizers
         self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
         self.Q_mul.set_qdict(q_mul)  # partial products
-        self.Q_acc.set_qdict(self.p['QA'])  # accumulator
+        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
 
         # Quantize coefficients and store them in local attributes
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
     """
 
-    p = {'b': [1, 2, 3, 2, 1], 'QA': {'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'},
+    p = {'b': [1, 2, 3, 2, 1], 'QACC': {'Q': '4.3', 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'Q': '2.3', 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'Q': '5.3', 'ovfl': 'wrap', 'quant': 'round'}
          }
