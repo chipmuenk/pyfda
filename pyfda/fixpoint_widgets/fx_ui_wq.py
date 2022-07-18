@@ -325,7 +325,7 @@ class FX_UI_WQ(QWidget):
                 f"{self.QObj.q_dict['MSB']:.{params['FMT_ba']}g}")
             self.lbl_LSB.setText(
                 "<b><i>LSB</i><sub>10</sub> = </b>"
-                f"{self.QObj.q_dict['MSB']:.{params['FMT_ba']}g}")
+                f"{self.QObj.q_dict['LSB']:.{params['FMT_ba']}g}")
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
