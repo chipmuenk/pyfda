@@ -207,11 +207,17 @@ class IIR_DF1_pyfixp(object):
         self.zi_b = np.concatenate((self.zi_b, x))
 
         for k in range(len(x)):
-            # partial products xa_q and xb_q at time k:
+            # partial products xa_q and xb_q at time k, quantized with Q_mul:
             xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
-            xa_q = self.Q_mul.fixp(self.zi_a * self.a_q[1:])
+            # append a zero to xa_q to equalize length of xb_q and xa_q
+            xa_q = np.append(self.Q_mul.fixp(self.zi_a * self.a_q[1:]), 0)
 
-            # accumutlate partial products x_bq and x_aq and quantize them (Q_acc)
+            # accumulate partial products x_bq and x_aq and quantize them (Q_acc)
+            # quantize individual accumulation steps - needed?!
+            # y_q[k] = 0.0
+            # for i in range(len(self.b_q)):
+            #     y_q[k] += self.Q_acc.fixp(xb_q[i] - xa_q[i])
+
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 

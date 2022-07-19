@@ -356,11 +356,11 @@ class Plot_Impz(QWidget):
             elif 'ui_changed' in dict_sig:
                 # exclude those ui elements  / events that don't require a recalculation
                 # of stimulus and response
-                if dict_sig['ui_changed'] in {'resized', 'tab'}:
+                # TODO: separate 'ui' (local) and 'ui_changed' (global) events
+                if dict_sig['ui_changed'] in {'resized', 'tab', 'csv'}:
                     pass
                 else:  # all the other ui elements are treated here
-                    if True:  # dict_sig['ui_changed'] == 'stim':
-                        self.resize_stim_tab_widget()
+                    self.resize_stim_tab_widget()
                     self.needs_calc = True
                     self.impz_init()
 
