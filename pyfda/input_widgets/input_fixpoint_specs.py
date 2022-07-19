@@ -44,7 +44,7 @@ classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : displa
 
 class Input_Fixpoint_Specs(QWidget):
     """
-    Create the widget that holds the dynamically loaded fixpoint filter ui
+    Create the widget that holds the dynamically loaded fixpoint filter UI
     """
 
     # sig_resize = pyqtSignal()  # emit a signal when the image has been resized
@@ -95,7 +95,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
         # ---------------------------------------------------------------------
-        # Updated fixpoint specs in filter widget, update ui + emit with self id
+        # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
@@ -103,14 +103,14 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit(dict_sig)
             return
 
-        # ---- Process input and output quantizer settings ('ui' in dict_sig) --
-        elif 'ui' in dict_sig:
+        # ---- Process input and output quantizer settings ('ui_local' in dict_sig) --
+        elif 'ui_local' in dict_sig:
             if 'wdg_name' not in dict_sig:
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
                 return
 
-            elif dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
+            elif dict_sig['ui_local'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+                logger.warning("Unknown value '{0}' for key 'ui_local'".format(dict_sig['ui_local']))
                 return
 
             elif dict_sig['wdg_name'] == 'wq_input':
@@ -119,7 +119,7 @@ class Input_Fixpoint_Specs(QWidget):
                 When I/O lock is active, copy input fixpoint word format to output
                 word format.
                 """
-                if dict_sig['ui'] == 'butLock'\
+                if dict_sig['ui_local'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return
@@ -187,7 +187,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         elif 'data_changed' in dict_sig:
             # Filter data has changed (but not the filter type):
-            # - reload ui from dict and set RUN button to "changed"
+            # - reload UI from dict and set RUN button to "changed"
             self.wdg_dict2ui()
 
         # =================== FX SIM ============================================
@@ -236,7 +236,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.fx_filt_ui.update()
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
-            # somewhere else, update ui and set run button to "changed" in wdg_dict2ui()
+            # somewhere else, update UI and set run button to "changed" in wdg_dict2ui()
 
             # --------------- fx specs_changed ------------
             elif self.fx_specs_changed or\
@@ -256,7 +256,7 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
-        Intitialize the main GUI, consisting of:
+        Intitialize the main UI, consisting of:
 
         - A combo box to select the filter topology and an image of the topology
         - The input quantizer

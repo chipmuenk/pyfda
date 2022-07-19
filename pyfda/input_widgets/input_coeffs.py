@@ -324,9 +324,9 @@ class Input_Coeffs(QWidget):
             # CSV options have been changed, update icons (file vs. clipboard)
             self.ui._set_load_save_icons()
 
-        elif 'ui' in dict_sig and 'wdg_name' in dict_sig and\
+        elif 'ui_local' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
-            # local events from ui, trigger requant and refresh table
+            # local events from UI, trigger requant and refresh table
             self.refresh_table()
             self.emit({'fx_sim': 'specs_changed'})
             return
@@ -662,7 +662,7 @@ class Input_Coeffs(QWidget):
         """
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
-        self.qdict2ui()  # set quantization ui from dictionary
+        self.qdict2ui()  # set quantization UI from dictionary
 
         self.refresh_table()
 

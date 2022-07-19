@@ -354,12 +354,12 @@ class Plot_Impz(QWidget):
                 self.impz_init()
 
             elif 'ui_changed' in dict_sig:
-                # exclude those ui elements  / events that don't require a recalculation
+                # exclude those UI elements  / events that don't require a recalculation
                 # of stimulus and response
-                # TODO: separate 'ui' (local) and 'ui_changed' (global) events
+                # TODO: separate 'ui_local' (local) and 'ui_changed' (global) events
                 if dict_sig['ui_changed'] in {'resized', 'tab', 'csv'}:
                     pass
-                else:  # all the other ui elements are treated here
+                else:  # all the other UI elements are treated here
                     self.resize_stim_tab_widget()
                     self.needs_calc = True
                     self.impz_init()
@@ -430,7 +430,7 @@ class Plot_Impz(QWidget):
         self.error = False
         self.needs_redraw = [True] * 2
 
-        # check for fixpoint setting (fb.fil[0]['fx_sim']) and update ui if needed
+        # check for fixpoint setting (fb.fil[0]['fx_sim']) and update UI if needed
         self.update_fx_ui_settings()
 
         if type(arg) == bool:
@@ -645,7 +645,7 @@ class Plot_Impz(QWidget):
         is set to True and the run button is set to "changed".
         """
         if fx in {"float", "fixpoint"}:
-            # Function call with argument, set ui and fb.fil[0]['fx_sim'] according to `fx`
+            # Function call with argument, set UI and fb.fil[0]['fx_sim'] according to `fx`
             qset_cmb_box(self.ui.cmb_sim_select, fx, data=True)
             fb.fil[0]['fx_sim'] = (fx == "fixpoint")
         elif fb.fil[0]['fx_sim']:
@@ -805,7 +805,7 @@ class Plot_Impz(QWidget):
 # ----------------------------------------------------------------------------
     def _spgr_cmb(self):
         """
-        Update spectrogram ui when signal selection combobox has been changed
+        Update spectrogram UI when signal selection combobox has been changed
         """
         spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none'
 

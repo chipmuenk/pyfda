@@ -114,10 +114,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        - For locally generated signals (key = 'ui'), emit
+        - For locally generated signals (key = 'ui_local'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
         - For external changes, i.e. `{'fx_sim': 'specs_changed'}` or
-          `{'data_changed': xxx}` update the ui via `self.dict_ui`.
+          `{'data_changed': xxx}` update the UI via `self.dict_ui`.
 
         Ignore all other signals
 
@@ -130,16 +130,16 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui' in dict_sig:
+        if 'ui_local' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
-            # emit signal, replace ui id with id of *this* widget
+            # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
-        # quantization dictionary has been updated outside the widget, update ui
+        # quantization dictionary has been updated outside the widget, update UI
         elif 'data_changed' in dict_sig or\
             'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()

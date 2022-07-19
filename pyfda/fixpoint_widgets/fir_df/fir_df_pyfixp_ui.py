@@ -106,12 +106,12 @@ class FIR_DF_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        - For locally generated signals (key = 'ui'), emit
+        - For locally generated signals (key = 'ui_local'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
           Update accu wordlengths for 'auto' or 'full' settings
 
         - For external changes, i.e. `{'fx_sim': 'specs_changed'}` or
-          `{'data_changed': xxx}` update the ui via `self.dict_ui`.
+          `{'data_changed': xxx}` update the UI via `self.dict_ui`.
 
         Ignore all other signals
 
@@ -124,7 +124,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui' in dict_sig:
+        if 'ui_local' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -136,7 +136,7 @@ class FIR_DF_pyfixp_UI(QWidget):
                 self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
                 if cmbW in {'full', 'auto'}\
-                        or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
+                        or ('ui_local' in dict_sig and dict_sig['ui_local'] in {'WF', 'WI'}):
                     self.update_accu_settings()
                 # elif cmbW == 'man':  # switched to manual, don't do anything
                 #   pass
@@ -144,7 +144,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             # emit signal, replace id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
-        # quantization dictionary has been updated outside the widget, update ui
+        # quantization dictionary has been updated outside the widget, update UI
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
@@ -210,7 +210,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning("QCB key missing")
 
         self.wdg_wq_coeffs.dict2ui()  # update coefficient wordlength
-        self.update_accu_settings()   # update accumulator settings and ui
+        self.update_accu_settings()   # update accumulator settings and UI
 
     # --------------------------------------------------------------------------
     def update(self):

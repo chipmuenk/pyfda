@@ -106,7 +106,7 @@ class FX_UI_WQ(QWidget):
 
     # # --------------------------------------------------------------------------
     # def process_sig_rx(self, dict_sig=None):
-    #     """ Update the ui when the quantization dictionary has been updated outside
+    #     """ Update the UI when the quantization dictionary has been updated outside
     #         (signal `{'fx_sim': 'specs_changed'}` received)"""
 
     #     logger.warning("sig_rx:\n{0}".format(dict_sig))
@@ -297,7 +297,7 @@ class FX_UI_WQ(QWidget):
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        dict_sig = {'wdg_name': self.wdg_name, 'ui': 'butLock'}
+        dict_sig = {'wdg_name': self.wdg_name, 'ui_local': 'butLock'}
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
@@ -357,7 +357,7 @@ class FX_UI_WQ(QWidget):
         Update the entries in the quantization dict from the UI for `ovfl`, `quant`,
         `WI`, `WF`, `W` when one of the widgets has been edited.
 
-        Emit a signal with `{'ui'<objectName of the sender>}`.
+        Emit a signal with `{'ui_local': <objectName of the sender>}`.
         """
         WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'], return_type="int",
                            sign='poszero'))
@@ -376,7 +376,7 @@ class FX_UI_WQ(QWidget):
 
         if self.sender():
             obj_name = self.sender().objectName()
-            dict_sig = {'wdg_name': self.wdg_name, 'ui': obj_name}
+            dict_sig = {'wdg_name': self.wdg_name, 'ui_local': obj_name}
             logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
