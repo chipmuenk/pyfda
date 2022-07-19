@@ -32,7 +32,7 @@ class Plot_Tran_Stim_UI(QWidget):
     """
     # incoming:
     sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
@@ -598,7 +598,7 @@ class Plot_Tran_Stim_UI(QWidget):
           current value normalized to f_S with full precision (only if
           ``spec_edited == True``) and display the stored value in selected format
 
-          Emit 'ui_changed':'stim'
+          Emit 'ui_local':'stim'
         """
         def _reload_entry(source):
             """ Reload text entry for active line edit field in rounded format """
@@ -655,7 +655,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
                 self.spec_edited = False  # reset flag
                 self._update_scale_impz()
-                self.emit({'ui_changed': 'stim'})
+                self.emit({'ui_local': 'stim'})
 
             # nothing has changed, but display frequencies in rounded format anyway
             else:
@@ -701,7 +701,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         self.update_freqs()
 
-        self.emit({'ui_changed': 'f1_f2'})
+        self.emit({'ui_local': 'f1_f2'})
 
     # -------------------------------------------------------------
     def update_freqs(self):
@@ -837,26 +837,26 @@ class Plot_Tran_Stim_UI(QWidget):
         self.cmbPeriodicType.setVisible(self.cmb_stim == 'periodic')
         self.cmbModulationType.setVisible(self.cmb_stim == 'modulation')
 
-        self.emit({'ui_changed': 'stim'})
+        self.emit({'ui_local': 'stim'})
 
     # -------------------------------------------------------------
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='cmplx')
         self.ledAmp1.setText(str(self.A1))
-        self.emit({'ui_changed': 'a1'})
+        self.emit({'ui_local': 'a1'})
 
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='cmplx')
         self.ledAmp2.setText(str(self.A2))
-        self.emit({'ui_changed': 'a2'})
+        self.emit({'ui_local': 'a2'})
 
     def _update_phi1(self):
         """ Update value for self.phi1 from QLineEditWidget"""
         self.phi1 = safe_eval(self.ledPhi1.text(), self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
-        self.emit({'ui_changed': 'phi1'})
+        self.emit({'ui_local': 'phi1'})
 
     def _update_BW1(self):
         """ Update value for self.BW1 from QLineEditWidget"""
@@ -864,14 +864,14 @@ class Plot_Tran_Stim_UI(QWidget):
             self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
         self.led_BW1.setText(str(self.BW1))
         self._update_scale_impz()
-        self.emit({'ui_changed': 'BW1'})
+        self.emit({'ui_local': 'BW1'})
 
     def _update_BW2(self):
         """ Update value for self.BW2 from QLineEditWidget"""
         self.BW2 = safe_eval(
             self.led_BW2.text(), self.BW2, return_type='float', sign='pos')
         self.led_BW2.setText(str(self.BW2))
-        self.emit({'ui_changed': 'BW2'})
+        self.emit({'ui_local': 'BW2'})
 
     def _update_scale_impz(self):
         """
@@ -891,12 +891,12 @@ class Plot_Tran_Stim_UI(QWidget):
         """ Update value for self.phi2 from the QLineEditWidget"""
         self.phi2 = safe_eval(self.ledPhi2.text(), self.phi2, return_type='float')
         self.ledPhi2.setText(str(self.phi2))
-        self.emit({'ui_changed': 'phi2'})
+        self.emit({'ui_local': 'phi2'})
 
     def _update_chirp_type(self):
         """ Update value for self.chirp_type from data field of ComboBox"""
         self.chirp_type = qget_cmb_box(self.cmbChirpType)
-        self.emit({'ui_changed': 'chirp_type'})
+        self.emit({'ui_local': 'chirp_type'})
 
     def _update_impulse_type(self):
         """ Update value for self.impulse_type from data field of ComboBox"""
@@ -965,26 +965,26 @@ class Plot_Tran_Stim_UI(QWidget):
                 self.ledNoi.setToolTip("<span>Standard deviation of the Gaussian process "
                                        "that is cumulated.</span>")
 
-        self.emit({'ui_changed': 'noi'})
+        self.emit({'ui_local': 'noi'})
 
     def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='cmplx')
         self.ledDC.setText(str(self.DC))
-        self.emit({'ui_changed': 'dc'})
+        self.emit({'ui_local': 'dc'})
 
     def _update_stim_formula(self):
         """Update string with formula to be evaluated by numexpr"""
         self.stim_formula = self.ledStimFormula.text().strip()
         self.ledStimFormula.setText(str(self.stim_formula))
-        self.emit({'ui_changed': 'stim_formula'})
+        self.emit({'ui_local': 'stim_formula'})
 
     def _update_stim_par1(self):
         """ Update value for self.par1 from QLineEditWidget"""
         self.stim_par1 = safe_eval(self.ledStimPar1.text(), self.stim_par1,
                                    sign='pos', return_type='float')
         self.ledStimPar1.setText(str(self.stim_par1))
-        self.emit({'ui_changed': 'stim_par1'})
+        self.emit({'ui_local': 'stim_par1'})
 
 
 # ------------------------------------------------------------------------------

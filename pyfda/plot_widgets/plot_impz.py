@@ -353,16 +353,15 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
-            elif 'ui_changed' in dict_sig:
-                # exclude those UI elements  / events that don't require a recalculation
-                # of stimulus and response
-                # TODO: separate 'ui_local' (local) and 'ui_changed' (global) events
-                if dict_sig['ui_changed'] in {'resized', 'tab', 'csv'}:
-                    pass
-                else:  # all the other UI elements are treated here
-                    self.resize_stim_tab_widget()
-                    self.needs_calc = True
-                    self.impz_init()
+            # elif 'ui_changed' in dict_sig:
+            #     # don't process global UI events like {'resized', 'tab', 'csv'}
+            #     pass
+
+            elif 'ui_local' in dict_sig:
+                # treat all local UI events here
+                self.resize_stim_tab_widget()
+                self.needs_calc = True
+                self.impz_init()
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
@@ -381,7 +380,7 @@ class Plot_Impz(QWidget):
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
-            elif 'ui_changed' in dict_sig:
+            elif 'ui_local' in dict_sig:
                 self.needs_redraw = [True] * 2
 
 # =============================================================================
