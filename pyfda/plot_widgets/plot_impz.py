@@ -359,8 +359,7 @@ class Plot_Impz(QWidget):
                 if dict_sig['ui_changed'] in {'resized', 'tab'}:
                     pass
                 else:  # all the other ui elements are treated here
-                    if True:  # dict_sig['ui_changed'] == 'stim':
-                        self.resize_stim_tab_widget()
+                    self.resize_stim_tab_widget()
                     self.needs_calc = True
                     self.impz_init()
 
