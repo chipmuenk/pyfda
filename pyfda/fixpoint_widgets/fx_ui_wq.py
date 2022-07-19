@@ -377,9 +377,8 @@ class FX_UI_WQ(QWidget):
         self.QObj.set_qdict(self.q_dict)  # set quant. object and reset counter
 
         if self.sender():
-            obj_name = self.sender().objectName()
-            dict_sig = {'wdg_name': self.wdg_name, 'ui_local': obj_name}
-            logger.warning(f"ui2dict:emit {dict_sig}")
+            dict_sig = {'wdg_name': self.wdg_name, 'ui_local': self.sender().objectName()}
+            # logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
             logger.error("Sender has no object name!")

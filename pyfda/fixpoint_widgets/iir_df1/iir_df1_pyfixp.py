@@ -190,7 +190,6 @@ class IIR_DF1_pyfixp(object):
                 self.zi_a = zi_a[:self.L - 1]
                 logger.warning("len(zi_a) > len(coeff) - 1, zi_a was truncated")
 
-
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
         xa_q = np.zeros(self.L - 1)
@@ -229,7 +228,8 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        logger.error(f"\n{self.Q_acc.q_dict['N_over']} - {self.Q_mul.q_dict['N_over']}")
+        logger.info(f"QAcc: Nover = {self.Q_acc.q_dict['N_over']}, "
+                    f"QMul: Nover = {self.Q_mul.q_dict['N_over']}")
         self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
 
