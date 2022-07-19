@@ -31,7 +31,7 @@ class Tran_IO_UI(QWidget):
     """
     # incoming:
     sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local':'xxx')
     sig_tx = pyqtSignal(object)
 
     from pyfda.libs.pyfda_qt_lib import emit
@@ -74,7 +74,6 @@ class Tran_IO_UI(QWidget):
         self.butLoad.setEnabled(True)
 
         self.lbl_info = QLabel(to_html("File:", frmt="b"))
-
 
         # ----------------------------------------------------------------------
         # Main Widget

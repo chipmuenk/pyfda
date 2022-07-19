@@ -601,7 +601,7 @@ class PlotImpz_UI(QWidget):
         self.N_end = self.N + self.N_start
 
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
-                                 return_type='int', sign='poszero')
+                                      return_type='int', sign='poszero')
 
         if self.N_frame_user == 0:
             self.N_frame = self.N_end  # use N_end for frame length

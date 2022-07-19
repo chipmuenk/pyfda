@@ -494,7 +494,7 @@ class Input_Coeffs(QWidget):
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
             try:
-                idx.remove([1,0])  # don't process '1' of recursive filters
+                idx.remove([1, 0])  # don't process '1' of recursive filters
             except ValueError:
                 pass
             for i in idx:

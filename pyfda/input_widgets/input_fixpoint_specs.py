@@ -110,7 +110,8 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             elif dict_sig['ui_local'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-                logger.warning("Unknown value '{0}' for key 'ui_local'".format(dict_sig['ui_local']))
+                logger.warning(
+                    "Unknown value '{0}' for key 'ui_local'".format(dict_sig['ui_local']))
                 return
 
             elif dict_sig['wdg_name'] == 'wq_input':
@@ -180,7 +181,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # =================== DATA CHANGED =====================================
         elif 'data_changed' in dict_sig and\
-            dict_sig['data_changed'] == "filter_designed":
+                dict_sig['data_changed'] == "filter_designed":
             # New filter has been designed, update list of available filter topologies
             self._update_filter_cmb()
             return
@@ -240,8 +241,9 @@ class Input_Fixpoint_Specs(QWidget):
 
             # --------------- fx specs_changed ------------
             elif self.fx_specs_changed or\
-                (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
-                self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+                    (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
+                # update wordlengths in UI and set RUN button to 'changed':
+                self.wdg_dict2ui()
                 self.fx_specs_changed = False
                 # self.emit(dict_sig)  # TODO: ???
                 return
@@ -722,7 +724,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             # initialize fixpoint filter instance with fixpoint quantizer
-            #self.fx_filt_ui.init_filter()
+            # self.fx_filt_ui.init_filter()
             self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
 
             return 0
@@ -787,7 +789,7 @@ class Input_Fixpoint_Specs(QWidget):
         if fb.fx_results is None:
             qstyle_widget(self.butSimFx, "error")
         else:
-            pass # everything ok, return
+            pass  # everything ok, return
             # logger.debug("Sending fixpoint results")
         return
 

@@ -230,7 +230,7 @@ class FreqSpecs(QWidget):
     def recalc_freqs(self):
         """
         Update normalized frequencies if required. This is called by via signal
-        ['ui_changed': 'f_S']
+        ['view_changed': 'f_S']
         """
         if fb.fil[0]['freq_locked']:
             for i in range(len(self.qlineedit)):

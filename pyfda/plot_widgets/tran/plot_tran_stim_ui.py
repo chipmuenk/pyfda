@@ -686,7 +686,7 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies if required. This is called by via signal
+        Update normalized frequencies if required. This is called via signal
         ['ui_changed':'f_S'] from plot_impz.process_sig_rx
         """
         if fb.fil[0]['freq_locked']:
@@ -709,7 +709,7 @@ class Plot_Tran_Stim_UI(QWidget):
         `update_freqs()` is called:
 
         - when one of the stimulus frequencies has changed via eventFilter()
-        - sampling frequency has been changed via signal ['ui_changed':'f_S']
+        - sampling frequency has been changed via signal ['view_changed':'f_S']
           from plot_impz.process_sig_rx -> self.recalc_freqs
 
         The sampling frequency is loaded from filter dictionary and stored as

@@ -256,8 +256,8 @@ class Plot_Impz(QWidget):
         - plot_tab_widgets() (global signals)
         """
         logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
-                       .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig),
-                               fb.fil[0]['fx_sim'], qget_cmb_box(self.ui.cmb_sim_select)))
+                    .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig),
+                            fb.fil[0]['fx_sim'], qget_cmb_box(self.ui.cmb_sim_select)))
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
