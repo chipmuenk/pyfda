@@ -279,8 +279,8 @@ class Input_PZ(QWidget):
         self.ui.butAddCells.clicked.connect(self._add_rows)
         self.ui.butClear.clicked.connect(self._clear_table)
 
-        self.ui.butFromTable.clicked.connect(self._copy_from_table)
-        self.ui.butToTable.clicked.connect(self._copy_to_table)
+        self.ui.butFromTable.clicked.connect(self._export)
+        self.ui.butToTable.clicked.connect(self._import)
 
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
 
@@ -434,7 +434,7 @@ class Input_PZ(QWidget):
         Update zpk[2]?
 
         Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(),
-                add_row(), _copy_to_table()
+                add_row(), _import()
         """
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
@@ -772,9 +772,9 @@ class Input_PZ(QWidget):
             return x + 1j * y
 
     # --------------------------------------------------------------------------
-    def _copy_from_table(self):
+    def _export(self):
         """
-        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
+        Export data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file using a selected format
         """
         # pass table instance, numpy data and current class for accessing the
@@ -782,9 +782,9 @@ class Input_PZ(QWidget):
         qtable2text(self.tblPZ, self.zpk, self, 'zpk', title="Export Poles / Zeros")
 
     # --------------------------------------------------------------------------
-    def _copy_to_table(self):
+    def _import(self):
         """
-        Read data from clipboard / file and copy it to `self.zpk` as array of complex
+        Import data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'zpk', title="Import Poles / Zeros ")
@@ -803,7 +803,7 @@ class Input_PZ(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.debug("_copy_to_table: c x r:", num_cols, num_rows)
+        logger.debug("_import: c x r:", num_cols, num_rows)
         if orientation_horiz:
             self.zpk = [[], []]
             for c in range(num_cols):

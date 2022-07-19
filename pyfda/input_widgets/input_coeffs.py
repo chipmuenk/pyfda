@@ -394,8 +394,8 @@ class Input_Coeffs(QWidget):
         self.ui.butEnable.clicked.connect(self.refresh_table)
         self.ui.spnDigits.editingFinished.connect(self.refresh_table)
 
-        self.ui.butFromTable.clicked.connect(self._copy_from_table)
-        self.ui.butToTable.clicked.connect(self._copy_to_table)
+        self.ui.butFromTable.clicked.connect(self._export)
+        self.ui.butToTable.clicked.connect(self._import)
 
         self.ui.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
@@ -678,18 +678,18 @@ class Input_Coeffs(QWidget):
         self.opt_widget.exec_()  # modal dialog (blocking)
 
     # --------------------------------------------------------------------------
-    def _copy_from_table(self):
+    def _export(self):
         """
-        Copy data from coefficient table `self.tblCoeff` to clipboard / file in
+        Export data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
         qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['fx_base'],
                     title="Export Filter Coefficients")
 
     # --------------------------------------------------------------------------
-    def _copy_to_table(self):
+    def _import(self):
         """
-        Read data from clipboard / file and copy it to `self.ba` as float / cmplx.
+        Import data from clipboard / file and copy it to `self.ba` as float / cmplx.
 
         Quantize data to `self.ba_q` and refresh table.
 
@@ -716,7 +716,7 @@ class Input_Coeffs(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.info("_copy_to_table: c x r = {0} x {1}".format(num_cols, num_rows))
+        logger.info("_import: c x r = {0} x {1}".format(num_cols, num_rows))
         if orientation_horiz:
             self.ba = [[], []]
             for c in range(num_cols):
