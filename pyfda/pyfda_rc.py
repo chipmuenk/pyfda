@@ -49,6 +49,7 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
                   'lineterminator': CRLF,  # OS-dependend line break from pyfda_lib
                   'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
                   'header': 'off',  # 'auto', 'on', 'off'
+                  'cmsis' : False,  # True, False
                   'clipboard': False  # source/target is QClipboard or file
                   },
           'FMT_ba': 4,      # number of digits for coefficient table

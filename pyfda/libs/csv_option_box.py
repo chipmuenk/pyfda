@@ -14,7 +14,7 @@ Library with classes and functions for file and text IO
 from .pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
 from pyfda.pyfda_rc import params
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
-                     QVBoxLayout, QGridLayout, pyqtSignal)
+                     QCheckBox, QVBoxLayout, QGridLayout, pyqtSignal)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class CSV_option_box(QDialog):
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
-        lblDelimiter = QLabel("CSV-Delimiter:", self)
+        lblDelimiter = QLabel("CSV-Delimiter", self)
         delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
                  ('<SPACE>', ' '), ('< | >', '|')]
         self.cmbDelimiter = QComboBox(self)
@@ -57,7 +57,7 @@ class CSV_option_box(QDialog):
             self.cmbDelimiter.addItem(d[0], d[1])
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
 
-        lblTerminator = QLabel("Line Terminator:", self)
+        lblTerminator = QLabel("Line Terminator", self)
         terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
                       ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
         self.cmbLineTerminator = QComboBox(self)
@@ -86,6 +86,13 @@ class CSV_option_box(QDialog):
         for h in header:
             self.cmbHeader.addItem(h[0], h[1])
 
+        lbl_cmsis = QLabel("CMSIS SOS format", self)
+        self.chk_cmsis = QCheckBox()
+        self.chk_cmsis.setChecked(False)
+        self.chk_cmsis.setToolTip(
+            "<span>Use CMSIS DSP second-order sections format "
+            "(only for coefficients).</span>")
+
         self.radClipboard = QRadioButton("Clipboard", self)
         self.radClipboard.setChecked(False)
         self.radFile = QRadioButton("File", self)
@@ -101,8 +108,10 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.cmbOrientation, 3, 2)
         lay_grid.addWidget(lblHeader, 4, 1)
         lay_grid.addWidget(self.cmbHeader, 4, 2)
-        lay_grid.addWidget(self.radClipboard, 5, 1)
-        lay_grid.addWidget(self.radFile, 5, 2)
+        lay_grid.addWidget(lbl_cmsis, 5, 1)
+        lay_grid.addWidget(self.chk_cmsis, 5, 2)
+        lay_grid.addWidget(self.radClipboard, 6, 1)
+        lay_grid.addWidget(self.radFile, 6, 2)
 
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
@@ -119,6 +128,7 @@ class CSV_option_box(QDialog):
         self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
         self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
         self.cmbHeader.currentIndexChanged.connect(self._store_settings)
+        self.chk_cmsis.clicked.connect(self._store_settings)
         self.radClipboard.clicked.connect(self._store_settings)
         self.radFile.clicked.connect(self._store_settings)
 
@@ -133,6 +143,7 @@ class CSV_option_box(QDialog):
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator,
                                                            data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
+            params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
             self.emit({'ui_changed': 'csv'})
@@ -145,16 +156,18 @@ class CSV_option_box(QDialog):
         Load settings of CSV options widget from ``pyfda_rc.params``.
         """
         try:
+            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
             qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
             qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'],
                          data=True)
             qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
-            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
+            self.chk_cmsis.setChecked(params['CSV']['cmsis'])
+
             self.radClipboard.setChecked(params['CSV']['clipboard'])
             self.radFile.setChecked(not params['CSV']['clipboard'])
 
         except KeyError as e:
-            logger.error(e)
+            logger.error(f"Unknown key {e}")
 
 
 # ==============================================================================
