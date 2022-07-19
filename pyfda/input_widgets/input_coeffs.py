@@ -17,14 +17,13 @@ from pyfda.libs.compat import (
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import fil_save, safe_eval, first_item
+from pyfda.libs.pyfda_lib import fil_save, safe_eval
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
-import pyfda.libs.pyfda_fix_lib as fx
 
 from .input_coeffs_ui import Input_Coeffs_UI
 
@@ -455,7 +454,7 @@ class Input_Coeffs(QWidget):
                          self.ba[1],
                          np.zeros(len_b),
                          np.zeros(len_a),
-                        ]
+                         ]
         elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
             self.ba_q = [
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])

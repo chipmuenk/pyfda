@@ -136,7 +136,8 @@ class FIR_DF_pyfixp_UI(QWidget):
                 self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
                 self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
                 if cmbW in {'full', 'auto'}\
-                        or ('ui_local' in dict_sig and dict_sig['ui_local'] in {'WF', 'WI'}):
+                        or ('ui_local' in dict_sig
+                            and dict_sig['ui_local'] in {'WF', 'WI'}):
                     self.update_accu_settings()
                 # elif cmbW == 'man':  # switched to manual, don't do anything
                 #   pass

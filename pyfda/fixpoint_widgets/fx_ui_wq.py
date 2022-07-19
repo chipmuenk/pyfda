@@ -12,7 +12,7 @@ Helper classes and functions for generating and simulating fixpoint filters
 import sys
 import inspect
 
-from numpy.lib.function_base import iterable
+# from numpy.lib.function_base import iterable
 
 import pyfda.libs.pyfda_fix_lib as fx
 
@@ -331,8 +331,10 @@ class FX_UI_WQ(QWidget):
         # -------
         frm = inspect.stack()[1]
         logger.debug(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
-                       f"{self.q_dict['N_over']} "
-                       f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}.{frm[3]}:{frm[2]}")
+                     f"{self.q_dict['N_over']} "
+                     f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}."
+                     f"{frm[3]}:{frm[2]}")
+
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'auto' and self.q_dict['N_over'] == 0:
@@ -342,7 +344,7 @@ class FX_UI_WQ(QWidget):
 
             self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setText(
-                to_html("<b><i>&nbsp;&nbsp;N</i>_ov = </b>{0}".format(self.q_dict['N_over'])))
+                to_html(f"<b><i>&nbsp;&nbsp;N</i>_ov = </b>{self.q_dict['N_over']}"))
             if self.q_dict['N_over'] == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:
@@ -440,12 +442,14 @@ class FX_UI_WQ(QWidget):
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if 'WI' in q_dict:
-            WI = safe_eval(q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
+            WI = safe_eval(
+                q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
             self.ledWI.setText(str(WI))
             self.q_dict.update({'WI': WI})
 
         if 'WF' in q_dict:
-            WF = safe_eval(q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
+            WF = safe_eval(
+                q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 

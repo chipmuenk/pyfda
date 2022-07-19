@@ -141,7 +141,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         # quantization dictionary has been updated outside the widget, update UI
         elif 'data_changed' in dict_sig or\
-            'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+                'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
     # --------------------------------------------------------------------------

@@ -947,8 +947,9 @@ class Plot_Tran_Stim_UI(QWidget):
                     "</span>")
             elif self.noise == 'mls':
                 self.lblNoi.setText(to_html("&nbsp;A =", frmt='bi'))
-                self.ledNoi.setToolTip("<span>Amplitude of Maximum Length Sequence. "
-                                       "Noise power is <i>P</i> = A<sup>2</sup>/2.</span>")
+                self.ledNoi.setToolTip(
+                    "<span>Amplitude of Maximum Length Sequence. "
+                    "Noise power is <i>P</i> = A<sup>2</sup>/2.</span>")
                 self.lblNoi_par.setText(to_html("&nbsp;b =", frmt='bi'))
                 self.mls_b = safe_eval(
                     self.ledNoi_par.text(), self.mls_b, return_type='int', sign='pos')

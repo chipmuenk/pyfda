@@ -23,7 +23,7 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, first_item, calc_ssb_spectrum, calc_Hcomplex)
+    safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -644,7 +644,7 @@ class Plot_Impz(QWidget):
         is set to True and the run button is set to "changed".
         """
         if fx in {"float", "fixpoint"}:
-            # Function call with argument, set UI and fb.fil[0]['fx_sim'] according to `fx`
+            # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `fx`
             qset_cmb_box(self.ui.cmb_sim_select, fx, data=True)
             fb.fil[0]['fx_sim'] = (fx == "fixpoint")
         elif fb.fil[0]['fx_sim']:
@@ -748,7 +748,8 @@ class Plot_Impz(QWidget):
         self.scale_i = self.scale_o = 1
         self.fx_min = -1.
         self.fx_max = 1.
-        if fb.fil[0]['fx_sim']:  # fixpoint simulation enabled -> scale stimulus and response
+        if fb.fil[0]['fx_sim']:
+            # fixpoint simulation enabled -> scale stimulus and response
             try:
                 if self.ui.but_fx_scale.isChecked():
                     # display stimulus and response as integer values:
