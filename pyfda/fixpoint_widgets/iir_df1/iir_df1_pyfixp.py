@@ -213,6 +213,11 @@ class IIR_DF1_pyfixp(object):
             xa_q = np.append(self.Q_mul.fixp(self.zi_a * self.a_q[1:]), 0)
 
             # accumulate partial products x_bq and x_aq and quantize them (Q_acc)
+            # quantize individual accumulation steps - needed?!
+            # y_q[k] = 0.0
+            # for i in range(len(self.b_q)):
+            #     y_q[k] += self.Q_acc.fixp(xb_q[i] - xa_q[i])
+
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 
