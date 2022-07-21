@@ -20,7 +20,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 from pyfda.libs.pyfda_lib import fil_save, safe_eval
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table
+from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table, export_data
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -682,8 +682,34 @@ class Input_Coeffs(QWidget):
         Export data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['fx_base'],
-                    title="Export Filter Coefficients")
+        if not params['CSV']['cmsis']:
+            qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['fx_base'],
+                        title="Export Filter Coefficients")
+        elif fb.fil[0]['ft'] != 'IIR':
+            logger.warning("CMSIS SOS export is only possible for IIR filters!")
+        else:
+            # Get coefficients in SOS format and delete 4th column containing the
+            # '1.0' of the recursive parts:
+            sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+            # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
+
+            delim = params['CSV']['delimiter'].lower()
+            if delim == 'auto':  # 'auto' doesn't make sense when exporting
+                delim = ","
+            cr = params['CSV']['lineterminator']
+
+            text = ""
+            for r in range(np.shape(sos_coeffs)[0]):  # number of rows
+                for c in range(5):  # always has 5 columns
+                    text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
+                text = text.rstrip(delim) + cr
+            text = text.rstrip(cr)  # delete last CR
+
+            if params['CSV']['clipboard']:
+                fb.clipboard.setText(text)
+            else:
+                export_data(self, text, title="Export in CMSIS DSP SOS format",
+                            file_types=('csv',))
 
     # --------------------------------------------------------------------------
     def _import(self):
