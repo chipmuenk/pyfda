@@ -870,7 +870,7 @@ def import_data(parent, fkey=None, title="Import",
 
 
 # ------------------------------------------------------------------------------
-def export_data(parent, data, fkey, title="Export",
+def export_data(parent, data, fkey=None, title="Export",
                 file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
@@ -890,6 +890,9 @@ def export_data(parent, data, fkey, title="Export",
     title: str
         title string for the file dialog box (e.g. "filter coefficients ")
 
+    file_types: tuple of strings
+        file extension (e.g. `(csv)` or list of file extensions (e.g. `(csv, txt)`
+        which are used to create a file filter.
     """
     logger.debug(
         f"imported data: type{type(data)}|dim{np.ndim(data)}|"
