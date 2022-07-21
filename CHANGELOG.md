@@ -2,6 +2,7 @@
 ### [v0.7](https://github.com/chipmuenk/pyfda/tree/v0.7.0) (2022-xxx)
 
 ### Bugfixes
+- Fix lot of bugs and redundancies in the fixpoint simulation routines
 - When the filter is complex-valued, set data type to 'complex' for the response
   signal in y[n] (was 'float' so only the real part was displayed)
 - Fix crash when entering a complex coefficient in a previously real-valued filter
@@ -11,6 +12,8 @@
   "KeyError: 'V_NMG'"
 
 ### New features
+- Implement IIR DF1 fixpoint filter
+- Export SOS filter coefficients in CMSIS DSP format
 - New stimulus Randint process
 - Add sequence length parameter to MLS process, remove PRBS (which was a Randint
   process with values 0 and 1)
