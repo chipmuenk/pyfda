@@ -11,8 +11,10 @@ Widget for specifying the parameters of a direct-form DF1 IIR filter
 """
 import sys
 
+import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import set_dict_defaults, pprint_log, first_item
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.libs.compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -143,6 +145,50 @@ class IIR_DF1_pyfixp_UI(QWidget):
         elif 'data_changed' in dict_sig or\
                 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
+
+    # --------------------------------------------------------------------------
+    def update_accu_settings(self):
+        """
+        Calculate required number of fractional bits for the accumulator from
+        the sum of coefficient and input resp. output fractional bits.
+
+        Calculate number of extra integer bits for the accumulator (guard bits)
+        depending on the coefficient area (sum of absolute coefficient
+        values) for `cmbW == 'auto'` or depending on the number of coefficients
+        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
+        requires more bits.
+
+        The new values are written to the fixpoint coefficient dict
+        `fb.fil[0]['fxqc']['QACC']`.
+        """
+        try:
+            if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
+                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
+            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+            else:
+                A_coeff = 0
+        except BaseException as e: # Exception as e:
+            logger.error("An error occured:", exc_info=True)
+            return
+
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
+            fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
+                + fb.fil[0]['fxqc']['QCB']['WF']
+            fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
+                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
+
+        # calculate total accumulator word length and 'Q' format
+        fb.fil[0]['fxqc']['QACC']['W'] = fb.fil[0]['fxqc']['QACC']['WI']\
+            + fb.fil[0]['fxqc']['QACC']['WF'] + 1
+        fb.fil[0]['fxqc']['QACC']['Q'] = str(fb.fil[0]['fxqc']['QACC']['WI'])\
+            + '.' + str(fb.fil[0]['fxqc']['QACC']['WF'])
+
+        # update quantization settings
+        fb.fil[0]['fxqc']['QACC'].update(self.wdg_wq_accu.q_dict)
+
+        # update UI
+        self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
     def dict2ui(self):
