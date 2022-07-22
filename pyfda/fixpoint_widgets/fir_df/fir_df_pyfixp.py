@@ -101,6 +101,8 @@ class FIR_DF_pyfixp(object):
 
         self.reset() # reset overflow counters (except coeffs) and registers
 
+        # Initialize filter memory with passed values zi and fill up with zeros
+        # or truncate to filter length L
         if zi is not None:
             if len(zi) == self.L - 1:
                 self.zi = zi
@@ -136,8 +138,8 @@ class FIR_DF_pyfixp(object):
             - When `x == None`, calculate impulse response with amplitude = 1.
 
         zi : array-like
-             initial conditions; when `zi == None`, the register contents are used from
-             the last run.
+             initial conditions for filter memory; when `zi == None`, register contents
+             from last run are used.
 
         Returns
         -------
@@ -145,8 +147,6 @@ class FIR_DF_pyfixp(object):
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` (impulse response).
         """
-        # When `zi` is specified, initialize filter memory with it and pad with zeros
-        # When `zi == None`, use register contents from last run
         if zi is not None:
             if len(zi) == self.L - 1:   # use zi as it is
                 self.zi = zi

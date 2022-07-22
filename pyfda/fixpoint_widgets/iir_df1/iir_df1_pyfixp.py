@@ -40,7 +40,7 @@ class IIR_DF1_pyfixp(object):
         - 'QACC', value: dict with accumulator quantizer settings
 
         - 'q_mul', value: dict with partial product quantizer settings
-            currently unused, create a copy of the QA dict
+            currently unused, created from a copy of the QACC dict
     """
     def __init__(self, p):
         self.p = p
@@ -111,7 +111,7 @@ class IIR_DF1_pyfixp(object):
         self.reset() # reset overflow counters (except coeffs) and registers
 
         # Initialize filter memory with passed values zi_b, zi_a and fill up with zeros
-        # or truncate
+        # or truncate to filter length L
         if zi_b is not None:
             if len(zi_b) == self.L - 1:
                 self.zi_b = zi_b
