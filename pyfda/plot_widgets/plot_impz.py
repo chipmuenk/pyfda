@@ -390,10 +390,10 @@ class Plot_Impz(QWidget):
         """
         Triggered when checkbox "Autorun" is clicked.
 
-        When Autorun has been pushed (`autorun == True` passed via signal-
-        slot connection), automatically run `impz_init()`.
+        When Autorun has been pushed (`but_auto_run.isChecked() == True`) and
+        calculation is required, automatically run `impz_init()`.
         """
-        if autorun and self.needs_calc:
+        if self.ui.but_auto_run.isChecked() and self.needs_calc:
             self.impz_init()
 
     # --------------------------------------------------------------------------
