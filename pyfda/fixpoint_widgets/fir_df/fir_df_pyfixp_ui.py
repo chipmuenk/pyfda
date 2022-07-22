@@ -153,8 +153,11 @@ class FIR_DF_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def update_accu_settings(self):
         """
-        Calculate number of extra integer bits needed in the accumulator (bit
-        growth) depending on the coefficient area (sum of absolute coefficient
+        Calculate required number of fractional bits for the accumulator from
+        the sum of coefficient and input resp. output fractional bits.
+
+        Calculate number of extra integer bits for the accumulator (guard bits)
+        depending on the coefficient area (sum of absolute coefficient
         values) for `cmbW == 'auto'` or depending on the number of coefficients
         for `cmbW == 'full'`. The latter works for arbitrary coefficients but
         requires more bits.
