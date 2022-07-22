@@ -232,8 +232,8 @@ class IIR_DF1_pyfixp(object):
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
-            logger.warning(f"QAcc: Nover = {self.Q_acc.q_dict['N_over']}, "
-                           f"QMul: Nover = {self.Q_mul.q_dict['N_over']}")
+            logger.warning(f"Overflows: N_Acc = {self.Q_acc.q_dict['N_over']}, "
+                           f"N_Mul = {self.Q_mul.q_dict['N_over']}")
         self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
 
