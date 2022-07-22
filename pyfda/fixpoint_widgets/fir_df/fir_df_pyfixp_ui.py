@@ -164,7 +164,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         """
         try:
             if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
+                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
             elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
             else:
