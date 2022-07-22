@@ -89,10 +89,12 @@ class IIR_DF1_pyfixp(object):
         self.p = p  # update parameter dictionary with coefficients etc.
 
         # When p'[q_mul'] is undefined, use accumulator quantization settings:
-        if 'q_mul' not in self.p or self.p['q_mul'] is None:
-            q_mul = p['QACC'].copy()
-        else:
-            q_mul = p['q_mul']
+        # if 'q_mul' not in self.p or self.p['q_mul'] is None:
+        #     q_mul = p['QACC'].copy()
+        # else:
+        #     q_mul = p['q_mul']
+
+        q_mul = p['QACC'].copy()
 
         # update the quantizers
         self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.
