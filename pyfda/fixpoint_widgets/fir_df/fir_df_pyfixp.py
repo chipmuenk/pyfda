@@ -95,9 +95,9 @@ class FIR_DF_pyfixp(object):
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
-        self.bq = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
-        self.L = len(self.bq)  # filter length = number of taps
+        self.L = len(self.b_q)  # filter length = number of taps
 
         self.reset() # reset overflow counters (except coeffs) and registers
 
@@ -170,8 +170,8 @@ class FIR_DF_pyfixp(object):
         self.zi = np.concatenate((self.zi, x))
 
         for k in range(len(x)):
-            # weighted state-vector x at time k, quantized with Q_mul:
-            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.bq)
+            # partial products xb_q at time k, quantized with Q_mul:
+            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q)
             # accumulate x_bq to get accu[k]
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
