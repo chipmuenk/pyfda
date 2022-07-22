@@ -161,16 +161,16 @@ class IIR_DF1_pyfixp_UI(QWidget):
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxqc']['QACC']`.
         """
-        try:
-            if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
-            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
-                A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
-            else:
-                A_coeff = 0
-        except BaseException as e: # Exception as e:
-            logger.error("An error occured:", exc_info=True)
-            return
+        # try:
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
+            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
+        elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        else:
+            A_coeff = 0
+        # except BaseException as e: # Exception as e:
+        #     logger.error("An error occured:", exc_info=True)
+        #     return
 
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
             fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
