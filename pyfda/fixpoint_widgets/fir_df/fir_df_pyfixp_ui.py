@@ -80,10 +80,10 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
-        # initial setting for accumulator mode
-        cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-        self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
-        self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
+        # # initial setting for accumulator mode
+        # cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
+        # self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
+        # self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
 
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
@@ -133,8 +133,8 @@ class FIR_DF_pyfixp_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
-                self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
+                # self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
+                # self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
                 if cmbW in {'full', 'auto'}\
                         or ('ui_local' in dict_sig
                             and dict_sig['ui_local'] in {'WF', 'WI'}):
