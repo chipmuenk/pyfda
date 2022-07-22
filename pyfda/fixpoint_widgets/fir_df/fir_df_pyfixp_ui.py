@@ -146,7 +146,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
         # quantization dictionary has been updated outside the widget, update UI
-        elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
+        elif 'data_changed' in dict_sig or\
+                'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
 
     # --------------------------------------------------------------------------
