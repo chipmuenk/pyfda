@@ -644,7 +644,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         Set the RUN button to "changed".
         """
-        logger.warning("fx_specs.dict2ui")
         self.wdg_wq_input.dict2ui()
         self.wdg_wq_output.dict2ui()
 
