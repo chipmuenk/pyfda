@@ -150,7 +150,9 @@ class FX_UI_WQ(QWidget):
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
                    'cmb_w_vis': 'off', 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
-                   'lock_vis': 'off', 'tip_lock': 'Sync input and output quantization.',
+                   'lock_vis': 'off',
+                   'tip_lock':
+                       '<span>Sync input and output quantization formats.</span>',
                    'count_ovfl_vis': 'auto', 'MSB_LSB_vis': 'off'
                    }
 
