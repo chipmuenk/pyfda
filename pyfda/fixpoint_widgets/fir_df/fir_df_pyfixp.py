@@ -176,8 +176,15 @@ class FIR_DF_pyfixp(object):
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
 
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
-        # TODO: Process overflows in QMul?!
-        self.N_over_filt = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
+
+        # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
+        if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
+            logger.warning(f"QAcc: Nover = {self.Q_acc.q_dict['N_over']}, "
+                           f"QMul: Nover = {self.Q_mul.q_dict['N_over']}")
+
+        self.Q_acc.q_dict['N_over'] = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
+        self.Q_mul.resetN()
+
         return self.Q_O.fixp(y_q[:len(x)]), self.zi
 
 
