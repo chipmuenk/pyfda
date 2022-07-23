@@ -232,13 +232,13 @@ class FX_UI_WQ(QWidget):
         layG.setColumnStretch(1, 10)
         # first row
         layG.addWidget(lbl_wdg, 0, 0)
-        layG.addLayout(layH_W, 0, 3)
-        layG.addWidget(self.butLock, 0, 4)  # enable 
-        layG.addWidget(self.cmbW, 0, 4)     # only one!
+        layG.addWidget(self.butLock, 0, 3)  # enable
+        layG.addWidget(self.cmbW, 0, 3)     # only one!
+        layG.addLayout(layH_W, 0, 4)
         # second row
         layG.addWidget(self.lbl_ovfl_count, 1, 0)
-        layG.addWidget(self.cmbQuant, 1, 3)
-        layG.addWidget(self.cmbOvfl, 1, 4)
+        layG.addWidget(self.cmbOvfl, 1, 3)
+        layG.addWidget(self.cmbQuant, 1, 4)
         # third row - MSB / LSB
         layG.addWidget(self.lbl_MSB, 2, 0, 1, 2)
         layG.addWidget(self.lbl_LSB, 2, 3, 1, 3)
