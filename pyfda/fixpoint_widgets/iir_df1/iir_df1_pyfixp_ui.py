@@ -89,7 +89,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-            cmb_w_vis='max')
+            cmb_w_vis='on')
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
@@ -138,6 +138,16 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
+
+            elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
+                cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
+                if cmbW in {'full', 'auto'}\
+                        or ('ui_local' in dict_sig
+                            and dict_sig['ui_local'] in {'WF', 'WI'}):
+                    self.update_accu_settings()
+                # elif cmbW == 'man':  # switched to manual, don't do anything
+                #   pass
+
             # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
