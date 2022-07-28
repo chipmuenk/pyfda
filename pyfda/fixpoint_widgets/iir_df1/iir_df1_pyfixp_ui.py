@@ -49,10 +49,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         self.cmb_w_items = [
             "<span>Set Accumulator word format</span>",
-            ("man", "Man", "<span>Manual entry</span>"),
-            ("auto", "Auto",
-             "<span>Automatic calculation from coefficients and input word formats "
-                  "(worst case estimation).</span>")
+            ("man", "M", "<span><b>Manual</b> entry</span>"),
+            ("auto", "A",
+             "<span><b>Automatic</b> estimation from coefficients and input word "
+             "formats (worst case estimation).</span>")
             ]
         self.cmb_w_init = 'man'
 
