@@ -132,13 +132,13 @@ class FX_UI_WQ(QWidget):
                   ("none", "None",
                    "<span>No overflow behaviour (only for debugging)</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
-                 ("man", "Man", "<span>Manual entry of word format.</span>"),
-                 ("auto", "Auto",
-                  "<span>Automatic calculation from coefficients and input word formats "
-                  "taking coefficients area into account.</span>"),
-                 ("full", "Full",
-                  "<span>Automatic calculation from coefficients and input word formats "
-                  "for arbitrary coefficients.</span>")
+                 ("man", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
+                 ("auto", "A",
+                  "<span><b>Automatic</b> calculation for given input word format "
+                  "and coefficients (<i>coefficient area</i>).</span>"),
+                 ("full", "F",
+                  "<span><b>Full</b> accumulator width for given input word format "
+                  "and arbitrary coefficients.</span>")
                  ]
         # default widget settings:
         dict_ui = {'wdg_name': 'fx_ui_wq', 'label': '',
