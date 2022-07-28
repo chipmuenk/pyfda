@@ -47,6 +47,15 @@ class IIR_DF1_pyfixp_UI(QWidget):
                             "overflows than DF2. Only suitable for low-order filters.")
         self.img_name = "iir_df1.png"
 
+        self.cmb_w_items = [
+            "<span>Set Accumulator word format</span>",
+            ("man", "Man", "<span>Manual entry</span>"),
+            ("auto", "Auto",
+             "<span>Automatic calculation from coefficients and input word formats "
+                  "(worst case estimation).</span>")
+            ]
+        self.cmb_w_init = 'man'
+
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict:
@@ -89,7 +98,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-            cmb_w_vis='on')
+            cmb_w_vis='on', cmb_w_items=self.cmb_w_items, cmb_w_init=self.cmb_w_init)
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
