@@ -98,6 +98,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
             cmb_w_init=self.cmb_wq_coeffs_a_init)
         layV_wq_coeffs_a = QVBoxLayout()
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
+        self.update_coeffs_settings()
 
         # widget for accumulator quantization
         if 'QACC' not in fb.fil[0]['fxqc']:
@@ -168,6 +169,18 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 elif dict_sig['ui_local'] in {'WF', 'WI'}:
                     self.update_accu_settings()
 
+            elif dict_sig['wdg_name'] == 'wq_coeffs_a' and dict_sig['ui_local'] == 'cmbW':
+                cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
+                if cmbW == 'auto':
+                    # automatic calculation of required integer bits for coeffs a
+                    self.update_coeffs_settings()
+                elif cmbW == 'man':
+                    # manual setting of integer bits for coeffs a, don't do anything
+                    return
+                else:
+                    logger.error(f"Unknown combobox setting '{cmbW}'!")
+                    return
+
             # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
 
@@ -175,6 +188,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
         elif 'data_changed' in dict_sig or\
                 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
+
+    # --------------------------------------------------------------------------
+    def update_coeffs_settings(self):
+        """
+        Calculate required number of integer bits for the largest coefficient
+
+        The new value is written to the fixpoint coefficient dict
+        `fb.fil[0]['fxqc']['QCA']` and the UI is updated.
+        """
+        WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
+        logger.info(f"Delta W_A = {WI_A}")
+        fb.fil[0]['fxqc']['QCA']['WI'] = WI_A
+        # update quantization settings ('W', 'Q', ...) and UI
+        fb.fil[0]['fxqc']['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
+        self.wdg_wq_coeffs_a.dict2ui()
+
 
     # --------------------------------------------------------------------------
     def update_accu_settings(self):
@@ -191,7 +220,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxqc']['QACC']`.
         """
-        # try:
         if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
             A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][1])))))
         else:
