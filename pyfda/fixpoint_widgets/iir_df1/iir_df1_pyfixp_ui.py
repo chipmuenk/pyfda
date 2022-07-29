@@ -166,6 +166,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         self.update_accu_settings()
                     elif cmbW == 'man':  # manual entry, don't do anything
                         return
+                    else:
+                        logger.error(f"Unknown accu combobox setting '{cmbW}'!")
+                        return
+
                 elif dict_sig['ui_local'] in {'WF', 'WI'}:
                     self.update_accu_settings()
 
