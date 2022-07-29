@@ -178,7 +178,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                     # manual setting of integer bits for coeffs a, don't do anything
                     return
                 else:
-                    logger.error(f"Unknown combobox setting '{cmbW}'!")
+                    logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
                     return
 
             # emit signal, replace UI id with id of *this* widget
