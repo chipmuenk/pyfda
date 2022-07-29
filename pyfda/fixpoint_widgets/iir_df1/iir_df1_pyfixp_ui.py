@@ -203,10 +203,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         fb.fil[0]['fxqc']['QACC']['Q'] = str(fb.fil[0]['fxqc']['QACC']['WI'])\
             + '.' + str(fb.fil[0]['fxqc']['QACC']['WF'])
 
-        # update quantization settings
+        # update quantization settings like 'Q', 'W' etc. and UI
         fb.fil[0]['fxqc']['QACC'].update(self.wdg_wq_accu.q_dict)
-
-        # update UI
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
