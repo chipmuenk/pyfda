@@ -56,6 +56,14 @@ class IIR_DF1_pyfixp_UI(QWidget):
             ]
         self.cmb_wq_accu_init = 'man'
 
+        self.cmb_wq_coeffs_a_items = [
+            "<span>Number of integer bits</span>",
+            ("man", "M", "<span><b>Manual</b> entry</span>"),
+            ("auto", "A",
+             "<span><b>Automatic</b> calculation from largest coefficient.</span>")
+            ]
+        self.cmb_wq_coeffs_a_init = 'auto'
+
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict:
@@ -86,7 +94,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max')
+            MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items,
+            cmb_w_init=self.cmb_wq_coeffs_a_init)
         layV_wq_coeffs_a = QVBoxLayout()
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
 
