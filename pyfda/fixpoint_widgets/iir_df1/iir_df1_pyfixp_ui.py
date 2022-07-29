@@ -160,12 +160,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if cmbW in {'full', 'auto'}\
-                        or ('ui_local' in dict_sig
-                            and dict_sig['ui_local'] in {'WF', 'WI'}):
+                if dict_sig['ui_local'] == 'cmbW':
+                    if cmbW == 'auto':
+                        self.update_accu_settings()
+                    elif cmbW == 'man':  # manual entry, don't do anything
+                        return
+                elif dict_sig['ui_local'] in {'WF', 'WI'}:
                     self.update_accu_settings()
-                # elif cmbW == 'man':  # switched to manual, don't do anything
-                #   pass
 
             # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
@@ -191,10 +192,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
         `fb.fil[0]['fxqc']['QACC']`.
         """
         # try:
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
-            A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
-        elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][1])))))
         else:
             A_coeff = 0
         # except BaseException as e: # Exception as e:
