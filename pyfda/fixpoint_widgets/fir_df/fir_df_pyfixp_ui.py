@@ -59,6 +59,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         output quantization
         """
         # widget for quantization of coefficients 'b'
+        # Attention: fb.fil[0]['fxqc']['QCB'] == self.wdg_wq_coeffs.q_dict
         if 'QCB' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
@@ -70,6 +71,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
         # widget for accumulator quantization
+        # Attention: fb.fil[0]['fxqc']['QACC'] == self.wdg_wq_accu.q_dict
         if 'QACC' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QACC'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QACC'],
@@ -80,10 +82,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
-        # # initial setting for accumulator mode
-        # cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-        # self.wdg_wq_accu.ledWF.setEnabled(cmbW == 'man')
-        # self.wdg_wq_accu.ledWI.setEnabled(cmbW == 'man')
 
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
@@ -174,6 +172,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         #     logger.error("An error occured:", exc_info=True)
         #     return
 
+        # calculate required accumulator word format
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
             fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
