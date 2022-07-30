@@ -494,6 +494,9 @@ class Fixed(object):
 
         * Calculate number of places required for printing from `fx_base` and `W`
 
+        When the passed dictionary `d` is empty, update the quantization dict from
+        its `WF` and `WI` entries.
+
         Check the docstring of class `Fixed()` for details on quantization
         """
         q_d = d.copy()  # create local copy to avoid modification of passed dict
@@ -501,7 +504,10 @@ class Fixed(object):
         self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
         # Transform `WI`, `WF`, `W` and `Q` parameters into each other
-        if 'WI' in q_d and 'WF' in q_d:
+        if q_d == {}:
+            q_d['W'] = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            q_d['Q'] = str(self.q_dict['WI']) + "." + str(self.q_dict['WF'])
+        elif 'WI' in q_d and 'WF' in q_d:
             q_d['WI'] = int(q_d['WI'])  # sanitize WI
             q_d['WF'] = abs(int(q_d['WF']))  # and WF
             q_d['W'] = q_d['WI'] + q_d['WF'] + 1
