@@ -148,7 +148,7 @@ class FIR_DF_pyfixp_UI(QWidget):
     def update_accu_settings(self):
         """
         Calculate required number of fractional bits for the accumulator from
-        the sum of coefficient and input resp. output fractional bits.
+        the sum of coefficient and input fractional bits.
 
         Calculate number of extra integer bits for the accumulator (guard bits)
         depending on the coefficient area (sum of absolute coefficient

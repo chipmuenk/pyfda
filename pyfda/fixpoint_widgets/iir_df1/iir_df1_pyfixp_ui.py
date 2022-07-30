@@ -216,13 +216,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
     def update_accu_settings(self):
         """
         Calculate required number of fractional bits for the accumulator from
-        the sum of coefficient and input resp. output fractional bits.
+        the sum of coefficient and input resp. output fractional bits, using
+        the maximum of both.
 
         Calculate number of extra integer bits for the accumulator (guard bits)
-        depending on the coefficient area (sum of absolute coefficient
-        values) for `cmbW == 'auto'` or depending on the number of coefficients
-        for `cmbW == 'full'`. The latter works for arbitrary coefficients but
-        requires more bits.
+        for `cmbW == 'auto'` from the sum of the integer part of recursive
+        coefficients and output signal resp. the integer part of non-recursive
+        coefficients and input signal, depending on which one is larger.
 
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxqc']['QACC']`.
