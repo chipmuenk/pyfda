@@ -82,7 +82,6 @@ class FIR_DF_pyfixp_UI(QWidget):
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
-
         # ----------------------------------------------------------------------
         layVWdg = QVBoxLayout()
         # margins are created in input_fixpoint_specs widget
@@ -179,14 +178,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # calculate total accumulator word length and 'Q' format
-        fb.fil[0]['fxqc']['QACC']['W'] = fb.fil[0]['fxqc']['QACC']['WI']\
-            + fb.fil[0]['fxqc']['QACC']['WF'] + 1
-        fb.fil[0]['fxqc']['QACC']['Q'] = str(fb.fil[0]['fxqc']['QACC']['WI'])\
-            + '.' + str(fb.fil[0]['fxqc']['QACC']['WF'])
-
         # update quantization settings like 'Q', 'W' etc. and UI
-        fb.fil[0]['fxqc']['QACC'].update(self.wdg_wq_accu.q_dict)
+        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------

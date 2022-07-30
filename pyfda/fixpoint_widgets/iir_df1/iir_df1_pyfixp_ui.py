@@ -205,7 +205,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         logger.info(f"Delta W_A = {WI_A}")
         fb.fil[0]['fxqc']['QCA']['WI'] = WI_A
         # update quantization settings ('W', 'Q', ...) and UI
-        fb.fil[0]['fxqc']['QCA'].update(self.wdg_wq_coeffs_a.q_dict)
+        self.wdg_wq_coeffs_a.QObj.set_qdict({})  # update `self.wdg_wq_coeffs_a.q_dict`
         self.wdg_wq_coeffs_a.dict2ui()
 
 
@@ -238,14 +238,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # calculate total accumulator word length and 'Q' format
-        fb.fil[0]['fxqc']['QACC']['W'] = fb.fil[0]['fxqc']['QACC']['WI']\
-            + fb.fil[0]['fxqc']['QACC']['WF'] + 1
-        fb.fil[0]['fxqc']['QACC']['Q'] = str(fb.fil[0]['fxqc']['QACC']['WI'])\
-            + '.' + str(fb.fil[0]['fxqc']['QACC']['WF'])
-
         # update quantization settings like 'Q', 'W' etc. and UI
-        fb.fil[0]['fxqc']['QACC'].update(self.wdg_wq_accu.q_dict)
+        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
