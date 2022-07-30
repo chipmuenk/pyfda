@@ -163,24 +163,25 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 if dict_sig['ui_local'] == 'cmbW'\
                         or dict_sig['ui_local'] in {'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                    if cmbW == 'auto':
-                        self.update_accu_settings()
-                    elif cmbW == 'man':  # manual entry, don't do anything
+                    if dict_sig['ui_local'] == 'cmbW' and cmbW == 'man':
+                        # returning to manual setting, don't do anything
                         return
+                    elif cmbW == 'auto':
+                        self.update_accu_settings()
                     else:
                         logger.error(f"Unknown accu combobox setting '{cmbW}'!")
                         return
 
-            elif dict_sig['wdg_name'] == 'wq_coeffs_a':
+            elif dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
                 if dict_sig['ui_local'] == 'cmbW'\
                     or dict_sig['ui_local'] in {'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
-                    if cmbW == 'auto':
+                    if dict_sig['ui_local'] == 'cmbW' and cmbW == 'man':
+                        # returning to manual setting, don't do anything
+                        return
+                    elif cmbW == 'auto':
                         # automatic calculation of required integer bits for coeffs a
                         self.update_coeffs_settings()
-                    elif cmbW == 'man':
-                        # manual setting of integer bits for coeffs a, don't do anything
-                        return
                     else:
                         logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
                         return
@@ -227,19 +228,18 @@ class IIR_DF1_pyfixp_UI(QWidget):
         The new values are written to the fixpoint coefficient dict
         `fb.fil[0]['fxqc']['QACC']`.
         """
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
-            A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][1])))))
-        else:
-            A_coeff = 0
         # except BaseException as e: # Exception as e:
         #     logger.error("An error occured:", exc_info=True)
         #     return
 
         if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
-            fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
-                + fb.fil[0]['fxqc']['QCB']['WF']
-            fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
-                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
+            fb.fil[0]['fxqc']['QACC']['WF'] = max(
+                fb.fil[0]['fxqc']['QI']['WF'] + fb.fil[0]['fxqc']['QCB']['WF'],
+                fb.fil[0]['fxqc']['QO']['WF'] + fb.fil[0]['fxqc']['QCA']['WF'])
+
+            fb.fil[0]['fxqc']['QACC']['WI'] = max(
+                fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'],
+                fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QCA']['WI']) 
 
         # update quantization settings like 'Q', 'W' etc. and UI
         self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
