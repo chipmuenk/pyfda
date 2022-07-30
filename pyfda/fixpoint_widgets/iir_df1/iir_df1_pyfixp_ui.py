@@ -68,7 +68,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict:
         self.fx_filt = IIR_DF1_pyfixp(fb.fil[0]['fxqc'])
-        self.update()  # initial setting of overflow counter display
+        self.update_disp()  # initial setting of overflow counter display
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):
@@ -264,16 +264,16 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_accu.dict2ui()
 
     # --------------------------------------------------------------------------
-    def update(self):
+    def update_disp(self):
         """
         Update the overflow counters etc. of the UI after simulation has finished.
 
         This is usually called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        self.wdg_wq_coeffs_b.update()
-        self.wdg_wq_coeffs_a.update()
-        self.wdg_wq_accu.update()
+        self.wdg_wq_coeffs_b.update_disp()
+        self.wdg_wq_coeffs_a.update_disp()
+        self.wdg_wq_accu.update_disp()
 
     # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):

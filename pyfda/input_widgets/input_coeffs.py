@@ -471,8 +471,8 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].q_dict['ovr_flag'],
                 self.QObj[1].q_dict['ovr_flag']
                         ]
-        self.ui.wdg_wq_coeffs_b.update()
-        self.ui.wdg_wq_coeffs_a.update()
+        self.ui.wdg_wq_coeffs_b.update_disp()
+        self.ui.wdg_wq_coeffs_a.update_disp()
 
 # ------------------------------------------------------------------------------
     def quant_coeffs_save(self):

@@ -276,7 +276,7 @@ class FX_UI_WQ(QWidget):
         self.butLock_clicked(self.butLock.isChecked())
 
         # initialize overflow counter and MSB / LSB display
-        self.update()
+        self.update_disp()
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -307,7 +307,7 @@ class FX_UI_WQ(QWidget):
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
-    def update(self):
+    def update_disp(self):
         """
         Update the overflow counter and MSB / LSB display (if visible)
         """
