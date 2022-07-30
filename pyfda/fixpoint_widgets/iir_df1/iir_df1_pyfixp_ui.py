@@ -160,8 +160,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 return
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
-                cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if dict_sig['ui_local'] == 'cmbW':
+                if dict_sig['ui_local'] == 'cmbW'\
+                        or dict_sig['ui_local'] in {'WF', 'WI'}:
+                    cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
                     if cmbW == 'auto':
                         self.update_accu_settings()
                     elif cmbW == 'man':  # manual entry, don't do anything
@@ -170,20 +171,22 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         logger.error(f"Unknown accu combobox setting '{cmbW}'!")
                         return
 
-                elif dict_sig['ui_local'] in {'WF', 'WI'}:
-                    self.update_accu_settings()
-
-            elif dict_sig['wdg_name'] == 'wq_coeffs_a' and dict_sig['ui_local'] == 'cmbW':
-                cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
-                if cmbW == 'auto':
-                    # automatic calculation of required integer bits for coeffs a
-                    self.update_coeffs_settings()
-                elif cmbW == 'man':
-                    # manual setting of integer bits for coeffs a, don't do anything
-                    return
-                else:
-                    logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
-                    return
+            elif dict_sig['wdg_name'] == 'wq_coeffs_a':
+                if dict_sig['ui_local'] == 'cmbW'\
+                    or dict_sig['ui_local'] in {'WF', 'WI'}:
+                    cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
+                    if cmbW == 'auto':
+                        # automatic calculation of required integer bits for coeffs a
+                        self.update_coeffs_settings()
+                    elif cmbW == 'man':
+                        # manual setting of integer bits for coeffs a, don't do anything
+                        return
+                    else:
+                        logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
+                        return
+                    # coefficient length has been changed, update accu as well
+                    if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'auto':
+                        self.update_accu_settings()
 
             # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})

@@ -131,12 +131,10 @@ class FIR_DF_pyfixp_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if cmbW in {'full', 'auto'}\
-                        or ('ui_local' in dict_sig
-                            and dict_sig['ui_local'] in {'WF', 'WI'}):
+                if cmbW in {'full', 'auto'} or dict_sig['ui_local'] in {'WF', 'WI'}:
                     self.update_accu_settings()
-                # elif cmbW == 'man':  # switched to manual, don't do anything
-                #   pass
+                elif cmbW == 'man':  # switched to manual, don't do anything
+                    return
 
             # emit signal, replace id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
