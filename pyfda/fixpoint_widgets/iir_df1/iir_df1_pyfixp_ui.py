@@ -232,7 +232,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         #     logger.error("An error occured:", exc_info=True)
         #     return
 
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
             fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
