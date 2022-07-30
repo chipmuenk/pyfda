@@ -175,14 +175,10 @@ class FIR_DF_pyfixp_UI(QWidget):
         #     return
 
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
-            fb.fil[0]['fxqc']['QACC']['WF'] = max(
-                fb.fil[0]['fxqc']['QI']['WF'] + fb.fil[0]['fxqc']['QCB']['WF'],
-                fb.fil[0]['fxqc']['QO']['WF'] + fb.fil[0]['fxqc']['QCA']['WF'])
-
-            # TODO: Get rid of A_coeff?
-            fb.fil[0]['fxqc']['QACC']['WI'] = A_coeff + max(
-                fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'],
-                fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QCA']['WI'])
+            fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
+                + fb.fil[0]['fxqc']['QCB']['WF']
+            fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
+                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
         # calculate total accumulator word length and 'Q' format
         fb.fil[0]['fxqc']['QACC']['W'] = fb.fil[0]['fxqc']['QACC']['WI']\
