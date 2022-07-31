@@ -31,7 +31,7 @@ class Tran_IO_UI(QWidget):
     """
     # incoming:
     sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_local':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
 
     from pyfda.libs.pyfda_qt_lib import emit

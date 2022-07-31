@@ -319,11 +319,12 @@ class Input_Coeffs(QWidget):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
+        if 'ui_global_changed' in dict_sig\
+                and dict_sig['ui_global_changed'] == 'csv':
             # CSV options have been changed, update icons (file vs. clipboard)
             self.ui._set_load_save_icons()
 
-        elif 'ui_local' in dict_sig and 'wdg_name' in dict_sig and\
+        elif 'ui_local_changed' in dict_sig and 'wdg_name' in dict_sig and\
                 dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
             # local events from UI, trigger requant and refresh table
             self.refresh_table()

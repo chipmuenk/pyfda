@@ -121,7 +121,8 @@ as needed.
 
 :'ui_local_changed': Propagate a change of the UI to the containing widget but not
     to other widgets, examples are:
-    - ``'ui_local_changed':'xxx'`` for a change of xxx
+    - ``'ui_local_changed': self.sender().objectName()'`` to propagate the name of
+        the emitting subwidget
 
 :'ui_global_changed': Propagate a change of the UI to other widgets, examples are:
 

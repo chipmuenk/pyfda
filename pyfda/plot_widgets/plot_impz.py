@@ -353,7 +353,7 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
-            elif 'ui_local' in dict_sig:
+            elif 'ui_local_changed' in dict_sig:
                 # treat all local UI events here
                 self.resize_stim_tab_widget()
                 self.needs_calc = True
@@ -376,7 +376,7 @@ class Plot_Impz(QWidget):
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
-            elif 'ui_local' in dict_sig:
+            elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
 # =============================================================================

@@ -90,28 +90,31 @@ class Input_Fixpoint_Specs(QWidget):
         emit {'fx_sim': 'specs_changed'} in the end.
         """
         logger.info(
-            "SIG_RX_LOCAL(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
+            f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
-            logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning(
+                f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
         # ---------------------------------------------------------------------
         # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.wdg_dict2ui()  # update wordlengths in UI, set RUN button to 'changed'
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
             return
 
-        # ---- Process input and output quantizer settings ('ui_local' in dict_sig) --
-        elif 'ui_local' in dict_sig:
+        # ---- Process input and output quantizer settings ('ui_local_changed') --
+        elif 'ui_local_changed' in dict_sig:
             if 'wdg_name' not in dict_sig:
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
                 return
 
-            elif dict_sig['ui_local'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+            elif dict_sig['ui_local_changed']\
+                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
                 logger.warning(
-                    "Unknown value '{0}' for key 'ui_local'".format(dict_sig['ui_local']))
+                    f"Unknown value '{dict_sig['ui_local_changed']}' "
+                    "for key 'ui_local_changed'")
                 return
 
             elif dict_sig['wdg_name'] == 'wq_input':
@@ -120,7 +123,7 @@ class Input_Fixpoint_Specs(QWidget):
                 When I/O lock is active, copy input fixpoint word format to output
                 word format.
                 """
-                if dict_sig['ui_local'] == 'butLock'\
+                if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return

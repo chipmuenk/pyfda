@@ -34,7 +34,7 @@ class PlotImpz_UI(QWidget):
     # incoming: not implemented at the moment, update_N is triggered directly
     # by plot_impz
     # sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_local':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
@@ -569,8 +569,8 @@ class PlotImpz_UI(QWidget):
         """
         Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
-        When `emit==True`, fire `'ui_local': 'N'` to update the FFT window and the
-        `plot_impz` widgets. In contrast to `view_changed`, this also forces a
+        When `emit==True`, fire `'ui_local_changed': 'N'` to update the FFT window
+         and the `plot_impz` widgets. In contrast to `view_changed`, this also forces a
         recalculation of the transient response.
 
         This method is called by:
@@ -615,9 +615,9 @@ class PlotImpz_UI(QWidget):
             self.update_freqs()
 
         if emit:
-            # use `'ui_local'` as this triggers recalculation of the transient
-            # response
-            self.emit({'ui_local': 'N'})
+            # use `'ui_local_changed'` as this triggers recalculation of the
+            #  transient response
+            self.emit({'ui_local_changed': 'N'})
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):

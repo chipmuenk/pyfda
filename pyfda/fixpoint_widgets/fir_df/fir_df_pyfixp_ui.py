@@ -104,7 +104,7 @@ class FIR_DF_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        - For locally generated signals (key = 'ui_local'), emit
+        - For locally generated signals (key = 'ui_local_changed'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
           Update accu wordlengths for 'auto' or 'full' settings
 
@@ -122,7 +122,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui_local' in dict_sig:
+        if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -131,7 +131,8 @@ class FIR_DF_pyfixp_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if cmbW in {'full', 'auto'} or dict_sig['ui_local'] in {'WF', 'WI'}:
+                if cmbW in {'full', 'auto'}\
+                        or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     self.update_accu_settings()
                 elif cmbW == 'man':  # switched to manual, don't do anything
                     return

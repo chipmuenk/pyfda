@@ -136,7 +136,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
-        - For locally generated signals (key = 'ui_local'), emit
+        - For locally generated signals (key = 'ui_local_changed'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
         - For external changes, i.e. `{'fx_sim': 'specs_changed'}` or
           `{'data_changed': xxx}` update the UI via `self.dict_ui`.
@@ -152,7 +152,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui_local' in dict_sig:
+        if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
@@ -160,10 +160,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 return
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
-                if dict_sig['ui_local'] == 'cmbW'\
-                        or dict_sig['ui_local'] in {'WF', 'WI'}:
+                if dict_sig['ui_local_changed'] == 'cmbW'\
+                        or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                    if dict_sig['ui_local'] == 'cmbW' and cmbW == 'man':
+                    if dict_sig['ui_local_changed'] == 'cmbW' and cmbW == 'man':
                         # returning to manual setting, don't do anything
                         return
                     elif cmbW == 'auto':
@@ -173,10 +173,10 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         return
 
             elif dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
-                if dict_sig['ui_local'] == 'cmbW'\
-                    or dict_sig['ui_local'] in {'WF', 'WI'}:
+                if dict_sig['ui_local_changed'] == 'cmbW'\
+                    or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
-                    if dict_sig['ui_local'] == 'cmbW' and cmbW == 'man':
+                    if dict_sig['ui_local_changed'] == 'cmbW' and cmbW == 'man':
                         # returning to manual setting, don't do anything
                         return
                     elif cmbW == 'auto':

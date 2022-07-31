@@ -303,7 +303,7 @@ class FX_UI_WQ(QWidget):
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        dict_sig = {'wdg_name': self.wdg_name, 'ui_local': 'butLock'}
+        dict_sig = {'wdg_name': self.wdg_name, 'ui_local_changed': 'butLock'}
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
@@ -365,7 +365,7 @@ class FX_UI_WQ(QWidget):
         Update the entries in the quantization dict from the UI for `ovfl`, `quant`,
         `WI`, `WF`, `W` when one of the widgets has been edited.
 
-        Emit a signal with `{'ui_local': <objectName of the sender>}`.
+        Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
         WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'], return_type="int",
                            sign='poszero'))
@@ -374,16 +374,18 @@ class FX_UI_WQ(QWidget):
                            sign='poszero'))
         self.ledWF.setText(str(WF))
 
-        W = int(WI + WF + 1)
+        # W = int(WI + WF + 1)
 
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
 
-        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
-        self.QObj.set_qdict(self.q_dict)  # set quant. object and reset counter
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF})
+        self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
+                                          # like W and Q and reset counter
 
         if self.sender():
-            dict_sig = {'wdg_name': self.wdg_name, 'ui_local': self.sender().objectName()}
+            dict_sig = {'wdg_name': self.wdg_name, 
+                        'ui_local_changed': self.sender().objectName()}
             # logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
