@@ -174,8 +174,8 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         #  =================== UI_CHANGED =======================================
-        elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
-                and self.isVisible():
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+                in {'resized', 'tab'} and self.isVisible():
             # Widget size has changed / "Fixpoint" tab has been selected -> resize image
             self.resize_img()
 
@@ -798,8 +798,8 @@ if __name__ == '__main__':
     """
     Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`
 
-    Resizing the image does not work standalone as the 'ui_changed: resized' signal is
-    issued from somewhere else
+    Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
+    signal is issued from somewhere else
     """
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication

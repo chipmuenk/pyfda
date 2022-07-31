@@ -146,7 +146,7 @@ class CSV_option_box(QDialog):
             params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
 
         except KeyError as e:
             logger.error(e)

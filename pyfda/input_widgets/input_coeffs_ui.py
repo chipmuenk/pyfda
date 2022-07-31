@@ -77,12 +77,12 @@ class Input_Coeffs_UI(QWidget):
 
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
             return
-        elif 'ui_changed' in dict_sig:
+        elif 'ui_global_changed' in dict_sig:
             self._set_load_save_icons()  # update icons file <-> clipboard
             # inform e.g. the p/z input widget about changes in CSV options
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -349,7 +349,7 @@ class Input_Coeffs_UI(QWidget):
                 else:
                     dirs.csv_options_handle.close()
 
-        self.emit({'ui_changed': 'csv'})
+        self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
     def _close_csv_win(self):

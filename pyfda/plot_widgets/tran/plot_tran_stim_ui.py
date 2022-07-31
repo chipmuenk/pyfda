@@ -687,7 +687,7 @@ class Plot_Tran_Stim_UI(QWidget):
     def recalc_freqs(self):
         """
         Update normalized frequencies if required. This is called via signal
-        ['ui_changed':'f_S'] from plot_impz.process_sig_rx
+        ['ui_global_changed':'f_S'] from plot_impz.process_sig_rx
         """
         if fb.fil[0]['freq_locked']:
             self.f1 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']

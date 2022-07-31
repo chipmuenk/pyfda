@@ -151,7 +151,7 @@ class InputTabWidgets(QWidget):
 
 # ------------------------------------------------------------------------------
     def current_tab_changed(self):
-        self.emit({'ui_changed': 'tab'})
+        self.emit({'ui_global_changed': 'tab'})
 
 
 # ------------------------------------------------------------------------

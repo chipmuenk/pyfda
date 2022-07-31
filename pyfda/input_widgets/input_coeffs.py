@@ -319,7 +319,7 @@ class Input_Coeffs(QWidget):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+        if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             # CSV options have been changed, update icons (file vs. clipboard)
             self.ui._set_load_save_icons()
 

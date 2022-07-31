@@ -206,13 +206,14 @@ class Input_PZ(QWidget):
         """
         Process signals coming from sig_rx
         """
-        # logger.debug("SIG_RX - data_changed = {0}, vis = {1}\n{2}"
-        #              .format(self.data_changed, self.isVisible(), pprint_log(dict_sig)))
+        # logger.debug(f"SIG_RX - data_changed = {self.data_changed}, vis = "
+        #              f"{self.isVisible()}\n{pprint_log(dict_sig)}")
+    
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
-        if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+        if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             self.ui._set_load_save_icons()
             # self.emit(dict_sig)
 

@@ -76,14 +76,16 @@ class Plot_PZ(QWidget):
             elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+            elif 'ui_global_changed' in dict_sig\
+                    and dict_sig['ui_global_changed'] == 'resized':
                 self.draw()
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
                 self.needs_draw = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+            elif 'ui_global_changed' in dict_sig\
+                    and dict_sig['ui_global_changed'] == 'resized':
                 self.needs_draw = True
 
 # ------------------------------------------------------------------------------

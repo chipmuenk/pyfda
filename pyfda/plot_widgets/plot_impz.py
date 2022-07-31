@@ -353,10 +353,6 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
-            # elif 'ui_changed' in dict_sig:
-            #     # don't process global UI events like {'resized', 'tab', 'csv'}
-            #     pass
-
             elif 'ui_local' in dict_sig:
                 # treat all local UI events here
                 self.resize_stim_tab_widget()
