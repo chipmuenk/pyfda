@@ -808,9 +808,11 @@ class Input_Coeffs(QWidget):
         of coefficient data but not the data itself.
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower())})
+            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base)}
+                                        )
         fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower())})
+            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base)}
+                                        )
         self.qdict2ui()  # update quant. widgets, table
 
 # ------------------------------------------------------------------------------
@@ -827,10 +829,10 @@ class Input_Coeffs(QWidget):
         Refresh the table and update quantization widgets
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower()),
+            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': str(self.ui.cmb_fx_base.currentText().lower()),
+            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base),
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         # update quant. widgets and table with the new `fx_base` and`qfrmt`settings
