@@ -156,7 +156,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     Returns
     -------
     None
-        Nothing, text is exported to clipboard or to file via ``export_data``
+        Nothing, text is exported to clipboard or to file via ``export_csv_data``
     """
 
     text = ""
@@ -266,7 +266,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     if params['CSV']['clipboard']:
         fb.clipboard.setText(text)
     else:
-        export_data(parent, text, fkey, title=title)
+        export_csv_data(parent, text, fkey, title=title)
 
 # ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -870,7 +870,7 @@ def import_data(parent, fkey=None, title="Import",
 
 
 # ------------------------------------------------------------------------------
-def export_data(parent, data, fkey=None, title="Export",
+def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
