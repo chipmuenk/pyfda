@@ -149,7 +149,7 @@ class ItemDelegate(QStyledItemDelegate):
         TODO: Still needed?
         """
         dtext = str(self.displayText(item.text(), QtCore.QLocale()))
-        logger.warning(f"dtext={dtext}")
+        # logger.warning(f"dtext={dtext}")
         return dtext
 
     # -------------------------------------------------------------------------
