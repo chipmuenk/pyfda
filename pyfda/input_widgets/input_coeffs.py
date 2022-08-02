@@ -601,7 +601,7 @@ class Input_Coeffs(QWidget):
 
         if self.ui.butEnable.isChecked():
             self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
-            self.ui.frmButtonsCoeffs.setVisible(True)
+            self.ui.frm_buttons_coeffs.setVisible(True)
             self.tblCoeff.setVisible(True)
 
             # check whether filter is FIR and only needs one column
@@ -646,7 +646,7 @@ class Input_Coeffs(QWidget):
             self.tblCoeff.clearSelection()
 
         else:
-            self.ui.frmButtonsCoeffs.setVisible(False)
+            self.ui.frm_buttons_coeffs.setVisible(False)
             self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(False)
 

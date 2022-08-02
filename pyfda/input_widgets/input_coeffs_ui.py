@@ -138,6 +138,27 @@ class Input_Coeffs_UI(QWidget):
         self.spnDigits.setToolTip("Number of digits to display.")
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
+        
+        self.cmb_q_frmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
+                          self.cmb_q_frmt_default)
+        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        self.but_quant = QPushButton(self)
+        self.but_quant.setToolTip(
+            "<span>Quantize selected coefficients / whole table with specified "
+            "settings and save to dict. This modifies the data, not only the view."
+            "</span>")
+        self.but_quant.setIcon(QIcon(':/quantize.svg'))
+        self.but_quant.setIconSize(q_icon_size)
+        self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        
+        layH_q_frmt = QHBoxLayout()
+        layH_q_frmt.addWidget(self.cmb_q_frmt)
+        layH_q_frmt.addWidget(self.but_quant)
+        layH_q_frmt.setContentsMargins(5, 0, 0, 0)
+        self.frm_q_frmt = QFrame(self)
+        self.frm_q_frmt.setLayout(layH_q_frmt)
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -145,15 +166,18 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.cmb_fx_base)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
-        # layHDisplay.addWidget(self.cmb_q_frmt)
+        layHDisplay.addWidget(self.frm_q_frmt)
         layHDisplay.addStretch()
+        
+        self.frm_display = QFrame(self)
+        self.frm_display.setLayout(layHDisplay)
 
         #######################################################################
-        # frmButtonsCoeffs
+        # frm_buttons_coeffs
         #
         # This frame contains all buttons for manipulating coefficients
         # -----------------------------------------------------------------
-        # layHButtonsCoeffs1
+        # layH_buttons_coeffs1
         #
         # UI Elements for loading / storing / manipulating cells and rows
         # -----------------------------------------------------------------
@@ -214,20 +238,20 @@ class Input_Coeffs_UI(QWidget):
 
         self._set_load_save_icons()  # initialize icon / button settings
 
-        layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        layHButtonsCoeffs1.addWidget(self.butAddCells)
-        layHButtonsCoeffs1.addWidget(self.butDelCells)
-        layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butSave)
-        layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butFromTable)
-        layHButtonsCoeffs1.addWidget(self.butToTable)
-        layHButtonsCoeffs1.addWidget(self.but_csv_options)
-        layHButtonsCoeffs1.addStretch()
+        layH_buttons_coeffs1 = QHBoxLayout()
+        layH_buttons_coeffs1.addWidget(self.cmbFilterType)
+        layH_buttons_coeffs1.addWidget(self.butAddCells)
+        layH_buttons_coeffs1.addWidget(self.butDelCells)
+        layH_buttons_coeffs1.addWidget(self.butClear)
+        layH_buttons_coeffs1.addWidget(self.butSave)
+        layH_buttons_coeffs1.addWidget(self.butLoad)
+        layH_buttons_coeffs1.addWidget(self.butFromTable)
+        layH_buttons_coeffs1.addWidget(self.butToTable)
+        layH_buttons_coeffs1.addWidget(self.but_csv_options)
+        layH_buttons_coeffs1.addStretch()
 
         # ----------------------------------------------------------------------
-        # layHButtonsCoeffs2
+        # layH_buttons_coeffs2
         #
         # Eps / set zero settings
         # ---------------------------------------------------------------------
@@ -243,46 +267,23 @@ class Input_Coeffs_UI(QWidget):
         self.ledEps = QLineEdit(self)
         self.ledEps.setToolTip("Specify tolerance value.")
 
-        layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(self.butSetZero)
-        layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledEps)
-        layHButtonsCoeffs2.addStretch()
+        layH_buttons_coeffs2 = QHBoxLayout()
+        layH_buttons_coeffs2.addWidget(self.butSetZero)
+        layH_buttons_coeffs2.addWidget(lblEps)
+        layH_buttons_coeffs2.addWidget(self.ledEps)
+        layH_buttons_coeffs2.addStretch()
 
         # -------------------------------------------------------------------
-        # Now put the ButtonsCoeffs HBoxes into frmButtonsCoeffs
+        # Now put the _buttons_coeffs HBoxes into frm_buttons_coeffs
         # ---------------------------------------------------------------------
-        layVButtonsCoeffs = QVBoxLayout()
-        layVButtonsCoeffs.addLayout(layHButtonsCoeffs1)
-        layVButtonsCoeffs.addLayout(layHButtonsCoeffs2)
-        layVButtonsCoeffs.setContentsMargins(0, 5, 0, 0)
+        layV_buttons_coeffs = QVBoxLayout()
+        layV_buttons_coeffs.addLayout(layH_buttons_coeffs1)
+        layV_buttons_coeffs.addLayout(layH_buttons_coeffs2)
+        layV_buttons_coeffs.setContentsMargins(0, 5, 0, 0)
         # This frame encompasses all Quantization Settings
-        self.frmButtonsCoeffs = QFrame(self)
-        self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
+        self.frm_buttons_coeffs = QFrame(self)
+        self.frm_buttons_coeffs.setLayout(layV_buttons_coeffs)
         #######################################################################
-
-        lbl_q_frmt = QLabel(to_html("Quant. Format:", frmt='b'))
-
-        self.cmb_q_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
-                          self.cmb_q_frmt_default)
-        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        
-        self.but_quant = QPushButton(self)
-        self.but_quant.setToolTip(
-            "<span>Quantize selected coefficients / whole table with specified "
-            "settings and save to dict. This modifies the data, not only the view."
-            "</span>")
-        self.but_quant.setIcon(QIcon(':/quantize.svg'))
-        self.but_quant.setIconSize(q_icon_size)
-        self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        layH_q_frmt = QHBoxLayout()
-        layH_q_frmt.addWidget(lbl_q_frmt)
-        layH_q_frmt.addWidget(self.cmb_q_frmt)
-        layH_q_frmt.addWidget(self.but_quant)
-        self.frm_q_frmt = QFrame(self)
-        self.frm_q_frmt.setLayout(layH_q_frmt)
 
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
@@ -299,18 +300,11 @@ class Input_Coeffs_UI(QWidget):
         # ########################  Main UI Layout ############################
         #######################################################################
 
-        # Construct frame encompassing all UI elements
-        layVMainF = QVBoxLayout()
-        layVMainF.addLayout(layHDisplay)
-        layVMainF.addWidget(self.frmButtonsCoeffs)
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVMainF)
-
         layVMain = QVBoxLayout()
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(frmMain)
-        layVMain.addWidget(self.frm_q_frmt)
+        layVMain.addWidget(self.frm_display)
+        layVMain.addWidget(self.frm_buttons_coeffs)
         layVMain.addWidget(self.wdg_wq_coeffs_b)
         layVMain.addWidget(self.wdg_wq_coeffs_a)
         layVMain.setContentsMargins(*params['wdg_margins'])
