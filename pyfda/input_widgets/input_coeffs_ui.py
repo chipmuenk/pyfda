@@ -138,12 +138,12 @@ class Input_Coeffs_UI(QWidget):
         self.spnDigits.setToolTip("Number of digits to display.")
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
-        
+
         self.cmb_q_frmt = QComboBox(self)
         qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
         self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        
+
         self.but_quant = QPushButton(self)
         self.but_quant.setToolTip(
             "<span>Quantize selected coefficients / whole table with specified "
@@ -152,11 +152,11 @@ class Input_Coeffs_UI(QWidget):
         self.but_quant.setIcon(QIcon(':/quantize.svg'))
         self.but_quant.setIconSize(q_icon_size)
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
+
         layH_q_frmt = QHBoxLayout()
         layH_q_frmt.addWidget(self.cmb_q_frmt)
         layH_q_frmt.addWidget(self.but_quant)
-        layH_q_frmt.setContentsMargins(5, 0, 0, 0)
+        layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
         self.frm_q_frmt = QFrame(self)
         self.frm_q_frmt.setLayout(layH_q_frmt)
 
