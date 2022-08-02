@@ -168,7 +168,8 @@ class Input_Coeffs_UI(QWidget):
         layHDisplay.addWidget(self.lblDigits)
         layHDisplay.addWidget(self.frm_q_frmt)
         layHDisplay.addStretch()
-        
+        layHDisplay.setContentsMargins(*params['wdg_margins'])
+
         self.frm_display = QFrame(self)
         self.frm_display.setLayout(layHDisplay)
 
