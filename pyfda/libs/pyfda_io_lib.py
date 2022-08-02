@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
+    'cmsis': 'CMSIS DSP FIR or IIR SOS coefficients',
     'coe': 'Xilinx FIR coefficients format',
     'csv': 'Comma / Tab Separated Values',
     'mat': 'Matlab-Workspace',
