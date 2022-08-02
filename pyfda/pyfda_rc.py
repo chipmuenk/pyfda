@@ -58,6 +58,7 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
           'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
           'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
+          'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
           'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
           'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}
           }
