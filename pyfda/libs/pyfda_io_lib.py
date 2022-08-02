@@ -12,6 +12,7 @@ Library with classes and functions for file and text IO
 import os, re, io
 import csv
 import datetime
+from typing import TextIO
 
 import pickle
 
@@ -49,10 +50,13 @@ file_filters_dict = {
     }
 
 
-def prune_file_ext(file_type):
+# ------------------------------------------------------------------------------
+def prune_file_ext(file_type: str) -> str:
     """
-    Prune file extension, e.g. '(\*.txt)' from file type description returned
-    by QFileDialog. This is achieved with the regular expression
+    Prune file extension, e.g. 'Text file' from 'Text file (\*.txt)' returned
+    by QFileDialog file type description.
+
+    Pruning is achieved with the following regular expression:
 
     .. code::
 
@@ -89,7 +93,7 @@ def prune_file_ext(file_type):
 
 
 # ------------------------------------------------------------------------------
-def extract_file_ext(file_type):
+def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
     (e.g. 'VHDL (\*.vhd)') returned by QFileDialog
@@ -100,7 +104,8 @@ def extract_file_ext(file_type):
 
 
 # ------------------------------------------------------------------------------
-def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
+def qtable2text(table: object, data: np.ndarray, parent: object,
+                fkey: str, frmt: str = 'float', title: str = "Export"):
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
@@ -288,7 +293,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 
 
 # ------------------------------------------------------------------------------
-def qtext2table(parent, fkey, title="Import"):
+def qtext2table(parent: object, fkey: str, title: str = "Import"):
     """
     Copy data from clipboard or file to table
 
@@ -357,7 +362,7 @@ def qtext2table(parent, fkey, title="Import"):
 
 
 # ------------------------------------------------------------------------------
-def csv2array(f):
+def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -545,7 +550,7 @@ def csv2array(f):
 
 
 # ------------------------------------------------------------------------------
-def csv2array_new(f):
+def csv2array_new(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -1021,10 +1026,21 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
 
 # ------------------------------------------------------------------------------
-def generate_header(title):
+def generate_header(title: str) -> str:
     """
-    Generate file header with filter informations for coefficient export to some
-    FPGA design flow.
+    Generate a file header (comment) for various FPGA FIR coefficient export formats
+    with information on the filter type, corner frequencies, ripple etc
+
+    Parameters
+    ----------
+    title: str
+       A string that is written in the top of the comment section of the exported
+       file.
+
+    Returns
+    -------
+    header: str
+        The string with all the gathered information
     """
     f_lbls = []
     f_vals = []
@@ -1113,7 +1129,7 @@ def generate_header(title):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f):
+def export_coe_xilinx(f: TextIO):
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1155,7 +1171,7 @@ def export_coe_xilinx(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f):
+def export_coe_microsemi(f: TextIO):
     """
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
@@ -1187,7 +1203,7 @@ def export_coe_microsemi(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f):
+def export_coe_vhdl_package(f: TextIO):
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1248,7 +1264,7 @@ def export_coe_vhdl_package(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f):
+def export_coe_TI(f: TextIO):
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
