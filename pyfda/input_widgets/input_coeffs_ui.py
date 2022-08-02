@@ -41,7 +41,10 @@ class Input_Coeffs_UI(QWidget):
         self.eps = 1.e-6  # initialize tolerance value
 
         self.cmb_q_frmt_items = [
-            "<span>Number format for displaying signed fixpoint coefficients.</span>",
+            "<span>Quantization format for signed fixpoint coefficients (affects only "
+            "the display, not the stored values).</span>",
+            # ("float", "Float", "<span>Coefficients with full precision in floating "
+            # "point format</span>"),
             ("qint", "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
             ("qfrac", "Fractional",
