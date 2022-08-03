@@ -12,6 +12,7 @@ Library with classes and functions for file and text IO
 import os, re, io
 import csv
 import datetime
+from typing import TextIO
 
 import pickle
 
@@ -36,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
+    'cmsis': 'CMSIS DSP FIR or IIR SOS coefficients',
     'coe': 'Xilinx FIR coefficients format',
     'csv': 'Comma / Tab Separated Values',
     'mat': 'Matlab-Workspace',
@@ -48,10 +50,13 @@ file_filters_dict = {
     }
 
 
-def prune_file_ext(file_type):
+# ------------------------------------------------------------------------------
+def prune_file_ext(file_type: str) -> str:
     """
-    Prune file extension, e.g. '(\*.txt)' from file type description returned
-    by QFileDialog. This is achieved with the regular expression
+    Prune file extension, e.g. 'Text file' from 'Text file (\*.txt)' returned
+    by QFileDialog file type description.
+
+    Pruning is achieved with the following regular expression:
 
     .. code::
 
@@ -84,22 +89,31 @@ def prune_file_ext(file_type):
     - '(' must be escaped as '\\\('
 
     """
+
     return re.sub('\([^\)]+\)', '', file_type)
 
 
+
 # ------------------------------------------------------------------------------
-def extract_file_ext(file_type):
+def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (\*.vhd)') returned by QFileDialog
-    """
+    'VHDL (\*.vhd)' returned by QFileDialog
 
-    ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
-    return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    Depending on the OS, this may be the full file type description
+    or just the extension. When `file_type` contains no '(', the passed string is
+    returned unchanged.
+    """
+    if "(" in file_type:
+        ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
+        return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    else:
+        return file_type
 
 
 # ------------------------------------------------------------------------------
-def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
+def qtable2text(table: object, data: np.ndarray, parent: object,
+                fkey: str, frmt: str = 'float', title: str = "Export"):
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
@@ -156,7 +170,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     Returns
     -------
     None
-        Nothing, text is exported to clipboard or to file via ``export_data``
+        Nothing, text is exported to clipboard or to file via ``export_csv_data``
     """
 
     text = ""
@@ -266,7 +280,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     if params['CSV']['clipboard']:
         fb.clipboard.setText(text)
     else:
-        export_data(parent, text, fkey, title=title)
+        export_csv_data(parent, text, fkey, title=title)
 
 # ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -287,7 +301,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 
 
 # ------------------------------------------------------------------------------
-def qtext2table(parent, fkey, title="Import"):
+def qtext2table(parent: object, fkey: str, title: str = "Import"):
     """
     Copy data from clipboard or file to table
 
@@ -356,7 +370,7 @@ def qtext2table(parent, fkey, title="Import"):
 
 
 # ------------------------------------------------------------------------------
-def csv2array(f):
+def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -544,7 +558,7 @@ def csv2array(f):
 
 
 # ------------------------------------------------------------------------------
-def csv2array_new(f):
+def csv2array_new(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -870,7 +884,7 @@ def import_data(parent, fkey=None, title="Import",
 
 
 # ------------------------------------------------------------------------------
-def export_data(parent, data, fkey=None, title="Export",
+def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
@@ -915,19 +929,25 @@ def export_data(parent, data, fkey=None, title="Export",
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)
+    dlg.setNameFilter(file_filters)  # set the list with all available file formats
+    # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
 
     if last_file_filter:
         dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        # sel_filt = dlg.selectedNameFilter()  # selected file filter
+        file_name = dlg.selectedFiles()[0]   # convert list (with single entry?) to item
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
     else:
         return -1
 
     # Slice off file extension
     file_type = os.path.splitext(file_name)[-1].strip('.')
+    if file_type == "":
+        # No file type specified, add the type from the file filter
+        file_type = extract_file_ext(sel_filt)[0].strip('.')
+        file_name = file_name + '.' + file_type
+
     err = False
 
     try:
@@ -1020,10 +1040,21 @@ def export_data(parent, data, fkey=None, title="Export",
 
 
 # ------------------------------------------------------------------------------
-def generate_header(title):
+def generate_header(title: str) -> str:
     """
-    Generate file header with filter informations for coefficient export to some
-    FPGA design flow.
+    Generate a file header (comment) for various FPGA FIR coefficient export formats
+    with information on the filter type, corner frequencies, ripple etc
+
+    Parameters
+    ----------
+    title: str
+       A string that is written in the top of the comment section of the exported
+       file.
+
+    Returns
+    -------
+    header: str
+        The string with all the gathered information
     """
     f_lbls = []
     f_vals = []
@@ -1112,7 +1143,7 @@ def generate_header(title):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f):
+def export_coe_xilinx(f: TextIO):
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1154,7 +1185,7 @@ def export_coe_xilinx(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f):
+def export_coe_microsemi(f: TextIO):
     """
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
@@ -1186,7 +1217,7 @@ def export_coe_microsemi(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f):
+def export_coe_vhdl_package(f: TextIO):
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1247,7 +1278,7 @@ def export_coe_vhdl_package(f):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f):
+def export_coe_TI(f: TextIO):
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
