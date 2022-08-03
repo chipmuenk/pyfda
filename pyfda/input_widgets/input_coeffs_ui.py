@@ -108,7 +108,6 @@ class Input_Coeffs_UI(QWidget):
         # This frame contains all the buttons
         #######################################################################
         # ---------------------------------------------
-        # layHDisplay
         #
         # UI Elements for controlling the display
         # ---------------------------------------------
@@ -160,18 +159,18 @@ class Input_Coeffs_UI(QWidget):
         self.frm_q_frmt = QFrame(self)
         self.frm_q_frmt.setLayout(layH_q_frmt)
 
-        layHDisplay = QHBoxLayout()
-        layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(self.butEnable)
-        layHDisplay.addWidget(self.cmb_fx_base)
-        layHDisplay.addWidget(self.spnDigits)
-        layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.frm_q_frmt)
-        layHDisplay.addStretch()
-        layHDisplay.setContentsMargins(*params['wdg_margins'])
+        layH_display = QHBoxLayout()
+        layH_display.setContentsMargins(*params['wdg_margins'])
+        layH_display.setAlignment(Qt.AlignLeft)
+        layH_display.addWidget(self.butEnable)
+        layH_display.addWidget(self.cmb_fx_base)
+        layH_display.addWidget(self.spnDigits)
+        layH_display.addWidget(self.lblDigits)
+        layH_display.addWidget(self.frm_q_frmt)
+        layH_display.addStretch()
 
         self.frm_display = QFrame(self)
-        self.frm_display.setLayout(layHDisplay)
+        self.frm_display.setLayout(layH_display)
 
         #######################################################################
         # frm_buttons_coeffs
@@ -280,7 +279,7 @@ class Input_Coeffs_UI(QWidget):
         layV_buttons_coeffs = QVBoxLayout()
         layV_buttons_coeffs.addLayout(layH_buttons_coeffs1)
         layV_buttons_coeffs.addLayout(layH_buttons_coeffs2)
-        layV_buttons_coeffs.setContentsMargins(0, 5, 0, 0)
+        layV_buttons_coeffs.setContentsMargins(*params['wdg_margins'])  # 0, 5, 0, 0)
         # This frame encompasses all Quantization Settings
         self.frm_buttons_coeffs = QFrame(self)
         self.frm_buttons_coeffs.setLayout(layV_buttons_coeffs)
@@ -302,13 +301,13 @@ class Input_Coeffs_UI(QWidget):
         #######################################################################
 
         layVMain = QVBoxLayout()
+        layVMain.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addWidget(self.frm_display)
         layVMain.addWidget(self.frm_buttons_coeffs)
         layVMain.addWidget(self.wdg_wq_coeffs_b)
         layVMain.addWidget(self.wdg_wq_coeffs_a)
-        layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         #######################################################################
 
