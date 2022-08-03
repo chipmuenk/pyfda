@@ -146,6 +146,7 @@ class FX_UI_WQ(QWidget):
                    'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov, 'ovfl': 'wrap',
                    #
                    'lbl_sep': '.', 'max_led_width': 30,
+                   'WG': 0, 'WG_len': 2, 'tip_WG': 'Number of guard bits',
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
@@ -195,14 +196,24 @@ class FX_UI_WQ(QWidget):
         sp_retain.setRetainSizeWhenHidden(True)
         self.butLock.setSizePolicy(sp_retain)
 
+        self.ledWG = QLineEdit(self)
+        self.ledWG.setToolTip("<span>Number of guard bits</span>")
+        self.ledWG.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
+        self.ledWG.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
+        self.ledWG.setVisible(False)
+        self.ledWG.setObjectName("WG")
+
+        self.lblPlus = QLabel("+", self)
+        self.lblPlus.setVisible(False)
+
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
         self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
         self.ledWI.setObjectName("WI")
 
-        lblDot = QLabel(dict_ui['lbl_sep'], self)
-        lblDot.setVisible(dict_ui['fractional'])
+        self.lblDot = QLabel(dict_ui['lbl_sep'], self)
+        self.lblDot.setVisible(dict_ui['fractional'])
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
@@ -227,8 +238,10 @@ class FX_UI_WQ(QWidget):
         self.lbl_LSB.setText("undefined")
 
         layH_W = QHBoxLayout()
+        layH_W.addWidget(self.ledWG)
+        layH_W.addWidget(self.lblPlus)
         layH_W.addWidget(self.ledWI)
-        layH_W.addWidget(lblDot)
+        layH_W.addWidget(self.lblDot)
         layH_W.addWidget(self.ledWF)
         layH_W.setContentsMargins(0, 0, 0, 0)
 
@@ -260,15 +273,18 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         # INITIAL SETTINGS OF UI AND FIXPOINT QUANTIZATION OBJECT
         # ----------------------------------------------------------------------
+        WG = int(dict_ui['WG'])
         WI = int(dict_ui['WI'])
         WF = int(dict_ui['WF'])
         W = WI + WF + 1
+        self.ledWG.setText(str(WG))
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
 
-        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'W': W})
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF,
+                            'WG': WG, 'W': W})
         # create fixpoint quantization object from passed quantization dict
         self.QObj = fx.Fixed(self.q_dict)
 
@@ -287,6 +303,7 @@ class FX_UI_WQ(QWidget):
         # ----------------------------------------------------------------------
         self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
         self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
+        self.ledWG.editingFinished.connect(self.ui2dict)
         self.ledWI.editingFinished.connect(self.ui2dict)
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
@@ -363,10 +380,13 @@ class FX_UI_WQ(QWidget):
     def ui2dict(self):
         """
         Update the entries in the quantization dict from the UI for `ovfl`, `quant`,
-        `WI`, `WF`, `W` when one of the widgets has been edited.
+        'WG', `WI`, `WF`, `W` when one of the widgets has been edited.
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
+        WG = int(safe_eval(self.ledWG.text(), self.QObj.q_dict['WG'], return_type="int",
+                           sign='poszero'))
+        self.ledWG.setText(str(WG))
         WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'], return_type="int",
                            sign='poszero'))
         self.ledWI.setText(str(WI))
@@ -374,12 +394,12 @@ class FX_UI_WQ(QWidget):
                            sign='poszero'))
         self.ledWF.setText(str(WF))
 
-        # W = int(WI + WF + 1)
+        # W = int(WG + WI + WF + 1)
 
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
 
-        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF})
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
                                           # like W and Q and reset counter
 
@@ -423,18 +443,24 @@ class FX_UI_WQ(QWidget):
                                    'scale': 1 << (self.q_dict['WI'] + self.q_dict['WF'])})
             elif qfrmt == 'qnfrac':  # normalized fractional format
                 self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0,
-                                    'scale': 1})
+                                    'WG': 0, 'scale': 1})
             elif qfrmt in {'qfrac', 'float'}:
-                self.q_dict.update({'scale': 1})
+                self.q_dict.update({'scale': 1, 'WG': 0})
             elif qfrmt == 'q31':
-                self.q_dict.update({'WI': 0, 'WF': 31, 'scale': 1})
+                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
             else:
                 logger.warning(f"Unknown quantization format '{qfrmt}'")
                 err = True
 
             if not err:
                 self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'})
+                self.ledWF.setVisible(qfrmt != 'qint')
+                self.ledWG.setVisible(qfrmt == 'qint')
+                self.ledWG.setEnabled(False)
+                self.lblPlus.setVisible(qfrmt == 'qint')
+                self.lblDot.setVisible(qfrmt != 'qint')
                 self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'})
+                self.ledWG.setText(str(self.q_dict['WG']))
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
 
