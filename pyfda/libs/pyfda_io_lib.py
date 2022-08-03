@@ -89,18 +89,26 @@ def prune_file_ext(file_type: str) -> str:
     - '(' must be escaped as '\\\('
 
     """
+
     return re.sub('\([^\)]+\)', '', file_type)
+
 
 
 # ------------------------------------------------------------------------------
 def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (\*.vhd)') returned by QFileDialog
-    """
+    'VHDL (\*.vhd)' returned by QFileDialog
 
-    ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
-    return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    Depending on the OS, this may be the full file type description
+    or just the extension. When `file_type` contains no '(', the passed string is
+    returned unchanged.
+    """
+    if "(" in file_type:
+        ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
+        return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    else:
+        return file_type
 
 
 # ------------------------------------------------------------------------------
