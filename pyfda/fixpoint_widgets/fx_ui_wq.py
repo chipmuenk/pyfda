@@ -17,7 +17,7 @@ import inspect
 import pyfda.libs.pyfda_fix_lib as fx
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
+    Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QIcon,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, pyqtSignal)
 
 from pyfda.libs.pyfda_qt_lib import (
@@ -236,8 +236,8 @@ class FX_UI_WQ(QWidget):
         layG.setColumnStretch(1, 10)
         # first row
         layG.addWidget(lbl_wdg, 0, 0)
-        layG.addWidget(self.butLock, 0, 3)  # enable
-        layG.addWidget(self.cmbW, 0, 4)     # only one!
+        layG.addWidget(self.butLock, 0, 3)
+        layG.addWidget(self.cmbW, 0, 4)
         layG.addLayout(layH_W, 0, 5)
         # second row
         layG.addWidget(self.lbl_ovfl_count, 1, 0)
@@ -245,7 +245,7 @@ class FX_UI_WQ(QWidget):
         layG.addWidget(self.cmbQuant, 1, 5)
         # third row - MSB / LSB
         layG.addWidget(self.lbl_MSB, 2, 0, 1, 2)
-        layG.addWidget(self.lbl_LSB, 2, 3, 1, 3)
+        layG.addWidget(self.lbl_LSB, 2, 3, 1, 3, Qt.AlignRight)
         layG.setContentsMargins(5, 5, 5, 5)
 
         frmMain = QFrame(self)
