@@ -921,19 +921,25 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.save_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)
+    dlg.setNameFilter(file_filters)  # set the list with all available file formats
+    # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
 
     if last_file_filter:
         dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        # sel_filt = dlg.selectedNameFilter()  # selected file filter
+        file_name = dlg.selectedFiles()[0]   # convert list (with single entry?) to item
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
     else:
         return -1
 
     # Slice off file extension
     file_type = os.path.splitext(file_name)[-1].strip('.')
+    if file_type == "":
+        # No file type specified, add the type from the file filter
+        file_type = extract_file_ext(sel_filt)[0].strip('.')
+        file_name = file_name + '.' + file_type
+
     err = False
 
     try:
