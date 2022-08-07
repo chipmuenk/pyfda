@@ -63,7 +63,7 @@ class ItemDelegate(QStyledItemDelegate):
     Editing the table triggers `setModelData()` but does not emit a signal outside
     this class, only the `ui.butSave` button is highlighted. When it is pressed,
     a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
-    Additionally, a signal is emitted with `'fx_sim': 'specs_changed'` by `ui2qdict()`
+    Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 
     def __init__(self, parent):
@@ -96,6 +96,16 @@ class ItemDelegate(QStyledItemDelegate):
 #         else:
 #             # continue with the original `paint()` method
 #             super(ItemDelegate, self).paint(painter, option, index)
+#             #painter.restore()
+# ----------------------------------
+#         logger.debug("Ovr_flag:".format(self.parent.self.QObj[0].ovr_flag))
+#         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
+#             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
+#         # continue with the original `paint()` method
+#         #option.palette.setColor(QPalette.Window, QColor(Qt.red))
+#         #option.palette.setColor(QPalette.Base, QColor(Qt.green))
+#         super(ItemDelegate, self).paint(painter, option, index)
+#
 #
 # ==============================================================================
 
@@ -119,25 +129,6 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
-
-# ==============================================================================
-#     def paint(self, painter, option, index):
-#
-#         """
-#         painter: instance of QPainter (default)
-#         option:  instance of QStyleOptionViewItemV4
-#         index:   instance of QModelIndex
-#         """
-#         logger.debug("Ovr_flag:".format(self.parent.self.QObj[0].ovr_flag))
-#         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
-#             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
-#         # continue with the original `paint()` method
-#         #option.palette.setColor(QPalette.Window, QColor(Qt.red))
-#         #option.palette.setColor(QPalette.Base, QColor(Qt.green))
-#         super(ItemDelegate, self).paint(painter, option, index)
-#         #painter.restore()
-#
-# ==============================================================================
 
     # -------------------------------------------------------------------------
     def text(self, item):
@@ -163,7 +154,6 @@ class ItemDelegate(QStyledItemDelegate):
         The instance parameter `QObj[c].ovr_flag` is set to +1 or -1 for
          positive / negative overflows, else it is 0.
         """
-        # logger.warning("displayText!")
 
         if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
             data = safe_eval(text, return_type='auto')  # convert to float
@@ -210,7 +200,6 @@ class ItemDelegate(QStyledItemDelegate):
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
         """
-#        data = qstr(index.data()) # get data from QTableWidget
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                  return_type="auto"))
         if self.QObj[index.column()].q_dict['fx_base'] == 'float':
