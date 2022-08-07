@@ -817,8 +817,8 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2qdict(self):
         """
-        Read out the UI settings of `self.ui.cmb_fx_base` and `self.ui.cmb_q_frmt`
-        (those two trigger this method)
+        Read out the UI settings of  `self.ui.cmb_q_frmt` and `self.ui.cmb_q_frmt`  (triggering this method)
+        and store the old 'qfrmt' setting under the 'qfrmt_last' key.
 
         The coefficient quantization settings are copied to the quantization dicts
         fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
@@ -828,13 +828,18 @@ class Input_Coeffs(QWidget):
         Refresh the table and update quantization widgets
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base),
+            {'qfrmt_last': fb.fil[0]['fxqc']['QCB']['qfrmt'],
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base),
+            {'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
-        # update quant. widgets and table with the new `fx_base` and`qfrmt`settings
+        fb.fil[0]['fxqc']['QCB'].update({'fx_base': qget_cmb_box(self.ui.cmb_fx_base)})
+        fb.fil[0]['fxqc']['QCA'].update({'fx_base': qget_cmb_box(self.ui.cmb_fx_base)})
+
+        # update quant. widgets and table with the new `qfrmt` settings
+        self.qdict2ui()
+
         self.qdict2ui()
 
 # ------------------------------------------------------------------------------

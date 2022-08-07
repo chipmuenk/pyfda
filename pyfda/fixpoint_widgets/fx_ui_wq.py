@@ -431,7 +431,7 @@ class FX_UI_WQ(QWidget):
             q_dict = self.q_dict
         else:
             for k in q_dict:
-                if k not in {'quant', 'ovfl', 'WI', 'WF', 'qfrmt'}:
+                if k not in {'quant', 'quant_last', 'ovfl', 'WI', 'WF', 'qfrmt'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
         if 'qfrmt' in q_dict:
