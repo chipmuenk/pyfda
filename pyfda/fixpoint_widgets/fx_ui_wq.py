@@ -437,26 +437,36 @@ class FX_UI_WQ(QWidget):
         if 'qfrmt' in q_dict:
             err = False
             qfrmt = q_dict['qfrmt']
+            if 'qfrmt_last' not in q_dict:
+                q_dict['qfrmt_last'] = qfrmt
+
+            logger.warning(f"qfrmt = {q_dict['qfrmt']} ({q_dict['qfrmt_last']})")
 
             if qfrmt == 'qint':  # integer format
-                self.q_dict.update({'WI': self.q_dict['WI'] + self.q_dict['WF'], 'WF': 0,
-                                   'scale': 1 << (self.q_dict['WI'] + self.q_dict['WF'])})
-            elif qfrmt == 'qnfrac':  # normalized fractional format
-                self.q_dict.update({'WF': self.q_dict['WI'] + self.q_dict['WF'], 'WI': 0,
-                                    'WG': 0, 'scale': 1})
-            elif qfrmt in {'qfrac', 'float'}:
-                self.q_dict.update({'scale': 1, 'WG': 0})
-            elif qfrmt == 'q31':
-                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
+                self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
+                                    'WF': 0, 'scale': 1 << self.q_dict['WF']})
             else:
-                logger.warning(f"Unknown quantization format '{qfrmt}'")
-                err = True
+                if self.q_dict['qfrmt_last'] == 'qint':
+                    self.q_dict.update({'WI': self.q_dict['WG'], 'WF': self.q_dict['WI']})
+
+                self.q_dict.update({'scale': 1, 'WG': 0})
+                if qfrmt == 'qnfrac':  # normalized fractional format
+                    self.q_dict.update({'WI': 0, 'WF': self.q_dict['W'] - 1})
+                elif qfrmt in {'qfrac', 'float'}:
+                    pass
+                elif qfrmt == 'q31':  # Q0.31
+                    self.q_dict.update({'WI': 0, 'WF': 31})
+                elif qfrmt == 'q15':  # Q0.15
+                    self.q_dict.update({'WI': 0, 'WF': 15})
+                else:
+                    logger.warning(f"Unknown quantization format '{qfrmt}'")
+                    err = True
 
             if not err:
                 self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'})
                 self.ledWF.setVisible(qfrmt != 'qint')
                 self.ledWG.setVisible(qfrmt == 'qint')
-                self.ledWG.setEnabled(False)
+                self.ledWG.setEnabled(True)
                 self.lblPlus.setVisible(qfrmt == 'qint')
                 self.lblDot.setVisible(qfrmt != 'qint')
                 self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'})
@@ -464,7 +474,7 @@ class FX_UI_WQ(QWidget):
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
 
-                self.q_dict.update({'qfrmt': qfrmt})
+                # self.q_dict.update({'qfrmt': qfrmt})
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
