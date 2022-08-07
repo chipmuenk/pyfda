@@ -408,8 +408,8 @@ class Input_Coeffs(QWidget):
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # store new settings and refresh table
-        self.ui.cmb_fx_base.currentIndexChanged.connect(self._cmb_fx_base_updated)
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.ui2qdict_emit)
+        self.ui.cmb_fx_base.currentIndexChanged.connect(self.fx_base2qdict)
+        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.qfrmt2qdict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -780,7 +780,8 @@ class Input_Coeffs(QWidget):
         Triggered by:
         - `process_sig_rx()`: self.fx_specs_changed == True or
                                 dict_sig['fx_sim'] == 'specs_changed'
-        - `self.ui2qdict()`
+        - `self.qfrmt2qdict()`
+        - `self.fx_base2qdict()`
 
         """
         if self.ui.wdg_wq_coeffs_b.q_dict['WI'] != 0\
@@ -797,27 +798,9 @@ class Input_Coeffs(QWidget):
         self.refresh_table()
 
 # ------------------------------------------------------------------------------
-    def _cmb_fx_base_updated(self):
+    def qfrmt2qdict(self):
         """
-        Read out the setting of combo box `self.ui.cmb_fx_base` (triggered by
-        a change) and store it in the quantization dicts
-        fb.fil[0]['fxqc']['QCB']` and `...['QCA']`.
-
-        No signal is emitted because this setting should only influence the display
-        of coefficient data but not the data itself.
-        """
-        fb.fil[0]['fxqc']['QCB'].update(
-            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base)}
-                                        )
-        fb.fil[0]['fxqc']['QCA'].update(
-            {'fx_base': qget_cmb_box(self.ui.cmb_fx_base)}
-                                        )
-        self.qdict2ui()  # update quant. widgets, table
-
-# ------------------------------------------------------------------------------
-    def ui2qdict(self):
-        """
-        Read out the UI settings of  `self.ui.cmb_q_frmt` and `self.ui.cmb_q_frmt`  (triggering this method)
+        Read out the UI settings of  `self.ui.cmb_q_frmt` (triggering this method)
         and store the old 'qfrmt' setting under the 'qfrmt_last' key.
 
         The coefficient quantization settings are copied to the quantization dicts
@@ -825,7 +808,8 @@ class Input_Coeffs(QWidget):
         instances of `FX_UI_WQ` every time something is updated there. This information
         is also kept in the quantization objects `QObj` of the quantization widgets.
 
-        Refresh the table and update quantization widgets
+        Refresh the table and update quantization widgets, finally emit a signal
+        `{'fx_sim': 'specs_changed'}`.
         """
         fb.fil[0]['fxqc']['QCB'].update(
             {'qfrmt_last': fb.fil[0]['fxqc']['QCB']['qfrmt'],
@@ -834,22 +818,29 @@ class Input_Coeffs(QWidget):
             {'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
+        # update quant. widgets and table with the new `qfrmt` settings
+        self.qdict2ui()
+        self.emit({'fx_sim': 'specs_changed'})
+
+# ------------------------------------------------------------------------------
+    def fx_base2qdict(self):
+        """
+        Read out the UI settings of `self.ui.cmb_fx_base` (triggering this method)
+        which specifies the number base (dec, bin, ...)
+
+        The coefficient quantization settings are copied to the quantization dicts
+        fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
+        instances of `FX_UI_WQ` every time something is updated there. This information
+        is also kept in the quantization objects `QObj` of the quantization widgets.
+
+        Refresh the table and update quantization widgets. Don't emit a signal
+        because this only influences the view not the data itself.
+        """
         fb.fil[0]['fxqc']['QCB'].update({'fx_base': qget_cmb_box(self.ui.cmb_fx_base)})
         fb.fil[0]['fxqc']['QCA'].update({'fx_base': qget_cmb_box(self.ui.cmb_fx_base)})
 
-        # update quant. widgets and table with the new `qfrmt` settings
+        # update quant. widgets and table with the new `fx_base` settings
         self.qdict2ui()
-
-        self.qdict2ui()
-
-# ------------------------------------------------------------------------------
-    def ui2qdict_emit(self):
-        """
-        Do all the things of `self.ui2qdict()`
-        plus emit signal `'fx_sim': 'specs_changed'`
-        """
-        self.ui2qdict()
-        self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
     def _save_dict(self):
