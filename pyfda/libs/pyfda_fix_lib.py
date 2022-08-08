@@ -506,7 +506,7 @@ class Fixed(object):
 
         # Transform `WI`, `WF`, `W` and `Q` parameters into each other
         if q_d == {}:
-            q_d['W'] = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            q_d['W'] = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1
             q_d['Q'] = str(self.q_dict['WI']) + "." + str(self.q_dict['WF'])
         elif 'WI' in q_d and 'WF' in q_d:
             if 'WG' in q_d:
