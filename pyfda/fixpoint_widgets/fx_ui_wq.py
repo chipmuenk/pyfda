@@ -474,8 +474,6 @@ class FX_UI_WQ(QWidget):
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
 
-                # self.q_dict.update({'qfrmt': qfrmt})
-
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
             self.q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
