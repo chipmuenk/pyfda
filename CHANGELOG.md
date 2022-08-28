@@ -12,8 +12,9 @@
   "KeyError: 'V_NMG'"
 
 ### New features
+- Show number of pos. and neg. overflows in quantizers
 - Implement IIR DF1 fixpoint filter
-- Export SOS filter coefficients in CMSIS DSP format
+- Export SOS filter coefficients in CMSIS DSP format (via the CSV export options in the coefficient tab)
 - New stimulus Randint process
 - Add sequence length parameter to MLS process, remove PRBS (which was a Randint
   process with values 0 and 1)
