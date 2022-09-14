@@ -46,8 +46,8 @@ jobs:
             TARGET: windows
 # pyinstaller -F -w -n clipster -i resources/clipster.ico cli.py
             CMD_BUILD: pyinstaller pyfdax.spec
-            OUT_FILE_NAME: pyfda.exe
-            ASSET_MIME: application/vnd.microsoft.portable-executabley
+            OUT_FILE_NAME: pyfdax.exe
+            ASSET_MIME: application/vnd.microsoft.portable-executable
           - os: macos-latest
             TARGET: macos
 # pyinstaller -F -w -n clipster -i resources/clipster.icns cli.py &&
