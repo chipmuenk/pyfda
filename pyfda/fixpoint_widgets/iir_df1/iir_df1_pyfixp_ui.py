@@ -154,38 +154,53 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
+            ui_changed = dict_sig['ui_local_changed']  # name of changed ui element
             if not dict_sig['wdg_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:
                 logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
                              f"in '{__name__}' !")
                 return
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
-                if dict_sig['ui_local_changed'] == 'cmbW'\
-                        or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
+                if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                    if dict_sig['ui_local_changed'] == 'cmbW' and cmbW == 'man':
-                        # returning to manual setting, don't do anything
-                        return
+                    if cmbW == 'man':
+                        if ui_changed == 'cmbW':
+                            # returning to manual setting, don't do anything
+                            return
+                        else:
+                            pass  # WI or WF have been edited, emit 'specs_changed'
                     elif cmbW == 'auto':
+                        # when switching to auto settings, run automatic accu calculation
+                        # this also reverses manual edits of WI or WF wordlengths
+                        # manual entry of word lengths cannot be disabled easily due to
+                        # additional logic in the wdg_wq_accu widget (class FX_UI_WQ)
                         self.update_accu_settings()
                     else:
                         logger.error(f"Unknown accu combobox setting '{cmbW}'!")
                         return
 
-            elif dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
-                if dict_sig['ui_local_changed'] == 'cmbW'\
-                    or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
+            elif dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:  # coeffs updated
+                if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
-                    if dict_sig['ui_local_changed'] == 'cmbW' and cmbW == 'man':
-                        # returning to manual setting, don't do anything
-                        return
+                    if cmbW == 'man':
+                        if ui_changed == 'cmbW':
+                            # returning to manual setting, don't do anything
+                            return
+                        else:
+                            pass  # WI or WF have been edited, emit 'specs_changed'
+
                     elif cmbW == 'auto':
-                        # automatic calculation of required integer bits for coeffs a
+                        # when switching to auto settings, run automatic calculation
+                        # of required integer bits for coeffs a
+                        # this also reverses manual edits of WI or WF wordlengths
+                        # manual entry of word lengths cannot be disabled easily due to
+                        # additional logic in the wdg_wq_accu widget (class FX_UI_WQ)
                         self.update_coeffs_settings()
                     else:
                         logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
                         return
-                    # coefficient length has been changed, update accu as well
+
+                    # in case coefficient length has been changed, update accu as well
                     if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'auto':
                         self.update_accu_settings()
 
@@ -211,7 +226,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # update quantization settings ('W', 'Q', ...) and UI
         self.wdg_wq_coeffs_a.QObj.set_qdict({})  # update `self.wdg_wq_coeffs_a.q_dict`
         self.wdg_wq_coeffs_a.dict2ui()
-
 
     # --------------------------------------------------------------------------
     def update_accu_settings(self):
