@@ -1,5 +1,13 @@
 # workflow for buildung pyinstaller packages for windows and MacOS
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
+#
+# The workflow only runs with a proper tag v*, so something similar to
+#
+#   git tag v0.4.5
+#   git push
+#   git push origin --tags
+#
+# is required.
 ---
 name: pyinstaller
 
@@ -42,19 +50,22 @@ jobs:
     strategy:
       matrix:
         include:
+          # ---
           - os: windows-latest
+          # ---
             TARGET: windows
-# pyinstaller -F -w -n clipster -i resources/clipster.ico cli.py
             CMD_BUILD: pyinstaller pyfdax.spec
             OUT_FILE_NAME: pyfdax.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
+          # ---
           - os: macos-latest
+          # ---
             TARGET: macos
-# pyinstaller -F -w -n clipster -i resources/clipster.icns cli.py &&
             CMD_BUILD: >
                 pyinstaller pyfdax.spec &&
                 cd dist/ &&
-                zip -r9 pyfda pyfda.app/
+                ls &&
+                zip -r9 pyfda pyfdax.app/
             OUT_FILE_NAME: pyfda.zip
             ASSET_MIME: application/zip
     steps:
