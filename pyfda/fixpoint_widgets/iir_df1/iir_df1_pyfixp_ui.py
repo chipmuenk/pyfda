@@ -253,7 +253,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
             fb.fil[0]['fxqc']['QACC']['WI'] = max(
                 fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'],
-                fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QCA']['WI']) 
+                fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QCA']['WI'])
 
         # update quantization settings like 'Q', 'W' etc. and UI
         self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
