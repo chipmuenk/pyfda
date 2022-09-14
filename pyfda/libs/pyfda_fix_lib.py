@@ -306,6 +306,8 @@ class Fixed(object):
     q_dict : dict
         define quantization options with the following keys
 
+    * **'WG'** : number of guard bits, default: 0
+
     * **'WI'** : number of integer bits, default: 0
 
     * **'WF'** : number of fractional bits; default: 15
@@ -504,10 +506,11 @@ class Fixed(object):
 
         self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
-        # Transform `WI`, `WF`, `W` and `Q` parameters into each other
+        # Transform `WG`,  `WI`, `WF`, `W` and `Q` parameters into each other
         if q_d == {}:
             q_d['W'] = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1
-            q_d['Q'] = str(self.q_dict['WI']) + "." + str(self.q_dict['WF'])
+            q_d['Q'] = str(self.q_dict['WG'] + self.q_dict['WI']) + "."\
+                + str(self.q_dict['WF'])
         elif 'WI' in q_d and 'WF' in q_d:
             if 'WG' in q_d:
                 q_d['WG'] = abs(int(q_d['WG']))  # sanitize WG
@@ -515,7 +518,7 @@ class Fixed(object):
                 q_d['WG'] = 0
             q_d['WI'] = int(q_d['WI'])  # sanitize WI
             q_d['WF'] = abs(int(q_d['WF']))  # and WF
-            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
+            q_d['W'] = q_d['WG'] + q_d['WI'] + q_d['WF'] + 1
             q_d['Q'] = str(q_d['WI']) + "." + str(q_d['WF'])
         elif 'W' in q_d:
             q_d['W'] = int(q_d['W'])  # sanitize W
@@ -532,8 +535,9 @@ class Fixed(object):
 
         self.q_dict.update(q_d)  # merge q_d into self.q_dict
 
-        self.q_dict['LSB'] = 2. ** -self.q_dict['WF']  # value of LSB
-        self.q_dict['MSB'] = 2. ** (self.q_dict['WI'] - 1)   # value of MSB
+        # Calculate min., max., LSB and MSB from word lengths
+        self.q_dict['LSB'] = 2. ** -self.q_dict['WF']
+        self.q_dict['MSB'] = 2. ** (self.q_dict['WG'] + self.q_dict['WI'] - 1)
 
         self.q_dict['MAX'] =  2. * self.q_dict['MSB'] - self.q_dict['LSB']
         self.q_dict['MIN'] = -2. * self.q_dict['MSB']

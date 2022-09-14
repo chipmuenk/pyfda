@@ -404,7 +404,7 @@ class FX_UI_WQ(QWidget):
                                           # like W and Q and reset counter
 
         if self.sender():
-            dict_sig = {'wdg_name': self.wdg_name, 
+            dict_sig = {'wdg_name': self.wdg_name,
                         'ui_local_changed': self.sender().objectName()}
             # logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
@@ -434,6 +434,8 @@ class FX_UI_WQ(QWidget):
                 if k not in {'quant', 'quant_last', 'ovfl', 'WI', 'WF', 'qfrmt'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
+        logger.warning(q_dict)
+
         if 'qfrmt' in q_dict:
             err = False
             qfrmt = q_dict['qfrmt']
@@ -443,21 +445,26 @@ class FX_UI_WQ(QWidget):
             logger.warning(f"qfrmt = {q_dict['qfrmt']} ({q_dict['qfrmt_last']})")
 
             if qfrmt == 'qint':  # integer format
-                self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
-                                    'WF': 0, 'scale': 1 << self.q_dict['WF']})
+                if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
+                    self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
+                                        'WF': 0, 'scale': 1 << self.q_dict['WF']})
+            elif qfrmt == 'q31':  # Q0.31
+                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
+            elif qfrmt == 'q15':  # Q0.15
+                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
+
             else:
-                if self.q_dict['qfrmt_last'] == 'qint':
-                    self.q_dict.update({'WI': self.q_dict['WG'], 'WF': self.q_dict['WI']})
-                    logger.error(f"correcting WF: WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
+                if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
+                    self.q_dict.update({'WF': self.q_dict['WI'], 'WI': self.q_dict['WG']})
+                    logger.error(f"correcting WF: WI = {self.q_dict['WI']}, "
+                                 f"WF = {self.q_dict['WF']}")
                 self.q_dict.update({'scale': 1, 'WG': 0})
+
                 if qfrmt == 'qnfrac':  # normalized fractional format
                     self.q_dict.update({'WI': 0, 'WF': self.q_dict['W'] - 1})
                 elif qfrmt in {'qfrac', 'float'}:
                     pass
-                elif qfrmt == 'q31':  # Q0.31
-                    self.q_dict.update({'WI': 0, 'WF': 31})
-                elif qfrmt == 'q15':  # Q0.15
-                    self.q_dict.update({'WI': 0, 'WF': 15})
+
                 else:
                     logger.warning(f"Unknown quantization format '{qfrmt}'")
                     err = True
@@ -473,6 +480,8 @@ class FX_UI_WQ(QWidget):
                 self.ledWG.setText(str(self.q_dict['WG']))
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
+
+        q_dict['qfrmt_last'] = qfrmt  # store current setting
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
@@ -500,13 +509,15 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        logger.error(f"Now: WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
+        logger.error(f"Bef: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
+                     f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
         self.q_dict.update(
             {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
         self.QObj.set_qdict(self.q_dict)  # update instance q_dict
-        logger.error(f"Now: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
+        logger.error(f"Aft: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
+                     f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
 
 # ==============================================================================
