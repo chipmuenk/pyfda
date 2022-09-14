@@ -448,7 +448,7 @@ class FX_UI_WQ(QWidget):
             else:
                 if self.q_dict['qfrmt_last'] == 'qint':
                     self.q_dict.update({'WI': self.q_dict['WG'], 'WF': self.q_dict['WI']})
-
+                    logger.error(f"correcting WF: WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
                 self.q_dict.update({'scale': 1, 'WG': 0})
                 if qfrmt == 'qnfrac':  # normalized fractional format
                     self.q_dict.update({'WI': 0, 'WF': self.q_dict['W'] - 1})
@@ -482,6 +482,12 @@ class FX_UI_WQ(QWidget):
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
+        if 'WG' in q_dict:
+            WG = safe_eval(
+                q_dict['WG'], self.QObj.q_dict['WG'], return_type="int", sign='poszero')
+            self.ledWG.setText(str(WG))
+            self.q_dict.update({'WG': WG})
+
         if 'WI' in q_dict:
             WI = safe_eval(
                 q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
@@ -494,9 +500,13 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        self.q_dict.update({'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
+        logger.error(f"Now: WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
+
+        self.q_dict.update(
+            {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
         self.QObj.set_qdict(self.q_dict)  # update instance q_dict
+        logger.error(f"Now: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, WF = {self.q_dict['WF']}")
 
 
 # ==============================================================================
