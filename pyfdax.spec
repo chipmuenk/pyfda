@@ -65,7 +65,7 @@ hiddenimports += [
 ### Fixpoint Widgets
 hiddenimports += [
     'pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp_ui',
-    'pyfda.fixpoint_widgets.iir_df1.iir_df_pyfixp_ui']
+    'pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui']
 
 excludes  = collect_submodules('tornado') 
 excludes += collect_submodules('colorama')
