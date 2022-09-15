@@ -40,7 +40,8 @@ datas = []
 
 # add images and configuration files
 datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
-    ('pyfda/fixpoint_widgets/*/*.png', 'pyfda/fixpoint_widgets/fir_df'),
+    ('pyfda/fixpoint_widgets/fir_df/*.png', 'pyfda/fixpoint_widgets/fir_df'),
+    ('pyfda/fixpoint_widgets/iir_df1/*.png', 'pyfda/fixpoint_widgets/iir_df1'),
     ('pyfda/libs/*.conf', 'pyfda/libs'),
     ('./*.md', '.'),
     ('pyfda/*.md', 'pyfda')]
