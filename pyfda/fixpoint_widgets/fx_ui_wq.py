@@ -434,15 +434,13 @@ class FX_UI_WQ(QWidget):
                 if k not in {'quant', 'quant_last', 'ovfl', 'WI', 'WF', 'qfrmt'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
-        logger.warning(q_dict)
-
         if 'qfrmt' in q_dict:
             err = False
             qfrmt = q_dict['qfrmt']
             if 'qfrmt_last' not in q_dict:
                 q_dict['qfrmt_last'] = qfrmt
 
-            logger.warning(f"qfrmt = {q_dict['qfrmt']} (was: {q_dict['qfrmt_last']})")
+            # logger.warning(f"qfrmt = {q_dict['qfrmt']} (was: {q_dict['qfrmt_last']})")
 
             if qfrmt == 'qint':  # integer format
                 if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
@@ -456,8 +454,7 @@ class FX_UI_WQ(QWidget):
             else:
                 if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
                     self.q_dict.update({'WF': self.q_dict['WI'], 'WI': self.q_dict['WG']})
-                    logger.error(f"correcting WF: WI = {self.q_dict['WI']}, "
-                                 f"WF = {self.q_dict['WF']}")
+
                 self.q_dict.update({'scale': 1, 'WG': 0})
 
                 if qfrmt == 'qnfrac':  # normalized fractional format
