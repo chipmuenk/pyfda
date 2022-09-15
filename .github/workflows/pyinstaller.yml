@@ -54,7 +54,7 @@ jobs:
           - os: windows-latest
           # ---
             TARGET: windows
-            CMD_BUILD: pyinstaller pyfdax.spec
+            CMD_BUILD: pyinstaller pyfdax_win.spec
             OUT_FILE_NAME: pyfdax.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           # ---
@@ -64,10 +64,10 @@ jobs:
             # ToDo: Why does the output file of pyinstaller have no suffix?
             # zip -r9 pyfda pyfdax.app/
             CMD_BUILD: >
-                pyinstaller pyfdax.spec &&
+                pyinstaller pyfdax_mac.spec &&
                 cd dist/ &&
                 ls -la
-            OUT_FILE_NAME: pyfdax  # pyfda.zip
+            OUT_FILE_NAME: pyfdax.app  # pyfda.zip
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v1
