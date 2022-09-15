@@ -128,6 +128,8 @@ a.datas = [x for x in a.datas if
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
+# name and content of the executable
 exe = EXE(pyz,
           a.scripts,
           a.binaries,
@@ -145,6 +147,7 @@ exe = EXE(pyz,
      	  icon=None)
     # icon is set in main program via qrc resources, no import needed
 
+# directory name and its content for files to be collected
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
