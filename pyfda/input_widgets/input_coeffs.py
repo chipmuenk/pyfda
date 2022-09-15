@@ -436,7 +436,14 @@ class Input_Coeffs(QWidget):
         # Create a copy of the a coefficients without the "1" as this could create
         # false overflows during quantization. The "1" is always printed though
         # by the `ItemDelegate.initStyleOption()` method
-        a = np.concatenate(([0], self.ba[1][1:]))
+        #
+        # TODO: Replacing the first element by 0  doesn't work, a is always converted 
+        # to integer for non-dec formats somehwhere - Why???
+
+        # logger.error(f"ba[1]: {self.ba[1].dtype}")
+        a = np.concatenate(([0.123], self.ba[1][1:]))
+        # a = self.ba[1]
+        # logger.error(f"a: {a.dtype}")
 
         if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
             self.ba_q = [self.ba[0],
@@ -474,6 +481,7 @@ class Input_Coeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
+
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
@@ -698,7 +706,7 @@ class Input_Coeffs(QWidget):
                 fb.clipboard.setText(text)
             else:
                 export_csv_data(self, text, title="Export in CMSIS DSP SOS format",
-                            file_types=('csv',))
+                                file_types=('csv',))
 
     # --------------------------------------------------------------------------
     def _import(self):
