@@ -442,7 +442,7 @@ class FX_UI_WQ(QWidget):
             if 'qfrmt_last' not in q_dict:
                 q_dict['qfrmt_last'] = qfrmt
 
-            logger.warning(f"qfrmt = {q_dict['qfrmt']} ({q_dict['qfrmt_last']})")
+            logger.warning(f"qfrmt = {q_dict['qfrmt']} (was: {q_dict['qfrmt_last']})")
 
             if qfrmt == 'qint':  # integer format
                 if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
@@ -509,15 +509,15 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        logger.error(f"Bef: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
-                     f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
+        # logger.error(f"Bef: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
+        #             f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
         self.q_dict.update(
             {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
         self.QObj.set_qdict(self.q_dict)  # update instance q_dict
-        logger.error(f"Aft: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
-                     f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
+        # logger.error(f"Aft: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
+        #              f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
 
 # ==============================================================================

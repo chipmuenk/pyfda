@@ -221,7 +221,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
         `fb.fil[0]['fxqc']['QCA']` and the UI is updated.
         """
         WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
-        logger.info(f"Delta W_A = {WI_A}")
         fb.fil[0]['fxqc']['QCA']['WI'] = WI_A
         # update quantization settings ('W', 'Q', ...) and UI
         self.wdg_wq_coeffs_a.QObj.set_qdict({})  # update `self.wdg_wq_coeffs_a.q_dict`
