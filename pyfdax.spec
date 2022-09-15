@@ -30,13 +30,13 @@ name_main = 'pyfdax'
 path_main = 'pyfda'
 
 from PyInstaller.utils.hooks import collect_submodules
-from PyInstaller.utils.hooks import collect_data_files
+## from PyInstaller.utils.hooks import collect_data_files
 
 hiddenimports = []
 datas = []
 #hiddenimports = collect_submodules('scipy.signal')
 #datas += collect_data_files('scipy.signal')
-datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
+## datas += collect_data_files('scipy.fftpack') # windows only? Adds some *.py files
 
 # add images and configuration files
 datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
@@ -45,8 +45,8 @@ datas += [('pyfda/fixpoint_widgets/*.png', 'pyfda/fixpoint_widgets'),
     ('./*.md', '.'),
     ('pyfda/*.md', 'pyfda')]
 
-hiddenimports += ['html.parser'] # needed for markdown 3.3 compatibility
-hiddenimports += ['scipy.special.cython_special']
+## hiddenimports += ['html.parser'] # needed for markdown 3.3 compatibility
+## hiddenimports += ['scipy.special.cython_special']
 ### Plot Widgets
 hiddenimports += [
     'pyfda.plot_widgets.plot_hf','pyfda.plot_widgets.plot_phi','pyfda.plot_widgets.plot_tau_g',
