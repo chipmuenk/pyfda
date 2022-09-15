@@ -95,8 +95,8 @@ a = Analysis(['pyfda/pyfdax.py'],
              noarchive=False)
 
 # Manually remove entire packages...
-a.binaries = [x for x in a.binaries if not x[0].startswith("IPython")] # no effect
-a.binaries = [x for x in a.binaries if not x[0].startswith("zmq")] # no effect
+## a.binaries = [x for x in a.binaries if not x[0].startswith("IPython")] # no effect
+## a.binaries = [x for x in a.binaries if not x[0].startswith("zmq")] # no effect
 
 # Remove specific libraries ...
 a.binaries = a.binaries - TOC([
