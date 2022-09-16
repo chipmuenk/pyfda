@@ -65,8 +65,7 @@ jobs:
             # zip -r9 pyfda pyfdax.app/
             CMD_BUILD: >
                 pyinstaller pyfdax_mac.spec &&
-                cd dist/ &&
-                ls -la
+                ls dist
             OUT_FILE_NAME: pyfdax.app  # pyfda.zip
             ASSET_MIME: application/zip
     steps:
