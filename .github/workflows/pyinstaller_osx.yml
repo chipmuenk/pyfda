@@ -66,7 +66,8 @@ jobs:
         pyinstaller pyfdax_mac.spec &&
         ls -la dist&&
         ls -la dist/pyfdax_osx_dir&&
-        less pyfdax_osx.app
+        less dist/pyfdax_osx.app&&
+        unzip -l dist/pyfdax_osx
     # ---
     - name: Load Release URL File from release job
       uses: actions/download-artifact@v1
@@ -87,6 +88,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-        asset_path: ./dist/pyfdax_osx.app
-        asset_name: pyfdax_osx.app
+        asset_path: ./dist/   # pyfdax_osx.app
+        asset_name: pyfdax_osx  # pyfdax_osx.app
         asset_content_type: application/zip
