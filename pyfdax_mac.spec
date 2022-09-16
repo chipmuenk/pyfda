@@ -12,6 +12,8 @@
 # Including an icon and other Mac-related stuff is described in
 # https://www.pythonguis.com/tutorials/packaging-pyqt5-applications-pyinstaller-macos-dmg/
 
+# check also https://github.com/actions/upload-release-asset/issues/35
+
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
