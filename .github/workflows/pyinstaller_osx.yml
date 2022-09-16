@@ -62,9 +62,10 @@ jobs:
         pip install pyinstaller pyinstaller-hooks-contrib
     # ---
     - name: Build with pyinstaller for MacOS
-          pyinstaller pyfdax_mac.spec &&
-          ls -la dist&&
-          ls -la pyfda_osx_dist
+      run:
+        pyinstaller pyfdax_mac.spec &&
+        ls -la dist&&
+        ls -la pyfda_osx_dist
     # ---
     - name: Load Release URL File from release job
       uses: actions/download-artifact@v1
