@@ -65,7 +65,8 @@ jobs:
           # ---
             TARGET: macos
             # ToDo: Why does the output file of pyinstaller have no suffix?
-            # zip -r9 pyfda pyfdax.app/
+            # zip directory recursively to pyfdax.app
+            # zip -r9 pyfda pyfdax.app/  
             CMD_BUILD: >
                 pyinstaller pyfdax_mac.spec &&
                 ls -la &&
