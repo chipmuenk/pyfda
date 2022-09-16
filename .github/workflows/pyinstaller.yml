@@ -54,8 +54,11 @@ jobs:
           - os: windows-latest
           # ---
             TARGET: windows
-            CMD_BUILD: pyinstaller pyfdax_win.spec
-            OUT_FILE_NAME: pyfdax.exe
+            CMD_BUILD: >
+                pyinstaller pyfdax_win.spec &&
+                ls -la &&
+                ls -la dist
+            OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           # ---
           - os: macos-latest
@@ -65,8 +68,9 @@ jobs:
             # zip -r9 pyfda pyfdax.app/
             CMD_BUILD: >
                 pyinstaller pyfdax_mac.spec &&
-                ls dist
-            OUT_FILE_NAME: pyfdax.app  # pyfda.zip
+                ls -la &&
+                ls -la dist
+            OUT_FILE_NAME: pyfdax_osx.app  # pyfda.zip
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v1

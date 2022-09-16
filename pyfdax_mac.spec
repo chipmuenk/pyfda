@@ -20,8 +20,8 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 block_cipher = None
-name_main = 'pyfdax'
-path_main = 'pyfda'
+name_main = 'pyfdax_osx'
+path_main = 'pyfda_osx'
 
 from PyInstaller.utils.hooks import collect_submodules
 ## from PyInstaller.utils.hooks import collect_data_files
@@ -151,6 +151,6 @@ coll = COLLECT(exe,
 
 # name and content of bundled file -> the actual app file
 app = BUNDLE(coll,
-             name='pyfdax.app',
+             name=name_main +'.app',
              icon=None,
              bundle_identifier=None)
