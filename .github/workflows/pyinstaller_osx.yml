@@ -64,10 +64,12 @@ jobs:
     - name: Build with pyinstaller for MacOS
       run:
         pyinstaller pyfdax_mac.spec &&
+        echo "ls -la dist" &&
         ls -la dist&&
+        echo "ls -la dist/pyfdax_osx_dir" &&
         ls -la dist/pyfdax_osx_dir&&
-        less dist/pyfdax_osx.app&&
-        unzip -l dist/pyfdax_osx
+        echo "ls -la dist/pyfdax_osx.app" &&
+        ls dist/pyfdax_osx.app
     # ---
     - name: Load Release URL File from release job
       uses: actions/download-artifact@v1
