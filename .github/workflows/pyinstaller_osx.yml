@@ -65,7 +65,7 @@ jobs:
       run:
         pyinstaller pyfdax_mac.spec &&
         ls -la dist&&
-        ls -la pyfda_osx_dir&&
+        ls -la dist/pyfda_osx_dir&&
         less pyfdax_osx.app
     # ---
     - name: Load Release URL File from release job
