@@ -102,10 +102,10 @@ class Plot_Tran_Stim(QWidget):
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
             # check whether some amplitude is complex and set array type for xf
-            # correspondingly. 
+            # correspondingly.
             if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
                 (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
-                    (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
+                (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
                 self.xf = np.zeros(N_frame, dtype=complex)
             else:
                 self.xf = np.zeros(N_frame, dtype=float)
