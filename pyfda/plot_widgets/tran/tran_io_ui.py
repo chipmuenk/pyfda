@@ -73,17 +73,23 @@ class Tran_IO_UI(QWidget):
         self.butLoad.setToolTip("Load data from file.")
         self.butLoad.setEnabled(True)
 
-        self.lbl_info = QLabel(to_html("File:", frmt="b"))
-
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        layH_io_par = QHBoxLayout()
-        layH_io_par.addWidget(self.butLoad)
-        layH_io_par.addWidget(self.lbl_info)
+        layG_io_file = QGridLayout()
+        self.lbl_file = QLabel(to_html("File:", frmt="b"))
+        self.lbl_filename = QLabel("None")
+        layG_io_file.addWidget(self.butLoad, 0, 0)
+        layG_io_file.addWidget(self.lbl_file, 0, 1)
+        layG_io_file.addWidget(self.lbl_filename, 0, 2)
+        
+        self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
+        self.lbl_shape_actual = QLabel("None")
+        layG_io_file.addWidget(self.lbl_shape, 1, 1)
+        layG_io_file.addWidget(self.lbl_shape_actual, 1, 2)
 
         layV_io = QVBoxLayout()
-        layV_io.addLayout(layH_io_par)
+        layV_io.addLayout(layG_io_file)
 
         layH_io = QHBoxLayout()
         layH_io.addLayout(layV_io)
