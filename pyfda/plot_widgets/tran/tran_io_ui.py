@@ -79,10 +79,10 @@ class Tran_IO_UI(QWidget):
         layG_io_file = QGridLayout()
         self.lbl_file = QLabel(to_html("File:", frmt="b"))
         self.lbl_filename = QLabel("None")
-        layG_io_file.addWidget(self.butLoad, 0, 0)
+        layG_io_file.addWidget(self.butLoad, 0, 0, 0, 1)
         layG_io_file.addWidget(self.lbl_file, 0, 1)
         layG_io_file.addWidget(self.lbl_filename, 0, 2)
-        
+
         self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
         self.lbl_shape_actual = QLabel("None")
         layG_io_file.addWidget(self.lbl_shape, 1, 1)
