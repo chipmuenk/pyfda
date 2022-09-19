@@ -174,6 +174,7 @@ class Plot_Impz(QWidget):
 
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.stim_wdg.sig_rx)
+        self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
@@ -347,6 +348,10 @@ class Plot_Impz(QWidget):
                 # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
                 # Highlight "RUN" button
+                if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
+                    logger.info(
+                        f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
+                        f"{self.file_io_wdg.N} samples.")
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
