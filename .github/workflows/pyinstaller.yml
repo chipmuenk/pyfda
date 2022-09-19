@@ -56,8 +56,8 @@ jobs:
             TARGET: windows
             CMD_BUILD: >
                 pyinstaller pyfdax_win.spec &&
-                ls -la &&
-                ls -la dist
+                ls &&
+                ls dist
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           # ---
