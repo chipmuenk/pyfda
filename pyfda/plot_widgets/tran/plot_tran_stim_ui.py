@@ -616,6 +616,7 @@ class Plot_Tran_Stim_UI(QWidget):
                 source.setText(str(params['FMT'].format(self.TW2 * self.t_scale)))
 
         def _store_entry(source):
+            """ Store transformed frequency / time values """
             if self.spec_edited:
                 if source.objectName() == "stimFreq1":
                     self.f1 = safe_eval(
