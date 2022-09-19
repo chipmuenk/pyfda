@@ -82,7 +82,16 @@ class Tran_IO(QWidget):
         self.x = io.import_data(
             self, title="Import Data", file_types=('csv', 'wav'))
         if self.x is not None and type(self.x) not in {np.ScalarType}:
+            logger.warning(f"Type of x: {type(self.x)}")
             qstyle_widget(self.ui.butLoad, "active")
+            if len(self.x.shape) == 1:
+                self.n_chan = 1
+                self.N = len(self.x)
+            elif len(self.x.shape) == 2:
+                self.n_chan = self.x.shape[0]
+                self.N = self.x.shape[1]
+            else:
+                logger.error(f"Unsuitable data with shape {self.x.shape}.")
             self.file_load_status = "loaded"
             logger.info(f"Shape = {self.x.shape}")
             self.emit({'data_changed': 'file_io'})
