@@ -55,9 +55,10 @@ jobs:
           # ---
             TARGET: windows
             CMD_BUILD: >
-                pyinstaller pyfdax_win.spec &&
+                pyinstaller pyfdax.spec &&
                 ls &&
-                ls dist
+                ls dist &&
+                mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           # ---
@@ -68,10 +69,11 @@ jobs:
             # zip directory recursively to pyfdax.app
             # zip -r9 pyfda pyfdax.app/  
             CMD_BUILD: >
-                pyinstaller pyfdax_win.spec &&
+                pyinstaller pyfdax.spec &&
                 ls -la &&
-                ls -la dist
-            OUT_FILE_NAME: pyfdax_win  # .app  # pyfda.zip
+                ls -la dist &&
+                mv dist/pyfdax dist/pyfdax_osx
+            OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v1

@@ -26,8 +26,8 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 block_cipher = None
-name_main = 'pyfdax_win'
-path_main = 'pyfda_win'
+name_main = 'pyfdax'
+path_main = 'pyfda'
 
 from PyInstaller.utils.hooks import collect_submodules
 ## from PyInstaller.utils.hooks import collect_data_files
