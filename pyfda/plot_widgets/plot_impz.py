@@ -149,7 +149,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
-        self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/speaker_90.svg"), "")
+        self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
         self.tab_stim_w.setTabToolTip(1, "I/O")
 
         self.resize_stim_tab_widget()
