@@ -17,6 +17,7 @@ import pyfda.libs.pyfda_io_lib as io
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval
 from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget
+import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
@@ -81,9 +82,13 @@ class Tran_IO(QWidget):
     def import_data(self):
         self.x = io.import_data(
             self, title="Import Data", file_types=('csv', 'wav'))
-        if self.x is not None and type(self.x) not in {np.ScalarType}:
-            logger.warning(f"Type of x: {type(self.x)}")
-            qstyle_widget(self.ui.butLoad, "active")
+        if self.x is None:
+            return  # file operation cancelled
+        elif type(self.x) != np.ndarray:
+            logger.warning("Unsuitable file format")
+            return
+        else:
+            logger.info(f"Type of x: {type(self.x)}")
             if len(self.x.shape) == 1:
                 self.n_chan = 1
                 self.N = len(self.x)
@@ -92,6 +97,11 @@ class Tran_IO(QWidget):
                 self.N = self.x.shape[1]
             else:
                 logger.error(f"Unsuitable data with shape {self.x.shape}.")
+                return
+            qstyle_widget(self.ui.butLoad, "active")
             self.file_load_status = "loaded"
             logger.info(f"Shape = {self.x.shape}")
             self.emit({'data_changed': 'file_io'})
+            self.ui.lbl_filename.setText(dirs.last_file_name)
+            self.ui.lbl_shape_actual.setText(
+                f"Channels = {self.n_chan}, Samples = {self.N}")
