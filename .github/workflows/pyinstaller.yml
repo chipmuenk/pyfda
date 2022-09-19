@@ -68,10 +68,10 @@ jobs:
             # zip directory recursively to pyfdax.app
             # zip -r9 pyfda pyfdax.app/  
             CMD_BUILD: >
-                pyinstaller pyfdax_mac.spec &&
+                pyinstaller pyfdax_win.spec &&
                 ls -la &&
                 ls -la dist
-            OUT_FILE_NAME: pyfdax_osx.app  # pyfda.zip
+            OUT_FILE_NAME: pyfdax_win  # .app  # pyfda.zip
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v1

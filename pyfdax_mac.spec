@@ -135,7 +135,7 @@ exe = EXE(pyz,
           upx=False,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True,
+          console=False,
      	  icon=None)
     # icon is set in main program via qrc resources, no import needed
 
