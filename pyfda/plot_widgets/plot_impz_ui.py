@@ -565,13 +565,15 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
     # -------------------------------------------------------------------------
-    def update_N(self, emit=True):
+    def update_N(self, emit=True, N_end=0):
         """
         Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
         When `emit==True`, fire `'ui_local_changed': 'N'` to update the FFT window
          and the `plot_impz` widgets. In contrast to `view_changed`, this also forces a
         recalculation of the transient response.
+
+        When N_end is specified, override manual entry and use the passed value
 
         This method is called by:
 
@@ -585,20 +587,30 @@ class PlotImpz_UI(QWidget):
             logger.error("update N: emit={0}".format(emit))
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
                                  return_type='int', sign='poszero')
-        self.led_N_start.setText(str(self.N_start))  # update widget
 
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
-        if self.N_user == 0:  # automatic calculation
-            self.N = self.calc_n_points(self.N_user)  # widget remains set to 0
-            self.led_N_points.setText("0")  # update widget
+        if N_end > 0:  # total number of data points was specified, e.g. for file I/O
+            if N_end <= self.N_start:
+                logger.warning(
+                    f"Total number of data points {N_end} is less than N_start, "
+                    "setting N_start = 0.")
+                self.N_start = 0
+            self.N_end = N_end
+            # calculate number of visible data points
+            self.N = self.N_end - self.N_start
         else:
-            self.N = self.N_user
-            self.led_N_points.setText(str(self.N))  # update widget
+            if self.N_user == 0:  # automatic calculation
+                self.N = self.calc_n_points(self.N_user)  # widget remains set to 0
+                self.led_N_points.setText("0")  # update widget
+            else:
+                self.N = self.N_user
+                self.led_N_points.setText(str(self.N))  # update widget
+            # total number of points to be calculated: N + N_start
+            self.N_end = self.N + self.N_start
 
-        # total number of points to be calculated: N + N_start
-        self.N_end = self.N + self.N_start
+        self.led_N_start.setText(str(self.N_start))  # update widget
 
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
                                       return_type='int', sign='poszero')
