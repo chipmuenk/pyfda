@@ -349,7 +349,7 @@ to be complex (no real values).
         dlg = QFileDialog(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileName_(
-                caption = "Save filter as", directory = dirs.save_dir,
+                caption = "Save filter as", directory=dirs.last_file_dir,
                 filter = file_filters)
     
         file_name = str(file_name)  # QString -> str() needed for Python 2.x
@@ -378,7 +378,7 @@ to be complex (no real values).
                     logger.error('Filter has no residues/poles, cannot save as *.txt_rpk file')
                 if not file_type_err:
                     logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
-                    dirs.save_dir = os.path.dirname(file_name) # save new dir
+                    dirs.last_file_dir = os.path.dirname(file_name) # save new dir
     
             except IOError as e:
                 logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))

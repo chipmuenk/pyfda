@@ -825,7 +825,7 @@ def import_data(parent, fkey=None, title="Import",
 
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
     dlg.setNameFilter(file_filters)  # pass available file filters
     dlg.setDefaultSuffix('csv')  # default suffix when none is given
@@ -874,7 +874,8 @@ def import_data(parent, fkey=None, title="Import",
         if not err:
             logger.info(
                 f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
-            dirs.save_dir = os.path.dirname(file_name)
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)
             dirs.last_file_type = file_type
             return data_arr  # returns numpy array
 
@@ -927,7 +928,7 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # return selected file name (with or without extension) and filter (Linux: full text)
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)  # set the list with all available file formats
     # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
@@ -1028,7 +1029,8 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
-            dirs.save_dir = os.path.dirname(file_name)  # save new dir
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
             dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
@@ -1305,7 +1307,7 @@ def load_filter(self):
 
     dlg = QFileDialog(self)
     dlg.setWindowTitle("Load Filter")
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
     dlg.setNameFilter(file_filters)  # pass available file filters
     # dlg.setDefaultSuffix('csv')  # default suffix when none is given
@@ -1353,7 +1355,8 @@ def load_filter(self):
                         logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
 
                 logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
-                dirs.save_dir = os.path.dirname(file_name)  # update working dir
+                dirs.last_file_name = file_name
+                dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
                 dirs.last_file_type = file_type  # save file type
                 # emit signal -> filter loaded
                 self.emit({'data_changed': 'filter_loaded'})
@@ -1375,7 +1378,7 @@ def save_filter(self):
 
     dlg = QFileDialog(self)
     dlg.setWindowTitle("Save filter as")
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
     dlg.setNameFilter(file_filters)
 
@@ -1403,7 +1406,8 @@ def save_filter(self):
 
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
-            dirs.save_dir = os.path.dirname(file_name)  # save new dir
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
             dirs.last_file_type = file_type  # save file type
 
     except IOError as e:

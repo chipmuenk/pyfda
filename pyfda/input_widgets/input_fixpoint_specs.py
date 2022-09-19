@@ -668,7 +668,7 @@ class Input_Fixpoint_Specs(QWidget):
         dlg.setDefaultSuffix('v')
         dlg.setWindowTitle('Export Verilog')
         dlg.setNameFilter(file_types)
-        dlg.setDirectory(dirs.save_dir)
+        dlg.setDirectory(dirs.last_file_dir)
         # set mode "save file" instead "open file":
         dlg.setAcceptMode(QFileDialog.AcceptSave)
         dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
@@ -680,7 +680,7 @@ class Input_Fixpoint_Specs(QWidget):
 #       # static method getSaveFileName_() is simple but unflexible
 #         hdl_file, hdl_filter = dlg.getSaveFileName_(
 #                 caption="Save Verilog netlist as (this also defines the module name)",
-#                 directory=dirs.save_dir, filter=file_types)
+#                 directory=dirs.last_file_dir, filter=file_types)
 #         hdl_file = qstr(hdl_file)
 #         if hdl_file != "": # "operation cancelled" returns an empty string
 #             # return '.v' or '.vhd' depending on filetype selection:
@@ -692,9 +692,11 @@ class Input_Fixpoint_Specs(QWidget):
             hdl_dir_name = os.path.dirname(hdl_file)  # extract the directory path
             if not os.path.isdir(hdl_dir_name):  # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
-            dirs.save_dir = hdl_dir_name  # make this directory the new default / base dir
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
             hdl_full_name = os.path.join(hdl_dir_name, hdl_file_name + ".v")
+            dirs.last_file_name = hdl_full_name
+            dirs.last_file_dir = hdl_dir_name  # make this directory the new default / base dir
+            # dirs.file
             # remove all non-alphanumeric chars:
             vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
 
