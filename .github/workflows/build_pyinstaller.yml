@@ -56,8 +56,6 @@ jobs:
             TARGET: windows
             CMD_BUILD: >
                 pyinstaller pyfdax.spec &&
-                ls &&
-                ls dist &&
                 mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
@@ -67,8 +65,6 @@ jobs:
             TARGET: macos
             CMD_BUILD: >
                 pyinstaller pyfdax.spec &&
-                ls -la &&
-                ls -la dist &&
                 mv dist/pyfdax dist/pyfdax_osx
             OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
