@@ -72,7 +72,7 @@ jobs:
     # https://github.com/marvinpinto/actions/issues/177
     needs: [flatpak]
     runs-on: ubuntu-latest # does not matter which
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Download artifacts
@@ -90,7 +90,7 @@ jobs:
           ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
 
       - name: Update GitHub prerelease
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
