@@ -11,8 +11,7 @@ Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, QProgressBar, pyqtSignal, QEvent, Qt, QSize, QHBoxLayout, QVBoxLayout,
-    QGridLayout, QTabWidget, QFrame)
+    QIcon, QProgressBar, pyqtSignal, QSize, QHBoxLayout, QVBoxLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
@@ -35,7 +34,7 @@ class PlotImpz_UI(QWidget):
     # incoming: not implemented at the moment, update_N is triggered directly
     # by plot_impz
     # sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
     # outgoing: to fft related widgets (FFT window widget, qfft_win_select)
     sig_tx_fft = pyqtSignal(object)
@@ -87,6 +86,9 @@ class PlotImpz_UI(QWidget):
         self.N_frame_user = 0
         self.N_frame = 0
 
+        # run
+        self.cmb_sim_select_init = "float"
+
         # time
         self.plt_time_resp = "stem"
         self.plt_time_stim = "line"
@@ -126,6 +128,13 @@ class PlotImpz_UI(QWidget):
             self, self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
+
+        # combobox fixpoint / floating point simulation
+        self.cmb_sim_select_items = [
+            "<span>Simulate floating-point or fixpoint response.</span>",
+            ("float", "Float", "floating point simulation"),
+            ("fixpoint", "Fixpoint", "fixpoint simulation")
+        ]
 
         # data / icon / tooltipp (none) for plotting styles
         self.plot_styles_list = [
@@ -195,10 +204,7 @@ class PlotImpz_UI(QWidget):
         self.but_run.setEnabled(True)
 
         self.cmb_sim_select = QComboBox(self)
-        self.cmb_sim_select.addItems(["Float", "Fixpoint"])
-        qset_cmb_box(self.cmb_sim_select, "Float")
-        self.cmb_sim_select.setToolTip("<span>Simulate floating-point or "
-                                       "fixpoint response.</span>")
+        qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items, self.cmb_sim_select_init)
 
         self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
@@ -559,13 +565,15 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
 
     # -------------------------------------------------------------------------
-    def update_N(self, emit=True):
+    def update_N(self, emit=True, N_end=0):
         """
         Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
-        When `emit==True`, fire `'ui_changed': 'N'` to update the FFT window and the
-        `plot_impz` widgets. In contrast to `view_changed`, this also forces a
+        When `emit==True`, fire `'ui_local_changed': 'N'` to update the FFT window
+         and the `plot_impz` widgets. In contrast to `view_changed`, this also forces a
         recalculation of the transient response.
+
+        When N_end is specified, override manual entry and use the passed value
 
         This method is called by:
 
@@ -579,24 +587,34 @@ class PlotImpz_UI(QWidget):
             logger.error("update N: emit={0}".format(emit))
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
                                  return_type='int', sign='poszero')
-        self.led_N_start.setText(str(self.N_start))  # update widget
 
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
-        if self.N_user == 0:  # automatic calculation
-            self.N = self.calc_n_points(self.N_user)  # widget remains set to 0
-            self.led_N_points.setText("0")  # update widget
+        if N_end > 0:  # total number of data points was specified, e.g. for file I/O
+            if N_end <= self.N_start:
+                logger.warning(
+                    f"Total number of data points {N_end} is less than N_start, "
+                    "setting N_start = 0.")
+                self.N_start = 0
+            self.N_end = N_end
+            # calculate number of visible data points
+            self.N = self.N_end - self.N_start
         else:
-            self.N = self.N_user
-            self.led_N_points.setText(str(self.N))  # update widget
+            if self.N_user == 0:  # automatic calculation
+                self.N = self.calc_n_points(self.N_user)  # widget remains set to 0
+                self.led_N_points.setText("0")  # update widget
+            else:
+                self.N = self.N_user
+                self.led_N_points.setText(str(self.N))  # update widget
+            # total number of points to be calculated: N + N_start
+            self.N_end = self.N + self.N_start
 
-        # total number of points to be calculated: N + N_start
-        self.N_end = self.N + self.N_start
-        
+        self.led_N_start.setText(str(self.N_start))  # update widget
+
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
-                                 return_type='int', sign='poszero')
-        
+                                      return_type='int', sign='poszero')
+
         if self.N_frame_user == 0:
             self.N_frame = self.N_end  # use N_end for frame length
             self.led_N_frame.setText("0")  # update widget with "0" as set by user
@@ -609,9 +627,9 @@ class PlotImpz_UI(QWidget):
             self.update_freqs()
 
         if emit:
-            # use `'ui_changed'` as this triggers recalculation of the transient
-            # response
-            self.emit({'ui_changed': 'N'})
+            # use `'ui_local_changed'` as this triggers recalculation of the
+            #  transient response
+            self.emit({'ui_local_changed': 'N'})
 
     # ------------------------------------------------------------------------------
     def toggle_fft_wdg(self):

@@ -39,19 +39,25 @@ logger = logging.getLogger(__name__)
 
 V_NP = np.__version__
 V_NUM = numexpr.__version__
-
-# redirect stdio output of show_config to string
-f = io.StringIO()
-with redirect_stdout(f):
-    np.show_config()
-INFO_NP = f.getvalue()
-
-if 'mkl_info' in INFO_NP:
-    MKL = " (mkl)"
+V_NUM_MKL = numexpr.get_vml_version()
+if V_NUM_MKL:
+    MKL = f" (mkl: {V_NUM_MKL:s})"
 else:
-    MKL = ""
+    MKL = " (no mkl)"
 
-# logger.warning(INFO_NP)
+# # redirect stdio output of show_config to string
+# f = io.StringIO()
+# with redirect_stdout(f):
+#     np.show_config()
+# INFO_NP = f.getvalue()
+
+
+# if 'mkl_info' in INFO_NP:
+#     MKL = " (mkl)"
+# else:
+#     MKL = ""
+
+# # logger.warning(INFO_NP)
 
 
 __all__ = ['cmp_version', 'mod_version',
@@ -78,13 +84,6 @@ MODULES = {'python':       {'V_PY': V_PY},
            }
 
 # ================ Optional Modules ============================
-
-try:
-    from pyfixp import __version__ as V_FX
-    MODULES.update({'pyfixp': {'V_FX': V_FX}})
-except ImportError:
-    MODULES.update({'pyfixp': {'V_FX': None}})
-
 try:
     from docutils import __version__ as V_DOC
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
@@ -94,12 +93,6 @@ except ImportError:
 try:
     from mplcursors import __version__ as V_CUR
     MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
-except ImportError:
-    pass
-
-try:
-    from nmigen import __version__ as V_NMG
-    MODULES.update({'nmigen': {'V_NMG': V_NMG}})
 except ImportError:
     pass
 
@@ -328,27 +321,6 @@ def qstr(text):
     """
     return str(text)  # this should be sufficient for Python 3 ?!
 
-    text_type = str(type(text)).lower()
-
-    if "qstring" in text_type:
-        # Python 3: convert QString -> str
-        # string = str(text)
-        # Convert QString -> Utf8
-        string = text.toUtf8()
-    elif "qvariant" in text_type:
-        # Python 2: convert QVariant -> QString
-        string = text.toString()
-        # string = QVariant(text).toString()
-        # string = str(text.toString())
-    elif "unicode" in text_type:
-        return text
-    else:
-        # `text` is numeric or of type str
-        string = str(text)
-
-    return str(string)  # convert QString -> str
-
-
 ###############################################################################
 # General functions ###########################################################
 ###############################################################################
@@ -402,7 +374,7 @@ def first_item(d: dict) -> str:
 
 
 # ------------------------------------------------------------------------------
-def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
+def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     """
     Provide pretty printed logging messages for dicts or lists.
 
@@ -410,11 +382,33 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
 
     If the value of dict key `d[k]` is a list or ndarray with more than `N` items,
     truncate it to `N` items.
+
+    Parameters
+    ----------
+    d : iterable
+        A dict or an array-like object with one or two dimensions
+        to be pretty-printed
+
+    N : int
+        maximum number of items to be printed per dimension
+
+    tab : str
+        tabulator character / string, default: '\t'
+
+    debug : bool
+        add debug info to output string, default: False
+
+    Returns
+    -------
+    s : str
+        formatted and truncated iterable as a string
     """
     cr = os.linesep
     s = tab
     first = True
-    # logger.info("Data: Type = {0}, ndim = {1}".format(type(d), np.ndim(d)))
+    if debug:
+        logger.info(f"Data: {type(d).__name__}[{type(d[0]).__name__}], "
+                    f"ndim={np.ndim(d)}")
     if type(d) == dict:
         for k in d:
             if not first:
@@ -426,8 +420,6 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
                 s += k + ' : ' + str(d[k])
             first = False
     elif type(d) in {list, np.ndarray}:
-        # if type(d) == np.ndarray:
-        #    d = d.tolist()
         if np.ndim(d) == 1:
             s += ('Type: {0} of {1}, Shape =  ({2} x 1)' + cr + tab)\
                 .format(type(d).__name__, type(d[0]).__name__, len(d))
@@ -436,22 +428,20 @@ def pprint_log(d, N: int = 10, tab: str = "\t") -> str:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
-            s += ('Type: {0} of {1}({2}), Shape = ({3} x {4})' + cr + tab)\
-                .format(type(d).__name__, type(d[0][0])
-                        .__name__, d[0][0].dtype, rows, cols)
-            #  use x.dtype.kind for general kind of numpy data
-            logger.debug(s)
+            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__} '
+                  f'({d[0][0].dtype}), Shape = ({rows} x {cols})' + cr + tab)
+            #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
             for c in range(min(N-1, cols)):
                 if not first:
                     s += cr + tab
-                logger.debug('rows={0}; min(N-1, rows)={1}\nd={2}'
-                             .format(rows, min(N, rows), d[c][:min(N, rows)]))
-                s += str(d[c][: min(N, rows)])
+                # logger.warning(f'rows={rows}; min(N-1, rows)={min(N, rows)}\n'
+                #                f'd={d[c][:min(N, rows)]}')
+                s += str(d[c][:min(N, rows)])
                 if rows > N-1:
                     s += ' ...'
                 first = False
-            s = d
-
+        else:
+            logger.warning(f"Object with ndim = {np.ndim(d)} cannot be processed.")
     return s
 
 
@@ -482,7 +472,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         `expr` converted to a numpy array or scalar
 
     """
-    local_dict.update({'j': 1j})
+    local_dict.update({'j': 1j, 'None': 0})
     if type(fallback) == tuple:
         np_expr = np.zeros(fallback)  # fallback defines the shape
         fallback_shape = fallback
@@ -490,24 +480,37 @@ def safe_numexpr_eval(expr: str, fallback=None,
         np_expr = fallback  # fallback is the default numpy return value or None
         fallback_shape = np.shape(fallback)
 
+    if type(expr) != str or expr == "None":
+        logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
+                       f"'{type(expr).__name__}', replacing with zero.")
+        expr = "0.0"
+
+    expr = expr.lstrip('0')  # remove trailing zeros which cannot be processed
+    if len(expr) == 0:
+        expr = "0"
+    else:
+        expr = expr.replace(',', '.')  # ',' -> '.' for German-style numbers
+        if expr[0] == '.':  # prepend '0' when the number starts with '.'
+            expr = "0" + expr
     try:
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
-        logger.warning("Syntax error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Syntax error:\n\t{e}")
     except KeyError as e:
-        logger.warning("Unknown variable {0}".format(e))
+        logger.warning(f"numexpr: Unknown variable {e}")
     except TypeError as e:
-        logger.warning("Type error\n\t{0}".format(e))
+        logger.warning(f"numexpr: Type error\n\t{e}")
     except AttributeError as e:
-        logger.warning("Attribute error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Attribute error:\n\t{e}")
     except ValueError as e:
-        logger.warning("Value error:\n\t{0}".format(e))
+        logger.warning(f"numexpr: Value error:\n\t{e}")
     except ZeroDivisionError:
-        logger.warning("Zero division error in formula.")
+        logger.warning("numexpr: Zero division error in formula.")
 
     if np_expr is None:
         return None  # no fallback, no error checking!
-    # check if dimensions of converted string agree with expected dimensions
+
+    # check if dimensions of converted string agrees with expected dimensions
     elif np.ndim(np_expr) != np.ndim(fallback):
         if np.ndim(np_expr) == 0:
             # np_expr is scalar, return array with shape of fallback of constant values
@@ -515,13 +518,14 @@ def safe_numexpr_eval(expr: str, fallback=None,
         else:
             # return array of zeros in the shape of the fallback
             logger.warning(
-                "Expression has unexpected dimension {0}!".format(np.ndim(np_expr)))
+                f"numexpr: Expression has unexpected dimension {np.ndim(np_expr)}!")
             np_expr = np.zeros(fallback_shape)
 
     if np.shape(np_expr) != fallback_shape:
         logger.warning(
-            "Expression has unsuitable length {0}!".format(np.shape(np_expr)[0]))
+            f"numexpr: Expression has unsuitable length {np.shape(np_expr)[0]}!")
         np_expr = np.zeros(fallback_shape)
+
     if not type(np_expr.item(0)) in {float, complex}:
         np_expr = np_expr.astype(float)
 

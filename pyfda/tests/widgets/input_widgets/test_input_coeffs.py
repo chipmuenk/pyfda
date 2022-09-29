@@ -77,12 +77,12 @@ class FilterCoeffsTest(unittest.TestCase):
         # self.ui.ledScale.setText("1.5")
         self.set_cmb_box(self.ui.cmbFilterType, 'FIR')
         spy = QSignalSpy(self.form.sig_tx)
-        self.set_cmb_box(self.ui.cmbFormat, 'Float')
+        self.set_cmb_box(self.ui.cmb_fx_base, 'Float')
         # Push <Delete Table> Button with the left mouse button
         QTest.mouseClick(self.ui.butClear, Qt.LeftButton)
 
     def initialize_fixpoint_format(self):
-        self.set_cmb_box(self.ui.cmbFormat, 'Dec')
+        self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
         self.set_lineedit_value(self.ui.ledW, "8")
         # The following triggers recalculation of scale etc.
         self.set_cmb_box(self.ui.cmbQFrmt, 'Integer')
@@ -99,7 +99,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.ui.spnDigits.value(), 4)
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "FIR")
 
-        self.assertEqual(qget_cmb_box(self.ui.cmbFormat, data=False).lower(), "float")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "float")
         self.assertEqual(self.ui.butSetZero.text(), "= 0")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
@@ -136,14 +136,14 @@ class FilterCoeffsTest(unittest.TestCase):
     def test_fixpoint_defaults(self):
         """Test fixpoint setting in its default state"""
         self.init()
-        self.set_cmb_box(self.ui.cmbFormat, 'Dec')
+        self.set_cmb_box(self.ui.cmb_fx_base, 'Dec')
         self.assertEqual(self.ui.spnDigits.value(), 4)
         self.assertEqual(qget_cmb_box(self.ui.cmbFilterType, data=False), "FIR")
 
         self.assertEqual(self.ui.ledW.text(), "16")
         self.assertEqual(self.ui.ledWF.text(), "15")
         self.assertEqual(self.ui.ledWI.text(), "0")
-        self.assertEqual(qget_cmb_box(self.ui.cmbFormat, data=False).lower(), "dec")
+        self.assertEqual(qget_cmb_box(self.ui.cmb_fx_base, data=False).lower(), "dec")
         self.assertEqual(self.get_cmb_box(self.ui.cmbQOvfl), 'wrap')
         self.assertEqual(self.get_cmb_box(self.ui.cmbQuant), 'floor')
         self.assertEqual(self.ui.butSetZero.text(), "= 0")

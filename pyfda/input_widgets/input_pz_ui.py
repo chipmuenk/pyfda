@@ -15,7 +15,7 @@ from pyfda.libs.compat import (
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
-from pyfda.libs.pyfda_io_lib import CSV_option_box
+from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
@@ -63,12 +63,12 @@ class Input_PZ_UI(QWidget):
 
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
             return  # probably not needed
-        elif 'ui_changed' in dict_sig:
+        elif 'ui_global_changed' in dict_sig:
             self._set_load_save_icons()  # update icons file <-> clipboard
             # inform e.g. the p/z input widget about changes in CSV options
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -153,13 +153,6 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing / manipulating cells and rows
         # ---------------------------------------------
-
-#        self.cmbFilterType = QComboBox(self)
-#        self.cmbFilterType.setObjectName("comboFilterType")
-#        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
-#        self.cmbFilterType.addItems(["FIR","IIR"])
-#        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.butAddCells = QPushButton(self)
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         self.butAddCells.setIconSize(q_icon_size)
@@ -293,7 +286,7 @@ class Input_PZ_UI(QWidget):
                 else:
                     dirs.csv_options_handle.close()
 
-        self.emit({'ui_changed': 'csv'})
+        self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
     def _close_csv_win(self):

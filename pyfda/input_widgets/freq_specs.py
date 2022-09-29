@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, unique_roots
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, pprint_log
+from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -95,11 +95,11 @@ class FreqSpecs(QWidget):
         self.frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout()  # Widget main layout
-        self.layVMain.addWidget(self.frmMain)  #, Qt.AlignLeft)
+        self.layVMain.addWidget(self.frmMain)  # , Qt.AlignLeft)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
 
-        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
+        self.n_cur_labels = 0  # number of currently visible labels / qlineedits
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -198,7 +198,7 @@ class FreqSpecs(QWidget):
 
         # ---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
-                            fb.fil[0]['rt'], fb.fil[0]['fc'],fb.fil[0]['fo']))
+                            fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]['fo']))
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
@@ -230,7 +230,7 @@ class FreqSpecs(QWidget):
     def recalc_freqs(self):
         """
         Update normalized frequencies if required. This is called by via signal
-        ['ui_changed': 'f_S']
+        ['view_changed': 'f_S']
         """
         if fb.fil[0]['freq_locked']:
             for i in range(len(self.qlineedit)):
@@ -278,13 +278,13 @@ class FreqSpecs(QWidget):
         self.update_f_unit()
 
         for i in range(len(self.qlineedit)):
-            f_name = str(self.qlineedit[i].objectName()).split(":",1)
+            f_name = str(self.qlineedit[i].objectName()).split(":", 1)
             f_label = f_name[0]
             f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(f_value))
+                self.qlineedit[i].setText(params['FMT'].format(f_value))  # TODO: WTF?!
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(f_value))
@@ -307,7 +307,8 @@ class FreqSpecs(QWidget):
         num_tot_labels = len(self.qlabels)  # number of existing labels (vis. + invis.)
 
         # less new subwidgets than currently displayed -> _hide some
-        if num_new_labels < self.n_cur_labels:  # less new labels/qlineedit fields than before
+        if num_new_labels < self.n_cur_labels:
+            # less new labels/qlineedit fields than before
             for i in range(num_new_labels, num_tot_labels):
                 self.qlabels[i].hide()
                 self.qlineedit[i].hide()
@@ -354,14 +355,19 @@ class FreqSpecs(QWidget):
         # by at least MIN_FREQ_STEP
         for i in range(self.n_cur_labels):
             if f_specs[i] <= MIN_FREQ:
-                logger.warning("Frequencies must be > 0, changed {0} from {1:.4g} to {2:.4g}."\
-                               .format(str(self.qlineedit[i].objectName()),f_specs[i]*fb.fil[0]['f_S'],
-                                       (MIN_FREQ + MIN_FREQ_STEP)*fb.fil[0]['f_S']))
+                logger.warning(
+                    "Frequencies must be > 0, changed {0} from {1:.4g} to {2:.4g}."
+                    .format(str(self.qlineedit[i].objectName()),
+                            f_specs[i]*fb.fil[0]['f_S'],
+                            (MIN_FREQ + MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MIN_FREQ + MIN_FREQ_STEP
+
             if f_specs[i] >= MAX_FREQ:
-                logger.warning("Frequencies must be < f_S /2, changed {0} from {1:.4g} to {2:.4g}."\
-                               .format(str(self.qlineedit[i].objectName()),f_specs[i]*fb.fil[0]['f_S'],
-                                       (MAX_FREQ - MIN_FREQ_STEP)*fb.fil[0]['f_S']))
+                logger.warning(
+                    "Frequencies must be < f_S /2, changed {0} from {1:.4g} to {2:.4g}."
+                    .format(str(self.qlineedit[i].objectName()),
+                            f_specs[i]*fb.fil[0]['f_S'],
+                            (MAX_FREQ - MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MAX_FREQ - MIN_FREQ_STEP
 
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]

@@ -119,13 +119,18 @@ as needed.
     :math:`0 \ldots f_S/2` to :math:`-f_S/2 \ldots f_S/2`, this information can
     be propagated with the ``'view_changed'`` key.
 
-:'ui_changed': Propagate a change of the UI to other widgets, examples are:
+:'ui_local_changed': Propagate a change of the UI to the containing widget but not
+    to other widgets, examples are:
+    - ``'ui_local_changed': self.sender().objectName()'`` to propagate the name of
+        the emitting subwidget
 
-     - ``'ui_changed':'csv'`` for a change of CSV import / export options
+:'ui_global_changed': Propagate a change of the UI to other widgets, examples are:
 
-     - ``'ui_changed':'resize'`` when the parent window has been resized
+     - ``'ui_global_changed':'csv'`` for a change of CSV import / export options
 
-     - ``'ui_changed':'tab'`` when a different tab has been selected
+     - ``'ui_global_changed':'resize'`` when the parent window has been resized
+
+     - ``'ui_global_changed':'tab'`` when a different tab has been selected
 
 :'fx_sim': Signal the phase / status of a fixpoint simulation ('finished', 'error')
 

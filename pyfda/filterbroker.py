@@ -225,6 +225,7 @@ fil_tree = freeze_hierarchical({
 fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             'N': 10,  # filter order
             'f_S': 1, 'T_S': 1,  # current sampling frequency and period
+            'f_S_wav': 16000,  # sampling frequency for wav files
             'f_S_prev': 1,  # previous sampling frequency
             'freq_locked': False,  # don't update absolute frequencies when f_S is changed
             'f_S_scale': 1,  #
@@ -248,19 +249,20 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             #
             'sos': [],
             # input, output, accu, coeffs, ... fixpoint word formats and quantizer
-            # settings as well as coefficients in integer format (scaled with W):
+            # settings:
             'fxqc':
                 {'QI': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round'},
                  'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor'},
-                 'QA': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'},
+                 'QACC': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'},
                  'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 2, 'frmt': 'float'},
+                         'scale': 1, 'fx_base': 'float'},
                  'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 4, 'frmt': 'float'},
-                 'b': [32768, 32768, 32768],
-                 'a': [65536, 6553, 0]
-                 },
-
+                         'scale': 1, 'fx_base': 'float'}
+                },
+                # 'b': [32768, 32768, 32768],
+                # 'a': [65536, 6553, 0]
+                # },
+            'fx_sim': False,  # fixpoint simulation mode 
             'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit': 'dB',
 

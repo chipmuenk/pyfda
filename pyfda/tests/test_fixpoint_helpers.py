@@ -33,7 +33,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.stim = np.array([0,1,15,64,32767,-1,-64,0]) # last zero isn't tested due to latency of 1
 
         # initialize a pyfda fixpoint quantizer
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'fx_base': 'dec', 'scale': 1}
         self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
@@ -81,15 +81,15 @@ class TestSequenceFunctions(unittest.TestCase):
         Check whether parameters are written correctly to the fixpoint instance
         """
 
-        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
-        self.myQ.setQobj(q_obj)
+        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
+        self.myQ.set_qdict(q_obj)
 
         # check whether option 'norm' sets the correct scale
-        self.myQ.setQobj({'scale':'norm'})
-        self.assertEqual(2**(-self.myQ.WI), self.myQ.scale)
+        self.myQ.set_qdict({'scale':'norm'})
+        self.assertEqual(2**(-self.myQ.q_dict['WI']), self.myQ.q_dict['scale'])
         # check whether option 'int' sets the correct scale
-        self.myQ.setQobj({'scale':'int'})
-        self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
+        self.myQ.set_qdict({'scale':'int'})
+        self.assertEqual(1<<self.myQ.q_dict['WF']), self.myQ.q_dict['scale'])
 
     #==========================================================================
     # Test requant routine, this needs a migen class (DUT)
@@ -126,7 +126,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'scale':'int'}) 
-        self.myQ.setQobj(q_out_pyfda)      
+        self.myQ.set_qdict(q_out_pyfda)      
 
         self.dut = DUT(q_in, q_out) # pass quantization dicts
         response = self.run_sim(self.stim)
@@ -147,7 +147,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'WI':6, 'WF':0, 'W':7}) # use integer representation
-        self.myQ.setQobj(q_out_pyfda)
+        self.myQ.set_qdict(q_out_pyfda)
       
         self.dut = DUT(q_in, q_out)
         response = self.run_sim(self.stim)

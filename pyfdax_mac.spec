@@ -8,17 +8,11 @@
 # How to choose between OpenBLAS and MKL optimized numpy / scipy: The MKL libraries increase
 # size of the exe from ~80 MB to 350 MB under linux (and I haven't seen a speed gain)
 # https://docs.anaconda.com/mkl-optimizations/
-# This only works under Linux and OS X, under Windows there seems to be no feasible
-# alternative to scipy built with mkl
-# see:  https://stackoverflow.com/questions/46656367/how-to-create-an-environment-in-anaconda-with-numpy-nomkl
 
-# Under windows, Qt library become installed twice, bloating the resulting exe
-# This might be caused by pywin32 (Anaconda) and pypiwin32 both installed (or a similar
-# issue related to Qt5)
-# https://github.com/pyinstaller/pyinstaller/issues/1488
+# Including an icon and other Mac-related stuff is described in
+# https://www.pythonguis.com/tutorials/packaging-pyqt5-applications-pyinstaller-macos-dmg/
 
-# Including an icon seems to be problem under windows. Some hints at
-# https://stackoverflow.com/questions/45628653/add-ico-file-to-executable-in-pyinstaller
+# check also https://github.com/actions/upload-release-asset/issues/35
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -26,8 +20,8 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 block_cipher = None
-name_main = 'pyfdax'
-path_main = 'pyfda'
+name_main = 'pyfdax_osx'
+path_main = 'pyfda_osx'
 
 from PyInstaller.utils.hooks import collect_submodules
 ## from PyInstaller.utils.hooks import collect_data_files
@@ -80,7 +74,6 @@ excludes += collect_submodules('nbformat')
 #excludes += collect_submodules('scipy.ndimage') # needed
 #jupyter,scipy.spatial, scipy.stats, scipy.integrate, scipy.interpolate
 
-# For MKL, set  binaries=[('/home/cmuenker/anaconda3/lib/libiomp5.so','.')],
 a = Analysis(['pyfda/pyfdax.py'],
              pathex=[],
              binaries=[],
@@ -122,14 +115,13 @@ a.binaries = a.binaries - TOC([
 a.datas = [x for x in a.datas if 
 	(not x[0].startswith('tk')
 	 and not x[0].startswith('IPython')
-	 # and not x[0].startswith('scipy/fftpack') # needed for windows
 	 and not x[0].startswith('lib')
 	 and not x[0].startswith('notebook'))]
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
-# name and content of the executable
+# name and content of the executable in the bundle file
 exe = EXE(pyz,
           a.scripts,
           a.binaries,
@@ -143,7 +135,7 @@ exe = EXE(pyz,
           upx=False,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True,
+          console=False,
      	  icon=None)
     # icon is set in main program via qrc resources, no import needed
 
@@ -156,3 +148,9 @@ coll = COLLECT(exe,
                upx=False,
                upx_exclude=[],
                name=name_main + '_dir')
+
+# name and content of bundled file -> the actual app file
+app = BUNDLE(coll,
+             name=name_main +'.app',
+             icon=None,
+             bundle_identifier=None)

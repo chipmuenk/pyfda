@@ -1,5 +1,5 @@
 ---
-name: pyfda
+name: build_flatpak
 on:
   push:
   pull_request:

@@ -718,7 +718,7 @@ class QFFTWinSelector(QWidget):
         self.win_dict.update({'cur_win_name': win_name, 'win': []})
         self.win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
 
-        return win_err  # error flag, ui (window combo box) needs to be updated
+        return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
     def get_window(self, N: int, win_name: str = None, sym: bool = False,

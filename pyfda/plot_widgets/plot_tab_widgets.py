@@ -172,11 +172,11 @@ class PlotTabWidgets(QTabWidget):
 
 # ------------------------------------------------------------------------------
     def current_tab_changed(self):
-        self.emit({'ui_changed': 'tab'})
+        self.emit({'ui_global_changed': 'tab'})
 
 # ------------------------------------------------------------------------------
     def current_tab_redraw(self):
-        self.emit({'ui_changed': 'resized'})
+        self.emit({'ui_global_changed': 'resized'})
 
 # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):

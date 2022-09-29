@@ -15,18 +15,16 @@ import re
 import importlib
 
 from pyfda.libs.compat import (
-    Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel, QPixmap,
+    Qt, QWidget, QPushButton, QComboBox, QFileDialog, QLabel, QPixmap,
     QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QSizePolicy)
 
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import qstr, cmp_version, pprint_log, first_item
-# import pyfda.libs.pyfda_fix_lib as fx
-# from pyfda.libs.pyfda_io_lib import extract_file_ext
+from pyfda.libs.pyfda_lib import qstr, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 
 # when deltasigma module is present, add a corresponding entry to the combobox
@@ -39,13 +37,6 @@ except ImportError:
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO:
-# when nmigen is present, instantiate the fixpoint widget
-if cmp_version("nmigen", "0.2") >= 0:
-    HAS_NMIGEN = True
-else:
-    HAS_NMIGEN = False
-
 # ------------------------------------------------------------------------------
 
 classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : display name
@@ -53,7 +44,7 @@ classes = {'Input_Fixpoint_Specs': 'Fixpoint'}  #: Dict with class name : displa
 
 class Input_Fixpoint_Specs(QWidget):
     """
-    Create the widget that holds the dynamically loaded fixpoint filter ui
+    Create the widget that holds the dynamically loaded fixpoint filter UI
     """
 
     # sig_resize = pyqtSignal()  # emit a signal when the image has been resized
@@ -64,11 +55,14 @@ class Input_Fixpoint_Specs(QWidget):
 
     def __init__(self, parent=None):
         super(Input_Fixpoint_Specs, self).__init__(parent)
+    # def __init__(self) -> None:
+    #    super().__init__()
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                          " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
+        self.fx_specs_changed = True  # fixpoint specs have been changed outside
         self.fx_path = os.path.realpath(
             os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
 
@@ -92,67 +86,74 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
         """
-        Process signals coming in from input and output quantizer subwidget and the
-        dynamically instantiated subwidget and emit {'fx_sim': 'specs_changed'} in
-        the end.
+        Process signals coming in from input and output quantizer subwidget and
+        emit {'fx_sim': 'specs_changed'} in the end.
         """
+        logger.info(
+            f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
-            logger.warning(f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning(
+                f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
             return
+        # ---------------------------------------------------------------------
+        # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.wdg_dict2ui()  # update wordlengths in UI, set RUN button to 'changed'
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
             return
 
-        # ---- Process input and output quantizer settings ('ui' in dict_sig) --
-        elif 'ui' in dict_sig:
+        # ---- Process input and output quantizer settings ('ui_local_changed') --
+        elif 'ui_local_changed' in dict_sig:
             if 'wdg_name' not in dict_sig:
                 logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
                 return
 
-            elif dict_sig['wdg_name'] == 'w_input':
+            elif dict_sig['ui_local_changed']\
+                    not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
+                logger.warning(
+                    f"Unknown value '{dict_sig['ui_local_changed']}' "
+                    "for key 'ui_local_changed'")
+                return
+
+            elif dict_sig['wdg_name'] == 'wq_input':
                 """
                 Input fixpoint format has been changed or butLock has been clicked.
                 When I/O lock is active, copy input fixpoint word format to output
                 word format.
                 """
-                if dict_sig['ui'] == 'butLock'\
-                        and not self.wdg_w_input.butLock.isChecked():
+                if dict_sig['ui_local_changed'] == 'butLock'\
+                        and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return
-                elif self.wdg_w_input.butLock.isChecked():
-                    # but lock was activated or wordlength setting have been changed
+                elif self.wdg_wq_input.butLock.isChecked():
+                    # button lock was activated or wordlength settings have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
                     fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
 
-            elif dict_sig['wdg_name'] == 'w_output':
+            elif dict_sig['wdg_name'] == 'wq_output':
                 """
                 Output fixpoint format has been changed. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
-                if self.wdg_w_input.butLock.isChecked():
+                if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
                     fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
-
-            elif dict_sig['wdg_name'] in {'q_output', 'q_input'}:
-                pass
             else:
                 logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
                              .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
                 return
 
-            if dict_sig['ui'] not in {'WI', 'WF', 'ovfl', 'quant', 'cmbW', 'butLock'}:
-                logger.warning("Unknown value '{0}' for key 'ui'".format(dict_sig['ui']))
-
             self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
+        # --------------------------------------------------------------------------------
 
         else:
             logger.error(f"Unknown key/value in 'dict_sig':\n{pprint_log(dict_sig)}")
+        return
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig: dict = None) -> None:
@@ -164,39 +165,39 @@ class Input_Fixpoint_Specs(QWidget):
         1. ``fx_sim': 'init'``: Start fixpoint simulation by sending
            'fx_sim':'start_fx_response_calculation'
 
-        2. ``fx_sim_calc_response()``: Receive stimulus from widget in
-            'fx_sim':'calc_frame_fx_response' and pass it to fixpoint simulation method
-
-        3. Store fixpoint response in `fb.fx_result` and return to initiating routine
+        2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
-        # logger.info(
-        #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
+        logger.info(
+            "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         # logger.debug(f'SIG_RX():  "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == "filter_designed":
+        #  =================== UI_CHANGED =======================================
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+                in {'resized', 'tab'} and self.isVisible():
+            # Widget size has changed / "Fixpoint" tab has been selected -> resize image
+            self.resize_img()
+
+        # =================== DATA CHANGED =====================================
+        elif 'data_changed' in dict_sig and\
+                dict_sig['data_changed'] == "filter_designed":
             # New filter has been designed, update list of available filter topologies
             self._update_filter_cmb()
             return
 
-        elif 'data_changed' in dict_sig or\
-             ('view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff'):
-            # Filter data has changed (but not the filter type) or the coefficient
-            # format / wordlength have been changed in `input_coeffs`. The latter means
-            # the view / display has been changed (wordlength) but not the actual
-            # coefficients in the `input_coeffs` widget. However, the wordlength setting
-            # is copied to the fxqc dict and from there to the fixpoint widget.
-            # - update fields in the fixpoint filter widget - wordlength may have
-            #   been changed.
-            # - Set RUN button to "changed" in wdg_dict2ui()
+        elif 'data_changed' in dict_sig:
+            # Filter data has changed (but not the filter type):
+            # - reload UI from dict and set RUN button to "changed"
             self.wdg_dict2ui()
 
-        # --------------- FX Simulation -------------------------------------------
+        # =================== FX SIM ============================================
         elif 'fx_sim' in dict_sig:
+
+            # --------------- init -------------------
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
                 # `impz.impz_init()`, return a handle to the fixpoint filter function
@@ -205,56 +206,81 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("No fixpoint widget found!")
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
-                elif self.fx_sim_init() != 0:  # returned an error
+                    return
+                # initialize fixpoint filter and check for error during initialization
+                err = self.fx_filt_init()
+                if err != 0:  # returned an error
                     qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
-                    self.emit({'fx_sim': 'start_fx_response_calculation',
-                               'fxfilter_func': self.fx_filt_ui.fxfilter})
+                    # Reset overflow counter for input and output quantization,
+                    self.wdg_wq_input.QObj.resetN()
+                    self.wdg_wq_output.QObj.resetN()
+                    # Trigger fixpoint response calculation, passing a handle to the
+                    # fixpoint filter function in the emitted dict
+                    if hasattr(self.fx_filt_ui, 'fxfilter'):
+                        self.emit({'fx_sim': 'start_fx_response_calculation',
+                                   'fxfilter_func': self.fx_filt_ui.fxfilter})
+                    else:
+                        logger.error(
+                            "Couldn't find fixpoint filter definition\n"
+                            f"\t'{self.fx_filt_ui.__class__.__name__}.fxfilter'!")
+                        self.emit({'fx_sim': 'error'})
 
-            elif dict_sig['fx_sim'] == 'calc_frame_fx_response':
-                self.fx_sim_calc_response(dict_sig)
-                # return to the routine collecting the response frame by frame
-                return
+                    # next, start fx response calculation in `plot_impz()`
+                    return
 
-            elif dict_sig['fx_sim'] == 'specs_changed':
-                # fixpoint specification have been changed somewhere, update ui
-                # and set run button to "changed" in wdg_dict2ui()
-                self.wdg_dict2ui()
+            # --------------- finish --------------
             elif dict_sig['fx_sim'] == 'finish':
+                # update I/O widgets and dynamically instantiated filter widget with
+                # number of overflows etc.
+                self.wdg_wq_input.update_disp()
+                self.wdg_wq_output.update_disp()
+                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update'):
+                    self.fx_filt_ui.update_disp()
                 qstyle_widget(self.butSimFx, "normal")
+            # fixpoint specifications / quantization settings have been changed
+            # somewhere else, update UI and set run button to "changed" in wdg_dict2ui()
+
+            # --------------- fx specs_changed ------------
+            elif self.fx_specs_changed or\
+                    (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
+                # update wordlengths in UI and set RUN button to 'changed':
+                self.wdg_dict2ui()
+                self.fx_specs_changed = False
+                # self.emit(dict_sig)  # TODO: ???
+                return
+            elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
+                self.fx_specs_changed = True
+
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
                              .format(dict_sig['fx_sim'], dict_sig['class']))
 
-        # ---- resize image when "Fixpoint" tab is selected or widget size is changed:
-        elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] in {'resized', 'tab'}\
-                and self.isVisible():
-            self.resize_img()
-
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
-        Intitialize the main GUI, consisting of:
+        Intitialize the main UI, consisting of:
 
         - A combo box to select the filter topology and an image of the topology
-
         - The input quantizer
-
         - The UI of the fixpoint filter widget
-
         - Simulation and export buttons
         """
+        margins = params['wdg_margins']
 # ------------------------------------------------------------------------------
         # Define frame and layout for the dynamically updated filter widget
-        # The actual filter widget is instantiated in self.set_fixp_widget() later on
+        # The actual filter widget is instantiated / deleted in
+        # `self._update_fixp_widget()` later on
 
         self.layH_fx_wdg = QHBoxLayout()
+        # left and right: Zero margin, top and bottom: default margin
+        self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
         # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
-        frmHDL_wdg = QFrame(self)
-        frmHDL_wdg.setLayout(self.layH_fx_wdg)
-        # frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        wdg_fx = QWidget(self)
+        wdg_fx.setStyleSheet(".QWidget { background-color:none; }")
+        wdg_fx.setLayout(self.layH_fx_wdg)
 
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
@@ -265,62 +291,44 @@ class Input_Fixpoint_Specs(QWidget):
         self.lblTitle = QLabel("not set", self)
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        self.lbl_descr = QLabel("", self)
+        self.lbl_descr.setWordWrap(True)
+
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(self.cmb_fx_wdg)
         layHTitle.addWidget(self.lblTitle)
 
+        layVTitle = QVBoxLayout()
+        layVTitle.addLayout(layHTitle)
+        layVTitle.addWidget(self.lbl_descr)
+
         self.frmTitle = QFrame(self)
-        self.frmTitle.setLayout(layHTitle)
+        self.frmTitle.setLayout(layVTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
 # ------------------------------------------------------------------------------
 #       Input and Output Quantizer
 # ------------------------------------------------------------------------------
 #       - instantiate widgets for input and output quantizer
-#       - pass the quantization (sub-?) dictionary to the constructor
+#       - pass the quantization dictionary to the constructor
 # ------------------------------------------------------------------------------
 
-        self.wdg_w_input = UI_W(self, q_dict=fb.fil[0]['fxqc']['QI'],
-                                wdg_name='w_input', label='', lock_visible=True)
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx_local)
-
-        cmb_q = ['round', 'floor', 'fix']
-
-        self.wdg_w_output = UI_W(self, q_dict=fb.fil[0]['fxqc']['QO'],
-                                 wdg_name='w_output', label='')
-        self.wdg_w_output.sig_tx.connect(self.process_sig_rx_local)
-
-        self.wdg_q_output = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QO'],
-                                 wdg_name='q_output',
-                                 label='Output Format <i>Q<sub>Y&nbsp;</sub></i>:',
-                                 cmb_q=cmb_q, cmb_ov=['wrap', 'sat'])
-        self.wdg_q_output.sig_tx.connect(self.sig_rx_local)
-
+        self.wdg_wq_input = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QI'], wdg_name='wq_input',
+            label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
+            lock_vis='on')
         if HAS_DS:
-            cmb_q.append('dsm')
-        self.wdg_q_input = UI_Q(self, q_dict=fb.fil[0]['fxqc']['QI'],
-                                wdg_name='q_input',
-                                label='Input Format <i>Q<sub>X&nbsp;</sub></i>:',
-                                cmb_q=cmb_q)
-        self.wdg_q_input.sig_tx.connect(self.sig_rx_local)
+            self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
+            self.wdg_wq_input.cmbQuant.setItemData(
+                self.wdg_wq_input.cmbQuant.count() - 1,
+                self.wdg_wq_input.cmbQuant.tr("Delta-Sigma Modulation"), Qt.ToolTipRole)
+        self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
-        # Layout and frame for input quantization
-        layVQiWdg = QVBoxLayout()
-        layVQiWdg.addWidget(self.wdg_q_input)
-        layVQiWdg.addWidget(self.wdg_w_input)
-        frmQiWdg = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQiWdg.setLayout(layVQiWdg)
-        frmQiWdg.setContentsMargins(*params['wdg_margins'])
-
-        # Layout and frame for output quantization
-        layVQoWdg = QVBoxLayout()
-        layVQoWdg.addWidget(self.wdg_q_output)
-        layVQoWdg.addWidget(self.wdg_w_output)
-        frmQoWdg = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQoWdg.setLayout(layVQoWdg)
-        frmQoWdg.setContentsMargins(*params['wdg_margins'])
+        self.wdg_wq_output = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QO'], wdg_name='wq_output',
+            label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>')
+        self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 
 # ------------------------------------------------------------------------------
 #       Dynamically updated image of filter topology (label as placeholder)
@@ -361,29 +369,19 @@ class Input_Fixpoint_Specs(QWidget):
         self.layHHdlBtns.addWidget(self.butExportHDL)
         # This frame encompasses the HDL buttons sim and convert
         frmHdlBtns = QFrame(self)
-        # frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmHdlBtns.setLayout(self.layHHdlBtns)
         frmHdlBtns.setContentsMargins(*params['wdg_margins'])
 
 # -------------------------------------------------------------------
 #       Top level layout
 # -------------------------------------------------------------------
-        splitter = QSplitter(self)
-        splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(frmHDL_wdg)
-        splitter.addWidget(frmQoWdg)
-        splitter.addWidget(self.frmImg)
-
-        # setSizes uses absolute pixel values, but can be "misused" by specifying values
-        # that are way too large: in this case, the space is distributed according
-        # to the _ratio_ of the values:
-        splitter.setSizes([3000, 3000, 5000])
-
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
-        layVMain.addWidget(frmQiWdg)
-        layVMain.addWidget(splitter)
+        layVMain.addWidget(self.wdg_wq_input)
+        layVMain.addWidget(wdg_fx)
+        layVMain.addWidget(self.wdg_wq_output)
+        layVMain.addWidget(self.frmImg)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
@@ -406,7 +404,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFx.clicked.connect(lambda x: self.emit({'fx_sim': 'start'}))
+        self.butSimFx.clicked.connect(self._start_fx_sim)
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -414,6 +412,15 @@ class Input_Fixpoint_Specs(QWidget):
         # self.lbl_fixp_img.installEventFilter(self)
         # # ... then redraw image when resized
         # self.sig_resize.connect(self.resize_img)
+
+# ------------------------------------------------------------------------------
+    def _start_fx_sim(self) -> None:
+        """
+        Start fixpoint simulation by setting the global fixpoint flag
+        `fb.fil[0]['fx_sim'] = True` and emitting `{'fx_sim': 'start_fx_sim'}`.
+        """
+        fb.fil[0]['fx_sim'] = True
+        self.emit({'fx_sim': 'start_fx_sim'})
 
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
@@ -504,8 +511,6 @@ class Input_Fixpoint_Specs(QWidget):
             img_file = self.default_fx_img
 
         self.img_fixp = QPixmap(img_file)
-        # logger.warning(f"img_fixp = {img_file}")
-        # logger.warning(f"_embed_fixp_img(): {self.img_fixp.__class__.__name__}")
         return self.img_fixp
 
 # ------------------------------------------------------------------------------
@@ -513,30 +518,31 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Triggered when `self` (the widget) is selected or resized. The method resizes
         the image inside QLabel to completely fill the label while keeping
-        the aspect ratio. An offset of some pixels is needed, otherwise the image
-        is clipped.
+        the aspect ratio.
+
+        The parent `InputTabWidget` defines the available width (minus some offset
+        due to margins etc.), unfortunately `self.width()` cannot be used as a measure
+        as it expands with the parent but doesn't shrink.
         """
-        # logger.warning(f"resize_img(): img_fixp = {self.img_fixp.__class__.__name__}")
-
-        if self.parent is None:  # parent is QApplication, has no width or height
-            par_w, par_h = 300, 700  # fixed size for module level test
+        # Module level test: Parent is QApplication which has no width:
+        if self.parent is None:
+            wdg_w = 300  # set fixed size for module level test
         else:  # widget parent is InputTabWidget()
-            par_w, par_h = self.parent.width(), self.parent.height()
+            wdg_w = self.parent.width()
 
-        img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
+        # img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
+        # if img_w > 20:
+        #     max_h = int(max(np.floor(img_h * scale) - 5, 20))
+        # else:
+        #     max_h = 200
+        # logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}"
+        #              .format(img_w, img_h, par_w, par_h, max_h))
 
-        if img_w > 10:
-            max_h = int(max(np.floor(img_h * par_w/img_w) - 5, 20))
-        else:
-            max_h = 200
-        logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}"
-                     .format(img_w, img_h, par_w, par_h, max_h))
-
-        # The following doesn't work because the width of the parent widget can grow
-        # with the image size
+        # The following doesn't work because the width of the parent widget can
+        # grow with the image size:
         # img_scaled = self.img_fixp.scaled(self.lbl_fixp_img.size(),
         # Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaledToWidth(wdg_w - 20, Qt.SmoothTransformation)
 
         self.lbl_fixp_img.setPixmap(img_scaled)
 
@@ -551,12 +557,11 @@ class Input_Fixpoint_Specs(QWidget):
           filter topology as
         - Try to load image for filter topology
         - Update the UI of the widget
-        - Try to instantiate HDL filter as `self.fx_filt_ui.fixp_filter` with
+        - Try to instantiate fixpoint filter as `self.fx_filt_ui.fixp_filter` with
             dummy data
         - emit {'fx_sim': 'specs_changed'} when successful
         """
         def _disable_fx_wdg(self) -> None:
-
             if hasattr(self, "fx_filt_ui") and self.fx_filt_ui is not None:
                 # is a fixpoint widget loaded?
                 try:
@@ -570,7 +575,6 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_wdg_found = False
             self.butSimFx.setEnabled(False)
             self.butExportHDL.setVisible(False)
-            # self.layH_fx_wdg.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
             self.lblTitle.setText("")
@@ -591,6 +595,9 @@ class Input_Fixpoint_Specs(QWidget):
                         f"{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
+            # set lightblue background with transparency for fixpoint widget
+            self.fx_filt_ui.setStyleSheet(
+               ".QFrame { background-color: rgba(173, 216, 230, 25%)}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
@@ -619,66 +626,53 @@ class Input_Fixpoint_Specs(QWidget):
 
             # ---- set title and description for filter
             self.lblTitle.setText(self.fx_filt_ui.title)
+            if hasattr(self.fx_filt_ui, "description"):
+                self.lbl_descr.setVisible(True)
+                self.lbl_descr.setText(self.fx_filt_ui.description)
+            else:
+                self.lbl_descr.setVisible(False)
 
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
             self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
-            self.update_fxqc_dict()
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
     def wdg_dict2ui(self):
         """
-        Trigger an update of the fixpoint widget UI when view (i.e. fixpoint
-        coefficient format) or data have been changed outside this class. Additionally,
-        pass the fixpoint quantization widget to update / restore other subwidget
-        settings.
+        Trigger an update of the input, output and fixpoint widgets UI when view
+        (i.e. fixpoint coefficient format) or data have been changed outside this
+        class.
 
         Set the RUN button to "changed".
         """
-#        fb.fil[0]['fxqc']['QCB'].update({'scale':(1 << fb.fil[0]['fxqc']['QCB']['W'])})
-        self.wdg_q_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_q_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        self.wdg_w_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_w_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
-            self.fx_filt_ui.dict2ui()
-#            dict_sig = {'fx_sim':'specs_changed'}
-#            self.emit(dict_sig)
+        self.wdg_wq_input.dict2ui()
+        self.wdg_wq_output.dict2ui()
+
+#       The following should be connected via signal-slot
+#         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
+#             self.fx_filt_ui.dict2ui()
 
         qstyle_widget(self.butSimFx, "changed")
-
-# ------------------------------------------------------------------------------
-    def update_fxqc_dict(self):
-        """
-        Update the fxqc dictionary before simulation / HDL generation starts.
-        """
-        if self.fx_wdg_found:
-            # get a dict with the coefficients and fixpoint settings from fixpoint widget
-            if hasattr(self.fx_filt_ui, "ui2dict"):
-                fb.fil[0]['fxqc'].update(self.fx_filt_ui.ui2dict())
-                logger.debug("update fxqc: \n{0}".format(pprint_log(fb.fil[0]['fxqc'])))
-        else:
-            logger.error("No fixpoint widget found!")
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
         """
         Synthesize HDL description of filter
         """
-        dlg = QFD(self)  # instantiate file dialog object
+        dlg = QFileDialog(self)  # instantiate file dialog object
 
         file_types = "Verilog (*.v)"
         # needed for overwrite confirmation when name is entered without suffix:
         dlg.setDefaultSuffix('v')
         dlg.setWindowTitle('Export Verilog')
         dlg.setNameFilter(file_types)
-        dlg.setDirectory(dirs.save_dir)
+        dlg.setDirectory(dirs.last_file_dir)
         # set mode "save file" instead "open file":
-        dlg.setAcceptMode(QFD.AcceptSave)
-        dlg.setOption(QFD.DontConfirmOverwrite, False)
-        if dlg.exec_() == QFD.Accepted:
+        dlg.setAcceptMode(QFileDialog.AcceptSave)
+        dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
+        if dlg.exec_() == QFileDialog.Accepted:
             hdl_file = qstr(dlg.selectedFiles()[0])
             # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))[0]
 
@@ -686,7 +680,7 @@ class Input_Fixpoint_Specs(QWidget):
 #       # static method getSaveFileName_() is simple but unflexible
 #         hdl_file, hdl_filter = dlg.getSaveFileName_(
 #                 caption="Save Verilog netlist as (this also defines the module name)",
-#                 directory=dirs.save_dir, filter=file_types)
+#                 directory=dirs.last_file_dir, filter=file_types)
 #         hdl_file = qstr(hdl_file)
 #         if hdl_file != "": # "operation cancelled" returns an empty string
 #             # return '.v' or '.vhd' depending on filetype selection:
@@ -698,16 +692,17 @@ class Input_Fixpoint_Specs(QWidget):
             hdl_dir_name = os.path.dirname(hdl_file)  # extract the directory path
             if not os.path.isdir(hdl_dir_name):  # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
-            dirs.save_dir = hdl_dir_name  # make this directory the new default / base dir
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
             hdl_full_name = os.path.join(hdl_dir_name, hdl_file_name + ".v")
+            dirs.last_file_name = hdl_full_name
+            dirs.last_file_dir = hdl_dir_name  # make this directory the new default / base dir
+            # dirs.file
             # remove all non-alphanumeric chars:
             vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
 
             logger.info('Creating hdl_file "{0}"\n\twith top level module "{1}"'
                         .format(hdl_full_name, vlog_mod_name))
             try:
-                self.update_fxqc_dict()
                 self.fx_filt_ui.construct_fixp_filter()
                 code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
@@ -719,13 +714,12 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.warning(e)
 
     # --------------------------------------------------------------------------
-    def fx_sim_init(self):
+    def fx_filt_init(self):
         """
-        Initialize fix-point simulation:
+        Wrapper around `self.fx_filt_ui.init_filter()` to catch errors.
+        Initialize fix-point filter, reset registers and overflow counters
 
-        - Update the `fxqc_dict` containing all quantization information
-        - Setup a filter instance for fixpoint simulation
-        - Request a stimulus signal
+        TODO: - Update the `fxqc_dict` containing all quantization information
 
         Returns
         -------
@@ -733,12 +727,14 @@ class Input_Fixpoint_Specs(QWidget):
             0 for sucessful fx widget construction, -1 for error
         """
         try:
-            self.update_fxqc_dict()
-            self.fx_filt_ui.init_filter()   # setup filter instance
+            # initialize fixpoint filter instance with fixpoint quantizer
+            # self.fx_filt_ui.init_filter()
+            self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
+
             return 0
 
-        except ValueError as e:
-            logger.error('Fixpoint stimulus generation failed during "init"'
+        except (ValueError, AttributeError) as e:
+            logger.error('Fixpoint filter reset or instantiation failed.'
                          '\nwith "{0} "'.format(e))
         return -1
 
@@ -797,7 +793,7 @@ class Input_Fixpoint_Specs(QWidget):
         if fb.fx_results is None:
             qstyle_widget(self.butSimFx, "error")
         else:
-            pass # everything ok, return 
+            pass  # everything ok, return
             # logger.debug("Sending fixpoint results")
         return
 
@@ -807,8 +803,8 @@ if __name__ == '__main__':
     """
     Run widget standalone with `python -m pyfda.input_widgets.input_fixpoint_specs`
 
-    Resizing the image does not work standalone as the 'ui_changed: resized' signal is
-    issued from somewhere else
+    Resizing the image does not work standalone as the {'ui_global_changed': 'resized'}
+    signal is issued from somewhere else
     """
     from pyfda.libs.tree_builder import Tree_Builder
     from pyfda.libs.compat import QApplication
@@ -819,7 +815,9 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
     # change initial settings to FIR (no IIR fixpoint filters available yet)
-    fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
+    # fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
+    # _ = Tree_Builder()  # TODO_ couldn't this be a function?
+    fb.fil[0].update({'ft': 'IIR', 'fc': 'Ellip'})
     _ = Tree_Builder()  # TODO_ couldn't this be a function?
     mainw = Input_Fixpoint_Specs()
     app.setActiveWindow(mainw)

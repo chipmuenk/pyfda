@@ -193,7 +193,7 @@ def qset_cmb_box(cmb_box: QComboBox, string: str, data: bool = False,
     fireSignals: bool (default: False)
         When True, fire a signal if the index is changed (useful for GUI testing)
 
-    caseInsensitive: bool (default: False)
+    caseSensitive: bool (default: False)
         When true, perform case sensitive search.
 
     Returns
@@ -551,7 +551,7 @@ class QHLine(QFrame):
 
 
 class QVLine(QFrame):
-    def __init__(self, width=1):
+    def __init__(self, width=2):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Plain)
@@ -560,8 +560,9 @@ class QVLine(QFrame):
         # self.setLineWidth(width)
         # self.setFrameShape(QFrame.StyledPanel);
         self.setStyleSheet(
-            "border-width: 2px; border-top-style: none; border-right-style: solid; "
-            "border-bottom-style: none; border-left-style: solid; border-color: grey;")
+            f"border-width: {str(width)}px; border-top-style: none; "
+            "border-right-style: none; border-bottom-style: none; "
+            "border-left-style: solid; border-color: grey;")
 
 
 class PushButton(QPushButton):

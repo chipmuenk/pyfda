@@ -9,177 +9,54 @@
 """
 Library with classes and functions for file and text IO
 """
-# TODO: import data from files doesn't update FIR / IIR and data changed
-
 import os, re, io
 import csv
 import datetime
+from typing import TextIO
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 import numpy as np
-from scipy.io import loadmat, savemat
+from scipy.io import loadmat, savemat, wavfile
 
 from .pyfda_lib import safe_eval, lin2unit, pprint_log
-from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
+from .pyfda_qt_lib import qget_selected
 
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 
-from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton, QFD,
-                     QFileDialog, QVBoxLayout, QGridLayout, pyqtSignal)
+from .compat import QFileDialog
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-# ------------------------------------------------------------------------------
-class CSV_option_box(QDialog):
-    """
-    Create a pop-up widget for setting CSV options. This is needed when storing /
-    reading Comma-Separated Value (CSV) files containing coefficients or poles
-    and zeros.
-    """
-    sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
-    from pyfda.libs.pyfda_qt_lib import emit
-
-    def __init__(self, parent):
-        super(CSV_option_box, self).__init__(parent)
-        self._construct_UI()
-        qwindow_stay_on_top(self, True)
-
-# ------------------------------------------------------------------------------
-    def closeEvent(self, event):
-        """
-        Override closeEvent (user has tried to close the window) and send a
-        signal to parent where window closing is registered before actually
-        closing the window.
-        """
-        self.emit({'closeEvent': ''})
-        event.accept()
-
-# ------------------------------------------------------------------------------
-    def _construct_UI(self):
-        """ initialize the User Interface """
-        self.setWindowTitle("CSV Options")
-        lblDelimiter = QLabel("CSV-Delimiter:", self)
-        delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
-                 ('<SPACE>', ' '), ('< | >', '|')]
-        self.cmbDelimiter = QComboBox(self)
-        for d in delim:
-            self.cmbDelimiter.addItem(d[0], d[1])
-        self.cmbDelimiter.setToolTip("Delimiter between data fields.")
-
-        lblTerminator = QLabel("Line Terminator:", self)
-        terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
-                      ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
-        self.cmbLineTerminator = QComboBox(self)
-        self.cmbLineTerminator.setToolTip(
-            "<span>Terminator at the end of a data row."
-            " (depending on the operating system). 'None' can be used for a single "
-            "row of data with added line breaks.</span>")
-        for t in terminator:
-            self.cmbLineTerminator.addItem(t[0], t[1])
-
-        butClose = QPushButton(self)
-        butClose.setText("Close")
-
-        lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Horz.', 'auto'),
-                       ('Vertical', 'vert'), ('Horizontal', 'horiz')]
-        self.cmbOrientation = QComboBox(self)
-        self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
-        for o in orientation:
-            self.cmbOrientation.addItem(o[0], o[1])
-
-        lblHeader = QLabel("Enable header", self)
-        header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
-        self.cmbHeader = QComboBox(self)
-        self.cmbHeader.setToolTip("First row is a header.")
-        for h in header:
-            self.cmbHeader.addItem(h[0], h[1])
-
-        self.radClipboard = QRadioButton("Clipboard", self)
-        self.radClipboard.setChecked(False)
-        self.radFile = QRadioButton("File", self)
-        # setting is read later on from params['CSV']['clipboard']
-        self.radFile.setChecked(True)
-
-        lay_grid = QGridLayout()
-        lay_grid.addWidget(lblDelimiter, 1, 1)
-        lay_grid.addWidget(self.cmbDelimiter, 1, 2)
-        lay_grid.addWidget(lblTerminator, 2, 1)
-        lay_grid.addWidget(self.cmbLineTerminator, 2, 2)
-        lay_grid.addWidget(lblOrientation, 3, 1)
-        lay_grid.addWidget(self.cmbOrientation, 3, 2)
-        lay_grid.addWidget(lblHeader, 4, 1)
-        lay_grid.addWidget(self.cmbHeader, 4, 2)
-        lay_grid.addWidget(self.radClipboard, 5, 1)
-        lay_grid.addWidget(self.radFile, 5, 2)
-
-        layVMain = QVBoxLayout()
-        # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
-        layVMain.addLayout(lay_grid)
-        layVMain.addWidget(butClose)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
-
-        self._load_settings()
-
-        # ============== Signals & Slots ================================
-        butClose.clicked.connect(self.close)
-        self.cmbOrientation.currentIndexChanged.connect(self._store_settings)
-        self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
-        self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
-        self.cmbHeader.currentIndexChanged.connect(self._store_settings)
-        self.radClipboard.clicked.connect(self._store_settings)
-        self.radFile.clicked.connect(self._store_settings)
-
-    def _store_settings(self):
-        """
-        Store settings of CSV options widget in ``pyfda_rc.params``.
-        """
-
-        try:
-            params['CSV']['orientation'] = qget_cmb_box(self.cmbOrientation, data=True)
-            params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
-            params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator,
-                                                           data=True)
-            params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
-            params['CSV']['clipboard'] = self.radClipboard.isChecked()
-
-            self.emit({'ui_changed': 'csv'})
-
-        except KeyError as e:
-            logger.error(e)
-
-    def _load_settings(self):
-        """
-        Load settings of CSV options widget from ``pyfda_rc.params``.
-        """
-        try:
-            qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
-            qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'],
-                         data=True)
-            qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
-            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
-            self.radClipboard.setChecked(params['CSV']['clipboard'])
-            self.radFile.setChecked(not params['CSV']['clipboard'])
-
-        except KeyError as e:
-            logger.error(e)
-
-
 # ##############################################################################
-def prune_file_ext(file_type):
+
+# file filters for the QFileDialog object are constructed from this dict
+file_filters_dict = {
+    'cmsis': 'CMSIS DSP FIR or IIR SOS coefficients',
+    'coe': 'Xilinx FIR coefficients format',
+    'csv': 'Comma / Tab Separated Values',
+    'mat': 'Matlab-Workspace',
+    'npy': 'Binary Numpy Array',
+    'npz': 'Zipped Binary Numpy Array',
+    'pkl': 'Pickled data',
+    'txt': 'Microsemi FIR coefficient format',
+    'vhd': 'VHDL package or architecture',
+    'wav': 'WAV audio format'
+    }
+
+
+# ------------------------------------------------------------------------------
+def prune_file_ext(file_type: str) -> str:
     """
-    Prune file extension, e.g. '(\*.txt)' from file type description returned
-    by QFileDialog. This is achieved with the regular expression
+    Prune file extension, e.g. 'Text file' from 'Text file (\*.txt)' returned
+    by QFileDialog file type description.
+
+    Pruning is achieved with the following regular expression:
 
     .. code::
 
@@ -212,22 +89,31 @@ def prune_file_ext(file_type):
     - '(' must be escaped as '\\\('
 
     """
+
     return re.sub('\([^\)]+\)', '', file_type)
 
 
+
 # ------------------------------------------------------------------------------
-def extract_file_ext(file_type):
+def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (\*.vhd)') returned by QFileDialog
-    """
+    'VHDL (\*.vhd)' returned by QFileDialog
 
-    ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
-    return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    Depending on the OS, this may be the full file type description
+    or just the extension. When `file_type` contains no '(', the passed string is
+    returned unchanged.
+    """
+    if "(" in file_type:
+        ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
+        return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+    else:
+        return file_type
 
 
 # ------------------------------------------------------------------------------
-def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
+def qtable2text(table: object, data: np.ndarray, parent: object,
+                fkey: str, frmt: str = 'float', title: str = "Export"):
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
@@ -284,7 +170,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     Returns
     -------
     None
-        Nothing, text is exported to clipboard or to file via ``export_data``
+        Nothing, text is exported to clipboard or to file via ``export_csv_data``
     """
 
     text = ""
@@ -394,7 +280,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
     if params['CSV']['clipboard']:
         fb.clipboard.setText(text)
     else:
-        export_data(parent, text, fkey, title=title)
+        export_csv_data(parent, text, fkey, title=title)
 
 # ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -415,7 +301,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', title="Export"):
 
 
 # ------------------------------------------------------------------------------
-def qtext2table(parent, fkey, title="Import"):
+def qtext2table(parent: object, fkey: str, title: str = "Import"):
     """
     Copy data from clipboard or file to table
 
@@ -473,7 +359,8 @@ def qtext2table(parent, fkey, title="Import"):
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else:  # data from file
-        data_arr = import_data(parent, fkey, title=title)
+        data_arr = import_data(
+            parent, fkey, title=title, file_types=('csv', 'mat', 'npy', 'npz'))
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                      .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -483,7 +370,7 @@ def qtext2table(parent, fkey, title="Import"):
 
 
 # ------------------------------------------------------------------------------
-def csv2array(f):
+def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -507,6 +394,9 @@ def csv2array(f):
     io_error: str
         String with the error message when import was unsuccessful
     """
+    # throw an error (instead of a deprecation warning) when trying to create a numpy
+    # array from nested ragged sequences. This error can then be caught easily.
+    np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
@@ -583,11 +473,11 @@ def csv2array(f):
                 # "\n\tType of passed text: '{4}'"
                 .format(use_header, repr(delimiter), repr(lineterminator),
                         quotechar))  # ,f.__class__.__name__))
-    # ------------------------------------------------
+    # --------------------------------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
                            lineterminator=lineterminator)  # returns an iterator
-    # ------------------------------------------------
+    # --------------------------------------------------------------------------
 # =============================================================================
 #     with open('/your/path/file') as f:
 #         for line in f:
@@ -613,17 +503,25 @@ def csv2array(f):
             logger.debug("{0}".format(row))
             data_list.append(row)
     except csv.Error as e:
-        io_error = "Error during CSV reading:\n{0}".format(e)
+        io_error = f"Error during CSV import:\n{e}"
         return io_error
 
     try:
         if data_list is None:
             return "Imported data is None."
-        data_arr = np.array(data_list)
+        try:
+            data_arr = np.array(data_list)
+        except np.VisibleDeprecationWarning:
+            # prevent creation of numpy arrays from nested ragged sequences
+            return "Columns with different number of elements."
+
         if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
             return f"Imported data is a scalar: '{data_arr}'"
         elif np.ndim(data_arr) == 1:
-            return data_arr
+            if len(data_arr) < 2:
+                return f"Not enough data: '{data_arr}'"
+            else:
+                return data_arr
         elif np.ndim(data_arr) == 2:
             cols, rows = np.shape(data_arr)
             logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
@@ -660,7 +558,7 @@ def csv2array(f):
 
 
 # ------------------------------------------------------------------------------
-def csv2array_new(f):
+def csv2array_new(f: TextIO):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
@@ -851,12 +749,55 @@ def csv2array_new(f):
 
 
 # ------------------------------------------------------------------------------
+def create_file_filters(file_types: tuple, file_filters: str = ""):
+    """
+    Create a string with file filters for QFileDialog object from `file_types`,
+    a tuple of file extensions and the global `file_filters_dict`.
+
+    When the file extension stored after last QFileDialog operation is in the tuple
+    of file types, return this file extension for e.g. preselecting the file type
+    in QFileDialog.
+
+    Parameters
+    ----------
+    file_types : tuple of str
+        list of file extensions which are used to create a file filter.
+
+    file_filters : str
+        String with file filters for QFileDialog object with the form
+        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
+        this string is empty, but it can be used to add file filters not contained
+        in the global `file_filters_dict`.
+
+    Returns
+    -------
+    file_filters : str
+        String containing file filters for a QFileDialog object
+
+    last_file_filter : str
+        Single file filter to setup the default file extension in QFileDialog
+
+    """
+    for t in file_types:
+        if t in file_filters_dict:
+            file_filters += file_filters_dict[t] + f" (*.{t});;"
+        else:
+            logger.warning(f"Unknown file extension '.{t}'")
+    # remove trailing ';;', otherwise file filter '*' is appended
+    file_filters = file_filters.rstrip(';;')
+
+    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
+        last_file_filter =\
+            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
+    else:
+        last_file_filter = ""
+
+    return file_filters, last_file_filter
+
+
+# ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
-                file_filters=(
-                    "Comma / Tab Separated Values (*.csv *.txt);;"
-                    "Matlab-Workspace (*.mat);;"
-                    "Binary Numpy Array (*.npy);;"
-                    "Zipped Binary Numpy Array(*.npz)")):
+                file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Import data from a file and convert it to a numpy array.
 
@@ -869,59 +810,58 @@ def import_data(parent, fkey=None, title="Import",
         multiple entries.
 
     title : str
-        title string for the file dialog box (e.g. "filter coefficients ")
+        title string for the file dialog box (e.g. "Filter Coefficients")
 
-    file_filter : tuple of str
-        list supported file types
+    file_types : tuple of str
+        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
+        of `file_filters_dict`
 
     Returns
     -------
     ndarray
         Data from the file
     """
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
+
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    dlg.setNameFilter(file_filters)
+    dlg.setNameFilter(file_filters)  # pass available file filters
     dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt)  # default filter selected in file dialog
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[1]
-        sel_filt = '*' + file_type
-        # sel_filt = dlg.selectedNameFilter()
+        file_type = os.path.splitext(file_name)[-1].strip('.')
     else:
         return -1  # operation cancelled
 
-    # strip extension from returned file name (if any) + append file type:
-    # file_name = os.path.splitext(file_name)[0] + file_type
-
-    logger.info('Try to import file \n\t"{0}"'.format(file_name))
-
-    file_type_err = False
+    err = False
     try:
-        if file_type in {'.csv', '.txt'}:
+        if file_type == 'wav':
+            f_S, data_arr = wavfile.read(file_name, mmap=False)
+            fb.fil[0]['f_S_wav'] = f_S
+        elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
-                    logger.error(
-                        "Error loading file '{0}':\n{1}".format(file_name, data_arr))
+                    logger.error(f"Error loading file '{file_name}':\n{data_arr}")
                     return None
         else:
             with open(file_name, 'rb') as f:
-                if file_type == '.mat':
+                if file_type == 'mat':
                     data_arr = loadmat(f)[fkey]
-                elif file_type == '.npy':
+                elif file_type == 'npy':
                     data_arr = np.load(f)
                     # contains only one array
-                elif file_type == '.npz':
+                elif file_type == 'npz':
                     fdict = np.load(f)
                     if fkey not in fdict:
-                        file_type_err = True
+                        err = True
                         raise IOError(
                             "Key '{0}' not in file '{1}'.\nKeys found: {2}"
                             .format(fkey, file_name, fdict.files))
@@ -929,13 +869,14 @@ def import_data(parent, fkey=None, title="Import",
                         data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
+                    err = True
 
-        if not file_type_err:
+        if not err:
             logger.info(
-                "Success! Parsed data format:\n{0}".format(pprint_log(data_arr, N=3)))
-            dirs.save_dir = os.path.dirname(file_name)
-            dirs.save_filt = sel_filt
+                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)
+            dirs.last_file_type = file_type
             return data_arr  # returns numpy array
 
     except IOError as e:
@@ -944,7 +885,8 @@ def import_data(parent, fkey=None, title="Import",
 
 
 # ------------------------------------------------------------------------------
-def export_data(parent, data, fkey, title="Export"):
+def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
+                file_types=('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
 
@@ -963,21 +905,19 @@ def export_data(parent, data, fkey, title="Export"):
     title: str
         title string for the file dialog box (e.g. "filter coefficients ")
 
+    file_types: tuple of strings
+        file extension (e.g. `(csv)` or list of file extensions (e.g. `(csv, txt)`
+        which are used to create a file filter.
     """
-
     logger.debug(
         f"imported data: type{type(data)}|dim{np.ndim(data)}|"
         f"shape{np.shape(data)}\n{data}")
 
-    file_filters = (
-        "Comma / Tab Separated Values (*.csv);;"
-        "Matlab-Workspace (*.mat);;"
-        "Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
-
+    # add file types for FIR filter coefficients
     if fb.fil[0]['ft'] == 'FIR':
-        file_filters += (";;Xilinx FIR coefficient format (*.coe)"
-                         ";;Microsemi FIR coefficient format (*.txt)"
-                         ";;VHDL Package (*.vhd)")
+        file_types += ('coe', 'vhd', 'txt')
+
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
 #        # Add further file types when modules are available:
 #        if XLWT:
@@ -988,60 +928,63 @@ def export_data(parent, data, fkey, title="Export"):
     # return selected file name (with or without extension) and filter (Linux: full text)
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.save_dir)
+    dlg.setDirectory(dirs.last_file_dir)
     dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)
-    # dlg.setDefaultSuffix('csv') # default suffix when none is given
-    dlg.selectNameFilter(dirs.save_filt)  # default file type selected in file dialog
+    dlg.setNameFilter(file_filters)  # set the list with all available file formats
+    # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
+
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        sel_filt = dlg.selectedNameFilter()
+        file_name = dlg.selectedFiles()[0]   # convert list (with single entry?) to item
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
     else:
         return -1
 
-    for t in extract_file_ext(file_filters):  # extract the list of file extensions
-        if t in str(sel_filt):
-            file_type = t
+    # Slice off file extension
+    file_type = os.path.splitext(file_name)[-1].strip('.')
+    if file_type == "":
+        # No file type specified, add the type from the file filter
+        file_type = extract_file_ext(sel_filt)[0].strip('.')
+        file_name = file_name + '.' + file_type
 
-    # strip extension from returned file name (if any) + append file type:
-    file_name = os.path.splitext(file_name)[0] + file_type
-    file_type_err = False
+    err = False
 
     try:
-        if file_type in {'.csv'}:
+        if file_type == 'csv':
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
-        elif file_type in {'.coe', '.txt', '.vhd'}:  # text / string format
+        elif file_type in {'coe', 'txt', 'vhd'}:  # text / string format
             with open(file_name, 'w', encoding="utf8") as f:
-                if file_type == '.coe':
+                if file_type == 'coe':
                     err = export_coe_xilinx(f)
-                elif file_type == '.txt':
+                elif file_type == 'txt':
                     err = export_coe_microsemi(f)
-                else:  # file_type == '.vhd':
+                elif file_type == '.vhd':
                     err = export_coe_vhdl_package(f)
+                else:
+                    logger.error(f'Unknown file extension "{file_type}')
+                    return None
 
-        else:  # binary format
-            # convert csv data to numpy array
-            np_data = csv2array(io.StringIO(data))
+        else:  # binary formats, storing numpy arrays
+            np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
                 logger.error("Error converting coefficient data:\n{0}".format(np_data))
                 return None
 
             with open(file_name, 'wb') as f:
-                if file_type == '.mat':
+                if file_type == 'mat':
                     savemat(f, mdict={fkey: np_data})
                     # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                elif file_type == '.npy':
-                    # can only store one array in the file, no pickled data
-                    # for Py2 <-> 3 compatibility
-                    np.save(f, np_data, allow_pickle=False)
-                elif file_type == '.npz':
+                elif file_type == 'npy':
+                    np.save(f, np_data)  # can only store one array
+                elif file_type == 'npz':
                     # would be possible to store multiple arrays in the file
                     fdict = {fkey: np_data}
                     np.savez(f, **fdict)  # unpack kw list (only one here)
-                elif file_type == '.xls':
+                elif file_type == 'xls':
                     # see
                     # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
                     # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
@@ -1056,14 +999,14 @@ def export_data(parent, data, fkey, title="Export"):
                             worksheet.write(row+1, col, data[col][row])  # vertical
                     workbook.save(f)
 
-                elif file_type == '.xlsx':
+                elif file_type == 'xlsx':
                     # from https://pypi.python.org/pypi/XlsxWriter
                     # Create an new Excel file and add a worksheet.
                     workbook = xlsx.Workbook(f)
                     worksheet = workbook.add_worksheet()
                     # Widen the first column to make the text clearer.
                     worksheet.set_column('A:A', 20)
-                    # Add a bold format to use to highlight cells.
+                    # define a bold format to highlight cells
                     bold = workbook.add_format({'bold': True})
                     # Write labels with formatting.
                     worksheet.write('A1', 'b', bold)
@@ -1082,12 +1025,13 @@ def export_data(parent, data, fkey, title="Export"):
 
                 else:
                     logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
+                    err = True
 
-        if not file_type_err:
-            logger.info('Filter saved as\n\t"{0}"'.format(file_name))
-            dirs.save_dir = os.path.dirname(file_name)  # save new dir
-            dirs.save_filt = sel_filt  # save new filter selection
+        if not err:
+            logger.info(f'Filter saved as\n\t"{file_name}"')
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
+            dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
@@ -1098,8 +1042,22 @@ def export_data(parent, data, fkey, title="Export"):
 
 
 # ------------------------------------------------------------------------------
-def generate_header(title):
+def generate_header(title: str) -> str:
+    """
+    Generate a file header (comment) for various FPGA FIR coefficient export formats
+    with information on the filter type, corner frequencies, ripple etc
 
+    Parameters
+    ----------
+    title: str
+       A string that is written in the top of the comment section of the exported
+       file.
+
+    Returns
+    -------
+    header: str
+        The string with all the gathered information
+    """
     f_lbls = []
     f_vals = []
     a_lbls = []
@@ -1168,43 +1126,46 @@ def generate_header(title):
     else:
         f_S = fb.fil[0]["f_S"]
     header = (
-        "------------------------------------------------------------------------------------\n"
-        "\n"
+        "-" * 85 + "\n\n"
         "{0}".format(title) + "\n"
-        "Generated by pyFDA 0.3 (https://github.com/chipmuenk/pyfda)\n\n")
-    header += "Designed:\t{0}\n".format(datetime.datetime.fromtimestamp(int(fb.fil[0]['timestamp'])).strftime(date_frmt))
+        "Generated by pyFDA 0.6 (https://github.com/chipmuenk/pyfda)\n\n")
+    header += "Designed:\t{0}\n".format(
+        datetime.datetime.fromtimestamp(
+            int(fb.fil[0]['timestamp'])).strftime(date_frmt))
     header += "Saved:\t{0}\n\n".format(datetime.datetime.now().strftime(date_frmt))
-    header += "Filter type:\t{0}, {1} (Order = {2})\n".format(fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]["N"])
-    header += "Sample Frequency \tf_S = {0} {1}\n\n".format(f_S, unit)
+    header += f"Filter type:\t{fb.fil[0]['rt']}, {fb.fil[0]['fc']} "
+    header += f"(Order = {fb.fil[0]['N']})\n"
+    header += f"Sample Frequency \tf_S = {f_S} {unit}\n\n"
     header += "Corner Frequencies:\n"
     for lf, f, la, a in zip(f_lbls, f_vals, a_lbls, a_targs_dB):
-        header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = " + str(a) + " dB\n"
-    header += "------------------------------------------------------------------------------------\n"
+        header += "\t" + lf + " = " + str(f) + " " + unit + " : " + la + " = "
+        header += str(a) + " dB\n"
+    header += "-" * 85 + "\n"
     return header
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f):
+def export_coe_xilinx(f: TextIO):
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    logger.debug("scale = {0}, WF = {1}".format(qc.scale, qc.WF))
+    logger.debug("scale = {0}, WF = {1}".format(qc.q_dict['scale'], qc.q_dict['WF']))
 
-    if qc.WF != 0:
+    if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
-    if qc.frmt == 'hex':  # select hex format
+    if qc.q_dict['fx_base'] == 'hex':  # select hex format
         coe_radix = 16
-    if qc.frmt == 'bin':  # select binary format
+    if qc.q_dict['fx_base'] == 'bin':  # select binary format
         coe_radix = 2
     else:
         logger.warning('Coefficients in "{0}" format are not supported in COE files, '
                        'using decimal format.')
-        qc.setQobj({'frmt': 'dec'})  # select decimal format in all other cases
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         coe_radix = 10
 
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
@@ -1214,7 +1175,7 @@ def export_coe_xilinx(f):
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file").replace("\n", "\n; ")
 
     exp_str += "\nRadix = {0};\n".format(coe_radix)
-    exp_str += "Coefficient_width = {0};\n".format(qc.W)  # quantized wordlength
+    exp_str += f"Coefficient_width = {qc.q_dict['W']};\n"  # quantized wordlength
     coeff_str = "CoefData = "
     for b in bq:
         coeff_str += str(b) + ",\n"
@@ -1222,24 +1183,26 @@ def export_coe_xilinx(f):
 
     f.write(exp_str)
 
+    return False
+
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f):
+def export_coe_microsemi(f: TextIO):
     """
-    Save FIR filter coefficients in Actel coefficient format as file '\*.txt'.
+    Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
-    For (anti)aymmetric filter only one half of the coefficients must be
+    For (anti)symmetric filter only one half of the coefficients must be
     specified?
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
 
-    if qc.WF != 0:
+    if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength:
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
-    if qc.frmt != 'dec':
-        qc.setQobj({'frmt': 'dec'})  # select decimal format in all other cases
+    if qc.q_dict['fx_base'] != 'dec':
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         logger.warning('Only coefficients in "dec" format are supported,'
                        'using decimal format.')
 
@@ -1252,38 +1215,38 @@ def export_coe_microsemi(f):
 
     f.write(coeff_str)
 
-    return None
+    return False
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f):
+def export_coe_vhdl_package(f: TextIO):
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    if not qc.frmt == 'float' and qc.WF != 0:
+    if not qc.q_dict['fx_base'] == 'float' and qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.setQobj({'W': qc.W, 'scale': 1 << qc.W-1})
+        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     WO = fb.fil[0]['fxqc']['QO']['W']
 
-    if qc.frmt == 'hex':
+    if qc.q_dict['fx_base'] == 'hex':
         pre = "#16#"
         post = "#"
-    elif qc.frmt == 'bin':
+    elif qc.q_dict['fx_base'] == 'bin':
         pre = "#2#"
         post = "#"
-    elif qc.frmt in {'dec', 'float'}:
+    elif qc.q_dict['fx_base'] in {'dec', 'float'}:
         pre = ""
         post = ""
     else:
-        qc.setQobj({'frmt': 'dec'})  # select decimal format in all other cases
+        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         pre = ""
         post = ""
         logger.warning('Coefficients in "{0}" format are currently not supported, '
-                       'using decimal format.'.format(qc.frmt))
+                       'using decimal format.'.format(qc.q_dict['fx_base']))
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -1292,12 +1255,12 @@ def export_coe_vhdl_package(f):
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
-    if qc.frmt == 'float':
+    if qc.q_dict['fx_base'] == 'float':
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    if qc.frmt == 'float':
+    if qc.q_dict['fx_base'] == 'float':
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "
@@ -1313,11 +1276,11 @@ def export_coe_vhdl_package(f):
 
     f.write(exp_str)
 
-    return None
+    return False
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f):
+def export_coe_TI(f: TextIO):
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
@@ -1339,75 +1302,70 @@ def load_filter(self):
     Load filter from zipped binary numpy array or (c)pickled object to
     filter dictionary and update input and plot widgets
     """
-    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-    dlg = QFD(self)
-    file_name, file_type = dlg.getOpenFileName_(
-            caption="Load filter ", directory=dirs.save_dir,
-            filter=file_filters)
-    file_name = str(file_name)  # QString -> str
+    file_types = ("npz", "pkl")
+    file_filters, last_file_filter = create_file_filters(file_types)
 
-    for t in extract_file_ext(file_filters):  # get a list of file extensions
-        if t in str(file_type):
-            file_type = t
+    dlg = QFileDialog(self)
+    dlg.setWindowTitle("Load Filter")
+    dlg.setDirectory(dirs.last_file_dir)
+    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    dlg.setNameFilter(file_filters)  # pass available file filters
+    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
-    if file_name != "":  # cancelled file operation returns empty string
-        if os.stat(file_name).st_size == 0:
-            dirs.save_dir = os.path.dirname(file_name)
-            logger.error('"{0}" has size zero, aborting.'.format(file_name))
-            return
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        file_type = os.path.splitext(file_name)[-1].strip('.')
+    else:
+        return -1  # operation cancelled
 
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] + file_type
+    err = False
+    fb.fil[1] = fb.fil[0].copy()  # backup filter dict
+    try:
+        with io.open(file_name, 'rb') as f:
+            if file_type == 'npz':
+                # array containing dict, dtype 'object':
+                a = np.load(f, allow_pickle=True)
 
-        file_type_err = False
-        fb.fil[1] = fb.fil[0].copy()  # backup filter dict
-        try:
-            with io.open(file_name, 'rb') as f:
-                if file_type == '.npz':
-                    # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
+                logger.debug(f"Entries in {file_name}:\n{a.files}")
+                for key in sorted(a):
+                    logger.debug(
+                        f"key: {key}|{type(key).__name__}|"
+                        f"{type(a[key]).__name__}|{a[key]}")
 
-                    # What encoding to use when reading Py2 strings. Only
-                    # needed for loading py2 generated pickled files on py3.
-                    # fix_imports will try to map old py2 names to new py3
-                    # names when unpickling.
+                    if np.ndim(a[key]) == 0:
+                        # scalar objects may be extracted with the item() method
+                        fb.fil[0][key] = a[key].item()
+                    else:
+                        # array objects are converted to list first
+                        fb.fil[0][key] = a[key].tolist()
+            elif file_type == 'pkl':
+                fb.fil[0] = pickle.load(f)
+            else:
+                logger.error('Unknown file type "{0}"'.format(file_type))
+                err = True
+            if not err:
+                # sanitize values in filter dictionary, keys are ok by now
+                for k in fb.fil[0]:
+                    # Bytes need to be decoded for py3 to be used as keys later on
+                    if type(fb.fil[0][k]) == bytes:
+                        fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                    if fb.fil[0][k] is None:
+                        logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
 
-                    # array containing dict, dtype 'object':
-                    a = np.load(f, fix_imports=True, encoding='bytes', allow_pickle=True)
+                logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
+                dirs.last_file_name = file_name
+                dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
+                dirs.last_file_type = file_type  # save file type
+                # emit signal -> filter loaded
+                self.emit({'data_changed': 'filter_loaded'})
 
-                    logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
-                    for key in sorted(a):
-                        logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
-
-                        if np.ndim(a[key]) == 0:
-                            # scalar objects may be extracted with the item() method
-                            fb.fil[0][key] = a[key].item()
-                        else:
-                            # array objects are converted to list first
-                            fb.fil[0][key] = a[key].tolist()
-                elif file_type == '.pkl':
-                    # this only works for python >= 3.3
-                    fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
-                else:
-                    logger.error('Unknown file type "{0}"'.format(file_type))
-                    file_type_err = True
-                if not file_type_err:
-                    # sanitize values in filter dictionary, keys are ok by now
-                    for k in fb.fil[0]:
-                        # Bytes need to be decoded for py3 to be used as keys later on
-                        if type(fb.fil[0][k]) == bytes:
-                            fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-                        if fb.fil[0][k] is None:
-                            logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
-
-                    logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
-                    # emit signal -> InputTabWidgets.load_all:
-                    self.emit({'data_changed': 'filter_loaded'})
-                    dirs.save_dir = os.path.dirname(file_name)  # update working dir
-        except IOError as e:
-            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
-        except Exception as e:
-            logger.error("Unexpected error:\n{0}".format(e))
-            fb.fil[0] = fb.fil[1]  # restore backup
+    except IOError as e:
+        logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+    except Exception as e:
+        logger.error("Unexpected error:\n{0}".format(e))
+        fb.fil[0] = fb.fil[1]  # restore backup
 
 
 # ------------------------------------------------------------------------------
@@ -1415,44 +1373,45 @@ def save_filter(self):
     """
     Save filter as zipped binary numpy array or pickle object
     """
-    file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-    dlg = QFD(self)
-    # return selected file name (with or without extension) and filter (Linux: full text)
-    file_name, file_type = dlg.getSaveFileName_(
-            caption="Save filter as", directory=dirs.save_dir,
-            filter=file_filters)
+    file_types = ("npz", "pkl")
+    file_filters, last_file_filter = create_file_filters(file_types)
 
-    file_name = str(file_name)  # QString -> str() needed for Python 2.x
-    # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
-    # be extracted reproducibly across file systems, so it is done manually:
+    dlg = QFileDialog(self)
+    dlg.setWindowTitle("Save filter as")
+    dlg.setDirectory(dirs.last_file_dir)
+    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
+    dlg.setNameFilter(file_filters)
 
-    for t in extract_file_ext(file_filters):  # get a list of file extensions
-        if t in str(file_type):
-            file_type = t           # return the last matching extension
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
-    if file_name != "":  # cancelled file operation returns empty string
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        # sel_filt = dlg.selectedNameFilter()  # selected file filter
+    else:
+        return -1  # operation cancelled
 
-        # strip extension from returned file name (if any) + append file type:
-        file_name = os.path.splitext(file_name)[0] + file_type
+    file_type = os.path.splitext(file_name)[-1].strip('.')  # slice off file extension
 
-        file_type_err = False
-        try:
-            with io.open(file_name, 'wb') as f:
-                if file_type == '.npz':
-                    np.savez(f, **fb.fil[0])
-                elif file_type == '.pkl':
-                    # save in default pickle version
-                    pickle.dump(fb.fil[0], f)
-                else:
-                    file_type_err = True
-                    logger.error('Unknown file type "{0}"'.format(file_type))
+    err = False
+    try:
+        with io.open(file_name, 'wb') as f:
+            if file_type == 'npz':
+                np.savez(f, **fb.fil[0])
+            elif file_type == 'pkl':
+                pickle.dump(fb.fil[0], f)  # save in default pickle version
+            else:
+                err = True
+                logger.error('Unknown file type "{0}"'.format(file_type))
 
-            if not file_type_err:
-                logger.info('Successfully saved filter as\n\t"{0}"'.format(file_name))
-                dirs.save_dir = os.path.dirname(file_name)  # save new dir
+        if not err:
+            logger.info(f'Filter saved as\n\t"{file_name}"')
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
+            dirs.last_file_type = file_type  # save file type
 
-        except IOError as e:
-            logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
+    except IOError as e:
+        logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
 
 
 # ==============================================================================

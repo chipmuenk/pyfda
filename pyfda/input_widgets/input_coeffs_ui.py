@@ -13,12 +13,16 @@ Create the UI for the FilterCoeffs class
 from pyfda.libs.compat import (
     pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QFrame,
     QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
+from pyfda.libs.pyfda_lib import to_html
 
-from pyfda.libs.pyfda_qt_lib import qset_cmb_box, qstyle_widget, QHLine, PushButton
-from pyfda.libs.pyfda_io_lib import CSV_option_box
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_qt_lib import (
+    qset_cmb_box, qstyle_widget, qcmb_box_populate, QHLine, PushButton)
+from pyfda.libs.csv_option_box import CSV_option_box
+# from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_dirs as dirs
+from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
+import pyfda.filterbroker as fb
 
 import logging
 logger = logging.getLogger(__name__)
@@ -35,6 +39,36 @@ class Input_Coeffs_UI(QWidget):
     def __init__(self, parent=None):
         super(Input_Coeffs_UI, self).__init__(parent)
         self.eps = 1.e-6  # initialize tolerance value
+
+        self.cmb_q_frmt_items = [
+            "<span>Quantization format for signed fixpoint coefficients (affects only "
+            "the display, not the stored values).</span>",
+            # ("float", "Float", "<span>Coefficients with full precision in floating "
+            # "point format</span>"),
+            ("qint", "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
+             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
+            ("qfrac", "Fractional",
+             "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
+             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>"),
+            ("qnfrac", "Norm. Frac.",
+             "<span>Normalized fractional format with <i>WF</i> + 1 bits "
+             "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
+            ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
+             "(31 fractional bits).</span>")
+            ]
+        self.cmb_q_frmt_default = "qfrac"
+
+        self.cmb_fx_base_items = [
+            "<span>Select the coefficient display format.</span>",
+            ("float", "Float", "<span>Coefficients with full precision in floating "
+             "point format</span>"),
+            ("dec", "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
+            ("hex", "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
+            ("bin", "Bin", "<span>Fixpoint coefficients in binary format</span>"),
+            ("csd", "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
+             "(ternary logic) format</span>")
+            ]
+        self.cmb_fx_base_default = "float"
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -46,12 +80,12 @@ class Input_Coeffs_UI(QWidget):
 
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
             return
-        elif 'ui_changed' in dict_sig:
+        elif 'ui_global_changed' in dict_sig:
             self._set_load_save_icons()  # update icons file <-> clipboard
             # inform e.g. the p/z input widget about changes in CSV options
-            self.emit({'ui_changed': 'csv'})
+            self.emit({'ui_global_changed': 'csv'})
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -74,7 +108,6 @@ class Input_Coeffs_UI(QWidget):
         # This frame contains all the buttons
         #######################################################################
         # ---------------------------------------------
-        # layHDisplay
         #
         # UI Elements for controlling the display
         # ---------------------------------------------
@@ -84,28 +117,19 @@ class Input_Coeffs_UI(QWidget):
             "<span>Show / hide filter coefficients in an editable table."
             " For high order systems, table display might be slow.</span>")
 
-        fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
-        self.cmbFormat = QComboBox(self)
-        model = self.cmbFormat.model()
-        item = QtGui.QStandardItem('Float')
-        item.setData('child', Qt.AccessibleDescriptionRole)
-        model.appendRow(item)
+        self.cmb_fx_base = QComboBox(self)
+        qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
+                          self.cmb_fx_base_default)
 
-        item = QtGui.QStandardItem('Fixp.:')
+        model = self.cmb_fx_base.model()
+        # create header "Fixpoint:" between separators
+        item = QtGui.QStandardItem('Fixpoint:')
         item.setData('parent', Qt.AccessibleDescriptionRole)
-        item.setData(0, QtGui.QFont.Bold)
-        item.setFlags(item.flags() & ~Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
-        model.appendRow(item)
-
-        for idx in range(len(fix_formats)):
-            item = QtGui.QStandardItem(fix_formats[idx])
-#            item.setForeground(QtGui.QColor('red'))
-            model.appendRow(item)
-
-        self.cmbFormat.insertSeparator(1)
-        qset_cmb_box(self.cmbFormat, 'float')
-        self.cmbFormat.setToolTip('Set the display format.')
-        self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        item.setData(0, role=QtGui.QFont.Bold)
+        item.setFlags(item.flags() & Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
+        model.insertRow(1, item)
+        self.cmb_fx_base.insertSeparator(1)
+        self.cmb_fx_base.insertSeparator(3)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
@@ -114,46 +138,53 @@ class Input_Coeffs_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
-        self.cmbQFrmt = QComboBox(self)
-        q_formats = [('Norm. Frac.', 'qnfrac'), ('Integer', 'qint'),
-                     ('Fractional', 'qfrac')]
-        for q in q_formats:
-            self.cmbQFrmt.addItem(*q)
+        self.cmb_q_frmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
+                          self.cmb_q_frmt_default)
+        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lbl_W = QLabel("W = ", self)
-        self.lbl_W.setFont(self.bifont)
+        self.but_quant = QPushButton(self)
+        self.but_quant.setToolTip(
+            "<span>Quantize selected coefficients / whole table with specified "
+            "settings and save to dict. This modifies the data, not only the view."
+            "</span>")
+        self.but_quant.setIcon(QIcon(':/quantize.svg'))
+        self.but_quant.setIconSize(q_icon_size)
+        self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        self.ledW = QLineEdit(self)
-        self.ledW.setToolTip("Specify total wordlength.")
-        self.ledW.setText("16")
-        self.ledW.setMaxLength(2)  # maximum of 2 digits
-        self.ledW.setFixedWidth(30)  # width of lineedit in points(?)
+        layH_q_frmt = QHBoxLayout()
+        layH_q_frmt.addWidget(self.cmb_q_frmt)
+        layH_q_frmt.addWidget(self.but_quant)
+        layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
+        self.frm_q_frmt = QFrame(self)
+        self.frm_q_frmt.setLayout(layH_q_frmt)
 
-        layHDisplay = QHBoxLayout()
-        layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(self.butEnable)
-        layHDisplay.addWidget(self.cmbFormat)
-        layHDisplay.addWidget(self.spnDigits)
-        layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.cmbQFrmt)
-        layHDisplay.addWidget(self.lbl_W)
-        layHDisplay.addWidget(self.ledW)
-        layHDisplay.addStretch()
+        layH_display = QHBoxLayout()
+        layH_display.setContentsMargins(*params['wdg_margins'])
+        layH_display.setAlignment(Qt.AlignLeft)
+        layH_display.addWidget(self.butEnable)
+        layH_display.addWidget(self.cmb_fx_base)
+        layH_display.addWidget(self.spnDigits)
+        layH_display.addWidget(self.lblDigits)
+        layH_display.addWidget(self.frm_q_frmt)
+        layH_display.addStretch()
+
+        self.frm_display = QFrame(self)
+        self.frm_display.setLayout(layH_display)
 
         #######################################################################
-        # frmButtonsCoeffs
+        # frm_buttons_coeffs
         #
         # This frame contains all buttons for manipulating coefficients
-        #######################################################################
         # -----------------------------------------------------------------
-        # layHButtonsCoeffs1
+        # layH_buttons_coeffs1
         #
         # UI Elements for loading / storing / manipulating cells and rows
         # -----------------------------------------------------------------
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip(
-            "<span>Select between IIR and FIR filter for manual entry."
+            "<span>Select between IIR and FIR filter for manual entry. "
             "Changing the type reloads the filter from the filter dict.</span>")
         self.cmbFilterType.addItems(["FIR", "IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -162,9 +193,9 @@ class Input_Coeffs_UI(QWidget):
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         self.butAddCells.setIconSize(q_icon_size)
         self.butAddCells.setToolTip(
-            "<span>Select cells to insert a new cell above each selected cell. "
+            "<span>Insert a row above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-            "When nothing is selected, add a row at the end.</span>")
+            "When nothing is selected, append a row to the end.</span>")
 
         self.butDelCells = QPushButton(self)
         self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
@@ -178,13 +209,14 @@ class Input_Coeffs_UI(QWidget):
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
         self.butSave.setToolTip(
-            "<span>Copy coefficient table to filter dict and update all plots"
+            "<span>Copy coefficient table to filter dict and update all plots "
             "and widgets.</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("Reload coefficient table from filter dict.")
+        self.butLoad.setToolTip(
+            "<span>Reload coefficient table from filter dict.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -206,20 +238,20 @@ class Input_Coeffs_UI(QWidget):
 
         self._set_load_save_icons()  # initialize icon / button settings
 
-        layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        layHButtonsCoeffs1.addWidget(self.butAddCells)
-        layHButtonsCoeffs1.addWidget(self.butDelCells)
-        layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butSave)
-        layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butFromTable)
-        layHButtonsCoeffs1.addWidget(self.butToTable)
-        layHButtonsCoeffs1.addWidget(self.but_csv_options)
-        layHButtonsCoeffs1.addStretch()
+        layH_buttons_coeffs1 = QHBoxLayout()
+        layH_buttons_coeffs1.addWidget(self.cmbFilterType)
+        layH_buttons_coeffs1.addWidget(self.butAddCells)
+        layH_buttons_coeffs1.addWidget(self.butDelCells)
+        layH_buttons_coeffs1.addWidget(self.butClear)
+        layH_buttons_coeffs1.addWidget(self.butSave)
+        layH_buttons_coeffs1.addWidget(self.butLoad)
+        layH_buttons_coeffs1.addWidget(self.butFromTable)
+        layH_buttons_coeffs1.addWidget(self.butToTable)
+        layH_buttons_coeffs1.addWidget(self.but_csv_options)
+        layH_buttons_coeffs1.addStretch()
 
         # ----------------------------------------------------------------------
-        # layHButtonsCoeffs2
+        # layH_buttons_coeffs2
         #
         # Eps / set zero settings
         # ---------------------------------------------------------------------
@@ -235,184 +267,47 @@ class Input_Coeffs_UI(QWidget):
         self.ledEps = QLineEdit(self)
         self.ledEps.setToolTip("Specify tolerance value.")
 
-        layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(self.butSetZero)
-        layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledEps)
-        layHButtonsCoeffs2.addStretch()
+        layH_buttons_coeffs2 = QHBoxLayout()
+        layH_buttons_coeffs2.addWidget(self.butSetZero)
+        layH_buttons_coeffs2.addWidget(lblEps)
+        layH_buttons_coeffs2.addWidget(self.ledEps)
+        layH_buttons_coeffs2.addStretch()
 
         # -------------------------------------------------------------------
-        # Now put the ButtonsCoeffs HBoxes into frmButtonsCoeffs
+        # Now put the _buttons_coeffs HBoxes into frm_buttons_coeffs
         # ---------------------------------------------------------------------
-        layVButtonsCoeffs = QVBoxLayout()
-        layVButtonsCoeffs.addLayout(layHButtonsCoeffs1)
-        layVButtonsCoeffs.addLayout(layHButtonsCoeffs2)
-        layVButtonsCoeffs.setContentsMargins(0, 5, 0, 0)
+        layV_buttons_coeffs = QVBoxLayout()
+        layV_buttons_coeffs.addLayout(layH_buttons_coeffs1)
+        layV_buttons_coeffs.addLayout(layH_buttons_coeffs2)
+        layV_buttons_coeffs.setContentsMargins(*params['wdg_margins'])  # 0, 5, 0, 0)
         # This frame encompasses all Quantization Settings
-        self.frmButtonsCoeffs = QFrame(self)
-        self.frmButtonsCoeffs.setLayout(layVButtonsCoeffs)
-
-        # ######################################################################
-        # frmQSettings
-        #
-        # This frame contains all quantization settings
-        # ######################################################################
-        # -------------------------------------------------------------------
-        # layHW_Scale
-        #
-        # QFormat and scale settings
-        # ---------------------------------------------------------------------
-        lbl_Q = QLabel("Q =", self)
-        lbl_Q.setFont(self.bifont)
-
-        self.ledWI = QLineEdit(self)
-        self.ledWI.setToolTip("Specify number of integer bits.")
-        self.ledWI.setText("0")
-        self.ledWI.setMaxLength(2)  # maximum of 2 digits
-        self.ledWI.setFixedWidth(30)  # width of lineedit in points(?)
-
-        self.lblDot = QLabel(".", self)  # class attribute, visibility is toggled
-        self.lblDot.setFont(self.bfont)
-
-        self.ledWF = QLineEdit(self)
-        self.ledWF.setToolTip("Specify number of fractional bits.")
-        self.ledWF.setText("15")
-        self.ledWF.setMaxLength(2)  # maximum of 2 digits
-#        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledWF.setMaximumWidth(30)
-
-        self.lblScale = QLabel("<b><i>Scale</i> =</b>", self)
-        self.ledScale = QLineEdit(self)
-        self.ledScale.setToolTip(
-            "Set the scale for converting float to fixpoint representation.")
-        self.ledScale.setText(str(1))
-        self.ledScale.setEnabled(False)
-
-        layHWI_WF = QHBoxLayout()
-        layHWI_WF.addWidget(lbl_Q)
-        layHWI_WF.addWidget(self.ledWI)
-        layHWI_WF.addWidget(self.lblDot)
-        layHWI_WF.addWidget(self.ledWF)
-        layHWI_WF.addStretch()
-
-        layHScale = QHBoxLayout()
-        layHScale.addWidget(self.lblScale)
-        layHScale.addWidget(self.ledScale)
-        layHScale.addStretch()
-
-        layHW_Scale = QHBoxLayout()
-        layHW_Scale.addLayout(layHWI_WF)
-        layHW_Scale.addLayout(layHScale)
-
-        # -------------------------------------------------------------------
-        # layGQOpt
-        #
-        # Quantization / Overflow / MSB / LSB settings
-        # ---------------------------------------------------------------------
-        lblQOvfl = QLabel("Ovfl.:", self)
-        lblQOvfl.setFont(self.bifont)
-        lblQuant = QLabel("Quant.:", self)
-        lblQuant.setFont(self.bifont)
-
-        self.cmbQOvfl = QComboBox(self)
-        qOvfl = ['wrap', 'sat']
-        self.cmbQOvfl.addItems(qOvfl)
-        qset_cmb_box(self.cmbQOvfl, 'sat')
-        self.cmbQOvfl.setToolTip("Select overflow behaviour.")
-        # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        layHQOvflOpt = QHBoxLayout()
-        layHQOvflOpt.addWidget(lblQOvfl)
-        layHQOvflOpt.addWidget(self.cmbQOvfl)
-        layHQOvflOpt.addStretch()
-
-        self.cmbQuant = QComboBox(self)
-        qQuant = ['none', 'round', 'fix', 'floor']
-        self.cmbQuant.addItems(qQuant)
-        qset_cmb_box(self.cmbQuant, 'round')
-        self.cmbQuant.setToolTip("Select the kind of quantization.")
-        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        layHQuantOpt = QHBoxLayout()
-        layHQuantOpt.addWidget(lblQuant)
-        layHQuantOpt.addWidget(self.cmbQuant)
-        layHQuantOpt.addStretch()
-
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip(
-            "<span>Quantize selected coefficients / "
-            "whole table with specified settings.</span>")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        lblMSBtxt = QLabel(self)
-        lblMSBtxt.setText("<b><i>MSB</i><sub>10</sub> =</b>")
-        self.lblMSB = QLabel(self)
-        layHMSB = QHBoxLayout()
-        layHMSB.addWidget(lblMSBtxt)
-        layHMSB.addWidget(self.lblMSB)
-        layHMSB.addStretch()
-
-        lblLSBtxt = QLabel(self)
-        lblLSBtxt.setText("<b><i>LSB</i><sub>10</sub> =</b>")
-        self.lblLSB = QLabel(self)
-        layHLSB = QHBoxLayout()
-        layHLSB.addWidget(lblLSBtxt)
-        layHLSB.addWidget(self.lblLSB)
-        layHLSB.addStretch()
-
-        layGQOpt = QGridLayout()
-        layGQOpt.addLayout(layHQOvflOpt, 0, 0)
-        layGQOpt.addLayout(layHQuantOpt, 0, 1)
-        layGQOpt.addWidget(self.butQuant, 0, 2, Qt.AlignCenter)
-        layGQOpt.addLayout(layHMSB, 1, 0)
-        layGQOpt.addLayout(layHLSB, 1, 1)
-
-        # -------------------------------------------------------------------
-        #   Display MAX
-        # ---------------------------------------------------------------------
-        lblMAXtxt = QLabel(self)
-        lblMAXtxt.setText("<b><i>Max =</i></b>")
-        self.lblMAX = QLabel(self)
-
-        layHCoeffs_MAX = QHBoxLayout()
-        layHCoeffs_MAX.addWidget(lblMAXtxt)
-        layHCoeffs_MAX.addWidget(self.lblMAX)
-        layHCoeffs_MAX.addStretch()
-
+        self.frm_buttons_coeffs = QFrame(self)
+        self.frm_buttons_coeffs.setLayout(layV_buttons_coeffs)
         #######################################################################
-        # Now put all the coefficient HBoxes into frmQSettings
-        # ---------------------------------------------------------------------
-        layVButtonsQ = QVBoxLayout()
-        layVButtonsQ.addLayout(layHW_Scale)
-        layVButtonsQ.addLayout(layGQOpt)
-        layVButtonsQ.addLayout(layHCoeffs_MAX)
-        layVButtonsQ.setContentsMargins(0, 0, 0, 0)
-        # This frame encompasses all Quantization Settings
-        self.frmQSettings = QFrame(self)
-        self.frmQSettings.setLayout(layVButtonsQ)
+
+        # -------------------
+        self.wdg_wq_coeffs_b = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
+            label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
+            MSB_LSB_vis='max')
+        # -------------------
+        self.wdg_wq_coeffs_a = FX_UI_WQ(
+            fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
+            label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
+            MSB_LSB_vis='max')
 
         #######################################################################
         # ########################  Main UI Layout ############################
         #######################################################################
-        # layout for frame (UI widget)
-        layVMainF = QVBoxLayout()
-        layVMainF.addLayout(layHDisplay)
-        layVMainF.addWidget(self.frmQSettings)
-        layVMainF.addWidget(QHLine())
-        layVMainF.addWidget(self.frmButtonsCoeffs)
-
-        # This frame encompasses all UI elements
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
+        layVMain.setContentsMargins(*params['wdg_margins'])
         # the following affects only the first widget (intended here)
         layVMain.setAlignment(Qt.AlignTop)
-        layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        layVMain.addWidget(self.frm_display)
+        layVMain.addWidget(self.frm_buttons_coeffs)
+        layVMain.addWidget(self.wdg_wq_coeffs_b)
+        layVMain.addWidget(self.wdg_wq_coeffs_a)
         self.setLayout(layVMain)
         #######################################################################
 
@@ -451,10 +346,9 @@ class Input_Coeffs_UI(QWidget):
                 else:
                     dirs.csv_options_handle.close()
 
-        self.emit({'ui_changed': 'csv'})
+        self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------
-
     def _close_csv_win(self):
         dirs.csv_options_handle = None
         self.but_csv_options.setChecked(False)
@@ -469,22 +363,29 @@ class Input_Coeffs_UI(QWidget):
         if params['CSV']['clipboard']:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard, SELECTED items are copied as "
-                "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "<span>Copy table to clipboard.<br>For float format, SELECTED items "
+                "are copied as displayed. When nothing is selected, the whole table "
+                "is copied with full precision.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-            self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
+            self.butToTable.setToolTip(
+                "<span>Copy clipboard to table. Table data format (e.g. 'Hex') has to "
+                "match the clipboard data format, otherwise data may be imported "
+                "incorrectly without warning.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
                 "<span>"
-                "Save table to file, SELECTED items are copied as "
+                "Save table to file.<br>"
+                "For float format,  SELECTED items are copied as "
                 "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "is copied with full precision.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
-            self.butToTable.setToolTip("<span>Load table from file.</span>")
+            self.butToTable.setToolTip(
+                "<span>Load table from file. Table data format (e.g. 'Hex') has to "
+                "match the data format in the file, otherwise data may be imported "
+                "incorrectly without warning.</span>")
 
         if dirs.csv_options_handle is None:
             qstyle_widget(self.but_csv_options, "normal")

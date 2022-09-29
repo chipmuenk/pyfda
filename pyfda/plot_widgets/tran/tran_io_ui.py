@@ -12,12 +12,12 @@ Create the UI for the Tran_IO class
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
-    pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
+    pyqtSignal, Qt, QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
-import pyfda.filterbroker as fb
+# import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, QVLine, 
     PushButton)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -31,7 +31,7 @@ class Tran_IO_UI(QWidget):
     """
     # incoming:
     sig_rx = pyqtSignal(object)
-    # outgoing: from various UI elements to PlotImpz ('ui_changed':'xxx')
+    # outgoing: from various UI elements to PlotImpz ('ui_local_changed':'xxx')
     sig_tx = pyqtSignal(object)
 
     from pyfda.libs.pyfda_qt_lib import emit
@@ -59,6 +59,15 @@ class Tran_IO_UI(QWidget):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
+        # combobox tooltip + data / text / tooltip for file I/O usage
+        self.cmb_file_io_items = [
+            ("<span>Select data from File I/O widget/span>"),
+            ("off", "Off", "<span>Don't use file I/O data.</span>"),
+            ("use", "Use", "<span><b>Use></b> file I/O data as stimuli.</span>"),
+            ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli")
+            ]
+        self.cmb_file_io_default = "none"
+
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
 
@@ -66,24 +75,34 @@ class Tran_IO_UI(QWidget):
         # =====================================================================
         # Controls
         # =====================================================================
-
         self.butLoad = PushButton(self, icon=QIcon(':/file.svg'),
                                   checkable=False)
         # self.butLoad.setIconSize(q_icon_size)
         self.butLoad.setToolTip("Load data from file.")
-        self.butLoad.setEnabled(False)
-
-        self.lbl_info = QLabel(to_html("  coming soon ...", frmt="b"))
+        self.butLoad.setEnabled(True)
 
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        layH_io_par = QHBoxLayout()
-        layH_io_par.addWidget(self.butLoad)
-        layH_io_par.addWidget(self.lbl_info)
+        layG_io_file = QGridLayout()
+        self.lbl_file = QLabel(to_html("File:", frmt="b"))
+        self.lbl_filename = QLabel("None")
+
+        self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
+        self.lbl_shape_actual = QLabel("None")
+
+        i = 0
+        i += 1
+        layG_io_file.addWidget(self.butLoad, 0, i, 0, 1)
+        i += 1
+        layG_io_file.addWidget(self.lbl_file, 0, i)
+        layG_io_file.addWidget(self.lbl_shape, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.lbl_filename, 0, i)
+        layG_io_file.addWidget(self.lbl_shape_actual, 1, i)
 
         layV_io = QVBoxLayout()
-        layV_io.addLayout(layH_io_par)
+        layV_io.addLayout(layG_io_file)
 
         layH_io = QHBoxLayout()
         layH_io.addLayout(layV_io)
@@ -95,22 +114,22 @@ class Tran_IO_UI(QWidget):
 
 
 # ------------------------------------------------------------------------------
-def main():
-    import sys
-    from pyfda.libs.compat import QApplication
+# def main():
+#     import sys
+#     from pyfda.libs.compat import QApplication
 
-    app = QApplication(sys.argv)
+#     app = QApplication(sys.argv)
 
-    mainw = Tran_IO_UI(None)
-    layVMain = QVBoxLayout()
-    layVMain.addWidget(mainw.wdg_stim)
-    layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+#     mainw = Tran_IO_UI(None)
+#     layVMain = QVBoxLayout()
+#     layVMain.addWidget(mainw.wdg_stim)
+#     layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
 
-    mainw.setLayout(layVMain)
+#     mainw.setLayout(layVMain)
 
-    app.setActiveWindow(mainw)
-    mainw.show()
-    sys.exit(app.exec_())
+#     app.setActiveWindow(mainw)
+#     mainw.show()
+#     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
@@ -131,4 +150,3 @@ if __name__ == "__main__":
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
-

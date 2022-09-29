@@ -7,18 +7,17 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for plotting impulse and general transient responses
+Widget for loading and storing stimulus data from / to transient plotting widget
 """
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
-#import numpy as np
-#from numpy import ndarray, pi
+import numpy as np
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
-from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval
+from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget
+import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
@@ -40,7 +39,8 @@ class Tran_IO(QWidget):
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
         # initial settings
-
+        self.x = None  # array for file data
+        self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -81,6 +81,27 @@ class Tran_IO(QWidget):
 # ------------------------------------------------------------------------------
     def import_data(self):
         self.x = io.import_data(
-            self, title="Import Data",
-            file_filters="Comma / Tab Separated Values (*.csv *.txt);;")
-
+            self, title="Import Data", file_types=('csv', 'wav'))
+        if self.x is None:
+            return  # file operation cancelled
+        elif type(self.x) != np.ndarray:
+            logger.warning("Unsuitable file format")
+            return
+        else:
+            logger.info(f"Type of x: {type(self.x)}")
+            if len(self.x.shape) == 1:
+                self.n_chan = 1
+                self.N = len(self.x)
+            elif len(self.x.shape) == 2:
+                self.n_chan = self.x.shape[0]
+                self.N = self.x.shape[1]
+            else:
+                logger.error(f"Unsuitable data with shape {self.x.shape}.")
+                return
+            qstyle_widget(self.ui.butLoad, "active")
+            self.file_load_status = "loaded"
+            logger.info(f"Shape = {self.x.shape}")
+            self.emit({'data_changed': 'file_io'})
+            self.ui.lbl_filename.setText(dirs.last_file_name)
+            self.ui.lbl_shape_actual.setText(
+                f"Channels = {self.n_chan}, Samples = {self.N}")

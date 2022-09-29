@@ -11,7 +11,6 @@
 | [PyQt](https://www.riverbankcomputing.com/software/pyqt/) | {V_PYQT} | GPLv3 | Python bindings for Qt5 |
 | [Markdown](https://github.com/Python-Markdown/markdown) |  {V_MD} | BSD | Markdown implementation |
 | [docutils](https://docutils.sourceforge.io) | {V_DOC} | GPLv3 a.o. | Plain text -> markup formats |
-| [nMigen](https://github.com/nmigen/nmigen) | {V_NMG} |  BSD-2 | Fixpoint simulation and synthesis |
 | [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
 | [YOSYS](http://www.clifford.at/yosys/download.html) | {V_YO} | ISC | Framework for Verilog RTL synthesis |
 

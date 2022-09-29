@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (QAction, QMenu,
                              QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,
                              QFileDialog, QInputDialog, QPlainTextEdit, QProgressBar,
                              QTableWidget, QTableWidgetItem, QHeaderView, QTextBrowser,
-                             QSizePolicy, QAbstractItemView,
+                             QSizePolicy, QAbstractItemView, QSpacerItem,
                              QHBoxLayout, QVBoxLayout, QGridLayout,
                              QStyledItemDelegate, QStyle, QStyleOption)
 from PyQt5.QtTest import QTest, QSignalSpy
@@ -70,22 +70,22 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 # ==============================================================================
 
 
-class QFD(QFileDialog):
-    """
-    Subclass QFileDialog methods whose names changed between PyQt4 and PyQt5
-    to provide a common API.
-    """
-    def __init__(self, parent):
-        super(QFD, self).__init__(parent)
+# class QFD(QFileDialog):
+#     """
+#     Subclass QFileDialog methods whose names changed between PyQt4 and PyQt5
+#     to provide a common API.
+#     """
+#     def __init__(self, parent):
+#         super(QFD, self).__init__(parent)
 
-    def getOpenFileName_(self, **kwarg):
-        return self.getOpenFileName(**kwarg)
+#     def getOpenFileName_(self, **kwarg):
+#         return self.getOpenFileName(**kwarg)
 
-    def getOpenFileNames_(self, **kwarg):
-        return self.getOpenFileNames(**kwarg)
+#     def getOpenFileNames_(self, **kwarg):
+#         return self.getOpenFileNames(**kwarg)
 
-    def getSaveFileName_(self, **kwarg):
-        return self.getSaveFileName(**kwarg)
+#     def getSaveFileName_(self, **kwarg):
+#         return self.getSaveFileName(**kwarg)
 
 
 class QPushButtonRT(QPushButton):

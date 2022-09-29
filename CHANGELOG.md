@@ -1,16 +1,37 @@
 ## Changelog
-### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2022-03-28)
+### [v0.7](https://github.com/chipmuenk/pyfda/tree/v0.7.0) (2022-xxx)
 
-### Bug fixes
+### Bugfixes
+- Fix lot of bugs and redundancies in the fixpoint simulation routines
+- When the filter is complex-valued, set data type to 'complex' for the response
+  signal in y[n] (was 'float' so only the real part was displayed)
+- Fix crash when entering a complex coefficient in a previously real-valued filter
+- Default file filters for QFileDialog objects could not be set in some cases, 
+  producing warning messages in the console
+- Remove module import and version display for module nmigen to avoid message
+  "KeyError: 'V_NMG'"
+
+### New features
+- Show number of pos. and neg. overflows in quantizers
+- Implement IIR DF1 fixpoint filter
+- Export SOS filter coefficients in CMSIS DSP format (via the CSV export options in the coefficient tab)
+- New stimulus Randint process
+- Add sequence length parameter to MLS process, remove PRBS (which was a Randint
+  process with values 0 and 1)
+
+### Maintenance
+- move CSV_option_box to separate module 'csv_option_box.py'
+
+### [v0.6.1](https://github.com/chipmuenk/pyfda/tree/v0.6.1) (2022-03-28)
+
+### Bugfixes
 - Fix crash with matplotlib 3.1 due to missing Axes3D import
 - Fix crash with scipy 1.8.0 by providing local copy of `validate_sos()` (#214)
 
 ### New features
 - Keyboard modifier `<ALT>` hides the plot title when saving a
   figure or copying it to the clipboard
-
 - Add new stimulus "PWM"
-
 - Verified functionality with Python 3.10
 
 ### [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-12-23)
