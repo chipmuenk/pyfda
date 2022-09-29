@@ -9,7 +9,7 @@
 #
 # is required.
 ---
-name: pyinstaller
+name: build_pyinstaller
 
 on:
   push:
