@@ -105,7 +105,7 @@ class Plot_Tran_Stim(QWidget):
             # correspondingly.
             if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
                 (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
-                (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
+                    (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
                 self.xf = np.zeros(N_frame, dtype=complex)
             else:
                 self.xf = np.zeros(N_frame, dtype=float)

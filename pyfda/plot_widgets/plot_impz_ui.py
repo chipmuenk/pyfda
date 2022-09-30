@@ -204,7 +204,8 @@ class PlotImpz_UI(QWidget):
         self.but_run.setEnabled(True)
 
         self.cmb_sim_select = QComboBox(self)
-        qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items, self.cmb_sim_select_init)
+        qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items,
+                          self.cmb_sim_select_init)
 
         self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
