@@ -79,7 +79,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.sinusoid_type = "sine"
 
         self.chirp_type = "linear"
-        self.cmb_file_io_default = "none"
+        self.cmb_file_io_default = "off"
 
         self.f1 = 0.02
         self.f2 = 0.03
@@ -230,6 +230,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.cmb_file_io = QComboBox(self)
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
+        self.cmb_file_io.setEnabled(False)
         layV_stim_io = QVBoxLayout()
         layV_stim_io.setContentsMargins(0, 0, 0, 0)
         layV_stim_io.addWidget(self.lbl_file_io)
