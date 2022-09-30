@@ -352,6 +352,12 @@ class Plot_Impz(QWidget):
                     logger.info(
                         f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
                         f"{self.file_io_wdg.N} samples.")
+                    if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
+                        qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
+                        self.stim_wdg.ui.cmb_file_io.setEnabled(False)
+                    else:
+                        self.stim_wdg.ui.cmb_file_io.setEnabled(True)
+
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
@@ -527,11 +533,14 @@ class Plot_Impz(QWidget):
             # TODO: Use file data here, limit to one channel
             x_io = self.file_io_wdg.x
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'use':
+                self.ui.update_N(emit=False, N_end=len(x_io))
                 self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            #
             elif qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'add':
                 self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            #
             else:
                 self.x[frame] = self.stim_wdg.calc_stimulus_frame(
                     N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
