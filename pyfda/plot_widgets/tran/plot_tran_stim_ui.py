@@ -371,7 +371,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledFreq1.setText(str(self.f1))
         self.ledFreq1.setToolTip("Stimulus frequency")
         self.ledFreq1.setObjectName("stimFreq1")
-        self.lblFreqUnit1 = QLabel("f_S", self)
+        self.lblFreqUnit1 = QLabel(to_html("f_S", frmt='i'), self)
 
         self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
         self.txtFreq2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
@@ -380,7 +380,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledFreq2.setText(str(self.f2))
         self.ledFreq2.setToolTip("Stimulus frequency 2")
         self.ledFreq2.setObjectName("stimFreq2")
-        self.lblFreqUnit2 = QLabel("f_S", self)
+        self.lblFreqUnit2 = QLabel(to_html("f_S", frmt='i'), self)
         # ----------------------------------------------
         self.lbl_BW1 = QLabel(to_html(self.tr("&nbsp;BW_1"), frmt='bi') + " =", self)
         self.led_BW1 = QLineEdit(self)
