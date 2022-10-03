@@ -10,11 +10,28 @@ jobs:
   pypi:
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v3
+        # fetch complete history for all branches
         with:
           fetch-depth: 0
-      - run: python3 -m pip install --upgrade build && python3 -m build
+
+      # Sets up python3, installing a version of Python or PyPy and (by default) 
+      # adds it to the PATH
+      # Optionally: caches dependencies for pip, pipenv and poetry
+      # Registers problem matchers for error output (?)
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Install build package and build the pip packages
+      - run: |
+        rm -r dist/*.*
+        rm -r build/*.*
+        python3 -m pip install --upgrade build
+        python3 -m build
+      # Upload the package to PyPI
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
