@@ -31,13 +31,12 @@ jobs:
         with:
           python-version: '3.10'
 
-      # Installs and upgrades pip, installs other dependencies and installs the package from setup.py
-      - name: "Installs and upgrades pip, other dependencies and the package from setup.py"
+      - name: "Install and upgrade pip, other dependencies and the package from setup.py"
         run: |
           python3 -m pip install --upgrade pip
           # Install build deps
           python3 -m pip install setuptools wheel twine
-          # If requirements.txt exists, install from it
+          # If requirements.txt exists, install dependencies from it
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # Install the package (pyfda) from setup.py
           python3 setup.py install
@@ -49,16 +48,17 @@ jobs:
       #     python3 -m unittest discover
       #     cd ..
 
+      # Build pip packages
+      - name: Build source and wheel distribution
+        run: python3 setup.py sdist bdist_wheel
       # Upload to TestPyPI
-      - name: Build and Upload to TestPyPI
-        # run: |
-        #   python3 setup.py sdist bdist_wheel
-        #   python3 -m twine upload dist/*
-        # env:
-        #   TWINE_USERNAME: __token__
-        #   TWINE_PASSWORD: ${{ secrets.PYPI_TEST_API_TOKEN }}
-        #   TWINE_REPOSITORY: testpypi
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+      - name: Upload to TestPyPI
+        run: python3 -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_API_TOKEN }}
+          TWINE_REPOSITORY: testpypi
+        # uses: pypa/gh-action-pypi-publish@release/v1
+        # with:
+        #   password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        #   repository_url: https://test.pypi.org/legacy/
