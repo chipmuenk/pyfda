@@ -27,10 +27,10 @@ jobs:
 
       # Install build package and build the pip packages
       - run: |
-        rm -r dist/*.*
-        rm -r build/*.*
-        python3 -m pip install --upgrade build
-        python3 -m build
+          rm -r dist/*.*
+          rm -r build/*.*
+          python3 -m pip install --upgrade build
+          python3 -m build
       # Upload the package to PyPI
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
