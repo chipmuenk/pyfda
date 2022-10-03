@@ -13,7 +13,8 @@ include pyfda/libs/pyfda_*.conf
 recursive-include pyfda/images *
 
 # Include documentation
-recursive-include *.md
+include *.md
+include pyfda/*.md
 
 include requirements.txt
 include pyfdax.spec
