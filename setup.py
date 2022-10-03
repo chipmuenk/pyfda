@@ -78,9 +78,8 @@ setup(
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
     packages=find_packages(exclude=('contrib', 'docs', 'test')),
-    # Read information from MANIFEST.in
-    ## include_package_data=True, 
-    
+    # Install data files (specified in MANIFEST.in)
+    include_package_data=True,
     # add additional data files (= non *.py) for package / subpackages relative
     # to package directory, include 'qrc_resources.py' instead of 'images/icons/*',
     # ('qrc_resources.py','version.py' are automatically installed).
