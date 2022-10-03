@@ -1,4 +1,6 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow builds a pip package (source and wheel) and uploads it to 
+# Install the uploaded package using
+#   > python3 -m pip install --index-url https://test.pypi.org/simple/ pyfda
 
 name: Test & Upload to TestPyPI
 
