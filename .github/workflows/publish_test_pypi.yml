@@ -41,7 +41,7 @@ jobs:
           # If requirements.txt exists, install dependencies from it
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # Install the package (pyfda) from setup.py
-          python3 setup.py install
+          ## python3 setup.py install
 
       # Tests with unittest
       # - name: Test with unittest
