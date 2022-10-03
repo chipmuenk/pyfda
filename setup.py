@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages #, find_namespace_packages
 from os import path
 
 here = path.abspath(path.dirname(__file__))
@@ -79,7 +79,8 @@ setup(
     # plot_widgets etc.:
     packages=find_packages(exclude=('contrib', 'docs', 'test')),
     # Read information from MANIFEST.in
-    include_package_data=True,
+    ## include_package_data=True, 
+    
     # add additional data files (= non *.py) for package / subpackages relative
     # to package directory, include 'qrc_resources.py' instead of 'images/icons/*',
     # ('qrc_resources.py','version.py' are automatically installed).
