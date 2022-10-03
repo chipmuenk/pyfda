@@ -20,23 +20,26 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      # Sets up python3
-      - uses: actions/setup-python@v2
+      # Sets up python3, installing a version of Python or PyPy and (by default) 
+      # adds it to the PATH
+      # Optionally: caches dependencies for pip, pipenv and poetry
+      # Registers problem matchers for error output (?)
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       # Installs and upgrades pip, installs other dependencies and installs the package from setup.py
-      - name: "Installs and upgrades pip, installs other dependencies and installs the package from setup.py"
+      - name: "Installs and upgrades pip, other dependencies and the package from setup.py"
         run: |
-          # Upgrade pip
           python3 -m pip install --upgrade pip
           # Install build deps
           python3 -m pip install setuptools wheel twine
           # If requirements.txt exists, install from it
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Install the package from setup.py
+          # Install the package (pyfda) from setup.py
           python3 setup.py install
 
       # Tests with unittest
@@ -48,10 +51,14 @@ jobs:
 
       # Upload to TestPyPI
       - name: Build and Upload to TestPyPI
-        run: |
-          python3 setup.py sdist bdist_wheel
-          python3 -m twine upload dist/*
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_API_TOKEN }}
-          TWINE_REPOSITORY: testpypi
+        # run: |
+        #   python3 setup.py sdist bdist_wheel
+        #   python3 -m twine upload dist/*
+        # env:
+        #   TWINE_USERNAME: __token__
+        #   TWINE_PASSWORD: ${{ secrets.PYPI_TEST_API_TOKEN }}
+        #   TWINE_REPOSITORY: testpypi
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
