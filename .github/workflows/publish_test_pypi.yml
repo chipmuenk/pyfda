@@ -52,7 +52,7 @@ jobs:
 
       # Build pip packages
       - name: Build source and wheel distribution
-        run: rm -r dist/*.* && rm -r build/*.* && python3 setup.py sdist bdist_wheel
+        run: python3 setup.py sdist bdist_wheel
       # Upload to TestPyPI
       - name: Upload to TestPyPI
         run: python3 -m twine upload dist/*
