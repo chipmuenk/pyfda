@@ -3,15 +3,21 @@
 #
 # ALWAYS DELETE pyfda.egg-info AFTER MODIFYING THIS FILE!
 
-# Copy *.png files, creating the corresponding subdirs
+# Copy fixpoint *.png files to the corresponding subdirs
 recursive-include pyfda/fixpoint_widgets *.png
 
+# Configuration templates for pyfda and for logging
 include pyfda/libs/pyfda_*.conf
-recursive-include pyfda *.md pyfda_icon.* *.qrc
-include *.md
+
+# Include icons
+recursive-include pyfda/images *
+
+# Include documentation
+recursive-include *.md
+
 include requirements.txt
 include pyfdax.spec
+include pyfda/*.qrc
 
-# exclude byte-code files and github readme
-exclude README.md
+# exclude byte-code files
 global-exclude *.py[cod]
