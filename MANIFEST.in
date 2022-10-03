@@ -7,7 +7,7 @@
 recursive-include pyfda/fixpoint_widgets *.png
 # include pyfda/fixpoint_widgets/*.png
 # include pyfda/fixpoint_widgets/fir_df/*.png
-include pyfda/fixpoint_widgets/iir_df1/*.png
+# include pyfda/fixpoint_widgets/iir_df1/*.png
 
 include pyfda/libs/pyfda_*.conf
 recursive-include pyfda *.md pyfda_icon.* *.qrc
