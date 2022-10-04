@@ -370,15 +370,12 @@ class Plot_Tran_Stim(QWidget):
         # Add file data
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
             if len(self.x_file) >= N_last:
-                self.xf = self.x_file[N_first:N_last]
+                self.xf += self.x_file[N_first:N_last]
             elif len(self.x_file) > N_first:
-                self.xf = np.concatenate((self.x_file[N_first:],
-                                          np.zeros(N_last - len(self.x_file))
-                                          ))
+                self.xf += np.concatenate(
+                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file))))
             else:
-                self.xf = np.zeros(N_frame)
-
-            return self.xf[:N_frame]
+                pass  # nothing left to be added
 
         return self.xf[:N_frame]
 # ------------------------------------------------------------------------------
