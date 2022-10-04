@@ -146,8 +146,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.cmb_file_io_items = [
             ("<span>Select data from File I/O widget/span>"),
             ("off", "Off", "<span>Don't use file I/O data.</span>"),
-            ("use", "Use", "<span><b>Use></b> file I/O data as stimuli.</span>"),
-            ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli")
+            ("use", "Use", "<span><b>Use</b> file I/O data as stimuli.</span>"),
+            ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli</span>")
             ]
 
         # combobox tooltip + data / text / tooltip for periodic signals items
