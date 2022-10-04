@@ -211,7 +211,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N))
         self.led_N_points.setToolTip(
-            "<span>Last data point. "
+            "<span>Number of data points to plot. "
             "<i>N</i> = 0 tries to choose for you.</span>")
         self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
@@ -570,11 +570,17 @@ class PlotImpz_UI(QWidget):
         """
         Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
-        When `emit==True`, fire `'ui_local_changed': 'N'` to update the FFT window
-         and the `plot_impz` widgets. In contrast to `view_changed`, this also forces a
-        recalculation of the transient response.
 
-        When N_end is specified, override manual entry and use the passed value
+        Parameters
+        ==========
+        emit: bool
+            When `emit==True` (default), fire `{'ui_local_changed': 'N'}` to update the
+            FFT window and the `plot_impz` widgets. In contrast to `view_changed`,
+             this also forces a calculation of the transient response.
+
+        N_end: int
+            When `N_end` is specified, use the passed value for the total number of data
+            points
 
         This method is called by:
 
@@ -585,34 +591,38 @@ class PlotImpz_UI(QWidget):
                 been changed (`emit==True`)
         """
         if not isinstance(emit, bool):
-            logger.error("update N: emit={0}".format(emit))
+            logger.error(f"update N: wrong data type emit={emit}")
+
+        # Read value for first data point to be plotted from UI
         self.N_start = safe_eval(self.led_N_start.text(), self.N_start,
                                  return_type='int', sign='poszero')
 
+        # Read value for number of data points to be plotted from UI
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
         if N_end > 0:  # total number of data points was specified, e.g. for file I/O
             if N_end <= self.N_start:
                 logger.warning(
-                    f"Total number of data points {N_end} is less than N_start, "
-                    "setting N_start = 0.")
+                    f"Total number of data points must be {N_end} > "
+                    f"N_start = {self.N_start}, setting N_start = 0.")
                 self.N_start = 0
+                self.led_N_start.setText(str(self.N_start))  # update widget
+
             self.N_end = N_end
-            # calculate number of visible data points
+            # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
         else:
             if self.N_user == 0:  # automatic calculation
-                self.N = self.calc_n_points(self.N_user)  # widget remains set to 0
-                self.led_N_points.setText("0")  # update widget
+                self.N = self.calc_n_points(self.N_user)
+                self.led_N_points.setText("0")  # widget remains set to 0
             else:
-                self.N = self.N_user
+                self.N = self.N_user  # specified by user
                 self.led_N_points.setText(str(self.N))  # update widget
             # total number of points to be calculated: N + N_start
             self.N_end = self.N + self.N_start
 
-        self.led_N_start.setText(str(self.N_start))  # update widget
-
+        # read number of data points per frame from UI
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
                                       return_type='int', sign='poszero')
 
@@ -622,7 +632,6 @@ class PlotImpz_UI(QWidget):
         else:
             self.N_frame = self.N_frame_user
             self.led_N_frame.setText(str(self.N_frame))  # update widget
-
 
         if emit:
             # use `'ui_local_changed'` as this triggers recalculation of the
