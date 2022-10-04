@@ -12,6 +12,7 @@ Widget for plotting impulse and general transient responses
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 from numpy import ndarray, pi
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 import scipy.signal as sig
 from scipy.special import sinc, diric
 
@@ -44,6 +45,7 @@ class Plot_Tran_Stim(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
+        self.x_file = None  # data mapped from file io
 
         self._construct_UI()
 
@@ -194,6 +196,11 @@ class Plot_Tran_Stim(QWidget):
             # ==================================================================
             if self.ui.ledDC.isVisible and self.ui.DC != 0:
                 self.title_str += r' + DC'
+            # ==================================================================
+            if qget_cmb_box(self.ui.cmb_file_io) == "add":
+                self.title_str += r' + File Data'
+            elif qget_cmb_box(self.ui.cmb_file_io) == "use":
+                self.title_str = r'File Data'
         # ----------------------------------------------------------------------
 
         N_last = N_first + N_frame
@@ -205,6 +212,9 @@ class Plot_Tran_Stim(QWidget):
         # calculate stimuli x[n] ==============================================
         if self.ui.stim == "none":
             self.xf.fill(0)
+        elif qget_cmb_box(self.ui.cmb_file_io) == "use":
+            self.xf = self.x_file[N_first:N_last]
+            return self.xf[:N_frame]
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             self.xf.fill(0)  # = np.zeros(N_frame, dtype=A_type)

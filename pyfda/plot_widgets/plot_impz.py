@@ -344,22 +344,20 @@ class Plot_Impz(QWidget):
         elif self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc or (fb.fil[0]['fx_sim'] and self.needs_calc_fx):
+
+                N_end = 0
+                # new file has been loaded
+                if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
+                    # make file data available to stimulus widget and modify number of
+                    # data points to be used:
+                    self.file_loaded()
+
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
                 # a different number of data points for simulation. Don't emit a signal.
-                # Highlight "RUN" button
-                if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
-                    logger.info(
-                        f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
-                        f"{self.file_io_wdg.N} samples.")
-                    if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
-                        qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
-                        self.stim_wdg.ui.cmb_file_io.setEnabled(False)
-                    else:
-                        self.stim_wdg.ui.cmb_file_io.setEnabled(True)
-
                 self.ui.update_N(emit=False)
                 self.needs_calc = True
+                # Highlight "RUN" button
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
@@ -368,6 +366,9 @@ class Plot_Impz(QWidget):
                 # treat all local UI events here
                 self.resize_stim_tab_widget()
                 self.needs_calc = True
+                # make file data available to stimulus widget and modify number of
+                # data points to be used:
+                self.file_loaded()
                 self.impz_init()
 
             elif 'view_changed' in dict_sig:
@@ -389,6 +390,34 @@ class Plot_Impz(QWidget):
                     self.stim_wdg.ui.recalc_freqs()
             elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
+
+    def file_loaded(self):
+        """
+        Check status of file_io widget:
+        - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
+        - if `cmb_file_io == 'add'`, map the file data to `self.stim_wdg.x_file`
+          to make it accessible from the stimulus widget
+        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in th UI
+        """
+        logger.info(
+            f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
+            f"{self.file_io_wdg.N} samples.")
+        if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
+            qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
+            self.stim_wdg.ui.cmb_file_io.setEnabled(False)
+        else:
+            self.stim_wdg.ui.cmb_file_io.setEnabled(True)
+            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
+                return
+
+            # map data from file io widget to stimulus widget:
+            self.stim_wdg.x_file = self.file_io_wdg.x
+            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "use":
+                # override ui setting of N_end
+                self.ui.update_N(emit=False, N_end = self.file_io_wdg.N)
+            else:  # qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "add":
+                pass
+        return
 
 # =============================================================================
 # Simulation: Calculate stimulus, response and draw them
@@ -423,13 +452,14 @@ class Plot_Impz(QWidget):
               quantizer and emit {'fx_sim':'init'}
         """
 
-        # allow scaling the frequency response from pure impulse (no DC, no noise)
+        # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
              self.stim_wdg.ui.cmbNoise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
+            and qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off"
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
