@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages #, find_namespace_packages
+from setuptools import setup, find_packages, find_namespace_packages
 from os import path
 
 here = path.abspath(path.dirname(__file__))
@@ -77,7 +77,7 @@ setup(
     ],
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
-    packages=find_packages(exclude=('contrib', 'docs', 'test')),
+    packages=find_namespace_packages(exclude=('contrib', 'docs', 'test')),
     # Install data files (specified in MANIFEST.in)
     include_package_data=True,
     # add additional data files (= non *.py) for package / subpackages relative
