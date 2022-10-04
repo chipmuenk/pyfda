@@ -623,9 +623,6 @@ class PlotImpz_UI(QWidget):
             self.N_frame = self.N_frame_user
             self.led_N_frame.setText(str(self.N_frame))  # update widget
 
-        # recalculate displayed freq. index values when freq. unit == 'k'
-        if fb.fil[0]['freq_specs_unit'] == 'k':
-            self.update_freqs()
 
         if emit:
             # use `'ui_local_changed'` as this triggers recalculation of the
