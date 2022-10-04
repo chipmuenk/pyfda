@@ -89,7 +89,7 @@ class Input_Fixpoint_Specs(QWidget):
         Process signals coming in from input and output quantizer subwidget and
         emit {'fx_sim': 'specs_changed'} in the end.
         """
-        logger.info(
+        logger.debug(
             f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(
@@ -168,7 +168,7 @@ class Input_Fixpoint_Specs(QWidget):
         2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
-        logger.info(
+        logger.debug(
             "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         # logger.debug(f'SIG_RX():  "{first_item(dict_sig)}"')
 

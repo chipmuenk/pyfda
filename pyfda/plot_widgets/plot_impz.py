@@ -256,7 +256,7 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.info("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
+        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig),
                             fb.fil[0]['fx_sim'], qget_cmb_box(self.ui.cmb_sim_select)))
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
@@ -399,9 +399,9 @@ class Plot_Impz(QWidget):
           to make it accessible from the stimulus widget
         - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in th UI
         """
-        logger.info(
-            f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
-            f"{self.file_io_wdg.N} samples.")
+        # logger.info(
+        #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
+        #     f"{self.file_io_wdg.N} samples.")
         if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.stim_wdg.ui.cmb_file_io.setEnabled(False)
