@@ -77,7 +77,7 @@ setup(
     ],
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
-    packages=find_namespace_packages()  # exclude=('contrib', 'docs', 'tests', 'bak',
+    packages=find_namespace_packages(),  # exclude=('contrib', 'docs', 'tests', 'bak',
                                         #      'recipe')),
     # Install data files (specified in MANIFEST.in)
     include_package_data=True,
