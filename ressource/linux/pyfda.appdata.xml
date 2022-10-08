@@ -89,6 +89,23 @@
   </provides>
 
   <releases>
+  <release version="0.7.1" date="2022-10-05">
+      <description>
+        <p>This release mainly fixes crashes with matplotlib 3.1 and scipy 1.8.0</p>
+      </description>
+    </release>
+    <release version="0.7.0" date="2022-10-04">
+      <description>
+        <p>Fixpoint filters</p>
+        <ul>
+          <li>This release has mainly addressed fixpoint simulation, introducing an IIR DF1 filter.</li>
+          <li>In the y[n] tab, you can now load CSV and WAV files as stimuli.</li>
+          <li>Export of CMSIS DSP coefficients in SOS format is now possible, somewhat hidden in the CSV export options.</li>
+          <li>Lots of bugfixes.</li>
+          <li>Usage of Github actions will ease future releases for hopefully shorter release cycles.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.1" date="2022-03-27">
       <description>
         <p>This release mainly fixes crashes with matplotlib 3.1 and scipy 1.8.0</p>
