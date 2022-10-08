@@ -8,7 +8,7 @@ pyfda
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 [![build_pyinstaller](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml/badge.svg)](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml)
 
-**pyfda** is tool written in Python / Qt for analysing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
+**pyfda** is a tool written in Python / Qt for analyzing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
 ![Screenshot](img/pyfda_screenshot_3.png)
 
@@ -34,7 +34,7 @@ pyfda
 pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Binaries / Bundles
-Currently, binaries (created with **[pyInstaller](https://www.pyinstaller.org/))** are provided for 64 bit Win 7 ... 10 and for OS X. The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
+Currently, binaries (created with **[pyInstaller](https://www.pyinstaller.org/))** are provided for 64 bit Windows and for OS X. The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
 
 A flatpak (Linux only) for pyfda is available on **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Some Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
