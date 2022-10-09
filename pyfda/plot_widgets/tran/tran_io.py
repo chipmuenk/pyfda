@@ -80,23 +80,23 @@ class Tran_IO(QWidget):
 
 # ------------------------------------------------------------------------------
     def import_data(self):
-        self.x = io.import_data(
+        self.data = io.import_data(
             self, title="Import Data", file_types=('csv', 'wav'))
-        if self.x is None:
+        if self.data is None:
             return  # file operation cancelled
-        elif type(self.x) != np.ndarray:
+        elif type(self.data) != np.ndarray:
             logger.warning("Unsuitable file format")
             return
         else:
             # logger.info(f"Type of x: {type(self.x)}")
-            if len(self.x.shape) == 1:
+            if len(self.data.shape) == 1:
                 self.n_chan = 1
-                self.N = len(self.x)
-            elif len(self.x.shape) == 2:
-                self.n_chan = self.x.shape[0]
-                self.N = self.x.shape[1]
+                self.N = len(self.data)
+            elif len(self.data.shape) == 2:
+                self.n_chan = self.data.shape[0]
+                self.N = self.data.shape[1]
             else:
-                logger.error(f"Unsuitable data with shape {self.x.shape}.")
+                logger.error(f"Unsuitable data with shape {self.data.shape}.")
                 return
             qstyle_widget(self.ui.butLoad, "active")
             self.file_load_status = "loaded"
@@ -105,3 +105,9 @@ class Tran_IO(QWidget):
             self.ui.lbl_filename.setText(dirs.last_file_name)
             self.ui.lbl_shape_actual.setText(
                 f"Channels = {self.n_chan}, Samples = {self.N}")
+            self.ui.lbl_f_S = 
+
+# ------------------------------------------------------------------------------
+    def normalize_data(self):
+        if self.ui.but_normalize.isChecked() == True:
+            
