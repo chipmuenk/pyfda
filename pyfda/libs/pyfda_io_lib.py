@@ -794,6 +794,11 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     return file_filters, last_file_filter
 
+#-------------------------------------------------------------------------------
+def read_wav_data():
+    pass
+# https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
+# http://soundfile.sapp.org/doc/WaveFormat/
 
 # ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
