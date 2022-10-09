@@ -11,13 +11,13 @@ Create the UI for the Tran_IO class
 """
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit,
     pyqtSignal, Qt, QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 # import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, QVLine, 
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, QVLine,
     PushButton)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -68,6 +68,8 @@ class Tran_IO_UI(QWidget):
             ]
         self.cmb_file_io_default = "none"
 
+        self.led_normalize_default = 1  # default setting for normalization
+
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
 
@@ -91,6 +93,21 @@ class Tran_IO_UI(QWidget):
         self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
         self.lbl_shape_actual = QLabel("None")
 
+        self.lbl_f_S = QLabel(to_html("f_S =", frmt="bi"))
+        self.lbl_f_S_value = QLabel("None")
+
+        self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
+        self.lbl_wordlength_value = QLabel("None")
+
+        self.but_normalize = PushButton("Norm")
+        self.but_normalize.setToolTip(
+            self.tr("<span>Normalize data to the value below.</span>"))
+        self.led_normalize = QLineEdit()
+        self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
+        self.led_normalize.setText(str(self.led_normalize_default))
+
+        line1 = QVLine()
+
         i = 0
         i += 1
         layG_io_file.addWidget(self.butLoad, 0, i, 0, 1)
@@ -100,6 +117,11 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.lbl_filename, 0, i)
         layG_io_file.addWidget(self.lbl_shape_actual, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.but_normalize, 0, i)
+        layG_io_file.addWidget(self.led_normalize, 1, i)
+        i += 1
+        layG_io_file.addWidget(line1, 0, i, 2, 1)
 
         layV_io = QVBoxLayout()
         layV_io.addLayout(layG_io_file)
