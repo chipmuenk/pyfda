@@ -42,6 +42,7 @@ class Tran_IO(QWidget):
         self.x = None  # array for file data
         self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
         self._construct_UI()
+        self.norm = self.ui.led_normalize_default
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None) -> None:
@@ -89,6 +90,12 @@ class Tran_IO(QWidget):
             return
         else:
             # logger.info(f"Type of x: {type(self.x)}")
+            logger.info(f"Last file: {dirs.last_file_name}\nType: {dirs.last_file_type}")
+            ret = io.read_wav_info(dirs.last_file_name)
+            if ret != 0:
+                return
+            logger.info(io.read_wav_info.f_S)
+            logger.info(io.read_wav_info.bits_per_sample)
             if len(self.data.shape) == 1:
                 self.n_chan = 1
                 self.N = len(self.data)
@@ -100,14 +107,24 @@ class Tran_IO(QWidget):
                 return
             qstyle_widget(self.ui.butLoad, "active")
             self.file_load_status = "loaded"
-            # logger.info(f"Shape = {self.x.shape}")
-            self.emit({'data_changed': 'file_io'})
+
             self.ui.lbl_filename.setText(dirs.last_file_name)
             self.ui.lbl_shape_actual.setText(
                 f"Channels = {self.n_chan}, Samples = {self.N}")
-            self.ui.lbl_f_S = 
+            self.ui.lbl_f_S = io.read_wav_info.f_S
+            self.x = self.normalize_data(self.data)
+            self.emit({'data_changed': 'file_io'})
 
 # ------------------------------------------------------------------------------
-    def normalize_data(self):
+    def normalize_data(self, data):
+        """ 
+        Scale `data` to the maximum specified by self.ui.led_normalize and return
+        the normalized result
+        """
         if self.ui.but_normalize.isChecked() == True:
-            
+            self.norm = int(safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float",
+                            sign='poszero'))
+            self.ui.led_normalize.setText(str(self.norm))
+            return data * self.norm / np.max(np.abs(data))
+        else:
+            return data

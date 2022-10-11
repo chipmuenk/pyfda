@@ -795,10 +795,84 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
     return file_filters, last_file_filter
 
 #-------------------------------------------------------------------------------
-def read_wav_data():
-    pass
-# https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
-# http://soundfile.sapp.org/doc/WaveFormat/
+def read_wav_info(file):
+    """
+    Get infos about the following properties of a wav file without actually
+    loading the whole file into memory. This is achieved by reading the
+    header.
+    """
+
+    # https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
+    # http://soundfile.sapp.org/doc/WaveFormat/
+    # https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+    def str2int(s: str) -> int:
+        """ convert argument from str `s` in little endian format to int """
+        int = 0
+        for i in range(len(s)):
+             int = int + ord(s[i]) * pow(256, i)
+        return int
+
+    f = open(file,'r', encoding='latin-1')
+    # Get the file size in bytes
+    file_size = os.path.getsize(file)
+    if file_size < 44:  # minimum length for WAV file due to header
+        logger.error(f"Not a wav file: Filesize is only {file_size} bytes!")
+        return -1
+    HEADER = f.read(44)  # read complete header
+    RIFF = HEADER[:4]  # file pos. 0
+
+    f.seek(8)
+    WAVE = f.read(4)  # pos. 8
+
+    if RIFF != "RIFF" or WAVE != "WAVE":
+        logger.error("Not a wav file: 'RIFF' or 'WAVE' id missing in file header.")
+        return -1
+
+    # Pos. 12: String 'fmt ' marks beginning of format subchunk
+    FMT = f.read(4)
+    if FMT != "fmt ":  # pos. 12
+        logger.error(f"Invalid format header {FMT}!")
+        return -1
+
+    # Pos. 16: Size of subchunk with format infos, must be 16 bytes for PCM
+    fmt_chnk_size1 = str2int(f.read(4))  # pos. 16
+    if fmt_chnk_size1 != 16:
+        logger.error(f"Invalid size {fmt_chnk_size1} of format subchunk!")
+        return -1
+
+    # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
+    if str2int(f.read(2)) != 1:
+        logger.error(f"Invalid audio encoding, only PCM supported!")
+        return -1
+
+    # Pos. 22: Number of channels
+    read_wav_info.nchans = str2int(f.read(2))
+
+    # Pos. 24: Sampling rate f_S
+    read_wav_info.f_S = str2int(f.read(4))
+
+    # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample
+    read_wav_info.byte_rate = str2int(f.read(4))
+
+    # Pos. 32: Block align, # of bytes per sample incl. all channels
+    read_wav_info.block_align = str2int(f.read(2))
+
+    # Pos. 34: Bits per sample
+    read_wav_info.bits_per_sample = str2int(f.read(2))
+
+    # Pos. 36: String 'data' marks beginning of data subchunk
+    DATA = f.read(4)
+    if DATA != "data":
+        logger.error(f"Invalid data header {DATA}!")     
+        return -1
+    
+    # Pos. 40: Total size of data
+    read_wav_info.data_size = str2int(HEADER[40:44])
+
+    #the duration of the data, in milliseconds, is given by
+    ms = ((file_size - 44) * 1000) / read_wav_info.f_S
+
+    return 0
 
 # ------------------------------------------------------------------------------
 def import_data(parent, fkey=None, title="Import",
