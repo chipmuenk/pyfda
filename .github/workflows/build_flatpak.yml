@@ -74,12 +74,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: validation
-    # Command copied from flathub build process
-    run: |
-      sudo apt install flatpak
-      sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      sudo flatpak install -y org.freedesktop.appstream-glib
-      flatpak run --env=G_DEBUG=fatal-criticals org.freedesktop.appstream-glib validate ./ressource/linux/pyfda.appdata.xml
+      # Command copied from flathub build process
+      run: |
+        sudo apt install flatpak
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y org.freedesktop.appstream-glib
+        flatpak run --env=G_DEBUG=fatal-criticals org.freedesktop.appstream-glib validate ./ressource/linux/pyfda.appdata.xml
 
   prerelease:
     # https://github.com/marvinpinto/actions/issues/177
