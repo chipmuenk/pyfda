@@ -475,7 +475,7 @@ class Input_Coeffs(QWidget):
         """
         - Store selected / all quantized coefficients in `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
-        - Reset Overflow counters
+        - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
         - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
           {'data_changed': 'input_coeffs'}
         """
