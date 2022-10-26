@@ -76,6 +76,8 @@ class Tran_IO(QWidget):
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
         self.ui.butLoad.clicked.connect(self.import_data)
+        self.ui.but_normalize.clicked.connect(self.normalize_data)
+        self.ui.led_normalize.editingFinished.connect(self.normalize_data)
 
         self.setLayout(layVMain)
 
@@ -112,19 +114,21 @@ class Tran_IO(QWidget):
             self.ui.lbl_shape_actual.setText(
                 f"Channels = {self.n_chan}, Samples = {self.N}")
             self.ui.lbl_f_S = io.read_wav_info.f_S
-            self.x = self.normalize_data(self.data)
-            self.emit({'data_changed': 'file_io'})
+            self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
-    def normalize_data(self, data):
+    def normalize_data(self):
         """ 
-        Scale `data` to the maximum specified by self.ui.led_normalize and return
-        the normalized result
+        Scale `self.data` to the maximum specified by self.ui.led_normalize and
+        assign normalized result to `self.x`
         """
         if self.ui.but_normalize.isChecked() == True:
             self.norm = int(safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float",
                             sign='poszero'))
             self.ui.led_normalize.setText(str(self.norm))
-            return data * self.norm / np.max(np.abs(data))
+            self.x = self.data * self.norm / np.max(np.abs(self.data))
         else:
-            return data
+            self.x = self.data
+            
+        self.emit({'data_changed': 'file_io'})
+        return
