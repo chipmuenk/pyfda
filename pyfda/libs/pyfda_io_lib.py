@@ -1353,6 +1353,27 @@ def load_filter(self):
                         fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
                     if fb.fil[0][k] is None:
                         logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+                if 'ba' not in fb.fil[0]\
+                    or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
+                        or np.ndim(fb.fil[0]['ba']) != 2\
+                        or (np.shape(fb.fil[0]['ba'][0]) != 2
+                            and np.shape(fb.fil[0]['ba'])[1] < 3):
+                    logger.error("Missing key 'ba' or wrong data type!")
+                    return
+                elif 'zpk' not in fb.fil[0]\
+                    or type(fb.fil[0]['zpk']) not in {list, np.ndarray}\
+                        or np.ndim(fb.fil[0]['zpk']) != 1:
+                    logger.error("Missing key 'zpk' or wrong data type!")
+                    return
+                elif 'sos' not in fb.fil[0]\
+                        or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
+                    logger.error("Missing key 'sos' or wrong data type!")
+                    return
+                # else:
+                #     logger.info(f"ba: {np.shape(fb.fil[0]['ba'])},"
+                #                 f"zpk: {np.shape(fb.fil[0]['zpk'])}"
+                #                 f"sos: {np.shape(fb.fil[0]['sos'])}")
+                # logger.info(pprint_log(fb.fil[0]))
 
                 logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                 dirs.last_file_name = file_name
