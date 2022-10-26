@@ -17,7 +17,7 @@ from pyfda.libs.compat import (
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import fil_save, safe_eval
+from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table, export_csv_data
@@ -301,8 +301,8 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        # logger.debug("process_sig_rx(): vis={0}\n{1}"\
-        #             .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("process_sig_rx(): vis={0}\n{1}"\
+                     .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -475,7 +475,7 @@ class Input_Coeffs(QWidget):
         """
         - Store selected / all quantized coefficients in `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
-        - Reset Overflow counters
+        - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
         - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
           {'data_changed': 'input_coeffs'}
         """
@@ -549,6 +549,7 @@ class Input_Coeffs(QWidget):
 
         brush = QBrush(Qt.SolidPattern)
         brush.setColor(QColor(255, 255, 255, 0))  # transparent white
+        logger.warning(pprint_log(self.ba_q))
         if self.ba_q[col + 2][row] > 0:
             # Color item backgrounds with pos. Overflows red
             brush.setColor(QColor(100, 0, 0, 80))

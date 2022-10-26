@@ -30,16 +30,16 @@ jobs:
     - name: Replace git tag by the commit id on which it runs
       if: github.ref_type != 'tag'
       run: >
-        sed -i 's@tag: v[0-9]*.[0-9]*.[0-9]*@commit: "${{ github.sha }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
+        sed -i 's@\&git_tag .*@\&git_tag "${{ github.sha }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Use correct git tag
       if: github.ref_type == 'tag'
       run: >
-        sed -i 's@tag: .*$@tag: "${{ github.ref_name }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
+        sed -i 's@\&git_tag .*@\&git_tag "${{ github.ref_name }}"@' com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Replace source url
       run: >
-        sed -i "s@url: .*pyfda.git@url: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
+        sed -i "s@\&git_url .*pyfda.git@\&git_url $GITHUB_SERVER_URL/$GITHUB_REPOSITORY@" com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Add dev build marker to cmake options
       if: github.ref_type != 'tag'
@@ -67,6 +67,19 @@ jobs:
       with:
         path: com.github.chipmuenk.pyfda/*
         name: pyfda Flatpak
+
+  Validate_appdata_file:
+    name: Validate appdata file
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: validation
+      # Command copied from flathub build process
+      run: |
+        sudo apt install flatpak
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y org.freedesktop.appstream-glib
+        flatpak run --env=G_DEBUG=fatal-criticals org.freedesktop.appstream-glib validate ./ressource/linux/pyfda.appdata.xml
 
   prerelease:
     # https://github.com/marvinpinto/actions/issues/177

@@ -428,8 +428,8 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
-            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__} '
-                  f'({d[0][0].dtype}), Shape = ({rows} x {cols})' + cr + tab)
+            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__}, '
+                  f'(Shape = ({rows} x {cols})' + cr + tab)
             #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
             for c in range(min(N-1, cols)):
                 if not first:
