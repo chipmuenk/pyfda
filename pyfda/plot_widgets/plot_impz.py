@@ -402,7 +402,7 @@ class Plot_Impz(QWidget):
         # logger.info(
         #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
         #     f"{self.file_io_wdg.N} samples.")
-        if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
+        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.stim_wdg.ui.cmb_file_io.setEnabled(False)
         else:
