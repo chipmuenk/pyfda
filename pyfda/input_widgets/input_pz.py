@@ -208,7 +208,7 @@ class Input_PZ(QWidget):
         """
         # logger.debug(f"SIG_RX - data_changed = {self.data_changed}, vis = "
         #              f"{self.isVisible()}\n{pprint_log(dict_sig)}")
-    
+
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -725,51 +725,62 @@ class Input_PZ(QWidget):
             logger.error("Unknown format {0}.".format(frmt))
 
     # ------------------------------------------------------------------------------
-    def frmt2cmplx(self, text, default=0.):
+    def frmt2cmplx(self, string, default=0.):
         """
-        Convert format defined by cmbPZFrmt to real or complex
+        Convert string to real or complex, try to find out the format (cartesian,
+        polar with various angle formats)
         """
-        conv_error = False
-        text = qstr(text).replace(" ", "")  # convert to "proper" string without blanks
-        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
-            return safe_eval(text, default, return_type='auto')
-        else:
-            # try to split text string at "*<" or the angle character
-            polar_str = text.replace(self.angle_char, '<').split('*<', 1)
+        def str2angle_rad(string: str) -> float:
+            """
+            Try to convert `string` to a corresponding angle in rad
+                Use the following regular expressions:
+                - '$' : matches the end of the string
+                - '|' : combine multiple matches with OR
+            """
+            if re.search('°$|o$', string):
+                # "°" in polar_str[1] or "o" in polar_str[1]:
+                scale = np.pi / 180.  # angle in degrees
+                string = re.sub('o|°', '', string)
+            elif re.search('π$|pi$|p$', string):
+                scale = np.pi
+                string = re.sub('π$|pi$|p$', '', string)
+            else:
+                scale = 1.  # angle in rad
+                string = re.sub('rad', '', string)
 
-            if len(polar_str) < 2:  # input is real or imaginary
-                # remove special characters
-                r = safe_eval(
-                    re.sub('['+self.angle_char+'<∠°]', '', text), default,
-                    return_type='auto')
+            phi = safe_eval(string) * scale
+            return phi
+        # -------------------------------------------
+
+        string = str(string).replace(" ", "")  # remove all blanks
+        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
+            return safe_eval(string, default, return_type='auto')
+        else:
+            # convert angle character to "<" and try to split string at "*<"
+            # When the "<" character is not found, this returns a list with 1 item!
+            polar_str = string.replace(self.angle_char, '<').replace('*', '')
+            polar_str = polar_str.split('<', 1)
+
+            if len(polar_str) == 2 and polar_str[0] == "": # pure angle
+                phi = str2angle_rad(polar_str[1])
+                x = np.cos(phi)
+                y = np.sin(phi)
+            elif len(polar_str) == 1:  # no angle found; real / imag / cartesian complex
+                r = safe_eval(string, default, return_type='auto')
                 x = r.real
                 y = r.imag
-            else:
+            else:  # r and angle found
                 r = safe_eval(polar_str[0], sign='pos')
-                if safe_eval.err > 0:
-                    conv_error = True
+                phi = str2angle_rad(polar_str[1])
 
-                if "°" in polar_str[1]:
-                    scale = np.pi / 180.  # angle in degrees
-                elif re.search('π$|pi$', polar_str[1]):
-                    scale = np.pi
-                else:
-                    scale = 1.  # angle in rad
+                x = r * np.cos(phi)
+                y = r * np.sin(phi)
 
-                # remove right-most special characters (regex $)
-                polar_str[1] = re.sub(
-                    '['+self.angle_char+'<∠°π]$|rad$|pi$', '', polar_str[1])
-                phi = safe_eval(polar_str[1]) * scale
-                if safe_eval.err > 0:
-                    conv_error = True
+            if safe_eval.err > 0:
+                x = default.real
+                y = default.imag
+                logger.warning(f"Expression {string} could not be evaluated.")
 
-                if not conv_error:
-                    x = r * np.cos(phi)
-                    y = r * np.sin(phi)
-                else:
-                    x = default.real
-                    y = default.imag
-                    logger.error("Expression {0} could not be evaluated.".format(text))
             return x + 1j * y
 
     # --------------------------------------------------------------------------
