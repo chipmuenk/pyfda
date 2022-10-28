@@ -44,8 +44,10 @@ class Input_PZ_UI(QWidget):
         # Items for PZ-format combobox (data, display text, tool tip):
         self.cmb_pz_frmt_list = [
             """<span>Set display format for poles and zeros to
-            either cartesian (x + jy) or polar (r * &ang; &Omega;)."
-            Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>""",
+            either cartesian (x + jy) or polar (r * &ang; &Omega;).
+            Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.
+            Typing just the angle '&lt;45 o' creates a pole or zero on the
+            unit circle.</span>""",
             #
             ('cartesian', 'Cartesian'), ('polar_rad', 'Polar (rad)'),
             ('polar_pi', 'Polar (pi)'), ('polar_deg', 'Polar (°)')]
