@@ -485,8 +485,8 @@ class Input_Coeffs(QWidget):
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
-            self.ba_q[2] = np.zeros(len(self.ba_q[2]))
-            self.ba_q[3] = np.zeros(len(self.ba_q[3]))
+            self.ba_q[2] = np.zeros(len(self.ba_q[0]))
+            self.ba_q[3] = np.zeros(len(self.ba_q[1]))
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
             try:
