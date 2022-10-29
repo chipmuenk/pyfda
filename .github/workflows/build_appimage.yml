@@ -27,8 +27,8 @@ jobs:
         uses: AppImageCrafters/build-appimage-action@master
         env:
           UPDATE_INFO: gh-releases-zsync|AppImageCrafters|pyfda|latest|*x86_64.AppImage.zsync
-        with:
-          recipe: AppImageBuilder.yml
+        # with:
+        #  recipe: AppImageBuilder.yml
       - uses: actions/upload-artifact@v2
         with:
           name: AppImage
