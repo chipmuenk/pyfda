@@ -18,7 +18,7 @@ jobs:
         # - install some basics and install tools
         # - install application dependencies
         run: |
-          rm -rf AppDir | True
+          rm -rf AppDir
           mkdir -p AppDir/usr/src
           cp pyfda  AppDir/usr/src -r
           sudo apt-get --quiet install --yes python3 python3-pip python3-setuptools python3-wheel
