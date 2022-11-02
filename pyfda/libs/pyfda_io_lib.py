@@ -1378,7 +1378,7 @@ def export_coe_TI(f: TextIO):
 def load_filter(self):
     """
     Load filter from zipped binary numpy array or (c)pickled object to
-    filter dictionary and update input and plot widgets
+    filter dictionary
     """
     file_types = ("npz", "pkl")
     file_filters, last_file_filter = create_file_filters(file_types)
@@ -1457,8 +1457,7 @@ def load_filter(self):
                 dirs.last_file_name = file_name
                 dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
                 dirs.last_file_type = file_type  # save file type
-                # emit signal -> filter loaded
-                self.emit({'data_changed': 'filter_loaded'})
+                return 0
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
