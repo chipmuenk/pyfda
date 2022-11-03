@@ -370,6 +370,10 @@ class FreqUnits(QWidget):
         self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         qset_cmb_box(self.cmbUnits, fb.fil[0]['freq_specs_unit'])
+        is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
+        self.ledF_S.setVisible(not is_normalized_freq)  # only vis. when
+        self.lblF_S.setVisible(not is_normalized_freq)  # not normalized
+        self.butLock.setVisible(not is_normalized_freq)
 
         qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
 
