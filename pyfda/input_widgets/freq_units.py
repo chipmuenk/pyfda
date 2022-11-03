@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -374,10 +374,7 @@ class FreqUnits(QWidget):
         self.cmbUnits.setCurrentIndex(idx)  # index for freq. unit combo box
         self.cmbUnits.blockSignals(False)
 
-        self.cmbFRange.blockSignals(True)
-        idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
-        self.cmbFRange.setCurrentIndex(idx)  # set frequency range
-        self.cmbFRange.blockSignals(False)
+        qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
 
         self.butSort.blockSignals(True)
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
