@@ -369,10 +369,7 @@ class FreqUnits(QWidget):
         """
         self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
-        self.cmbUnits.blockSignals(True)
-        idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit'])  # get and set
-        self.cmbUnits.setCurrentIndex(idx)  # index for freq. unit combo box
-        self.cmbUnits.blockSignals(False)
+        qset_cmb_box(self.cmbUnits, fb.fil[0]['freq_specs_unit'])
 
         qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
 
