@@ -381,6 +381,14 @@ class FreqUnits(QWidget):
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         self.butSort.blockSignals(False)
 
+        # Is this required?
+        # self.butLock.setChecked(fb.fil[0]['but_locked?'])
+        # self.butSort.blockSignals(False)
+        # set f_S_last?!
+        # f_S_scale = 1  # default setting for f_S scale
+
+        # self.update_UI()
+
 # -------------------------------------------------------------
     def _store_sort_flag(self):
         """
