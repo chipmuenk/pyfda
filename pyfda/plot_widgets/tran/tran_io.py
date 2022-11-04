@@ -93,13 +93,6 @@ class Tran_IO(QWidget):
 
         logger.info(f"Last file: {dirs.last_file_name}\nType: {dirs.last_file_type}")
 
-        if dirs.last_file_type == 'wav':
-            ret = io.read_wav_info(dirs.last_file_name)
-            if ret != 0:
-                return
-            logger.info(io.read_wav_info.f_S)
-            logger.info(io.read_wav_info.bits_per_sample)
-
         if len(self.data.shape) == 1:
             self.n_chan = 1
             self.N = len(self.data)
@@ -108,14 +101,27 @@ class Tran_IO(QWidget):
             self.N = self.data.shape[1]
         else:
             logger.error(f"Unsuitable data with shape {self.data.shape}.")
+            self.n_chan = -1
+            self.N = -1
             return
+
         qstyle_widget(self.ui.butLoad, "active")
         self.file_load_status = "loaded"
+
+        if dirs.last_file_type == 'wav':
+            ret = io.read_wav_info(dirs.last_file_name)
+            if ret != 0:
+                return
+            logger.info(io.read_wav_info.f_S)
+            logger.info(io.read_wav_info.bits_per_sample)
+            self.ui.lbl_f_S.setVisible(True)
+            self.ui.lbl_f_S_value.setVisible(True)            
+            self.ui.lbl_f_S_value.setText(str(io.read_wav_info.f_S))
 
         self.ui.lbl_filename.setText(dirs.last_file_name)
         self.ui.lbl_shape_actual.setText(
             f"Channels = {self.n_chan}, Samples = {self.N}")
-        self.ui.lbl_f_S = io.read_wav_info.f_S
+
         self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
