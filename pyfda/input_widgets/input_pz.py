@@ -680,9 +680,9 @@ class Input_PZ(QWidget):
             string
         """
         # convert to "normal" string and prettify via safe_eval:
-        data = safe_eval(qstr(text), return_type='auto')
+        data = safe_eval(text, return_type='auto')
         frmt = qget_cmb_box(self.ui.cmbPZFrmt)  # get selected format
-
+        # logger.warning(f"{text} -> {data}")
         if places == -1:
             full_prec = True
         else:
@@ -780,7 +780,6 @@ class Input_PZ(QWidget):
                 x = default.real
                 y = default.imag
                 logger.warning(f"Expression {string} could not be evaluated.")
-
             return x + 1j * y
 
     # --------------------------------------------------------------------------
