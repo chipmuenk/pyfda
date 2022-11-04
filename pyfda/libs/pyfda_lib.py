@@ -485,7 +485,9 @@ def safe_numexpr_eval(expr: str, fallback=None,
                        f"'{type(expr).__name__}', replacing with zero.")
         expr = "0.0"
 
-    expr = expr.lstrip('0')  # remove trailing zeros which cannot be processed
+    # Find one or more redundant zeros '0+' at the beginning '^' leading a number [0-9] 
+    # Group the number(s) '(...)' and write it '\1' to the resulting string. 
+    expr = re.sub(r'^0+([0-9])', r'\1', expr)
     if len(expr) == 0:
         expr = "0"
     else:
