@@ -122,6 +122,9 @@ class Tran_IO(QWidget):
         Scale `self.data` to the maximum specified by self.ui.led_normalize and
         assign normalized result to `self.x`
         """
+        if not hasattr(self, 'data') or self.data is None:
+            logger.error("No data loaded yet.")
+            return
         if self.ui.but_normalize.isChecked() == True:
             self.norm = int(safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float",
                             sign='poszero'))
