@@ -328,42 +328,42 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledPhi1.setText(str(self.phi1))
         self.ledPhi1.setToolTip("Stimulus phase")
         self.ledPhi1.setObjectName("stimPhi1")
-        self.lblPhU1 = QLabel(to_html("&deg;", frmt='b'), self)
+        self.lblPhU1 = QLabel(to_html("&deg;", frmt='i'), self)
 
         self.lblPhi2 = QLabel(to_html("&nbsp;&phi;_2", frmt='bi') + " =", self)
         self.ledPhi2 = QLineEdit(self)
         self.ledPhi2.setText(str(self.phi2))
         self.ledPhi2.setToolTip("Stimulus phase 2")
         self.ledPhi2.setObjectName("stimPhi2")
-        self.lblPhU2 = QLabel(to_html("&deg;", frmt='b'), self)
+        self.lblPhU2 = QLabel(to_html("&deg;", frmt='i'), self)
         # ----------------------------------------------
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
         self.led_T1.setText(str(self.T1))
         self.led_T1.setToolTip("Time shift")
         self.led_T1.setObjectName("stimT1")
-        self.lbl_TU1 = QLabel(to_html("T_S", frmt='b'), self)
+        self.lbl_TU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_T2 = QLabel(to_html("&nbsp;T_2", frmt='bi') + " =", self)
         self.led_T2 = QLineEdit(self)
         self.led_T2.setText(str(self.T2))
         self.led_T2.setToolTip("Time shift 2")
         self.led_T2.setObjectName("stimT2")
-        self.lbl_TU2 = QLabel(to_html("T_S", frmt='b'), self)
+        self.lbl_TU2 = QLabel(to_html("T_S", frmt='i'), self)
         # ---------------------------------------------
         self.lbl_TW1 = QLabel(to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
         self.led_TW1 = QLineEdit(self)
         self.led_TW1.setText(str(self.TW1))
         self.led_TW1.setToolTip("Time width")
         self.led_TW1.setObjectName("stimTW1")
-        self.lbl_TWU1 = QLabel(to_html("T_S", frmt='b'), self)
+        self.lbl_TWU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_TW2 = QLabel(to_html("&nbsp;&Delta;T_2", frmt='bi') + " =", self)
         self.led_TW2 = QLineEdit(self)
         self.led_TW2.setText(str(self.TW2))
         self.led_TW2.setToolTip("Time width 2")
         self.led_TW2.setObjectName("stimTW2")
-        self.lbl_TWU2 = QLabel(to_html("T_S", frmt='b'), self)
+        self.lbl_TWU2 = QLabel(to_html("T_S", frmt='i'), self)
         # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
         self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="

@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -369,19 +369,25 @@ class FreqUnits(QWidget):
         """
         self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
-        self.cmbUnits.blockSignals(True)
-        idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit'])  # get and set
-        self.cmbUnits.setCurrentIndex(idx)  # index for freq. unit combo box
-        self.cmbUnits.blockSignals(False)
+        qset_cmb_box(self.cmbUnits, fb.fil[0]['freq_specs_unit'])
+        is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
+        self.ledF_S.setVisible(not is_normalized_freq)  # only vis. when
+        self.lblF_S.setVisible(not is_normalized_freq)  # not normalized
+        self.butLock.setVisible(not is_normalized_freq)
 
-        self.cmbFRange.blockSignals(True)
-        idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
-        self.cmbFRange.setCurrentIndex(idx)  # set frequency range
-        self.cmbFRange.blockSignals(False)
+        qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
 
         self.butSort.blockSignals(True)
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         self.butSort.blockSignals(False)
+
+        # Is this required?
+        # self.butLock.setChecked(fb.fil[0]['but_locked?'])
+        # self.butSort.blockSignals(False)
+        # set f_S_last?!
+        # f_S_scale = 1  # default setting for f_S scale
+
+        # self.update_UI()
 
 # -------------------------------------------------------------
     def _store_sort_flag(self):

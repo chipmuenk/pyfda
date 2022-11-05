@@ -90,31 +90,39 @@ class Tran_IO(QWidget):
         elif type(self.data) != np.ndarray:
             logger.warning("Unsuitable file format")
             return
+
+        logger.info(f"Last file: {dirs.last_file_name}\nType: {dirs.last_file_type}")
+
+        if len(self.data.shape) == 1:
+            self.n_chan = 1
+            self.N = len(self.data)
+        elif len(self.data.shape) == 2:
+            self.n_chan = self.data.shape[0]
+            self.N = self.data.shape[1]
         else:
-            # logger.info(f"Type of x: {type(self.x)}")
-            logger.info(f"Last file: {dirs.last_file_name}\nType: {dirs.last_file_type}")
+            logger.error(f"Unsuitable data with shape {self.data.shape}.")
+            self.n_chan = -1
+            self.N = -1
+            return
+
+        qstyle_widget(self.ui.butLoad, "active")
+        self.file_load_status = "loaded"
+
+        if dirs.last_file_type == 'wav':
             ret = io.read_wav_info(dirs.last_file_name)
             if ret != 0:
                 return
             logger.info(io.read_wav_info.f_S)
             logger.info(io.read_wav_info.bits_per_sample)
-            if len(self.data.shape) == 1:
-                self.n_chan = 1
-                self.N = len(self.data)
-            elif len(self.data.shape) == 2:
-                self.n_chan = self.data.shape[0]
-                self.N = self.data.shape[1]
-            else:
-                logger.error(f"Unsuitable data with shape {self.data.shape}.")
-                return
-            qstyle_widget(self.ui.butLoad, "active")
-            self.file_load_status = "loaded"
+            self.ui.lbl_f_S.setVisible(True)
+            self.ui.lbl_f_S_value.setVisible(True)            
+            self.ui.lbl_f_S_value.setText(str(io.read_wav_info.f_S))
 
-            self.ui.lbl_filename.setText(dirs.last_file_name)
-            self.ui.lbl_shape_actual.setText(
-                f"Channels = {self.n_chan}, Samples = {self.N}")
-            self.ui.lbl_f_S = io.read_wav_info.f_S
-            self.x = self.normalize_data()
+        self.ui.lbl_filename.setText(dirs.last_file_name)
+        self.ui.lbl_shape_actual.setText(
+            f"Channels = {self.n_chan}, Samples = {self.N}")
+
+        self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
     def normalize_data(self):
@@ -122,6 +130,9 @@ class Tran_IO(QWidget):
         Scale `self.data` to the maximum specified by self.ui.led_normalize and
         assign normalized result to `self.x`
         """
+        if not hasattr(self, 'data') or self.data is None:
+            logger.error("No data loaded yet.")
+            return
         if self.ui.but_normalize.isChecked() == True:
             self.norm = int(safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float",
                             sign='poszero'))

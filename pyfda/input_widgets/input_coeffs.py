@@ -549,7 +549,7 @@ class Input_Coeffs(QWidget):
 
         brush = QBrush(Qt.SolidPattern)
         brush.setColor(QColor(255, 255, 255, 0))  # transparent white
-        logger.warning(pprint_log(self.ba_q))
+
         if self.ba_q[col + 2][row] > 0:
             # Color item backgrounds with pos. Overflows red
             brush.setColor(QColor(100, 0, 0, 80))

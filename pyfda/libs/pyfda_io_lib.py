@@ -1378,7 +1378,7 @@ def export_coe_TI(f: TextIO):
 def load_filter(self):
     """
     Load filter from zipped binary numpy array or (c)pickled object to
-    filter dictionary and update input and plot widgets
+    filter dictionary
     """
     file_types = ("npz", "pkl")
     file_filters, last_file_filter = create_file_filters(file_types)
@@ -1437,16 +1437,16 @@ def load_filter(self):
                         or (np.shape(fb.fil[0]['ba'][0]) != 2
                             and np.shape(fb.fil[0]['ba'])[1] < 3):
                     logger.error("Missing key 'ba' or wrong data type!")
-                    return
+                    return -1
                 elif 'zpk' not in fb.fil[0]\
                     or type(fb.fil[0]['zpk']) not in {list, np.ndarray}\
                         or np.ndim(fb.fil[0]['zpk']) != 1:
                     logger.error("Missing key 'zpk' or wrong data type!")
-                    return
+                    return -1
                 elif 'sos' not in fb.fil[0]\
                         or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
                     logger.error("Missing key 'sos' or wrong data type!")
-                    return
+                    return -1
                 # else:
                 #     logger.info(f"ba: {np.shape(fb.fil[0]['ba'])},"
                 #                 f"zpk: {np.shape(fb.fil[0]['zpk'])}"
@@ -1457,14 +1457,15 @@ def load_filter(self):
                 dirs.last_file_name = file_name
                 dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
                 dirs.last_file_type = file_type  # save file type
-                # emit signal -> filter loaded
-                self.emit({'data_changed': 'filter_loaded'})
+                return 0
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+        return -1
     except Exception as e:
         logger.error("Unexpected error:\n{0}".format(e))
         fb.fil[0] = fb.fil[1]  # restore backup
+        return -1
 
 
 # ------------------------------------------------------------------------------
