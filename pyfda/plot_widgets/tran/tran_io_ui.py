@@ -11,7 +11,7 @@ Create the UI for the Tran_IO class
 """
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit, QFrame,
     pyqtSignal, Qt, QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
@@ -93,8 +93,19 @@ class Tran_IO_UI(QWidget):
         self.lbl_shape = QLabel(to_html("Shape:", frmt="b"))
         self.lbl_shape_actual = QLabel("None")
 
-        self.lbl_f_S = QLabel(to_html("f_S =", frmt="bi"))
-        self.lbl_f_S_value = QLabel("None")
+        lbl_f_s = QLabel(to_html("f_S =", frmt="bi"))
+        self.lbl_f_s_value = QLabel("None")
+        lbl_f_s_unit = QLabel("Hz")
+        layH_f_s = QHBoxLayout()
+        layH_f_s.addWidget(lbl_f_s)
+        layH_f_s.addWidget(self.lbl_f_s_value)
+        layH_f_s.addWidget(lbl_f_s_unit)
+        layH_f_s.addStretch()
+        layH_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s = QFrame(self)
+        self.frm_f_s.setLayout(layH_f_s)
+        self.frm_f_s.setContentsMargins(0, 0, 0, 0)
+        self.frm_f_s.setVisible(False)
 
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
@@ -115,8 +126,10 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_file, 0, i)
         layG_io_file.addWidget(self.lbl_shape, 1, i)
         i += 1
-        layG_io_file.addWidget(self.lbl_filename, 0, i)
+        layG_io_file.addWidget(self.lbl_filename, 0, i, 1, 2)
         layG_io_file.addWidget(self.lbl_shape_actual, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.frm_f_s, 1, i)
         i += 1
         layG_io_file.addWidget(self.but_normalize, 0, i)
         layG_io_file.addWidget(self.led_normalize, 1, i)

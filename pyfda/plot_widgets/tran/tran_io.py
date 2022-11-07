@@ -112,21 +112,21 @@ class Tran_IO(QWidget):
             ret = io.read_wav_info(dirs.last_file_name)
             if ret != 0:
                 return
-            logger.info(io.read_wav_info.f_S)
-            logger.info(io.read_wav_info.bits_per_sample)
-            self.ui.lbl_f_S.setVisible(True)
-            self.ui.lbl_f_S_value.setVisible(True)            
-            self.ui.lbl_f_S_value.setText(str(io.read_wav_info.f_S))
+            self.ui.frm_f_s.setVisible(True)
+            self.ui.lbl_f_s_value.setText(str(io.read_wav_info.f_S))
+            word_length = f" x {io.read_wav_info.bits_per_sample} bits,"
+        else:
+            self.ui.frm_f_s.setVisible(False)
+            word_length = ""
 
         self.ui.lbl_filename.setText(dirs.last_file_name)
         self.ui.lbl_shape_actual.setText(
-            f"Channels = {self.n_chan}, Samples = {self.N}")
-
+            f"{self.n_chan} x {self.N}{word_length}")
         self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
     def normalize_data(self):
-        """ 
+        """
         Scale `self.data` to the maximum specified by self.ui.led_normalize and
         assign normalized result to `self.x`
         """
@@ -140,6 +140,6 @@ class Tran_IO(QWidget):
             self.x = self.data * self.norm / np.max(np.abs(self.data))
         else:
             self.x = self.data
-            
+
         self.emit({'data_changed': 'file_io'})
         return
