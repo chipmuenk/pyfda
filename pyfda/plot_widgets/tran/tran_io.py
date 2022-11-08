@@ -91,7 +91,7 @@ class Tran_IO(QWidget):
             logger.warning("Unsuitable file format")
             return
 
-        logger.info(f"Last file: {dirs.last_file_name}\nType: {dirs.last_file_type}")
+        logger.info(f"Last file: {dirs.last_file_name}\nLen: {len(dirs.last_file_name)}")
 
         if len(self.data.shape) == 1:
             self.n_chan = 1
@@ -119,7 +119,12 @@ class Tran_IO(QWidget):
             self.ui.frm_f_s.setVisible(False)
             word_length = ""
 
-        self.ui.lbl_filename.setText(dirs.last_file_name)
+        if len(dirs.last_file_name) < 45:
+            self.ui.lbl_filename.setText(dirs.last_file_name)
+        else:
+            self.ui.lbl_filename.setText(
+                dirs.last_file_name[:10] + ' ... ' + dirs.last_file_name[-20:])
+        self.ui.lbl_filename.setToolTip(dirs.last_file_name)
         self.ui.lbl_shape_actual.setText(
             f"{self.n_chan} x {self.N}{word_length}")
         self.x = self.normalize_data()
