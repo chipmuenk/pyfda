@@ -804,17 +804,18 @@ def read_csv_info(file):
     https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
     """
 
-    read_csv_info.nchans = 1
     chunk = 1024*1024   # Process 1 MB at a time.
-    f = np.memmap(file)
+    f = np.memmap(file, mode='r')  # map file to memory as an ndarray
     sniffer = csv.Sniffer()
     with f:
         dialect = sniffer.sniff(f.read(5000))  # only read the first 5000 chars
         delimiter = dialect.delimiter
         lineterminator = dialect.lineterminator
-    logger.error(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
-    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord('\n'))
+    logger.info(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
+    # count linebreaks
+    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord(lineterminator))
                     for i in range(0, len(f), chunk))
+    read_csv_info.nchans = 1
     del f
 
 #-------------------------------------------------------------------------------
@@ -900,8 +901,61 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def import_data(parent, fkey=None, title="Import",
-                file_types=('csv', 'mat', 'npy', 'npz')):
+def select_file(parent: object, fkey: str = None, title: str = "Import",
+                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')
+                ) -> Tuple[str, str]:
+    """
+    Open a handle to a file and peek into it to find the dimensions and some
+    other infos (depending on the file type).
+
+    Parameters
+    ----------
+    parent : handle to calling instance
+
+    fkey : str
+        Optional. key for accessing data in *.npz or Matlab workspace (*.mat)
+        file with multiple entries. Unused for other data formats.
+
+    title : str
+        title string for the file dialog box (e.g. "Filter Coefficients")
+
+    file_types : tuple of str
+        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
+        of `file_filters_dict`
+
+    Returns
+    -------
+    file_name: str
+        Fully qualified name of selected file. None when operation has been
+        cancelled.
+
+    file_type: str
+        File type, e.g. 'wav'. None when operation has been cancelled.
+    """
+
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
+
+    dlg = QFileDialog(parent)  # create instance for QFileDialog
+    dlg.setWindowTitle(title)
+    dlg.setDirectory(dirs.last_file_dir)
+    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    dlg.setNameFilter(file_filters)  # pass available file filters
+    dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
+
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        file_type = os.path.splitext(file_name)[-1].strip('.')
+    else:  # operation cancelled
+        file_name = None
+        file_type = None
+
+    return file_name, file_type
+# ------------------------------------------------------------------------------
+def import_data(parent: object, fkey: str = None, title: str ="Import",
+                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')
+                )-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
 
