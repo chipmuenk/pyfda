@@ -795,6 +795,29 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
     return file_filters, last_file_filter
 
 #-------------------------------------------------------------------------------
+def read_csv_info(file):
+    """
+    Get infos about the size of a csv file without actually loading the whole
+    file into memory.
+
+    See
+    https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
+    """
+
+    read_csv_info.nchans = 1
+    chunk = 1024*1024   # Process 1 MB at a time.
+    f = np.memmap(file)
+    sniffer = csv.Sniffer()
+    with f:
+        dialect = sniffer.sniff(f.read(5000))  # only read the first 5000 chars
+        delimiter = dialect.delimiter
+        lineterminator = dialect.lineterminator
+    logger.error(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
+    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord('\n'))
+                    for i in range(0, len(f), chunk))
+    del f
+
+#-------------------------------------------------------------------------------
 def read_wav_info(file):
     """
     Get infos about the following properties of a wav file without actually
