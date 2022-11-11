@@ -12,7 +12,7 @@ Library with classes and functions for file and text IO
 import os, re, io
 import csv
 import datetime
-from typing import TextIO
+from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
 
 import pickle
 
@@ -990,7 +990,7 @@ def import_data(parent, fkey=None, title="Import",
 
 # ------------------------------------------------------------------------------
 def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
-                file_types=('csv', 'mat', 'npy', 'npz')):
+                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
 
@@ -1249,7 +1249,7 @@ def generate_header(title: str) -> str:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f: TextIO):
+def export_coe_xilinx(f: TextIO) -> None:
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1291,7 +1291,7 @@ def export_coe_xilinx(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f: TextIO):
+def export_coe_microsemi(f: TextIO) -> None:
     """
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
@@ -1323,7 +1323,7 @@ def export_coe_microsemi(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f: TextIO):
+def export_coe_vhdl_package(f: TextIO) -> None:
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1384,7 +1384,7 @@ def export_coe_vhdl_package(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f: TextIO):
+def export_coe_TI(f: TextIO) -> None:
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
@@ -1401,7 +1401,7 @@ def export_coe_TI(f: TextIO):
 
 
 # ==============================================================================
-def load_filter(self):
+def load_filter(self) -> int:
     """
     Load filter from zipped binary numpy array or (c)pickled object to
     filter dictionary
