@@ -862,14 +862,17 @@ def read_wav_info(file):
     # Pos. 36: String 'data' marks beginning of data subchunk
     DATA = f.read(4)
     if DATA != "data":
-        logger.error(f"Invalid data header {DATA}!")     
+        logger.error(f"Invalid data header {DATA}!")
         return -1
-    
-    # Pos. 40: Total size of data
-    read_wav_info.data_size = str2int(HEADER[40:44])
 
-    #the duration of the data, in milliseconds, is given by
-    ms = ((file_size - 44) * 1000) / read_wav_info.f_S
+    # Pos. 40: Total size of data
+    read_wav_info.N = str2int(HEADER[40:44])\
+        // (read_wav_info.nchans * read_wav_info.bits_per_sample // 8)
+
+    # duration of the data in milliseconds
+    # ms = ((file_size - 44) * 1000) / read_wav_info.f_S
+    read_wav_info.ms = read_wav_info.N * 1000\
+        / (read_wav_info.f_S * read_wav_info.nchans)
 
     return 0
 

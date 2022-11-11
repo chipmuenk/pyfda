@@ -97,8 +97,8 @@ class Tran_IO(QWidget):
             self.n_chan = 1
             self.N = len(self.data)
         elif len(self.data.shape) == 2:
-            self.n_chan = self.data.shape[0]
-            self.N = self.data.shape[1]
+            self.n_chan = self.data.shape[1]
+            self.N = self.data.shape[0]
         else:
             logger.error(f"Unsuitable data with shape {self.data.shape}.")
             self.n_chan = -1
@@ -115,6 +115,7 @@ class Tran_IO(QWidget):
             self.ui.frm_f_s.setVisible(True)
             self.ui.lbl_f_s_value.setText(str(io.read_wav_info.f_S))
             word_length = f" x {io.read_wav_info.bits_per_sample} bits,"
+            self.N = io.read_wav_info.N
         else:
             self.ui.frm_f_s.setVisible(False)
             word_length = ""
