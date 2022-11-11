@@ -75,11 +75,20 @@ class Tran_IO(QWidget):
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
-        self.ui.butLoad.clicked.connect(self.import_data)
+        self.ui.but_load.clicked.connect(self.import_data)
         self.ui.but_normalize.clicked.connect(self.normalize_data)
         self.ui.led_normalize.editingFinished.connect(self.normalize_data)
 
         self.setLayout(layVMain)
+
+# ------------------------------------------------------------------------------
+    def open_file(self):
+        """
+        Open a handle to a file and peek into it to find the dimensions and some
+        other infos (depending on the file type).
+        """
+        pass
+
 
 # ------------------------------------------------------------------------------
     def import_data(self):
@@ -105,7 +114,7 @@ class Tran_IO(QWidget):
             self.N = -1
             return
 
-        qstyle_widget(self.ui.butLoad, "active")
+        qstyle_widget(self.ui.but_load, "active")
         self.file_load_status = "loaded"
 
         if dirs.last_file_type == 'wav':
