@@ -82,15 +82,6 @@ class Tran_IO(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
-    def open_file(self):
-        """
-        Open a handle to a file and peek into it to find the dimensions and some
-        other infos (depending on the file type).
-        """
-        pass
-
-
-# ------------------------------------------------------------------------------
     def import_data(self):
         self.data = io.import_data(
             self, title="Import Data", file_types=('csv', 'wav'))
