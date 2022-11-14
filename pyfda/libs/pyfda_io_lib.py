@@ -372,7 +372,6 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
                 data_arr = None
     return data_arr
 
-
 # ------------------------------------------------------------------------------
 def csv2array(f: TextIO):
     """
@@ -807,19 +806,22 @@ def read_csv_info(file):
     See
     https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
     """
-
-    chunk = 1024*1024   # Process 1 MB at a time.
-    f = np.memmap(file, mode='r')  # map file to memory as an ndarray
     sniffer = csv.Sniffer()
-    with f:
+    # TODO: detect and skip header
+    # TODO: count other linebreaks as well
+    with open(file) as f:
         dialect = sniffer.sniff(f.read(5000))  # only read the first 5000 chars
         delimiter = dialect.delimiter
         lineterminator = dialect.lineterminator
-    logger.info(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
+        first_line = f.readline()
+        read_csv_info.nchans = first_line.count(delimiter) + 1
+    # logger.info(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
+
+    chunk = 1024*1024   # Process 1 MB at a time.
+    f = np.memmap(file)  # map file to memory as an ndarray
     # count linebreaks
-    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord(lineterminator))
+    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord('\n'))
                     for i in range(0, len(f), chunk))
-    read_csv_info.nchans = 1
     del f
 
 #-------------------------------------------------------------------------------
