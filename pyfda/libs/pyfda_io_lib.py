@@ -359,13 +359,17 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else:  # data from file
-        data_arr = import_data(
-            parent, fkey, title=title, file_types=('csv', 'mat', 'npy', 'npz'))
-        # pass data as numpy array
-        logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
-                     .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
-        if type(data_arr) == int and data_arr == -1:  # file operation cancelled
-            data_arr = None
+        file_name, file_type = select_file(parent, fkey, title=title,
+                                   file_types=('csv', 'mat', 'npy', 'npz'))
+        if file_name is None:  # operation cancelled or error
+            return None
+        else:
+            data_arr = import_data(file_name, file_type)
+            # pass data as numpy array
+            logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
+                        .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
+            if type(data_arr) == int and data_arr == -1:  # file operation cancelled
+                data_arr = None
     return data_arr
 
 
@@ -875,13 +879,14 @@ def read_wav_info(file):
     read_wav_info.f_S = str2int(f.read(4))
 
     # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample
-    read_wav_info.byte_rate = str2int(f.read(4))
+    byte_rate = str2int(f.read(4))
 
     # Pos. 32: Block align, # of bytes per sample incl. all channels
-    read_wav_info.block_align = str2int(f.read(2))
+    block_align = str2int(f.read(2))
 
-    # Pos. 34: Bits per sample
-    read_wav_info.bits_per_sample = str2int(f.read(2))
+    # Pos. 34: Bits per sample, WL = wordlength in bytes
+    bits_per_sample = str2int(f.read(2))
+    read_wav_info.WL = bits_per_sample // 8
 
     # Pos. 36: String 'data' marks beginning of data subchunk
     DATA = f.read(4)
@@ -889,35 +894,27 @@ def read_wav_info(file):
         logger.error(f"Invalid data header {DATA}!")
         return -1
 
-    # Pos. 40: Total size of data
+    # Pos. 40: Total number of samples
     read_wav_info.N = str2int(HEADER[40:44])\
-        // (read_wav_info.nchans * read_wav_info.bits_per_sample // 8)
+        // (read_wav_info.nchans * read_wav_info.WL)
 
     # duration of the data in milliseconds
-    # ms = ((file_size - 44) * 1000) / read_wav_info.f_S
     read_wav_info.ms = read_wav_info.N * 1000\
         / (read_wav_info.f_S * read_wav_info.nchans)
 
     return 0
 
 # ------------------------------------------------------------------------------
-def select_file(parent: object, fkey: str = None, title: str = "Import",
-                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')
-                ) -> Tuple[str, str]:
+def select_file(parent: object, title: str = "Import", mode: str = "read",
+                file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
     """
-    Open a handle to a file and peek into it to find the dimensions and some
-    other infos (depending on the file type).
-
     Parameters
     ----------
-    parent : handle to calling instance
-
-    fkey : str
-        Optional. key for accessing data in *.npz or Matlab workspace (*.mat)
-        file with multiple entries. Unused for other data formats.
-
     title : str
-        title string for the file dialog box (e.g. "Filter Coefficients")
+        title string for the file dialog box (e.g. "Filter Coefficients"),
+
+    mode : str
+        file access mode, must be either "read" or "write"
 
     file_types : tuple of str
         supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
@@ -938,7 +935,12 @@ def select_file(parent: object, fkey: str = None, title: str = "Import",
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    if mode == "read":
+        dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    else:
+        logger.error("Currently, only read mode is supported!")
+        return None, None
+
     dlg.setNameFilter(file_filters)  # pass available file filters
     dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
     if last_file_filter:
@@ -947,54 +949,58 @@ def select_file(parent: object, fkey: str = None, title: str = "Import",
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[-1].strip('.')
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)
+        dirs.last_file_type = file_type
     else:  # operation cancelled
         file_name = None
         file_type = None
 
     return file_name, file_type
+
 # ------------------------------------------------------------------------------
-def import_data(parent: object, fkey: str = None, title: str ="Import",
-                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')
-                )-> np.ndarray:
+def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
 
     Parameters
     ----------
-    parent : handle to calling instance
+    file_name: str
+        Full name of the file to be imported
+
+    file_type: str
+        File type (e.g. 'wav')
 
     fkey : str
         Key for accessing data in *.npz or Matlab workspace (*.mat) file with
         multiple entries.
-
-    title : str
-        title string for the file dialog box (e.g. "Filter Coefficients")
-
-    file_types : tuple of str
-        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
-        of `file_filters_dict`
 
     Returns
     -------
     ndarray
         Data from the file
     """
-    file_filters, last_file_filter = create_file_filters(file_types=file_types)
+    # file_name, file_type = select_file(parent, title = title, file_types = file_types,
+    #                                   mode = mode)
 
-    dlg = QFileDialog(parent)  # create instance for QFileDialog
-    dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    dlg.setNameFilter(file_filters)  # pass available file filters
-    dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
+    # file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[-1].strip('.')
-    else:
-        return -1  # operation cancelled
+    # dlg = QFileDialog(parent)  # create instance for QFileDialog
+    # dlg.setWindowTitle(title)
+    # dlg.setDirectory(dirs.last_file_dir)
+    # dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    # dlg.setNameFilter(file_filters)  # pass available file filters
+    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
+    # if last_file_filter:
+    #     dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
+
+    # if dlg.exec_() == QFileDialog.Accepted:
+    #     file_name = dlg.selectedFiles()[0]  # pick only first selected file
+    #     file_type = os.path.splitext(file_name)[-1].strip('.')
+    # else:
+    #     return -1  # operation cancelled
+    if file_name is None:  # error or operation cancelled
+        return -1
 
     err = False
     try:
@@ -1032,9 +1038,6 @@ def import_data(parent: object, fkey: str = None, title: str ="Import",
         if not err:
             logger.info(
                 f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)
-            dirs.last_file_type = file_type
             return data_arr  # returns numpy array
 
     except IOError as e:

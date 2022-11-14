@@ -87,9 +87,9 @@ class Tran_IO_UI(QWidget):
         # Main Widget
         # ----------------------------------------------------------------------
         layG_io_file = QGridLayout()
-        self.but_open = PushButton("Open", checkable=False)
-        self.but_open.setToolTip(
-            self.tr("<span>Open file to get its shape and size but don't load"
+        self.but_select = PushButton("Select", checkable=False)
+        self.but_select.setToolTip(
+            self.tr("<span>Select file, get its shape and size but don't load"
                    " it yet.</span>"))
         self.but_load = PushButton("Load")
         self.but_load.setToolTip(
@@ -129,8 +129,8 @@ class Tran_IO_UI(QWidget):
 
         i = 0
         i += 1
-        layG_io_file.addWidget(self.but_load, 0, i)
-        layG_io_file.addWidget(self.but_open, 1, i)
+        layG_io_file.addWidget(self.but_select, 0, i)
+        layG_io_file.addWidget(self.but_load, 1, i)
         i += 1
         layG_io_file.addWidget(self.lbl_file, 0, i)
         layG_io_file.addWidget(self.lbl_shape, 1, i)

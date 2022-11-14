@@ -15,7 +15,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval, to_html
 from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -40,6 +40,8 @@ class Tran_IO(QWidget):
 
         # initial settings
         self.x = None  # array for file data
+        self.file_name = None  # full name of loaded file
+        self.file_type = None  # type of loaded file
         self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
@@ -75,6 +77,7 @@ class Tran_IO(QWidget):
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
+        self.ui.but_select.clicked.connect(self.select_file)
         self.ui.but_load.clicked.connect(self.import_data)
         self.ui.but_normalize.clicked.connect(self.normalize_data)
         self.ui.led_normalize.editingFinished.connect(self.normalize_data)
@@ -82,52 +85,107 @@ class Tran_IO(QWidget):
         self.setLayout(layVMain)
 
 # ------------------------------------------------------------------------------
+    def select_file(self):
+        """
+        Select a file and peek into it to find the dimensions and some
+        other infos (depending on the file type).
+
+        Unload previous file from memory
+        """
+        self.file_name, self.file_type = io.select_file(
+            self, title="Import Data", mode="read", file_types=('csv', 'wav'))
+
+        self.N = None
+        self.nchans = None
+        self.f_S = None
+        self.WL = None
+
+        del self.x
+        self.x = None
+        self.ui.but_load.setText("Load")
+        qstyle_widget(self.ui.but_load, "normal")
+
+        if self.file_name is None:
+            return  # operation cancelled
+        elif self.file_type == 'wav':
+            io.read_wav_info(self.file_name)
+            self.N = io.read_wav_info.N
+            self.nchans = io.read_wav_info.nchans
+            self.f_S = io.read_wav_info.f_S
+            self.WL = io.read_wav_info.WL
+            WL_str = f" x {self.WL * 8} bits,"
+            self.ui.frm_f_s.setVisible(True)
+            self.ui.lbl_f_s_value.setText(str(self.f_S))
+
+        elif self.file_type == 'csv':
+            io.read_csv_info(self.file_name)
+            self.ui.frm_f_s.setVisible(False)
+            self.N = io.read_csv_info.N
+            self.nchans = io.read_csv_info.nchans
+            WL_str = ""
+        else:
+            logger.error(f"Unknown file format '{self.file_type}'")
+
+        if len(self.file_name) < 45:
+            self.ui.lbl_filename.setText(self.file_name)
+        else:
+            self.ui.lbl_filename.setText(
+                self.file_name[:10] + ' ... ' + self.file_name[-20:])
+
+        self.ui.lbl_filename.setToolTip(self.file_name)
+        self.ui.lbl_shape_actual.setText(
+            f"{self.nchans} x {self.N}{WL_str}")
+
+# ------------------------------------------------------------------------------
     def import_data(self):
-        self.data = io.import_data(
-            self, title="Import Data", file_types=('csv', 'wav'))
+        if self.file_name is None:
+            logger.warning("No valid file has been selected yet!")
+            return
+        self.data = io.import_data(self.file_name, self.file_type)
         if self.data is None:
-            return  # file operation cancelled
+            return -1  # file operation cancelled
         elif type(self.data) != np.ndarray:
             logger.warning("Unsuitable file format")
-            return
+            return -1
 
         logger.info(f"Last file: {dirs.last_file_name}\nLen: {len(dirs.last_file_name)}")
 
-        if len(self.data.shape) == 1:
-            self.n_chan = 1
-            self.N = len(self.data)
-        elif len(self.data.shape) == 2:
-            self.n_chan = self.data.shape[1]
-            self.N = self.data.shape[0]
-        else:
-            logger.error(f"Unsuitable data with shape {self.data.shape}.")
-            self.n_chan = -1
-            self.N = -1
-            return
+        # if len(self.data.shape) == 1:
+        #     self.n_chan = 1
+        #     self.N = len(self.data)
+        # elif len(self.data.shape) == 2:
+        #     self.n_chan = self.data.shape[1]
+        #     self.N = self.data.shape[0]
+        # else:
+        #     logger.error(f"Unsuitable data with shape {self.data.shape}.")
+        #     self.n_chan = -1
+        #     self.N = -1
+        #     return
 
         qstyle_widget(self.ui.but_load, "active")
+        self.ui.but_load.setText("Loaded")
         self.file_load_status = "loaded"
 
-        if dirs.last_file_type == 'wav':
-            ret = io.read_wav_info(dirs.last_file_name)
-            if ret != 0:
-                return
-            self.ui.frm_f_s.setVisible(True)
-            self.ui.lbl_f_s_value.setText(str(io.read_wav_info.f_S))
-            word_length = f" x {io.read_wav_info.bits_per_sample} bits,"
-            self.N = io.read_wav_info.N
-        else:
-            self.ui.frm_f_s.setVisible(False)
-            word_length = ""
+        # if dirs.last_file_type == 'wav':
+        #     ret = io.read_wav_info(dirs.last_file_name)
+        #     if ret != 0:
+        #         return
+        #     self.ui.frm_f_s.setVisible(True)
+        #     self.ui.lbl_f_s_value.setText(str(io.read_wav_info.f_S))
+        #     word_length = f" x {io.read_wav_info.WL * 8} bits,"
+        #     self.N = io.read_wav_info.N
+        # else:
+        #     self.ui.frm_f_s.setVisible(False)
+        #     word_length = ""
 
-        if len(dirs.last_file_name) < 45:
-            self.ui.lbl_filename.setText(dirs.last_file_name)
-        else:
-            self.ui.lbl_filename.setText(
-                dirs.last_file_name[:10] + ' ... ' + dirs.last_file_name[-20:])
-        self.ui.lbl_filename.setToolTip(dirs.last_file_name)
-        self.ui.lbl_shape_actual.setText(
-            f"{self.n_chan} x {self.N}{word_length}")
+        # if len(dirs.last_file_name) < 45:
+        #     self.ui.lbl_filename.setText(dirs.last_file_name)
+        # else:
+        #     self.ui.lbl_filename.setText(
+        #         dirs.last_file_name[:10] + ' ... ' + dirs.last_file_name[-20:])
+        # self.ui.lbl_filename.setToolTip(dirs.last_file_name)
+        # self.ui.lbl_shape_actual.setText(
+        #     f"{self.n_chan} x {self.N}{word_length}")
         self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
