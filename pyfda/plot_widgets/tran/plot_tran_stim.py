@@ -103,8 +103,9 @@ class Plot_Tran_Stim(QWidget):
             # use radians for angle internally
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
-            # check whether some amplitude is complex and set array type for xf
-            # correspondingly.
+
+            # - Initialize self.xf with N_frame zeros.
+            # - Set dtype of ndarray to complex or float, depending on stimuli
             if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
                 (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
                     (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
@@ -209,11 +210,18 @@ class Plot_Tran_Stim(QWidget):
         # T_S = fb.fil[0]['T_S']
         self.T1_idx = int(np.round(self.ui.T1))
 
-        # calculate stimuli x[n] ==============================================
+        # #####################################################################
+        #
+        # calculate stimuli x[n]
+        #
+        # ######################################################################
         if self.ui.stim == "none":
-            self.xf.fill(0)
+            pass  # self.xf.fill(0)
         elif qget_cmb_box(self.ui.cmb_file_io) == "use":
-            self.xf = self.x_file[N_first:N_last]
+            if self.x_file is None:
+                logger.warning("No file loaded!")
+            else:
+                self.xf = self.x_file[N_first:N_last]
             return self.xf[:N_frame]
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
@@ -369,7 +377,9 @@ class Plot_Tran_Stim(QWidget):
 
         # Add file data
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
-            if len(self.x_file) >= N_last:
+            if self.x_file is None:
+                logger.warning("No file loaded!")
+            elif len(self.x_file) >= N_last:
                 self.xf += self.x_file[N_first:N_last]
             elif len(self.x_file) > N_first:
                 self.xf += np.concatenate(

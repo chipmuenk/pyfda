@@ -451,6 +451,9 @@ class Plot_Impz(QWidget):
             - When in fixpoint mode, initialize quantized stimulus `x_q` and input
               quantizer and emit {'fx_sim':'init'}
         """
+        # set number of data points from file length when 'use' is selected
+        if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'use':
+            self.ui.update_N(emit=False, N_end=self.file_io_wdg.N)
 
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
@@ -558,22 +561,8 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame -------------------------
             # ------------------------------------------------------------------
-            # self.stim_wdg = Plot_Tran_Stim()
-            # self.file_io_wdg = Tran_IO()
-            # TODO: Use file data here, limit to one channel
-            x_io = self.file_io_wdg.x
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'use':
-                self.ui.update_N(emit=False, N_end=len(x_io))
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-            #
-            elif qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'add':
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-            #
-            else:
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            self.x[frame] = self.stim_wdg.calc_stimulus_frame(
+                N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
