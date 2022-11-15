@@ -874,11 +874,11 @@ def read_wav_info(file):
         return -1
 
     # Pos. 22: Number of channels
-    read_wav_info.nchans = str2int(HEADER[22:24])
+    nchans = str2int(HEADER[22:24])
 
     f.seek(24)
     # Pos. 24: Sampling rate f_S
-    read_wav_info.f_S = str2int(f.read(4))
+    f_S = str2int(f.read(4))
 
     # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample
     byte_rate = str2int(f.read(4))
@@ -888,7 +888,6 @@ def read_wav_info(file):
 
     # Pos. 34: Bits per sample, WL = wordlength in bytes
     bits_per_sample = str2int(f.read(2))
-    read_wav_info.WL = bits_per_sample // 8
 
     # Pos. 36: String 'data' marks beginning of data subchunk
     DATA = f.read(4)
@@ -896,13 +895,19 @@ def read_wav_info(file):
         logger.error(f"Invalid data header {DATA}!")
         return -1
 
-    # Pos. 40: Total number of samples
-    read_wav_info.N = str2int(HEADER[40:44])\
-        // (read_wav_info.nchans * read_wav_info.WL)
+    # -- Function attributes that are accessible from outside
+    # ------------------------------------------------------------
+    read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
+
+    # Pos. 40: Total number of samples per channel
+    read_wav_info.N = str2int(HEADER[40:44]) // (nchans * read_wav_info.WL)
+
+    read_wav_info.nchans = nchans  # number of channels
+
+    read_wav_info.f_S = f_S  # sampling rate in Hz
 
     # duration of the data in milliseconds
-    read_wav_info.ms = read_wav_info.N * 1000\
-        / (read_wav_info.f_S * read_wav_info.nchans)
+    read_wav_info.ms = read_wav_info.N * 1000 / (f_S * nchans)
 
     return 0
 
