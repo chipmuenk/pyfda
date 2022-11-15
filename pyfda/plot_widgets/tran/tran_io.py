@@ -100,10 +100,6 @@ class Tran_IO(QWidget):
         self.f_S = None
         self.WL = None
 
-        del self.x
-        self.x = None
-        self.ui.but_load.setText("Load")
-        qstyle_widget(self.ui.but_load, "normal")
 
         if self.file_name is None:
             return  # operation cancelled
@@ -131,6 +127,11 @@ class Tran_IO(QWidget):
         else:
             self.ui.lbl_filename.setText(
                 self.file_name[:10] + ' ... ' + self.file_name[-20:])
+
+        del self.x
+        self.x = None
+        self.ui.but_load.setText("Load")
+        qstyle_widget(self.ui.but_load, "normal")
 
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
