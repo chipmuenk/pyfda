@@ -91,7 +91,7 @@ class Tran_IO_UI(QWidget):
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
                    " it yet.</span>"))
-        self.but_load = PushButton("Load")
+        self.but_load = PushButton("Load", checkable=False)
         self.but_load.setToolTip(
             self.tr("<span>Load file to memory.</span>"))
 
