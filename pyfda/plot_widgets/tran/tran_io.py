@@ -149,8 +149,6 @@ class Tran_IO(QWidget):
             logger.warning("Unsuitable file format")
             return -1
 
-        logger.info(f"Last file: {dirs.last_file_name}\nLen: {len(dirs.last_file_name)}")
-
         # if len(self.data.shape) == 1:
         #     self.n_chan = 1
         #     self.N = len(self.data)
@@ -163,7 +161,7 @@ class Tran_IO(QWidget):
         #     self.N = -1
         #     return
 
-        qstyle_widget(self.ui.but_load, "active")
+        qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
         self.file_load_status = "loaded"
 
