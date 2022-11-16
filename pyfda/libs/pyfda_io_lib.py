@@ -359,12 +359,12 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else:  # data from file
-        file_name, file_type = select_file(parent, fkey, title=title,
+        file_name, file_type = select_file(parent, title=title, mode="r",
                                    file_types=('csv', 'mat', 'npy', 'npz'))
         if file_name is None:  # operation cancelled or error
             return None
         else:
-            data_arr = import_data(file_name, file_type)
+            data_arr = import_data(file_name, file_type) # fkey,
             # pass data as numpy array
             logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                         .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -912,7 +912,7 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def select_file(parent: object, title: str = "Import", mode: str = "read",
+def select_file(parent: object, title: str = "Import", mode: str = "r",
                 file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
     """
     Parameters
@@ -921,7 +921,7 @@ def select_file(parent: object, title: str = "Import", mode: str = "read",
         title string for the file dialog box (e.g. "Filter Coefficients"),
 
     mode : str
-        file access mode, must be either "read" or "write"
+        file access mode, must be either "r" or "w" for read / write access
 
     file_types : tuple of str
         supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
@@ -942,7 +942,7 @@ def select_file(parent: object, title: str = "Import", mode: str = "read",
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.last_file_dir)
-    if mode == "read":
+    if mode == "r":
         dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
     else:
         logger.error("Currently, only read mode is supported!")
