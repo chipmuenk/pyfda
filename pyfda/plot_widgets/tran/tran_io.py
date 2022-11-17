@@ -100,7 +100,6 @@ class Tran_IO(QWidget):
         self.f_S = None
         self.WL = None
 
-
         if self.file_name is None:
             return  # operation cancelled
         elif self.file_type == 'wav':
@@ -165,26 +164,6 @@ class Tran_IO(QWidget):
         self.ui.but_load.setText("Loaded")
         self.file_load_status = "loaded"
 
-        # if dirs.last_file_type == 'wav':
-        #     ret = io.read_wav_info(dirs.last_file_name)
-        #     if ret != 0:
-        #         return
-        #     self.ui.frm_f_s.setVisible(True)
-        #     self.ui.lbl_f_s_value.setText(str(io.read_wav_info.f_S))
-        #     word_length = f" x {io.read_wav_info.WL * 8} bits,"
-        #     self.N = io.read_wav_info.N
-        # else:
-        #     self.ui.frm_f_s.setVisible(False)
-        #     word_length = ""
-
-        # if len(dirs.last_file_name) < 45:
-        #     self.ui.lbl_filename.setText(dirs.last_file_name)
-        # else:
-        #     self.ui.lbl_filename.setText(
-        #         dirs.last_file_name[:10] + ' ... ' + dirs.last_file_name[-20:])
-        # self.ui.lbl_filename.setToolTip(dirs.last_file_name)
-        # self.ui.lbl_shape_actual.setText(
-        #     f"{self.n_chan} x {self.N}{word_length}")
         self.x = self.normalize_data()
 
 # ------------------------------------------------------------------------------
