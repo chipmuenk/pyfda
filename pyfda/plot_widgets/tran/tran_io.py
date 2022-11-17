@@ -61,7 +61,7 @@ class Tran_IO(QWidget):
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
-        Instantiate the UI of the widget.
+        Instantiate the UI of the widget
         """
         self.main_wdg = QWidget()
         layVMain = QVBoxLayout()
@@ -181,12 +181,14 @@ class Tran_IO(QWidget):
         Scale `self.data` to the maximum specified by self.ui.led_normalize and
         assign normalized result to `self.x`
         """
+        # TODO: Crashes with non-array data
         if not hasattr(self, 'data') or self.data is None:
             logger.error("No data loaded yet.")
             return
+
         if self.ui.but_normalize.isChecked() == True:
-            self.norm = int(safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float",
-                            sign='poszero'))
+            self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
+            logger.info(f"norm: {type(self.norm)}, data: {type(self.data)} / {self.data.dtype}")
             self.ui.led_normalize.setText(str(self.norm))
             self.x = self.data * self.norm / np.max(np.abs(self.data))
         else:
