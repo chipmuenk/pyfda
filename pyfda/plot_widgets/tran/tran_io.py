@@ -93,7 +93,7 @@ class Tran_IO(QWidget):
         Unload previous file from memory
         """
         self.file_name, self.file_type = io.select_file(
-            self, title="Import Data", mode="read", file_types=('csv', 'wav'))
+            self, title="Import Data", mode="r", file_types=('csv', 'wav'))
 
         self.N = None
         self.nchans = None
@@ -108,7 +108,7 @@ class Tran_IO(QWidget):
             self.nchans = io.read_wav_info.nchans
             self.f_S = io.read_wav_info.f_S
             self.WL = io.read_wav_info.WL
-            WL_str = f" x {self.WL * 8} bits,"
+            info_str = f" x {self.WL * 8} bits,"
             self.ui.frm_f_s.setVisible(True)
             self.ui.lbl_f_s_value.setText(str(self.f_S))
 
@@ -117,7 +117,7 @@ class Tran_IO(QWidget):
             self.ui.frm_f_s.setVisible(False)
             self.N = io.read_csv_info.N
             self.nchans = io.read_csv_info.nchans
-            WL_str = ""
+            info_str = f" ({io.read_csv_info.info})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
 
@@ -134,7 +134,7 @@ class Tran_IO(QWidget):
 
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
-            f"{self.nchans} x {self.N}{WL_str}")
+            f"{self.nchans} x {self.N}{info_str}")
 
 # ------------------------------------------------------------------------------
     def import_data(self):

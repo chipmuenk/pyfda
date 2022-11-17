@@ -798,7 +798,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
     return file_filters, last_file_filter
 
 #-------------------------------------------------------------------------------
-def read_csv_info(file):
+def read_csv_info(filename):
     """
     Get infos about the size of a csv file without actually loading the whole
     file into memory.
@@ -809,20 +809,46 @@ def read_csv_info(file):
     sniffer = csv.Sniffer()
     # TODO: detect and skip header
     # TODO: count other linebreaks as well
-    with open(file) as f:
+    horizontal = False
+
+    file_size = os.path.getsize(filename)
+    logger.info(f"File Size is {file_size} bytes")
+
+    with open(filename) as f:
         dialect = sniffer.sniff(f.read(5000))  # only read the first 5000 chars
         delimiter = dialect.delimiter
-        lineterminator = dialect.lineterminator
+        lineterminator = repr(dialect.lineterminator)
+        # has_header = dialect.has_header
         first_line = f.readline()
-        read_csv_info.nchans = first_line.count(delimiter) + 1
-    # logger.info(f"Delimiter: {delimiter}, Terminator: {lineterminator}")
+        nchans = first_line.count(delimiter) + 1
+        f.seek(0)
+        N = sum(1 for row in f)  # f isfileobject (csv.reader)
 
-    chunk = 1024*1024   # Process 1 MB at a time.
-    f = np.memmap(file)  # map file to memory as an ndarray
-    # count linebreaks
-    read_csv_info.N = sum(np.sum(f[i:i+chunk] == ord('\n'))
-                    for i in range(0, len(f), chunk))
     del f
+
+    logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
+                f"RowCount = {N}")
+
+    if N < nchans:  # swap rows and columns
+        N, nchans = nchans, N
+        horizontal = True
+        transpose = "T #"
+    else:
+        horizontal = False
+        transpose = ""
+
+    if N < 2:
+        logger.error(f"No suitable CSV file, has {N} data entries.")
+        return -1
+
+    # file is ok, copy local variables to function attributes
+    read_csv_info.horizontal = horizontal
+    read_csv_info.file_size = file_size
+    read_csv_info.N = N
+    read_csv_info.nchans = nchans
+    read_csv_info.info = f"{transpose} '{lineterminator}' # '{delimiter}'"
+
+    return 0
 
 #-------------------------------------------------------------------------------
 def read_wav_info(file):
