@@ -923,6 +923,7 @@ def read_wav_info(file):
 
     # -- Function attributes that are accessible from outside
     # ------------------------------------------------------------
+    read_wav_info.file_size = file_size
     read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
 
     # Pos. 40: Total number of samples per channel
