@@ -133,8 +133,10 @@ class Tran_IO(QWidget):
 
         del self.x
         self.x = None
+        self.ui.but_load.setEnabled(True)
         self.ui.but_load.setText("Load")
         qstyle_widget(self.ui.but_load, "normal")
+        self.ui.but_normalize.setEnabled(False)
 
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
@@ -166,7 +168,8 @@ class Tran_IO(QWidget):
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
-        self.file_load_status = "loaded"
+        self.ui.but_load.setEnabled(False)
+        self.ui.but_normalize.setEnabled(True)
 
         self.x = self.normalize_data()
 

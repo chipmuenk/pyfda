@@ -94,6 +94,7 @@ class Tran_IO_UI(QWidget):
         self.but_load = PushButton("Load", checkable=False)
         self.but_load.setToolTip(
             self.tr("<span>Load file to memory.</span>"))
+        self.but_load.setEnabled(False)
 
         self.lbl_file = QLabel(to_html("Name:", frmt="b"))
         self.lbl_filename = QLabel("None")
@@ -121,6 +122,7 @@ class Tran_IO_UI(QWidget):
         self.but_normalize = PushButton("Norm")
         self.but_normalize.setToolTip(
             self.tr("<span>Normalize data to the value below.</span>"))
+        self.but_normalize.setEnabled(False)
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
         self.led_normalize.setText(str(self.led_normalize_default))
