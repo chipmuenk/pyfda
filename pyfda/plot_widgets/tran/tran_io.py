@@ -128,6 +128,10 @@ class Tran_IO(QWidget):
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
 
+        if self.nchans > 9:
+            logger.warning(
+                f"Unsuitable file format with {io.read_csv_info} > 9 columns.")
+
         if len(self.file_name) < 45:
             self.ui.lbl_filename.setText(self.file_name)
         else:
