@@ -103,7 +103,9 @@ class Tran_IO(QWidget):
         if self.file_name is None:
             return  # operation cancelled
         elif self.file_type == 'wav':
-            io.read_wav_info(self.file_name)
+            ret = io.read_wav_info(self.file_name)
+            if ret < 0:
+                return
             self.N = io.read_wav_info.N
             self.nchans = io.read_wav_info.nchans
             self.f_S = io.read_wav_info.f_S
@@ -113,7 +115,9 @@ class Tran_IO(QWidget):
             self.ui.lbl_f_s_value.setText(str(self.f_S))
 
         elif self.file_type == 'csv':
-            io.read_csv_info(self.file_name)
+            ret = io.read_csv_info(self.file_name)
+            if ret < 0:
+                return
             self.ui.frm_f_s.setVisible(False)
             self.N = io.read_csv_info.N
             self.nchans = io.read_csv_info.nchans
@@ -140,7 +144,7 @@ class Tran_IO(QWidget):
     def import_data(self):
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
-            return
+            return -1
         self.data = io.import_data(self.file_name, self.file_type)
         if self.data is None:
             return -1  # file operation cancelled
@@ -165,6 +169,8 @@ class Tran_IO(QWidget):
         self.file_load_status = "loaded"
 
         self.x = self.normalize_data()
+
+        return 0
 
 # ------------------------------------------------------------------------------
     def normalize_data(self):
