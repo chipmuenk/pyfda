@@ -1013,25 +1013,6 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     ndarray
         Data from the file
     """
-    # file_name, file_type = select_file(parent, title = title, file_types = file_types,
-    #                                   mode = mode)
-
-    # file_filters, last_file_filter = create_file_filters(file_types=file_types)
-
-    # dlg = QFileDialog(parent)  # create instance for QFileDialog
-    # dlg.setWindowTitle(title)
-    # dlg.setDirectory(dirs.last_file_dir)
-    # dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    # dlg.setNameFilter(file_filters)  # pass available file filters
-    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    # if last_file_filter:
-    #     dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    # if dlg.exec_() == QFileDialog.Accepted:
-    #     file_name = dlg.selectedFiles()[0]  # pick only first selected file
-    #     file_type = os.path.splitext(file_name)[-1].strip('.')
-    # else:
-    #     return -1  # operation cancelled
     if file_name is None:  # error or operation cancelled
         return -1
 
