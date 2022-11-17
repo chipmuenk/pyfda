@@ -100,6 +100,9 @@ class Tran_IO(QWidget):
         self.f_S = None
         self.WL = None
 
+        del self.x
+        self.x = None
+
         if self.file_name is None:
             return  # operation cancelled
         elif self.file_type == 'wav':
@@ -131,8 +134,6 @@ class Tran_IO(QWidget):
             self.ui.lbl_filename.setText(
                 self.file_name[:10] + ' ... ' + self.file_name[-20:])
 
-        del self.x
-        self.x = None
         self.ui.but_load.setEnabled(True)
         self.ui.but_load.setText("Load")
         qstyle_widget(self.ui.but_load, "normal")
