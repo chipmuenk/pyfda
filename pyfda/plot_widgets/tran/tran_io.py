@@ -120,13 +120,14 @@ class Tran_IO(QWidget):
         elif self.file_type == 'csv':
             ret = io.read_csv_info(self.file_name)
             if ret < 0:
-                return
+                return -1
             self.ui.frm_f_s.setVisible(False)
             self.N = io.read_csv_info.N
             self.nchans = io.read_csv_info.nchans
             info_str = f" ({io.read_csv_info.info})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
+            return -1
 
         if self.nchans > 9:
             logger.warning(
@@ -149,27 +150,20 @@ class Tran_IO(QWidget):
 
 # ------------------------------------------------------------------------------
     def import_data(self):
+        err = False
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
-            return -1
+            err = True
         self.data = io.import_data(self.file_name, self.file_type)
-        if self.data is None:
-            return -1  # file operation cancelled
+        if self.data is None:  # file operation cancelled
+            err = True
         elif type(self.data) != np.ndarray:
             logger.warning("Unsuitable file format")
-            return -1
+            err = True
 
-        # if len(self.data.shape) == 1:
-        #     self.n_chan = 1
-        #     self.N = len(self.data)
-        # elif len(self.data.shape) == 2:
-        #     self.n_chan = self.data.shape[1]
-        #     self.N = self.data.shape[0]
-        # else:
-        #     logger.error(f"Unsuitable data with shape {self.data.shape}.")
-        #     self.n_chan = -1
-        #     self.N = -1
-        #     return
+        if err:
+            self.ui.but_load.setEnabled(False)
+            return -1
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
