@@ -132,6 +132,21 @@ class Tran_IO(QWidget):
         if self.nchans > 9:
             logger.warning(
                 f"Unsuitable file format with {io.read_csv_info} > 9 columns.")
+            return -1
+        elif self.nchans == 1:
+            self.ui.lbl_chan.setVisible(False)
+            self.ui.cmb_chan.setVisible(False)
+            self.ui.line_chan.setVisible(False)
+        else:
+            self.ui.lbl_chan.setVisible(True)
+            self.ui.cmb_chan.setVisible(True)
+            self.ui.line_chan.setVisible(True)
+            self.ui.cmb_chan.clear()
+            # create a list with the numbers of the channels and the
+            # sum sign and populate the combo box with it
+            self.ui.cmb_chan.addItems(
+                [str(k + 1) for k in range(self.nchans)] + ["Σ"]
+                )
 
         if len(self.file_name) < 45:
             self.ui.lbl_filename.setText(self.file_name)
@@ -147,6 +162,7 @@ class Tran_IO(QWidget):
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
             f"{self.nchans} x {self.N}{info_str}")
+        return 0
 
 # ------------------------------------------------------------------------------
     def import_data(self):
