@@ -116,6 +116,21 @@ class Tran_IO_UI(QWidget):
         self.frm_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s.setVisible(False)
 
+        self.line_chan = QVLine()
+        self.line_chan.setVisible(False)
+        self.lbl_chan = QLabel(to_html("Col.", frmt="b"))
+        self.lbl_chan.setVisible(False)
+        self.cmb_chan = QComboBox(self)
+        self.cmb_chan.setToolTip(
+            "<span>Select channel / column for data import. '&Sigma;' "
+            "</span> sums up all columns.")
+        self.cmb_chan.addItems(["1", "2", "Σ"])
+        self.cmb_chan.setVisible(False)
+
+        layV_chan = QVBoxLayout()
+        layV_chan.addWidget(self.lbl_chan)
+        layV_chan.addWidget(self.cmb_chan)
+
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
@@ -128,6 +143,7 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setText(str(self.led_normalize_default))
 
         line1 = QVLine()
+        line2 = QVLine()
 
         i = 0
         i += 1
@@ -140,12 +156,20 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_filename, 0, i, 1, 2)
         layG_io_file.addWidget(self.lbl_shape_actual, 1, i)
         i += 1
+        # row 0 is used by the file name
         layG_io_file.addWidget(self.frm_f_s, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.line_chan, 0, i, 2, 1)
+        i+=1
+        layG_io_file.addWidget(self.lbl_chan, 0, i)
+        layG_io_file.addWidget(self.cmb_chan, 1, i)
+        i+=1
+        layG_io_file.addWidget(line1, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.but_normalize, 0, i)
         layG_io_file.addWidget(self.led_normalize, 1, i)
         i += 1
-        layG_io_file.addWidget(line1, 0, i, 2, 1)
+        layG_io_file.addWidget(line2, 0, i, 2, 1)
 
         layV_io = QVBoxLayout()
         layV_io.addLayout(layG_io_file)
