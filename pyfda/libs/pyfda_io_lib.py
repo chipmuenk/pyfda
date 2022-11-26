@@ -969,10 +969,12 @@ def select_file(parent: object, title: str = "Import", mode: str = "r",
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.last_file_dir)
-    if mode == "r":
+    if mode in {"r", "rb"}:
         dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    elif mode in {"w", "wb"}:
+        dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
     else:
-        logger.error("Currently, only read mode is supported!")
+        logger.error(f"Unknown mode '{mode}'")
         return None, None
 
     dlg.setNameFilter(file_filters)  # pass available file filters
