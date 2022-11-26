@@ -1480,23 +1480,11 @@ def load_filter(self) -> int:
     Load filter from zipped binary numpy array or (c)pickled object to
     filter dictionary
     """
-    file_types = ("npz", "pkl")
-    file_filters, last_file_filter = create_file_filters(file_types)
+    file_name, file_type = select_file(
+        self, title="Load Filter", mode="rb", file_types = ("npz", "pkl"))
 
-    dlg = QFileDialog(self)
-    dlg.setWindowTitle("Load Filter")
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    dlg.setNameFilter(file_filters)  # pass available file filters
-    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[-1].strip('.')
-    else:
-        return -1  # operation cancelled
+    if file_name is None:
+        return -1  # operation cancelled or some other error
 
     err = False
     fb.fil[1] = fb.fil[0].copy()  # backup filter dict
@@ -1568,26 +1556,11 @@ def save_filter(self):
     """
     Save filter as zipped binary numpy array or pickle object
     """
-    file_types = ("npz", "pkl")
-    file_filters, last_file_filter = create_file_filters(file_types)
+    file_name, file_type = select_file(
+        self, title="Load Filter", mode='wb', file_types = ("npz", "pkl"))
 
-    dlg = QFileDialog(self)
-    dlg.setWindowTitle("Save filter as")
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)
-
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        # sel_filt = dlg.selectedNameFilter()  # selected file filter
-    else:
-        return -1  # operation cancelled
-
-    file_type = os.path.splitext(file_name)[-1].strip('.')  # slice off file extension
-
+    if file_name is None:
+        return -1  # operation cancelled or other error
     err = False
     try:
         with io.open(file_name, 'wb') as f:
