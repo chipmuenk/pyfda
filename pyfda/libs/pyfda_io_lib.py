@@ -957,11 +957,11 @@ def select_file(parent: object, title: str = "Import", mode: str = "r",
     Returns
     -------
     file_name: str
-        Fully qualified name of selected file. None when operation has been
+        Fully qualified name of selected file. `None` when operation has been
         cancelled.
 
     file_type: str
-        File type, e.g. 'wav'. None when operation has been cancelled.
+        File type, e.g. 'wav'. `None` when operation has been cancelled.
     """
 
     file_filters, last_file_filter = create_file_filters(file_types=file_types)
@@ -1002,7 +1002,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     Parameters
     ----------
     file_name: str
-        Full name of the file to be imported
+        Full path and name of the file to be imported
 
     file_type: str
         File type (e.g. 'wav')
@@ -1547,11 +1547,6 @@ def load_filter(self) -> int:
                         or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
                     logger.error("Missing key 'sos' or wrong data type!")
                     return -1
-                # else:
-                #     logger.info(f"ba: {np.shape(fb.fil[0]['ba'])},"
-                #                 f"zpk: {np.shape(fb.fil[0]['zpk'])}"
-                #                 f"sos: {np.shape(fb.fil[0]['sos'])}")
-                # logger.info(pprint_log(fb.fil[0]))
 
                 logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                 dirs.last_file_name = file_name
