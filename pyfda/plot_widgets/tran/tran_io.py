@@ -171,12 +171,19 @@ class Tran_IO(QWidget):
             logger.warning("No valid file has been selected yet!")
             err = True
         self.data = io.import_data(self.file_name, self.file_type)
+
         if self.data is None:  # file operation cancelled
             err = True
         elif type(self.data) != np.ndarray:
             logger.warning("Unsuitable file format")
             err = True
-
+        elif self.nchans > 1:
+            if self.ui.cmb_chan.currentIndex() == self.nchans - 1:
+                self.data = self.data.sum(1)  # sum all slices along dim 1
+                logger.warning(np.shape(self.data))
+            else:
+                self.data = self.data[self.ui.cmb_chan.currentIndex() - 1][:]
+                logger.warning(np.shape(self.data))
         if err:
             self.ui.but_load.setEnabled(False)
             return -1
