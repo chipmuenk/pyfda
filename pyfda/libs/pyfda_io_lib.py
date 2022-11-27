@@ -971,8 +971,10 @@ def select_file(parent: object, title: str = "Import", mode: str = "r",
     dlg.setDirectory(dirs.last_file_dir)
     if mode in {"r", "rb"}:
         dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+        dlg.setFileMode(QFileDialog.ExistingFile)
     elif mode in {"w", "wb"}:
         dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
+        dlg.setFileMode(QFileDialog.AnyFile)
     else:
         logger.error(f"Unknown mode '{mode}'")
         return None, None
