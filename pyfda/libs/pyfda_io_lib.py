@@ -1383,8 +1383,8 @@ def export_coe_microsemi(f: TextIO) -> None:
 
     if qc.q_dict['fx_base'] != 'dec':
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
-        logger.warning('Only coefficients in "dec" format are supported,'
-                       'using decimal format.')
+        logger.warning('Switching to decimal coefficient format, other numeric formats '
+                       'are not supported by Microsemi tools.')
 
     # Quantize coefficients to decimal integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
