@@ -985,13 +985,20 @@ def select_file(parent: object, title: str = "Import", mode: str = "r",
         return None, None
 
     dlg.setNameFilter(file_filters)  # pass available file filters
-    dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
+    # dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
     if last_file_filter:
         dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[-1].strip('.')
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
+
+        if file_type == "":
+            # No file type specified, add the type from the file filter
+            file_type = extract_file_ext(sel_filt)[0].strip('.')
+            file_name = file_name + '.' + file_type
+
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)
         dirs.last_file_type = file_type
