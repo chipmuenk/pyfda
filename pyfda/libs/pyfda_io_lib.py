@@ -19,6 +19,15 @@ import pickle
 import numpy as np
 from scipy.io import loadmat, savemat, wavfile
 
+try:
+    import xlwt
+except ImportError:
+    xlwt = None
+try:
+    import xlsx
+except ImportError:
+    xlsx = None
+
 from .pyfda_lib import safe_eval, lin2unit, pprint_log
 from .pyfda_qt_lib import qget_selected
 
@@ -46,7 +55,9 @@ file_filters_dict = {
     'pkl': 'Pickled data',
     'txt': 'Microsemi FIR coefficient format',
     'vhd': 'VHDL package or architecture',
-    'wav': 'WAV audio format'
+    'wav': 'WAV audio format',
+    'xls': 'Excel Worksheet',
+    'xlsx': 'Excel 2007 Worksheet'
     }
 
 
@@ -1096,39 +1107,14 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # add file types for FIR filter coefficients
     if fb.fil[0]['ft'] == 'FIR':
         file_types += ('coe', 'vhd', 'txt')
+    # Add file types when Excel modules are available:
+    if xlwt is not None:
+        file_types += ('xls',)
+    if xlsx is not None:
+        file_types += ('xlsx',)
 
-    file_filters, last_file_filter = create_file_filters(file_types=file_types)
-
-#        # Add further file types when modules are available:
-#        if XLWT:
-#            file_filters += ";;Excel Worksheet (.xls)"
-#        if XLSX:
-#            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
-
-    # return selected file name (with or without extension) and filter (Linux: full text)
-    dlg = QFileDialog(parent)  # create instance for QFileDialog
-    dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)  # set the list with all available file formats
-    # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
-
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]   # convert list (with single entry?) to item
-        sel_filt = dlg.selectedNameFilter()  # selected file filter
-    else:
-        return -1
-
-    # Slice off file extension
-    file_type = os.path.splitext(file_name)[-1].strip('.')
-    if file_type == "":
-        # No file type specified, add the type from the file filter
-        file_type = extract_file_ext(sel_filt)[0].strip('.')
-        file_name = file_name + '.' + file_type
-
+    file_name, file_type = select_file(parent,title=title, mode='wb',
+                                       file_types=file_types)
     err = False
 
     try:
@@ -1209,9 +1195,6 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
-            dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
