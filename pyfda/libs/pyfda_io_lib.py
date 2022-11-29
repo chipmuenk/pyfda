@@ -60,7 +60,6 @@ file_filters_dict = {
     'xlsx': 'Excel 2007 Worksheet'
     }
 
-
 # ------------------------------------------------------------------------------
 def prune_file_ext(file_type: str) -> str:
     """
@@ -90,15 +89,10 @@ def prune_file_ext(file_type: str) -> str:
     occurrences of ``pattern`` in ``string`` by ``replacement``.
 
     - '.' means any character
-
     - '+' means one or more
-
     - '[^a]' means except for 'a'
-
     - '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-
     - '(' must be escaped as '\\\('
-
     """
 
     return re.sub('\([^\)]+\)', '', file_type)
@@ -1036,6 +1030,8 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     try:
         if file_type == 'wav':
             f_S, data_arr = wavfile.read(file_name, mmap=False)
+            # data_arr is 1D for single channel (mono) files and
+            # 2D otherwise (n_chans, n_samples)
             fb.fil[0]['f_S_wav'] = f_S
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
