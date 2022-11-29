@@ -1057,11 +1057,13 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
                     # contains only one array
                 elif file_type == 'npz':
                     fdict = np.load(f)
-                    if fkey not in fdict:
+                    if fkey in{"", None}:
+                        data_arr = fdict  # pick the whole array
+                    elif fkey not in fdict:
                         err = True
                         raise IOError(
-                            "Key '{0}' not in file '{1}'.\nKeys found: {2}"
-                            .format(fkey, file_name, fdict.files))
+                            f"Key '{fkey}' not in file '{file_name}'.\n"
+                            f"Keys found: {fdict.files}")
                     else:
                         data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
