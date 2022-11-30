@@ -78,9 +78,10 @@ class Tran_IO(QWidget):
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
         self.ui.but_select.clicked.connect(self.select_file)
+        self.ui.cmb_chan.currentIndexChanged.connect(self.select_normalize_data)
         self.ui.but_load.clicked.connect(self.import_data)
-        self.ui.but_normalize.clicked.connect(self.normalize_data)
-        self.ui.led_normalize.editingFinished.connect(self.normalize_data)
+        self.ui.but_normalize.clicked.connect(self.select_normalize_data)
+        self.ui.led_normalize.editingFinished.connect(self.select_normalize_data)
 
         self.setLayout(layVMain)
 
@@ -92,6 +93,7 @@ class Tran_IO(QWidget):
 
         Unload previous file from memory
         """
+        logger.info("select_file")
         self.file_name, self.file_type = io.select_file(
             self, title="Import Data", mode="r", file_types=('csv', 'wav'))
 
@@ -144,9 +146,12 @@ class Tran_IO(QWidget):
             self.ui.cmb_chan.clear()
             # create a list with the numbers of the channels and the
             # sum sign and populate the combo box with it
+            # don't emit a signal while re-initializing the combo box
+            self.ui.cmb_chan.blockSignals(True)
             self.ui.cmb_chan.addItems(
                 [str(k + 1) for k in range(self.nchans)] + ["Σ"]
                 )
+            self.ui.cmb_chan.blockSignals(False)
 
         if len(self.file_name) < 45:
             self.ui.lbl_filename.setText(self.file_name)
@@ -166,24 +171,20 @@ class Tran_IO(QWidget):
 
 # ------------------------------------------------------------------------------
     def import_data(self):
+        logger.info("import data")
         err = False
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
             err = True
-        self.data = io.import_data(self.file_name, self.file_type)
 
-        if self.data is None:  # file operation cancelled
+        self.data_raw = io.import_data(self.file_name, self.file_type)
+
+        if self.data_raw is None:  # file operation cancelled
             err = True
-        elif type(self.data) != np.ndarray:
+        elif type(self.data_raw) != np.ndarray:
             logger.warning("Unsuitable file format")
             err = True
-        elif self.nchans > 1:
-            if self.ui.cmb_chan.currentIndex() == self.nchans - 1:
-                self.data = self.data.sum(1)  # sum all slices along dim 1
-                logger.warning(np.shape(self.data))
-            else:
-                self.data = self.data[self.ui.cmb_chan.currentIndex() - 1][:]
-                logger.warning(np.shape(self.data))
+
         if err:
             self.ui.but_load.setEnabled(False)
             return -1
@@ -193,28 +194,42 @@ class Tran_IO(QWidget):
         self.ui.but_load.setEnabled(False)
         self.ui.but_normalize.setEnabled(True)
 
-        self.x = self.normalize_data()
-
+        self.select_normalize_data()
         return 0
 
 # ------------------------------------------------------------------------------
-    def normalize_data(self):
+    def select_normalize_data(self):
         """
-        Scale `self.data` to the maximum specified by self.ui.led_normalize and
-        assign normalized result to `self.x`
+        - For multi-channel data, select one channel resp. average all channels
+          from `self.data_raw`
+
+        - Scale `self.data` to the maximum specified by self.ui.led_normalize and
+            assign normalized result to `self.x`
         """
-        # TODO: Crashes with non-array data
-        if not hasattr(self, 'data') or self.data is None:
-            logger.error("No data loaded yet.")
+        logger.info("select_normalize_data")
+        if not hasattr(self, 'data_raw') or self.data_raw is None:
+            logger.warning("No data loaded yet.")
             return
+        logger.warning(f"idx = {self.ui.cmb_chan.currentIndex()}")
+        logger.warning(f"self.data_raw: {np.shape(self.data_raw)}")
+        logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
+
+        if self.nchans == 1:
+            data = self.data_raw
+        elif self.ui.cmb_chan.currentIndex() == self.nchans:  # last item (sum) selected
+            data = self.data_raw.sum(1)  # sum all slices along dim 1
+        else:
+            data = self.data_raw[:, self.ui.cmb_chan.currentIndex()]
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
-            logger.info(f"norm: {type(self.norm)}, data: {type(self.data)} / {self.data.dtype}")
+            # logger.info(f"norm: {type(self.norm)}, data: {type(self.data)} / {self.data.dtype}")
             self.ui.led_normalize.setText(str(self.norm))
-            self.x = self.data * self.norm / np.max(np.abs(self.data))
+            self.x = data * self.norm / np.max(np.abs(data))
         else:
-            self.x = self.data
+            self.x = data
+        logger.warning(f"self.x: {np.shape(self.x)}")
+        logger.warning(f"self.x: {pprint_log(self.x)}")
 
         self.emit({'data_changed': 'file_io'})
         return
