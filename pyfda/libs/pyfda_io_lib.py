@@ -401,9 +401,37 @@ def csv2array(f: TextIO):
 
     io_error: str
         String with the error message when import was unsuccessful
+
+    -----------------------------
+    While opening a file, the `newline` parameter can be used to
+    control how universal newlines works (it only applies to text mode).
+    It can be None, '', '\n', '\r', and '\r\n'. It works as follows:
+
+    - Input: If `newline == None`, universal newlines mode is enabled. Lines in
+      the input can end in '\n', '\r', or '\r\n', and these are translated into
+      '\n' before being returned to the caller. If it is '', universal newline
+      mode is enabled, but line endings are returned to the caller untranslated.
+      If it has any of the other legal values, input lines are only terminated
+      by the given string, and the line ending is returned to the caller untranslated.
+
+    - On output, if newline is None, any '\n' characters written are translated
+      to the system default line separator, os.linesep. If newline is '',
+      no translation takes place. If newline is any of the other legal values,
+      any '\n' characters written are translated to the given string.
+
+      Example: convert from Windows-style line endings to Linux:
+
+      fileContents = open(filename,"r").read()
+      f = open(filename,"w", newline="\n")
+      f.write(fileContents)
+      f.close()
+
+      https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
     """
-    # throw an error (instead of a deprecation warning) when trying to create a numpy
-    # array from nested ragged sequences. This error can then be caught easily.
+
+    # throw an error (instead of just issueing a deprecation warning) when trying to
+    # create a numpy array from nested ragged sequences. This error can then be
+    # caught easily.
     np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
@@ -451,7 +479,7 @@ def csv2array(f: TextIO):
 
         if header == "auto":
             # True when header detected:
-            use_header = csv.Sniffer().has_header(f.read(1000))
+            use_header = csv.Sniffer().has_header(f.read(10000))
             f.seek(0)
 
     except csv.Error as e:
@@ -476,11 +504,11 @@ def csv2array(f: TextIO):
     if cr != 'auto':
         lineterminator = str(cr)
 
-    logger.info("Parsing CSV data with \n"
-                "\tHeader = {0} | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3} '"
-                # "\n\tType of passed text: '{4}'"
-                .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar))  # ,f.__class__.__name__))
+    logger.info(f"Parsing CSV data with header = '{use_header}'\n"
+                f"\tDelimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
+                f"| quotechar = ' {quotechar} '\n"
+                f"\tType of passed text: '{f.__class__.__name__}'")
+
     # --------------------------------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
@@ -493,9 +521,10 @@ def csv2array(f: TextIO):
 #
 #     Where you define your process function any way you want. For example:
 #
-#         def process(line):
-#             if 'save the world' in line.lower():
-#                 superman.save_the_world()
+#    data_list = []
+#    def process(line):
+#        # split into lines (if not split yet):
+#        data_list.append(line.split(lineterminator))
 #
 #     This will work nicely for any file size and you go through your file in just 1 pass.
 #     This is typically how generic parsers will work.
@@ -536,6 +565,7 @@ def csv2array(f: TextIO):
             if cols > 2 and rows > 2:
                 return f"Unsuitable data shape {np.shape(data_arr)}"
             elif cols > rows:
+                logger.warning("Swapping rows and columns.")
                 return data_arr.T
             else:
                 return data_arr
@@ -563,197 +593,6 @@ def csv2array(f: TextIO):
 #         return io_error
 #
 # =============================================================================
-
-
-# ------------------------------------------------------------------------------
-def csv2array_new(f: TextIO):
-    """
-    Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict.
-
-    Parameters
-    ----------
-
-    f: handle to file or file-like object
-        e.g.
-
-        >>> f = open(file_name, 'r') # or
-        >>> f = io.StringIO(text)
-
-    Returns
-    -------
-
-    ndarray
-        numpy array containing table data from file or text when import was
-        successful
-
-    io_error: str
-        String with the error message when import was unsuccessful
-    """
-    # ------------------------------------------------------------------------------
-    # Get CSV parameter settings
-    # ------------------------------------------------------------------------------
-    io_error = ""  # initialize string for I/O error messages
-    CSV_dict = params['CSV']
-    logger.warning("Fileobject format: {0}".format(type(f).__name__))
-    try:
-        header = CSV_dict['header'].lower()
-        if header in {'auto', 'on', 'off'}:
-            pass
-        else:
-            header = 'auto'
-            logger.warning(
-                f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
-                f"using {header} instead.")
-
-        orientation_horiz = CSV_dict['orientation'].lower()
-        if orientation_horiz in {'auto', 'vert', 'horiz'}:
-            pass
-        else:
-            orientation_horiz = 'vert'
-            logger.warning(
-                f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
-                f"using {orientation_horiz} instead.")
-
-        tab = CSV_dict['delimiter'].lower()
-        cr = CSV_dict['lineterminator'].lower()
-
-    except KeyError as e:
-        io_error = "Dict 'params':\n{0}".format(e)
-        return io_error
-
-    try:
-        # ------------------------------------------------------------------------------
-        # Analyze CSV object
-        # ------------------------------------------------------------------------------
-        if header == 'auto' or tab == 'auto' or cr == 'auto':
-            # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(),
-                                          delimiters=['\t', ';', ',', '|', ' '])
-            f.seek(0)                               # and reset the file pointer
-        else:
-            # fall back, alternatives: 'excel', 'unix':
-            dialect = csv.get_dialect('excel-tab')
-
-        if header == "auto":
-            # True when header detected:
-            use_header = csv.Sniffer().has_header(f.read(1000))
-            f.seek(0)
-
-    except csv.Error as e:
-        logger.warning("Error during CSV analysis:\n{0},\n"
-                       "continuing with format 'excel-tab'".format(e))
-        dialect = csv.get_dialect('excel-tab')  # fall back
-        use_header = False
-
-    if header == 'on':
-        use_header = True
-    elif header == 'off':
-        use_header = False
-    # case 'auto' has been treated above
-
-    delimiter = dialect.delimiter
-    lineterminator = dialect.lineterminator
-    quotechar = dialect.quotechar
-
-    if tab != 'auto':
-        delimiter = str(tab)
-
-    if cr != 'auto':
-        lineterminator = str(cr)
-
-    logger.info("Parsing CSV data with header = '{0}'\n"
-                "\tDelimiter = {1} | Lineterm. = {2} | quotechar = ' {3} '\n"
-                "\tType of passed text: '{4}'"
-                .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar, f.__class__.__name__))
-    # ------------------------------------------------
-    # finally, create iterator from csv data
-    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
-                           lineterminator=lineterminator)
-    # ------------------------------------------------
-# =============================================================================
-    """
-    newline controls how universal newlines works (it only applies to text mode).
-    It can be None, '', '\n', '\r', and '\r\n'. It works as follows:
-
-    - On input, if newline is None, universal newlines mode is enabled. Lines in
-      the input can end in '\n', '\r', or '\r\n', and these are translated into
-      '\n' before being returned to the caller. If it is '', universal newline
-      mode is enabled, but line endings are returned to the caller untranslated.
-      If it has any of the other legal values, input lines are only terminated
-      by the given string, and the line ending is returned to the caller untranslated.
-
-    - On output, if newline is None, any '\n' characters written are translated
-      to the system default line separator, os.linesep. If newline is '',
-      no translation takes place. If newline is any of the other legal values,
-      any '\n' characters written are translated to the given string.
-
-      Example: convert from Windows-style line endings to Linux:
-      fileContents = open(filename,"r").read()
-      f = open(filename,"w", newline="\n")
-      f.write(fileContents)
-      f.close()
-      https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
-     """
-
-    data_list = []
-
-    def process(line):
-        # split into lines (if not split yet):
-        data_list.append(line.split(lineterminator))
-
-    # with open(fo) as f:
-    for line in f:
-        process(line)
-
-    for e in data_list:
-        pass
-
-    # Where you define your process function any way you want. For example:
-
-    # This will work nicely for any file size and you go through your file in just 1 pass.
-    # This is typically how generic parsers will work.
-    # (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
-# =============================================================================
-
-# =============================================================================
-#     if use_header:
-#         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
-#
-#     try:
-#         for row in data_iter:
-#             logger.debug("{0}".format(row))
-#             data_list.append(row)
-#     except csv.Error as e:
-#         io_error = "Error during CSV reading:\n{0}".format(e)
-#         return io_error
-# =============================================================================
-
-    try:
-        if data_list is None:
-            return "Imported data is None."
-        data_arr = np.array(data_list)
-        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
-            return f"Imported data is a scalar: '{data_arr}'"
-        elif np.ndim(data_arr) == 1:
-            return data_arr
-        elif np.ndim(data_arr) == 2:
-            cols, rows = np.shape(data_arr)
-            logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
-            if cols > 2 and rows > 2:
-                return "Unsuitable data shape {0}".format(np.shape(data_arr))
-            elif cols > rows:
-                return data_arr.T
-            else:
-                return data_arr
-        else:
-            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
-                .format(np.ndim(data_arr), np.shape(data_arr))
-
-    except (TypeError, ValueError) as e:
-        io_error = f"{e}\nFormat = {np.shape(data_arr)}\n{data_list}"
-        return io_error
 
 
 # ------------------------------------------------------------------------------
