@@ -1125,6 +1125,9 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
     file_name, file_type = select_file(parent,title=title, mode='wb',
                                        file_types=file_types)
+    if file_name is None:
+        return None  # file operation cancelled or other error
+
     err = False
 
     try:
