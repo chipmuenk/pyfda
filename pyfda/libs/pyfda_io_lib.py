@@ -98,16 +98,27 @@ def prune_file_ext(file_type: str) -> str:
     return re.sub('\([^\)]+\)', '', file_type)
 
 
-
 # ------------------------------------------------------------------------------
 def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    'VHDL (\*.vhd)' returned by QFileDialog
+    'VHDL (\*.vhd)' returned by QFileDialog. Depending on the OS, this may be the
+    full file type description or just the extension like '(\*.vhd)'.
 
-    Depending on the OS, this may be the full file type description
-    or just the extension. When `file_type` contains no '(', the passed string is
-    returned unchanged.
+    When `file_type` contains no '(', the passed string is returned unchanged.
+
+    For an explanation of the RegEx, see the docstring for `prune_file_ext`.
+
+    Parameters
+    ----------
+    file_type : str
+
+    Returns
+    -------
+    str
+        The file extension between ( ... ) or the unchanged input argument
+        `file_type` when no '('  was contained.
+
     """
     if "(" in file_type:
         ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
@@ -395,9 +406,11 @@ def csv2array(f: TextIO):
     Returns
     -------
 
-    ndarray
+    data_arr: ndarray
         numpy array containing table data from file or text when import was
         successful
+
+    OR
 
     io_error: str
         String with the error message when import was unsuccessful
@@ -884,6 +897,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
             # data_arr is 1D for single channel (mono) files and
             # 2D otherwise (n_chans, n_samples)
             fb.fil[0]['f_S_wav'] = f_S
+
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
