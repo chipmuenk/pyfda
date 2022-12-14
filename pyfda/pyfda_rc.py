@@ -45,10 +45,10 @@ mpl_ms = 8  # base size for matplotlib markers
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}',  # format string for QLineEdit fields
           'CSV':  {  # format options and parameters for CSV-files and clipboard
-                  'delimiter': ',',  # default delimiter
-                  'lineterminator': CRLF,  # OS-dependend line break from pyfda_lib
+                  'delimiter': 'auto',  # default delimiter
+                  'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
                   'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
-                  'header': 'off',  # 'auto', 'on', 'off'
+                  'header': 'auto',  # 'auto', 'on', 'off'
                   'cmsis' : False,  # True, False
                   'clipboard': False  # source/target is QClipboard or file
                   },

@@ -11,7 +11,8 @@ Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
 
-from .pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
+from .pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
+                           qwindow_stay_on_top)
 from pyfda.pyfda_rc import params
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QCheckBox, QVBoxLayout, QGridLayout, pyqtSignal)
@@ -32,6 +33,9 @@ class CSV_option_box(QDialog):
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
+
+        self.cmb_delimiter_default = "auto"
+
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
@@ -49,13 +53,25 @@ class CSV_option_box(QDialog):
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
-        lblDelimiter = QLabel("CSV-Delimiter", self)
-        delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
-                 ('<SPACE>', ' '), ('< | >', '|')]
-        self.cmbDelimiter = QComboBox(self)
-        for d in delim:
-            self.cmbDelimiter.addItem(d[0], d[1])
-        self.cmbDelimiter.setToolTip("Delimiter between data fields.")
+        lbl_delimiter = QLabel("CSV-Delimiter", self)
+        # delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
+        #         ('<SPACE>', ' '), ('< | >', '|')]
+        cmb_delimiter_items = ["<span>Select delimiter between data fields for im- and export."
+                       "</span>",
+            ("auto", "Auto / ','", "<span>Detect the delimiter automatically for import, "
+             "use ',' for exporting data.</span>"),
+            (',', '< , >', "<span>Use ',' as delimiter between data fields.</span>"),
+            (';', '< ; >', "<span>Use ';' as delimiter between data fields.</span>"),
+            ( '\t', '<TAB>', "<span>Use &lt;TAB&gt; as delimiter between data fields."
+             "</span>"),
+            ( ' ', '<SPACE>', "<span>Use &lt;SPACE&gt; as delimiter between data "
+             "fields.</span>"),
+            ( '|', '< | >',"<span>Use '|' as delimiter between data fields.</span>")
+            ]
+        self.cmb_delimiter = QComboBox(self)
+        qcmb_box_populate(self.cmb_delimiter, cmb_delimiter_items,
+                          self.cmb_delimiter_default)
+
 
         lblTerminator = QLabel("Line Terminator", self)
         terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
@@ -72,7 +88,7 @@ class CSV_option_box(QDialog):
         butClose.setText("Close")
 
         lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Horz.', 'auto'),
+        orientation = [('Auto/Vert.', 'auto'),
                        ('Vertical', 'vert'), ('Horizontal', 'horiz')]
         self.cmbOrientation = QComboBox(self)
         self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
@@ -91,7 +107,7 @@ class CSV_option_box(QDialog):
         self.chk_cmsis.setChecked(False)
         self.chk_cmsis.setToolTip(
             "<span>Use CMSIS DSP second-order sections format "
-            "(only for coefficients).</span>")
+            "(only for IIR coefficients).</span>")
 
         self.radClipboard = QRadioButton("Clipboard", self)
         self.radClipboard.setChecked(False)
@@ -100,8 +116,8 @@ class CSV_option_box(QDialog):
         self.radFile.setChecked(True)
 
         lay_grid = QGridLayout()
-        lay_grid.addWidget(lblDelimiter, 1, 1)
-        lay_grid.addWidget(self.cmbDelimiter, 1, 2)
+        lay_grid.addWidget(lbl_delimiter, 1, 1)
+        lay_grid.addWidget(self.cmb_delimiter, 1, 2)
         lay_grid.addWidget(lblTerminator, 2, 1)
         lay_grid.addWidget(self.cmbLineTerminator, 2, 2)
         lay_grid.addWidget(lblOrientation, 3, 1)
@@ -125,7 +141,7 @@ class CSV_option_box(QDialog):
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
         self.cmbOrientation.currentIndexChanged.connect(self._store_settings)
-        self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
+        self.cmb_delimiter.currentIndexChanged.connect(self._store_settings)
         self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
         self.cmbHeader.currentIndexChanged.connect(self._store_settings)
         self.chk_cmsis.clicked.connect(self._store_settings)
@@ -139,7 +155,7 @@ class CSV_option_box(QDialog):
 
         try:
             params['CSV']['orientation'] = qget_cmb_box(self.cmbOrientation, data=True)
-            params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
+            params['CSV']['delimiter'] = qget_cmb_box(self.cmb_delimiter, data=True)
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator,
                                                            data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
@@ -157,7 +173,7 @@ class CSV_option_box(QDialog):
         """
         try:
             qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
-            qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
+            qset_cmb_box(self.cmb_delimiter, params['CSV']['delimiter'], data=True)
             qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'],
                          data=True)
             qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
