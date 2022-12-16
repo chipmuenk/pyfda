@@ -58,6 +58,12 @@ class Tran_IO(QWidget):
         logger.warning("SIG_RX - vis: {0}\n{1}"
                        .format(self.isVisible(), pprint_log(dict_sig)))
 
+        if 'closeEvent' in dict_sig:
+            self.ui.but_csv_options.setChecked(False)
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv'\
+            and self.ui.but_csv_options.isChecked():
+                self.ui.wdg_csv_options.load_settings()
+
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
@@ -82,6 +88,8 @@ class Tran_IO(QWidget):
         self.ui.but_load.clicked.connect(self.import_data)
         self.ui.but_normalize.clicked.connect(self.select_normalize_data)
         self.ui.led_normalize.editingFinished.connect(self.select_normalize_data)
+
+        self.ui.wdg_csv_options.sig_tx.connect(self.process_sig_rx)
 
         self.setLayout(layVMain)
 
