@@ -84,12 +84,12 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
-        # self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
-        self.csv_options = CSV_option_box(self, has_cmsis=False)
+        self.wdg_csv_options = CSV_option_box(self, has_cmsis=False)
+
         self.but_select = PushButton("Select", checkable=False)
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
@@ -187,24 +187,20 @@ class Tran_IO_UI(QWidget):
         self.wdg_top.setLayout(layH_io)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-
-# ------------------------------------------------------------------------------
-# def main():
-#     import sys
-#     from pyfda.libs.compat import QApplication
-
-#     app = QApplication(sys.argv)
-
-#     mainw = Tran_IO_UI(None)
-#     layVMain = QVBoxLayout()
-#     layVMain.addWidget(mainw.wdg_stim)
-#     layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
-
-#     mainw.setLayout(layVMain)
-
-#     app.setActiveWindow(mainw)
-#     mainw.show()
-#     sys.exit(app.exec_())
+        # ---- Local (UI) signal-slot connections
+        self.but_csv_options.clicked.connect(self._open_csv_win)
+    # --------------------------------------------------------------------------
+    def _open_csv_win(self):
+        """
+        Pop-up window for CSV options
+        """
+        if self.but_csv_options.isChecked():
+            self.wdg_csv_options.show()  # modeless i.e. non-blocking popup window
+            self.wdg_csv_options.load_settings()
+            # qstyle_widget(self.but_csv_options, "changed")
+        else:
+            self.wdg_csv_options.hide()  # modeless i.e. non-blocking popup window
+            # qstyle_widget(self.but_csv_options, "normal")
 
 
 if __name__ == "__main__":
