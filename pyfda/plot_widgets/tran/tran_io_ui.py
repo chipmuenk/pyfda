@@ -19,6 +19,7 @@ from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, QVLine,
     PushButton)
+from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -77,16 +78,18 @@ class Tran_IO_UI(QWidget):
         # =====================================================================
         # Controls
         # =====================================================================
-        # self.butLoad = PushButton(self, icon=QIcon(':/file.svg'),
-        #                           checkable=False)
-        # # self.butLoad.setIconSize(q_icon_size)
-        # self.butLoad.setToolTip("Load data from file.")
-        # self.butLoad.setEnabled(True)
 
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        layG_io_file = QGridLayout()
+        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+                                          checked=False)
+        # self.but_csv_options.setIconSize(q_icon_size)
+        self.but_csv_options.setToolTip(
+            "<span>Select CSV format and whether "
+            "to copy to/from clipboard or file.</span>")
+
+        self.csv_options = CSV_option_box(self, has_cmsis=False)
         self.but_select = PushButton("Select", checkable=False)
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
@@ -144,8 +147,10 @@ class Tran_IO_UI(QWidget):
 
         line1 = QVLine()
         line2 = QVLine()
-
+        #-------------------------------
+        layG_io_file = QGridLayout()
         i = 0
+        layG_io_file.addWidget(self.but_csv_options, 0, i)
         i += 1
         layG_io_file.addWidget(self.but_select, 0, i)
         layG_io_file.addWidget(self.but_load, 1, i)
