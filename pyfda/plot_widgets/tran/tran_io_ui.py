@@ -197,12 +197,10 @@ class Tran_IO_UI(QWidget):
         if self.but_csv_options.isChecked():
             self.wdg_csv_options.show()  # modeless i.e. non-blocking popup window
             self.wdg_csv_options.load_settings()
-            # qstyle_widget(self.but_csv_options, "changed")
         else:
             self.wdg_csv_options.hide()  # modeless i.e. non-blocking popup window
-            # qstyle_widget(self.but_csv_options, "normal")
 
-
+# ================================================================================
 if __name__ == "__main__":
     """ Run widget standalone with
         `python -m pyfda.plot_widgets.tran.tran_io_ui` """
