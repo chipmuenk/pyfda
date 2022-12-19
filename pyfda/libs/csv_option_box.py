@@ -37,6 +37,7 @@ class CSV_option_box(QDialog):
         self.has_cmsis = has_cmsis
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
+        self.cmb_orientation_default = "auto"
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
@@ -76,37 +77,38 @@ class CSV_option_box(QDialog):
 
         lbl_terminator = QLabel("Line Terminator", self)
         cmb_terminator_items = [
-            ('Auto', 'auto', "<span>Use operating system's line terminator default "
-             'characters.</span>'),
-            ('CRLF (Win)', '\r\n', 'Use &lt;CRLF&gt; as line terminator (Windows '
+            "<span>Terminator at the end of a data row, depending on the operating "
+            "system. 'None' can be used for a single row of data with added line breaks.</span>",
+            ('auto', 'Auto',
+             "<span>Use operating system's default line terminator.</span>"),
+            ('\r\n', 'CRLF (Win)', 'Use &lt;CRLF&gt; as line terminator (Windows '
              'convention)</span>'),
-            ('CR (Mac)', '\r', 'Use &lt;CR&gt; for line termination (MacOS '
+            ('\r', 'CR (Mac)', 'Use &lt;CR&gt; as line terminator (MacOS '
              'convention)</span>'),
-            ('LF (Unix)', '\n', 'Use &lt;LF&gt; for line termination (Unix '
-             'convention)</span>')
-            # ('None', '\a')  # WTF?
+            ('\n', 'LF (Unix)', 'Use &lt;LF&gt; as line terminator (Unix '
+             'convention)</span>'),
+            ('\a', 'None', '<span>No line terminator, use for single row data</span>')
             ]
         self.cmb_terminator = QComboBox(self)
-        self.cmb_terminator.setToolTip(
-            "<span>Terminator at the end of a data row."
-            " (depending on the operating system). 'None' can be used for a single "
-            "row of data with added line breaks.</span>")
-        for t in cmb_terminator_items:
-            self.cmb_terminator.addItem(t[0], t[1])
+        qcmb_box_populate(self.cmb_terminator, cmb_terminator_items,
+                          self.cmb_terminator_default)
 
         butClose = QPushButton(self)
         butClose.setText("Close")
 
         lbl_orientation = QLabel("Table orientation", self)
         cmb_orientation_items = [
-            ('Auto/Vert.', 'auto'),
-            ('Vertical', 'vert'),
-            ('Horizontal', 'horiz')
+            "<span>Select orientation of table.</span>",
+            ('auto', 'Auto/Vert.', "<span>Detect table orientation automatically "
+             "for import, use vertical format for exporting data.</span>"),
+            ('vert', 'Vertical', "<span>Import / export data in vertical (column) "
+             "mode.</span>"),
+            ('horiz', 'Horizontal', "<span>Import / export data in horizontal (row) "
+             "mode.</span>")
             ]
         self.cmb_orientation = QComboBox(self)
-        self.cmb_orientation.setToolTip("<span>Select orientation of table.</span>")
-        for o in cmb_orientation_items:
-            self.cmb_orientation.addItem(o[0], o[1])
+        qcmb_box_populate(self.cmb_orientation, cmb_orientation_items,
+                          self.cmb_orientation_default)
 
         lblHeader = QLabel("Enable header", self)
         header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
