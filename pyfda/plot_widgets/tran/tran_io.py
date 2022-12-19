@@ -105,8 +105,16 @@ class Tran_IO(QWidget):
         When an error occurred, return -1.
 
         """
+        file_name_prev = self.file_name
+        file_type_prev = self.file_type
+
         self.file_name, self.file_type = io.select_file(
             self, title="Import Data", mode="r", file_types=('csv', 'wav'))
+
+        if self.file_name is None:
+            self.file_name = file_name_prev
+            self.file_type = file_type_prev
+            return -1  # operation cancelled
 
         self.N = None
         self.nchans = None
@@ -116,12 +124,10 @@ class Tran_IO(QWidget):
         del self.x
         self.x = None
 
-        if self.file_name is None:
-            return  # operation cancelled
-        elif self.file_type == 'wav':
+        if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
-                return
+                return -1
             self.N = io.read_wav_info.N
             self.nchans = io.read_wav_info.nchans
             self.f_S = io.read_wav_info.f_S
