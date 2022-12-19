@@ -96,12 +96,15 @@ class Tran_IO(QWidget):
 # ------------------------------------------------------------------------------
     def select_file(self):
         """
-        Select a file and peek into it to find the dimensions and some
-        other infos (depending on the file type).
+        Select a file in a UI dialog and peek into it to find the dimensions
+        and some other infos (depending on the file type).
 
-        Unload previous file from memory
+        When the selection was successful, store the fully qualified file name
+        and the file type in the attributes `self.file_name` and `self.file_type`,
+        delete previous data `self.x` from memory and return 0.
+        When an error occurred, return -1.
+
         """
-        logger.info("select_file")
         self.file_name, self.file_type = io.select_file(
             self, title="Import Data", mode="r", file_types=('csv', 'wav'))
 
