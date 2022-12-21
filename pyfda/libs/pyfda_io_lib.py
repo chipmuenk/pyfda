@@ -677,19 +677,22 @@ def read_csv_info(filename):
     #     sniff_size = 50000  # only read first 50000 chars
 
     with open(filename) as f:
-        dialect = sniffer.sniff(f.read(5000))  # only read the first 5000 chars
+        first_line = f.readline()
+        sample = first_line + f.readline()
+
+        dialect = sniffer.sniff(sample)
         delimiter = dialect.delimiter
         lineterminator = repr(dialect.lineterminator)
-        # has_header = dialect.has_header
-        first_line = f.readline()
+        has_header = sniffer.has_header(sample)
         nchans = first_line.count(delimiter) + 1
+        # count rows in file
         f.seek(0)
         N = sum(1 for row in f)  # f isfileobject (csv.reader)
 
     del f
 
     logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
-                f"RowCount = {N}")
+                f"RowCount = {N}, Header={has_header}")
 
     if N < nchans:  # swap rows and columns
         N, nchans = nchans, N
