@@ -234,9 +234,9 @@ class Tran_IO(QWidget):
         if self.nchans == 1:
             data = self.data_raw
         elif self.ui.cmb_chan.currentIndex() == self.nchans:  # last item (sum) selected
-            data = self.data_raw.sum(1)  # sum all slices along dim 1
+            data = self.data_raw.sum(0)  # sum all slices along dim 0
         else:
-            data = self.data_raw[:, self.ui.cmb_chan.currentIndex()]
+            data = self.data_raw[self.ui.cmb_chan.currentIndex()]
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
