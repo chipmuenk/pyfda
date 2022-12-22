@@ -888,7 +888,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 
     Returns
     -------
-    ndarray
+    ndarray of float
         Data from the file
     """
     if file_name is None:  # error or operation cancelled
@@ -935,7 +935,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         if not err:
             logger.info(
                 f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
-            return data_arr  # returns numpy array
+            return data_arr.astype(np.float)  # returns numpy array
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
