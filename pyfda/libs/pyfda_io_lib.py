@@ -663,11 +663,6 @@ def read_csv_info(filename):
     See
     https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
     """
-    sniffer = csv.Sniffer()
-    # TODO: detect and skip header
-    # TODO: count other linebreaks as well
-    horizontal = False
-
     file_size = os.path.getsize(filename)
     logger.info(f"File Size is {file_size} bytes")
 
@@ -676,14 +671,20 @@ def read_csv_info(filename):
     # else:
     #     sniff_size = 50000  # only read first 50000 chars
 
+    sniffer = csv.Sniffer()
+    # TODO: detect and skip header
+    # TODO: count other linebreaks as well
+    horizontal = False
+
     with open(filename) as f:
         first_line = f.readline()
         sample = first_line + f.readline()
 
+        has_header = sniffer.has_header(sample)
         dialect = sniffer.sniff(sample)
         delimiter = dialect.delimiter
         lineterminator = repr(dialect.lineterminator)
-        has_header = sniffer.has_header(sample)
+
         nchans = first_line.count(delimiter) + 1
         # count rows in file
         f.seek(0)
