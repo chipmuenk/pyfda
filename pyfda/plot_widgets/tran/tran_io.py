@@ -208,7 +208,7 @@ class Tran_IO(QWidget):
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
-        self.ui.but_load.setEnabled(False)
+        self.ui.but_load.setEnabled(True)
         self.ui.but_normalize.setEnabled(True)
 
         self.select_chan_normalize()
