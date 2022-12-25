@@ -84,10 +84,10 @@ class Tran_IO(QWidget):
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
         self.ui.but_select.clicked.connect(self.select_file)
-        self.ui.cmb_chan.currentIndexChanged.connect(self.select_normalize_data)
+        self.ui.cmb_chan.currentIndexChanged.connect(self.select_chan_normalize)
         self.ui.but_load.clicked.connect(self.import_data)
-        self.ui.but_normalize.clicked.connect(self.select_normalize_data)
-        self.ui.led_normalize.editingFinished.connect(self.select_normalize_data)
+        self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
+        self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
         self.ui.wdg_csv_options.sig_tx.connect(self.process_sig_rx)
 
@@ -211,11 +211,11 @@ class Tran_IO(QWidget):
         self.ui.but_load.setEnabled(False)
         self.ui.but_normalize.setEnabled(True)
 
-        self.select_normalize_data()
+        self.select_chan_normalize()
         return 0
 
 # ------------------------------------------------------------------------------
-    def select_normalize_data(self):
+    def select_chan_normalize(self):
         """
         - For multi-channel data, select one channel resp. average all channels
           from `self.data_raw`
@@ -223,7 +223,7 @@ class Tran_IO(QWidget):
         - Scale `self.data` to the maximum specified by self.ui.led_normalize and
             assign normalized result to `self.x`
         """
-        logger.info("select_normalize_data")
+        logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
             return
