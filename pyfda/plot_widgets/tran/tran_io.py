@@ -206,6 +206,22 @@ class Tran_IO(QWidget):
             self.ui.but_load.setEnabled(False)
             return -1
 
+        if self.data_raw.ndim == 1:
+            nchans_actual = 1
+            N_actual = len(self.data_raw)
+        elif self.data_raw.ndim == 2:
+            nchans_actual, N_actual = np.shape(self.data_raw)
+        else:
+            logger.warning("Unsuitable data shape with "
+                           f"{self.data_raw.ndim} dimensions.")
+            return -1
+
+        if (nchans_actual, N_actual) != (self.nchans, self.N):
+            logger.warning(f"Actual data shape {(nchans_actual, N_actual)} is different "
+                           f"from guestimated shape {(self.nchans, self.N)}, "
+                           "using actual shape.")
+            self.nchans, self.N = (nchans_actual, N_actual)
+
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
         self.ui.but_load.setEnabled(True)
