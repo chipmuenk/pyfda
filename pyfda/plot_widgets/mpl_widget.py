@@ -33,8 +33,8 @@ except ImportError:
     figureoptions = None
 
 from pyfda.libs.compat import (
-    QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
-    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets)
+    Qt, QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
+    QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets, QEvent)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
@@ -675,10 +675,13 @@ class MplToolbar(NavigationToolbar):
         """
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()
+            # key = QtWidgets.QApplication.key
             title_info = ""
-            if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier:
+            if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier\
+                or modifiers & QtCore.Qt.MetaModifier == QtCore.Qt.MetaModifier:
                 # logger.warning(f"suptitle {self.mpl_widget.fig._suptitle.get_text()}")
-                modifiers = modifiers & ~QtCore.Qt.AltModifier  # blank out AltMod. bit
+                 # blank out Alt und Meta Modifier bits
+                modifiers = modifiers & ~QtCore.Qt.AltModifier & ~QtCore.Qt.MetaModifier
                 title_info = "(no title) "
                 title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
                 self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
