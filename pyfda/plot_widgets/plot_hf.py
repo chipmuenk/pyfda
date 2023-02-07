@@ -731,10 +731,20 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
+
+            title_str = ""
+            if self.chk_show_H_abs.isChecked():
+                title_str = "Magnitude "
+            elif self.chk_show_H_re.isChecked() or self.chk_show_H_im.isChecked():
+                title_str = "Amplitude "
             if self.but_phase.isChecked():
-                self.ax.set_title(r'Magnitude and Phase Frequency Response')
-            else:
-                self.ax.set_title(r'Magnitude Frequency Response')
+                if title_str != "":
+                    title_str += "and Phase "
+                else:
+                    title_str += "Phase "
+            if title_str != "":
+                self.ax.set_title(f'{title_str}Frequency Response')
+
             self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
             self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
 
