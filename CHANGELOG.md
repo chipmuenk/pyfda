@@ -1,5 +1,13 @@
 # Changelog
-## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.0) (2022-10-xx)
+## [v0.7.2](https://github.com/chipmuenk/pyfda/tree/v0.7.2) (2023-02-xx)
+### Bugfixes
+- 
+
+### New features
+- Allow plotting magnitude, real and imaginary part of H(F) at the same time
+- Add legend for H(F) plot
+
+## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.1) (2022-10-05)
 ### Bugfixes
 - Fix crash in 'y[n]' tab when no file is loaded
 - Remove some superfluous files in pip package
