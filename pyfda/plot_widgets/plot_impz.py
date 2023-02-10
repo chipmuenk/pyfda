@@ -77,6 +77,8 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_resp = {'marker': 'o', 'color': 'red', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         self.fmt_plot_stim = {'color': 'blue', 'linewidth': 2, 'alpha': 0.5}
+        self.fmt_plot_stim_interp = {'color': 'black', 'linewidth': 1, 'alpha': 0.5}
+
         self.fmt_mkr_stim = {'marker': 's', 'color': 'blue', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
@@ -1057,6 +1059,16 @@ class Plot_Impz(QWidget):
         else:
             x_q = None
 
+        # Create finer grid for plotting interpolated waveforms
+        if True:
+            I = 20
+            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I + 1)
+            # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
+            #                      period=None)
+            self.x_interp = sig.resample_poly(self.x, I, 1, axis=0, window=('kaiser', 5.0),
+                                              padtype='line', cval=None)
+            self.t_interp = np.linspace(self.n[0], self.n[-1] + 1, len(self.n) * I, endpoint=False) * fb.fil[0]['T_S']
+
         t = self.t[N_start:N_end]
         x = self.x[N_start:N_end] * self.scale_i
         y = self.y[N_start:N_end] * self.scale_o
@@ -1077,6 +1089,7 @@ class Plot_Impz(QWidget):
             y_i = None
             lbl_x_r = "$x[n]$"
             lbl_y_r = "$y[n]$"
+        lbl_x_r_interp = "$x(t)$"
 
         # log. scale for stimulus / response time domain:
         if self.ui.but_log_time.isChecked():
@@ -1122,6 +1135,14 @@ class Plot_Impz(QWidget):
                 x_r, label=lbl_x_r, bottom=bottom_t,
                 plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
             l_r += [lbl_x_r]
+
+            if True:
+                # add interpolated waveform
+                h_r.append(self.draw_data(
+                    "line", self.ax_r, self.t_interp,
+                    self.x_interp, label=lbl_x_r_interp, bottom=bottom_t,
+                    plt_fmt=self.fmt_plot_stim_interp, mkr_fmt={'marker': ''}))
+                l_r += [lbl_x_r_interp]
 
         # -------------- Stimulus <q> plot ------------------------------------
         if x_q is not None and self.plt_time_stmq != "none":
