@@ -217,6 +217,12 @@ class PlotImpz_UI(QWidget):
         qcmb_box_populate(self.cmb_sim_select, self.cmb_sim_select_items,
                           self.cmb_sim_select_init)
 
+        self.prg_wdg = QProgressBar(self)
+        self.prg_wdg.setFixedHeight(but_height)
+        self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
+        self.prg_wdg.setMinimum(0)
+        self.prg_wdg.setValue(0)
+
         self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N))
@@ -241,11 +247,6 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_ui_select = QLabel(self)
         self.lbl_ui_select = QLabel(to_html("UI", frmt='b'), self)
-        self.prg_wdg = QProgressBar(self)
-        self.prg_wdg.setFixedHeight(but_height)
-        self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
-        self.prg_wdg.setMinimum(0)
-        self.prg_wdg.setValue(0)
 
         self.cmb_ui_select = QComboBox(self)
         qcmb_box_populate(self.cmb_ui_select, self.cmb_ui_select_items,
@@ -283,6 +284,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_auto_run)
         layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
+        layH_ctrl_run.addWidget(self.prg_wdg)
         layH_ctrl_run.addSpacing(10)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
@@ -290,7 +292,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addWidget(self.lbl_N_frame)
         layH_ctrl_run.addWidget(self.led_N_frame)
-        layH_ctrl_run.addWidget(self.prg_wdg)
 
         layH_ctrl_run.addSpacing(20)
         layH_ctrl_run.addWidget(self.lbl_ui_select)
