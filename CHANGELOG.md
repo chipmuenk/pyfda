@@ -6,6 +6,8 @@
 ### New features
 - Allow plotting magnitude, real and imaginary part of H(F) at the same time
 - Add legend for H(F) plot
+- Show interpolated waveform for discrete time stimuli (mainly for didactic
+  purposes)
 
 ## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.1) (2022-10-05)
 ### Bugfixes
