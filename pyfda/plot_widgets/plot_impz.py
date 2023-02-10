@@ -192,7 +192,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
-        self.ui.but_toggle_stim_options.clicked.connect(self.toggle_stim_options)
+        self.ui.cmb_ui_select.currentIndexChanged.connect(self.toggle_stim_options)
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
@@ -224,7 +224,9 @@ class Plot_Impz(QWidget):
         Toggle visibility of stimulus options, depending on the state of the
         "Stimuli" button
         """
-        self.tab_stim_w.setVisible(self.ui.but_toggle_stim_options.isChecked())
+        self.tab_stim_w.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
+        self.ui.wdg_ctrl_freq.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+        self.ui.wdg_ctrl_time.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
 
 # ------------------------------------------------------------------------------
     def resize_stim_tab_widget(self):

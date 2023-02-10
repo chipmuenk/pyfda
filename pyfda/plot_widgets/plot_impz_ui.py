@@ -88,6 +88,7 @@ class PlotImpz_UI(QWidget):
 
         # run
         self.cmb_sim_select_init = "float"
+        self.cmb_ui_select_init = "plot_stim"
 
         # time
         self.plt_time_resp = "stem"
@@ -134,6 +135,15 @@ class PlotImpz_UI(QWidget):
             "<span>Simulate floating-point or fixpoint response.</span>",
             ("float", "Float", "floating point simulation"),
             ("fixpoint", "Fixpoint", "fixpoint simulation")
+        ]
+
+        # combobox UI selection
+        self.cmb_ui_select_items = [
+            "<span>Select UI elements to display.</span>",
+            ("plot_stim", "Plot + Stim", "Show plot and stimuli selection widgets"),
+            ("plot", "Plot", "Only show plot selection widget"),
+            ("stim", "Stimuli", "Only show stimuli selection widget"),
+            ("none", "Compact", "Compact view, show neither plot nor stimuli widget")
         ]
 
         # data / icon / tooltipp (none) for plotting styles
@@ -229,15 +239,17 @@ class PlotImpz_UI(QWidget):
             "<i>&Delta;N</i> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
+        self.lbl_ui_select = QLabel(self)
+        self.lbl_ui_select = QLabel(to_html("UI", frmt='b'), self)
         self.prg_wdg = QProgressBar(self)
         self.prg_wdg.setFixedHeight(but_height)
         self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
-        self.but_toggle_stim_options = PushButton(" Stimuli ", checked=True)
-        self.but_toggle_stim_options.setObjectName("but_stim_options")
-        self.but_toggle_stim_options.setToolTip("<span>Show / hide stimulus options.</span>")
+        self.cmb_ui_select = QComboBox(self)
+        qcmb_box_populate(self.cmb_ui_select, self.cmb_ui_select_items,
+                          self.cmb_ui_select_init)
 
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
@@ -281,7 +293,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.prg_wdg)
 
         layH_ctrl_run.addSpacing(20)
-        layH_ctrl_run.addWidget(self.but_toggle_stim_options)
+        layH_ctrl_run.addWidget(self.lbl_ui_select)
+        layH_ctrl_run.addWidget(self.cmb_ui_select)
         layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addSpacing(20)
