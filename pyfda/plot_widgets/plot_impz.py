@@ -902,8 +902,9 @@ class Plot_Impz(QWidget):
             self.ui.bottom_f = 0
 
     # ------------------------------------------------------------------------
-    def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
-                  plt_fmt={}, mkr_fmt={}, **args):
+    def draw_data(self, plt_style: str, ax: object, x: np.ndarray, y:np.ndarray,
+                  bottom: float = 0, label: str = '',
+                  plt_fmt: dict = {}, mkr_fmt: dict = {}, **args):
         """
         Plot x, y data (numpy arrays with equal length) in a plot style defined
         by `plt_style`.
@@ -963,8 +964,10 @@ class Plot_Impz(QWidget):
         """
         Clear and initialize the axes of the time domain matplotlib widgets
         """
+        # calculate time vector from index n and T_S
         self.t = self.n * fb.fil[0]['T_S']
 
+        # Read out combo boxes with plotting styles and remove the '*' for markers
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
