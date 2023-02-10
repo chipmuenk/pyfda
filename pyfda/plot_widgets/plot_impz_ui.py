@@ -321,8 +321,16 @@ class PlotImpz_UI(QWidget):
             self.cmb_plt_time_stim, self.plot_styles_list, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
 
+        self.lbl_plt_time_stim_interp = QLabel(to_html("&nbsp;&nbsp;x(t)", frmt='bi'), self)
+        self.chk_plt_time_stim_interp = QCheckBox(self)
+        self.chk_plt_time_stim_interp.setChecked(False)
+        self.chk_plt_time_stim_interp.setObjectName("chk_plt_time_stim_interp")
+        self.chk_plt_time_stim_interp.setToolTip(
+            '<span>Plot interpolated pseudo-analog stimulus "<i>x</i>(<i>t</i>)", '
+            'valid up to approx. 0.4 <i>f<sub>S</sub></i>.</span>')
+
         self.lbl_plt_time_stmq = QLabel(to_html(
-            "&nbsp;&nbsp;Fixp. Stim. x_Q", frmt='bi'), self)
+            "&nbsp;&nbsp;FX Stim. x_Q", frmt='bi'), self)
         self.cmb_plt_time_stmq = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_stmq, self.plot_styles_list, self.plt_time_stmq)
@@ -417,7 +425,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
-        #
+        layH_ctrl_time.addWidget(self.lbl_plt_time_stim_interp)
+        layH_ctrl_time.addWidget(self.chk_plt_time_stim_interp)
+#
         layH_ctrl_time.addWidget(self.lbl_plt_time_stmq)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stmq)
         #

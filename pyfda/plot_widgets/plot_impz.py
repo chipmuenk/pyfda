@@ -196,6 +196,7 @@ class Plot_Impz(QWidget):
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
+        self.ui.chk_plt_time_stim_interp.clicked.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
         self.ui.but_log_time.clicked.connect(self.draw)
@@ -1062,7 +1063,7 @@ class Plot_Impz(QWidget):
             x_q = None
 
         # Create finer grid for plotting interpolated waveforms
-        if True:
+        if self.ui.chk_plt_time_stim_interp.isChecked():
             I = 20
             # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I + 1)
             # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
@@ -1138,7 +1139,7 @@ class Plot_Impz(QWidget):
                 plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
             l_r += [lbl_x_r]
 
-            if True:
+            if self.ui.chk_plt_time_stim_interp.isChecked():
                 # add interpolated waveform
                 h_r.append(self.draw_data(
                     "line", self.ax_r, self.t_interp,
