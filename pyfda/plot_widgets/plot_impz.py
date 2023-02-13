@@ -852,16 +852,8 @@ class Plot_Impz(QWidget):
         """
         Update spectrogram UI when signal selection combobox has been changed
         """
-        spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none'
-
-        self.ui.but_log_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_time_nfft_spgr.setVisible(spgr_en)
-        self.ui.led_time_nfft_spgr.setVisible(spgr_en)
-        self.ui.lbl_time_ovlp_spgr.setVisible(spgr_en)
-        self.ui.led_time_ovlp_spgr.setVisible(spgr_en)
-        self.ui.cmb_mode_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_byfs_spgr_time.setVisible(spgr_en)
-        self.ui.chk_byfs_spgr_time.setVisible(spgr_en)
+        self.ui.wdg_ctrl_time_spgr.setVisible(
+            qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none')
 
         self.draw()
 

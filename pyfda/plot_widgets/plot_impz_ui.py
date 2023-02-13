@@ -11,12 +11,12 @@ Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, QProgressBar, pyqtSignal, QSize, QHBoxLayout, QVBoxLayout)
+    QIcon, QProgressBar, pyqtSignal, QSize, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width,
+    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
     QVLine, PushButton)
 from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -315,6 +315,17 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
+        self.lbl_title_plot_time = QLabel("Plots:")
+        self.lbl_title_plot_time.setObjectName("large")
+        self.lbl_title_plot_time.setFixedWidth(qtext_width(N_x = 5))
+        # setting up background color and border
+        # self.lbl_title_plot_time.setStyleSheet("font-size:14")
+        # self.lbl_title_plot_time.setFont(QFont('Arial', 10))
+        # self.lbl_title_plot_time.resize(200, 20)
+        # color_effect = QGraphicsColorizeEffect()
+        # color_effect.setColor(Qt.darkGreen)
+        # self.lbl_title_plot_time.setGraphicsEffect(color_effect)
+
         self.lbl_plt_time_stim = QLabel(to_html("Stim. x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
         qcmb_box_populate(
@@ -361,21 +372,17 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_spgr = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
-        spgr_en = self.plt_time_spgr != "none"
 
         self.cmb_mode_spgr_time = QComboBox(self)
         qcmb_box_populate(
             self.cmb_mode_spgr_time, self.cmb_mode_spgr_time_items, self.mode_spgr_time)
-        self.cmb_mode_spgr_time.setVisible(spgr_en)
 
         self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
-        self.lbl_byfs_spgr_time.setVisible(spgr_en)
         self.chk_byfs_spgr_time = QCheckBox(self)
         self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
         self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
                                            "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
-        self.chk_byfs_spgr_time.setVisible(spgr_en)
 
         self.but_log_spgr_time = QPushButton("dB")
         self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
@@ -384,23 +391,19 @@ class PlotImpz_UI(QWidget):
             "<span>Logarithmic scale for spectrogram.</span>")
         self.but_log_spgr_time.setCheckable(True)
         self.but_log_spgr_time.setChecked(True)
-        self.but_log_spgr_time.setVisible(spgr_en)
 
         self.lbl_time_nfft_spgr = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
-        self.lbl_time_nfft_spgr.setVisible(spgr_en)
         self.led_time_nfft_spgr = QLineEdit(self)
         self.led_time_nfft_spgr.setText(str(self.time_nfft_spgr))
         self.led_time_nfft_spgr.setToolTip("<span>Number of FFT points per "
                                            "spectrogram segment.</span>")
-        self.led_time_nfft_spgr.setVisible(spgr_en)
 
         self.lbl_time_ovlp_spgr = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
-        self.lbl_time_ovlp_spgr.setVisible(spgr_en)
         self.led_time_ovlp_spgr = QLineEdit(self)
         self.led_time_ovlp_spgr.setText(str(self.time_ovlp_spgr))
         self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
                                            "between spectrogram segments.</span>")
-        self.led_time_ovlp_spgr.setVisible(spgr_en)
+
 
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
@@ -411,7 +414,7 @@ class PlotImpz_UI(QWidget):
             "</span>")
         self.lbl_log_bottom_time.setVisible(
             self.but_log_time.isChecked() or
-            (spgr_en and self.but_log_spgr_time.isChecked()))
+            ((self.plt_time_spgr != "none") and self.but_log_spgr_time.isChecked()))
         self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
 
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
@@ -422,49 +425,76 @@ class PlotImpz_UI(QWidget):
         # self.chk_colorbar_time.setChecked(True)
         # self.chk_colorbar_time.setVisible(spgr_en)
 
-        layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
-        layH_ctrl_time.addWidget(self.lbl_plt_time_stim_interp)
-        layH_ctrl_time.addWidget(self.chk_plt_time_stim_interp)
+        layH_ctrl_time_0 = QHBoxLayout()
+        layH_ctrl_time_0.addWidget(self.lbl_title_plot_time)
+        # layH_ctrl_time_0.addSpacing(10)
+
+        layH_ctrl_time_1 = QHBoxLayout()
+        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stim)
+        layH_ctrl_time_1.addWidget(self.cmb_plt_time_stim)
+        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stim_interp)
+        layH_ctrl_time_1.addWidget(self.chk_plt_time_stim_interp)
 #
-        layH_ctrl_time.addWidget(self.lbl_plt_time_stmq)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_stmq)
+        layH_ctrl_time_1.addWidget(self.lbl_plt_time_stmq)
+        layH_ctrl_time_1.addWidget(self.cmb_plt_time_stmq)
         #
-        layH_ctrl_time.addWidget(lbl_plt_time_resp)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
+        layH_ctrl_time_1.addWidget(lbl_plt_time_resp)
+        layH_ctrl_time_1.addWidget(self.cmb_plt_time_resp)
         #
-        layH_ctrl_time.addWidget(self.lbl_win_time)
-        layH_ctrl_time.addWidget(self.chk_win_time)
-        layH_ctrl_time.addSpacing(5)
-        layH_ctrl_time.addWidget(line1)
-        layH_ctrl_time.addSpacing(5)
+        layH_ctrl_time_1.addWidget(self.lbl_win_time)
+        layH_ctrl_time_1.addWidget(self.chk_win_time)
+        layH_ctrl_time_1.addSpacing(5)
+        layH_ctrl_time_1.addWidget(line1)
+        layH_ctrl_time_1.addSpacing(5)
         #
-        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
-        layH_ctrl_time.addWidget(self.led_log_bottom_time)
-        layH_ctrl_time.addWidget(self.but_log_time)
+        layH_ctrl_time_1.addWidget(self.lbl_log_bottom_time)
+        layH_ctrl_time_1.addWidget(self.led_log_bottom_time)
+        layH_ctrl_time_1.addWidget(self.but_log_time)
 
-        layH_ctrl_time.addSpacing(5)
-        layH_ctrl_time.addWidget(line2)
-        layH_ctrl_time.addSpacing(5)
+        layH_ctrl_time_1.addSpacing(5)
+        layH_ctrl_time_1.addWidget(line2)
+        layH_ctrl_time_1.addSpacing(5)
         #
-        layH_ctrl_time.addWidget(lbl_plt_time_spgr)
-        layH_ctrl_time.addWidget(self.cmb_plt_time_spgr)
-        layH_ctrl_time.addWidget(self.cmb_mode_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_byfs_spgr_time)
-        layH_ctrl_time.addWidget(self.chk_byfs_spgr_time)
-        layH_ctrl_time.addWidget(self.but_log_spgr_time)
-        layH_ctrl_time.addWidget(self.lbl_time_nfft_spgr)
-        layH_ctrl_time.addWidget(self.led_time_nfft_spgr)
-        layH_ctrl_time.addWidget(self.lbl_time_ovlp_spgr)
-        layH_ctrl_time.addWidget(self.led_time_ovlp_spgr)
+        layH_ctrl_time_1.addWidget(lbl_plt_time_spgr)
+        layH_ctrl_time_1.addWidget(self.cmb_plt_time_spgr)
+        layH_ctrl_time_1.addStretch(10)
 
-        layH_ctrl_time.addStretch(10)
+        layH_ctrl_time_spgr = QHBoxLayout()
+        layH_ctrl_time_spgr.addWidget(self.cmb_mode_spgr_time)
+        layH_ctrl_time_spgr.addWidget(self.lbl_byfs_spgr_time)
+        layH_ctrl_time_spgr.addWidget(self.chk_byfs_spgr_time)
+        layH_ctrl_time_spgr.addWidget(self.but_log_spgr_time)
+        layH_ctrl_time_spgr.addWidget(self.lbl_time_nfft_spgr)
+        layH_ctrl_time_spgr.addWidget(self.led_time_nfft_spgr)
+        layH_ctrl_time_spgr.addWidget(self.lbl_time_ovlp_spgr)
+        layH_ctrl_time_spgr.addWidget(self.led_time_ovlp_spgr)
+        layH_ctrl_time_spgr.addStretch(10)
 
         # layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
+        self.wdg_ctrl_time_0 = QWidget(self)
+        self.wdg_ctrl_time_0.setLayout(layH_ctrl_time_0)
+        self.wdg_ctrl_time_0.setContentsMargins(0, 0, 0, 0)
+        self.wdg_ctrl_time_1 = QWidget(self)
+        self.wdg_ctrl_time_1.setLayout(layH_ctrl_time_1)
+        self.wdg_ctrl_time_1.setContentsMargins(0, 0, 0, 0)
+        self.wdg_ctrl_time_spgr = QWidget(self)
+        self.wdg_ctrl_time_spgr.setLayout(layH_ctrl_time_spgr)
+        self.wdg_ctrl_time_spgr.setContentsMargins(0, 0, 0, 0)
+
+        layG_ctrl_time = QGridLayout()
+        layG_ctrl_time.addWidget(self.wdg_ctrl_time_0, 0, 0, 2, 1)
+        layG_ctrl_time.addWidget(self.wdg_ctrl_time_1, 0, 1)
+        layG_ctrl_time.addWidget(self.wdg_ctrl_time_spgr, 1, 1)
+        layG_ctrl_time.setContentsMargins(0, 0, 0, 0)
+        layG_ctrl_time.setVerticalSpacing(0)
 
         self.wdg_ctrl_time = QWidget(self)
-        self.wdg_ctrl_time.setLayout(layH_ctrl_time)
+        self.wdg_ctrl_time.setLayout(layG_ctrl_time)
+        self.wdg_ctrl_time.setObjectName("transparent")
+        self.wdg_ctrl_time.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
+
+        self.wdg_ctrl_time_spgr.setVisible(self.plt_time_spgr != "none")
+
         # ---- end time domain ------------------
 
         # ---------------------------------------------------------------
