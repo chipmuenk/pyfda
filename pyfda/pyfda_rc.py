@@ -413,6 +413,10 @@ qss_common = """
                 * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
+
+                #large{font-size: 12pt; font-weight: bold; }
+                #xlarge{font-size: 14pt; font-weight: black;}
+
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
                     border-top: solid darkgrey;
@@ -441,6 +445,8 @@ qss_common = """
                     padding: 0;
                     margin: 0;
                     }
+
+                QWidget#transparent{background-color:none}
 
                 /* Dynamic filter subwidget */
                 #wdg_fil{
