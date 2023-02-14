@@ -500,6 +500,10 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
+        self.lbl_title_plot_freq = QLabel("Plots:")
+        self.lbl_title_plot_freq.setObjectName("large")
+        self.lbl_title_plot_freq.setFixedWidth(qtext_width(N_x = 5))
+        #
         self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(
@@ -568,36 +572,54 @@ class PlotImpz_UI(QWidget):
         self.but_freq_show_info.setCheckable(True)
         self.but_freq_show_info.setChecked(False)
 
-        layH_ctrl_freq = QHBoxLayout()
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
-        #
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq_stmq)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq_stmq)
-        #
-        layH_ctrl_freq.addWidget(lbl_plt_freq_resp)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
-        #
-        layH_ctrl_freq.addSpacing(5)
-        layH_ctrl_freq.addWidget(self.but_Hf)
-        layH_ctrl_freq.addStretch(1)
-        #
-        layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
-        layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
-        layH_ctrl_freq.addWidget(self.but_log_freq)
-        layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(self.cmb_freq_display)
-        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq_0 = QHBoxLayout()
+        layH_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)
 
-        layH_ctrl_freq.addWidget(self.but_freq_norm_impz)
-        layH_ctrl_freq.addStretch(1)
-        layH_ctrl_freq.addWidget(self.but_freq_show_info)
-        layH_ctrl_freq.addStretch(10)
+        layH_ctrl_freq_1 = QHBoxLayout()
+        layH_ctrl_freq_1.addWidget(self.lbl_plt_freq_stim)
+        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_stim)
+        #
+        layH_ctrl_freq_1.addWidget(self.lbl_plt_freq_stmq)
+        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_stmq)
+        #
+        layH_ctrl_freq_1.addWidget(lbl_plt_freq_resp)
+        layH_ctrl_freq_1.addWidget(self.cmb_plt_freq_resp)
+        #
+        layH_ctrl_freq_1.addSpacing(5)
+        layH_ctrl_freq_1.addWidget(self.but_Hf)
+        layH_ctrl_freq_1.addStretch(1)
+        #
+        layH_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
+        layH_ctrl_freq_1.addWidget(self.led_log_bottom_freq)
+        layH_ctrl_freq_1.addWidget(self.but_log_freq)
+        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addWidget(self.cmb_freq_display)
+        layH_ctrl_freq_1.addStretch(1)
 
-        # layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
+        layH_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
+        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addWidget(self.but_freq_show_info)
+        layH_ctrl_freq_1.addStretch(10)
+        # layH_ctrl_freq_1.setContentsMargins(*params['wdg_margins'])
+        
+        self.wdg_ctrl_freq_0 = QWidget(self)
+        self.wdg_ctrl_freq_0.setLayout(layH_ctrl_freq_0)
+        self.wdg_ctrl_freq_0.setContentsMargins(0, 0, 0, 0)
+        self.wdg_ctrl_freq_1 = QWidget(self)
+        self.wdg_ctrl_freq_1.setLayout(layH_ctrl_freq_1)
+        self.wdg_ctrl_freq_1.setContentsMargins(0, 0, 0, 0)
+        layG_ctrl_freq = QGridLayout()
+        layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_0, 0, 0)
+        layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_1, 0, 1)
+        # layG_ctrl_freq.addLayout(layH_ctrl_freq_0, 0, 0)
+        # layG_ctrl_freq.addLayout(layH_ctrl_freq_1, 0, 1)
+        layG_ctrl_freq.setContentsMargins(0, 0, 0, 0)
+        layG_ctrl_freq.setVerticalSpacing(0)
 
         self.wdg_ctrl_freq = QWidget(self)
-        self.wdg_ctrl_freq.setLayout(layH_ctrl_freq)
+        self.wdg_ctrl_freq.setLayout(layG_ctrl_freq)
+        self.wdg_ctrl_freq.setObjectName("transparent")
+        self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
         # ---- end Frequency Domain ------------------
 
         # ----------------------------------------------------------------------
