@@ -19,7 +19,8 @@ from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
     QVLine, PushButton)
 from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict, QFFTWinSelector
-from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
+# FMT string for QLineEdit fields, e.g. '{:.3g}'
+from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 
@@ -53,7 +54,8 @@ class PlotImpz_UI(QWidget):
         #              .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            logger.warning("Stopped infinite loop:\n{0}".format(
+                pprint_log(dict_sig)))
             return
 
         # --- signals coming from the FFT window widget or the FFT window selector
@@ -157,7 +159,7 @@ class PlotImpz_UI(QWidget):
             ("stem*", QIcon(":/plot_style-stem-mkr"), "stems + markers"),
             ("steps", QIcon(":/plot_style-steps"), "steps"),
             ("steps*", QIcon(":/plot_style-steps-mkr"), "steps + markers")
-            ]
+        ]
 
         self.cmb_time_spgr_items = [
             "<span>Show Spectrogram for selected signal.</span>",
@@ -165,7 +167,7 @@ class PlotImpz_UI(QWidget):
             ("xn", "x[n]", "input"),
             ("xqn", "x_q[n]", "quantized input"),
             ("yn", "y[n]", "output")
-            ]
+        ]
 
         self.cmb_mode_spgr_time_items = [
             "<span>Spectrogram display mode.</span>",
@@ -175,7 +177,7 @@ class PlotImpz_UI(QWidget):
             ("magnitude", "Mag.", "Signal magnitude"),
             ("angle", "Angle", "Phase, wrapped to &pm; &pi;"),
             ("phase", "Phase", "Phase (unwrapped)")
-            ]
+        ]
 #        self.N
 
         self.cmb_freq_display_items = [
@@ -183,7 +185,7 @@ class PlotImpz_UI(QWidget):
             ("mag", "Magnitude", "<span>Spectral magnitude</span>"),
             ("mag_phi", "Mag. / Phase", "<span>Magnitude and phase.</span>"),
             ("re_im", "Re. / Imag.", "<span>Real and imaginary part of spectrum.</span>")
-            ]
+        ]
 
         self._construct_UI()
 #        self._enable_stim_widgets()
@@ -278,7 +280,8 @@ class PlotImpz_UI(QWidget):
 
         self.but_fx_range = PushButton(" FX:Range")
         self.but_fx_range.setObjectName("but_fx_limits")
-        self.but_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
+        self.but_fx_range.setToolTip(
+            "<span>Display limits of fixpoint range.</span>")
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_auto_run)
@@ -330,9 +333,11 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stim = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_stim, self.plot_styles_list, self.plt_time_stim)
-        self.cmb_plt_time_stim.setToolTip("<span>Plot style for stimulus.</span>")
+        self.cmb_plt_time_stim.setToolTip(
+            "<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_time_stim_interp = QLabel(to_html("&nbsp;&nbsp;x(t)", frmt='bi'), self)
+        self.lbl_plt_time_stim_interp = QLabel(
+            to_html("&nbsp;&nbsp;x(t)", frmt='bi'), self)
         self.chk_plt_time_stim_interp = QCheckBox(self)
         self.chk_plt_time_stim_interp.setChecked(False)
         self.chk_plt_time_stim_interp.setObjectName("chk_plt_time_stim_interp")
@@ -348,11 +353,13 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stmq.setToolTip("<span>Plot style for <em>fixpoint</em> "
                                           "(quantized) stimulus.</span>")
 
-        lbl_plt_time_resp = QLabel(to_html("&nbsp;&nbsp;Resp. y", frmt='bi'), self)
+        lbl_plt_time_resp = QLabel(
+            to_html("&nbsp;&nbsp;Resp. y", frmt='bi'), self)
         self.cmb_plt_time_resp = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_resp, self.plot_styles_list, self.plt_time_resp)
-        self.cmb_plt_time_resp.setToolTip("<span>Plot style for response.</span>")
+        self.cmb_plt_time_resp.setToolTip(
+            "<span>Plot style for response.</span>")
 
         self.lbl_win_time = QLabel(to_html("&nbsp;&nbsp;Win", frmt='bi'), self)
         self.chk_win_time = QCheckBox(self)
@@ -366,7 +373,8 @@ class PlotImpz_UI(QWidget):
 
         self.but_log_time = PushButton(" dB")
         self.but_log_time.setObjectName("but_log_time")
-        self.but_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.but_log_time.setToolTip(
+            "<span>Logarithmic scale for y-axis.</span>")
 
         lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'), self)
         self.cmb_plt_time_spgr = QComboBox(self)
@@ -377,7 +385,8 @@ class PlotImpz_UI(QWidget):
         qcmb_box_populate(
             self.cmb_mode_spgr_time, self.cmb_mode_spgr_time_items, self.mode_spgr_time)
 
-        self.lbl_byfs_spgr_time = QLabel(to_html("&nbsp;per f_S", frmt='b'), self)
+        self.lbl_byfs_spgr_time = QLabel(
+            to_html("&nbsp;per f_S", frmt='b'), self)
         self.chk_byfs_spgr_time = QCheckBox(self)
         self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
         self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
@@ -392,13 +401,15 @@ class PlotImpz_UI(QWidget):
         self.but_log_spgr_time.setCheckable(True)
         self.but_log_spgr_time.setChecked(True)
 
-        self.lbl_time_nfft_spgr = QLabel(to_html("&nbsp;N_FFT =", frmt='bi'), self)
+        self.lbl_time_nfft_spgr = QLabel(
+            to_html("&nbsp;N_FFT =", frmt='bi'), self)
         self.led_time_nfft_spgr = QLineEdit(self)
         self.led_time_nfft_spgr.setText(str(self.time_nfft_spgr))
         self.led_time_nfft_spgr.setToolTip("<span>Number of FFT points per "
                                            "spectrogram segment.</span>")
 
-        self.lbl_time_ovlp_spgr = QLabel(to_html("&nbsp;N_OVLP =", frmt='bi'), self)
+        self.lbl_time_ovlp_spgr = QLabel(
+            to_html("&nbsp;N_OVLP =", frmt='bi'), self)
         self.led_time_ovlp_spgr = QLineEdit(self)
         self.led_time_ovlp_spgr.setText(str(self.time_ovlp_spgr))
         self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
@@ -415,7 +426,8 @@ class PlotImpz_UI(QWidget):
         self.lbl_log_bottom_time.setVisible(
             self.but_log_time.isChecked() or
             ((self.plt_time_spgr != "none") and self.but_log_spgr_time.isChecked()))
-        self.led_log_bottom_time.setVisible(self.lbl_log_bottom_time.isVisible())
+        self.led_log_bottom_time.setVisible(
+            self.lbl_log_bottom_time.isVisible())
 
         # self.lbl_colorbar_time = QLabel(to_html("&nbsp;Col.bar", frmt='b'), self)
         # self.lbl_colorbar_time.setVisible(spgr_en)
@@ -508,25 +520,30 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_stim, self.plot_styles_list, self.plt_freq_stim)
-        self.cmb_plt_freq_stim.setToolTip("<span>Plot style for stimulus.</span>")
+        self.cmb_plt_freq_stim.setToolTip(
+            "<span>Plot style for stimulus.</span>")
 
-        self.lbl_plt_freq_stmq = QLabel(to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
+        self.lbl_plt_freq_stmq = QLabel(
+            to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_stmq, self.plot_styles_list, self.plt_freq_stmq)
         self.cmb_plt_freq_stmq.setToolTip(
             "<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
-        lbl_plt_freq_resp = QLabel(to_html("&nbsp;Response Y", frmt='bi'), self)
+        lbl_plt_freq_resp = QLabel(
+            to_html("&nbsp;Response Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_resp, self.plot_styles_list, self.plt_freq_resp)
-        self.cmb_plt_freq_resp.setToolTip("<span>Plot style for response.</span>")
+        self.cmb_plt_freq_resp.setToolTip(
+            "<span>Plot style for response.</span>")
 
         self.but_log_freq = QPushButton("dB")
         self.but_log_freq.setMaximumWidth(qtext_width(" dB"))
         self.but_log_freq.setObjectName(".but_log_freq")
-        self.but_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.but_log_freq.setToolTip(
+            "<span>Logarithmic scale for y-axis.</span>")
         self.but_log_freq.setCheckable(True)
         self.but_log_freq.setChecked(True)
 
@@ -568,7 +585,8 @@ class PlotImpz_UI(QWidget):
         self.but_freq_show_info = QPushButton("Info", self)
         self.but_freq_show_info.setMaximumWidth(qtext_width(" Info "))
         self.but_freq_show_info.setObjectName("but_show_info_freq")
-        self.but_freq_show_info.setToolTip("<span>Show signal power in legend.</span>")
+        self.but_freq_show_info.setToolTip(
+            "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setCheckable(True)
         self.but_freq_show_info.setChecked(False)
 
@@ -619,7 +637,7 @@ class PlotImpz_UI(QWidget):
         self.wdg_ctrl_freq = QWidget(self)
         self.wdg_ctrl_freq.setLayout(layG_ctrl_freq)
         self.wdg_ctrl_freq.setObjectName("transparent")
-        self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
+        self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0)  # (*rc.params['wdg_margins'])
         # ---- end Frequency Domain ------------------
 
         # ----------------------------------------------------------------------
@@ -704,7 +722,8 @@ class PlotImpz_UI(QWidget):
 
         if self.N_frame_user == 0:
             self.N_frame = self.N_end  # use N_end for frame length
-            self.led_N_frame.setText("0")  # update widget with "0" as set by user
+            # update widget with "0" as set by user
+            self.led_N_frame.setText("0")
         else:
             self.N_frame = self.N_frame_user
             self.led_N_frame.setText(str(self.N_frame))  # update widget
@@ -771,7 +790,8 @@ def main():
     layVMain.addWidget(mainw.wdg_ctrl_freq)
     layVMain.addWidget(mainw.wdg_ctrl_stim)
     layVMain.addWidget(mainw.wdg_ctrl_run)
-    layVMain.setContentsMargins(*params['wdg_margins'])  # (left, top, right, bottom)
+    # (left, top, right, bottom)
+    layVMain.setContentsMargins(*params['wdg_margins'])
 
     mainw.setLayout(layVMain)
 
