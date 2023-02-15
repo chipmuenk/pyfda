@@ -228,17 +228,9 @@ class Plot_Tran_Stim_UI(QWidget):
         # =====================================================================
         # Controls for stimuli
         # =====================================================================
-        self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
-        self.cmb_file_io = QComboBox(self)
-        qcmb_box_populate(
-            self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
-        self.cmb_file_io.setEnabled(False)
-        layV_stim_io = QVBoxLayout()
-        layV_stim_io.setContentsMargins(0, 0, 0, 0)
-        layV_stim_io.addWidget(self.lbl_file_io)
-        layV_stim_io.addWidget(self.cmb_file_io)
-        # -------------------------------------
-        line1 = QVLine()
+        self.lbl_title_stim = QLabel("Stim:")
+        self.lbl_title_stim.setObjectName("large")
+        #
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus,
                           self.cmb_stim_items, self.cmb_stim_item)
@@ -290,6 +282,19 @@ class Plot_Tran_Stim_UI(QWidget):
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
+        #
+        line1 = QVLine()
+        #
+        self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
+        self.cmb_file_io = QComboBox(self)
+        qcmb_box_populate(
+            self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
+        self.cmb_file_io.setEnabled(False)
+        layV_stim_io = QVBoxLayout()
+        layV_stim_io.setContentsMargins(0, 0, 0, 0)
+        layV_stim_io.addWidget(self.lbl_file_io)
+        layV_stim_io.addWidget(self.cmb_file_io)
+        # -------------------------------------
 
         layHCmbStim = QHBoxLayout()
         layHCmbStim.addWidget(self.cmbStimulus)
@@ -423,73 +428,70 @@ class Plot_Tran_Stim_UI(QWidget):
         layH_noi_params.addWidget(self.lblNoi_par)
         layH_noi_params.addWidget(self.ledNoi_par)
 
-        layGStim = QGridLayout()
-        layGStim.setContentsMargins(0, 0, 0, 0)
+        layG_ctrl_stim = QGridLayout()
+        layG_ctrl_stim.setContentsMargins(0, 0, 0, 0)
         i = 0
-        layGStim.addWidget(line1, 0, i, 2, 1)  # fromRow, fromCol, rowSpan, colSpan
+        layG_ctrl_stim.addLayout(layHCmbStim, 0, i)
+        layG_ctrl_stim.addLayout(layHStimDC, 1, i)
         i += 1
-        layGStim.addLayout(layHCmbStim, 0, i)
-        layGStim.addLayout(layHStimDC, 1, i)
+        layG_ctrl_stim.addWidget(self.lblAmp1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblAmp2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblAmp1, 0, i)
-        layGStim.addWidget(self.lblAmp2, 1, i)
+        layG_ctrl_stim.addWidget(self.ledAmp1, 0, i)
+        layG_ctrl_stim.addWidget(self.ledAmp2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledAmp1, 0, i)
-        layGStim.addWidget(self.ledAmp2, 1, i)
+        layG_ctrl_stim.addWidget(self.lblPhi1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblPhi2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblPhi1, 0, i)
-        layGStim.addWidget(self.lblPhi2, 1, i)
+        layG_ctrl_stim.addWidget(self.ledPhi1, 0, i)
+        layG_ctrl_stim.addWidget(self.ledPhi2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledPhi1, 0, i)
-        layGStim.addWidget(self.ledPhi2, 1, i)
+        layG_ctrl_stim.addWidget(self.lblPhU1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblPhU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblPhU1, 0, i)
-        layGStim.addWidget(self.lblPhU2, 1, i)
+        layG_ctrl_stim.addWidget(self.lbl_T1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_T2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_T1, 0, i)
-        layGStim.addWidget(self.lbl_T2, 1, i)
+        layG_ctrl_stim.addWidget(self.led_T1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_T2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_T1, 0, i)
-        layGStim.addWidget(self.led_T2, 1, i)
+        layG_ctrl_stim.addWidget(self.lbl_TU1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_TU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TU1, 0, i)
-        layGStim.addWidget(self.lbl_TU2, 1, i)
+        layG_ctrl_stim.addWidget(self.lbl_TW1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_TW2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TW1, 0, i)
-        layGStim.addWidget(self.lbl_TW2, 1, i)
+        layG_ctrl_stim.addWidget(self.led_TW1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_TW2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_TW1, 0, i)
-        layGStim.addWidget(self.led_TW2, 1, i)
+        layG_ctrl_stim.addWidget(self.lbl_TWU1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_TWU2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_TWU1, 0, i)
-        layGStim.addWidget(self.lbl_TWU2, 1, i)
+        layG_ctrl_stim.addWidget(self.lblFreq1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblFreq2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblFreq1, 0, i)
-        layGStim.addWidget(self.lblFreq2, 1, i)
+        layG_ctrl_stim.addWidget(self.ledFreq1, 0, i)
+        layG_ctrl_stim.addWidget(self.ledFreq2, 1, i)
         i += 1
-        layGStim.addWidget(self.ledFreq1, 0, i)
-        layGStim.addWidget(self.ledFreq2, 1, i)
+        layG_ctrl_stim.addWidget(self.lblFreqUnit1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblFreqUnit2, 1, i)
         i += 1
-        layGStim.addWidget(self.lblFreqUnit1, 0, i)
-        layGStim.addWidget(self.lblFreqUnit2, 1, i)
+        layG_ctrl_stim.addWidget(self.lbl_BW1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_BW2, 1, i)
         i += 1
-        layGStim.addWidget(self.lbl_BW1, 0, i)
-        layGStim.addWidget(self.lbl_BW2, 1, i)
+        layG_ctrl_stim.addWidget(self.led_BW1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_BW2, 1, i)
         i += 1
-        layGStim.addWidget(self.led_BW1, 0, i)
-        layGStim.addWidget(self.led_BW2, 1, i)
+        layG_ctrl_stim.addWidget(line2, 0, i, 2, 1)
         i += 1
-        layGStim.addWidget(line2, 0, i, 2, 1)
+        layG_ctrl_stim.addWidget(self.lblNoise, 0, i)
+        layG_ctrl_stim.addWidget(self.lblNoi, 1, i)
         i += 1
-        layGStim.addWidget(self.lblNoise, 0, i)
-        layGStim.addWidget(self.lblNoi, 1, i)
+        layG_ctrl_stim.addWidget(self.cmbNoise, 0, i)
+        layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
         i += 1
-        layGStim.addWidget(self.cmbNoise, 0, i)
-        layGStim.addLayout(layH_noi_params, 1, i)
-
-        self.frmGStim = QFrame(self)
-        self.frmGStim.setContentsMargins(0, 0, 0, 0)
-        self.frmGStim.setLayout(layGStim)
+        # fromRow, fromCol, rowSpan, colSpan
+        layG_ctrl_stim.addWidget(line1, 0, i, 2, 1)
 
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
@@ -506,21 +508,38 @@ class Plot_Tran_Stim_UI(QWidget):
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        layH_stim_par = QHBoxLayout()
-        layH_stim_par.addLayout(layV_stim_io)
-        layH_stim_par.addWidget(self.frmGStim)
 
-        layV_stim = QVBoxLayout()
-        layV_stim.addLayout(layH_stim_par)
-        layV_stim.addLayout(layH_stim_formula)
+        layH_title_stim = QHBoxLayout()
+        layH_title_stim.addWidget(self.lbl_title_stim)
+        self.wdg_title_stim = QWidget(self)
+        self.wdg_title_stim.setLayout(layH_title_stim)
+        self.wdg_title_stim.setContentsMargins(0, 0, 0, 0)
 
-        layH_stim = QHBoxLayout()
-        layH_stim.addLayout(layV_stim)
-        layH_stim.addStretch(10)
+        self.wdg_ctrl_stim = QWidget(self)
+        self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
+        self.wdg_ctrl_stim.setContentsMargins(0, 0, 0, 0)
+
+        layH_io_stim = QHBoxLayout()
+        layH_io_stim.addWidget(self.wdg_ctrl_stim)
+        layH_io_stim.addLayout(layV_stim_io)
+        layH_io_stim.addStretch(10)
+        self.wdg_io_stim = QWidget(self)
+        self.wdg_io_stim.setLayout(layH_io_stim)
+        self.wdg_io_stim.setContentsMargins(0, 0, 0, 0)
+
+        layG_stim = QGridLayout()
+        layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
+        #layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
+        layG_stim.addWidget(self.wdg_io_stim, 0, 1)
+        layG_stim.addLayout(layH_stim_formula, 1, 1, 1, 2)
+        layG_stim.setContentsMargins(0, 0, 0, 0)
+        layG_stim.setVerticalSpacing(0)
 
         self.wdg_stim = QWidget(self)
-        self.wdg_stim.setLayout(layH_stim)
-        self.wdg_stim.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.wdg_stim.setObjectName("transparent")
+        self.wdg_stim.setLayout(layG_stim)
+        self.wdg_stim.setContentsMargins(0, 0, 0, 0)
+        # self.wdg_stim.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         # ----------------------------------------------------------------------
         # Event Filter
@@ -798,7 +817,7 @@ class Plot_Tran_Stim_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
         use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
-        self.frmGStim.setVisible(use_file_io)
+        self.wdg_ctrl_stim.setVisible(use_file_io)
 
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
         if self.cmb_stim == "impulse":
