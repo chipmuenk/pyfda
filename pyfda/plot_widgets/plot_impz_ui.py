@@ -320,7 +320,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         self.lbl_title_plot_time = QLabel("Plots:")
         self.lbl_title_plot_time.setObjectName("large")
-        self.lbl_title_plot_time.setFixedWidth(qtext_width(N_x = 5))
+
         # setting up background color and border
         # self.lbl_title_plot_time.setStyleSheet("font-size:14")
         # self.lbl_title_plot_time.setFont(QFont('Arial', 10))
@@ -414,7 +414,6 @@ class PlotImpz_UI(QWidget):
         self.led_time_ovlp_spgr.setText(str(self.time_ovlp_spgr))
         self.led_time_ovlp_spgr.setToolTip("<span>Number of overlap data points "
                                            "between spectrogram segments.</span>")
-
 
         self.lbl_log_bottom_time = QLabel(to_html("min =", frmt='bi'), self)
         self.led_log_bottom_time = QLineEdit(self)
@@ -514,7 +513,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         self.lbl_title_plot_freq = QLabel("Plots:")
         self.lbl_title_plot_freq.setObjectName("large")
-        self.lbl_title_plot_freq.setFixedWidth(qtext_width(N_x = 5))
         #
         self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -619,7 +617,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq_1.addWidget(self.but_freq_show_info)
         layH_ctrl_freq_1.addStretch(10)
         # layH_ctrl_freq_1.setContentsMargins(*params['wdg_margins'])
-        
+
         self.wdg_ctrl_freq_0 = QWidget(self)
         self.wdg_ctrl_freq_0.setLayout(layH_ctrl_freq_0)
         self.wdg_ctrl_freq_0.setContentsMargins(0, 0, 0, 0)

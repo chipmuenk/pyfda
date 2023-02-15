@@ -138,6 +138,8 @@ class Plot_Impz(QWidget):
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
         self.stim_wdg = Plot_Tran_Stim()
+        # set "Stim:" label width to same width as "Plots:" label:
+        self.stim_wdg.ui.lbl_title_stim.setFixedWidth(self.ui.lbl_title_plot_time.sizeHint().width())
         self.file_io_wdg = Tran_IO()
 
         self.tab_stim_w = QTabWidget(self)
