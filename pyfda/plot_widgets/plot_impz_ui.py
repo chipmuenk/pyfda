@@ -627,8 +627,6 @@ class PlotImpz_UI(QWidget):
         layG_ctrl_freq = QGridLayout()
         layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_0, 0, 0)
         layG_ctrl_freq.addWidget(self.wdg_ctrl_freq_1, 0, 1)
-        # layG_ctrl_freq.addLayout(layH_ctrl_freq_0, 0, 0)
-        # layG_ctrl_freq.addLayout(layH_ctrl_freq_1, 0, 1)
         layG_ctrl_freq.setContentsMargins(0, 0, 0, 0)
         layG_ctrl_freq.setVerticalSpacing(0)
 

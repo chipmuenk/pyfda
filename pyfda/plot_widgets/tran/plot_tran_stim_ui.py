@@ -13,7 +13,7 @@ import collections
 
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QFrame,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
     pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
@@ -291,7 +291,6 @@ class Plot_Tran_Stim_UI(QWidget):
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
         self.cmb_file_io.setEnabled(False)
         layV_stim_io = QVBoxLayout()
-        layV_stim_io.setContentsMargins(0, 0, 0, 0)
         layV_stim_io.addWidget(self.lbl_file_io)
         layV_stim_io.addWidget(self.cmb_file_io)
         # -------------------------------------
@@ -501,9 +500,9 @@ class Plot_Tran_Stim_UI(QWidget):
             "<span>Enter formula for stimulus in numexpr syntax.</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
-        layH_stim_formula = QHBoxLayout()
-        layH_stim_formula.addWidget(self.lblStimFormula)
-        layH_stim_formula.addWidget(self.ledStimFormula, 10)
+        layH_formula_stim = QHBoxLayout()
+        layH_formula_stim.addWidget(self.lblStimFormula)
+        layH_formula_stim.addWidget(self.ledStimFormula)
 
         # ----------------------------------------------------------------------
         # Main Widget
@@ -527,11 +526,15 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_io_stim.setLayout(layH_io_stim)
         self.wdg_io_stim.setContentsMargins(0, 0, 0, 0)
 
+        self.wdg_formula_stim = QWidget(self)
+        self.wdg_formula_stim.setLayout(layH_formula_stim)
+        self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
+
         layG_stim = QGridLayout()
         layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
         #layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
         layG_stim.addWidget(self.wdg_io_stim, 0, 1)
-        layG_stim.addLayout(layH_stim_formula, 1, 1, 1, 2)
+        layG_stim.addWidget(self.wdg_formula_stim, 1, 1, 1, 2)
         layG_stim.setContentsMargins(0, 0, 0, 0)
         layG_stim.setVerticalSpacing(0)
 
