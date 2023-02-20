@@ -116,7 +116,7 @@ class Plot_Tran_Stim(QWidget):
             self.H_str = r'$y[n]$'  # default
             self.title_str = ""
             if self.ui.stim == "none":
-                self.title_str = r'Zero Input Response'
+                self.title_str = r'Zero Input'
                 self.H_str = r'$h_0[n]$'
             # ------------------------------------------------------------------
             elif self.ui.stim == "dirac":
@@ -189,9 +189,9 @@ class Plot_Tran_Stim(QWidget):
             elif self.ui.noise == "uniform":
                 self.title_str += r' + Uniform Noise'
             elif self.ui.noise == "randint":
-                self.title_str += r' + random int. sequence'
+                self.title_str += r' + Random Int. Sequence'
             elif self.ui.noise == "mls":
-                self.title_str += r' + max. length sequence'
+                self.title_str += r' + Max. Length Sequence'
             elif self.ui.noise == "brownian":
                 self.title_str += r' + Brownian Noise'
             # ==================================================================
@@ -345,32 +345,63 @@ class Plot_Tran_Stim(QWidget):
         if self.ui.noise == "none":
             pass
         elif self.ui.noise == "gauss":
-            noi = self.ui.noi * np.random.randn(N_frame)
+            if np.iscomplexobj(self.ui.noi):
+                noi = self.ui.noi.real * np.random.randn(N_frame)\
+                    + 1j * self.ui.noi.imag * np.random.randn(N_frame)
+            else:
+                noi = self.ui.noi * np.random.randn(N_frame)
+        ####
         elif self.ui.noise == "uniform":
-            noi = self.ui.noi * (np.random.rand(N_frame)-0.5)
+            if np.iscomplexobj(self.ui.noi):
+                noi = self.ui.noi.real * (np.random.rand(N_frame) - 0.5)\
+                    + 1j * self.ui.noi.imag * (np.random.rand(N_frame) - 0.5)
+            else:     
+                noi = self.ui.noi * (np.random.rand(N_frame) - 0.5)
+        ###
         elif self.ui.noise == "randint":
-            noi = np.random.randint(np.abs(np.int(self.ui.noi)) + 1, size=N_frame)
+            if np.iscomplexobj(self.ui.noi):
+                noi = np.random.randint(
+                    np.int(np.abs(self.ui.noi.real)) + 1, size=N_frame) +\
+                        1j * np.random.randint(
+                            np.int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
+            else:
+                noi = np.random.randint(np.int(np.abs(self.ui.noi)) + 1, size=N_frame)
+        ###
         elif self.ui.noise == "mls":
-            seed = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
-                    0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0][:self.ui.mls_b]
+            if N_first == 0:
+                # initialize sequence(s) with fixed seeds, creating an identical 
+                # sequence at every run
+                seed = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
+                        0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0][:self.ui.mls_b]
+                seed2 = np.roll(seed, 1)
             # seed = np.random.randint(2, size=self.ui.mls_b)
             #
-            # max_len_seq returns `sequence, state`. The state is initialized with a
-            # fixed seed, hence, an identical sequence is created every time.
-            noi = self.ui.noi * sig.max_len_seq(
-                self.ui.mls_b, length=N_frame, state=seed)[0]
-        elif self.ui.noise == "brownian":
-            # brownian noise
-            noi = np.cumsum(self.ui.noi * np.random.randn(N_frame))
+            # max_len_seq returns `sequence, state`.
+            noi, seed = self.ui.noi.real * sig.max_len_seq(
+                self.ui.mls_b, length=N_frame, state=seed)
+            if np.iscomplexobj(self.ui.noi):
+                noi, seed2 += 1j * self.ui.noi.imag * sig.max_len_seq(
+                    self.ui.mls_b, length=N_frame, state=seed2)
+        ###
+        elif self.ui.noise == "brownian":  # brownian noise
+            if np.iscomplexobj(self.ui.noi):
+                noi = np.cumsum(self.ui.noi.real * np.random.randn(N_frame))\
+                    + 1j * np.cumsum(self.ui.noi.imag * np.random.randn(N_frame))
+            else:
+                noi = np.cumsum(self.ui.noi * np.random.randn(N_frame))
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
-        if type(self.ui.noi) == complex:
+
+        if np.iscomplexobj(self.ui.noi):
             self.xf = self.xf.astype(complex) + noi
+        elif np.iscomplexobj(self.xf):
+            self.xf += noi + 1j * noi  # add "mono" noise to complex signal
         else:
             self.xf += noi
+
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
-            if type(self.ui.DC) == complex:
+            if np.iscomplexobj(self.ui.DC):
                 self.xf = self.xf.astype(complex) + self.ui.DC
             else:
                 self.xf += self.ui.DC
