@@ -145,7 +145,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         tab_w = 30  # needs to fit with the tab size defined in pyfda_rc.py
         # tab_w = self.tab_mpl_w.tabBar().tabSizeHint(0).width()  # crashes under Linux

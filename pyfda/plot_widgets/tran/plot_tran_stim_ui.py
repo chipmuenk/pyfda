@@ -500,10 +500,6 @@ class Plot_Tran_Stim_UI(QWidget):
             "<span>Enter formula for stimulus in numexpr syntax.</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
-        layH_formula_stim = QHBoxLayout()
-        layH_formula_stim.addWidget(self.lblStimFormula)
-        layH_formula_stim.addWidget(self.ledStimFormula)
-
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
@@ -526,15 +522,18 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_io_stim.setLayout(layH_io_stim)
         self.wdg_io_stim.setContentsMargins(0, 0, 0, 0)
 
+
+        layH_formula_stim = QHBoxLayout()
+        layH_formula_stim.addWidget(self.lblStimFormula)
+        layH_formula_stim.addWidget(self.ledStimFormula)
         self.wdg_formula_stim = QWidget(self)
         self.wdg_formula_stim.setLayout(layH_formula_stim)
         self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
 
         layG_stim = QGridLayout()
         layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
-        #layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
         layG_stim.addWidget(self.wdg_io_stim, 0, 1)
-        layG_stim.addWidget(self.wdg_formula_stim, 1, 1, 1, 2)
+        layG_stim.addWidget(self.wdg_formula_stim, 1, 1)
         layG_stim.setContentsMargins(0, 0, 0, 0)
         layG_stim.setVerticalSpacing(0)
 
