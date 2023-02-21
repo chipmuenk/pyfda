@@ -375,17 +375,18 @@ class Plot_Tran_Stim(QWidget):
             if N_first == 0:
                 # initialize sequence(s) with fixed seeds, creating an identical
                 # sequence at every run
-                seed = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
+                self.seed_r = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
                         0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0][:self.ui.mls_b]
-                seed2 = np.roll(seed, 1)
-            # seed = np.random.randint(2, size=self.ui.mls_b)
-            #
-            # max_len_seq returns `sequence, state`.
-            noi, seed = self.ui.noi.real * sig.max_len_seq(
-                self.ui.mls_b, length=N_frame, state=seed)
+                self.seed_i = np.roll(self.seed_r, 1)
+
+            noi_r, self.seed_r = sig.max_len_seq(
+                self.ui.mls_b, length=N_frame, state=self.seed_r)
             if np.iscomplexobj(self.ui.noi):
-                noi, seed2 += 1j * self.ui.noi.imag * sig.max_len_seq(
-                    self.ui.mls_b, length=N_frame, state=seed2)
+                noi_i, self.seed_i = sig.max_len_seq(
+                    self.ui.mls_b, length=N_frame, state=self.seed_i)
+                noi = self.ui.noi.real * noi_r + 1j * self.ui.noi.imag * noi_i
+            else:
+                noi = noi_r * self.ui.noi.real
         ###
         elif self.ui.noise == "brownian":  # brownian noise
             # Brownian noise in cumulative, add last value of last frame to
