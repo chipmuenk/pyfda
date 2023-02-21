@@ -225,7 +225,6 @@ class Plot_Tran_Stim(QWidget):
             return self.xf[:N_frame]
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
-            self.xf.fill(0)  # = np.zeros(N_frame, dtype=A_type)
             if N_first <= self.T1_idx < N_last:
                 self.xf[self.T1_idx - N_first] = self.ui.A1
         # ----------------------------------------------------------------------
@@ -256,13 +255,13 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
             self.xf =\
-                self.ui.A1 * np.cos(2*pi * n * self.ui.f1 + self.rad_phi1) +\
-                self.ui.A2 * np.cos(2*pi * n * self.ui.f2 + self.rad_phi2)
+                self.ui.A1 * np.cos(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.A2 * np.cos(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sine":
             self.xf =\
-                self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1) +\
-                self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
+                self.ui.A1 * np.sin(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
+                self.ui.A2 * np.sin(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "exp":
             self.xf =\
@@ -271,7 +270,7 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
             self.xf = self.ui.A1 * diric(
-                (4 * pi * (n-self.ui.T1) * self.ui.f1 + self.rad_phi1*2)
+                (4 * pi * (n - self.ui.T1) * self.ui.f1 + self.rad_phi1 * 2)
                 / self.ui.TW1, self.ui.TW1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
@@ -345,6 +344,7 @@ class Plot_Tran_Stim(QWidget):
         if self.ui.noise == "none":
             pass
         elif self.ui.noise == "gauss":
+            # Gaussian noise is uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
                 noi = self.ui.noi.real * np.random.randn(N_frame)\
                     + 1j * self.ui.noi.imag * np.random.randn(N_frame)
@@ -352,13 +352,15 @@ class Plot_Tran_Stim(QWidget):
                 noi = self.ui.noi * np.random.randn(N_frame)
         ####
         elif self.ui.noise == "uniform":
+            # Uniform noise is uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
                 noi = self.ui.noi.real * (np.random.rand(N_frame) - 0.5)\
                     + 1j * self.ui.noi.imag * (np.random.rand(N_frame) - 0.5)
-            else:     
+            else:
                 noi = self.ui.noi * (np.random.rand(N_frame) - 0.5)
         ###
         elif self.ui.noise == "randint":
+            # Random integers are uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
                 noi = np.random.randint(
                     np.int(np.abs(self.ui.noi.real)) + 1, size=N_frame) +\
@@ -368,8 +370,10 @@ class Plot_Tran_Stim(QWidget):
                 noi = np.random.randint(np.int(np.abs(self.ui.noi)) + 1, size=N_frame)
         ###
         elif self.ui.noise == "mls":
+            # Maximum Length Sequences have a fixed length of 2 ** self.ui.mls_b,
+            # use seed of last sequence element to seed new sequence
             if N_first == 0:
-                # initialize sequence(s) with fixed seeds, creating an identical 
+                # initialize sequence(s) with fixed seeds, creating an identical
                 # sequence at every run
                 seed = [1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1,
                         0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0][:self.ui.mls_b]
