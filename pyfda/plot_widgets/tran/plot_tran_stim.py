@@ -384,11 +384,17 @@ class Plot_Tran_Stim(QWidget):
                     self.ui.mls_b, length=N_frame, state=seed2)
         ###
         elif self.ui.noise == "brownian":  # brownian noise
+            # Brownian noise in cumulative, add last value of last frame to
+            # current frame
+            if N_first == 0:
+                self.noi_last = 0  # initialize for first frame
             if np.iscomplexobj(self.ui.noi):
                 noi = np.cumsum(self.ui.noi.real * np.random.randn(N_frame))\
                     + 1j * np.cumsum(self.ui.noi.imag * np.random.randn(N_frame))
             else:
                 noi = np.cumsum(self.ui.noi * np.random.randn(N_frame))
+            noi += self.noi_last
+            self.noi_last = noi[-1]
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
 
