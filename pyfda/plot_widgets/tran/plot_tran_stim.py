@@ -249,7 +249,7 @@ class Plot_Tran_Stim(QWidget):
                 self.xf.fill(self.ui.A1)
             if N_first <= self.T1_idx < N_last:  # step in current frame
                 self.xf[0:self.T1_idx - N_first].fill(0)
-                self.xf[self.T1_idx - N_first:].fill(self.ui.A1)
+                self.xf[self.T1_idx - N_first:N_last].fill(self.ui.A1)
             elif self.T1_idx >= N_last:  # step after current frame
                 self.xf.fill(0)
         # ----------------------------------------------------------------------
