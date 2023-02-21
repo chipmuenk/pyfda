@@ -883,8 +883,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblFreqUnit2.setVisible("f2" in stim_wdg)
         self.lbl_BW2.setVisible("BW2" in stim_wdg)
         self.led_BW2.setVisible("BW2" in stim_wdg)
-        self.lblStimFormula.setVisible(self.stim == "formula" and use_file_io)
-        self.ledStimFormula.setVisible(self.stim == "formula" and use_file_io)
+        self.wdg_formula_stim.setVisible(self.stim == "formula" and use_file_io)
 
         self.cmbImpulseType.setVisible(self.cmb_stim == 'impulse')
         self.cmbSinusoidType.setVisible(self.cmb_stim == 'sinusoid')
