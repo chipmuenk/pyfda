@@ -75,35 +75,9 @@ class Plot_Tran_Stim(QWidget):
 
         self.setLayout(layVMain)
 
-# ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, N_first: int = 0, N_frame: int = 10, N_end: int = 10,
-                            init: bool = False) -> np.ndarray:
-        """
-        Calculate a data frame of stimulus `x` with a length of `N_frame` samples,
-        starting with index `N_first`
-
-        Parameters
-        ----------
-        N_first: int
-            index of first data point
-
-        N_frame: int
-            number of samples to be generated
-
-        init: bool
-            when init == True, initialize stimulus settings
-
-        Returns
-        -------
-        x: ndarray
-            an array with `N` stimulus data points
-        """
-        if init or N_first == 0:
+    def init_labels_stim(self):
             '''intialize title string, y-axis label and some variables'''
             # use radians for angle internally
-            self.rad_phi1 = self.ui.phi1 / 180 * pi
-            self.rad_phi2 = self.ui.phi2 / 180 * pi
-
             self.H_str = r'$y[n]$'  # default
             self.title_str = ""
             if self.ui.stim == "none":
@@ -195,10 +169,66 @@ class Plot_Tran_Stim(QWidget):
                 self.title_str = r'File Data'
         # ----------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------------
+    def calc_stimulus_frame(self, N_first: int = 0, N_frame: int = 10, N_end: int = 10,
+                            init: bool = False) -> np.ndarray:
+        """
+        Calculate a data frame of stimulus `x` with a length of `N_frame` samples,
+        starting with index `N_first`
+
+        Parameters
+        ----------
+        N_first: int
+            index of first data point of the frame
+
+        N_frame: int
+            frame length
+
+        N_end: int
+            last sample of total stimulus to be generated
+
+        init: bool
+            when init == True, initialize stimulus settings
+
+        Returns
+        -------
+        x: ndarray
+            an array with `N` stimulus data points
+        """
+        # -------------------------------------------
+        def add_signal(stim: np.ndarray, sig: np.ndarray, ampl_sig = None):
+            """
+            Add signal `sig` to stimulus `stim` (both need to have the same shape).
+            """
+            if sig is None:
+                return stim
+            elif np.ndim(sig) > 0 and np.shape(stim) != np.shape(sig):
+                logger.error(
+                    f"Cannot combine stimulus ({np.shape(stim)}) and additional "
+                    f"signal ({np.shape(sig)}) due to different shapes!")
+                return stim
+            elif np.iscomplexobj(ampl_sig) or np.iscomplexobj(sig):
+                stim = stim.astype(complex) + sig
+            # if sig is real and stimulus is complex, add sig to both
+            # real and imaginary part of stimulus:
+            elif np.iscomplexobj(self.xf):
+                stim += sig + 1j * sig
+            else:
+                stim += sig
+            return stim
+        # -------------------------------------------
+
+        if init or N_first == 0:
+            self.init_labels_stim()
+            self.rad_phi1 = self.ui.phi1 / 180 * pi
+            self.rad_phi2 = self.ui.phi2 / 180 * pi
+            noi = 0
+
         N_last = N_first + N_frame
         n = np.arange(N_first, N_last)
 
-        # T_S = fb.fil[0]['T_S']
+        # calculate index for T1, only needed for dirac and step
         self.T1_idx = int(np.round(self.ui.T1))
 
         # - Initialize self.xf with N_frame zeros.
@@ -239,7 +269,7 @@ class Plot_Tran_Stim(QWidget):
                     (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
-            n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))
+            n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
             n_max = min(n_rise + self.ui.TW1, N_end)
             self.xf = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
@@ -339,8 +369,8 @@ class Plot_Tran_Stim(QWidget):
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None
         # ----------------------------------------------------------------------
-        # Add noise to stimulus
-        noi = 0
+        # Calculate noise
+        # ----------------------------------------------------------------------
         if self.ui.noise == "none":
             pass
         elif self.ui.noise == "gauss":
@@ -350,7 +380,7 @@ class Plot_Tran_Stim(QWidget):
                     + 1j * self.ui.noi.imag * np.random.randn(N_frame)
             else:
                 noi = self.ui.noi * np.random.randn(N_frame)
-        ####
+        # ---
         elif self.ui.noise == "uniform":
             # Uniform noise is uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
@@ -358,7 +388,7 @@ class Plot_Tran_Stim(QWidget):
                     + 1j * self.ui.noi.imag * (np.random.rand(N_frame) - 0.5)
             else:
                 noi = self.ui.noi * (np.random.rand(N_frame) - 0.5)
-        ###
+        # ---
         elif self.ui.noise == "randint":
             # Random integers are uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
@@ -368,7 +398,7 @@ class Plot_Tran_Stim(QWidget):
                             np.int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
             else:
                 noi = np.random.randint(np.int(np.abs(self.ui.noi)) + 1, size=N_frame)
-        ###
+        # ---
         elif self.ui.noise == "mls":
             # Maximum Length Sequences have a fixed length of 2 ** self.ui.mls_b,
             # use seed of last sequence element to seed new sequence
@@ -387,7 +417,7 @@ class Plot_Tran_Stim(QWidget):
                 noi = self.ui.noi.real * noi_r + 1j * self.ui.noi.imag * noi_i
             else:
                 noi = noi_r * self.ui.noi.real
-        ###
+        # ---
         elif self.ui.noise == "brownian":  # brownian noise
             # Brownian noise in cumulative, add last value of last frame to
             # current frame
@@ -403,31 +433,28 @@ class Plot_Tran_Stim(QWidget):
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
 
-        if np.iscomplexobj(self.ui.noi):
-            self.xf = self.xf.astype(complex) + noi
-        elif np.iscomplexobj(self.xf):
-            self.xf += noi + 1j * noi  # add "mono" noise to complex signal
-        else:
-            self.xf += noi
+        # Add noise to stimulus:
+        self.xf = add_signal(self.xf, noi)
 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
-            if np.iscomplexobj(self.ui.DC):
-                self.xf = self.xf.astype(complex) + self.ui.DC
-            else:
-                self.xf += self.ui.DC
+            self.xf = add_signal(self.xf, self.ui.DC)
 
         # Add file data
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
             if self.x_file is None:
                 logger.warning("No file loaded!")
+
+            # file data is longer than frame, use only a part:
             elif len(self.x_file) >= N_last:
-                self.xf += self.x_file[N_first:N_last]
+                self.xf = add_signal(self.xf, self.x_file[N_first:N_last])
+            # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > N_first:
-                self.xf += np.concatenate(
-                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file))))
+                self.xf = add_signal(self.xf, np.concatenate(
+                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))))
+            # file data has been consumed, nothing left to be added
             else:
-                pass  # nothing left to be added
+                pass
 
         return self.xf[:N_frame]
 # ------------------------------------------------------------------------------
