@@ -163,7 +163,7 @@ class AboutWindow(QDialog):
 
         self.info_str = (
             "<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-            f"Version {version.__version__} (c) 2013 - 2022 Christian Münker</b><br />"
+            f"Version {version.__version__} (c) 2013 - 2023 Christian Münker</b><br />"
             "Design, analyze and synthesize digital filters. Docs @ "
             "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
             " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)"
