@@ -419,10 +419,10 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             else:
                 s += k + ' : ' + str(d[k])
             first = False
-    elif type(d) in {list, np.ndarray}:
+    elif type(d) in {list, np.ndarray, tuple}:
         if np.ndim(d) == 1:
-            s += ('Type: {0} of {1}, Shape =  ({2} x 1)' + cr + tab)\
-                .format(type(d).__name__, type(d[0]).__name__, len(d))
+            s += (f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
+                  f'Shape =  ({len(d)} x 1)' + cr + tab)
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
@@ -442,6 +442,17 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
                 first = False
         else:
             logger.warning(f"Object with ndim = {np.ndim(d)} cannot be processed.")
+    else:  # scalar, string or None
+        if type(d) is None:
+            s += ('Type: None')
+        elif type(d) is str:
+            s += (f' Type: str, length = {len(d)}' +  cr + tab + d[: min(N-1, len(d))])
+            if len(d) > N-1:
+                s += ' ...'
+        elif np.isscalar(d):
+            s += (f'Type: {type(d).__name__}' + cr + tab + str(d))
+        else:
+            s += (f'Type: {type(d).__name__}')
     return s
 
 
