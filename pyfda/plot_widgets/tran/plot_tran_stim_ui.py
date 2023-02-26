@@ -522,7 +522,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_io_stim.setLayout(layH_io_stim)
         self.wdg_io_stim.setContentsMargins(0, 0, 0, 0)
 
-
         layH_formula_stim = QHBoxLayout()
         layH_formula_stim.addWidget(self.lblStimFormula)
         layH_formula_stim.addWidget(self.ledStimFormula)
