@@ -197,24 +197,38 @@ class Plot_Tran_Stim(QWidget):
             an array with `N` stimulus data points
         """
         # -------------------------------------------
-        def add_signal(stim: np.ndarray, sig: np.ndarray, ampl_sig = None):
+        def add_signal(stim: np.ndarray, sig: np.ndarray):
             """
-            Add signal `sig` to stimulus `stim` (both need to have the same shape).
+            Add signal `sig` to stimulus `stim` (both need to have the same shape)
+            and respect all combinations of real and complex-valued signals.
+            If `sig` has the shape (N x 2), the two columns are added as real and
+            imaginary values.
             """
-            if sig is None:
-                return stim
-            elif np.ndim(sig) > 0 and np.shape(stim) != np.shape(sig):
+            # logger.warning(f"stim: {pprint_log(stim)}\n\nsig: {pprint_log(sig)}")
+            if np.ndim(sig) == 0:
+                if sig is None or sig == 0:
+                    return stim
+                # else sig is a scalar, can be added to stim
+            elif np.ndim(sig) > 1 or np.ndim(stim) != 1\
+                    or len(stim) != np.shape(stim)[0]\
+                        or np.ndim(sig) == 2 and np.shape(sig)[1] != 2:
                 logger.error(
                     f"Cannot combine stimulus ({np.shape(stim)}) and additional "
                     f"signal ({np.shape(sig)}) due to different shapes!")
                 return stim
-            elif np.iscomplexobj(ampl_sig) or np.iscomplexobj(sig):
+            # special case of 2D-sig which is added to stimulus as a complex signal
+            elif np.ndim(sig) == 2:
+                stim = stim.astype(complex) + sig[:, 0] + 1j * sig[:, 1]
+                return stim
+            # ---
+            # sig is complex, cast stim to complex as well before adding
+            if np.iscomplexobj(sig):
                 stim = stim.astype(complex) + sig
-            # if sig is real and stimulus is complex, add sig to both
-            # real and imaginary part of stimulus:
+            # sig is real and stimulus is complex:
+            # -> add sig to bothreal and imaginary part of stimulus
             elif np.iscomplexobj(self.xf):
                 stim += sig + 1j * sig
-            else:
+            else:  # stim and sig are real-valued
                 stim += sig
             return stim
         # -------------------------------------------
@@ -223,19 +237,21 @@ class Plot_Tran_Stim(QWidget):
             self.init_labels_stim()
             self.rad_phi1 = self.ui.phi1 / 180 * pi
             self.rad_phi2 = self.ui.phi2 / 180 * pi
-            noi = 0
+            self.xf_is_cmplx =\
+                (self.ui.ledDC.isVisible and type(self.ui.DC) == complex)\
+                    or (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex)\
+                        or (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex)
 
-        N_last = N_first + N_frame
-        n = np.arange(N_first, N_last)
+        noi = 0  # initialize noise frame
+        N_last = N_first + N_frame  # calculate last element index
+        n = np.arange(N_first, N_last)  #  create frame index
 
         # calculate index for T1, only needed for dirac and step
         self.T1_idx = int(np.round(self.ui.T1))
 
         # - Initialize self.xf with N_frame zeros.
         # - Set dtype of ndarray to complex or float, depending on stimuli
-        if (self.ui.ledDC.isVisible and type(self.ui.DC) == complex) or\
-            (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex) or\
-                (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex):
+        if self.xf_is_cmplx:
             self.xf = np.zeros(N_frame, dtype=complex)
         else:
             self.xf = np.zeros(N_frame, dtype=float)
@@ -246,7 +262,7 @@ class Plot_Tran_Stim(QWidget):
         #
         # ######################################################################
         if self.ui.stim == "none":
-            pass  # self.xf.fill(0)
+            pass
         elif qget_cmb_box(self.ui.cmb_file_io) == "use":
             if self.x_file is None:
                 logger.warning("No file loaded!")
@@ -444,14 +460,15 @@ class Plot_Tran_Stim(QWidget):
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
             if self.x_file is None:
                 logger.warning("No file loaded!")
-
             # file data is longer than frame, use only a part:
             elif len(self.x_file) >= N_last:
-                self.xf = add_signal(self.xf, self.x_file[N_first:N_last])
+                self.xf = add_signal(self.xf, self.x_file[N_first:N_last, :])
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > N_first:
                 self.xf = add_signal(self.xf, np.concatenate(
-                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))))
+                    (self.x_file[N_first:, :],
+                     np.zeros(N_last - np.shape(self.x_file)[0], np.shape(self.x_file[1])))
+                    ))
             # file data has been consumed, nothing left to be added
             else:
                 pass
