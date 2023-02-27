@@ -562,7 +562,6 @@ class MplToolbar(NavigationToolbar):
         This method shadows `home()` inherited from NavigationToolbar.
         """
         self.push_current()
-        self.emit({'home': ''})  # only the key is used by the slot
         self.emit({'mpl_toolbar': 'home'})
         self.mpl_widget.redraw()
 
