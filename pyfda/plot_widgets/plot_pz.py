@@ -69,7 +69,8 @@ class Plot_PZ(QWidget):
         # logger.info("Processing {0} | needs_draw = {1}, visible = {2}"\
         #              .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or self.needs_calc\
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False

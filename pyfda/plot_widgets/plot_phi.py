@@ -54,7 +54,8 @@ class Plot_Phi(QWidget):
             return
 
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or self.needs_calc\
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False

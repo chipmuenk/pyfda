@@ -78,7 +78,8 @@ class Plot_3D(QWidget):
         # logger.debug("Processing {0} | data_changed = {1}, visible = {2}"\
         #              .format(dict_sig, self.data_changed, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
+            if 'data_changed' in dict_sig or self.data_changed\
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.data_changed = False
         else:

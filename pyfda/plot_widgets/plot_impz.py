@@ -383,9 +383,13 @@ class Plot_Impz(QWidget):
                     self.stim_wdg.ui.recalc_freqs()
                 self.draw()
 
-            elif 'home' in dict_sig:
-                self.redraw()
-                self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
+            elif 'mpl_toolbar' in dict_sig:
+                if dict_sig['mpl_toolbar'] == 'ui_level':
+                    logger.warning(f"ui level = {self.mplwidget_t.mplToolbar.a_ui_state}")
+                    logger.warning(f"ui level = {self.mplwidget_f.mplToolbar.a_ui_state}")
+                elif dict_sig['mpl_toolbar'] == 'home':
+                    self.redraw()
+                    self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:

@@ -69,7 +69,8 @@ class Plot_Hf(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                    or 'home' in dict_sig or self.needs_calc:
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home')\
+                         or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False

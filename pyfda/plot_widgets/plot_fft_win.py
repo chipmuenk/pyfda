@@ -144,7 +144,7 @@ class Plot_FFT_win(QDialog):
             self.calc_win_draw()
             self.needs_calc = False
 
-        elif 'home' in dict_sig:
+        elif  'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home':
             self.update_view()
 
         else:
