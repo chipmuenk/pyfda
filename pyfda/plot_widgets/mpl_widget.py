@@ -446,6 +446,14 @@ class MplToolbar(NavigationToolbar):
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
 
         # ---------------------------------------------
+        # UI Detail:
+        # ---------------------------------------------
+        self.a_ui = self.addAction(
+            QIcon(':/grid_coarse.svg'), 'UI detail', self.cycle_ui_level)
+        self.a_ui.setToolTip('UI detail level: All / basic / compact')
+        self.a_ui_state = 2  # 0: compact, 1: reduced, 2: full ui level
+
+        # ---------------------------------------------
         # REDRAW:
         # ---------------------------------------------
         # self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.mpl_widget.redraw)
@@ -555,6 +563,7 @@ class MplToolbar(NavigationToolbar):
         """
         self.push_current()
         self.emit({'home': ''})  # only the key is used by the slot
+        self.emit({'mpl_toolbar': 'home'})
         self.mpl_widget.redraw()
 
 # ------------------------------------------------------------------------------
@@ -619,6 +628,34 @@ class MplToolbar(NavigationToolbar):
 
         if cycle:
             self.canvas.draw()  # don't use self.draw(), use FigureCanvasQTAgg.draw()
+
+# ------------------------------------------------------------------------------
+    def cycle_ui_level(self, cycle : bool = True) -> int:
+        """
+        Cycle th UI level (full / )
+        and redraw the figure.
+
+        Parameters
+        ----------
+        cycle : bool, optional
+            Cycle the ui level and redraw the ui?
+
+        Returns
+        -------
+        ui_level : int
+
+        """
+        if cycle:
+            self.a_ui_state = (self.a_ui_state + 1) % 3
+
+        if self.a_ui_state == 0:
+            self.a_ui.setIcon(QIcon(':/ui_level_0'))
+        elif self.a_ui_state == 1:
+            self.a_ui.setIcon(QIcon(':/ui_level_1'))
+        elif self.a_ui_state == 2:
+            self.a_ui.setIcon(QIcon(':/ui_level_2'))
+
+        self.emit({'mpl_toolbar': 'ui_level'})
 
 # ------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
