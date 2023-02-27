@@ -40,6 +40,9 @@
     <file alias="stop.svg">images/icons/dark/ic_play_arrow_48px.svg</file>
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
+    <file alias="ui_level_0.svg">images/icons/dark/square_outlined.svg</file>
+    <file alias="ui_level_1.svg">images/icons/dark/table_chart_outlined.svg</file>
+    <file alias="ui_level_2.svg">images/icons/dark/table_outlined.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
     <file alias="pause_w.svg">images/icons/light/ic_pause_48px_white.svg</file>
