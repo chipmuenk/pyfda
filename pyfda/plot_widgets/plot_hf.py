@@ -186,7 +186,7 @@ class Plot_Hf(QWidget):
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_hf.html"
         self.mplwidget.mplToolbar.a_ui.setEnabled(True)
-        self.mplwidget.mplToolbar.a_ui_levels = 2
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()

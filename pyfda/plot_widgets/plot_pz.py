@@ -174,7 +174,7 @@ class Plot_PZ(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_pz.html"
-        self.mplwidget.mplToolbar.a_ui_levels = 2
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()

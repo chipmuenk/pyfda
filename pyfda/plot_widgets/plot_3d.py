@@ -221,7 +221,7 @@ class Plot_3D(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_3d.html"
-        self.mplwidget.mplToolbar.a_ui_levels = 2
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self._init_grid()  # initialize grid and do initial plot

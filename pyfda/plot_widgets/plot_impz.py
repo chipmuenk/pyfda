@@ -111,6 +111,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_t.mplToolbar.a_ui_num_levels = 4
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ---------- MplWidget for FREQUENCY domain plots ----------------------
@@ -120,6 +121,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_f.mplToolbar.a_ui_num_levels = 4
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------- Construct TabWidget with time and frequency plot widgets
@@ -230,6 +232,34 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
         self.ui.wdg_ctrl_freq.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
         self.ui.wdg_ctrl_time.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+
+# ------------------------------------------------------------------------------
+    def set_ui_level(self, ui_level):
+        """
+        Sync time and frequency subwidget and set their ui display level
+        """
+        self.mplwidget_f.mplToolbar.cycle_ui_level(ui_level)
+        self.mplwidget_t.mplToolbar.cycle_ui_level(ui_level)
+        if ui_level == 0:
+            self.ui.wdg_ctrl_time.setVisible(True)
+            self.ui.wdg_ctrl_freq.setVisible(True)
+            self.tab_stim_w.setVisible(True)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 1:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(True)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 2:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(False)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 3:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(False)
+            self.ui.wdg_ctrl_run.setVisible(False)
 
 # ------------------------------------------------------------------------------
     def resize_stim_tab_widget(self):
@@ -368,6 +398,8 @@ class Plot_Impz(QWidget):
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                    self.set_ui_level(dict_sig['value'])
 
             elif 'ui_local_changed' in dict_sig:
                 # treat all local UI events here

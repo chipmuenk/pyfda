@@ -368,8 +368,8 @@ class MplToolbar(NavigationToolbar):
         self.a_ui = self.addAction(
             QIcon(':/ui_level_max'), 'UI detail', self.cycle_ui_level)
         self.a_ui.setToolTip('UI detail level: All / basic / compact')
-        self.a_ui_levels = 3
-        self.a_ui_state = 0  # 0: full ui, 1: reduced, 2: compact ui
+        self.a_ui_num_levels = 3
+        self.a_ui_level = 0  # 0: full ui, 1: reduced, 2: compact ui
 
         self.addSeparator()
 
@@ -629,33 +629,37 @@ class MplToolbar(NavigationToolbar):
             self.canvas.draw()  # don't use self.draw(), use FigureCanvasQTAgg.draw()
 
 # ------------------------------------------------------------------------------
-    def cycle_ui_level(self, cycle : bool = True) -> int:
+    def cycle_ui_level(self, ui_level : int = -1) -> None:
         """
         Cycle th UI level (full / )
-        and redraw the figure.
 
         Parameters
         ----------
-        cycle : bool, optional
-            Cycle the ui level and redraw the ui?
+        ui_level : int, optional
+            Set the ui level and the icon accordingly when ui_level != -1,
+            don't emit a signal
+            When ui_level is not passed as a parameter, cycle through the
+            `self.ai_num_levels`
 
         Returns
         -------
-        ui_level : int
+        None
 
         """
-        if cycle:
-            self.a_ui_state = (self.a_ui_state + 1) % self.a_ui_levels
+        if ui_level == -1:
+            self.a_ui_level = (self.a_ui_level + 1) % self.a_ui_num_levels
+        else:
+            self.a_ui_level = ui_level
 
-        if self.a_ui_state == 0:
+        if self.a_ui_level == 0:
             self.a_ui.setIcon(QIcon(':/ui_level_max'))
-        elif self.a_ui_state == self.a_ui_levels - 1:
+        elif self.a_ui_level == self.a_ui_num_levels - 1:
             self.a_ui.setIcon(QIcon(':/ui_level_min'))
         else:
             self.a_ui.setIcon(QIcon(':/ui_level_mid'))
 
-
-        self.emit({'mpl_toolbar': 'ui_level', 'value': self.a_ui_state})
+        if ui_level == -1:
+            self.emit({'mpl_toolbar': 'ui_level', 'value': self.a_ui_level})
 
 # ------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
