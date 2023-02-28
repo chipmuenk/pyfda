@@ -82,6 +82,9 @@ class Plot_3D(QWidget):
                     or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.data_changed = False
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                self.frmControls.setVisible(dict_sig['value'] == 0)
+
         else:
             if 'data_changed' in dict_sig:
                 self.data_changed = True
@@ -218,6 +221,7 @@ class Plot_3D(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_3d.html"
+        self.mplwidget.mplToolbar.a_ui_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self._init_grid()  # initialize grid and do initial plot

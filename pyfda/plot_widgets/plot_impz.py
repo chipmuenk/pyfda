@@ -385,8 +385,9 @@ class Plot_Impz(QWidget):
 
             elif 'mpl_toolbar' in dict_sig:
                 if dict_sig['mpl_toolbar'] == 'ui_level':
-                    logger.warning(f"ui level = {self.mplwidget_t.mplToolbar.a_ui_state}")
-                    logger.warning(f"ui level = {self.mplwidget_f.mplToolbar.a_ui_state}")
+                    ui_level = dict_sig['value']
+                    self.mplwidget_t.mplToolbar.a_ui_state = ui_level
+                    self.mplwidget_f.mplToolbar.a_ui_state = ui_level
                 elif dict_sig['mpl_toolbar'] == 'home':
                     self.redraw()
                     self.needs_redraw[self.tab_mpl_w.currentIndex()] = False

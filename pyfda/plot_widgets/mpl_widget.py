@@ -109,10 +109,7 @@ class MplWidget(QWidget):
         # Construct the canvas with the figure:
         self.plt_lim = []  # define variable for x,y plot limits
 
-        if cmp_version("matplotlib", "2.2.0") >= 0:
-            self.fig = Figure(constrained_layout=True)
-        else:
-            self.fig = Figure()
+        self.fig = Figure(constrained_layout=True)
 
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setSizePolicy(QSizePolicy.Expanding,
@@ -365,14 +362,26 @@ class MplToolbar(NavigationToolbar):
         self.a_en.setChecked(True)
         self.a_en.setVisible(False)
 
-        # self.addSeparator()
+        # ---------------------------------------------
+        # UI Detail Level:
+        # ---------------------------------------------
+        self.a_ui = self.addAction(
+            QIcon(':/ui_level_max'), 'UI detail', self.cycle_ui_level)
+        self.a_ui.setToolTip('UI detail level: All / basic / compact')
+        self.a_ui_levels = 3
+        self.a_ui_state = 0  # 0: full ui, 1: reduced, 2: compact ui
+
+        self.addSeparator()
 
         # ---------------------------------------------
         # HOME:
         # ---------------------------------------------
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
         self.a_ho.setToolTip('Reset zoom')
+
+        # ---------------------------------------------
         # BACK:
+        # ---------------------------------------------
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous zoom')
 
@@ -444,14 +453,6 @@ class MplToolbar(NavigationToolbar):
             QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
         self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
-
-        # ---------------------------------------------
-        # UI Detail:
-        # ---------------------------------------------
-        self.a_ui = self.addAction(
-            QIcon(':/grid_coarse.svg'), 'UI detail', self.cycle_ui_level)
-        self.a_ui.setToolTip('UI detail level: All / basic / compact')
-        self.a_ui_state = 2  # 0: compact, 1: reduced, 2: full ui level
 
         # ---------------------------------------------
         # REDRAW:
@@ -614,7 +615,6 @@ class MplToolbar(NavigationToolbar):
             else:
                 if self.a_gr_state == 0:
                     ax.grid(False, which='both')
-
                     self.a_gr.setIcon(QIcon(':/grid_none.svg'))
                 elif self.a_gr_state == 1:
                     ax.grid(True, which='major', lw=0.75, ls='-')
@@ -645,16 +645,17 @@ class MplToolbar(NavigationToolbar):
 
         """
         if cycle:
-            self.a_ui_state = (self.a_ui_state + 1) % 3
+            self.a_ui_state = (self.a_ui_state + 1) % self.a_ui_levels
 
         if self.a_ui_state == 0:
-            self.a_ui.setIcon(QIcon(':/ui_level_0'))
-        elif self.a_ui_state == 1:
-            self.a_ui.setIcon(QIcon(':/ui_level_1'))
-        elif self.a_ui_state == 2:
-            self.a_ui.setIcon(QIcon(':/ui_level_2'))
+            self.a_ui.setIcon(QIcon(':/ui_level_max'))
+        elif self.a_ui_state == self.a_ui_levels - 1:
+            self.a_ui.setIcon(QIcon(':/ui_level_min'))
+        else:
+            self.a_ui.setIcon(QIcon(':/ui_level_mid'))
 
-        self.emit({'mpl_toolbar': 'ui_level'})
+
+        self.emit({'mpl_toolbar': 'ui_level', 'value': self.a_ui_state})
 
 # ------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
