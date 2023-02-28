@@ -139,15 +139,6 @@ class PlotImpz_UI(QWidget):
             ("fixpoint", "Fixpoint", "fixpoint simulation")
         ]
 
-        # combobox UI selection
-        self.cmb_ui_select_items = [
-            "<span>Select UI elements to display.</span>",
-            ("plot_stim", "Plot + Stim", "Show plot and stimuli selection widgets"),
-            ("plot", "Plot", "Only show plot selection widget"),
-            ("stim", "Stimuli", "Only show stimuli selection widget"),
-            ("none", "Compact", "Compact view, show neither plot nor stimuli widget")
-        ]
-
         # data / icon / tooltipp (none) for plotting styles
         self.plot_styles_list = [
             ("Plot style"),
@@ -220,6 +211,7 @@ class PlotImpz_UI(QWidget):
                           self.cmb_sim_select_init)
 
         self.prg_wdg = QProgressBar(self)
+        self.prg_wdg.setToolTip("Show simulation progress")
         self.prg_wdg.setFixedHeight(but_height)
         self.prg_wdg.setFixedWidth(qtext_width(N_x=6))
         self.prg_wdg.setMinimum(0)
@@ -246,13 +238,6 @@ class PlotImpz_UI(QWidget):
             "be stopped so quickly. "
             "<i>&Delta;N</i> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
-
-        self.lbl_ui_select = QLabel(self)
-        self.lbl_ui_select = QLabel(to_html("UI", frmt='b'), self)
-
-        self.cmb_ui_select = QComboBox(self)
-        qcmb_box_populate(self.cmb_ui_select, self.cmb_ui_select_items,
-                          self.cmb_ui_select_init)
 
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
@@ -295,10 +280,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addWidget(self.lbl_N_frame)
         layH_ctrl_run.addWidget(self.led_N_frame)
-
-        layH_ctrl_run.addSpacing(20)
-        layH_ctrl_run.addWidget(self.lbl_ui_select)
-        layH_ctrl_run.addWidget(self.cmb_ui_select)
         layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addSpacing(20)
