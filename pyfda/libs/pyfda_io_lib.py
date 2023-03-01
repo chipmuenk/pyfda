@@ -12,6 +12,7 @@ Library with classes and functions for file and text IO
 import os, re, io
 import csv
 import datetime
+import warnings
 from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
 
 import pickle
@@ -445,7 +446,7 @@ def csv2array(f: TextIO):
     # throw an error (instead of just issueing a deprecation warning) when trying to
     # create a numpy array from nested ragged sequences. This error can then be
     # caught easily.
-    np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
+    warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
@@ -936,7 +937,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 
         if not err:
             try:  # try to convert array elements to float
-                data_arr = data_arr.astype(np.float)
+                data_arr = data_arr.astype(float)
             except ValueError as e:
                 logger.error(e)
                 return None
