@@ -9,14 +9,14 @@
 """
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
-from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
+from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval, to_html
-from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget
+from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qcmb_box_populate, qget_cmb_box
 import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -43,6 +43,17 @@ class Tran_IO(QWidget):
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
         self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
+
+        self.cmb_select_chan_items = [
+            "<span>Simulate floating-point or fixpoint response.</span>",
+            ("del", "x", "Unload data from memory"),
+            ("1", "1", "Use data from channel 1 (left, mono)"),
+            ("2", "2", "Use data from channel 2 (right, mono)"),
+            ("12", "1|2", "Use data from both channels (stereo)"),
+            ("sum", "Σ", "Sum data from both channels (mono)")
+        ]
+        self.cmb_select_chan_init = "1"
+
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
 
@@ -148,9 +159,9 @@ class Tran_IO(QWidget):
             logger.error(f"Unknown file format '{self.file_type}'")
             return -1
 
-        if self.nchans > 9:
+        if self.nchans > 2:
             logger.warning(
-                f"Unsuitable file format with {io.read_csv_info} > 9 columns.")
+                f"Unsuitable file format with {io.read_csv_info} > 2 channels.")
             return -1
         elif self.nchans == 1:
             self.ui.lbl_chan.setVisible(False)
@@ -165,9 +176,12 @@ class Tran_IO(QWidget):
             # sum sign and populate the combo box with it
             # don't emit a signal while re-initializing the combo box
             self.ui.cmb_chan.blockSignals(True)
-            self.ui.cmb_chan.addItems(
-                [str(k + 1) for k in range(self.nchans)] + ["Σ"]
-                )
+            qcmb_box_populate(self.ui.cmb_chan, self.cmb_select_chan_items, self.cmb_select_chan_init)
+            # self.ui.cmb_chan.addItems(
+            #     [str(k + 1) for k in range(self.nchans)] + ["1|2"] + ["Σ"]
+            #     )
+            # self.ui.cmb_chan.setToolTip("Select channel(s) to load")
+            # self.ui.cmb_chan.setItemData(0, "Unload data", Qt.ToolTipRole)
             self.ui.cmb_chan.blockSignals(False)
 
         if len(self.file_name) < 45:
@@ -249,10 +263,23 @@ class Tran_IO(QWidget):
 
         if self.nchans == 1:
             data = self.data_raw
-        elif self.ui.cmb_chan.currentIndex() == self.nchans:  # last item (sum) selected
-            data = self.data_raw.sum(0)  # sum all slices along dim 0
         else:
-            data = self.data_raw[self.ui.cmb_chan.currentIndex()]
+            item = qget_cmb_box(self.ui.cmb_chan)
+
+            if item == "del":  # delete data
+                self.x = self.data_raw = None
+                self.emit({'data_changed': 'file_io'})
+                return
+            elif item == "1":  # use channel 1 (mono)
+                data = self.data_raw[0]
+            elif item == "2":  # use channel 2 (mono)
+                data = self.data_raw[1]
+            elif item == "12":  # use channel 1 and 2 as stereo signal
+                data = self.data_raw[0] + 1j * self.data_raw[1]
+            elif item == "sum":  # sum channel 1 and 2 as mono signal
+                data = self.data_raw.sum(0)  # sum all channels along dim 0
+            else:
+                logger.error('Unknown item "{item}"')
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
