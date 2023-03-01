@@ -45,7 +45,7 @@ class Plot_Tran_Stim(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-        self.x_file = None  # data mapped from file io
+        self.x_file = None  # data mapped from file io in Plot_Impz.file_loaded()
 
         self._construct_UI()
 
@@ -462,12 +462,12 @@ class Plot_Tran_Stim(QWidget):
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
             elif len(self.x_file) >= N_last:
-                self.xf = add_signal(self.xf, self.x_file[N_first:N_last, :])
+                self.xf = add_signal(self.xf, self.x_file[N_first:N_last])
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > N_first:
                 self.xf = add_signal(self.xf, np.concatenate(
-                    (self.x_file[N_first:, :],
-                     np.zeros(N_last - np.shape(self.x_file)[0], np.shape(self.x_file[1])))
+                    (self.x_file[N_first:],
+                     np.zeros(N_last - np.shape(self.x_file)[0], np.shape(self.x_file)[1]))
                     ))
             # file data has been consumed, nothing left to be added
             else:
