@@ -381,7 +381,7 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
         if file_name is None:  # operation cancelled or error
             return None
         else:
-            data_arr = import_data(file_name, file_type) # fkey,
+            data_arr = import_data(file_name, file_type)
             # pass data as numpy array
             logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                         .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -408,7 +408,7 @@ def csv2array(f: TextIO):
     -------
 
     data_arr: ndarray
-        numpy array containing table data from file or text when import was
+        numpy array of str with table data from file or text when import was
         successful
 
     OR
@@ -562,7 +562,7 @@ def csv2array(f: TextIO):
     if data_list == [] or data_list ==[""]:
             return "Imported data is empty."
 
-    # ------- Try to convert list to an array --------------------
+    # ------- Try to convert list to an array of str --------------------
     try:
         data_arr = np.array(data_list)
     except np.VisibleDeprecationWarning:
