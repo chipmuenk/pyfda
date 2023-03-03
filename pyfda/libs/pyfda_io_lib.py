@@ -940,9 +940,12 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         if not err:
             try:  # try to convert array elements to float
                 data_arr = data_arr.astype(float)
-            except ValueError as e:
-                logger.error(e)
-                return None
+            except ValueError as e1:
+                try:
+                    data_arr = data_arr.astype(complex)
+                except ValueError as e2:
+                    logger.error(f"{e1}\n{e2}")
+                    return None
             logger.info(
                 f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
             return data_arr  # returns numpy array of type float
