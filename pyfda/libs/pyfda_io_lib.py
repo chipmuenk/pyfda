@@ -559,6 +559,8 @@ def csv2array(f: TextIO):
         io_error = f"Error during CSV import:\n{e}"
         return io_error
 
+    if data_list == [] or data_list ==[""]:
+            return "Imported data is empty."
     try:
         if data_list is None:
             return "Imported data is None."
