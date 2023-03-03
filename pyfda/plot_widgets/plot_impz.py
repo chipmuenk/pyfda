@@ -152,7 +152,7 @@ class Plot_Impz(QWidget):
         tab_w = 30  # needs to fit with the tab size defined in pyfda_rc.py
         # tab_w = self.tab_mpl_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
-        self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
+        self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
         self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")

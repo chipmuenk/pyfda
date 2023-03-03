@@ -14,7 +14,7 @@
     <file alias="fft.svg">images/icons/fft.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
-    <file alias="graph_90.png">images/icons/dark/graph_90.png</file>
+    <file alias="graph_90.svg">images/icons/dark/graph_90.svg</file>
     <file alias="grid_none.svg">images/icons/dark/grid_none.svg</file>
     <file alias="grid_fine.svg">images/icons/dark/grid_fine.svg</file>
     <file alias="grid_coarse.svg">images/icons/dark/grid_coarse.svg</file>
