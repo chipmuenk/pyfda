@@ -419,7 +419,15 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             else:
                 s += k + ' : ' + str(d[k])
             first = False
-    elif type(d) in {list, np.ndarray, tuple}:
+        return s
+    if type(d) in {list, tuple}:
+        try:
+            _ = np.asarray(d)
+        except (TypeError, ValueError) as e:
+            logger.warning(f"pprint_log(): Could not transform data to array:\n{e}")
+            return ""
+
+    if type(d) in {list, np.ndarray, tuple}:
         if np.ndim(d) == 1:
             s += (f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
                   f'Shape =  ({len(d)} x 1)' + cr + tab)
@@ -441,7 +449,8 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
                     s += ' ...'
                 first = False
         else:
-            logger.warning(f"Object with ndim = {np.ndim(d)} cannot be processed.")
+            logger.warning(f"pprint_log(): Object with ndim = {np.ndim(d)} cannot be processed.")
+            return ""
     else:  # scalar, string or None
         if type(d) is None:
             s += ('Type: None')
