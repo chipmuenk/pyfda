@@ -561,39 +561,37 @@ def csv2array(f: TextIO):
 
     if data_list == [] or data_list ==[""]:
             return "Imported data is empty."
+
+    # ------- Try to convert list to an array --------------------
     try:
-        if data_list is None:
-            return "Imported data is None."
-        try:
-            data_arr = np.array(data_list)
-        except np.VisibleDeprecationWarning:
-            # prevent creation of numpy arrays from nested ragged sequences
-            return "Columns with different number of elements."
-
-        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
-            return f"Imported data is a scalar: '{data_arr}'"
-        elif np.ndim(data_arr) == 1:
-            if len(data_arr) < 2:
-                return f"Not enough data: '{data_arr}'"
-            else:
-                return data_arr
-        elif np.ndim(data_arr) == 2:
-            cols, rows = np.shape(data_arr)
-            logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
-            if cols > 2 and rows > 2:
-                return f"Unsuitable data shape {np.shape(data_arr)}"
-            elif cols > rows:
-                logger.warning("Swapping rows and columns.")
-                return data_arr.T
-            else:
-                return data_arr
-        else:
-            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
-                .format(np.ndim(data_arr), np.shape(data_arr))
-
+        data_arr = np.array(data_list)
+    except np.VisibleDeprecationWarning:
+        # prevent creation of numpy arrays from nested ragged sequences
+        return "Can't convert to array, columns have different lengths."
     except (TypeError, ValueError) as e:
-        io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
+        io_error = f"{e}\nData = {pprint_log(data_list)}"
         return io_error
+
+    if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
+        return f"Imported data is a scalar: '{data_arr}'"
+    elif np.ndim(data_arr) == 1:
+        if len(data_arr) < 2:
+            return f"Not enough data: '{data_arr}'"
+        else:
+            return data_arr
+    elif np.ndim(data_arr) == 2:
+        cols, rows = np.shape(data_arr)
+        logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
+        if cols > 2 and rows > 2:
+            return f"Unsuitable data shape {np.shape(data_arr)}"
+        elif cols > rows:
+            logger.warning("Swapping rows and columns.")
+            return data_arr.T
+        else:
+            return data_arr
+    else:
+        return "Unsuitable data shape: ndim = {0}, shape = {1}"\
+            .format(np.ndim(data_arr), np.shape(data_arr))
 
 # =============================================================================
 #     try:
