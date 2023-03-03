@@ -548,11 +548,13 @@ def csv2array(f: TextIO):
     if use_header:
         logger.info("Headers:\n{0}".format(next(data_iter, None)))  # py3 and py2
 
+    # ------- Read CSV file into a list --------------------
     data_list = []
     try:
         for row in data_iter:
             logger.debug("{0}".format(row))
-            data_list.append(row)
+            if row:  # only append non-empty rows
+                data_list.append(row)
     except csv.Error as e:
         io_error = f"Error during CSV import:\n{e}"
         return io_error
