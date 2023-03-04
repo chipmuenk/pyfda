@@ -199,11 +199,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
         logger.error(
             f"Unknown key '{params['CSV']['header']}' for params['CSV']['header']")
 
-    if params['CSV']['orientation'] in {'horiz', 'auto'}:
-        orientation_horiz = True
-    elif params['CSV']['orientation'] == 'vert':
-        orientation_horiz = False
-    else:
+    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
         logger.error(
             f"Unknown key '{params['CSV']['orientation']}' for "
             "params['CSV']['orientation']")
@@ -229,16 +225,16 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Nothing selected, copy complete table from the model (data) in float format:
     # ==========================================================================
     if not np.any(sel):
-        if orientation_horiz:  # rows are horizontal
+        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
             for c in range(num_cols):
-                if use_header:  # add the table header
+                if use_header:  # add the table header at the beginning of the row(s)
                     text += table.horizontalHeaderItem(c).text() + delim
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
             text = text.rstrip(cr)  # delete last CR
-        else:  # rows are vertical
-            if use_header:  # add the table header
+        else:  # write table in column(s)
+            if use_header:  # add the table header at the top of the column(s)
                 for c in range(num_cols):
                     text += table.horizontalHeaderItem(c).text() + delim
                 text = text.rstrip(delim) + cr
@@ -252,8 +248,8 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Copy only selected cells in displayed format:
     # =======================================================================
     else:
-        if orientation_horiz:  # horizontal orientation, one or two rows
-            if use_header:  # add the table header
+        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
+            if use_header:  # insert table header at the beginning of row 1
                 text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
                 for r in sel[0]:
@@ -264,14 +260,14 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
 
             if sel[1]:  # returns False for []
                 text += cr  # add a CRLF when there are two columns
-                if use_header:  # add the table header
+                if use_header:  # insert table header at the beginning of row 2
                     text += table.horizontalHeaderItem(1).text() + delim
                 for r in sel[1]:
                     item = table.item(r, 1)
                     if item and item.text() != "":
                         text += table.itemDelegate().text(item) + delim
                 text = text.rstrip(delim)  # remove last tab delimiter again
-        else:  # vertical orientation, one or two columns
+        else:  # write table in column(s)
             sel_c = []
             if sel[0]:
                 sel_c.append(0)
@@ -462,14 +458,10 @@ def csv2array(f: TextIO):
                 f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
                 f"using {header} instead.")
 
-        orientation_horiz = CSV_dict['orientation'].lower()
-        if orientation_horiz in {'auto', 'vert', 'horiz'}:
-            pass
-        else:
-            orientation_horiz = 'vert'
-            logger.warning(
+        if not CSV_dict['orientation'].lower() in {'auto', 'cols', 'rows'}:
+            logger.error(
                 f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
-                f"using {orientation_horiz} instead.")
+                "using column mode.")
 
         tab = CSV_dict['delimiter'].lower()
         cr = CSV_dict['lineterminator'].lower()
@@ -574,20 +566,25 @@ def csv2array(f: TextIO):
 
     if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
         return f"Imported data is a scalar: '{data_arr}'"
+
     elif np.ndim(data_arr) == 1:
         if len(data_arr) < 2:
             return f"Not enough data: '{data_arr}'"
         else:
             return data_arr
+
     elif np.ndim(data_arr) == 2:
-        cols, rows = np.shape(data_arr)
-        logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
+        rows, cols = np.shape(data_arr)
+        logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
         if cols > 2 and rows > 2:
             return f"Unsuitable data shape {np.shape(data_arr)}"
-        elif cols > rows:
-            logger.warning("Swapping rows and columns.")
+        elif params['CSV']['orientation'] == 'rows'\
+                or params['CSV']['orientation'] == 'auto' and cols > rows:
+            # returned table is transposed, swap cols and rows
+            logger.info(f"Building table from {cols} row(s) with {rows} columns.")
             return data_arr.T
         else:
+            logger.info(f"Building table from {cols} column(s) with {rows} rows.")
             return data_arr
     else:
         return "Unsuitable data shape: ndim = {0}, shape = {1}"\

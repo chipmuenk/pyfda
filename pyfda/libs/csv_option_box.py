@@ -57,7 +57,7 @@ class CSV_option_box(QDialog):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
 
-        lbl_delimiter = QLabel("CSV-Delimiter", self)
+        lbl_delimiter = QLabel("CSV delimiter", self)
         cmb_delimiter_items = ["<span>Select delimiter between data fields for im- and export."
                        "</span>",
             ("auto", "Auto / ','", "<span>Detect the delimiter automatically for import, "
@@ -75,7 +75,7 @@ class CSV_option_box(QDialog):
                           self.cmb_delimiter_default)
 
 
-        lbl_terminator = QLabel("Line Terminator", self)
+        lbl_terminator = QLabel("Line terminator", self)
         cmb_terminator_items = [
             "<span>Terminator at the end of a data row, depending on the operating "
             "system. 'None' can be used for a single row of data with added line breaks.</span>",
@@ -96,15 +96,13 @@ class CSV_option_box(QDialog):
         butClose = QPushButton(self)
         butClose.setText("Close")
 
-        lbl_orientation = QLabel("Table orientation", self)
+        lbl_orientation = QLabel("Table mode", self)
         cmb_orientation_items = [
-            "<span>Select orientation of table.</span>",
-            ('auto', 'Auto/Vert.', "<span>Detect table orientation automatically "
-             "for import, use vertical format for exporting data.</span>"),
-            ('vert', 'Vertical', "<span>Import / export data in vertical (column) "
-             "mode.</span>"),
-            ('horiz', 'Horizontal', "<span>Import / export data in horizontal (row) "
-             "mode.</span>")
+            "<span>Select row / column mode of table.</span>",
+            ('auto', 'Auto/Cols.', "<span>Detect table orientation automatically "
+             "for import, use column format for exporting data.</span>"),
+            ('cols', 'Columns', "<span>Import / export data in columns.</span>"),
+            ('rows', 'Rows', "<span>Import / export data in rows.</span>")
             ]
         self.cmb_orientation = QComboBox(self)
         qcmb_box_populate(self.cmb_orientation, cmb_orientation_items,
