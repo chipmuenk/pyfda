@@ -183,12 +183,6 @@ class ItemDelegate(QStyledItemDelegate):
 
         return line_edit
 
-#    def updateEditorGeometry(self, editor, option, index):
-#        """
-#        Updates the editor for the item specified by index according to the option given
-#        """
-#        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
-
     # -------------------------------------------------------------------------
     def setEditorData(self, editor, index):
         """

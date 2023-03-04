@@ -152,6 +152,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent._normalize_gain()  # recalculate gain
 
 
+# ===================================================================================
 class ItemDelegateAnti(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
