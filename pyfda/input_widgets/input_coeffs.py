@@ -131,17 +131,17 @@ class ItemDelegate(QStyledItemDelegate):
             super(ItemDelegate, self).initStyleOption(option, index)
 
     # -------------------------------------------------------------------------
-    def text(self, item):
-        """
-        Return item text as string transformed by self.displayText()
+    # def text(self, item):
+    #     """
+    #     Return item text as string transformed by self.displayText()
 
-        Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
+    #     Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
 
-        TODO: Still needed?
-        """
-        dtext = str(self.displayText(item.text(), QtCore.QLocale()))
-        # logger.warning(f"dtext={dtext}")
-        return dtext
+    #     TODO: Still needed?
+    #     """
+    #     dtext = str(self.displayText(item.text(), QtCore.QLocale()))
+    #     # logger.warning(f"dtext={dtext}")
+    #     return dtext
 
     # -------------------------------------------------------------------------
     def displayText(self, text, locale):
