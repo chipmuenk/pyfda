@@ -564,7 +564,7 @@ def csv2array(f: TextIO):
         io_error = f"{e}\nData = {pprint_log(data_list)}"
         return io_error
 
-    if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
+    if np.ndim(data_arr) == 0:
         return f"Imported data is a scalar: '{data_arr}'"
 
     elif np.ndim(data_arr) == 1:
@@ -589,24 +589,6 @@ def csv2array(f: TextIO):
     else:
         return "Unsuitable data shape: ndim = {0}, shape = {1}"\
             .format(np.ndim(data_arr), np.shape(data_arr))
-
-# =============================================================================
-#     try:
-#         data_arr = np.array(data_list)
-#         cols, rows = np.shape(data_arr)
-#         logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n"
-#                       .format(cols, rows, data_arr))
-#         if params['CSV']['orientation'] == 'vert':
-#             return data_arr.T
-#         else:
-#             return data_arr
-#
-#     except (TypeError, ValueError) as e:
-#         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
-#         return io_error
-#
-# =============================================================================
-
 
 # ------------------------------------------------------------------------------
 def create_file_filters(file_types: tuple, file_filters: str = ""):
