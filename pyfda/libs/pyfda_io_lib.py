@@ -61,6 +61,12 @@ file_filters_dict = {
     'xlsx': 'Excel 2007 Worksheet'
     }
 
+# regex pattern that yields true in a re.search() when only the specified
+#  characters (numeric, "eEjJ(),.+-" and blank / line breaks) are contained
+pattern_num_chars = re.compile('[eEjJ()0-9,\.\+\-\s]+$')
+# regex pattern that identifies characters and their position *not* specified
+pattern_no_num = re.compile('(?![eEjJ()0-9,\.\+\-\s])')
+
 # ------------------------------------------------------------------------------
 def prune_file_ext(file_type: str) -> str:
     """
@@ -470,33 +476,31 @@ def csv2array(f: TextIO):
         io_error = "Dict 'params':\n{0}".format(e)
         return io_error
 
-    try:
-        # ------------------------------------------------------------------------------
-        # Analyze CSV object
-        # ------------------------------------------------------------------------------
-        if header == 'auto' or tab == 'auto' or cr == 'auto':
-            # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(),
-                                          delimiters=['\t', ';', ',', '|', ' '])
-            f.seek(0)                               # and reset the file pointer
-        else:
-            # fall back, alternatives: 'excel', 'unix':
+    sample = ""
+
+    # ------------------------------------------------------------------------------
+    # Analyze CSV object
+    # ------------------------------------------------------------------------------
+    if header == 'auto' or tab == 'auto' or cr == 'auto':
+        # test the first line for delimiters (of the given selection)
+        sample = f.readline()
+        f.seek(0)  # and reset the file pointer
+        try:
+            dialect = csv.Sniffer().sniff(sample, delimiters=['\t', ';', ',', '|', ' '])
+        except csv.Error as e:
+            logger.warning(f'CSV sniffing reported "{e}",\n'
+                        'continuing with format "excel-tab"')
             dialect = csv.get_dialect('excel-tab')
+    else:
+        # fall back, alternatives: 'excel', 'unix':
+        dialect = csv.get_dialect('excel-tab')
 
-        if header == "auto":
-            # True when header detected:
-            use_header = csv.Sniffer().has_header(f.read(10000))
-            f.seek(0)
-
-    except csv.Error as e:
-        logger.warning("Error during CSV analysis:\n{0},\n"
-                       "continuing with format 'excel-tab'".format(e))
-        dialect = csv.get_dialect('excel-tab')  # fall back
-        use_header = False
-
-    if header == 'on':
+    if header == "auto":
+        # yields True when a non-numeric character is detected, indicating a header:
+        use_header = not pattern_num_chars.search(sample)
+    elif header == 'on':
         use_header = True
-    if header == 'off':
+    else:
         use_header = False
 
     delimiter = dialect.delimiter
@@ -653,8 +657,13 @@ def read_csv_info(filename):
     with open(filename) as f:
         first_line = f.readline()
         sample = first_line + f.readline()
-
-        has_header = sniffer.has_header(sample)
+        # pattern search returns true when only allowed characters are found
+        # when the first line contains other characters, it is assumed that this
+        # is a header
+        has_header = not pattern_num_chars.search(sample)
+        logger.warning(f"has_header = {has_header}")
+        if has_header:
+             logger.warning(pattern_no_num.search(sample))
         dialect = sniffer.sniff(sample)
         delimiter = dialect.delimiter
         lineterminator = repr(dialect.lineterminator)
@@ -911,11 +920,11 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         if not err:
             try:  # try to convert array elements to float
                 data_arr = data_arr.astype(float)
-            except ValueError as e1:
+            except ValueError as e:
                 try:
                     data_arr = data_arr.astype(complex)
-                except ValueError as e2:
-                    logger.error(f"{e1}\n{e2}")
+                except ValueError:
+                    logger.error(f"{e},\n\tconversion to complex also failed.")
                     return None
             logger.info(
                 f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
