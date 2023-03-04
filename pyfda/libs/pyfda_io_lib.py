@@ -498,7 +498,6 @@ def csv2array(f: TextIO):
         use_header = True
     if header == 'off':
         use_header = False
-    # case 'auto' has been treated above
 
     delimiter = dialect.delimiter
     lineterminator = dialect.lineterminator
@@ -648,14 +647,7 @@ def read_csv_info(filename):
     file_size = os.path.getsize(filename)
     logger.info(f"File Size is {file_size} bytes")
 
-    # if file_size < 1e6:
-    #     sniff_size = file_size + 10  # run sniffer over whole file
-    # else:
-    #     sniff_size = 50000  # only read first 50000 chars
-
     sniffer = csv.Sniffer()
-    # TODO: detect and skip header
-    # TODO: count other linebreaks as well
     horizontal = False
 
     with open(filename) as f:
