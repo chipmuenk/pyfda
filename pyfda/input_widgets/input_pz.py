@@ -196,11 +196,6 @@ class Input_PZ(QWidget):
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False)  # initial setting of cmbNorm
         self._construct_UI()  # construct the rest of the UI
 
-        self.load_dict()  # initialize table from filterbroker
-        self._refresh_table()  # initialize table with values
-
-        self.setup_signal_slot()  # setup signal-slot connections and eventFilters
-
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -255,10 +250,9 @@ class Input_PZ(QWidget):
 
         self.setLayout(layVMain)
 
-    def setup_signal_slot(self):
-        """
-        Setup setup signal-slot connections
-        """
+        self.load_dict()  # initialize table from filterbroker
+        self._refresh_table()  # initialize table with values
+
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
