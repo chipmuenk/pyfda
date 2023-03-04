@@ -430,16 +430,16 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
     if type(d) in {list, np.ndarray, tuple}:
         if np.ndim(d) == 1:
             s += (f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
-                  f'Shape =  ({len(d)} x 1)' + cr + tab)
+                  f'shape =  ({len(d)} x 1)' + cr + tab)
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
             cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
             s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__}, '
-                  f'(Shape = ({rows} x {cols})' + cr + tab)
+                  f'shape = ({rows} x {cols})' + cr + tab)
             #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
-            for c in range(min(N-1, cols)):
+            for c in range(min(N, cols)):
                 if not first:
                     s += cr + tab
                 # logger.warning(f'rows={rows}; min(N-1, rows)={min(N, rows)}\n'
@@ -448,6 +448,8 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
                 if rows > N-1:
                     s += ' ...'
                 first = False
+            if cols > N-1:
+                    s += cr + tab + ' ...'
         else:
             logger.warning(f"pprint_log(): Object with ndim = {np.ndim(d)} cannot be processed.")
             return ""
