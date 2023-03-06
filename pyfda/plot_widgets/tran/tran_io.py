@@ -100,8 +100,6 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
-        self.ui.wdg_csv_options.sig_tx.connect(self.process_sig_rx)
-
         self.setLayout(layVMain)
 
     # ------------------------------------------------------------------------------
