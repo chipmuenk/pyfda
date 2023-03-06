@@ -104,7 +104,7 @@ class Tran_IO(QWidget):
 
         self.setLayout(layVMain)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def select_file(self):
         """
         Select a file in a UI dialog and peek into it to find the dimensions
