@@ -288,6 +288,7 @@ class Input_PZ_UI(QWidget):
                 else:
                     dirs.csv_options_handle.close()
 
+        # alert other widgets that csv options / visibility have changed
         self.emit({'ui_global_changed': 'csv'})
 
     # ------------------------------------------------------------------------------

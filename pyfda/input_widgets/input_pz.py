@@ -66,9 +66,9 @@ class ItemDelegate(QStyledItemDelegate):
         """
         # continue with the original `initStyleOption()` and call displayText()
         super(ItemDelegate, self).initStyleOption(option, index)
-        # test whether fixpoint conversion during displayText() created an overflow:
+        # test for poles with magnitude > 1
         if index.column() == 1 and False:
-            # Color item backgrounds with pos. Overflows red
+            # Color item backgrounds with poles outside the UC red
             option.backgroundBrush = QBrush(Qt.SolidPattern)
             option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 

@@ -515,8 +515,7 @@ def csv2array(f: TextIO):
 
     logger.info(f"Parsing CSV data with header = '{use_header}'\n"
                 f"\tDelimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
-                f"| quotechar = ' {quotechar} '\n"
-                f"\tType of passed text: '{f.__class__.__name__}'")
+                f"| quotechar = ' {quotechar} as '{f.__class__.__name__}'")
 
     # --------------------------------------------------------------------------
     # finally, create iterator from csv data
@@ -541,7 +540,7 @@ def csv2array(f: TextIO):
 # =============================================================================
 
     if use_header:
-        logger.info("Headers:\n{0}".format(next(data_iter, None)))  # py3 and py2
+        logger.info("Header detected:\n{0}".format(next(data_iter, None)))
 
     # ------- Read CSV file into a list --------------------
     data_list = []
