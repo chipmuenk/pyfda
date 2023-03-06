@@ -659,14 +659,14 @@ class Input_Coeffs(QWidget):
 
         qstyle_widget(self.ui.butSave, 'normal')
 
-    # --------------------------------------------------------------------------
-    def _copy_options(self):
-        """
-        Set options for copying to/from clipboard or file.
-        """
-        self.opt_widget = CSV_option_box(self)  # Handle must be class attribute!
-        # self.opt_widget.show() # modeless dialog, i.e. non-blocking
-        self.opt_widget.exec_()  # modal dialog (blocking)
+    # # --------------------------------------------------------------------------
+    # def _copy_options(self):
+    #     """
+    #     Set options for copying to/from clipboard or file.
+    #     """
+    #     self.opt_widget = CSV_option_box(self)  # Handle must be class attribute!
+    #     # self.opt_widget.show() # modeless dialog, i.e. non-blocking
+    #     self.opt_widget.exec_()  # modal dialog (blocking)
 
     # --------------------------------------------------------------------------
     def _export(self):
