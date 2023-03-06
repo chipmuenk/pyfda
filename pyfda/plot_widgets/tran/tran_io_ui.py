@@ -16,9 +16,8 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 # import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, QVLine,
-    PushButton)
+import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.pyfda_qt_lib import (qstyle_widget, QVLine, PushButton)
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -41,19 +40,20 @@ class Tran_IO_UI(QWidget):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
-        -
+        - CSV options window
         -
         """
-
         logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
                        .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-            return
-        # elif 'view_changed' in dict_sig:
-        #     if dict_sig['view_changed'] == 'f_S':
-        #         self.recalc_freqs()
+        elif 'closeEvent' in dict_sig:
+            self._close_csv_win()
+            self.emit({'ui_global_changed': 'csv'})
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
+            # adopt setting of CSV options button to state of CSV popup handle
+            self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 # ------------------------------------------------------------------------------
     def __init__(self, parent=None):
@@ -87,8 +87,6 @@ class Tran_IO_UI(QWidget):
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
-
-        self.wdg_csv_options = CSV_option_box(self, has_cmsis=False)
 
         self.but_select = PushButton("Select", checkable=False)
         self.but_select.setToolTip(
@@ -189,16 +187,32 @@ class Tran_IO_UI(QWidget):
 
         # ---- Local (UI) signal-slot connections
         self.but_csv_options.clicked.connect(self._open_csv_win)
-    # --------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
     def _open_csv_win(self):
         """
-        Pop-up window for CSV options
+        Pop-up window for CSV options, triggered by clicking the options button
         """
-        if self.but_csv_options.isChecked():
-            self.wdg_csv_options.show()  # modeless i.e. non-blocking popup window
-            self.wdg_csv_options.load_settings()
-        else:
-            self.wdg_csv_options.hide()  # modeless i.e. non-blocking popup window
+        if dirs.csv_options_handle is None:
+            # no handle to the window? Create a new instance!
+            if self.but_csv_options.isChecked():
+                # Important: Handle to window must be class attribute otherwise it (and
+                # the attached window) is deleted immediately when it goes out of scope
+                dirs.csv_options_handle = CSV_option_box(self)
+                dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
+                dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
+        else:  # close window, delete handle
+            dirs.csv_options_handle.close()
+            self.but_csv_options.setChecked(False)
+
+        # alert other widgets that csv options / visibility have changed
+        self.emit({'ui_global_changed': 'csv'})
+
+    # ------------------------------------------------------------------------------
+    def _close_csv_win(self):
+        dirs.csv_options_handle = None
+        self.but_csv_options.setChecked(False)
+        qstyle_widget(self.but_csv_options, "normal")
 
 # ================================================================================
 if __name__ == "__main__":

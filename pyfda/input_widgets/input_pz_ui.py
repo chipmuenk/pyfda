@@ -66,11 +66,9 @@ class Input_PZ_UI(QWidget):
         if 'closeEvent' in dict_sig:
             self._close_csv_win()
             self.emit({'ui_global_changed': 'csv'})
-            return  # probably not needed
         elif 'ui_global_changed' in dict_sig:
             self._set_load_save_icons()  # update icons file <-> clipboard
-            # inform e.g. the p/z input widget about changes in CSV options
-            self.emit({'ui_global_changed': 'csv'})
+            # set state of CSV options button according to state of CSV popup handle
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -268,11 +266,6 @@ class Input_PZ_UI(QWidget):
         """
         Pop-up window for CSV options
         """
-        if self.but_csv_options.isChecked():
-            qstyle_widget(self.but_csv_options, "changed")
-        else:
-            qstyle_widget(self.but_csv_options, "normal")
-
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance!
             if self.but_csv_options.isChecked():
@@ -281,12 +274,10 @@ class Input_PZ_UI(QWidget):
                 dirs.csv_options_handle = CSV_option_box(self)
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
-        else:
-            if not self.but_csv_options.isChecked():  # this should not happen
-                if dirs.csv_options_handle is None:
-                    logger.warning("CSV options window is already closed!")
-                else:
-                    dirs.csv_options_handle.close()
+
+        else:  # close window, delete handle
+            dirs.csv_options_handle.close()
+            self.but_csv_options.setChecked(False)
 
         # alert other widgets that csv options / visibility have changed
         self.emit({'ui_global_changed': 'csv'})
@@ -322,12 +313,8 @@ class Input_PZ_UI(QWidget):
             self.butToTable.setIcon(QIcon(':/file.svg'))
             self.butToTable.setToolTip("<span>Load table from file.</span>")
 
-        if dirs.csv_options_handle is None:
-            qstyle_widget(self.but_csv_options, "normal")
-            self.but_csv_options.setChecked(False)
-        else:
-            qstyle_widget(self.but_csv_options, "changed")
-            self.but_csv_options.setChecked(True)
+        # set state of CSV options button according to state of handle
+        self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 
 # ------------------------------------------------------------------------------
