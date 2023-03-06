@@ -38,6 +38,7 @@ class CSV_option_box(QDialog):
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
         self.cmb_orientation_default = "auto"
+        self.cmb_header_default = "auto"
 
         self._construct_UI()
         qwindow_stay_on_top(self, True)
@@ -100,7 +101,7 @@ class CSV_option_box(QDialog):
         cmb_orientation_items = [
             "<span>Select row / column mode of table.</span>",
             ('auto', 'Auto/Cols.', "<span>Detect table orientation automatically "
-             "for import, use column format for exporting data.</span>"),
+             "during import; use column format for exporting data.</span>"),
             ('cols', 'Columns', "<span>Import / export data in columns.</span>"),
             ('rows', 'Rows', "<span>Import / export data in rows.</span>")
             ]
@@ -108,12 +109,17 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_orientation, cmb_orientation_items,
                           self.cmb_orientation_default)
 
-        lblHeader = QLabel("Enable header", self)
-        header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
-        self.cmbHeader = QComboBox(self)
-        self.cmbHeader.setToolTip("First row is a header.")
-        for h in header:
-            self.cmbHeader.addItem(h[0], h[1])
+        lbl_header = QLabel("Use header", self)
+        cmb_header_items = [
+            "<span>Interpret first row resp. column as header.</span>",
+            ('auto', 'Auto/Off', "<span>Detect header automatically during import; "
+             "turn off header during export.</span>"),
+            ('on', 'On', "<span>Turn on header.</span>"),
+            ('off', 'Off', "<span>Turn off.</span>")
+            ]
+        self.cmb_header = QComboBox(self)
+        qcmb_box_populate(self.cmb_header, cmb_header_items,
+                          self.cmb_header_default)
 
         lbl_cmsis = QLabel("CMSIS SOS format", self)
         lbl_cmsis.setVisible(self.has_cmsis)
@@ -137,8 +143,8 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.cmb_terminator, 2, 2)
         lay_grid.addWidget(lbl_orientation, 3, 1)
         lay_grid.addWidget(self.cmb_orientation, 3, 2)
-        lay_grid.addWidget(lblHeader, 4, 1)
-        lay_grid.addWidget(self.cmbHeader, 4, 2)
+        lay_grid.addWidget(lbl_header, 4, 1)
+        lay_grid.addWidget(self.cmb_header, 4, 2)
         lay_grid.addWidget(lbl_cmsis, 5, 1)
         lay_grid.addWidget(self.chk_cmsis, 5, 2)
         lay_grid.addWidget(self.radClipboard, 6, 1)
@@ -158,7 +164,7 @@ class CSV_option_box(QDialog):
         self.cmb_orientation.currentIndexChanged.connect(self.store_settings)
         self.cmb_delimiter.currentIndexChanged.connect(self.store_settings)
         self.cmb_terminator.currentIndexChanged.connect(self.store_settings)
-        self.cmbHeader.currentIndexChanged.connect(self.store_settings)
+        self.cmb_header.currentIndexChanged.connect(self.store_settings)
         self.chk_cmsis.clicked.connect(self.store_settings)
         self.radClipboard.clicked.connect(self.store_settings)
         self.radFile.clicked.connect(self.store_settings)
@@ -173,7 +179,7 @@ class CSV_option_box(QDialog):
             params['CSV']['delimiter'] = qget_cmb_box(self.cmb_delimiter, data=True)
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmb_terminator,
                                                            data=True)
-            params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
+            params['CSV']['header'] = qget_cmb_box(self.cmb_header, data=True)
             params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
@@ -191,7 +197,7 @@ class CSV_option_box(QDialog):
             qset_cmb_box(self.cmb_delimiter, params['CSV']['delimiter'], data=True)
             qset_cmb_box(self.cmb_terminator, params['CSV']['lineterminator'],
                          data=True)
-            qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
+            qset_cmb_box(self.cmb_header, params['CSV']['header'], data=True)
             self.chk_cmsis.setChecked(params['CSV']['cmsis'])
 
             self.radClipboard.setChecked(params['CSV']['clipboard'])
