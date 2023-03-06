@@ -321,5 +321,9 @@ last_file_name = ""
 last_file_dir = HOME_DIR
 """ Place holder for file type selected (e.g. "csv") in last file dialog"""
 last_file_type = ''
-""" Global handle to pop-up window for CSV options """
+"""
+Global handle to pop-up window for CSV options - this window must be closed
+before opening another pop-up window! Otherwise, the second window becomes
+unaccessible (?) and pyfda becomes unresponsive.
+"""
 csv_options_handle = None
