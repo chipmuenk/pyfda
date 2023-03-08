@@ -268,6 +268,7 @@ class Plot_Tran_Stim(QWidget):
                 logger.warning("No file loaded!")
             else:
                 self.xf = self.x_file[N_first:N_last]
+
             return self.xf[:N_frame]
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
@@ -472,7 +473,6 @@ class Plot_Tran_Stim(QWidget):
             # file data has been consumed, nothing left to be added
             else:
                 pass
-
         return self.xf[:N_frame]
 # ------------------------------------------------------------------------------
 
