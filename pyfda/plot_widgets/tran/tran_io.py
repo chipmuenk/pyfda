@@ -12,11 +12,11 @@ Widget for loading and storing stimulus data from / to transient plotting widget
 from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 
-import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_io_lib as io
 
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log, safe_numexpr_eval, to_html
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qcmb_box_populate, qget_cmb_box
+from pyfda.libs.csv_option_box import CSV_option_box
 import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -65,17 +65,19 @@ class Tran_IO(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-
         logger.warning("SIG_RX - vis: {0}\n{1}"
                        .format(self.isVisible(), pprint_log(dict_sig)))
 
-        if 'closeEvent' in dict_sig:
-            self.ui.but_csv_options.setChecked(False)
-        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv'\
-            and self.ui.but_csv_options.isChecked():
-                self.ui.wdg_csv_options.load_settings()
+        if 'id' in dict_sig and dict_sig['id'] == id(self):
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+        elif 'closeEvent' in dict_sig:
+            self.close_csv_win()
+            self.emit({'ui_local_changed': 'csv'})  # propagate one level up
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
+            # Set CSV options button according to state of CSV popup handle
+            self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
         """
         Instantiate the UI of the widget
@@ -84,12 +86,6 @@ class Tran_IO(QWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.ui.wdg_top)
         layVMain.setContentsMargins(*params['mpl_margins'])
-
-        # ----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        # ----------------------------------------------------------------------
-        self.ui.sig_tx.connect(self.sig_tx)  # relay UI events further up
-        self.sig_rx.connect(self.ui.sig_rx)  # ... and the other way round
 
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
@@ -100,6 +96,7 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
+        self.ui.but_csv_options.clicked.connect(self.open_csv_win)
         self.setLayout(layVMain)
 
     # ------------------------------------------------------------------------------
@@ -198,7 +195,7 @@ class Tran_IO(QWidget):
             f"{self.nchans} x {self.N}{info_str}")
         return 0
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def import_data(self):
         logger.info("import data")
         err = False
@@ -242,7 +239,7 @@ class Tran_IO(QWidget):
         self.select_chan_normalize()
         return 0
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
         - For multi-channel data, select one channel resp. average all channels
@@ -284,11 +281,36 @@ class Tran_IO(QWidget):
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
             # logger.info(f"norm: {type(self.norm)}, data: {type(self.data)} / {self.data.dtype}")
             self.ui.led_normalize.setText(str(self.norm))
-            self.x = data * self.norm / np.max(np.abs(data))
+            # use data.ravel() to enforce ndim == 1 instead of (N, 1) which is ndim == 2
+            # ravel() creates only a view on the array, not a new array.
+            self.x = data.ravel() * self.norm / np.max(np.abs(data))
         else:
-            self.x = data
-        logger.warning(f"self.x: {np.shape(self.x)}")
-        logger.warning(f"self.x: {pprint_log(self.x)}")
+            self.x = data.ravel()
 
         self.emit({'data_changed': 'file_io'})
         return
+
+    # ------------------------------------------------------------------------------
+    def open_csv_win(self):
+        """
+        Pop-up window for CSV options, triggered by clicking the options button
+        """
+        if dirs.csv_options_handle is None:
+            # no handle to the window? Create a new instance!
+            if self.ui.but_csv_options.isChecked():
+                # Important: Handle to window must be class attribute otherwise it (and
+                # the attached window) is deleted immediately when it goes out of scope
+                dirs.csv_options_handle = CSV_option_box(self)
+                dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
+                dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
+        else:  # close window, delete handle
+            dirs.csv_options_handle.close()
+            self.ui.but_csv_options.setChecked(False)
+
+        # alert other widgets that csv options / visibility have changed
+        self.emit({'ui_global_changed': 'csv'})
+
+    # ------------------------------------------------------------------------------
+    def close_csv_win(self):
+        dirs.csv_options_handle = None
+        self.ui.but_csv_options.setChecked(False)
