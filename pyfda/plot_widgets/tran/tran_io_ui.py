@@ -95,7 +95,8 @@ class Tran_IO_UI(QWidget):
         self.cmb_chan.setToolTip(
             "<span>Select channel / column for data import. '&Sigma;' "
             "</span> sums up all columns.")
-        self.cmb_chan.addItems(["1", "2", "Σ"])
+        # populate combobox for correct width (is overwritten later)
+        self.cmb_chan.addItems(["1", "2", "Σ", "1|2"])
         self.cmb_chan.setVisible(False)
 
         layV_chan = QVBoxLayout()
