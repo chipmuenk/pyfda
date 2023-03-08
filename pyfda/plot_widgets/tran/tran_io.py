@@ -128,7 +128,9 @@ class Tran_IO(QWidget):
         self.WL = None
 
         del self.x
-        self.x = None
+
+        qstyle_widget(self.ui.but_load, "normal")
+        self.ui.but_load.setText("Load")
 
         if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
@@ -264,6 +266,8 @@ class Tran_IO(QWidget):
             if item == "del":  # delete data
                 self.x = self.data_raw = None
                 self.emit({'data_changed': 'file_io'})
+                qstyle_widget(self.ui.but_load, "normal")
+                self.ui.but_load.setText("Load")
                 return
             elif item == "1":  # use channel 1 (mono)
                 data = self.data_raw[0]
