@@ -15,7 +15,7 @@ from pyfda.libs.compat import (
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html
-from pyfda.libs.pyfda_qt_lib import QVLine, PushButton
+from pyfda.libs.pyfda_qt_lib import QVLine, PushButton, qtext_width
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -66,6 +66,7 @@ class Tran_IO_UI(QWidget):
         self.but_load.setToolTip(
             self.tr("<span>Load file to memory.</span>"))
         self.but_load.setEnabled(False)
+        self.but_load.setFixedWidth(qtext_width("Loaded"))
 
         self.lbl_file = QLabel(to_html("Name:", frmt="b"))
         self.lbl_filename = QLabel("None")
