@@ -401,13 +401,17 @@ class Plot_Impz(QWidget):
                     self.set_ui_level(dict_sig['value'])
 
             elif 'ui_local_changed' in dict_sig:
-                # treat all local UI events here
-                self.resize_stim_tab_widget()
-                self.needs_calc = True
-                # make file data available to stimulus widget and modify number of
-                # data points to be used:
-                self.file_loaded()
-                self.impz_init()
+                if dict_sig['ui_local_changed'] == 'csv':
+                    # CSV options window has been closed, propagate the event
+                    self.emit({'ui_global_changed': 'csv'})
+                else:
+                    # treat all other local UI events here
+                    self.resize_stim_tab_widget()
+                    self.needs_calc = True
+                    # make file data available to stimulus widget and modify number of
+                    # data points to be used:
+                    self.file_loaded()
+                    self.impz_init()
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
