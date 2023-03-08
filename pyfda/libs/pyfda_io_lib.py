@@ -667,10 +667,10 @@ def read_csv_info(filename):
         delimiter = dialect.delimiter
         lineterminator = repr(dialect.lineterminator)
 
-        nchans = first_line.count(delimiter) + 1
+        nchans = first_line.count(delimiter) + 1  # number of columns
         # count rows in file
         f.seek(0)
-        N = sum(1 for row in f)  # f isfileobject (csv.reader)
+        N = sum(1 for row in f)  # f isfileobject (csv.reader)  # number of rows
 
     del f
 
@@ -679,10 +679,10 @@ def read_csv_info(filename):
 
     if N < nchans:  # swap rows and columns
         N, nchans = nchans, N
-        horizontal = True
+        row_mode = True
         transpose = "T #"
     else:
-        horizontal = False
+        row_mode = False
         transpose = ""
 
     if N < 2:
@@ -690,7 +690,7 @@ def read_csv_info(filename):
         return -1
 
     # file is ok, copy local variables to function attributes
-    read_csv_info.horizontal = horizontal
+    read_csv_info.row_mode = row_mode
     read_csv_info.file_size = file_size
     read_csv_info.N = N
     read_csv_info.nchans = nchans
@@ -1043,8 +1043,8 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     # Write some numbers, with row/column notation.
                     for col in range(2):
                         for row in range(np.shape(data)[1]):
-                            worksheet.write(row+1, col, data[col][row])  # vertical
-        #                    worksheet.write(row, col, coeffs[col][row])  # horizontal
+                            worksheet.write(row+1, col, data[col][row])  # columns
+        #                    worksheet.write(row, col, coeffs[col][row])  # rows
 
                     # Insert an image - useful for documentation export ?!.
         #            worksheet.insert_image('B5', 'logo.png')
