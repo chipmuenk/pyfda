@@ -277,7 +277,8 @@ class Tran_IO(QWidget):
             elif item == "sum":  # sum channel 1 and 2 as mono signal
                 data = self.data_raw.sum(0)  # sum all channels along dim 0
             else:
-                logger.error('Unknown item "{item}"')
+                logger.error(f'Unknown item "{item}"')
+                return
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
