@@ -651,7 +651,6 @@ def read_csv_info(filename):
     logger.info(f"File Size is {file_size} bytes")
 
     sniffer = csv.Sniffer()
-    horizontal = False
 
     with open(filename) as f:
         first_line = f.readline()
@@ -660,9 +659,8 @@ def read_csv_info(filename):
         # when the first line contains other characters, it is assumed that this
         # is a header
         has_header = not pattern_num_chars.search(sample)
-        logger.warning(f"has_header = {has_header}")
-        if has_header:
-             logger.warning(pattern_no_num.search(sample))
+        # if has_header:
+        #      logger.warning(pattern_no_num.search(sample))
         dialect = sniffer.sniff(sample)
         delimiter = dialect.delimiter
         lineterminator = repr(dialect.lineterminator)
