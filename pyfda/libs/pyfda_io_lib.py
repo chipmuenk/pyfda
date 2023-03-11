@@ -395,7 +395,17 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
 def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict.
+    to numpy array, taking into accout the settings of the CSV dict:
+
+    Read data as it is, splitting each row into the column items when:
+    - `CSV_dict['orientation'] == cols` or
+    - `CSV_dict['orientation'] == auto` and cols <= rows:
+
+    Transpose data when:
+    - `CSV_dict['orientation'] == rows` or
+    - `CSV_dict['orientation'] == auto` and cols > rows:
+
+    `np.shape(data)` returns rows, columns
 
     Parameters
     ----------

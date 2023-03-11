@@ -184,11 +184,12 @@ class Tran_IO(QWidget):
             err = True
 
         self.data_raw = io.import_data(self.file_name, self.file_type)
+        logger.warning(f"data_raw: {np.shape(self.data_raw)}")
 
         if self.data_raw is None:  # file operation cancelled
             err = True
         elif type(self.data_raw) != np.ndarray:
-            logger.warning("Unsuitable file format")
+            logger.warning("Unsuitable file / data format")
             err = True
 
         if err:
@@ -198,8 +199,10 @@ class Tran_IO(QWidget):
         if self.data_raw.ndim == 1:
             nchans_actual = 1
             N_actual = len(self.data_raw)
+            logger.warning(f"imported data: ndim = 1, len = {len(self.data_raw)}")
         elif self.data_raw.ndim == 2:
-            nchans_actual, N_actual = np.shape(self.data_raw)
+            N_actual, nchans_actual = np.shape(self.data_raw)
+            logger.warning(f"imported data: ndim = 2, rows (N) x colums (chans) = {np.shape(self.data_raw)}")
         else:
             logger.warning("Unsuitable data shape with "
                            f"{self.data_raw.ndim} dimensions.")
@@ -232,8 +235,7 @@ class Tran_IO(QWidget):
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
             return
-        logger.warning(f"idx = {self.ui.cmb_chan.currentIndex()}")
-        logger.warning(f"self.data_raw: {np.shape(self.data_raw)}")
+        logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
         logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
 
         if self.nchans == 1:
@@ -268,6 +270,9 @@ class Tran_IO(QWidget):
             self.x = data.ravel() * self.norm / np.max(np.abs(data))
         else:
             self.x = data.ravel()
+
+
+        logger.warning(f"normalized data: rows x columns = {np.shape(self.x)}, {self.x.dtype}")
 
         self.emit({'data_changed': 'file_io'})
         return

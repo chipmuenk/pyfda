@@ -292,7 +292,7 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
+        logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig),
                             fb.fil[0]['fx_sim'], qget_cmb_box(self.ui.cmb_sim_select)))
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
