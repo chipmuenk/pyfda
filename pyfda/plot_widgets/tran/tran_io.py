@@ -181,7 +181,8 @@ class Tran_IO(QWidget):
         err = False
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
-            err = True
+            self.ui.but_load.setEnabled(False)
+            return -1
 
         self.data_raw = io.import_data(self.file_name, self.file_type)
         logger.warning(f"data_raw: {np.shape(self.data_raw)}")
