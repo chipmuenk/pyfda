@@ -896,8 +896,6 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
             # data_arr is 1D for single channel (mono) files and
             # 2D otherwise (n_chans, n_samples)
             fb.fil[0]['f_S_wav'] = f_S
-            if np.ndim(data_arr) == 2:
-                data_arr = np.transpose(data_arr)
 
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:

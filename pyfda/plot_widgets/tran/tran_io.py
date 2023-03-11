@@ -243,13 +243,13 @@ class Tran_IO(QWidget):
                 self.ui.but_load.setText("Load")
                 return
             elif item == "1":  # use channel 1 (mono)
-                data = self.data_raw[0]
+                data = self.data_raw[:, 0]
             elif item == "2":  # use channel 2 (mono)
-                data = self.data_raw[1]
+                data = self.data_raw[:, 1]
             elif item == "12":  # use channel 1 and 2 as stereo signal
-                data = self.data_raw[0] + 1j * self.data_raw[1]
+                data = self.data_raw[:, 0] + 1j * self.data_raw[:, 1]
             elif item == "sum":  # sum channel 1 and 2 as mono signal
-                data = self.data_raw.sum(0)  # sum all channels along dim 0
+                data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
                 logger.error(f'Unknown item "{item}"')
                 return
