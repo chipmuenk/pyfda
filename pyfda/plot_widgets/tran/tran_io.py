@@ -119,9 +119,6 @@ class Tran_IO(QWidget):
 
         del self.x
 
-        qstyle_widget(self.ui.but_load, "normal")
-        self.ui.but_load.setText("Load")
-
         if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
@@ -215,11 +212,6 @@ class Tran_IO(QWidget):
         #                    "using actual shape.")
         #     self.nchans, self.N = (nchans_actual, N_actual)
 
-        qstyle_widget(self.ui.but_load, "ok")
-        self.ui.but_load.setText("Loaded")
-        self.ui.but_load.setEnabled(True)
-        self.ui.but_normalize.setEnabled(True)
-
         self.select_chan_normalize()
         return 0
 
@@ -272,6 +264,10 @@ class Tran_IO(QWidget):
         else:
             self.x = data.ravel()
 
+        qstyle_widget(self.ui.but_load, "ok")
+        self.ui.but_load.setText("Loaded")
+        self.ui.but_load.setEnabled(True)
+        self.ui.but_normalize.setEnabled(True)
 
         logger.warning(f"normalized data: rows x columns = {np.shape(self.x)}, {self.x.dtype}")
 
