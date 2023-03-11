@@ -577,16 +577,16 @@ def csv2array(f: TextIO):
 
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
-        logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
+        # logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
         if cols > 2 and rows > 2:
             return f"Unsuitable data shape {np.shape(data_arr)}"
         elif params['CSV']['orientation'] == 'rows'\
                 or params['CSV']['orientation'] == 'auto' and cols > rows:
             # returned table is transposed, swap cols and rows
-            logger.info(f"Building table from {cols} row(s) with {rows} columns.")
+            logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
             return data_arr.T
         else:
-            logger.info(f"Building table from {cols} column(s) with {rows} rows.")
+            logger.info(f"Building table with {cols} column(s) and {rows} rows.")
             return data_arr
     else:
         return "Unsuitable data shape: ndim = {0}, shape = {1}"\
@@ -689,7 +689,7 @@ def read_csv_info(filename):
         transpose = ""
 
     if N < 2:
-        logger.error(f"No suitable CSV file, has {N} data entries.")
+        logger.error(f"No suitable CSV file, has only {N} data entries.")
         return -1
 
     # file is ok, copy local variables to function attributes
@@ -929,7 +929,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
                     logger.error(f"{e},\n\tconversion to complex also failed.")
                     return None
             logger.info(
-                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
+                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
             return data_arr  # returns numpy array of type float
 
     except IOError as e:
