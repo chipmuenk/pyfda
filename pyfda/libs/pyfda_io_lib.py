@@ -675,7 +675,12 @@ def read_csv_info(filename):
     logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
                 f"RowCount = {N}, Header={has_header}")
 
-    if N < nchans:  # swap rows and columns
+    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
+        logger.error(
+            f"Unknown key '{params['CSV']['orientation']}' for "
+            "params['CSV']['orientation']")
+    if params['CSV']['orientation'] == 'auto' and (N < nchans)\
+        or params['CSV']['orientation'] == 'rows':  # swap rows and columns
         N, nchans = nchans, N
         row_mode = True
         transpose = "T #"
