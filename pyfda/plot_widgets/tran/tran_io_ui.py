@@ -15,7 +15,7 @@ from pyfda.libs.compat import (
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html
-from pyfda.libs.pyfda_qt_lib import QVLine, PushButton, qtext_width
+from pyfda.libs.pyfda_qt_lib import QVLine, PushButton, qtext_width, qcmb_box_populate
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -24,20 +24,21 @@ logger = logging.getLogger(__name__)
 
 class Tran_IO_UI(QWidget):
     """
-    Create the UI for the PlotImpz class
+    Create the UI for the Tran_IO class
     """
     def __init__(self, parent=None):
-        """
-        Pass instance `parent` of parent class (FilterCoeffs)
-        """
-        # combobox tooltip + data / text / tooltip for file I/O usage
-        self.cmb_file_io_items = [
-            ("<span>Select data from File I/O widget/span>"),
-            ("off", "Off", "<span>Don't use file I/O data.</span>"),
-            ("use", "Use", "<span><b>Use></b> file I/O data as stimuli.</span>"),
-            ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli")
-            ]
-        self.cmb_file_io_default = "none"
+
+        # combobox tooltip + data / text / tooltip for channel selection
+        self.cmb_select_chan_items = [
+            "<span>Simulate floating-point or fixpoint response.</span>",
+            ("del", "x", "Unload data from memory"),
+            ("1", "1", "Use data from channel 1 (left, mono)"),
+            ("2", "2", "Use data from channel 2 (right, mono)"),
+            ("12", "1|2", "Use data from both channels (stereo)"),
+            ("sum", "Σ", "Sum data from both channels (mono)")
+        ]
+        self.cmb_select_chan_init = "1"
+        # self.cmb_file_io_default = "none"
 
         self.led_normalize_default = 1  # default setting for normalization
 
@@ -96,8 +97,8 @@ class Tran_IO_UI(QWidget):
         self.cmb_chan.setToolTip(
             "<span>Select channel / column for data import. '&Sigma;' "
             "</span> sums up all columns.")
-        # populate combobox for correct width (is overwritten later)
-        self.cmb_chan.addItems(["1", "2", "Σ", "1|2"])
+
+        qcmb_box_populate(self.cmb_chan, self.cmb_select_chan_items, self.cmb_select_chan_init)        
         self.cmb_chan.setVisible(False)
 
         layV_chan = QVBoxLayout()

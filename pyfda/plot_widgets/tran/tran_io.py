@@ -15,7 +15,7 @@ import numpy as np
 import pyfda.libs.pyfda_io_lib as io
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log
-from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qcmb_box_populate, qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box
 from pyfda.libs.csv_option_box import CSV_option_box
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -43,16 +43,6 @@ class Tran_IO(QWidget):
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
         self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
-
-        self.cmb_select_chan_items = [
-            "<span>Simulate floating-point or fixpoint response.</span>",
-            ("del", "x", "Unload data from memory"),
-            ("1", "1", "Use data from channel 1 (left, mono)"),
-            ("2", "2", "Use data from channel 2 (right, mono)"),
-            ("12", "1|2", "Use data from both channels (stereo)"),
-            ("sum", "Σ", "Sum data from both channels (mono)")
-        ]
-        self.cmb_select_chan_init = "1"
 
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
@@ -168,18 +158,6 @@ class Tran_IO(QWidget):
             self.ui.lbl_chan.setVisible(True)
             self.ui.cmb_chan.setVisible(True)
             self.ui.line_chan.setVisible(True)
-            self.ui.cmb_chan.clear()
-            # create a list with the numbers of the channels and the
-            # sum sign and populate the combo box with it
-            # don't emit a signal while re-initializing the combo box
-            self.ui.cmb_chan.blockSignals(True)
-            qcmb_box_populate(self.ui.cmb_chan, self.cmb_select_chan_items, self.cmb_select_chan_init)
-            # self.ui.cmb_chan.addItems(
-            #     [str(k + 1) for k in range(self.nchans)] + ["1|2"] + ["Σ"]
-            #     )
-            # self.ui.cmb_chan.setToolTip("Select channel(s) to load")
-            # self.ui.cmb_chan.setItemData(0, "Unload data", Qt.ToolTipRole)
-            self.ui.cmb_chan.blockSignals(False)
 
         if len(self.file_name) < 45:
             self.ui.lbl_filename.setText(self.file_name)
