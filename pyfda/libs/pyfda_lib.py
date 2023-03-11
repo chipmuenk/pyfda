@@ -435,20 +435,20 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
-            cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
+            rows, cols = np.shape(d)
             s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__}, '
-                  f'shape = ({cols} x {rows})' + cr + tab)
+                  f'shape = (r{rows} x c{cols})' + cr + tab)
             #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
-            for c in range(min(N, cols)):
+            for r in range(min(N, rows)):
                 if not first:
                     s += cr + tab
                 # logger.warning(f'rows={rows}; min(N-1, rows)={min(N, rows)}\n'
                 #                f'd={d[c][:min(N, rows)]}')
-                s += str(d[c][:min(N, rows)])
-                if rows > N-1:
+                s += str(d[r][:min(N, cols)])
+                if cols > N-1:
                     s += ' ...'
                 first = False
-            if cols > N-1:
+            if rows > N-1:
                     s += cr + tab + ' ...'
         else:
             logger.warning(f"pprint_log(): Object with ndim = {np.ndim(d)} cannot be processed.")
