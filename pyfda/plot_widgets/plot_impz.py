@@ -156,7 +156,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
         self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
-        self.tab_stim_w.setTabToolTip(1, "I/O")
+        self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
         # ----------------------------------------------------------------------
