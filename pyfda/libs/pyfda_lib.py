@@ -719,11 +719,11 @@ def to_html(text: str, frmt: str = None) -> str:
         html = "<span>" + html + "</span>"
 
     if frmt != 'log':  # this is a label, not a logger message
-        # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
-        if "<i>" in html:  # make subscripts non-italic
-            html = re.sub(r'_(\w+)', r'</i><sub>\1</span></sub><i>', html)
+        # replace _xxx (where xxx are alphanumeric, non-space characters \w) by <sub> xxx </sub> ()
+        if "<i>" in html:  # make subscripts non-talic
+            html = re.sub(r'_(\w+)', r'</i><sub>\1</sub><i>', html)
         else:
-            html = re.sub(r'_(\w+)', r'<sub>\1</span></sub>', html)
+            html = re.sub(r'_(\w+)', r'<sub>\1</sub>', html)
 
     return html
 
