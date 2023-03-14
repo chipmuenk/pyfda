@@ -284,7 +284,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -438,13 +438,14 @@ class Plot_Impz(QWidget):
             elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
+    # ------------------------------------------------------------------------------
     def file_loaded(self):
         """
         Check status of file_io widget:
         - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
         - if `cmb_file_io == 'add'`, map the file data to `self.stim_wdg.x_file`
           to make it accessible from the stimulus widget
-        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in th UI
+        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in the UI
         """
         # logger.info(
         #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
@@ -466,9 +467,9 @@ class Plot_Impz(QWidget):
                 pass
         return
 
-# =============================================================================
-# Simulation: Calculate stimulus, response and draw them
-# =============================================================================
+    # =========================================================================
+    # Simulation: Calculate stimulus, response and draw them
+    # =========================================================================
     def calc_auto(self, autorun=None):
         """
         Triggered when checkbox "Autorun" is clicked.
