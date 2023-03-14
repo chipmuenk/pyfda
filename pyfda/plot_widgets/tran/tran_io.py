@@ -218,7 +218,7 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
-        - For multi-channel data, select one channel resp. average all channels
+        - For two channel data, select one channel, average the channels or
           from `self.data_raw`
 
         - Scale `self.data` to the maximum specified by self.ui.led_normalize and
@@ -247,7 +247,8 @@ class Tran_IO(QWidget):
             elif item == "2":  # use channel 2 (mono)
                 data = self.data_raw[:, 1]
             elif item == "12":  # use channel 1 and 2 as stereo signal
-                data = self.data_raw[:, 0] + 1j * self.data_raw[:, 1]
+                data = np.array(
+                    self.data_raw[:, 0] + 1j * self.data_raw[:, 1], dtype=complex)
             elif item == "sum":  # sum channel 1 and 2 as mono signal
                 data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
