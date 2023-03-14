@@ -47,6 +47,9 @@ class Plot_Tran_Stim(QWidget):
         self.error = False
         self.x_file = None  # data mapped from file io in Plot_Impz.file_loaded()
 
+        self.rad_phi1 = self.ui.phi1 / 180 * pi  # precalculate constants
+        self.rad_phi2 = self.ui.phi2 / 180 * pi
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -171,8 +174,8 @@ class Plot_Tran_Stim(QWidget):
 
 
 # ------------------------------------------------------------------------------
-    def calc_stimulus_frame(self, N_first: int = 0, N_frame: int = 10, N_end: int = 10,
-                            init: bool = False) -> np.ndarray:
+    def calc_stimulus_frame(self, x: np.ndarray = np.random.randn(10), N_first: int = 0,
+                            N_frame: int = 10, N_end: int = 10) -> np.ndarray:
         """
         Calculate a data frame of stimulus `x` with a length of `N_frame` samples,
         starting with index `N_first`
@@ -186,15 +189,12 @@ class Plot_Tran_Stim(QWidget):
             frame length
 
         N_end: int
-            last sample of total stimulus to be generated
-
-        init: bool
-            when init == True, initialize stimulus settings
+            last sample of total stimulus to be generated (needed for scaling for some stimuli)
 
         Returns
         -------
         x: ndarray
-            an array with `N` stimulus data points
+            an array with `N_frame` stimulus data points
         """
         # -------------------------------------------
         def add_signal(stim: np.ndarray, sig: np.ndarray):
@@ -232,11 +232,8 @@ class Plot_Tran_Stim(QWidget):
                 stim += sig
             return stim
         # -------------------------------------------
-
-        if init or N_first == 0:
-            self.init_labels_stim()
-            self.rad_phi1 = self.ui.phi1 / 180 * pi
-            self.rad_phi2 = self.ui.phi2 / 180 * pi
+        frm_slc = slice(N_first, N_frame)  # current slice of stimulus self.x
+        if N_first == 0:
             self.xf_is_cmplx =\
                 (self.ui.ledDC.isVisible and type(self.ui.DC) == complex)\
                     or (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex)\
