@@ -182,19 +182,23 @@ class Plot_Tran_Stim(QWidget):
 
         Parameters
         ----------
+        x: ndarray of float or complex
+            empty array that is filled in place frame by frame
+
         N_first: int
-            index of first data point of the frame
+            index of first data point of the current frame
 
         N_frame: int
-            frame length
+            current frame length; the last frame can be shorter than the rest
 
         N_end: int
             last sample of total stimulus to be generated (needed for scaling for some stimuli)
 
         Returns
         -------
-        x: ndarray
-            an array with `N_frame` stimulus data points
+        None
+            x is filled with data in place
+
         """
         # -------------------------------------------
         def add_signal(stim: np.ndarray, sig: np.ndarray):
@@ -204,7 +208,6 @@ class Plot_Tran_Stim(QWidget):
             If `sig` has the shape (N x 2), the two columns are added as real and
             imaginary values.
             """
-            # logger.warning(f"stim: {pprint_log(stim)}\n\nsig: {pprint_log(sig)}")
             if np.ndim(sig) == 0:
                 if sig is None or sig == 0:
                     return stim
@@ -225,33 +228,23 @@ class Plot_Tran_Stim(QWidget):
             if np.iscomplexobj(sig):
                 stim = stim.astype(complex) + sig
             # sig is real and stimulus is complex:
-            # -> add sig to bothreal and imaginary part of stimulus
-            elif np.iscomplexobj(self.xf):
+            # -> add sig to both real and imaginary part of stimulus
+            elif np.iscomplexobj(stim):
                 stim += sig + 1j * sig
             else:  # stim and sig are real-valued
                 stim += sig
             return stim
-        # -------------------------------------------
-        frm_slc = slice(N_first, N_frame)  # current slice of stimulus self.x
-        if N_first == 0:
-            self.xf_is_cmplx =\
-                (self.ui.ledDC.isVisible and type(self.ui.DC) == complex)\
-                    or (self.ui.ledAmp1.isVisible and type(self.ui.A1) == complex)\
-                        or (self.ui.ledAmp2.isVisible and type(self.ui.A2) == complex)
+        # ====================================================================
+        # Initialization for all frames
+        if True: # N_first == 0:
+            # calculate index for T1, only needed for dirac and step
+            self.T1_idx = int(np.round(self.ui.T1))
 
-        noi = 0  # initialize noise frame
+        # Initialization for current frame
         N_last = N_first + N_frame  # calculate last element index
+        frm_slc = slice(N_first, N_last)  # current slice
         n = np.arange(N_first, N_last)  #  create frame index
-
-        # calculate index for T1, only needed for dirac and step
-        self.T1_idx = int(np.round(self.ui.T1))
-
-        # - Initialize self.xf with N_frame zeros.
-        # - Set dtype of ndarray to complex or float, depending on stimuli
-        if self.xf_is_cmplx:
-            self.xf = np.zeros(N_frame, dtype=complex)
-        else:
-            self.xf = np.zeros(N_frame, dtype=float)
+        noi = 0  # this is used when noise is deactivated
 
         # #####################################################################
         #
@@ -264,20 +257,20 @@ class Plot_Tran_Stim(QWidget):
             if self.x_file is None:
                 logger.warning("No file loaded!")
             else:
-                self.xf = self.x_file[N_first:N_last]
+                x[frm_slc] = self.x_file[frm_slc]  # [N_first:N_last]
 
-            return self.xf[:N_frame]
+            # return self.xf[:N_frame]
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if N_first <= self.T1_idx < N_last:
-                self.xf[self.T1_idx - N_first] = self.ui.A1
+                x[self.T1_idx - N_first] = self.ui.A1
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sinc":
-            self.xf = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
+            x[frm_slc] = self.ui.A1 * sinc(2 * (n - self.ui.T1) * self.ui.f1)\
                 + self.ui.A2 * sinc(2 * (n - self.ui.T2) * self.ui.f2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "gauss":
-            self.xf = self.ui.A1 * sig.gausspulse(
+            x[frm_slc] = self.ui.A1 * sig.gausspulse(
                     (n - self.ui.T1), fc=self.ui.f1, bw=self.ui.BW1) +\
                 self.ui.A2 * sig.gausspulse(
                     (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
@@ -286,34 +279,34 @@ class Plot_Tran_Stim(QWidget):
             n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))  # pos. of rising edge
             n_min = max(n_rise, 0)
             n_max = min(n_rise + self.ui.TW1, N_end)
-            self.xf = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
+            x[frm_slc] = self.ui.A1 * np.where((n >= n_min) & (n < n_max), 1, 0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "step":
             if self.T1_idx < N_first:   # step before current frame
-                self.xf.fill(self.ui.A1)
+                x[frm_slc].fill(self.ui.A1)
             if N_first <= self.T1_idx < N_last:  # step in current frame
-                self.xf[0:self.T1_idx - N_first].fill(0)
-                self.xf[self.T1_idx - N_first:N_last].fill(self.ui.A1)
+                x[frm_slc][0:self.T1_idx - N_first].fill(0)
+                x[frm_slc][self.T1_idx - N_first:N_last].fill(self.ui.A1)
             elif self.T1_idx >= N_last:  # step after current frame
-                self.xf.fill(0)
+                x[frm_slc].fill(0)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "cos":
-            self.xf =\
+            x[frm_slc] =\
                 self.ui.A1 * np.cos(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
                 self.ui.A2 * np.cos(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "sine":
-            self.xf =\
+            x[frm_slc] =\
                 self.ui.A1 * np.sin(2 * pi * n * self.ui.f1 + self.rad_phi1) +\
                 self.ui.A2 * np.sin(2 * pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "exp":
-            self.xf =\
+            x[frm_slc] =\
                 self.ui.A1 * np.exp(1j * (2 * pi * n * self.ui.f1 + self.rad_phi1)) +\
                 self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
-            self.xf = self.ui.A1 * diric(
+            x[frm_slc] = self.ui.A1 * diric(
                 (4 * pi * (n - self.ui.T1) * self.ui.f1 + self.rad_phi1 * 2)
                 / self.ui.TW1, self.ui.TW1)
         # ----------------------------------------------------------------------
@@ -322,51 +315,51 @@ class Plot_Tran_Stim(QWidget):
                 T_end = N_end  # frequency sweep over complete interval
             else:
                 T_end = self.ui.T2  # frequency sweep till T2
-            self.xf = self.ui.A1 * sig.chirp(
+            x[frm_slc] = self.ui.A1 * sig.chirp(
                 n, self.ui.f1, T_end, self.ui.f2,
                 method=self.ui.chirp_type, phi=self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
             if self.ui.but_stim_bl.isChecked():
-                self.xf = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                self.xf = self.ui.A1 * sig.sawtooth(
+                x[frm_slc] = self.ui.A1 * sig.sawtooth(
                     2*pi * n * self.ui.f1 + self.rad_phi1, width=0.5)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
             if self.ui.but_stim_bl.isChecked():
-                self.xf = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
-                self.xf = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
+                x[frm_slc] = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "square":
             if self.ui.but_stim_bl.isChecked():
-                self.xf = self.ui.A1 * rect_bl(
+                x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
-                self.xf = self.ui.A1 * sig.square(
+                x[frm_slc] = self.ui.A1 * sig.square(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
-            self.xf = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
+            x[frm_slc] = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
-            self.xf = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
+            x[frm_slc] = self.ui.A1 * np.sin(2*pi * n * self.ui.f1 + self.rad_phi1)\
                 * self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pmfm":
-            self.xf = self.ui.A1 * np.sin(
+            x[frm_slc] = self.ui.A1 * np.sin(
                 2 * pi * n * self.ui.f1 + self.rad_phi1 +
                 self.ui.A2 * np.sin(2*pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pwm":
             if self.ui.but_stim_bl.isChecked():
-                self.xf = self.ui.A1 * rect_bl(
+                x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
                     duty=(1/2 + self.ui.A2 / 2 *
                           np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
             else:
-                self.xf = self.ui.A1 * sig.square(
+                x[frm_slc] = self.ui.A1 * sig.square(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
                     duty=(1/2 + self.ui.A2 / 2 *
                           np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
@@ -378,7 +371,7 @@ class Plot_Tran_Stim(QWidget):
                           "BW1": self.ui.BW1, "BW2": self.ui.BW2,
                           "f_S": fb.fil[0]['f_S'], "n": n, "j": 1j}
 
-            self.xf = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
+            x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None
@@ -448,11 +441,11 @@ class Plot_Tran_Stim(QWidget):
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
 
         # Add noise to stimulus:
-        self.xf = add_signal(self.xf, noi)
+        x[frm_slc] = add_signal(x[frm_slc], noi)
 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
-            self.xf = add_signal(self.xf, self.ui.DC)
+            x[frm_slc] = add_signal(x[frm_slc], self.ui.DC)
 
         # Add file data
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
@@ -460,17 +453,17 @@ class Plot_Tran_Stim(QWidget):
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
             elif len(self.x_file) >= N_last:
-                self.xf = add_signal(self.xf, self.x_file[N_first:N_last])
+                x[frm_slc] = add_signal(x[frm_slc], self.x_file[N_first:N_last])
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > N_first:
-                self.xf = add_signal(self.xf, np.concatenate(
+                x[frm_slc] = add_signal(x[frm_slc], np.concatenate(
                     (self.x_file[N_first:],
                      np.zeros(N_last - np.shape(self.x_file)[0], np.shape(self.x_file)[1]))
                     ))
             # file data has been consumed, nothing left to be added
             else:
                 pass
-        return self.xf[:N_frame]
+
 # ------------------------------------------------------------------------------
 
 
