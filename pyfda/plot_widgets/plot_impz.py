@@ -545,13 +545,12 @@ class Plot_Impz(QWidget):
             self.title_str = self.stim_wdg.title_str
 
             self.n = np.arange(self.ui.N_end, dtype=float)
-            self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
 
             if self.cmplx:
-                self.x = np.empty(self.ui.N_end, dtype=complex)  # stimulus
+                self.x = np.zeros(self.ui.N_end, dtype=complex)  # stimulus
                 self.y = np.empty_like(self.x, dtype=complex)  # always complex
             else:
-                self.x = np.empty(self.ui.N_end, dtype=float)  # stimulus
+                self.x = np.zeros(self.ui.N_end, dtype=float)  # stimulus
                 self.y = np.empty_like(self.x)  # same type as self.x
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
