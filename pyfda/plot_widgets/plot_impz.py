@@ -156,7 +156,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
         self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
-        self.tab_stim_w.setTabToolTip(1, "I/O")
+        self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
         # ----------------------------------------------------------------------
@@ -284,7 +284,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -438,20 +438,24 @@ class Plot_Impz(QWidget):
             elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
+    # ------------------------------------------------------------------------------
     def file_loaded(self):
         """
         Check status of file_io widget:
         - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
         - if `cmb_file_io == 'add'`, map the file data to `self.stim_wdg.x_file`
           to make it accessible from the stimulus widget
-        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in th UI
+        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in the UI
         """
         # logger.info(
         #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
         #     f"{self.file_io_wdg.N} samples.")
+        # No file has been loaded or number of data points is zero
+        #    -> set file_io combobox to off and disable it
         if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.stim_wdg.ui.cmb_file_io.setEnabled(False)
+        # File is loaded, enable file_io combobox
         else:
             self.stim_wdg.ui.cmb_file_io.setEnabled(True)
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
@@ -466,9 +470,9 @@ class Plot_Impz(QWidget):
                 pass
         return
 
-# =============================================================================
-# Simulation: Calculate stimulus, response and draw them
-# =============================================================================
+    # =========================================================================
+    # Simulation: Calculate stimulus, response and draw them
+    # =========================================================================
     def calc_auto(self, autorun=None):
         """
         Triggered when checkbox "Autorun" is clicked.
@@ -525,21 +529,28 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            # set title and axis string and calculate 10 samples to determine ndtype
-            x_test = self.stim_wdg.calc_stimulus_frame(init=True)
+            # Test whether stimulus or filter coefficients are complex and set flag
+            # and UI field correspondingly. Calculate 10 samples to be sure about complex values.
+            self.N_first = 0  # initialize frame index
+            x_test = np.zeros(10)
+            self.stim_wdg.calc_stimulus_frame(x_test)  # calculate 10 samples starting at n = 0
+            self.cmplx =\
+                (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
+                    or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
+                or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
+                    or bool(np.any(np.iscomplex(np.asarray(fb.fil[0]['ba']))))\
+                        or bool(np.any(np.any(np.iscomplex(x_test))))
+            # set title and axis string
+            self.stim_wdg.init_labels_stim()
             self.title_str = self.stim_wdg.title_str
 
-            self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
-            self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            # Test whether stimulus or filter coefficients are complex and set
-            # flag and UI field correspondingly
-            self.cmplx = bool(
-                np.any(np.any(np.iscomplex(x_test))
-                       or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))))
+
             if self.cmplx:
+                self.x = np.zeros(self.ui.N_end, dtype=complex)  # stimulus
                 self.y = np.empty_like(self.x, dtype=complex)  # always complex
             else:
+                self.x = np.zeros(self.ui.N_end, dtype=float)  # stimulus
                 self.y = np.empty_like(self.x)  # same type as self.x
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
@@ -608,8 +619,9 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame -------------------------
             # ------------------------------------------------------------------
-            self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
+            self.stim_wdg.calc_stimulus_frame(
+                self.x, N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
