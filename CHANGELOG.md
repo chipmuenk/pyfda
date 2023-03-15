@@ -1,14 +1,15 @@
 # Changelog
 ## [v0.7.2](https://github.com/chipmuenk/pyfda/tree/v0.7.2) (2023-02-xx)
 ### Bugfixes
-- 
+- Various crashes related to file imports
 
 ### New features
 - Allow plotting magnitude, real and imaginary part of H(F) at the same time
 - Add legend for H(F) plot
 - Show interpolated waveform x(t) for discrete time stimuli (mainly for didactic
   purposes)
-- Make UI for y[n] cleaner, allow hiding a part of the toolbars
+- Make UI for y[n] cleaner
+- Allow hiding the control options for maximum plotting area via a new button in the toolbar
 
 ## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.1) (2022-10-05)
 ### Bugfixes
