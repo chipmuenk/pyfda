@@ -117,8 +117,6 @@ class Tran_IO(QWidget):
         self.f_S = None
         self.WL = None
 
-        del self.x
-
         if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
