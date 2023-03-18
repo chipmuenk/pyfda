@@ -234,6 +234,7 @@ class Plot_Tran_Stim(QWidget):
             else:  # stim and sig are real-valued
                 stim += sig
             return stim
+
         # ====================================================================
         # Initialization for all frames
         if True: # N_first == 0:
@@ -244,7 +245,7 @@ class Plot_Tran_Stim(QWidget):
         N_last = N_first + N_frame  # calculate last element index
         frm_slc = slice(N_first, N_last)  # current slice
         n = np.arange(N_first, N_last)  #  create frame index
-        noi = 0  # this is used when noise is deactivated
+        noi = 0  # fallback when noise is deactivated
 
         # #####################################################################
         #
