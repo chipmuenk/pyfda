@@ -454,16 +454,15 @@ class Plot_Tran_Stim(QWidget):
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
             elif len(self.x_file) >= N_last:
-                x[frm_slc] = add_signal(x[frm_slc], self.x_file[N_first:N_last])
+                x[frm_slc] = add_signal(x[frm_slc], self.x_file[frm_slc])
             # file data is shorter than frame, pad with zeros
             elif len(self.x_file) > N_first:
                 x[frm_slc] = add_signal(x[frm_slc], np.concatenate(
-                    (self.x_file[N_first:],
-                     np.zeros(N_last - len(self.x_file)))
+                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file)))
                     ))
             # file data has been consumed, nothing left to be added
             else:
-                pass
+                return
 
 # ------------------------------------------------------------------------------
 
