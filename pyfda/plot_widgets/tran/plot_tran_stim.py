@@ -257,10 +257,16 @@ class Plot_Tran_Stim(QWidget):
         elif qget_cmb_box(self.ui.cmb_file_io) == "use":
             if self.x_file is None:
                 logger.warning("No file loaded!")
+            # file data is longer than frame, use only a part:
+            elif len(self.x_file) >= N_last:
+                x[frm_slc] = self.x_file[frm_slc]
+            # file data is shorter than frame, pad with zeros
+            elif len(self.x_file) > N_first:
+                x[frm_slc] = np.concatenate(
+                    (self.x_file[N_first:], np.zeros(N_last - len(self.x_file))))
             else:
-                x[frm_slc] = self.x_file[frm_slc]  # [N_first:N_last]
-
-            # return self.xf[:N_frame]
+            # file data has been consumed, nothing left to be added
+                return
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if N_first <= self.T1_idx < N_last:
