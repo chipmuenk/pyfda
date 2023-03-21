@@ -386,7 +386,7 @@ class Plot_Impz(QWidget):
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
                     # data points to be used:
-                    self.file_loaded()
+                    self.file_io()
 
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
@@ -397,6 +397,7 @@ class Plot_Impz(QWidget):
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
+
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
                     self.set_ui_level(dict_sig['value'])
 
@@ -410,7 +411,10 @@ class Plot_Impz(QWidget):
                     self.needs_calc = True
                     # make file data available to stimulus widget and modify number of
                     # data points to be used:
-                    self.file_loaded()
+                    if 'sender_name' in dict_sig:
+                        self.file_io(sender_name=dict_sig['sender_name'])
+                    else:
+                        self.file_io()
                     self.impz_init()
 
             elif 'view_changed' in dict_sig:
@@ -439,7 +443,7 @@ class Plot_Impz(QWidget):
                 self.needs_redraw = [True] * 2
 
     # ------------------------------------------------------------------------------
-    def file_loaded(self):
+    def file_io(self, sender_name = ""):
         """
         Check status of file_io widget:
         - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0

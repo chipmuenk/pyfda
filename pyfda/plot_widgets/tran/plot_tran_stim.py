@@ -45,7 +45,7 @@ class Plot_Tran_Stim(QWidget):
         self.needs_calc = True   # flag whether plots need to be recalculated
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
-        self.x_file = None  # data mapped from file io in Plot_Impz.file_loaded()
+        self.x_file = None  # data mapped from file io in Plot_Impz.file_io()
 
         self.rad_phi1 = self.ui.phi1 / 180 * pi  # precalculate constants
         self.rad_phi2 = self.ui.phi2 / 180 * pi
