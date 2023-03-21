@@ -464,8 +464,9 @@ class Plot_Impz(QWidget):
 
             # map data from file io widget to stimulus widget:
             self.stim_wdg.x_file = self.file_io_wdg.x
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "use":
-                # override ui setting of N_end
+            # if cmb_file_io has been changed to "use", set N_end to length of file:
+            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "use"\
+                    and sender_name == "cmb_file_io":
                 self.ui.update_N(emit=False, N_end = self.file_io_wdg.N)
             else:  # qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "add":
                 pass
