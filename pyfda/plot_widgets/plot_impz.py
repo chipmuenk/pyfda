@@ -447,11 +447,8 @@ class Plot_Impz(QWidget):
           to make it accessible from the stimulus widget
         - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in the UI
         """
-        # logger.info(
-        #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
-        #     f"{self.file_io_wdg.N} samples.")
         # No file has been loaded or number of data points is zero
-        #    -> set file_io combobox to off and disable it
+        #    -> set file_io combobox to off and disable it:
         if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.stim_wdg.ui.cmb_file_io.setEnabled(False)
