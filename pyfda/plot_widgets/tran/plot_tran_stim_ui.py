@@ -287,6 +287,7 @@ class Plot_Tran_Stim_UI(QWidget):
         #
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
         self.cmb_file_io = QComboBox(self)
+        self.cmb_file_io.setObjectName("cmb_file_io")
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
         self.cmb_file_io.setEnabled(False)
