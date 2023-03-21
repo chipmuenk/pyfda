@@ -29,6 +29,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
       instance if not contained in the dict
     - If key 'ttl' is in the dict and its value is less than one, terminate the
       signal. Otherwise, reduce the value by one.
+    - If the sender has passed an objectName, add it with the key "sender_name"
+      to the dict.
     """
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
@@ -40,6 +42,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
             return
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
+    if self.sender() and self.sender().objectName():
+        dict_sig.update({'sender_name': self.sender().objectName()})
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
