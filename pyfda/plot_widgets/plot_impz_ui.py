@@ -681,6 +681,7 @@ class PlotImpz_UI(QWidget):
                 self.led_N_start.setText(str(self.N_start))  # update widget
 
             self.N_end = N_end
+            self.led_N_points.setText(str(self.N_end))  # update widget
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
         else:
