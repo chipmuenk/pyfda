@@ -502,10 +502,6 @@ class Plot_Impz(QWidget):
             - When in fixpoint mode, initialize quantized stimulus `x_q` and input
               quantizer and emit {'fx_sim':'init'}
         """
-        # set number of data points from file length when 'use' is selected
-        if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'use':
-            self.ui.update_N(emit=False, N_end=self.file_io_wdg.N)
-
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
