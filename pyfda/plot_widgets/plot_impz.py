@@ -409,12 +409,8 @@ class Plot_Impz(QWidget):
                     # treat all other local UI events here
                     self.resize_stim_tab_widget()
                     self.needs_calc = True
-                    # make file data available to stimulus widget and modify number of
-                    # data points to be used:
-                    if 'sender_name' in dict_sig:
-                        self.file_io(sender_name=dict_sig['sender_name'])
-                    else:
-                        self.file_io()
+                    # make file data available to stimulus widget:
+                    self.file_io()
                     self.impz_init()
 
             elif 'view_changed' in dict_sig:
@@ -443,7 +439,24 @@ class Plot_Impz(QWidget):
                 self.needs_redraw = [True] * 2
 
     # ------------------------------------------------------------------------------
-    def file_io(self, sender_name = ""):
+    def set_N_to_file_len(self):
+        """
+        Check status of file_io widget:
+        - if no file is loaded or `cmb_file_io == 'off'`, do nothing. This shouldn't happen.
+        - if `cmb_file_io == 'add'` or `use`, set N_end = len(file_data) in the UI
+        """
+        # This case should never happen, just to be sure ...
+        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
+            qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
+            self.ui.frm_file_io.setEnabled(False)
+            logger.warning("No data loaded, you shouldn't see this message!")
+        # File is loaded, copy file length to N_end
+        else:
+            self.ui.update_N(emit=False, N_end = self.file_io_wdg.N)
+            logger.info(f"Set N to file length {self.file_io_wdg.N}")
+
+    # ------------------------------------------------------------------------------
+    def file_io(self):
         """
         Check status of file_io widget:
         - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
@@ -455,22 +468,15 @@ class Plot_Impz(QWidget):
         #    -> set file_io combobox to off and disable it:
         if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
-            self.stim_wdg.ui.cmb_file_io.setEnabled(False)
+            self.ui.frm_file_io.setEnabled(False)
         # File is loaded, enable file_io combobox
         else:
-            self.stim_wdg.ui.cmb_file_io.setEnabled(True)
+            self.ui.frm_file_io.setEnabled(True)
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
                 return
-
-            # map data from file io widget to stimulus widget:
-            self.stim_wdg.x_file = self.file_io_wdg.x
-            # if cmb_file_io has been changed to "use", set N_end to length of file:
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "use"\
-                    and sender_name == "cmb_file_io":
-                self.ui.update_N(emit=False, N_end = self.file_io_wdg.N)
-            else:  # qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "add":
-                pass
-        return
+            else:
+                # "use" or "add", map data from file io widget to stimulus widget:
+                self.stim_wdg.x_file = self.file_io_wdg.x
 
     # =========================================================================
     # Simulation: Calculate stimulus, response and draw them
