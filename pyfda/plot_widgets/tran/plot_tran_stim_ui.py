@@ -283,8 +283,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
         #
-        line1 = QVLine()
-        #
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
         self.cmb_file_io = QComboBox(self)
         self.cmb_file_io.setObjectName("cmb_file_io")
@@ -489,10 +487,6 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         layG_ctrl_stim.addWidget(self.cmbNoise, 0, i)
         layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
-        i += 1
-        # fromRow, fromCol, rowSpan, colSpan
-        layG_ctrl_stim.addWidget(line1, 0, i, 2, 1)
-
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
         self.ledStimFormula = QLineEdit(self)
