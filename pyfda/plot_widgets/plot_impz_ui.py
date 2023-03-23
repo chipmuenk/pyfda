@@ -230,13 +230,13 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
-        self.lbl_N_frame = QLabel(to_html("&Delta;N", frmt='bi') + " =", self)
+        self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.led_N_frame = QLineEdit(self)
         self.led_N_frame.setText(str(self.N_frame))
         self.led_N_frame.setToolTip(
             "<span>Frame length; longer frames calculate faster but calculation cannot "
             "be stopped so quickly. "
-            "<i>&Delta;N</i> = 0 calculates all samples in one frame.</span>")
+            "<i>N</i><sub>Frame</sub> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
         self.lbl_stim_cmplx_warn = QLabel(self)
