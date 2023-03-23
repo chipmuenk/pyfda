@@ -11,7 +11,6 @@ Create the UI for the Plot_Tran_Impz class
 """
 import collections
 
-from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
     QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
     pyqtSignal, QEvent, Qt, QHBoxLayout, QVBoxLayout, QGridLayout)
