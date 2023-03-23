@@ -38,7 +38,6 @@ class Tran_IO_UI(QWidget):
             ("sum", "Σ", "Sum data from both channels (mono)")
         ]
         self.cmb_select_chan_init = "1"
-        # self.cmb_file_io_default = "none"
 
         self.led_normalize_default = 1  # default setting for normalization
 
