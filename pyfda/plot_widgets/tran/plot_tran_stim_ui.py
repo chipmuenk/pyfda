@@ -812,8 +812,9 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
-        use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
-        self.wdg_ctrl_stim.setVisible(use_file_io)
+        not_use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
+        self.wdg_ctrl_stim.setVisible(not_use_file_io)
+        self.wdg_formula_stim.setVisible(self.stim == "formula" and not_use_file_io)
 
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
         if self.cmb_stim == "impulse":
@@ -876,7 +877,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblFreqUnit2.setVisible("f2" in stim_wdg)
         self.lbl_BW2.setVisible("BW2" in stim_wdg)
         self.led_BW2.setVisible("BW2" in stim_wdg)
-        self.wdg_formula_stim.setVisible(self.stim == "formula" and use_file_io)
 
         self.cmbImpulseType.setVisible(self.cmb_stim == 'impulse')
         self.cmbSinusoidType.setVisible(self.cmb_stim == 'sinusoid')
