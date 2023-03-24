@@ -554,7 +554,7 @@ class Plot_Impz(QWidget):
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
                     or bool(np.any(np.iscomplex(np.asarray(fb.fil[0]['ba']))))\
-                        or bool(np.any(np.any(np.iscomplex(x_test))))
+                or bool(np.any(np.any(np.iscomplex(x_test))))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
@@ -565,11 +565,11 @@ class Plot_Impz(QWidget):
             self.n = np.arange(self.ui.N_end, dtype=float)
 
             if self.cmplx:
-                self.x = np.zeros(self.ui.N_end, dtype=complex)  # stimulus
-                self.y = np.empty_like(self.x, dtype=complex)  # always complex
+                self.x = np.zeros(self.ui.N_end, dtype=complex)
+                self.y = np.zeros(self.ui.N_end, dtype=complex)
             else:
-                self.x = np.zeros(self.ui.N_end, dtype=float)  # stimulus
-                self.y = np.empty_like(self.x)  # same type as self.x
+                self.x = np.zeros(self.ui.N_end, dtype=float)
+                self.y = np.zeros(self.ui.N_end, dtype=float)
 
             # initialize progress bar
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
