@@ -678,7 +678,7 @@ class PlotImpz_UI(QWidget):
         self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
                                 return_type='int', sign='poszero')
 
-        if N_end > 0:  # total number of data points was specified, e.g. for file I/O
+        if N_end > 0:  # total number of data points was specified, e.g. from file I/O
             if N_end <= self.N_start:
                 logger.warning(
                     f"Total number of data points must be {N_end} > "
@@ -689,6 +689,7 @@ class PlotImpz_UI(QWidget):
             self.N_end = N_end
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
+            self.led_N_points.setText(str(self.N))  # update widget
         else:
             if self.N_user == 0:  # automatic calculation
                 self.N = self.calc_n_points(self.N_user)
