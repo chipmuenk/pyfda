@@ -817,7 +817,7 @@ class Plot_Tran_Stim_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
         not_use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
-        self.wdg_ctrl_stim.setVisible(not_use_file_io)
+        self.wdg_ctrl_stim.setEnabled(not_use_file_io)
         self.wdg_formula_stim.setVisible(self.stim == "formula" and not_use_file_io)
 
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
