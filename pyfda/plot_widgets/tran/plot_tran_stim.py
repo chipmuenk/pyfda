@@ -438,7 +438,7 @@ class Plot_Tran_Stim(QWidget):
                     self.ui.mls_b, length=N_frame, state=self.seed_i)
                 noi = self.ui.noi.real * noi_r + 1j * self.ui.noi.imag * noi_i
             else:
-                noi = noi_r * self.ui.noi.real
+                noi = noi_r * self.ui.noi
         # ---
         elif self.ui.noise == "brownian":  # brownian noise
             # Brownian noise in cumulative, add last value of last frame to
