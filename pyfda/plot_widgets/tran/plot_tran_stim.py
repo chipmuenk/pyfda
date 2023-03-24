@@ -419,7 +419,7 @@ class Plot_Tran_Stim(QWidget):
                         1j * np.random.randint(
                             np.int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
             else:
-                noi = np.random.randint(np.int(np.abs(self.ui.noi)) + 1, size=N_frame)
+                noi = np.random.randint(int(np.abs(self.ui.noi)) + 1, size=N_frame)
         # ---
         elif self.ui.noise == "mls":
             # Maximum Length Sequences have a fixed length of 2 ** self.ui.mls_b,
