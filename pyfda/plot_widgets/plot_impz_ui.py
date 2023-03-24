@@ -11,7 +11,8 @@ Create the UI for the PlotImz class
 """
 from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT,
-    QIcon, QProgressBar, pyqtSignal, QSize, QHBoxLayout, QVBoxLayout, QGridLayout)
+    QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
+    QHBoxLayout, QVBoxLayout, QGridLayout)
 
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
@@ -239,6 +240,10 @@ class PlotImpz_UI(QWidget):
             "<i>N</i><sub>Frame</sub> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
 
+        self.frm_file_io = QFrame(self)
+        self.frm_file_io.setContentsMargins(0, 0, 0, 0)
+        self.frm_file_io.setEnabled(False)
+
         self.lbl_stim_cmplx_warn = QLabel(self)
         self.lbl_stim_cmplx_warn = QLabel(to_html("Cmplx!", frmt='b'), self)
         self.lbl_stim_cmplx_warn.setToolTip(
@@ -280,6 +285,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addWidget(self.lbl_N_frame)
         layH_ctrl_run.addWidget(self.led_N_frame)
+        layH_ctrl_run.addWidget(self.frm_file_io)
         layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
         layH_ctrl_run.addSpacing(20)

@@ -144,6 +144,10 @@ class Plot_Impz(QWidget):
         self.stim_wdg.ui.lbl_title_stim.setFixedWidth(self.ui.lbl_title_plot_time.sizeHint().width())
         self.file_io_wdg = Tran_IO()
 
+        # This places the combo box for adding / using file data to the
+        # run control toolbar:
+        self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
+
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
@@ -196,6 +200,7 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
+        self.stim_wdg.ui.but_file_io.clicked.connect(self.set_N_to_file_len)
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)

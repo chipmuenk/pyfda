@@ -18,7 +18,7 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qtext_width, QVLine)
+    qcmb_box_populate, qget_cmb_box, qtext_width, QVLine, PushButton)
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
@@ -282,15 +282,21 @@ class Plot_Tran_Stim_UI(QWidget):
         self.chk_step_err.setChecked(False)
         self.chk_step_err.setObjectName("stim_step_err")
         #
+        self.but_file_io = PushButton("<", checkable=False)
+        self.but_file_io.setToolTip(
+            "<span>Use file length as number of data points.</span>")
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
         self.cmb_file_io = QComboBox(self)
         self.cmb_file_io.setObjectName("cmb_file_io")
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
-        self.cmb_file_io.setEnabled(False)
-        layV_stim_io = QVBoxLayout()
-        layV_stim_io.addWidget(self.lbl_file_io)
-        layV_stim_io.addWidget(self.cmb_file_io)
+
+        # TODO: layH_file_io is instantiated in plot_impz, this is very hacky
+        self.layH_file_io = QHBoxLayout()
+        self.layH_file_io.addWidget(self.but_file_io)
+        self.layH_file_io.addWidget(self.lbl_file_io)
+        self.layH_file_io.addWidget(self.cmb_file_io)
+        self.layH_file_io.setContentsMargins(0, 0, 0, 0)
         # -------------------------------------
 
         layHCmbStim = QHBoxLayout()
@@ -510,7 +516,6 @@ class Plot_Tran_Stim_UI(QWidget):
 
         layH_io_stim = QHBoxLayout()
         layH_io_stim.addWidget(self.wdg_ctrl_stim)
-        layH_io_stim.addLayout(layV_stim_io)
         layH_io_stim.addStretch(10)
         self.wdg_io_stim = QWidget(self)
         self.wdg_io_stim.setLayout(layH_io_stim)
