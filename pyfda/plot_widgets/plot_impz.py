@@ -539,12 +539,16 @@ class Plot_Impz(QWidget):
 
         if self.needs_calc:
             # Test whether stimulus or filter coefficients are complex and set flag
-            # and UI field correspondingly. Calculate 10 samples to be sure about complex values.
+            #  correspondingly, additionally calculate up to 10 samples to test for
+            # complex values:
             self.N_first = 0  # initialize frame index
             x_test = np.zeros(10, dtype=complex)
-            # TODO: For stimuli that become complex only after the 10th sample, the test may fail
-            # calculate up to 10 samples starting at n = 0 to test for complex values
+            # TODO: For stimuli that become complex only after the 10th sample,
+            #       the test fails
+            # TODO: np.iscomplexobj() returns true for an array with dtype complex
+            #       although each item is real.
             self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
+ 
             self.cmplx =\
                 (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
