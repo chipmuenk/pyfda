@@ -201,38 +201,46 @@ class Plot_Tran_Stim(QWidget):
 
         """
         # -------------------------------------------
-        def add_signal(stim: np.ndarray, sig: np.ndarray):
+        def add_signal(stim: np.ndarray, add_sig: np.ndarray):
             """
-            Add signal `sig` to stimulus `stim` (both need to have the same shape)
+            Add signal `add_sig` to stimulus `stim` (both need to have the same shape)
             and respect all combinations of real and complex-valued signals.
-            If `sig` has the shape (N x 2), the two columns are added as real and
+            If `add_sig` has the shape (N x 2), the two columns are added as real and
             imaginary values.
             """
-            if np.ndim(sig) == 0:
-                if sig is None or sig == 0:
+            logger.info(f"Stim: is_cmplx = {np.iscomplexobj(stim)}, {stim.dtype}\n"
+                        f"add_sig: is_cmplx = {np.iscomplexobj(add_sig)}")
+            if np.ndim(add_sig) == 0:
+                if add_sig is None or add_sig == 0:
                     return stim
-                # else sig is a scalar, can be added to stim
-            elif np.ndim(sig) > 1 or np.ndim(stim) != 1\
-                    or len(stim) != np.shape(stim)[0]\
-                        or np.ndim(sig) == 2 and np.shape(sig)[1] != 2:
+                # else add_sig is a scalar, can be added to stim
+            elif np.ndim(stim) != 1 or np.ndim(add_sig) > 2\
+                or np.ndim(add_sig) == 2 and np.shape(add_sig)[1] != 2:
                 logger.error(
                     f"Cannot combine stimulus ({np.shape(stim)}) and additional "
-                    f"signal ({np.shape(sig)}) due to different shapes!")
+                    f"signal ({np.shape(add_sig)}) due to unsuitable dimensions!")
                 return stim
-            # special case of 2D-sig which is added to stimulus as a complex signal
-            elif np.ndim(sig) == 2:
-                stim = stim.astype(complex) + sig[:, 0] + 1j * sig[:, 1]
+            elif len(stim) != np.shape(add_sig)[0]:
+                logger.error(
+                    f"Cannot combine stimulus (len = {np.shape(stim)}) and additional "
+                    f"signal (len = {np.shape(add_sig)}) due to different lenghts!")
+                return stim
+            # add_sig is 2D, add it to stimulus as a complex signal
+            elif np.ndim(add_sig) == 2:
+                stim = stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
                 return stim
             # ---
-            # sig is complex, cast stim to complex as well before adding
-            if np.iscomplexobj(sig):
-                stim = stim.astype(complex) + sig
-            # sig is real and stimulus is complex:
-            # -> add sig to both real and imaginary part of stimulus
+            # add_sig is complex, cast stim to complex as well before adding
+            if np.iscomplexobj(add_sig):
+                logger.info("add_sig is complex")
+                stim = stim.astype(complex) + add_sig
+            # add_sig is real and stimulus is complex:
+            # -> add add_sig to both real and imaginary part of stimulus
             elif np.iscomplexobj(stim):
-                stim += sig + 1j * sig
-            else:  # stim and sig are real-valued
-                stim += sig
+                logger.info("stim is complex")
+                stim += add_sig + 1j * add_sig
+            else:  # stim and add_sig are real-valued
+                stim += add_sig
             return stim
 
         # ====================================================================
