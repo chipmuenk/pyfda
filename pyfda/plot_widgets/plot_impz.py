@@ -553,8 +553,8 @@ class Plot_Impz(QWidget):
                 (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
-                    or bool(np.any(np.iscomplex(np.asarray(fb.fil[0]['ba']))))\
-                or bool(np.any(np.any(np.iscomplex(x_test))))
+                    or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
+                or np.any(np.iscomplex(x_test))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
