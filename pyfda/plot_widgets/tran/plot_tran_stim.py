@@ -415,9 +415,9 @@ class Plot_Tran_Stim(QWidget):
             # Random integers are uncorrelated, no information from last frame needed
             if np.iscomplexobj(self.ui.noi):
                 noi = np.random.randint(
-                    np.int(np.abs(self.ui.noi.real)) + 1, size=N_frame) +\
+                    int(np.abs(self.ui.noi.real)) + 1, size=N_frame) +\
                         1j * np.random.randint(
-                            np.int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
+                            int(np.abs(self.ui.noi.imag)) + 1, size=N_frame)
             else:
                 noi = np.random.randint(int(np.abs(self.ui.noi)) + 1, size=N_frame)
         # ---
