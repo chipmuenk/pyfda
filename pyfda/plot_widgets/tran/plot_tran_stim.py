@@ -229,14 +229,15 @@ class Plot_Tran_Stim(QWidget):
             elif np.ndim(add_sig) == 2:
                 stim = stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
                 return stim
+
             # ---
             # add_sig is complex, cast stim to complex as well before adding
-            if np.iscomplexobj(add_sig):
+            if np.any(type(add_sig) == complex):
                 logger.info("add_sig is complex")
                 stim = stim.astype(complex) + add_sig
             # add_sig is real and stimulus is complex:
             # -> add add_sig to both real and imaginary part of stimulus
-            elif np.iscomplexobj(stim):
+            elif np.any(type(stim) == complex):
                 logger.info("stim is complex")
                 stim += add_sig + 1j * add_sig
             else:  # stim and add_sig are real-valued
