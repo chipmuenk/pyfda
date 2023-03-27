@@ -274,8 +274,9 @@ class Plot_Tran_Stim(QWidget):
                 x[frm_slc] = np.concatenate(
                     (self.x_file[N_first:], np.zeros(N_last - len(self.x_file))))
             else:
-            # file data has been consumed, nothing left to be added
-                return
+                # file data has been consumed, nothing left to be added
+                pass
+            return
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if N_first <= self.T1_idx < N_last:
@@ -463,7 +464,7 @@ class Plot_Tran_Stim(QWidget):
         if self.ui.ledDC.isVisible:
             x[frm_slc] = add_signal(x[frm_slc], self.ui.DC)
 
-        # Add file data
+        # Add file data to stimulus
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
             if self.x_file is None:
                 logger.warning("No file loaded!")
