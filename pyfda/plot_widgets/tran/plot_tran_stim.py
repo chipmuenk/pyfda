@@ -246,7 +246,7 @@ class Plot_Tran_Stim(QWidget):
 
         # ====================================================================
         # Initialization for all frames
-        if True: # N_first == 0:
+        if N_first == 0:
             # calculate index for T1, only needed for dirac and step
             self.T1_idx = int(np.round(self.ui.T1))
 
