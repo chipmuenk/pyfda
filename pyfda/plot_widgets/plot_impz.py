@@ -458,7 +458,6 @@ class Plot_Impz(QWidget):
         # File is loaded, copy file length to N_end
         else:
             self.ui.update_N(N_end = self.file_io_wdg.N)
-            logger.info(f"Set N to file length {self.file_io_wdg.N}")
 
     # ------------------------------------------------------------------------------
     def file_io(self):
