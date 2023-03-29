@@ -42,7 +42,7 @@ class Tran_IO(QWidget):
         self.x = None  # array for file data
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
-        self.file_load_status = "none"  # status flag ("none" / "loaded" / "error")
+        self.file_load_status = 'none'  # status flag ('none' / 'loaded' / 'error')
 
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
@@ -96,8 +96,8 @@ class Tran_IO(QWidget):
         and some other infos (depending on the file type).
 
         When the selection was successful, store the fully qualified file name
-        and the file type in the attributes `self.file_name` and `self.file_type`,
-        delete previous data `self.x` from memory and return 0.
+        and the file type in the attributes `self.file_name` and `self.file_type`
+        and return 0.
         When an error occurred, return -1.
 
         """
@@ -132,6 +132,7 @@ class Tran_IO(QWidget):
         elif self.file_type == 'csv':
             ret = io.read_csv_info(self.file_name)
             if ret < 0:
+                self.file_load_status = 'error'
                 return -1
             self.ui.frm_f_s.setVisible(False)
             self.N = io.read_csv_info.N
@@ -139,11 +140,13 @@ class Tran_IO(QWidget):
             info_str = f" ({io.read_csv_info.info})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
+            self.file_load_status = 'error'
             return -1
 
         if self.nchans > 2:
             logger.warning(
                 f"Unsuitable file format with {io.read_csv_info} > 2 channels.")
+            self.file_load_status = 'error'
             return -1
         elif self.nchans == 1:
             self.ui.lbl_chan.setVisible(False)
@@ -168,6 +171,7 @@ class Tran_IO(QWidget):
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
             f"{self.nchans} x {self.N}{info_str}")
+        self.file_load_status = 'none'
         return 0
 
     # ------------------------------------------------------------------------------
@@ -177,6 +181,7 @@ class Tran_IO(QWidget):
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
             self.ui.but_load.setEnabled(False)
+            self.file_load_status = 'none'
             return -1
 
         self.data_raw = io.import_data(self.file_name, self.file_type)
@@ -190,6 +195,7 @@ class Tran_IO(QWidget):
 
         if err:
             self.ui.but_load.setEnabled(False)
+            self.file_load_status = 'error'
             return -1
 
         if self.data_raw.ndim == 1:
@@ -202,6 +208,7 @@ class Tran_IO(QWidget):
         else:
             logger.warning("Unsuitable data shape with "
                            f"{self.data_raw.ndim} dimensions.")
+            self.file_load_status = 'error'
             return -1
 
         # if (nchans_actual, N_actual) != (self.nchans, self.N):
@@ -210,8 +217,12 @@ class Tran_IO(QWidget):
         #                    "using actual shape.")
         #     self.nchans, self.N = (nchans_actual, N_actual)
 
-        self.select_chan_normalize()
-        return 0
+        if self.select_chan_normalize() == 0:
+            self.file_load_status = 'loaded'
+            return 0
+        else:
+            self.file_load_status = 'error'
+            return -1
 
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
@@ -225,7 +236,7 @@ class Tran_IO(QWidget):
         logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
-            return
+            return -1
         logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
         logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
 
@@ -239,7 +250,7 @@ class Tran_IO(QWidget):
                 self.emit({'data_changed': 'file_io'})
                 qstyle_widget(self.ui.but_load, "normal")
                 self.ui.but_load.setText("Load")
-                return
+                return -1
             elif item == "1":  # use channel 1 (mono)
                 data = self.data_raw[:, 0]
             elif item == "2":  # use channel 2 (mono)
@@ -251,7 +262,7 @@ class Tran_IO(QWidget):
                 data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
                 logger.error(f'Unknown item "{item}"')
-                return
+                return -1
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
@@ -271,7 +282,7 @@ class Tran_IO(QWidget):
         logger.warning(f"normalized data: rows x columns = {np.shape(self.x)}, {self.x.dtype}")
 
         self.emit({'data_changed': 'file_io'})
-        return
+        return 0
 
     # ------------------------------------------------------------------------------
     def open_csv_win(self):
