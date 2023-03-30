@@ -246,15 +246,18 @@ class Plot_Tran_Stim(QWidget):
 
         # ====================================================================
         # Initialization for all frames
+        # -------------------------------------------------------------------
         if N_first == 0:
-            # calculate index for T1, only needed for dirac and step
+            # calculate index for T1, only needed for dirac, step and rect
             self.T1_idx = int(np.round(self.ui.T1))
-
+        # -------------------------------------------------------------------
         # Initialization for current frame
+        # -------------------------------------------------------------------
         N_last = N_first + N_frame  # calculate last element index
         frm_slc = slice(N_first, N_last)  # current slice
         n = np.arange(N_first, N_last)  #  create frame index
-        noi = 0  # fallback when noise is deactivated
+        noi = 0  # fallback when no noise is selected
+        # ====================================================================
 
         # #####################################################################
         #
@@ -457,14 +460,22 @@ class Plot_Tran_Stim(QWidget):
         else:
             logger.error('Unknown kind of noise "{}"'.format(self.ui.noise))
 
-        # Add noise to stimulus:
-        x[frm_slc] = add_signal(x[frm_slc], noi)
+
+        # #####################################################################
+        #
+        # Add noise / DC / file data to stimulus x[n]
+        #
+        # ######################################################################
+
+        # Add noise to stimulus when enabled:
+        if noi != 0:
+            x[frm_slc] = add_signal(x[frm_slc], noi)
 
         # Add DC to stimulus when visible / enabled
-        if self.ui.ledDC.isVisible:
+        if self.ui.ledDC.isVisible and self.ui.DC != 0:
             x[frm_slc] = add_signal(x[frm_slc], self.ui.DC)
 
-        # Add file data to stimulus
+        # Add file data to stimulus for combobox setting "add"
         if qget_cmb_box(self.ui.cmb_file_io) == "add":
             if self.x_file is None:
                 logger.warning("No file loaded!")
