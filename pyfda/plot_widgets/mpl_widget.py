@@ -276,7 +276,8 @@ class MplWidget(QWidget):
                         self.cursors[i].remove()         # yes, remove them!
                 self.cursors = []
                 for ax in self.fig.axes:
-                    if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot"}:
+                    if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
+                                                 "Axes", "Axes3D"}:
                         self.cursors.append(mplcursors.cursor(ax, hover=True))
             else:
                 for i in range(len(self.cursors)):
