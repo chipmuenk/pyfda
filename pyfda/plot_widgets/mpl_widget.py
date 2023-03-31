@@ -367,9 +367,11 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_ui = self.addAction(
             QIcon(':/ui_level_max'), 'UI detail', self.cycle_ui_level)
-        self.a_ui.setToolTip('UI detail level: All / basic / compact')
+        self.a_ui.setToolTip('Show / hide UI elements (CTRL-H)')
         self.a_ui_num_levels = 3
         self.a_ui_level = 0  # 0: full ui, 1: reduced, 2: compact ui
+        self.a_ui.setShortcut('Ctrl+H')
+
 
         self.addSeparator()
 
@@ -382,14 +384,21 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         # BACK:
         # ---------------------------------------------
+        # self.ba = QtWidgets.QAction('&Undo', self)
+        # self.ba.setIcon(QIcon(':/action-undo.svg'))
+        # self.ba.setShortcut('Ctrl+Z')
+        # self.ba.triggered.connect(self.back)
+        # self.addAction(self.ba)
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
-        self.a_ba.setToolTip('Back to previous zoom')
+        self.a_ba.setToolTip('Back to previous zoom (CTRL-Z)')
+        self.a_ba.setShortcut('Ctrl+Z')
 
         # ---------------------------------------------
         # FORWARD:
         # ---------------------------------------------
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
-        self.a_fw.setToolTip('Forward to next zoom')
+        self.a_fw.setToolTip('Forward to next zoom (Ctrl+SHIFT-Z)')
+        self.a_fw.setShortcut('Ctrl+SHIFT-Z')
 
         # ---------------------------------------------
         self.addSeparator()
@@ -466,15 +475,16 @@ class MplToolbar(NavigationToolbar):
         self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self._save_figure)
         self.a_sv.setToolTip('<span>Save the figure in various file formats. '
                              'Press &lt;ALT&gt; to hide title.</span>')
-        self.cb = fb.clipboard
+        self.a_sv.setShortcut("Ctrl+S")
 
         # --------------------------------------
         # Copy to clipboard:
         # --------------------------------------
+        self.cb = fb.clipboard
         self.a_cb = self.addAction(
             QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(
-            '<span>Copy figure to clipboard in png format.'
+            '<span>Copy figure to clipboard in png format (CTRL-C).'
             '<ul><li>Press &lt;ALT&gt; to hide title.</li>'
             '<li>Press &lt;SHIFT&gt; for base64 '
             'encoded png format (e.g. for Jupyter Notebooks).</li> '
