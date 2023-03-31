@@ -340,7 +340,7 @@ class MplToolbar(NavigationToolbar):
     def _init_toolbar(self):
         pass  # needed for backward compatibility with mpl < 3.3
 
-    # disable coordinate display when mplcursors is available
+    # turn off coordinate display
     def set_message(self, msg):
         pass
 
@@ -496,23 +496,23 @@ class MplToolbar(NavigationToolbar):
 
 #        self.buttons = {}
 
-        # --------------------------------------
-        # PRINT COORDINATES (only when mplcursors is not available):
-        # --------------------------------------
-        # Add the x,y location widget at the right side of the toolbar
-        # The stretch factor is 1 which means any resizing of the toolbar
-        # will resize this label instead of the buttons.
-        # --------------------------------------
-        if not MPL_CURS and self.coordinates:
-            self.addSeparator()
-            self.locLabel = QLabel("", self)
-            self.locLabel.setAlignment(
-                    QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
-            self.locLabel.setSizePolicy(
-                QSizePolicy(QSizePolicy.Expanding,
-                            QSizePolicy.Ignored))
-            labelAction = self.addWidget(self.locLabel)
-            labelAction.setVisible(True)
+        # # --------------------------------------
+        # # PRINT COORDINATES (only when mplcursors is not available):
+        # # --------------------------------------
+        # # Add the x,y location widget at the right side of the toolbar
+        # # The stretch factor is 1 which means any resizing of the toolbar
+        # # will resize this label instead of the buttons.
+        # # --------------------------------------
+        # if not MPL_CURS and self.coordinates:
+        #     self.addSeparator()
+        #     self.locLabel = QLabel("", self)
+        #     self.locLabel.setAlignment(
+        #             QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        #     self.locLabel.setSizePolicy(
+        #         QSizePolicy(QSizePolicy.Expanding,
+        #                     QSizePolicy.Ignored))
+        #     labelAction = self.addWidget(self.locLabel)
+        #     labelAction.setVisible(True)
 
         # ---------------------------------------------
         # HELP:
