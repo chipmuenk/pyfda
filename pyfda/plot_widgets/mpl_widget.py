@@ -337,7 +337,8 @@ class MplToolbar(NavigationToolbar):
     sig_tx = pyqtSignal(object)  # general signal, containing a dict
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def _init_toolbar(self): pass  # needed for backward compatibility with mpl < 3.3
+    def _init_toolbar(self):
+        pass  # needed for backward compatibility with mpl < 3.3
 
     # disable coordinate display when mplcursors is available
     def set_message(self, msg):
