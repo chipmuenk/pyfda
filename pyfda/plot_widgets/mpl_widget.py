@@ -398,7 +398,7 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
         self.a_fw.setToolTip('Forward to next zoom (Ctrl+SHIFT-Z)')
-        self.a_fw.setShortcut('Ctrl+SHIFT-Z')
+        self.a_fw.setShortcut(QtGui.QKeySequence(Qt.SHIFT|Qt.CTRL|Qt.Key_Z)) # 'Ctrl+SHIFT-Z')
 
         # ---------------------------------------------
         self.addSeparator()
