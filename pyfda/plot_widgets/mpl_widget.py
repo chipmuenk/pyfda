@@ -23,10 +23,9 @@ from matplotlib.pyplot import setp
 try:
     MPL_CURS = True
     import mplcursors
-    if cmp_version('matplotlib', '3.1') < 0:
-        MPL_CURS = False
 except ImportError:
     MPL_CURS = False
+
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
@@ -120,7 +119,7 @@ class MplWidget(QWidget):
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
 
-        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)  # Qt.StrongFocus
         self.canvas.setFocus()
 
         self.canvas.updateGeometry()
@@ -340,13 +339,12 @@ class MplToolbar(NavigationToolbar):
     def _init_toolbar(self): pass  # needed for backward compatibility with mpl < 3.3
 
     # disable coordinate display when mplcursors is available
-    if MPL_CURS:
-        def set_message(self, msg): pass
+    def set_message(self, msg):
+        pass
 
     def __init__(self, canv, mpl_widget, *args, **kwargs):
         NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
 
-        # self.canvas = canv
         self.mpl_widget = mpl_widget
 
     # --------------------------------------------------------------------------
