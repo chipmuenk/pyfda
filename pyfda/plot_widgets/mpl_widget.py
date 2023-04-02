@@ -384,7 +384,7 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         # BACK:
         # ---------------------------------------------
-        # self.ba = QtWidgets.QAction('&Undo', self)
+        # self.ba = QtWidgets.QAction(QIcon(':/action-undo.svg'), '&Undo', self)
         # self.ba.setIcon(QIcon(':/action-undo.svg'))
         # self.ba.setShortcut('Ctrl+Z')
         # self.ba.triggered.connect(self.back)
