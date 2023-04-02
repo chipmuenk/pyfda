@@ -390,15 +390,16 @@ class MplToolbar(NavigationToolbar):
         # self.ba.triggered.connect(self.back)
         # self.addAction(self.ba)
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
-        self.a_ba.setToolTip('Back to previous zoom (CTRL-Z)')
+        self.a_ba.setToolTip('Back to previous zoom (CTRL+Z)')
         self.a_ba.setShortcut('Ctrl+Z')
 
         # ---------------------------------------------
         # FORWARD:
         # ---------------------------------------------
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
-        self.a_fw.setToolTip('Forward to next zoom (Ctrl+SHIFT-Z)')
-        self.a_fw.setShortcut(QtGui.QKeySequence(Qt.SHIFT|Qt.CTRL|Qt.Key_Z)) # 'Ctrl+SHIFT-Z')
+        self.a_fw.setToolTip('Forward to next zoom (CTRL+SHIFT+Z or CTRL+Y)')
+        self.a_fw.setShortcuts(['Ctrl+Shift+Z', 'Ctrl+Y'])
+        # self.a_fw.setShortcut(QtGui.QKeySequence(Qt.SHIFT|Qt.CTRL|Qt.Key_Z))
 
         # ---------------------------------------------
         self.addSeparator()
@@ -460,8 +461,9 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_gr = self.addAction(
             QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
-        self.a_gr.setToolTip('Cycle grid: Off / coarse / fine')
+        self.a_gr.setToolTip('Cycle grid: Off / coarse / fine (CTRL+G)')
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
+        self.a_gr.setShortcut("Ctrl+G")
 
         # ---------------------------------------------
         # REDRAW:
@@ -473,7 +475,7 @@ class MplToolbar(NavigationToolbar):
         # SAVE:
         # --------------------------------------
         self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self._save_figure)
-        self.a_sv.setToolTip('<span>Save the figure in various file formats. '
+        self.a_sv.setToolTip('<span>Save the figure in various file formats (CTRL+S). '
                              'Press &lt;ALT&gt; to hide title.</span>')
         self.a_sv.setShortcut("Ctrl+S")
 
@@ -484,7 +486,7 @@ class MplToolbar(NavigationToolbar):
         self.a_cb = self.addAction(
             QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(
-            '<span>Copy figure to clipboard in png format (CTRL-C).'
+            '<span>Copy figure to clipboard in png format (CTRL+C).'
             '<ul><li>Press &lt;ALT&gt; to hide title.</li>'
             '<li>Press &lt;SHIFT&gt; for base64 '
             'encoded png format (e.g. for Jupyter Notebooks).</li> '
@@ -763,6 +765,7 @@ class MplToolbar(NavigationToolbar):
             modifiers = QtWidgets.QApplication.keyboardModifiers()
             # key = QtWidgets.QApplication.key
             title_info = ""
+            # ALT / META modifier detected -> remove title
             if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier\
                 or modifiers & QtCore.Qt.MetaModifier == QtCore.Qt.MetaModifier:
                 # logger.warning(f"suptitle {self.mpl_widget.fig._suptitle.get_text()}")
