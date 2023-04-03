@@ -778,7 +778,7 @@ class MplToolbar(NavigationToolbar):
         """
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()
-            # key = QtWidgets.QApplication.key
+
             title_info = ""
             # ALT / META modifier detected -> remove title
             if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier\
