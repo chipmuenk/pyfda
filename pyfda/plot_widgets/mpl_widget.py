@@ -316,6 +316,12 @@ class MplToolbar(NavigationToolbar):
     https://matplotlib.org/3.1.1/gallery/user_interfaces/toolmanager_sgskip.html
     https://stackoverflow.com/questions/52971285/add-toolbar-button-icon-matplotlib
 
+    Documentation on QKeySequences:
+    https://doc.qt.io/qt-6/qkeysequence.html
+
+    Construct a shortcut string:
+    logger.info(QtGui.QKeySequence.toString(QtGui.QKeySequence(Qt.SHIFT|Qt.CTRL|Qt.Key_Z)))
+
     """
 
     toolitems = ()  # remove original icons and actions
