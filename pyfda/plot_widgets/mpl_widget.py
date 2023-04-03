@@ -126,7 +126,7 @@ class MplWidget(QWidget):
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
 
         self.canvas.setFocusPolicy(Qt.ClickFocus)  # Qt.StrongFocus
-        self.canvas.setFocus()
+        # self.canvas.setFocus()
 
         self.canvas.updateGeometry()
 
