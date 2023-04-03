@@ -125,7 +125,7 @@ class MplWidget(QWidget):
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
 
-        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)  # Qt.StrongFocus
+        self.canvas.setFocusPolicy(Qt.ClickFocus)  # Qt.StrongFocus
         self.canvas.setFocus()
 
         self.canvas.updateGeometry()
@@ -143,7 +143,7 @@ class MplWidget(QWidget):
         self.mplToolbar.installEventFilter(self)
 
         layHToolbar = QHBoxLayout()
-        layHToolbar.addWidget(self.mplToolbar, 1, QtCore.Qt.AlignLeft)
+        layHToolbar.addWidget(self.mplToolbar, 1, Qt.AlignLeft)
         layHToolbar.addStretch(1)
 
         # =============================================
@@ -534,7 +534,7 @@ class MplToolbar(NavigationToolbar):
         #     self.addSeparator()
         #     self.locLabel = QLabel("", self)
         #     self.locLabel.setAlignment(
-        #             QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        #             Qt.AlignRight | Qt.AlignTop)
         #     self.locLabel.setSizePolicy(
         #         QSizePolicy(QSizePolicy.Expanding,
         #                     QSizePolicy.Ignored))
@@ -755,7 +755,7 @@ class MplToolbar(NavigationToolbar):
         Save current figure using matplotlib's `save_figure()`. When <ALT> key is
         pressed, remove the title before saving.
         """
-        if QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier:
+        if QtWidgets.QApplication.keyboardModifiers() == Qt.AltModifier:
             title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
             self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
             self.canvas.draw()  # redraw plot without title
@@ -781,12 +781,12 @@ class MplToolbar(NavigationToolbar):
 
             title_info = ""
             # ALT / META modifier detected -> remove title
-            if modifiers & QtCore.Qt.AltModifier == QtCore.Qt.AltModifier\
-                or modifiers & QtCore.Qt.MetaModifier == QtCore.Qt.MetaModifier:
+            if modifiers & Qt.AltModifier == Qt.AltModifier\
+                or modifiers & Qt.MetaModifier == Qt.MetaModifier:
                 # logger.warning(f"suptitle {self.mpl_widget.fig._suptitle.get_text()}")
                  # blank out Alt und Meta Modifier bits
-                modifiers = modifiers & ~QtCore.Qt.AltModifier & ~QtCore.Qt.MetaModifier
-                title_info = "(no title) "
+                modifiers = modifiers & ~Qt.AltModifier & ~Qt.MetaModifier
+                title_info = "without title "
                 title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
                 self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
                 self.canvas.draw()  # redraw plot without title
@@ -796,7 +796,7 @@ class MplToolbar(NavigationToolbar):
             else:
                 img = QImage(self.canvas.grab())  # grab original screen
 
-            if modifiers in {QtCore.Qt.ShiftModifier, QtCore.Qt.ControlModifier}:
+            if modifiers in {Qt.ShiftModifier, Qt.ControlModifier}:
                 ba = QtCore.QByteArray()
                 buffer = QtCore.QBuffer(ba)  # create buffer of ByteArray
                 buffer.open(QtCore.QIODevice.WriteOnly)  # ... open it
@@ -804,18 +804,18 @@ class MplToolbar(NavigationToolbar):
                 # ... convert to base64 bytes -> str -> strip b' ... '
                 base64_str = str(ba.toBase64().data()).lstrip("b'").rstrip("'")
                 # ... and copy as string to clipboard after removing b' ... '
-                if modifiers == QtCore.Qt.ShiftModifier:
+                if modifiers == Qt.ShiftModifier:
                     self.cb.setText(base64_str)
                     logger.info(
                         f'Copied plot {title_info}as base64 encoded PNG image '
                         'to Clipboard.')
-                elif modifiers == QtCore.Qt.ControlModifier:
+                elif modifiers == Qt.ControlModifier:
                     self.cb.setText(
                         '<img src="data:image/png;base64,' + base64_str + '"/>')
                     logger.info(f'Copied plot {title_info}as base64 encoded PNG image '
                                 'with <img> tag to Clipboard.')
-                # elif modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
-                #     logger.warning('Control+Shift+Click')
+                elif modifiers == (Qt.ControlModifier | Qt.ShiftModifier):
+                    logger.warning('Control+Shift+Click')
             else:
                 self.cb.setImage(img)
                 logger.info(f'Copied plot {title_info}as PNG image to Clipboard.')
