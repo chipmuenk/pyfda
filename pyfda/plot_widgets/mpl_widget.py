@@ -133,7 +133,7 @@ class MplWidget(QWidget):
         self.canvas.installEventFilter(self)
 
         # Create a custom navigation toolbar, tied to the canvas and
-        # initialize toolbar settings
+        # initialize toolbar settings. Send events through event filter
         #
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.zoom_locked = False
@@ -785,7 +785,7 @@ class MplToolbar(NavigationToolbar):
         """
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()
-            if key_event:
+            if key_event: # blank out ControlModifier
                 modifiers = modifiers &~ Qt.ControlModifier
             title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
             title_info = f'"{title}" '
