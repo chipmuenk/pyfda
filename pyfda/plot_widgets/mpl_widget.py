@@ -384,13 +384,14 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_ui = self.addAction(
             QIcon(':/ui_level_max'), 'UI detail', self.cycle_ui_level)
-        self.a_ui.setToolTip('Show / hide UI elements (CTRL-H)')
+        self.a_ui.setToolTip('Show / hide UI elements (CTRL-U)')
         self.a_ui_num_levels = 3
         self.a_ui_level = 0  # 0: full ui, 1: reduced, 2: compact ui
-        self.a_ui.setShortcut('Ctrl+H')
+        self.a_ui.setShortcut('Ctrl+U')
 
-
+        # ---------------------------------------------
         self.addSeparator()
+        # ---------------------------------------------
 
         # ---------------------------------------------
         # HOME:
@@ -427,20 +428,23 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip(
-            "Pan axes with left mouse button, zoom with right,\npressing x / y / CTRL "
+            "Pan axes (Ctrl+P) with left mouse button, zoom with right,\npressing x / y / CTRL "
             "keys constrains to horizontal / vertical / diagonal movements.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
+        self.a_pa.setShortcut('Ctrl+P')
 
         # ---------------------------------------------
         # ZOOM RECTANGLE:
         # ---------------------------------------------
         self.a_zo = self.addAction(QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
         self.a_zo.setToolTip(
-            "Zoom in / out to rectangle with left / right mouse button,\n"
+            "Zoom in / out to rectangle (Ctrl+O) with left / right mouse button,\n"
             "pressing x / y keys constrains zoom to horizontal / vertical direction.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
+        self.a_zo.setShortcut('Ctrl+O')
+
 
         # ---------------------------------------------
         # FULL VIEW:
@@ -448,7 +452,8 @@ class MplToolbar(NavigationToolbar):
         self.a_fv = self.addAction(
             QIcon(':/fullscreen-enter.svg'),
             'Zoom full extent', self.mpl_widget.plt_full_view)
-        self.a_fv.setToolTip('Zoom to full extent')
+        self.a_fv.setToolTip('Zoom to full extent (Ctrl+F)')
+        self.a_fv.setShortcut("Ctrl+F")
 
         # ---------------------------------------------
         # LOCK ZOOM:
@@ -457,7 +462,8 @@ class MplToolbar(NavigationToolbar):
                                    'Lock zoom', self.toggle_lock_zoom)
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
-        self.a_lk.setToolTip('Lock / unlock current zoom setting')
+        self.a_lk.setToolTip('Lock / unlock current zoom setting (Ctrl+L)')
+        self.a_lk.setShortcut("Ctrl+L")
 
         # ---------------------------------------------
         # TRACKING CURSOR:
@@ -467,7 +473,8 @@ class MplToolbar(NavigationToolbar):
                                        'Cursor', self.mpl_widget.toggle_cursor)
             self.a_cr.setCheckable(True)
             self.a_cr.setChecked(False)
-            self.a_cr.setToolTip('Tracking Cursor')
+            self.a_cr.setToolTip('Tracking Cursor (Ctrl+T)')
+            self.a_cr.setShortcut("Ctrl+T")
 
         # --------------------------------------
         self.addSeparator()
@@ -478,7 +485,7 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         self.a_gr = self.addAction(
             QIcon(':/grid_coarse.svg'), 'Grid', self.cycle_draw_grid)
-        self.a_gr.setToolTip('Cycle grid: Off / coarse / fine (CTRL+G)')
+        self.a_gr.setToolTip('Cycle grid: Off / coarse / fine (Ctrl+G)')
         self.a_gr_state = 2  # 0: off, 1: major, 2: minor
         self.a_gr.setShortcut("Ctrl+G")
 
@@ -492,8 +499,8 @@ class MplToolbar(NavigationToolbar):
         # SAVE:
         # --------------------------------------
         self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self._save_figure)
-        self.a_sv.setToolTip('<span>Save the figure in various file formats (CTRL+S). '
-                             'Press &lt;ALT&gt; to hide title.</span>')
+        self.a_sv.setToolTip('<span>Save the figure in various file formats (Ctrl+S). '
+                             'Press &lt;SHIFT&gt; to hide title.</span>')
         self.a_sv.setShortcut("Ctrl+S")
 
         # --------------------------------------
@@ -523,7 +530,8 @@ class MplToolbar(NavigationToolbar):
         if figureoptions is not None:
             self.a_op = self.addAction(
                 QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
-            self.a_op.setToolTip('Edit curves line and axes parameters')
+            self.a_op.setToolTip(self.tr('Edit curves line and axes parameters (Ctrl+E)'))
+            self.a_op.setShortcut(self.tr('Ctrl+E'))
 
 #        self.buttons = {}
 
