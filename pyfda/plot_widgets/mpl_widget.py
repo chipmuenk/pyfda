@@ -35,6 +35,8 @@ from pyfda.libs.compat import (
     Qt, QtCore, QtGui, QWidget, QLabel, pyqtSignal, QSizePolicy, QIcon, QImage, QVBoxLayout,
     QHBoxLayout, QInputDialog, FigureCanvas, NavigationToolbar, pyqtSlot, QtWidgets, QEvent)
 
+from pyfda.libs.pyfda_qt_lib import EventTypes
+
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
 from pyfda import qrc_resources  # contains all icons
@@ -104,6 +106,10 @@ class MplWidget(QWidget):
 
     def __init__(self, parent):
         super(MplWidget, self).__init__(parent)
+
+        # initialize dict for translation of events to strings
+        self.event_types = EventTypes()
+
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure:
         self.plt_lim = []  # define variable for x,y plot limits
@@ -168,6 +174,9 @@ class MplWidget(QWidget):
          to this eventFilter, evaluated and passed on to the next hierarchy level.
         """
         modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if event.type() in {QEvent.KeyPress, QEvent.Wheel, QtGui.QMouseEvent.MouseButtonPress,
+                            QEvent.KeyRelease}:
+            logger.info(self.event_types.as_string(event.type()))
         if event.type() == QEvent.KeyPress:
             #if QtGui.QKeySequence(event.key() + int(event.modifiers())) == QtGui.QKeySequence("Ctrl+C"):
                 # key = QKeySequence(event.modifiers()|event.key()).toString()
