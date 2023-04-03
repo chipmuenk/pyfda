@@ -768,20 +768,25 @@ class MplToolbar(NavigationToolbar):
             self.save_figure()
 
 # ------------------------------------------------------------------------------
-    def mpl2Clip(self):
+    def mpl2Clip(self, key_event = False):
         """
         Copy current figure to the clipboard, either directly as PNG file or as
         base64 encoded PNG file.
 
         Qt.ShiftModifier = 0x02000000 # Shift key pressed
         Qt.ControlModifier = 0x04000000 # Control key
-        Qt.AltModifier   = 0x08000000 # Alt key
+        Qt.AltModifier   = 0x08000000 # Alt key, doesn't work under Linux?
         Qt.MetaModifier  = 0x10000000 # Meta key
+
+        When `key_event == True`, the trigger was a CTRL+C keypress and the Control
+        modifier has to be blanked out.
         """
         try:
             modifiers = QtWidgets.QApplication.keyboardModifiers()
-
-            title_info = ""
+            if key_event:
+                modifiers = modifiers &~ Qt.ControlModifier
+            title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
+            title_info = f'"{title}" '
             # ALT / META modifier detected -> remove title
             if modifiers & Qt.AltModifier == Qt.AltModifier\
                 or modifiers & Qt.MetaModifier == Qt.MetaModifier:
@@ -789,7 +794,6 @@ class MplToolbar(NavigationToolbar):
                  # blank out Alt und Meta Modifier bits
                 modifiers = modifiers & ~Qt.AltModifier & ~Qt.MetaModifier
                 title_info = "without title "
-                title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
                 self.mpl_widget.fig.get_axes()[0].set_title("")  # and remove it from plot
                 self.canvas.draw()  # redraw plot without title
                 img = QImage(self.canvas.grab())  # and grab it
