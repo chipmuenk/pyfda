@@ -507,7 +507,9 @@ class MplToolbar(NavigationToolbar):
             'encoded png format (e.g. for Jupyter Notebooks).</li> '
             '<li>Press &lt;CTRL&gt; to '
             'embed base64 encoded PNG in &lt;img&gt; tag.</li></ul></span>')
-        self.a_cb.setShortcut("Ctrl+C")
+        # Don't set a shortcut here, as this jumps to `self.mpl2Clip` and
+        # interpretes the CTRL key as a modifier
+        # Decoding "CTRL+C" is performed in the event filter instead
 
         # --------------------------------------
         self.addSeparator()
