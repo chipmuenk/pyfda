@@ -179,6 +179,7 @@ class MplWidget(QWidget):
         #     logger.info(self.event_types.as_string(event.type()))
         if event.type() == QEvent.KeyPress:
             key = event.key()
+            # logger.warning(key)
             if key < 256:
                 modifiers = event.modifiers()
                 meta = modifiers & Qt.AltModifier == Qt.AltModifier\
@@ -186,7 +187,7 @@ class MplWidget(QWidget):
                 ctrl = modifiers & Qt.ControlModifier == Qt.ControlModifier
                 shift = modifiers & Qt.ShiftModifier == Qt.ShiftModifier
 
-                logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
+                # logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
                 if key == 67 and ctrl:  # "ctrl-c"
                     self.mplToolbar.mpl2Clip(key_event=True)
 
