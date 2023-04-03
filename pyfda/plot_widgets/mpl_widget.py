@@ -200,7 +200,7 @@ class MplWidget(QWidget):
         #     pass
 
         # Call base class method to continue normal event processing:
-        return super(MplWidget, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
 # ------------------------------------------------------------------------------
     def save_limits(self):
