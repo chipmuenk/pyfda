@@ -174,28 +174,30 @@ class MplWidget(QWidget):
          to this eventFilter, evaluated and passed on to the next hierarchy level.
         """
         modifiers = QtWidgets.QApplication.keyboardModifiers()
-        if event.type() in {QEvent.KeyPress, QEvent.Wheel, QtGui.QMouseEvent.MouseButtonPress,
-                            QEvent.KeyRelease}:
-            logger.info(self.event_types.as_string(event.type()))
+        # if event.type() in {QEvent.KeyPress, QEvent.Wheel, QtGui.QMouseEvent.MouseButtonPress,
+        #                     QEvent.KeyRelease}:
+        #     logger.info(self.event_types.as_string(event.type()))
         if event.type() == QEvent.KeyPress:
-            #if QtGui.QKeySequence(event.key() + int(event.modifiers())) == QtGui.QKeySequence("Ctrl+C"):
-                # key = QKeySequence(event.modifiers()|event.key()).toString()
-                # logger.warning("Ctrl-C!")
-
-           # logger.warning("Key Event!")
             key = event.key()
-            # if key == 67:
-            #     logger.warning("c")
-            # else:
-            #     logger.warning(key)
-            if modifiers == Qt.ControlModifier:
-                    logger.warning("control key")
-        if event.type() == QtCore.QEvent.Wheel:
-            logger.warning(event.angleDelta().y())
+            if key < 256:
+                modifiers = event.modifiers()
+                meta = modifiers & Qt.AltModifier == Qt.AltModifier\
+                    or modifiers & Qt.MetaModifier == Qt.MetaModifier
+                ctrl = modifiers & Qt.ControlModifier == Qt.ControlModifier
+                shift = modifiers & Qt.ShiftModifier == Qt.ShiftModifier
 
-        else:
-            # do other weird things
-            pass
+                logger.warning(f"Key = {key}, meta = {meta}, ctrl = {ctrl}, shift = {shift}")
+                if key == 67 and ctrl:  # "ctrl-c"
+                    self.mplToolbar.mpl2Clip(key_event=True)
+
+        # elif event.type() == QtGui.QMouseEvent.MouseButtonPress:
+        #     logger.warning("Mouse Event")
+        # if event.type() == QEvent.Wheel:
+        #     logger.warning(event.angleDelta().y())
+
+        # else:
+        #     # do other weird things
+        #     pass
 
         # Call base class method to continue normal event processing:
         return super(MplWidget, self).eventFilter(source, event)
