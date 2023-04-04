@@ -179,7 +179,8 @@ class MplWidget(QWidget):
         if event.type() == QEvent.KeyPress:
             key = event.key()
             # logger.warning(key)
-            if key < 256:
+            # check for "normal" keys, skip x and y (used as mouse modifiers)
+            if key < 256 and key != 88 and key != 89:
                 modifiers = event.modifiers()
                 meta = modifiers & Qt.AltModifier == Qt.AltModifier\
                     or modifiers & Qt.MetaModifier == Qt.MetaModifier
