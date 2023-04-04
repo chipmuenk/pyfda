@@ -561,6 +561,7 @@ class MplToolbar(NavigationToolbar):
         self.a_he = self.addAction(QIcon(':/help.svg'), 'help', self.help)
         self.a_he.setToolTip('Open help page from https://pyfda.rtfd.org in browser')
         self.a_he.setDisabled(True)
+        self.a_he.setShortcut(self.tr('F1'))
 
 # ------------------------------------------------------------------------------
     if figureoptions is not None:
