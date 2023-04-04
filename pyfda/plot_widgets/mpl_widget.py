@@ -398,7 +398,8 @@ class MplToolbar(NavigationToolbar):
         # HOME:
         # ---------------------------------------------
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
-        self.a_ho.setToolTip('Reset zoom')
+        self.a_ho.setToolTip('Home zoom setting (Ctrl+H)')
+        self.a_ho.setShortcut('Ctrl+H')
 
         # ---------------------------------------------
         # BACK:
@@ -511,7 +512,6 @@ class MplToolbar(NavigationToolbar):
         self.a_cb = self.addAction(
             QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(
-            '<span>Copy figure to clipboard in png format (CTRL+C).'
             '<span>Copy figure to clipboard in png format (CTRL+C). '
             'Modifiers:'
             '<ul><li>&lt;SHIFT&gt; to hide title.</li> '
