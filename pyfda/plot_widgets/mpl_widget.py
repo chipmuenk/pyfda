@@ -140,7 +140,6 @@ class MplWidget(QWidget):
         self.mplToolbar.cursor_enabled = False
         # self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
-        self.mplToolbar.installEventFilter(self)
 
         layHToolbar = QHBoxLayout()
         layHToolbar.addWidget(self.mplToolbar, 1, Qt.AlignLeft)
