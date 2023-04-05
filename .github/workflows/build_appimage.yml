@@ -22,7 +22,7 @@ jobs:
           mkdir -p AppDir/usr/src
           cp pyfda  AppDir/usr/src -r
           sudo apt-get --quiet install --yes python3 python3-pip python3-setuptools python3-wheel
-          python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+          python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
       - name: Build AppImage
         uses: AppImageCrafters/build-appimage-action@master
         env:
@@ -43,7 +43,7 @@ jobs:
 #   # Copy the python application code into the AppDir
 #   - cp pyfdax.py  AppDir/usr/src -r
 #   # Install application dependencies
-#   - python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+#   - python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
 
 # AppDir:
 #   path: ./AppDir
