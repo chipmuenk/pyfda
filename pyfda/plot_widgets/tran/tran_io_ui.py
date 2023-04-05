@@ -28,16 +28,17 @@ class Tran_IO_UI(QWidget):
     """
     def __init__(self, parent=None):
 
-        # combobox tooltip + data / text / tooltip for channel selection
-        self.cmb_select_chan_items = [
-            "<span>Simulate floating-point or fixpoint response.</span>",
+        # combobox tooltip + data / text / tooltip for channel import
+        self.cmb_select_chan_import_items = [
+            "<span>Select channel / column for data import. '&Sigma;' "
+            "sums up all columns.</span>",
             ("del", "x", "Unload data from memory"),
             ("1", "1", "Use data from channel 1 (left, mono)"),
             ("2", "2", "Use data from channel 2 (right, mono)"),
             ("12", "1|2", "Use data from both channels (stereo)"),
             ("sum", "Σ", "Sum data from both channels (mono)")
         ]
-        self.cmb_select_chan_init = "1"
+        self.cmb_select_chan_import_init = "1"
 
         self.led_normalize_default = 1  # default setting for normalization
 
@@ -93,11 +94,9 @@ class Tran_IO_UI(QWidget):
         self.lbl_chan = QLabel(to_html("Col.", frmt="b"))
         self.lbl_chan.setVisible(False)
         self.cmb_chan = QComboBox(self)
-        self.cmb_chan.setToolTip(
-            "<span>Select channel / column for data import. '&Sigma;' "
-            "</span> sums up all columns.")
-
-        qcmb_box_populate(self.cmb_chan, self.cmb_select_chan_items, self.cmb_select_chan_init)        
+        qcmb_box_populate(
+            self.cmb_chan, self.cmb_select_chan_import_items,
+            self.cmb_select_chan_import_init)
         self.cmb_chan.setVisible(False)
 
         layV_chan = QVBoxLayout()
@@ -116,7 +115,7 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setText(str(self.led_normalize_default))
 
         line1 = QVLine()
-        line2 = QVLine()
+        line2 = QVLine(width=5)
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
@@ -145,6 +144,8 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.led_normalize, 1, i)
         i += 1
         layG_io_file.addWidget(line2, 0, i, 2, 1)
+        i += 1
+
 
         layV_io = QVBoxLayout()
         layV_io.addLayout(layG_io_file)
