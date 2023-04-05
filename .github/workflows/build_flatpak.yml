@@ -76,6 +76,7 @@ jobs:
     - name: validation
       # Command copied from flathub build process
       run: |
+        sudo apt-get update 
         sudo apt install flatpak
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         sudo flatpak install -y org.freedesktop.appstream-glib
