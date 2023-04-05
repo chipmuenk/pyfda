@@ -13,7 +13,7 @@ scale. Optionally, the magnitude specifications and the phase
 can be overlayed.
 """
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
-                               QFrame, QHBoxLayout, pyqtSlot, pyqtSignal)
+                               QFrame, QHBoxLayout, QGridLayout, pyqtSlot, pyqtSignal)
 import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
@@ -69,13 +69,17 @@ class Plot_Hf(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                    or 'home' in dict_sig or self.needs_calc:
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home')\
+                         or self.needs_calc:
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False
             if 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                self.frmControls.setVisible(dict_sig['value'] == 0)
+
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_calc = True
@@ -86,13 +90,26 @@ class Plot_Hf(QWidget):
         """
         Define and construct the subwidgets
         """
-        modes = ['| H |', 're{H}', 'im{H}']
-        self.cmbShowH = QComboBox(self)
-        self.cmbShowH.addItems(modes)
-        self.cmbShowH.setObjectName("cmbUnitsH")
-        self.cmbShowH.setToolTip("Show magnitude, real / imag. part of H or H \n"
-                                 "without linear phase (acausal system).")
-        self.cmbShowH.setCurrentIndex(0)
+        self.lbl_show_H_abs = QLabel(to_html('| H | ', frmt='b'))
+        self.chk_show_H_abs = QCheckBox(self)
+        self.chk_show_H_abs.setChecked(True)
+        self.chk_show_H_abs.setToolTip("Show magnitude of H(F)")
+        self.lbl_show_H_re = QLabel(to_html('re{H}&nbsp;', frmt='b'))
+        self.chk_show_H_re = QCheckBox(self)
+        self.chk_show_H_re.setToolTip("Show real part of H(F)")
+        self.lbl_show_H_im = QLabel(to_html('im{H}', frmt='b'))
+        self.chk_show_H_im = QCheckBox(self)
+        self.chk_show_H_im.setToolTip("Show imaginary part of H(F)")
+
+        layG_show_H = QGridLayout()
+        layG_show_H.addWidget(self.lbl_show_H_abs, 0, 0)
+        layG_show_H.addWidget(self.chk_show_H_abs, 0, 1)
+        layG_show_H.addWidget(self.lbl_show_H_re, 1, 0)
+        layG_show_H.addWidget(self.chk_show_H_re, 1, 1)
+        layG_show_H.addWidget(self.lbl_show_H_im, 2, 0)
+        layG_show_H.addWidget(self.chk_show_H_im, 2, 1)
+        layG_show_H.setContentsMargins(0,0,10,0)
+        layG_show_H.setSpacing(0)
 
         self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
 
@@ -109,7 +126,6 @@ class Plot_Hf(QWidget):
             "<span>Minimum display value for dB. scale.</span>")
         self.lbl_log_unit = QLabel("dB", self)
 
-        self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_units_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.but_zerophase = PushButton(" Zero phase ", checked=False)
@@ -143,7 +159,7 @@ class Plot_Hf(QWidget):
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.cmbShowH)
+        layHControls.addLayout(layG_show_H)
         layHControls.addWidget(self.lblIn)
         layHControls.addWidget(self.cmb_units_a)
         layHControls.addStretch(1)
@@ -176,6 +192,8 @@ class Plot_Hf(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_hf.html"
+        self.mplwidget.mplToolbar.a_ui.setEnabled(True)
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()
@@ -191,7 +209,9 @@ class Plot_Hf(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_units_a.currentIndexChanged.connect(self.draw)
         self.led_log_bottom.editingFinished.connect(self.update_view)
-        self.cmbShowH.currentIndexChanged.connect(self.draw)
+        self.chk_show_H_abs.clicked.connect(self.draw)
+        self.chk_show_H_re.clicked.connect(self.draw)
+        self.chk_show_H_im.clicked.connect(self.draw)
 
         self.but_zerophase.clicked.connect(self.draw)
         self.cmbInset.currentIndexChanged.connect(self.draw_inset)
@@ -489,7 +509,12 @@ class Plot_Hf(QWidget):
                 self.ax_i.patches.append(rect)
 
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
-                self.ax_i.plot(self.F, self.H_plt)
+                if self.chk_show_H_abs.isChecked():
+                    self.ax_i.plot(self.F, self.H_plt_abs)
+                if self.chk_show_H_re.isChecked():
+                    self.ax_i.plot(self.F, self.H_plt_re)
+                if self.chk_show_H_im.isChecked():
+                    self.ax_i.plot(self.F, self.H_plt_im)
 
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
@@ -543,7 +568,7 @@ class Plot_Hf(QWidget):
             phi = np.angle(np.nan_to_num(self.H_c))
         # -----------------------------------------------------------
             self.ax_p.plot(self.F, np.unwrap(phi)*scale,
-                           'g-.', label="Phase")
+                           'g-.', label=r"$\angle\,H(F)$")
         # -----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
 
@@ -642,52 +667,68 @@ class Plot_Hf(QWidget):
             # use H and F as calculated
             self.H_c = self.H_cmplx
 
-        # now calculate mag / real / imaginary part of H_c:
-        if self.but_zerophase.isChecked():  # remove the linear phase
+        # remove linear phase if button is checked
+        if self.but_zerophase.isChecked():
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
 
-        if self.cmbShowH.currentIndex() == 0:  # show magnitude of H
-            H = abs(self.H_c)
-            H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
-        elif self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = self.H_c.real
-            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        else:  # show imag. part of H
-            H = self.H_c.imag
-            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        H_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
 
         # ================ Main Plotting Routine =========================
         # ===  clear the axes and (re)draw the plot (if selectable)
         if self.ax.get_navigate():
+            #-----------------------------------------------------------
+            self.ax.clear()
+            # Select abs / real / imaginary part and scale according to selected unit
+            if self.chk_show_H_abs.isChecked():
+                if self.unitA == 'dB':
+                    self.H_plt_abs = np.maximum(20*np.log10(np.abs(self.H_c)), self.log_bottom)
+                elif self.unitA == 'V':
+                    self.H_plt_abs = np.abs(self.H_c)
+                elif self.unitA == 'W':
+                    self.H_plt_abs =  np.abs(self.H_c) * np.abs(self.H_c)
+                self.ax.plot(self.F, self.H_plt_abs, label = '$|H(f)|$')
+            if self.chk_show_H_re.isChecked():
+                if self.unitA == 'dB':
+                    self.H_plt_re = np.maximum(20*np.log10(np.abs(self.H_c.real)), self.log_bottom)
+                elif self.unitA == 'V':
+                    self.H_plt_re = self.H_c.real
+                elif self.unitA == 'W':
+                    self.H_plt_re =  self.H_c.real * self.H_c.real
+                self.ax.plot(self.F, self.H_plt_re, label = r'$\Re\{H(F)\}$')
+            if self.chk_show_H_im.isChecked():
+                if self.unitA == 'dB':
+                    self.H_plt_im = np.maximum(20*np.log10(np.abs(self.H_c.imag)), self.log_bottom)
+                elif self.unitA == 'V':
+                    self.H_plt_im = self.H_c.imag
+                elif self.unitA == 'W':
+                    self.H_plt_im =  self.H_c.imag * self.H_c.imag
+                self.ax.plot(self.F, self.H_plt_im, label = r'$\Im\{H(F)\}$')
 
+            # calculate limits for selected curves depending on selected unit
             if self.unitA == 'dB':
                 self.log_bottom = safe_eval(
                     self.led_log_bottom.text(), self.log_bottom,
                     return_type='float', sign='neg')
                 self.led_log_bottom.setText(str(self.log_bottom))
-
-                self.H_plt = np.maximum(20*np.log10(abs(H)), self.log_bottom)
                 A_lim = [self.log_bottom, 2]
                 H_str += ' in dB ' + r'$\rightarrow$'
+
             elif self.unitA == 'V':  #  'lin'
-                self.H_plt = H
-                if self.cmbShowH.currentIndex() != 0:  # H can be less than zero
-                    A_min = max(self.lin_neg_bottom, np.nanmin(self.H_plt[np.isfinite(self.H_plt)]))
-                else:
-                    A_min = 0
+                A_min = 0
+                if self.chk_show_H_re.isChecked():  # H can be less than zero
+                    A_min = min(A_min, np.nanmin(self.H_plt_re[np.isfinite(self.H_c)]))
+                if self.chk_show_H_im.isChecked():  # H can be less than zero
+                    A_min = min(A_min, np.nanmin(self.H_plt_im[np.isfinite(self.H_c)]))
+
+                A_min = max(A_min, self.lin_neg_bottom)
                 A_lim = [A_min, (1.05 + A_max)]
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
+
             else: # unit is W
                 A_lim = [0, (1.03 + A_max)**2.]
-                self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
 
-            #logger.debug("lim: {0}, min: {1}, max: {2} - {3}".format(A_lim, A_min, A_max, self.H_plt[0]))
-
-            #-----------------------------------------------------------
-            self.ax.clear()
-            self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             # TODO: self.draw_inset() # this gives an infinite recursion
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
@@ -703,12 +744,32 @@ class Plot_Hf(QWidget):
 
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
+
+            title_str = ""
+            if self.chk_show_H_abs.isChecked():
+                title_str = "Magnitude "
+            elif self.chk_show_H_re.isChecked() or self.chk_show_H_im.isChecked():
+                title_str = "Amplitude "
             if self.but_phase.isChecked():
-                self.ax.set_title(r'Magnitude and Phase Frequency Response')
-            else:
-                self.ax.set_title(r'Magnitude Frequency Response')
+                if title_str != "":
+                    title_str += "and Phase "
+                else:
+                    title_str += "Phase "
+            if title_str != "":
+                self.ax.set_title(f'{title_str}Frequency Response')
+
             self.ax.xaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
             self.ax.yaxis.set_minor_locator(AutoMinorLocator()) # enable minor ticks
+
+            if hasattr(self, "ax_p"):  # if phase is visible, add label to legend
+                lines, labels = self.ax.get_legend_handles_labels()
+                lines2, labels2 = self.ax_p.get_legend_handles_labels()
+                self.ax.legend(lines + lines2, labels + labels2, loc='best',
+                               fontsize='small', fancybox=True, framealpha=0.7)
+            # only show legend if at least one label is visible
+            elif self.ax.get_legend_handles_labels()[1]:
+                self.ax.legend(loc='best', fontsize='small', fancybox=True,
+                               framealpha=0.7)
 
             np.seterr(**old_settings_seterr)
 

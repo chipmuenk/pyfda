@@ -481,11 +481,11 @@ class Fixed(object):
         Check against the merged `self.q_dict_default` and `self.q_dict_default_ro`
         dictionaries whether all keys in the passed `q_dict` dictionary are valid.
 
-        Unknown keys raise an exception.
+        Unknown keys throw an error message
         """
         for k in q_dict.keys():
             if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
-                raise Exception(u'Unknown Key "{0:s}"!'.format(k))
+                logger.error(u'Unknown Key "{0:s}"!'.format(k))
 
     def set_qdict(self, d: dict) -> None:
         """

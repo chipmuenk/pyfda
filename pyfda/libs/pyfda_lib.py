@@ -419,29 +419,51 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             else:
                 s += k + ' : ' + str(d[k])
             first = False
-    elif type(d) in {list, np.ndarray}:
+        return s
+    if type(d) in {list, tuple}:
+        try:
+            _ = np.asarray(d)
+        except (TypeError, ValueError) as e:
+            logger.warning(f"pprint_log(): Could not transform data to array:\n{e}")
+            return ""
+
+    if type(d) in {list, np.ndarray, tuple}:
         if np.ndim(d) == 1:
-            s += ('Type: {0} of {1}, Shape =  ({2} x 1)' + cr + tab)\
-                .format(type(d).__name__, type(d[0]).__name__, len(d))
+            s += (f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
+                  f'shape =  ({len(d)},)' + cr + tab)
             s += str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
         elif np.ndim(d) == 2:
-            cols, rows = np.shape(d)  # (outer, inner), inner (rows)is 1 or 2
-            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__} '
-                  f'({d[0][0].dtype}), Shape = ({rows} x {cols})' + cr + tab)
+            rows, cols = np.shape(d)
+            s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__}, '
+                  f'shape = (r{rows} x c{cols})' + cr + tab)
             #  x.dtype.kind returns general information on numpy data (e.g. "iufc","SU")
-            for c in range(min(N-1, cols)):
+            for r in range(min(N, rows)):
                 if not first:
                     s += cr + tab
                 # logger.warning(f'rows={rows}; min(N-1, rows)={min(N, rows)}\n'
                 #                f'd={d[c][:min(N, rows)]}')
-                s += str(d[c][:min(N, rows)])
-                if rows > N-1:
+                s += str(d[r][:min(N, cols)])
+                if cols > N-1:
                     s += ' ...'
                 first = False
+            if rows > N-1:
+                    s += cr + tab + ' ...'
         else:
-            logger.warning(f"Object with ndim = {np.ndim(d)} cannot be processed.")
+            logger.warning(f"pprint_log(): Object with ndim = {np.ndim(d)} cannot be processed.")
+            return ""
+    else:  # scalar, string or None
+        if type(d) is None:
+            s += ('Type: None')
+        elif type(d) is str:
+            s += (f' Type: str, length = {len(d)}' +  cr + tab + d[: min(N-1, len(d))])
+            if len(d) > N-1:
+                s += ' ...'
+        elif np.isscalar(d):
+            s += (f'Type: {type(d).__name__}' + cr + tab + str(d))
+        else:
+            s += (f'Type: {type(d).__name__}')
     return s
 
 
@@ -485,7 +507,9 @@ def safe_numexpr_eval(expr: str, fallback=None,
                        f"'{type(expr).__name__}', replacing with zero.")
         expr = "0.0"
 
-    expr = expr.lstrip('0')  # remove trailing zeros which cannot be processed
+    # Find one or more redundant zeros '0+' at the beginning '^' leading a number [0-9]
+    # Group the number(s) '(...)' and write it '\1' to the resulting string.
+    expr = re.sub(r'^0+([0-9])', r'\1', expr)
     if len(expr) == 0:
         expr = "0"
     else:
@@ -695,15 +719,11 @@ def to_html(text: str, frmt: str = None) -> str:
         html = "<span>" + html + "</span>"
 
     if frmt != 'log':  # this is a label, not a logger message
-        # replace _xxx (terminated by whitespace) by <sub> xxx </sub> ()
-        html = re.sub(r'([<>a-zA-Z;])_(\w+)', r'\1<sub>\2</sub>', html)
-        # don't render numbers as italic
-#        if "<i>" in html:
-#            html = re.sub(r'([<>a-zA-Z;_])([0-9]+)',
-#                           r'\1<span class="font-style:normal">\2</span>', html)
-
-    # (^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
-    # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
+        # replace _xxx (where xxx are alphanumeric, non-space characters \w) by <sub> xxx </sub> ()
+        if "<i>" in html:  # make subscripts non-talic
+            html = re.sub(r'_(\w+)', r'</i><sub>\1</sub><i>', html)
+        else:
+            html = re.sub(r'_(\w+)', r'<sub>\1</sub>', html)
 
     return html
 

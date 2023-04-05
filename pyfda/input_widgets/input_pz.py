@@ -55,6 +55,7 @@ class ItemDelegate(QStyledItemDelegate):
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent  # instance of the parent (not the base) class
 
+    # --------------------------------------------------------------------------
     def initStyleOption(self, option, index):
         """
         Initialize `option` with the values using the `index` index. All items are
@@ -65,19 +66,20 @@ class ItemDelegate(QStyledItemDelegate):
         """
         # continue with the original `initStyleOption()` and call displayText()
         super(ItemDelegate, self).initStyleOption(option, index)
-        # test whether fixpoint conversion during displayText() created an overflow:
+        # test for poles with magnitude > 1
         if index.column() == 1 and False:
-            # Color item backgrounds with pos. Overflows red
+            # Color item backgrounds with poles outside the UC red
             option.backgroundBrush = QBrush(Qt.SolidPattern)
             option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
-    def text(self, item):
-        """
-        Return item text as string transformed by self.displayText()
-        """
-        # return qstr(item.text()) # convert to "normal" string
-        return qstr(self.displayText(item.text(), QtCore.QLocale()))
+    # --------------------------------------------------------------------------
+    # def text(self, item):
+    #     """
+    #     Return item text as string transformed by self.displayText()
+    #     """
+    #     return qstr(self.displayText(item.text(), QtCore.QLocale()))
 
+    # --------------------------------------------------------------------------
     def displayText(self, text, locale):
         """
         Display `text` with selected format (cartesian / polar)
@@ -86,12 +88,9 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
         """
-
         return self.parent.cmplx2frmt(text, places=params['FMT_pz'])
-        # r, phi = np.absolute(data), np.angle(data, deg=False)
-        # return "{0:.{2}g} * {3}{1:.{2}g} rad".format(r, phi, params['FMT_pz'],
-        #    self.angle_char)
 
+    # --------------------------------------------------------------------------
     def createEditor(self, parent, options, index):
         """
         Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
@@ -107,6 +106,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         return line_edit
 
+    # --------------------------------------------------------------------------
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
@@ -116,11 +116,11 @@ class ItemDelegate(QStyledItemDelegate):
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
         """
-#        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.zpk[index.column()][index.row()]
-        data_str = self.parent.cmplx2frmt(data, places=-1)  # qstr(safe_eval(data, return_type="auto"))
+        data_str = self.parent.cmplx2frmt(data, places=-1)
         editor.setText(data_str)
 
+    # --------------------------------------------------------------------------
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
@@ -152,6 +152,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent._normalize_gain()  # recalculate gain
 
 
+# ===================================================================================
 class ItemDelegateAnti(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
@@ -172,7 +173,7 @@ class ItemDelegateAnti(QStyledItemDelegate):
                                         n_digits=params['FMT_pz'])
 
 
-# ------------------------------------------------------------------------------
+# ===================================================================================
 class Input_PZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -192,14 +193,9 @@ class Input_PZ(QWidget):
         self.tab_label = "P/Z"
         self.tool_tip = "Display and edit filter poles and zeros."
 
-        self.ui = Input_PZ_UI(self)  # create the UI part with buttons etc.
+        self.ui = Input_PZ_UI(self)  # create the UI control part
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False)  # initial setting of cmbNorm
         self._construct_UI()  # construct the rest of the UI
-
-        self.load_dict()  # initialize table from filterbroker
-        self._refresh_table()  # initialize table with values
-
-        self.setup_signal_slot()  # setup signal-slot connections and eventFilters
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -208,7 +204,7 @@ class Input_PZ(QWidget):
         """
         # logger.debug(f"SIG_RX - data_changed = {self.data_changed}, vis = "
         #              f"{self.isVisible()}\n{pprint_log(dict_sig)}")
-    
+
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -229,7 +225,8 @@ class Input_PZ(QWidget):
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
         """
-        Intitialize the widget
+        Construct the UI from the table widget and the control part (`self.ui`),
+        initialize the widget and setup signal-slot connections and event filters
         """
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
@@ -255,10 +252,9 @@ class Input_PZ(QWidget):
 
         self.setLayout(layVMain)
 
-    def setup_signal_slot(self):
-        """
-        Setup setup signal-slot connections
-        """
+        self.load_dict()  # initialize table from filterbroker
+        self._refresh_table()  # initialize table with values
+
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -298,8 +294,7 @@ class Input_PZ(QWidget):
         # signal itemChanged is also triggered programmatically,
         # itemSelectionChanged is only triggered when entering cell
 
-# ------------------------------------------------------------------------------
-
+    # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
         Filter all events generated by the QLineEdit widgets. Source and type
@@ -341,7 +336,7 @@ class Input_PZ(QWidget):
 
         return super(Input_PZ, self).eventFilter(source, event)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
@@ -389,7 +384,7 @@ class Input_PZ(QWidget):
 
         self._restore_gain()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _restore_gain(self, source=None):
         """
         Update QLineEdit with either full (has focus) or reduced precision (no focus)
@@ -412,7 +407,7 @@ class Input_PZ(QWidget):
             else:  # widget has focus, show gain with full precision
                 self.ui.ledGain.setText(str(k))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
         """
         Refresh the table item with the index `row, col` from self.zpk
@@ -425,7 +420,7 @@ class Input_PZ(QWidget):
                   str(self.zpk[col][row]).strip('()')))
         self.tblPZ.item(row, col).setTextAlignment(Qt.AlignRight | Qt.AlignCenter)
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _refresh_table(self):
         """
         (Re-)Create the displayed table from self.zpk with the
@@ -465,7 +460,7 @@ class Input_PZ(QWidget):
         else:  # disable widgets
             self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def load_dict(self):
         """
         Load all entries from filter dict fb.fil[0]['zpk'] into the Zero/Pole/Gain list
@@ -486,7 +481,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.butSave, 'normal')
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _save_entries(self):
         """
         Save the values from self.zpk to the filter PZ dict,
@@ -521,7 +516,7 @@ class Input_PZ(QWidget):
                      .format(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
                              ))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _clear_table(self):
         """
         Clear & initialize table and zpk for two poles and zeros @ origin,
@@ -534,7 +529,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _get_selected(self, table):
         """
         get selected cells and return:
@@ -553,7 +548,7 @@ class Input_PZ(QWidget):
 
         return {'idx': idx, 'cols': cols, 'rows': rows, 'cur': cur}
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _delete_cells(self):
         """
         Delete all selected elements by:
@@ -588,7 +583,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _add_rows(self):
         """
         Add the number of selected rows to the table and fill new cells with
@@ -607,7 +602,7 @@ class Input_PZ(QWidget):
 
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _set_eps(self):
         """
         Set tolerance value
@@ -615,7 +610,7 @@ class Input_PZ(QWidget):
         self.ui.eps = safe_eval(self.ui.ledEps.text(), alt_expr=self.ui.eps, sign='pos')
         self.ui.ledEps.setText(str(self.ui.eps))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _zero_PZ(self):
         """
         Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
@@ -653,7 +648,7 @@ class Input_PZ(QWidget):
             qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _delete_PZ_pairs(self):
         """
         Find and delete pairs of poles and zeros in self.zpk
@@ -680,9 +675,9 @@ class Input_PZ(QWidget):
             string
         """
         # convert to "normal" string and prettify via safe_eval:
-        data = safe_eval(qstr(text), return_type='auto')
+        data = safe_eval(text, return_type='auto')
         frmt = qget_cmb_box(self.ui.cmbPZFrmt)  # get selected format
-
+        # logger.warning(f"{text} -> {data}")
         if places == -1:
             full_prec = True
         else:
@@ -725,51 +720,61 @@ class Input_PZ(QWidget):
             logger.error("Unknown format {0}.".format(frmt))
 
     # ------------------------------------------------------------------------------
-    def frmt2cmplx(self, text, default=0.):
+    def frmt2cmplx(self, string, default=0.):
         """
-        Convert format defined by cmbPZFrmt to real or complex
+        Convert string to real or complex, try to find out the format (cartesian,
+        polar with various angle formats)
         """
-        conv_error = False
-        text = qstr(text).replace(" ", "")  # convert to "proper" string without blanks
-        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
-            return safe_eval(text, default, return_type='auto')
-        else:
-            # try to split text string at "*<" or the angle character
-            polar_str = text.replace(self.angle_char, '<').split('*<', 1)
+        def str2angle_rad(string: str) -> float:
+            """
+            Try to convert `string` to a corresponding angle in rad
+                Use the following regular expressions:
+                - '$' : matches the end of the string
+                - '|' : combine multiple matches with OR
+            """
+            if re.search('°$|o$', string):
+                # "°" in polar_str[1] or "o" in polar_str[1]:
+                scale = np.pi / 180.  # angle in degrees
+                string = re.sub('o|°', '', string)
+            elif re.search('π$|pi$|p$', string):
+                scale = np.pi
+                string = re.sub('π$|pi$|p$', '', string)
+            else:
+                scale = 1.  # angle in rad
+                string = re.sub('rad', '', string)
 
-            if len(polar_str) < 2:  # input is real or imaginary
-                # remove special characters
-                r = safe_eval(
-                    re.sub('['+self.angle_char+'<∠°]', '', text), default,
-                    return_type='auto')
+            phi = safe_eval(string) * scale
+            return phi
+        # -------------------------------------------
+
+        string = str(string).replace(" ", "")  # remove all blanks
+        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
+            return safe_eval(string, default, return_type='auto')
+        else:
+            # convert angle character to "<" and try to split string at "*<"
+            # When the "<" character is not found, this returns a list with 1 item!
+            polar_str = string.replace(self.angle_char, '<').replace('*', '')
+            polar_str = polar_str.split('<', 1)
+
+            if len(polar_str) == 2 and polar_str[0] == "": # pure angle
+                phi = str2angle_rad(polar_str[1])
+                x = np.cos(phi)
+                y = np.sin(phi)
+            elif len(polar_str) == 1:  # no angle found; real / imag / cartesian complex
+                r = safe_eval(string, default, return_type='auto')
                 x = r.real
                 y = r.imag
-            else:
+            else:  # r and angle found
                 r = safe_eval(polar_str[0], sign='pos')
-                if safe_eval.err > 0:
-                    conv_error = True
+                phi = str2angle_rad(polar_str[1])
 
-                if "°" in polar_str[1]:
-                    scale = np.pi / 180.  # angle in degrees
-                elif re.search('π$|pi$', polar_str[1]):
-                    scale = np.pi
-                else:
-                    scale = 1.  # angle in rad
+                x = r * np.cos(phi)
+                y = r * np.sin(phi)
 
-                # remove right-most special characters (regex $)
-                polar_str[1] = re.sub(
-                    '['+self.angle_char+'<∠°π]$|rad$|pi$', '', polar_str[1])
-                phi = safe_eval(polar_str[1]) * scale
-                if safe_eval.err > 0:
-                    conv_error = True
-
-                if not conv_error:
-                    x = r * np.cos(phi)
-                    y = r * np.sin(phi)
-                else:
-                    x = default.real
-                    y = default.imag
-                    logger.error("Expression {0} could not be evaluated.".format(text))
+            if safe_eval.err > 0:
+                x = default.real
+                y = default.imag
+                logger.warning(f"Expression {string} could not be evaluated.")
             return x + 1j * y
 
     # --------------------------------------------------------------------------
@@ -825,7 +830,7 @@ class Input_PZ(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def _equalize_columns(self):
         """
         test and equalize if P and Z subarray have different lengths:

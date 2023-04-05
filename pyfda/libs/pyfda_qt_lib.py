@@ -13,7 +13,7 @@ from .pyfda_lib import qstr, pprint_log
 
 from .compat import (
     Qt, QtGui, QtCore, QFrame, QMessageBox, QPushButton, QLabel, QComboBox, QDialog,
-    QFont, QSize, QFontMetrics, QIcon)
+    QFont, QSize, QFontMetrics, QIcon, QEvent)
 from .pyfda_dirs import OS, OS_VER
 
 import logging
@@ -29,6 +29,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
       instance if not contained in the dict
     - If key 'ttl' is in the dict and its value is less than one, terminate the
       signal. Otherwise, reduce the value by one.
+    - If the sender has passed an objectName, add it with the key "sender_name"
+      to the dict.
     """
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
@@ -40,6 +42,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
             return
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
+    if self.sender() and self.sender().objectName():
+        dict_sig.update({'sender_name': self.sender().objectName()})
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
@@ -534,6 +538,40 @@ def qtext_height(text: str = 'X', font=None) -> int:
     # row4_height = fm.lineSpacing() * 4
     # fm_size = fm.size(0, text)
 
+# ----------------------------------------------------------------------------
+class EventTypes:
+    """
+    https://stackoverflow.com/questions/62196835/how-to-get-string-name-for-qevent-in-pyqt5
+    Events in Qt5: https://doc.qt.io/qt-5/qevent.html
+
+    Stores a string name for each event type.
+
+    With PySide2 str() on the event type gives a nice string name,
+    but with PyQt5 it does not. So this method works with both systems.
+
+    Example usage (simultaneous initialization and method call / translation)
+    > event_str = EventTypes().as_string(QEvent.UpdateRequest)
+    > assert event_str == "UpdateRequest"
+
+    Example usage, separate initialization and method call
+    > event types = EventTypes()
+    > event_str = event_types.as_string(event.type())
+    """
+
+    def __init__(self):
+        """Create mapping for all known event types."""
+        self.string_name = {}
+        for name in vars(QEvent):
+            attribute = getattr(QEvent, name)
+            if type(attribute) == QEvent.Type:
+                self.string_name[attribute] = name
+
+    def as_string(self, event: QEvent.Type) -> str:
+        """Return the string name for this event."""
+        try:
+            return self.string_name[event]
+        except KeyError:
+            return f"UnknownEvent:{event}"
 
 # ----------------------------------------------------------------------------
 class QHLine(QFrame):

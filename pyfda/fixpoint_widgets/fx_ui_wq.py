@@ -223,7 +223,7 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setObjectName("WF")
 
         self.count_ovfl_vis = dict_ui['count_ovfl_vis']
-        self.lbl_ovfl_count = QLabel(to_html("N_ov = 0", frmt='i'))
+        self.lbl_ovfl_count = QLabel(to_html("N_ov = 0"))
         self.lbl_ovfl_count.setAutoFillBackground(True)
 
         self.MSB_LSB_vis = dict_ui['MSB_LSB_vis']
@@ -367,7 +367,7 @@ class FX_UI_WQ(QWidget):
 
             self.lbl_ovfl_count.setVisible(True)
             self.lbl_ovfl_count.setText(
-                to_html(f"<b><i>&nbsp;&nbsp;N</i>_ov = </b>{self.q_dict['N_over']}"))
+                to_html(f"<b><i>&nbsp;&nbsp;N_ov </i>= {self.q_dict['N_over']}</b>"))
             if self.q_dict['N_over'] == 0:
                 qstyle_widget(self.lbl_ovfl_count, "normal")
             else:

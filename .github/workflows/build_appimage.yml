@@ -1,0 +1,107 @@
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build-appimage:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies
+        # - remove any previous build
+        # - make usr and icons dirs
+        # - copy the python application code into the AppDir
+        # - install some basics and install tools
+        # - install application dependencies
+        run: |
+          rm -rf AppDir
+          mkdir -p AppDir/usr/src
+          cp pyfda  AppDir/usr/src -r
+          sudo apt-get --quiet install --yes python3 python3-pip python3-setuptools python3-wheel
+          python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+      - name: Build AppImage
+        uses: AppImageCrafters/build-appimage-action@master
+        env:
+          UPDATE_INFO: gh-releases-zsync|AppImageCrafters|pyfda|latest|*x86_64.AppImage.zsync
+        # with:
+        #  recipe: AppImageBuilder.yml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: AppImage
+
+# https://github.com/AppImageCrafters/appimage-builder-docs/blob/master/source/examples/pyqt.rst
+# version: 1
+# script:
+#   # Remove any previous build
+#   - rm -rf AppDir  | true
+#   # Make usr and icons dirs
+#   - mkdir -p AppDir/usr/src
+#   # Copy the python application code into the AppDir
+#   - cp pyfdax.py  AppDir/usr/src -r
+#   # Install application dependencies
+#   - python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+
+# AppDir:
+#   path: ./AppDir
+
+#   app_info:
+#     id: org.appimage-crafters.pyfda
+#     name: pyfda filter designer
+#     icon: utilities-terminal
+#     version: 0.1.0
+#     # Set the python executable as entry point
+#     exec: usr/bin/python3
+#     # Set the application main script path as argument. Use '$@' to forward CLI parameters
+#     exec_args: "$APPDIR/usr/src/pyfdax.py $@"
+
+#   apt:
+#     arch: amd64
+#     sources:
+#       - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse'
+#         key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+
+#     include:
+#       - python3
+#       - python3-pkg-resources
+#       - python3-pyqt5
+#     exclude: []
+
+#   runtime:
+#     env:
+#       # Set python home
+#       # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHOME
+#       PYTHONHOME: '${APPDIR}/usr'
+#       # Path to the site-packages dir or other modules dirs
+#       # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
+#       PYTHONPATH: '${APPDIR}/usr/lib/python3.6/site-packages'
+
+#   test:
+#     fedora:
+#       image: appimagecrafters/tests-env:fedora-30
+#       command: ./AppRun
+#       use_host_x: true
+#     debian:
+#       image: appimagecrafters/tests-env:debian-stable
+#       command: ./AppRun
+#       use_host_x: true
+#     arch:
+#       image: appimagecrafters/tests-env:archlinux-latest
+#       command: ./AppRun
+#       use_host_x: true
+#     centos:
+#       image: appimagecrafters/tests-env:centos-7
+#       command: ./AppRun
+#       use_host_x: true
+#     ubuntu:
+#       image: appimagecrafters/tests-env:ubuntu-xenial
+#       command: ./AppRun
+#       use_host_x: true
+
+# AppImage:
+#   update-information: 'gh-releases-zsync|AppImageCrafters|python-appimage-example|latest|python-appimage-*x86_64.AppImage.zsync'
+#   sign-key: None
+#   arch: x86_64

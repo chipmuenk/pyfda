@@ -253,6 +253,11 @@ class pyFDA(QMainWindow):
         """
         reimplement QMainWindow.closeEvent() to prompt the user
         """
+        # test for a handle to another pop-up window (CSV options) and close it,
+        # otherwise pyfda cannot be terminated and freezes
+        if not dirs.csv_options_handle is None:
+            dirs.csv_options_handle.close()
+
         reply = QMessageBox.question(self, 'Message',
             "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
 

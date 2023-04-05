@@ -12,12 +12,22 @@ Library with classes and functions for file and text IO
 import os, re, io
 import csv
 import datetime
-from typing import TextIO
+import warnings
+from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
 
 import pickle
 
 import numpy as np
 from scipy.io import loadmat, savemat, wavfile
+
+try:
+    import xlwt
+except ImportError:
+    xlwt = None
+try:
+    import xlsx
+except ImportError:
+    xlsx = None
 
 from .pyfda_lib import safe_eval, lin2unit, pprint_log
 from .pyfda_qt_lib import qget_selected
@@ -46,9 +56,16 @@ file_filters_dict = {
     'pkl': 'Pickled data',
     'txt': 'Microsemi FIR coefficient format',
     'vhd': 'VHDL package or architecture',
-    'wav': 'WAV audio format'
+    'wav': 'WAV audio format',
+    'xls': 'Excel Worksheet',
+    'xlsx': 'Excel 2007 Worksheet'
     }
 
+# regex pattern that yields true in a re.search() when only the specified
+#  characters (numeric, "eEjJ(),.+-" and blank / line breaks) are contained
+pattern_num_chars = re.compile('[eEjJ()0-9,\.\+\-\s]+$')
+# regex pattern that identifies characters and their position *not* specified
+pattern_no_num = re.compile('(?![eEjJ()0-9,\.\+\-\s])')
 
 # ------------------------------------------------------------------------------
 def prune_file_ext(file_type: str) -> str:
@@ -79,30 +96,36 @@ def prune_file_ext(file_type: str) -> str:
     occurrences of ``pattern`` in ``string`` by ``replacement``.
 
     - '.' means any character
-
     - '+' means one or more
-
     - '[^a]' means except for 'a'
-
     - '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-
     - '(' must be escaped as '\\\('
-
     """
 
     return re.sub('\([^\)]+\)', '', file_type)
-
 
 
 # ------------------------------------------------------------------------------
 def extract_file_ext(file_type: str) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    'VHDL (\*.vhd)' returned by QFileDialog
+    'VHDL (\*.vhd)' returned by QFileDialog. Depending on the OS, this may be the
+    full file type description or just the extension like '(\*.vhd)'.
 
-    Depending on the OS, this may be the full file type description
-    or just the extension. When `file_type` contains no '(', the passed string is
-    returned unchanged.
+    When `file_type` contains no '(', the passed string is returned unchanged.
+
+    For an explanation of the RegEx, see the docstring for `prune_file_ext`.
+
+    Parameters
+    ----------
+    file_type : str
+
+    Returns
+    -------
+    str
+        The file extension between ( ... ) or the unchanged input argument
+        `file_type` when no '('  was contained.
+
     """
     if "(" in file_type:
         ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
@@ -182,11 +205,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
         logger.error(
             f"Unknown key '{params['CSV']['header']}' for params['CSV']['header']")
 
-    if params['CSV']['orientation'] in {'horiz', 'auto'}:
-        orientation_horiz = True
-    elif params['CSV']['orientation'] == 'vert':
-        orientation_horiz = False
-    else:
+    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
         logger.error(
             f"Unknown key '{params['CSV']['orientation']}' for "
             "params['CSV']['orientation']")
@@ -212,16 +231,16 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Nothing selected, copy complete table from the model (data) in float format:
     # ==========================================================================
     if not np.any(sel):
-        if orientation_horiz:  # rows are horizontal
+        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
             for c in range(num_cols):
-                if use_header:  # add the table header
+                if use_header:  # add the table header at the beginning of the row(s)
                     text += table.horizontalHeaderItem(c).text() + delim
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
             text = text.rstrip(cr)  # delete last CR
-        else:  # rows are vertical
-            if use_header:  # add the table header
+        else:  # write table in column(s)
+            if use_header:  # add the table header at the top of the column(s)
                 for c in range(num_cols):
                     text += table.horizontalHeaderItem(c).text() + delim
                 text = text.rstrip(delim) + cr
@@ -235,8 +254,8 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Copy only selected cells in displayed format:
     # =======================================================================
     else:
-        if orientation_horiz:  # horizontal orientation, one or two rows
-            if use_header:  # add the table header
+        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
+            if use_header:  # insert table header at the beginning of row 1
                 text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
                 for r in sel[0]:
@@ -247,14 +266,14 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
 
             if sel[1]:  # returns False for []
                 text += cr  # add a CRLF when there are two columns
-                if use_header:  # add the table header
+                if use_header:  # insert table header at the beginning of row 2
                     text += table.horizontalHeaderItem(1).text() + delim
                 for r in sel[1]:
                     item = table.item(r, 1)
                     if item and item.text() != "":
                         text += table.itemDelegate().text(item) + delim
                 text = text.rstrip(delim)  # remove last tab delimiter again
-        else:  # vertical orientation, one or two columns
+        else:  # write table in column(s)
             sel_c = []
             if sel[0]:
                 sel_c.append(0)
@@ -359,21 +378,34 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
             logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
             return None
     else:  # data from file
-        data_arr = import_data(
-            parent, fkey, title=title, file_types=('csv', 'mat', 'npy', 'npz'))
-        # pass data as numpy array
-        logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
-                     .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
-        if type(data_arr) == int and data_arr == -1:  # file operation cancelled
-            data_arr = None
+        file_name, file_type = select_file(parent, title=title, mode="r",
+                                   file_types=('csv', 'mat', 'npy', 'npz'))
+        if file_name is None:  # operation cancelled or error
+            return None
+        else:
+            data_arr = import_data(file_name, file_type)
+            # pass data as numpy array
+            logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
+                        .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
+            if type(data_arr) == int and data_arr == -1:  # file operation cancelled
+                data_arr = None
     return data_arr
-
 
 # ------------------------------------------------------------------------------
 def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict.
+    to numpy array, taking into accout the settings of the CSV dict:
+
+    Read data as it is, splitting each row into the column items when:
+    - `CSV_dict['orientation'] == cols` or
+    - `CSV_dict['orientation'] == auto` and cols <= rows:
+
+    Transpose data when:
+    - `CSV_dict['orientation'] == rows` or
+    - `CSV_dict['orientation'] == auto` and cols > rows:
+
+    `np.shape(data)` returns rows, columns
 
     Parameters
     ----------
@@ -387,289 +419,21 @@ def csv2array(f: TextIO):
     Returns
     -------
 
-    ndarray
-        numpy array containing table data from file or text when import was
+    data_arr: ndarray
+        numpy array of str with table data from file or text when import was
         successful
+
+    OR
 
     io_error: str
         String with the error message when import was unsuccessful
-    """
-    # throw an error (instead of a deprecation warning) when trying to create a numpy
-    # array from nested ragged sequences. This error can then be caught easily.
-    np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
-    # ------------------------------------------------------------------------------
-    # Get CSV parameter settings
-    # ------------------------------------------------------------------------------
-    io_error = ""  # initialize string for I/O error messages
-    CSV_dict = params['CSV']
-    try:
-        header = CSV_dict['header'].lower()
-        if header in {'auto', 'on', 'off'}:
-            pass
-        else:
-            header = 'auto'
-            logger.warning(
-                f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
-                f"using {header} instead.")
 
-        orientation_horiz = CSV_dict['orientation'].lower()
-        if orientation_horiz in {'auto', 'vert', 'horiz'}:
-            pass
-        else:
-            orientation_horiz = 'vert'
-            logger.warning(
-                f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
-                f"using {orientation_horiz} instead.")
-
-        tab = CSV_dict['delimiter'].lower()
-        cr = CSV_dict['lineterminator'].lower()
-
-    except KeyError as e:
-        io_error = "Dict 'params':\n{0}".format(e)
-        return io_error
-
-    try:
-        # ------------------------------------------------------------------------------
-        # Analyze CSV object
-        # ------------------------------------------------------------------------------
-        if header == 'auto' or tab == 'auto' or cr == 'auto':
-            # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(),
-                                          delimiters=['\t', ';', ',', '|', ' '])
-            f.seek(0)                               # and reset the file pointer
-        else:
-            # fall back, alternatives: 'excel', 'unix':
-            dialect = csv.get_dialect('excel-tab')
-
-        if header == "auto":
-            # True when header detected:
-            use_header = csv.Sniffer().has_header(f.read(1000))
-            f.seek(0)
-
-    except csv.Error as e:
-        logger.warning("Error during CSV analysis:\n{0},\n"
-                       "continuing with format 'excel-tab'".format(e))
-        dialect = csv.get_dialect('excel-tab')  # fall back
-        use_header = False
-
-    if header == 'on':
-        use_header = True
-    if header == 'off':
-        use_header = False
-    # case 'auto' has been treated above
-
-    delimiter = dialect.delimiter
-    lineterminator = dialect.lineterminator
-    quotechar = dialect.quotechar
-
-    if tab != 'auto':
-        delimiter = str(tab)
-
-    if cr != 'auto':
-        lineterminator = str(cr)
-
-    logger.info("Parsing CSV data with \n"
-                "\tHeader = {0} | Delim. = {1} | Lineterm. = {2} | Quotechar = ' {3} '"
-                # "\n\tType of passed text: '{4}'"
-                .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar))  # ,f.__class__.__name__))
-    # --------------------------------------------------------------------------
-    # finally, create iterator from csv data
-    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
-                           lineterminator=lineterminator)  # returns an iterator
-    # --------------------------------------------------------------------------
-# =============================================================================
-#     with open('/your/path/file') as f:
-#         for line in f:
-#             process(line)
-#
-#     Where you define your process function any way you want. For example:
-#
-#         def process(line):
-#             if 'save the world' in line.lower():
-#                 superman.save_the_world()
-#
-#     This will work nicely for any file size and you go through your file in just 1 pass.
-#     This is typically how generic parsers will work.
-#     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
-# =============================================================================
-
-    if use_header:
-        logger.info("Headers:\n{0}".format(next(data_iter, None)))  # py3 and py2
-
-    data_list = []
-    try:
-        for row in data_iter:
-            logger.debug("{0}".format(row))
-            data_list.append(row)
-    except csv.Error as e:
-        io_error = f"Error during CSV import:\n{e}"
-        return io_error
-
-    try:
-        if data_list is None:
-            return "Imported data is None."
-        try:
-            data_arr = np.array(data_list)
-        except np.VisibleDeprecationWarning:
-            # prevent creation of numpy arrays from nested ragged sequences
-            return "Columns with different number of elements."
-
-        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
-            return f"Imported data is a scalar: '{data_arr}'"
-        elif np.ndim(data_arr) == 1:
-            if len(data_arr) < 2:
-                return f"Not enough data: '{data_arr}'"
-            else:
-                return data_arr
-        elif np.ndim(data_arr) == 2:
-            cols, rows = np.shape(data_arr)
-            logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
-            if cols > 2 and rows > 2:
-                return f"Unsuitable data shape {np.shape(data_arr)}"
-            elif cols > rows:
-                return data_arr.T
-            else:
-                return data_arr
-        else:
-            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
-                .format(np.ndim(data_arr), np.shape(data_arr))
-
-    except (TypeError, ValueError) as e:
-        io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
-        return io_error
-
-# =============================================================================
-#     try:
-#         data_arr = np.array(data_list)
-#         cols, rows = np.shape(data_arr)
-#         logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n"
-#                       .format(cols, rows, data_arr))
-#         if params['CSV']['orientation'] == 'vert':
-#             return data_arr.T
-#         else:
-#             return data_arr
-#
-#     except (TypeError, ValueError) as e:
-#         io_error = "{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list)
-#         return io_error
-#
-# =============================================================================
-
-
-# ------------------------------------------------------------------------------
-def csv2array_new(f: TextIO):
-    """
-    Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict.
-
-    Parameters
-    ----------
-
-    f: handle to file or file-like object
-        e.g.
-
-        >>> f = open(file_name, 'r') # or
-        >>> f = io.StringIO(text)
-
-    Returns
-    -------
-
-    ndarray
-        numpy array containing table data from file or text when import was
-        successful
-
-    io_error: str
-        String with the error message when import was unsuccessful
-    """
-    # ------------------------------------------------------------------------------
-    # Get CSV parameter settings
-    # ------------------------------------------------------------------------------
-    io_error = ""  # initialize string for I/O error messages
-    CSV_dict = params['CSV']
-    logger.warning("Fileobject format: {0}".format(type(f).__name__))
-    try:
-        header = CSV_dict['header'].lower()
-        if header in {'auto', 'on', 'off'}:
-            pass
-        else:
-            header = 'auto'
-            logger.warning(
-                f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
-                f"using {header} instead.")
-
-        orientation_horiz = CSV_dict['orientation'].lower()
-        if orientation_horiz in {'auto', 'vert', 'horiz'}:
-            pass
-        else:
-            orientation_horiz = 'vert'
-            logger.warning(
-                f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
-                f"using {orientation_horiz} instead.")
-
-        tab = CSV_dict['delimiter'].lower()
-        cr = CSV_dict['lineterminator'].lower()
-
-    except KeyError as e:
-        io_error = "Dict 'params':\n{0}".format(e)
-        return io_error
-
-    try:
-        # ------------------------------------------------------------------------------
-        # Analyze CSV object
-        # ------------------------------------------------------------------------------
-        if header == 'auto' or tab == 'auto' or cr == 'auto':
-            # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(),
-                                          delimiters=['\t', ';', ',', '|', ' '])
-            f.seek(0)                               # and reset the file pointer
-        else:
-            # fall back, alternatives: 'excel', 'unix':
-            dialect = csv.get_dialect('excel-tab')
-
-        if header == "auto":
-            # True when header detected:
-            use_header = csv.Sniffer().has_header(f.read(1000))
-            f.seek(0)
-
-    except csv.Error as e:
-        logger.warning("Error during CSV analysis:\n{0},\n"
-                       "continuing with format 'excel-tab'".format(e))
-        dialect = csv.get_dialect('excel-tab')  # fall back
-        use_header = False
-
-    if header == 'on':
-        use_header = True
-    elif header == 'off':
-        use_header = False
-    # case 'auto' has been treated above
-
-    delimiter = dialect.delimiter
-    lineterminator = dialect.lineterminator
-    quotechar = dialect.quotechar
-
-    if tab != 'auto':
-        delimiter = str(tab)
-
-    if cr != 'auto':
-        lineterminator = str(cr)
-
-    logger.info("Parsing CSV data with header = '{0}'\n"
-                "\tDelimiter = {1} | Lineterm. = {2} | quotechar = ' {3} '\n"
-                "\tType of passed text: '{4}'"
-                .format(use_header, repr(delimiter), repr(lineterminator),
-                        quotechar, f.__class__.__name__))
-    # ------------------------------------------------
-    # finally, create iterator from csv data
-    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
-                           lineterminator=lineterminator)
-    # ------------------------------------------------
-# =============================================================================
-    """
-    newline controls how universal newlines works (it only applies to text mode).
+    -----------------------------
+    While opening a file, the `newline` parameter can be used to
+    control how universal newlines works (it only applies to text mode).
     It can be None, '', '\n', '\r', and '\r\n'. It works as follows:
 
-    - On input, if newline is None, universal newlines mode is enabled. Lines in
+    - Input: If `newline == None`, universal newlines mode is enabled. Lines in
       the input can end in '\n', '\r', or '\r\n', and these are translated into
       '\n' before being returned to the caller. If it is '', universal newline
       mode is enabled, but line endings are returned to the caller untranslated.
@@ -682,71 +446,161 @@ def csv2array_new(f: TextIO):
       any '\n' characters written are translated to the given string.
 
       Example: convert from Windows-style line endings to Linux:
+
       fileContents = open(filename,"r").read()
       f = open(filename,"w", newline="\n")
       f.write(fileContents)
       f.close()
+
       https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
-     """
+    """
 
-    data_list = []
-
-    def process(line):
-        # split into lines (if not split yet):
-        data_list.append(line.split(lineterminator))
-
-    # with open(fo) as f:
-    for line in f:
-        process(line)
-
-    for e in data_list:
-        pass
-
-    # Where you define your process function any way you want. For example:
-
-    # This will work nicely for any file size and you go through your file in just 1 pass.
-    # This is typically how generic parsers will work.
-    # (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
-# =============================================================================
-
-# =============================================================================
-#     if use_header:
-#         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
-#
-#     try:
-#         for row in data_iter:
-#             logger.debug("{0}".format(row))
-#             data_list.append(row)
-#     except csv.Error as e:
-#         io_error = "Error during CSV reading:\n{0}".format(e)
-#         return io_error
-# =============================================================================
-
+    # throw an error (instead of just issueing a deprecation warning) when trying to
+    # create a numpy array from nested ragged sequences. This error can then be
+    # caught easily.
+    warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
+    # ------------------------------------------------------------------------------
+    # Get CSV parameter settings
+    # ------------------------------------------------------------------------------
+    io_error = ""  # initialize string for I/O error messages
+    CSV_dict = params['CSV']
     try:
-        if data_list is None:
-            return "Imported data is None."
-        data_arr = np.array(data_list)
-        if np.ndim(data_arr) == 0 or (np.ndim(data_arr) == 1 and len(data_arr) < 2):
-            return f"Imported data is a scalar: '{data_arr}'"
-        elif np.ndim(data_arr) == 1:
-            return data_arr
-        elif np.ndim(data_arr) == 2:
-            cols, rows = np.shape(data_arr)
-            logger.debug(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
-            if cols > 2 and rows > 2:
-                return "Unsuitable data shape {0}".format(np.shape(data_arr))
-            elif cols > rows:
-                return data_arr.T
-            else:
-                return data_arr
+        header = CSV_dict['header'].lower()
+        if header in {'auto', 'on', 'off'}:
+            pass
         else:
-            return "Unsuitable data shape: ndim = {0}, shape = {1}"\
-                .format(np.ndim(data_arr), np.shape(data_arr))
+            header = 'auto'
+            logger.warning(
+                f"Unknown key '{CSV_dict['header']}' for CSV_dict['header'], "
+                f"using {header} instead.")
 
-    except (TypeError, ValueError) as e:
-        io_error = f"{e}\nFormat = {np.shape(data_arr)}\n{data_list}"
+        if not CSV_dict['orientation'].lower() in {'auto', 'cols', 'rows'}:
+            logger.error(
+                f"Unknown key '{CSV_dict['orientation']}' for CSV_dict['orientation'], "
+                "using column mode.")
+
+        tab = CSV_dict['delimiter'].lower()
+        cr = CSV_dict['lineterminator'].lower()
+
+    except KeyError as e:
+        io_error = "Dict 'params':\n{0}".format(e)
         return io_error
 
+    sample = ""
+
+    # ------------------------------------------------------------------------------
+    # Analyze CSV object
+    # ------------------------------------------------------------------------------
+    if header == 'auto' or tab == 'auto' or cr == 'auto':
+        # test the first line for delimiters (of the given selection)
+        sample = f.readline()
+        f.seek(0)  # and reset the file pointer
+        try:
+            dialect = csv.Sniffer().sniff(sample, delimiters=['\t', ';', ',', '|', ' '])
+        except csv.Error as e:
+            logger.warning(f'CSV sniffing reported "{e}",\n'
+                        'continuing with format "excel-tab"')
+            dialect = csv.get_dialect('excel-tab')
+    else:
+        # fall back, alternatives: 'excel', 'unix':
+        dialect = csv.get_dialect('excel-tab')
+
+    if header == "auto":
+        # yields True when a non-numeric character is detected, indicating a header:
+        use_header = not pattern_num_chars.search(sample)
+    elif header == 'on':
+        use_header = True
+    else:
+        use_header = False
+
+    delimiter = dialect.delimiter
+    lineterminator = dialect.lineterminator
+    quotechar = dialect.quotechar
+
+    if tab != 'auto':
+        delimiter = str(tab)
+
+    if cr != 'auto':
+        lineterminator = str(cr)
+
+    logger.info(f"Parsing CSV data with header = '{use_header}'\n"
+                f"\tDelimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
+                f"| quotechar = ' {quotechar} as '{f.__class__.__name__}'")
+
+    # --------------------------------------------------------------------------
+    # finally, create iterator from csv data
+    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter,
+                           lineterminator=lineterminator)  # returns an iterator
+    # --------------------------------------------------------------------------
+# =============================================================================
+#     with open('/your/path/file') as f:
+#         for line in f:
+#             process(line)
+#
+#     Where you define your process function any way you want. For example:
+#
+#    data_list = []
+#    def process(line):
+#        # split into lines (if not split yet):
+#        data_list.append(line.split(lineterminator))
+#
+#     This will work nicely for any file size and you go through your file in just 1 pass.
+#     This is typically how generic parsers will work.
+#     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
+# =============================================================================
+
+    if use_header:
+        logger.info("Header detected:\n{0}".format(next(data_iter, None)))
+
+    # ------- Read CSV file into a list --------------------
+    data_list = []
+    try:
+        for row in data_iter:
+            logger.debug("{0}".format(row))
+            if row:  # only append non-empty rows
+                data_list.append(row)
+    except csv.Error as e:
+        io_error = f"Error during CSV import:\n{e}"
+        return io_error
+
+    if data_list == [] or data_list ==[""]:
+            return "Imported data is empty."
+
+    # ------- Try to convert list to an array of str --------------------
+    try:
+        data_arr = np.array(data_list)
+    except np.VisibleDeprecationWarning:
+        # prevent creation of numpy arrays from nested ragged sequences
+        return "Can't convert to array, columns have different lengths."
+    except (TypeError, ValueError) as e:
+        io_error = f"{e}\nData = {pprint_log(data_list)}"
+        return io_error
+
+    if np.ndim(data_arr) == 0:
+        return f"Imported data is a scalar: '{data_arr}'"
+
+    elif np.ndim(data_arr) == 1:
+        if len(data_arr) < 2:
+            return f"Not enough data: '{data_arr}'"
+        else:
+            return data_arr
+
+    elif np.ndim(data_arr) == 2:
+        rows, cols = np.shape(data_arr)
+        # logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
+        if cols > 2 and rows > 2:
+            return f"Unsuitable data shape {np.shape(data_arr)}"
+        elif params['CSV']['orientation'] == 'rows'\
+                or params['CSV']['orientation'] == 'auto' and cols > rows:
+            # returned table is transposed, swap cols and rows
+            logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
+            return data_arr.T
+        else:
+            logger.info(f"Building table with {cols} column(s) and {rows} rows.")
+            return data_arr
+    else:
+        return "Unsuitable data shape: ndim = {0}, shape = {1}"\
+            .format(np.ndim(data_arr), np.shape(data_arr))
 
 # ------------------------------------------------------------------------------
 def create_file_filters(file_types: tuple, file_filters: str = ""):
@@ -794,23 +648,168 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     return file_filters, last_file_filter
 
+#-------------------------------------------------------------------------------
+def read_csv_info(filename):
+    """
+    Get infos about the size of a csv file without actually loading the whole
+    file into memory.
+
+    See
+    https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
+    """
+    file_size = os.path.getsize(filename)
+    logger.info(f"File Size is {file_size} bytes")
+
+    sniffer = csv.Sniffer()
+
+    with open(filename) as f:
+        first_line = f.readline()
+        sample = first_line + f.readline()
+        # pattern search returns true when only allowed characters are found
+        # when the first line contains other characters, it is assumed that this
+        # is a header
+        has_header = not pattern_num_chars.search(sample)
+        # if has_header:
+        #      logger.warning(pattern_no_num.search(sample))
+        dialect = sniffer.sniff(sample)
+        delimiter = dialect.delimiter
+        lineterminator = repr(dialect.lineterminator)
+
+        nchans = first_line.count(delimiter) + 1  # number of columns
+        # count rows in file
+        f.seek(0)
+        N = sum(1 for row in f)  # f isfileobject (csv.reader)  # number of rows
+
+    del f
+
+    logger.info(f"Terminator = '{lineterminator}', Delimiter = '{delimiter}', "
+                f"RowCount = {N}, Header={has_header}")
+
+    if not params['CSV']['orientation'] in {'rows', 'cols', 'auto'}:
+        logger.error(
+            f"Unknown key '{params['CSV']['orientation']}' for "
+            "params['CSV']['orientation']")
+    if params['CSV']['orientation'] == 'auto' and (N < nchans)\
+        or params['CSV']['orientation'] == 'rows':  # swap rows and columns
+        N, nchans = nchans, N
+        row_mode = True
+        transpose = "T #"
+    else:
+        row_mode = False
+        transpose = ""
+
+    if N < 2:
+        logger.error(f"No suitable CSV file, has only {N} data entries.")
+        return -1
+
+    # file is ok, copy local variables to function attributes
+    read_csv_info.row_mode = row_mode
+    read_csv_info.file_size = file_size
+    read_csv_info.N = N
+    read_csv_info.nchans = nchans
+    read_csv_info.info = f"{transpose} '{lineterminator}' # '{delimiter}'"
+
+    return 0
+
+#-------------------------------------------------------------------------------
+def read_wav_info(file):
+    """
+    Get infos about the following properties of a wav file without actually
+    loading the whole file into memory. This is achieved by reading the
+    header.
+    """
+
+    # https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
+    # http://soundfile.sapp.org/doc/WaveFormat/
+    # https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+    def str2int(s: str) -> int:
+        """ convert argument from str `s` in little endian format to int """
+        int = 0
+        for i in range(len(s)):
+             int = int + ord(s[i]) * pow(256, i)
+        return int
+
+    f = open(file,'r', encoding='latin-1')
+    # Get the file size in bytes
+    file_size = os.path.getsize(file)
+    if file_size < 44:  # minimum length for WAV file due to header
+        logger.error(f"Not a wav file: Filesize is only {file_size} bytes!")
+        return -1
+    HEADER = f.read(44)  # read complete header
+
+    RIFF = HEADER[:4]  # file pos. 0
+    WAVE = HEADER[8:12]  # pos. 8
+    if RIFF != "RIFF" or WAVE != "WAVE":
+        logger.error("Not a wav file: 'RIFF' or 'WAVE' id missing in file header.")
+        return -1
+
+    # Pos. 12: String 'fmt ' marks beginning of format subchunk
+    FMT = HEADER[12:16]  # f.read(4)
+    if FMT != "fmt ":  # pos. 12
+        logger.error(f"Invalid format header {FMT}!")
+        return -1
+
+    # Pos. 16: Size of subchunk with format infos, must be 16 bytes for PCM
+    fmt_chnk_size1 = str2int(HEADER[16:20])  # pos. 16
+    if fmt_chnk_size1 != 16:
+        logger.error(f"Invalid size {fmt_chnk_size1} of format subchunk!")
+        return -1
+
+    # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
+    if str2int(HEADER[20:22]) != 1:
+        logger.error(f"Invalid audio encoding, only PCM supported!")
+        return -1
+
+    # Pos. 22: Number of channels
+    nchans = str2int(HEADER[22:24])
+
+    f.seek(24)
+    # Pos. 24: Sampling rate f_S
+    f_S = str2int(f.read(4))
+
+    # Pos. 28: Byte rate = f_S * n_chans * Bytes per sample
+    byte_rate = str2int(f.read(4))
+
+    # Pos. 32: Block align, # of bytes per sample incl. all channels
+    block_align = str2int(f.read(2))
+
+    # Pos. 34: Bits per sample, WL = wordlength in bytes
+    bits_per_sample = str2int(f.read(2))
+
+    # Pos. 36: String 'data' marks beginning of data subchunk
+    DATA = f.read(4)
+    if DATA != "data":
+        logger.error(f"Invalid data header {DATA}!")
+        return -1
+
+    # -- Function attributes that are accessible from outside
+    # ------------------------------------------------------------
+    read_wav_info.file_size = file_size
+    read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
+
+    # Pos. 40: Total number of samples per channel
+    read_wav_info.N = str2int(HEADER[40:44]) // (nchans * read_wav_info.WL)
+
+    read_wav_info.nchans = nchans  # number of channels
+
+    read_wav_info.f_S = f_S  # sampling rate in Hz
+
+    # duration of the data in milliseconds
+    read_wav_info.ms = read_wav_info.N * 1000 / (f_S * nchans)
+
+    return 0
 
 # ------------------------------------------------------------------------------
-def import_data(parent, fkey=None, title="Import",
-                file_types=('csv', 'mat', 'npy', 'npz')):
+def select_file(parent: object, title: str = "Import", mode: str = "r",
+                file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
     """
-    Import data from a file and convert it to a numpy array.
-
     Parameters
     ----------
-    parent : handle to calling instance
-
-    fkey : str
-        Key for accessing data in *.npz or Matlab workspace (*.mat) file with
-        multiple entries.
-
     title : str
-        title string for the file dialog box (e.g. "Filter Coefficients")
+        title string for the file dialog box (e.g. "Filter Coefficients"),
+
+    mode : str
+        file access mode, must be either "r" or "w" for read / write access
 
     file_types : tuple of str
         supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
@@ -818,31 +817,86 @@ def import_data(parent, fkey=None, title="Import",
 
     Returns
     -------
-    ndarray
-        Data from the file
+    file_name: str
+        Fully qualified name of selected file. `None` when operation has been
+        cancelled.
+
+    file_type: str
+        File type, e.g. 'wav'. `None` when operation has been cancelled.
     """
+
     file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+    if mode in {"r", "rb"}:
+        dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+        dlg.setFileMode(QFileDialog.ExistingFile)
+    elif mode in {"w", "wb"}:
+        dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
+        dlg.setFileMode(QFileDialog.AnyFile)
+    else:
+        logger.error(f"Unknown mode '{mode}'")
+        return None, None
+
     dlg.setNameFilter(file_filters)  # pass available file filters
-    dlg.setDefaultSuffix('csv')  # default suffix when none is given
+    # dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
     if last_file_filter:
         dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
 
     if dlg.exec_() == QFileDialog.Accepted:
         file_name = dlg.selectedFiles()[0]  # pick only first selected file
         file_type = os.path.splitext(file_name)[-1].strip('.')
-    else:
-        return -1  # operation cancelled
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
+
+        if file_type == "":
+            # No file type specified, add the type from the file filter
+            file_type = extract_file_ext(sel_filt)[0].strip('.')
+            file_name = file_name + '.' + file_type
+
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)
+        dirs.last_file_type = file_type
+    else:  # operation cancelled
+        file_name = None
+        file_type = None
+
+    return file_name, file_type
+
+# ------------------------------------------------------------------------------
+def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
+    """
+    Import data from a file and convert it to a numpy array.
+
+    Parameters
+    ----------
+    file_name: str
+        Full path and name of the file to be imported
+
+    file_type: str
+        File type (e.g. 'wav')
+
+    fkey : str
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file with
+        multiple entries.
+
+    Returns
+    -------
+    ndarray of float
+        Data from the file
+    """
+    if file_name is None:  # error or operation cancelled
+        return -1
 
     err = False
     try:
         if file_type == 'wav':
             f_S, data_arr = wavfile.read(file_name, mmap=False)
+            # data_arr is 1D for single channel (mono) files and
+            # 2D otherwise (n_chans, n_samples)
             fb.fil[0]['f_S_wav'] = f_S
+
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
@@ -860,11 +914,13 @@ def import_data(parent, fkey=None, title="Import",
                     # contains only one array
                 elif file_type == 'npz':
                     fdict = np.load(f)
-                    if fkey not in fdict:
+                    if fkey in{"", None}:
+                        data_arr = fdict  # pick the whole array
+                    elif fkey not in fdict:
                         err = True
                         raise IOError(
-                            "Key '{0}' not in file '{1}'.\nKeys found: {2}"
-                            .format(fkey, file_name, fdict.files))
+                            f"Key '{fkey}' not in file '{file_name}'.\n"
+                            f"Keys found: {fdict.files}")
                     else:
                         data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
@@ -872,12 +928,17 @@ def import_data(parent, fkey=None, title="Import",
                     err = True
 
         if not err:
+            try:  # try to convert array elements to float
+                data_arr = data_arr.astype(float)
+            except ValueError as e:
+                try:
+                    data_arr = data_arr.astype(complex)
+                except ValueError:
+                    logger.error(f"{e},\n\tconversion to complex also failed.")
+                    return None
             logger.info(
-                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=3)}')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)
-            dirs.last_file_type = file_type
-            return data_arr  # returns numpy array
+                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
+            return data_arr  # returns numpy array of type float
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
@@ -886,7 +947,7 @@ def import_data(parent, fkey=None, title="Import",
 
 # ------------------------------------------------------------------------------
 def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
-                file_types=('csv', 'mat', 'npy', 'npz')):
+                file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
 
@@ -916,38 +977,16 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # add file types for FIR filter coefficients
     if fb.fil[0]['ft'] == 'FIR':
         file_types += ('coe', 'vhd', 'txt')
+    # Add file types when Excel modules are available:
+    if xlwt is not None:
+        file_types += ('xls',)
+    if xlsx is not None:
+        file_types += ('xlsx',)
 
-    file_filters, last_file_filter = create_file_filters(file_types=file_types)
-
-#        # Add further file types when modules are available:
-#        if XLWT:
-#            file_filters += ";;Excel Worksheet (.xls)"
-#        if XLSX:
-#            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
-
-    # return selected file name (with or without extension) and filter (Linux: full text)
-    dlg = QFileDialog(parent)  # create instance for QFileDialog
-    dlg.setWindowTitle(title)
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)  # set the list with all available file formats
-    # dlg.setDefaultSuffix()  # does not work, need to specify the suffix
-
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]   # convert list (with single entry?) to item
-        sel_filt = dlg.selectedNameFilter()  # selected file filter
-    else:
-        return -1
-
-    # Slice off file extension
-    file_type = os.path.splitext(file_name)[-1].strip('.')
-    if file_type == "":
-        # No file type specified, add the type from the file filter
-        file_type = extract_file_ext(sel_filt)[0].strip('.')
-        file_name = file_name + '.' + file_type
+    file_name, file_type = select_file(parent,title=title, mode='wb',
+                                       file_types=file_types)
+    if file_name is None:
+        return None  # file operation cancelled or other error
 
     err = False
 
@@ -1015,8 +1054,8 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     # Write some numbers, with row/column notation.
                     for col in range(2):
                         for row in range(np.shape(data)[1]):
-                            worksheet.write(row+1, col, data[col][row])  # vertical
-        #                    worksheet.write(row, col, coeffs[col][row])  # horizontal
+                            worksheet.write(row+1, col, data[col][row])  # columns
+        #                    worksheet.write(row, col, coeffs[col][row])  # rows
 
                     # Insert an image - useful for documentation export ?!.
         #            worksheet.insert_image('B5', 'logo.png')
@@ -1029,9 +1068,6 @@ def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
         if not err:
             logger.info(f'Filter saved as\n\t"{file_name}"')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
-            dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
@@ -1145,7 +1181,7 @@ def generate_header(title: str) -> str:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f: TextIO):
+def export_coe_xilinx(f: TextIO) -> None:
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1187,7 +1223,7 @@ def export_coe_xilinx(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f: TextIO):
+def export_coe_microsemi(f: TextIO) -> None:
     """
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
@@ -1203,8 +1239,8 @@ def export_coe_microsemi(f: TextIO):
 
     if qc.q_dict['fx_base'] != 'dec':
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
-        logger.warning('Only coefficients in "dec" format are supported,'
-                       'using decimal format.')
+        logger.warning('Switching to decimal coefficient format, other numeric formats '
+                       'are not supported by Microsemi tools.')
 
     # Quantize coefficients to decimal integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
@@ -1219,7 +1255,7 @@ def export_coe_microsemi(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f: TextIO):
+def export_coe_vhdl_package(f: TextIO) -> None:
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -1280,7 +1316,7 @@ def export_coe_vhdl_package(f: TextIO):
 
 
 # ------------------------------------------------------------------------------
-def export_coe_TI(f: TextIO):
+def export_coe_TI(f: TextIO) -> None:
     """
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
@@ -1297,28 +1333,16 @@ def export_coe_TI(f: TextIO):
 
 
 # ==============================================================================
-def load_filter(self):
+def load_filter(self) -> int:
     """
     Load filter from zipped binary numpy array or (c)pickled object to
-    filter dictionary and update input and plot widgets
+    filter dictionary
     """
-    file_types = ("npz", "pkl")
-    file_filters, last_file_filter = create_file_filters(file_types)
+    file_name, file_type = select_file(
+        self, title="Load Filter", mode="rb", file_types = ("npz", "pkl"))
 
-    dlg = QFileDialog(self)
-    dlg.setWindowTitle("Load Filter")
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-    dlg.setNameFilter(file_filters)  # pass available file filters
-    # dlg.setDefaultSuffix('csv')  # default suffix when none is given
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[-1].strip('.')
-    else:
-        return -1  # operation cancelled
+    if file_name is None:
+        return -1  # operation cancelled or some other error
 
     err = False
     fb.fil[1] = fb.fil[0].copy()  # backup filter dict
@@ -1353,19 +1377,36 @@ def load_filter(self):
                         fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
                     if fb.fil[0][k] is None:
                         logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+                if 'ba' not in fb.fil[0]\
+                    or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
+                        or np.ndim(fb.fil[0]['ba']) != 2\
+                        or (np.shape(fb.fil[0]['ba'][0]) != 2
+                            and np.shape(fb.fil[0]['ba'])[1] < 3):
+                    logger.error("Missing key 'ba' or wrong data type!")
+                    return -1
+                elif 'zpk' not in fb.fil[0]\
+                    or type(fb.fil[0]['zpk']) not in {list, np.ndarray}\
+                        or np.ndim(fb.fil[0]['zpk']) != 1:
+                    logger.error("Missing key 'zpk' or wrong data type!")
+                    return -1
+                elif 'sos' not in fb.fil[0]\
+                        or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
+                    logger.error("Missing key 'sos' or wrong data type!")
+                    return -1
 
                 logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                 dirs.last_file_name = file_name
                 dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
                 dirs.last_file_type = file_type  # save file type
-                # emit signal -> filter loaded
-                self.emit({'data_changed': 'filter_loaded'})
+                return 0
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+        return -1
     except Exception as e:
         logger.error("Unexpected error:\n{0}".format(e))
         fb.fil[0] = fb.fil[1]  # restore backup
+        return -1
 
 
 # ------------------------------------------------------------------------------
@@ -1373,26 +1414,11 @@ def save_filter(self):
     """
     Save filter as zipped binary numpy array or pickle object
     """
-    file_types = ("npz", "pkl")
-    file_filters, last_file_filter = create_file_filters(file_types)
+    file_name, file_type = select_file(
+        self, title="Load Filter", mode='wb', file_types = ("npz", "pkl"))
 
-    dlg = QFileDialog(self)
-    dlg.setWindowTitle("Save filter as")
-    dlg.setDirectory(dirs.last_file_dir)
-    dlg.setAcceptMode(QFileDialog.AcceptSave)  # set dialog to "file save" mode
-    dlg.setNameFilter(file_filters)
-
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        # sel_filt = dlg.selectedNameFilter()  # selected file filter
-    else:
-        return -1  # operation cancelled
-
-    file_type = os.path.splitext(file_name)[-1].strip('.')  # slice off file extension
-
+    if file_name is None:
+        return -1  # operation cancelled or other error
     err = False
     try:
         with io.open(file_name, 'wb') as f:

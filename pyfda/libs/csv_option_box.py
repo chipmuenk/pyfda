@@ -11,7 +11,8 @@ Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
 
-from .pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qwindow_stay_on_top
+from .pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
+                           qwindow_stay_on_top)
 from pyfda.pyfda_rc import params
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QCheckBox, QVBoxLayout, QGridLayout, pyqtSignal)
@@ -30,8 +31,15 @@ class CSV_option_box(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent):
+    def __init__(self, parent, has_cmsis=True):
         super(CSV_option_box, self).__init__(parent)
+
+        self.has_cmsis = has_cmsis
+        self.cmb_delimiter_default = "auto"
+        self.cmb_terminator_default = "auto"
+        self.cmb_orientation_default = "auto"
+        self.cmb_header_default = "auto"
+
         self._construct_UI()
         qwindow_stay_on_top(self, True)
 
@@ -49,49 +57,78 @@ class CSV_option_box(QDialog):
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
-        lblDelimiter = QLabel("CSV-Delimiter", self)
-        delim = [('Auto', 'auto'), ('< , >', ','), ('< ; >', ';'), ('<TAB>', '\t'),
-                 ('<SPACE>', ' '), ('< | >', '|')]
-        self.cmbDelimiter = QComboBox(self)
-        for d in delim:
-            self.cmbDelimiter.addItem(d[0], d[1])
-        self.cmbDelimiter.setToolTip("Delimiter between data fields.")
 
-        lblTerminator = QLabel("Line Terminator", self)
-        terminator = [('Auto', 'auto'), ('CRLF (Win)', '\r\n'),
-                      ('CR (Mac)', '\r'), ('LF (Unix)', '\n'), ('None', '\a')]
-        self.cmbLineTerminator = QComboBox(self)
-        self.cmbLineTerminator.setToolTip(
-            "<span>Terminator at the end of a data row."
-            " (depending on the operating system). 'None' can be used for a single "
-            "row of data with added line breaks.</span>")
-        for t in terminator:
-            self.cmbLineTerminator.addItem(t[0], t[1])
+        lbl_delimiter = QLabel("CSV delimiter", self)
+        cmb_delimiter_items = ["<span>Select delimiter between data fields for im- and export."
+                       "</span>",
+            ("auto", "Auto / ','", "<span>Detect the delimiter automatically for import, "
+             "use ',' for exporting data.</span>"),
+            (',', '< , >', "<span>Use ',' as delimiter between data fields.</span>"),
+            (';', '< ; >', "<span>Use ';' as delimiter between data fields.</span>"),
+            ( '\t', '<TAB>', "<span>Use &lt;TAB&gt; as delimiter between data fields."
+             "</span>"),
+            ( ' ', '<SPACE>', "<span>Use &lt;SPACE&gt; as delimiter between data "
+             "fields.</span>"),
+            ( '|', '< | >',"<span>Use '|' as delimiter between data fields.</span>")
+            ]
+        self.cmb_delimiter = QComboBox(self)
+        qcmb_box_populate(self.cmb_delimiter, cmb_delimiter_items,
+                          self.cmb_delimiter_default)
+
+
+        lbl_terminator = QLabel("Line terminator", self)
+        cmb_terminator_items = [
+            "<span>Terminator at the end of a data row, depending on the operating "
+            "system. 'None' can be used for a single row of data with added line breaks.</span>",
+            ('auto', 'Auto',
+             "<span>Use operating system's default line terminator.</span>"),
+            ('\r\n', 'CRLF (Win)', 'Use &lt;CRLF&gt; as line terminator (Windows '
+             'convention)</span>'),
+            ('\r', 'CR (Mac)', 'Use &lt;CR&gt; as line terminator (MacOS '
+             'convention)</span>'),
+            ('\n', 'LF (Unix)', 'Use &lt;LF&gt; as line terminator (Unix '
+             'convention)</span>'),
+            ('\a', 'None', '<span>No line terminator, use for single row data</span>')
+            ]
+        self.cmb_terminator = QComboBox(self)
+        qcmb_box_populate(self.cmb_terminator, cmb_terminator_items,
+                          self.cmb_terminator_default)
 
         butClose = QPushButton(self)
         butClose.setText("Close")
 
-        lblOrientation = QLabel("Table orientation", self)
-        orientation = [('Auto/Horz.', 'auto'),
-                       ('Vertical', 'vert'), ('Horizontal', 'horiz')]
-        self.cmbOrientation = QComboBox(self)
-        self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
-        for o in orientation:
-            self.cmbOrientation.addItem(o[0], o[1])
+        lbl_orientation = QLabel("Table mode", self)
+        cmb_orientation_items = [
+            "<span>Select row / column mode of table.</span>",
+            ('auto', 'Auto/Cols.', "<span>Detect table orientation automatically "
+             "during import; use column format for exporting data.</span>"),
+            ('cols', 'Columns', "<span>Import / export data in columns.</span>"),
+            ('rows', 'Rows', "<span>Import / export data in rows.</span>")
+            ]
+        self.cmb_orientation = QComboBox(self)
+        qcmb_box_populate(self.cmb_orientation, cmb_orientation_items,
+                          self.cmb_orientation_default)
 
-        lblHeader = QLabel("Enable header", self)
-        header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
-        self.cmbHeader = QComboBox(self)
-        self.cmbHeader.setToolTip("First row is a header.")
-        for h in header:
-            self.cmbHeader.addItem(h[0], h[1])
+        lbl_header = QLabel("Use header", self)
+        cmb_header_items = [
+            "<span>Interpret first row resp. column as header.</span>",
+            ('auto', 'Auto/Off', "<span>Detect header automatically during import; "
+             "turn off header during export.</span>"),
+            ('on', 'On', "<span>Turn on header.</span>"),
+            ('off', 'Off', "<span>Turn off.</span>")
+            ]
+        self.cmb_header = QComboBox(self)
+        qcmb_box_populate(self.cmb_header, cmb_header_items,
+                          self.cmb_header_default)
 
         lbl_cmsis = QLabel("CMSIS SOS format", self)
+        lbl_cmsis.setVisible(self.has_cmsis)
         self.chk_cmsis = QCheckBox()
         self.chk_cmsis.setChecked(False)
         self.chk_cmsis.setToolTip(
             "<span>Use CMSIS DSP second-order sections format "
-            "(only for coefficients).</span>")
+            "(only for IIR coefficients).</span>")
+        self.chk_cmsis.setVisible(self.has_cmsis)
 
         self.radClipboard = QRadioButton("Clipboard", self)
         self.radClipboard.setChecked(False)
@@ -100,14 +137,14 @@ class CSV_option_box(QDialog):
         self.radFile.setChecked(True)
 
         lay_grid = QGridLayout()
-        lay_grid.addWidget(lblDelimiter, 1, 1)
-        lay_grid.addWidget(self.cmbDelimiter, 1, 2)
-        lay_grid.addWidget(lblTerminator, 2, 1)
-        lay_grid.addWidget(self.cmbLineTerminator, 2, 2)
-        lay_grid.addWidget(lblOrientation, 3, 1)
-        lay_grid.addWidget(self.cmbOrientation, 3, 2)
-        lay_grid.addWidget(lblHeader, 4, 1)
-        lay_grid.addWidget(self.cmbHeader, 4, 2)
+        lay_grid.addWidget(lbl_delimiter, 1, 1)
+        lay_grid.addWidget(self.cmb_delimiter, 1, 2)
+        lay_grid.addWidget(lbl_terminator, 2, 1)
+        lay_grid.addWidget(self.cmb_terminator, 2, 2)
+        lay_grid.addWidget(lbl_orientation, 3, 1)
+        lay_grid.addWidget(self.cmb_orientation, 3, 2)
+        lay_grid.addWidget(lbl_header, 4, 1)
+        lay_grid.addWidget(self.cmb_header, 4, 2)
         lay_grid.addWidget(lbl_cmsis, 5, 1)
         lay_grid.addWidget(self.chk_cmsis, 5, 2)
         lay_grid.addWidget(self.radClipboard, 6, 1)
@@ -120,29 +157,29 @@ class CSV_option_box(QDialog):
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
 
-        self._load_settings()
+        self.load_settings()
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
-        self.cmbOrientation.currentIndexChanged.connect(self._store_settings)
-        self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
-        self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
-        self.cmbHeader.currentIndexChanged.connect(self._store_settings)
-        self.chk_cmsis.clicked.connect(self._store_settings)
-        self.radClipboard.clicked.connect(self._store_settings)
-        self.radFile.clicked.connect(self._store_settings)
+        self.cmb_orientation.currentIndexChanged.connect(self.store_settings)
+        self.cmb_delimiter.currentIndexChanged.connect(self.store_settings)
+        self.cmb_terminator.currentIndexChanged.connect(self.store_settings)
+        self.cmb_header.currentIndexChanged.connect(self.store_settings)
+        self.chk_cmsis.clicked.connect(self.store_settings)
+        self.radClipboard.clicked.connect(self.store_settings)
+        self.radFile.clicked.connect(self.store_settings)
 
-    def _store_settings(self):
+    def store_settings(self):
         """
         Store settings of CSV options widget in ``pyfda_rc.params``.
         """
 
         try:
-            params['CSV']['orientation'] = qget_cmb_box(self.cmbOrientation, data=True)
-            params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
-            params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator,
+            params['CSV']['orientation'] = qget_cmb_box(self.cmb_orientation, data=True)
+            params['CSV']['delimiter'] = qget_cmb_box(self.cmb_delimiter, data=True)
+            params['CSV']['lineterminator'] = qget_cmb_box(self.cmb_terminator,
                                                            data=True)
-            params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
+            params['CSV']['header'] = qget_cmb_box(self.cmb_header, data=True)
             params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
             params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
@@ -151,16 +188,16 @@ class CSV_option_box(QDialog):
         except KeyError as e:
             logger.error(e)
 
-    def _load_settings(self):
+    def load_settings(self):
         """
         Load settings of CSV options widget from ``pyfda_rc.params``.
         """
         try:
-            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
-            qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
-            qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'],
+            qset_cmb_box(self.cmb_orientation, params['CSV']['orientation'], data=True)
+            qset_cmb_box(self.cmb_delimiter, params['CSV']['delimiter'], data=True)
+            qset_cmb_box(self.cmb_terminator, params['CSV']['lineterminator'],
                          data=True)
-            qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
+            qset_cmb_box(self.cmb_header, params['CSV']['header'], data=True)
             self.chk_cmsis.setChecked(params['CSV']['cmsis'])
 
             self.radClipboard.setChecked(params['CSV']['clipboard'])

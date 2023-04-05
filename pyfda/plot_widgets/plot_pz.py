@@ -69,7 +69,8 @@ class Plot_PZ(QWidget):
         # logger.info("Processing {0} | needs_draw = {1}, visible = {2}"\
         #              .format(dict_sig, self.needs_calc, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or self.needs_calc\
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False
@@ -79,6 +80,9 @@ class Plot_PZ(QWidget):
             elif 'ui_global_changed' in dict_sig\
                     and dict_sig['ui_global_changed'] == 'resized':
                 self.draw()
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                self.frmControls.setVisible(dict_sig['value'] == 0)
+
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
@@ -170,6 +174,7 @@ class Plot_PZ(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_pz.html"
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()

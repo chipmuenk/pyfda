@@ -4,7 +4,6 @@
     <file alias="action-redo.svg">images/icons/dark/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/dark/action-undo.svg</file>
     <file alias="brush.svg">images/icons/dark/brush.svg</file>
-    <file alias="camera-slr.svg">images/icons/dark/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
     <file alias="circle-x.svg">images/icons/dark/circle-x.svg</file>    
     <file alias="clipboard.svg">images/icons/dark/clipboard.svg</file>
@@ -15,12 +14,12 @@
     <file alias="fft.svg">images/icons/fft.svg</file>
     <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
-    <file alias="graph_90.png">images/icons/dark/graph_90.png</file>
-    <file alias="grid_none.svg">images/icons/grid_none.svg</file>
-    <file alias="grid_fine.svg">images/icons/grid_fine.svg</file>
-    <file alias="grid_coarse.svg">images/icons/grid_coarse.svg</file>
-    <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  
-    <file alias="help.svg">images/icons/dark/ic_help_outline_24px.svg</file>
+    <file alias="graph_90.svg">images/icons/dark/graph_90.svg</file>
+    <file alias="grid_none.svg">images/icons/dark/grid_none.svg</file>
+    <file alias="grid_fine.svg">images/icons/dark/grid_fine.svg</file>
+    <file alias="grid_coarse.svg">images/icons/dark/grid_coarse.svg</file>
+     <!--  <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  -->
+    <file alias="help.svg">images/icons/dark/ic_help_24px.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
@@ -40,6 +39,9 @@
     <file alias="stop.svg">images/icons/dark/ic_play_arrow_48px.svg</file>
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
+    <file alias="ui_level_min.svg">images/icons/dark/density_large.svg</file>
+    <file alias="ui_level_mid.svg">images/icons/dark/density_medium.svg</file>
+    <file alias="ui_level_max.svg">images/icons/dark/density_small.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
     <file alias="pause_w.svg">images/icons/light/ic_pause_48px_white.svg</file>

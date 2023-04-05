@@ -45,10 +45,10 @@ mpl_ms = 8  # base size for matplotlib markers
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}',  # format string for QLineEdit fields
           'CSV':  {  # format options and parameters for CSV-files and clipboard
-                  'delimiter': ',',  # default delimiter
-                  'lineterminator': CRLF,  # OS-dependend line break from pyfda_lib
+                  'delimiter': 'auto',  # default delimiter
+                  'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
                   'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
-                  'header': 'off',  # 'auto', 'on', 'off'
+                  'header': 'auto',  # 'auto', 'on', 'off'
                   'cmsis' : False,  # True, False
                   'clipboard': False  # source/target is QClipboard or file
                   },
@@ -413,6 +413,10 @@ qss_common = """
                 * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
+
+                #large{font-size: 12pt; font-weight: bold; }
+                #xlarge{font-size: 14pt; font-weight: black;}
+
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
                     border-top: solid darkgrey;
@@ -441,6 +445,8 @@ qss_common = """
                     padding: 0;
                     margin: 0;
                     }
+
+                QWidget#transparent{background-color:none}
 
                 /* Dynamic filter subwidget */
                 #wdg_fil{

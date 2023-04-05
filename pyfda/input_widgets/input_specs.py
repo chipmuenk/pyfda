@@ -66,7 +66,7 @@ class Input_Specs(QWidget):
         its parent widget (`input_specs`) to prevent infinite loops.
 
         """
-        # logger.debug(f"SIG_RX: {pprint_log(dict_sig)}")
+        logger.info(f"SIG_RX: {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{pprint_log(dict_sig)}")
@@ -198,7 +198,7 @@ class Input_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx_local.connect(self.process_sig_rx_local)
-        self.butLoadFilt.clicked.connect(lambda: load_filter(self))
+        self.butLoadFilt.clicked.connect(self._load_filter)
         self.butSaveFilt.clicked.connect(lambda: save_filter(self))
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
@@ -289,6 +289,17 @@ class Input_Specs(QWidget):
         # Update state of "DESIGN FILTER" button
         # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
         self.color_design_button("changed")
+
+# ------------------------------------------------------------------------------
+    def _load_filter(self):
+        ret = load_filter(self)
+        if ret == 0:
+            self.load_dict()
+            self.emit({'data_changed': 'filter_loaded'})
+        elif ret == -1:
+            return  # error occurred, do nothing
+        else:
+            logger.error(f'Unknown return code "{ret}"!')
 
 # ------------------------------------------------------------------------------
     def load_dict(self):

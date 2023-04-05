@@ -77,6 +77,8 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_resp = {'marker': 'o', 'color': 'red', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         self.fmt_plot_stim = {'color': 'blue', 'linewidth': 2, 'alpha': 0.5}
+        self.fmt_plot_stim_interp = {'color': 'black', 'linewidth': 1, 'alpha': 0.5}
+
         self.fmt_mkr_stim = {'marker': 's', 'color': 'blue', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         self.fmt_plot_stmq = {'color': 'darkgreen', 'linewidth': 2, 'alpha': 0.5}
@@ -109,6 +111,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_t.mplToolbar.a_ui_num_levels = 4
         self.mplwidget_t.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ---------- MplWidget for FREQUENCY domain plots ----------------------
@@ -118,6 +121,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
+        self.mplwidget_f.mplToolbar.a_ui_num_levels = 4
         self.mplwidget_f.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # ----------- Construct TabWidget with time and frequency plot widgets
@@ -136,21 +140,27 @@ class Plot_Impz(QWidget):
         # Tabbed layout with vertical tabs ("west") for stimulus and audio
         # ----------------------------------------------------------------------
         self.stim_wdg = Plot_Tran_Stim()
+        # set "Stim:" label width to same width as "Plots:" label:
+        self.stim_wdg.ui.lbl_title_stim.setFixedWidth(self.ui.lbl_title_plot_time.sizeHint().width())
         self.file_io_wdg = Tran_IO()
+
+        # This places the combo box for adding / using file data to the
+        # run control toolbar:
+        self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         tab_w = 30  # needs to fit with the tab size defined in pyfda_rc.py
         # tab_w = self.tab_mpl_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
-        self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.png"), "")
+        self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
         self.tab_stim_w.addTab(self.file_io_wdg, QIcon(":/file.svg"), "")
-        self.tab_stim_w.setTabToolTip(1, "I/O")
+        self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
         # ----------------------------------------------------------------------
@@ -190,10 +200,11 @@ class Plot_Impz(QWidget):
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.ui.but_fx_scale.clicked.connect(self.draw)
-        self.ui.but_toggle_stim_options.clicked.connect(self.toggle_stim_options)
+        self.stim_wdg.ui.but_file_io.clicked.connect(self.set_N_to_file_len)
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw)
+        self.ui.chk_plt_time_stim_interp.clicked.connect(self.draw)
         self.ui.cmb_plt_time_stmq.currentIndexChanged.connect(self.draw)
         self.ui.cmb_plt_time_spgr.currentIndexChanged.connect(self._spgr_cmb)
         self.ui.but_log_time.clicked.connect(self.draw)
@@ -222,7 +233,37 @@ class Plot_Impz(QWidget):
         Toggle visibility of stimulus options, depending on the state of the
         "Stimuli" button
         """
-        self.tab_stim_w.setVisible(self.ui.but_toggle_stim_options.isChecked())
+        self.tab_stim_w.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"stim", "plot_stim"})
+        self.ui.wdg_ctrl_freq.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+        self.ui.wdg_ctrl_time.setVisible(qget_cmb_box(self.ui.cmb_ui_select) in {"plot", "plot_stim"})
+
+# ------------------------------------------------------------------------------
+    def set_ui_level(self, ui_level):
+        """
+        Sync time and frequency subwidget and set their ui display level
+        """
+        self.mplwidget_f.mplToolbar.cycle_ui_level(ui_level)
+        self.mplwidget_t.mplToolbar.cycle_ui_level(ui_level)
+        if ui_level == 0:
+            self.ui.wdg_ctrl_time.setVisible(True)
+            self.ui.wdg_ctrl_freq.setVisible(True)
+            self.tab_stim_w.setVisible(True)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 1:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(True)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 2:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(False)
+            self.ui.wdg_ctrl_run.setVisible(True)
+        elif ui_level == 3:
+            self.ui.wdg_ctrl_time.setVisible(False)
+            self.ui.wdg_ctrl_freq.setVisible(False)
+            self.tab_stim_w.setVisible(False)
+            self.ui.wdg_ctrl_run.setVisible(False)
 
 # ------------------------------------------------------------------------------
     def resize_stim_tab_widget(self):
@@ -248,7 +289,7 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
 
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from
@@ -256,7 +297,7 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.debug("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
+        logger.warning("SIG_RX - needs_calc: {0} | vis: {1}\n{2}\n\tfx_sim = {3}: cmb = {4}"
                     .format(self.needs_calc, self.isVisible(), pprint_log(dict_sig),
                             fb.fil[0]['fx_sim'], qget_cmb_box(self.ui.cmb_sim_select)))
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
@@ -350,7 +391,7 @@ class Plot_Impz(QWidget):
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
                     # data points to be used:
-                    self.file_loaded()
+                    self.file_io()
 
                 # update number of data points in impz_ui and FFT window
                 # needed when e.g. FIR filter order has been changed, requiring
@@ -362,23 +403,34 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                    self.set_ui_level(dict_sig['value'])
+
             elif 'ui_local_changed' in dict_sig:
-                # treat all local UI events here
-                self.resize_stim_tab_widget()
-                self.needs_calc = True
-                # make file data available to stimulus widget and modify number of
-                # data points to be used:
-                self.file_loaded()
-                self.impz_init()
+                if dict_sig['ui_local_changed'] == 'csv':
+                    # CSV options window has been closed, propagate the event
+                    self.emit({'ui_global_changed': 'csv'})
+                else:
+                    # treat all other local UI events here
+                    self.resize_stim_tab_widget()
+                    self.needs_calc = True
+                    # make file data available to stimulus widget:
+                    self.file_io()
+                    self.impz_init()
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
                 self.draw()
 
-            elif 'home' in dict_sig:
-                self.redraw()
-                self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
+            elif 'mpl_toolbar' in dict_sig:
+                if dict_sig['mpl_toolbar'] == 'ui_level':
+                    ui_level = dict_sig['value']
+                    self.mplwidget_t.mplToolbar.a_ui_state = ui_level
+                    self.mplwidget_f.mplToolbar.a_ui_state = ui_level
+                elif dict_sig['mpl_toolbar'] == 'home':
+                    self.redraw()
+                    self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
@@ -391,37 +443,48 @@ class Plot_Impz(QWidget):
             elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
-    def file_loaded(self):
+    # ------------------------------------------------------------------------------
+    def set_N_to_file_len(self):
+        """
+        Check status of file_io widget:
+        - if no file is loaded or `cmb_file_io == 'off'`, do nothing. This shouldn't happen.
+        - if `cmb_file_io == 'add'` or `use`, set N_end = len(file_data) in the UI
+        """
+        # This case should never happen, just to be sure ...
+        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
+            qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
+            self.ui.frm_file_io.setEnabled(False)
+            logger.warning("No data loaded, you shouldn't see this message!")
+        # File is loaded, copy file length to N_end
+        else:
+            self.ui.update_N(N_end = self.file_io_wdg.N)
+
+    # ------------------------------------------------------------------------------
+    def file_io(self):
         """
         Check status of file_io widget:
         - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
         - if `cmb_file_io == 'add'`, map the file data to `self.stim_wdg.x_file`
           to make it accessible from the stimulus widget
-        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in th UI
+        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in the UI
         """
-        # logger.info(
-        #     f"File loaded with {self.file_io_wdg.n_chan} channel(s) and "
-        #     f"{self.file_io_wdg.N} samples.")
-        if not self.file_io_wdg.N or self.file_io_wdg.N == 0:
+        # No file has been loaded or number of data points is zero
+        #    -> set file_io combobox to off and disable it:
+        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
-            self.stim_wdg.ui.cmb_file_io.setEnabled(False)
+            self.ui.frm_file_io.setEnabled(False)
+        # File is loaded, enable file_io combobox
         else:
-            self.stim_wdg.ui.cmb_file_io.setEnabled(True)
+            self.ui.frm_file_io.setEnabled(True)
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
                 return
+            else:
+                # "use" or "add", map data from file io widget to stimulus widget:
+                self.stim_wdg.x_file = self.file_io_wdg.x
 
-            # map data from file io widget to stimulus widget:
-            self.stim_wdg.x_file = self.file_io_wdg.x
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "use":
-                # override ui setting of N_end
-                self.ui.update_N(emit=False, N_end = self.file_io_wdg.N)
-            else:  # qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "add":
-                pass
-        return
-
-# =============================================================================
-# Simulation: Calculate stimulus, response and draw them
-# =============================================================================
+    # =========================================================================
+    # Simulation: Calculate stimulus, response and draw them
+    # =========================================================================
     def calc_auto(self, autorun=None):
         """
         Triggered when checkbox "Autorun" is clicked.
@@ -451,7 +514,6 @@ class Plot_Impz(QWidget):
             - When in fixpoint mode, initialize quantized stimulus `x_q` and input
               quantizer and emit {'fx_sim':'init'}
         """
-
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
@@ -475,23 +537,41 @@ class Plot_Impz(QWidget):
             return
 
         if self.needs_calc:
-            # set title and axis string and calculate 10 samples to determine ndtype
-            x_test = self.stim_wdg.calc_stimulus_frame(init=True)
+            # Test whether stimulus or filter coefficients are complex and set flag
+            #  correspondingly, additionally calculate up to 10 samples to test for
+            # complex values:
+            self.N_first = 0  # initialize frame index
+            x_test = np.zeros(10, dtype=complex)
+            # TODO: For stimuli that become complex only after the 10th sample,
+            #       the test fails
+            # TODO: np.iscomplexobj() returns true for an array with dtype complex
+            #       although each item is real.
+            self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
+ 
+            self.cmplx =\
+                (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
+                    or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
+                or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
+                    or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
+                or (qget_cmb_box(self.stim_wdg.ui.cmb_file_io) in {"use", "add"}
+                    and self.file_io_wdg.file_load_status == 'loaded'
+                    and np.iscomplexobj(self.file_io_wdg.x))\
+                or np.any(np.iscomplex(x_test))
+
+            self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+
+            # set title and axis string
+            self.stim_wdg.init_labels_stim()
             self.title_str = self.stim_wdg.title_str
 
-            self.N_first = 0  # initialize frame index
             self.n = np.arange(self.ui.N_end, dtype=float)
-            self.x = np.empty(self.ui.N_end, dtype=x_test.dtype)  # stimulus
-            # Test whether stimulus or filter coefficients are complex and set
-            # flag and UI field correspondingly
-            self.cmplx = bool(
-                np.any(np.any(np.iscomplex(x_test))
-                       or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))))
+
             if self.cmplx:
-                self.y = np.empty_like(self.x, dtype=complex)  # always complex
+                self.x = np.zeros(self.ui.N_end, dtype=complex)
+                self.y = np.zeros(self.ui.N_end, dtype=complex)
             else:
-                self.y = np.empty_like(self.x)  # same type as self.x
-            self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
+                self.x = np.zeros(self.ui.N_end, dtype=float)
+                self.y = np.zeros(self.ui.N_end, dtype=float)
 
             # initialize progress bar
             self.ui.prg_wdg.setMaximum(self.ui.N_end)
@@ -558,22 +638,9 @@ class Plot_Impz(QWidget):
             # ------------------------------------------------------------------
             # ---- calculate stimuli for current frame -------------------------
             # ------------------------------------------------------------------
-            # self.stim_wdg = Plot_Tran_Stim()
-            # self.file_io_wdg = Tran_IO()
-            # TODO: Use file data here, limit to one channel
-            x_io = self.file_io_wdg.x
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'use':
-                self.ui.update_N(emit=False, N_end=len(x_io))
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-            #
-            elif qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == 'add':
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
-            #
-            else:
-                self.x[frame] = self.stim_wdg.calc_stimulus_frame(
-                    N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
+            # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
+            self.stim_wdg.calc_stimulus_frame(
+                self.x, N_first=self.N_first, N_frame=L_frame, N_end=self.ui.N_end)
 
             # ------------------------------------------------------------------
             # ---- calculate fixpoint or floating point response for current frame
@@ -858,16 +925,8 @@ class Plot_Impz(QWidget):
         """
         Update spectrogram UI when signal selection combobox has been changed
         """
-        spgr_en = qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none'
-
-        self.ui.but_log_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_time_nfft_spgr.setVisible(spgr_en)
-        self.ui.led_time_nfft_spgr.setVisible(spgr_en)
-        self.ui.lbl_time_ovlp_spgr.setVisible(spgr_en)
-        self.ui.led_time_ovlp_spgr.setVisible(spgr_en)
-        self.ui.cmb_mode_spgr_time.setVisible(spgr_en)
-        self.ui.lbl_byfs_spgr_time.setVisible(spgr_en)
-        self.ui.chk_byfs_spgr_time.setVisible(spgr_en)
+        self.ui.wdg_ctrl_time_spgr.setVisible(
+            qget_cmb_box(self.ui.cmb_plt_time_spgr) != 'none')
 
         self.draw()
 
@@ -913,8 +972,9 @@ class Plot_Impz(QWidget):
             self.ui.bottom_f = 0
 
     # ------------------------------------------------------------------------
-    def draw_data(self, plt_style, ax, x, y, bottom=0, label='',
-                  plt_fmt={}, mkr_fmt={}, **args):
+    def draw_data(self, plt_style: str, ax: object, x: np.ndarray, y:np.ndarray,
+                  bottom: float = 0, label: str = '',
+                  plt_fmt: dict = {}, mkr_fmt: dict = {}, **args):
         """
         Plot x, y data (numpy arrays with equal length) in a plot style defined
         by `plt_style`.
@@ -974,8 +1034,10 @@ class Plot_Impz(QWidget):
         """
         Clear and initialize the axes of the time domain matplotlib widgets
         """
+        # calculate time vector from index n and T_S
         self.t = self.n * fb.fil[0]['T_S']
 
+        # Read out combo boxes with plotting styles and remove the '*' for markers
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp).replace("*", "")
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim).replace("*", "")
         self.plt_time_stmq = qget_cmb_box(self.ui.cmb_plt_time_stmq).replace("*", "")
@@ -1065,6 +1127,16 @@ class Plot_Impz(QWidget):
         else:
             x_q = None
 
+        # Create finer grid for plotting interpolated waveforms
+        if self.ui.chk_plt_time_stim_interp.isChecked():
+            I = 20
+            # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I + 1)
+            # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
+            #                      period=None)
+            self.x_interp = sig.resample_poly(self.x, I, 1, axis=0, window=('kaiser', 5.0),
+                                              padtype='line', cval=None)
+            self.t_interp = np.linspace(self.n[0], self.n[-1] + 1, len(self.n) * I, endpoint=False) * fb.fil[0]['T_S']
+
         t = self.t[N_start:N_end]
         x = self.x[N_start:N_end] * self.scale_i
         y = self.y[N_start:N_end] * self.scale_o
@@ -1085,6 +1157,7 @@ class Plot_Impz(QWidget):
             y_i = None
             lbl_x_r = "$x[n]$"
             lbl_y_r = "$y[n]$"
+        lbl_x_r_interp = "$x(t)$"
 
         # log. scale for stimulus / response time domain:
         if self.ui.but_log_time.isChecked():
@@ -1130,6 +1203,14 @@ class Plot_Impz(QWidget):
                 x_r, label=lbl_x_r, bottom=bottom_t,
                 plt_fmt=self.fmt_plot_stim, mkr_fmt=fmt_mkr_stim))
             l_r += [lbl_x_r]
+
+            if self.ui.chk_plt_time_stim_interp.isChecked():
+                # add interpolated waveform
+                h_r.append(self.draw_data(
+                    "line", self.ax_r, self.t_interp,
+                    self.x_interp, label=lbl_x_r_interp, bottom=bottom_t,
+                    plt_fmt=self.fmt_plot_stim_interp, mkr_fmt={'marker': ''}))
+                l_r += [lbl_x_r_interp]
 
         # -------------- Stimulus <q> plot ------------------------------------
         if x_q is not None and self.plt_time_stmq != "none":

@@ -17,7 +17,7 @@ from pyfda.libs.compat import (
 import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
-from pyfda.libs.pyfda_lib import fil_save, safe_eval
+from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table, export_csv_data
@@ -131,17 +131,17 @@ class ItemDelegate(QStyledItemDelegate):
             super(ItemDelegate, self).initStyleOption(option, index)
 
     # -------------------------------------------------------------------------
-    def text(self, item):
-        """
-        Return item text as string transformed by self.displayText()
+    # def text(self, item):
+    #     """
+    #     Return item text as string transformed by self.displayText()
 
-        Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
+    #     Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
 
-        TODO: Still needed?
-        """
-        dtext = str(self.displayText(item.text(), QtCore.QLocale()))
-        # logger.warning(f"dtext={dtext}")
-        return dtext
+    #     TODO: Still needed?
+    #     """
+    #     dtext = str(self.displayText(item.text(), QtCore.QLocale()))
+    #     # logger.warning(f"dtext={dtext}")
+    #     return dtext
 
     # -------------------------------------------------------------------------
     def displayText(self, text, locale):
@@ -182,12 +182,6 @@ class ItemDelegate(QStyledItemDelegate):
         line_edit.setMinimumSize(QSize(W, H))  # (160, 25));
 
         return line_edit
-
-#    def updateEditorGeometry(self, editor, option, index):
-#        """
-#        Updates the editor for the item specified by index according to the option given
-#        """
-#        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
 
     # -------------------------------------------------------------------------
     def setEditorData(self, editor, index):
@@ -301,8 +295,8 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        # logger.debug("process_sig_rx(): vis={0}\n{1}"\
-        #             .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.debug("process_sig_rx(): vis={0}\n{1}"\
+                     .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -475,7 +469,7 @@ class Input_Coeffs(QWidget):
         """
         - Store selected / all quantized coefficients in `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
-        - Reset Overflow counters
+        - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
         - Save quantized `self.ba` to filter dict (in `_save_dict()`). This emits
           {'data_changed': 'input_coeffs'}
         """
@@ -485,8 +479,8 @@ class Input_Coeffs(QWidget):
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
-            self.ba_q[2] = np.zeros(len(self.ba_q[2]))
-            self.ba_q[3] = np.zeros(len(self.ba_q[3]))
+            self.ba_q[2] = np.zeros(len(self.ba_q[0]))
+            self.ba_q[3] = np.zeros(len(self.ba_q[1]))
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
         else:
             try:
@@ -549,6 +543,7 @@ class Input_Coeffs(QWidget):
 
         brush = QBrush(Qt.SolidPattern)
         brush.setColor(QColor(255, 255, 255, 0))  # transparent white
+
         if self.ba_q[col + 2][row] > 0:
             # Color item backgrounds with pos. Overflows red
             brush.setColor(QColor(100, 0, 0, 80))
@@ -664,14 +659,14 @@ class Input_Coeffs(QWidget):
 
         qstyle_widget(self.ui.butSave, 'normal')
 
-    # --------------------------------------------------------------------------
-    def _copy_options(self):
-        """
-        Set options for copying to/from clipboard or file.
-        """
-        self.opt_widget = CSV_option_box(self)  # Handle must be class attribute!
-        # self.opt_widget.show() # modeless dialog, i.e. non-blocking
-        self.opt_widget.exec_()  # modal dialog (blocking)
+    # # --------------------------------------------------------------------------
+    # def _copy_options(self):
+    #     """
+    #     Set options for copying to/from clipboard or file.
+    #     """
+    #     self.opt_widget = CSV_option_box(self)  # Handle must be class attribute!
+    #     # self.opt_widget.show() # modeless dialog, i.e. non-blocking
+    #     self.opt_widget.exec_()  # modal dialog (blocking)
 
     # --------------------------------------------------------------------------
     def _export(self):

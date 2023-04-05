@@ -54,13 +54,17 @@ class Plot_Phi(QWidget):
             return
 
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_calc:
+            if 'data_changed' in dict_sig or self.needs_calc\
+                    or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home'):
                 self.draw()
                 self.needs_calc = False
                 self.needs_draw = False
             elif 'view_changed' in dict_sig or self.needs_draw:
                 self.update_view()
                 self.needs_draw = False
+            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+                self.frmControls.setVisible(dict_sig['value'] == 0)
+
         else:
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
@@ -112,6 +116,7 @@ class Plot_Phi(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['mpl_margins'])
         self.mplwidget.mplToolbar.a_he.setEnabled(True)
         self.mplwidget.mplToolbar.a_he.info = "manual/plot_phi.html"
+        self.mplwidget.mplToolbar.a_ui_num_levels = 2
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()
@@ -233,7 +238,6 @@ class Plot_Phi(QWidget):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-
 
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
