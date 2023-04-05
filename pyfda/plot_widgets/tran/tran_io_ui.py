@@ -42,6 +42,28 @@ class Tran_IO_UI(QWidget):
 
         self.led_normalize_default = 1  # default setting for normalization
 
+        # combobox tooltip + data / text / item tooltip for channel export (real data)
+        self.cmb_select_chan_export_real_items = [
+            "<span>Select signals for data export. '&Sigma;' "
+            "sums up all columns.</span>",
+            ("none", "none", "no data"),
+            ("x", "x", "Stimuli"),
+            ("y", "y", "Response")
+        ]
+        self.cmb_select_chan_export_init = "x"
+
+        # combobox tooltip + data / text / item tooltip for channel export (complex data)
+        self.cmb_select_chan_export_complex_items = [
+            "<span>Select signals for data export. '&Sigma;' "
+            "sums up all columns.</span>",
+            ("none", "none", "no data"),
+            ("x_re", "x_re", "Stimuli (real part)"),
+            ("x_im", "x_im", "Stimuli (imag. part)"),
+            ("y_re", "y_re", "Response (real part)"),
+            ("y_im", "y_im", "Response (imag. part)")
+        ]
+        self.cmb_select_chan_export_init = "x_re"
+
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
 
