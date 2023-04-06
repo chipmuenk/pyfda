@@ -1,21 +1,21 @@
 # workflow for buildung pyinstaller packages for windows and MacOS
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
-# The workflow only runs with a proper tag v*, so something similar to
+# The workflow runs:
+#  - for push events on the main branch
+#  - for push events with a proper tag v*, requiring something similar to
 #
 #   git tag v0.4.5
 #   git push
 #   git push origin --tags
-#
-# is required.
 ---
 name: build_pyinstaller
 
 on:
   push:
-#     branches:
+    branches:
 #       - develop
-#       - main
+    - main
     tags:
     - 'v*' # Push events with proper version number, i.e. v1.0, v20.15.10
 
