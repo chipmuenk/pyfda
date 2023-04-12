@@ -81,7 +81,7 @@ class Tran_IO(QWidget):
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
         self.ui.but_select.clicked.connect(self.select_file)
-        self.ui.cmb_chan.currentIndexChanged.connect(self.select_chan_normalize)
+        self.ui.cmb_chan_import.currentIndexChanged.connect(self.select_chan_normalize)
         self.ui.but_load.clicked.connect(self.import_data)
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
@@ -149,12 +149,12 @@ class Tran_IO(QWidget):
             self.file_load_status = 'error'
             return -1
         elif self.nchans == 1:
-            self.ui.lbl_chan.setVisible(False)
-            self.ui.cmb_chan.setVisible(False)
+            self.ui.lbl_chan_import.setVisible(False)
+            self.ui.cmb_chan_import.setVisible(False)
             self.ui.line_chan.setVisible(False)
         else:
-            self.ui.lbl_chan.setVisible(True)
-            self.ui.cmb_chan.setVisible(True)
+            self.ui.lbl_chan_import.setVisible(True)
+            self.ui.cmb_chan_import.setVisible(True)
             self.ui.line_chan.setVisible(True)
 
         if len(self.file_name) < 45:
@@ -243,7 +243,7 @@ class Tran_IO(QWidget):
         if self.nchans == 1:
             data = self.data_raw
         else:
-            item = qget_cmb_box(self.ui.cmb_chan)
+            item = qget_cmb_box(self.ui.cmb_chan_import)
 
             if item == "del":  # delete data
                 self.x = self.data_raw = None

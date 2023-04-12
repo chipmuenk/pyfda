@@ -113,17 +113,17 @@ class Tran_IO_UI(QWidget):
 
         self.line_chan = QVLine()
         self.line_chan.setVisible(False)
-        self.lbl_chan = QLabel(to_html("Col.", frmt="b"))
-        self.lbl_chan.setVisible(False)
-        self.cmb_chan = QComboBox(self)
+        self.lbl_chan_import = QLabel(to_html("Col.", frmt="b"))
+        self.lbl_chan_import.setVisible(False)
+        self.cmb_chan_import = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_chan, self.cmb_select_chan_import_items,
+            self.cmb_chan_import, self.cmb_select_chan_import_items,
             self.cmb_select_chan_import_init)
-        self.cmb_chan.setVisible(False)
+        self.cmb_chan_import.setVisible(False)
 
         layV_chan = QVBoxLayout()
-        layV_chan.addWidget(self.lbl_chan)
-        layV_chan.addWidget(self.cmb_chan)
+        layV_chan.addWidget(self.lbl_chan_import)
+        layV_chan.addWidget(self.cmb_chan_import)
 
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
@@ -157,8 +157,8 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.line_chan, 0, i, 2, 1)
         i+=1
-        layG_io_file.addWidget(self.lbl_chan, 0, i)
-        layG_io_file.addWidget(self.cmb_chan, 1, i)
+        layG_io_file.addWidget(self.lbl_chan_import, 0, i)
+        layG_io_file.addWidget(self.cmb_chan_import, 1, i)
         i+=1
         layG_io_file.addWidget(line1, 0, i, 2, 1)
         i += 1
