@@ -138,6 +138,19 @@ class Tran_IO_UI(QWidget):
 
         line1 = QVLine()
         line2 = QVLine(width=5)
+
+        self.lbl_chan_export_l = QLabel(to_html("Left", frmt="b"))
+        self.lbl_chan_export_r = QLabel(to_html("Right", frmt="b"))
+        # self.lbl_chan_export_l.setVisible(False)
+        self.cmb_select_chan_export_l = QComboBox(self)
+        qcmb_box_populate(self.cmb_select_chan_export_l,
+                          self.cmb_select_chan_export_real_items,
+                          self.cmb_select_chan_export_init)
+        self.cmb_select_chan_export_r = QComboBox(self)
+        qcmb_box_populate(self.cmb_select_chan_export_r,
+                          self.cmb_select_chan_export_real_items,
+                          self.cmb_select_chan_export_init)
+
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
@@ -167,6 +180,12 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
+        layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
+        layG_io_file.addWidget(self.cmb_select_chan_export_l, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
+        layG_io_file.addWidget(self.cmb_select_chan_export_r, 1, i)
+
 
 
         layV_io = QVBoxLayout()
