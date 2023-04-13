@@ -164,7 +164,7 @@ class Tran_IO(QWidget):
                 self.file_name[:10] + ' ... ' + self.file_name[-20:])
 
         self.ui.but_load.setEnabled(True)
-        self.ui.but_load.setText("Load")
+        self.ui.but_load.setText("Load:")
         qstyle_widget(self.ui.but_load, "normal")
         self.ui.but_normalize.setEnabled(False)
 
@@ -249,7 +249,7 @@ class Tran_IO(QWidget):
                 self.x = self.data_raw = None
                 self.emit({'data_changed': 'file_io'})
                 qstyle_widget(self.ui.but_load, "normal")
-                self.ui.but_load.setText("Load")
+                self.ui.but_load.setText("Load:")
                 return -1
             elif item == "1":  # use channel 1 (mono)
                 data = self.data_raw[:, 0]

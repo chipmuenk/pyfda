@@ -75,21 +75,18 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
-                                          checked=False)
-        self.but_csv_options.setToolTip(
-            "<span>Select CSV format and whether "
-            "to copy to/from clipboard or file.</span>")
+        self.but_load = QPushButton("Load:")
+        self.but_load.setObjectName("large")
+        self.but_load.setSizePolicy(QSizePolicy.Expanding,
+                                      QSizePolicy.Expanding)
+        self.but_load.setToolTip(
+            self.tr("<span>Load file to memory.</span>"))
+        self.but_load.setEnabled(False)
 
         self.but_select = PushButton("Select", checkable=False)
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
                    " it yet.</span>"))
-        self.but_load = PushButton("Load", checkable=False)
-        self.but_load.setToolTip(
-            self.tr("<span>Load file to memory.</span>"))
-        self.but_load.setEnabled(False)
-        self.but_load.setFixedWidth(qtext_width("Loaded"))
 
         self.lbl_file = QLabel(to_html("Name:", frmt="b"))
         self.lbl_filename = QLabel("None")
@@ -137,7 +134,15 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setText(str(self.led_normalize_default))
 
         line1 = QVLine()
+
         line2 = QVLine(width=5)
+        self.lbl_csv_options = QLabel(to_html("CSV", frmt='b'))
+        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+                                          checked=False)
+        self.but_csv_options.setToolTip(
+            "<span>Select CSV format and whether "
+            "to copy to/from clipboard or file.</span>")
+        line3 = QVLine(width=5)
 
         self.lbl_chan_export_l = QLabel(to_html("Left", frmt="b"))
         self.lbl_chan_export_r = QLabel(to_html("Right", frmt="b"))
@@ -154,10 +159,10 @@ class Tran_IO_UI(QWidget):
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
-        layG_io_file.addWidget(self.but_csv_options, 0, i)
+        layG_io_file.addWidget(self.but_load, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.but_select, 0, i)
-        layG_io_file.addWidget(self.but_load, 1, i)
+        # layG_io_file.addWidget(self.but_load, 1, i)
         i += 1
         layG_io_file.addWidget(self.lbl_file, 0, i)
         layG_io_file.addWidget(self.lbl_shape, 1, i)
@@ -179,6 +184,11 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.led_normalize, 1, i)
         i += 1
         layG_io_file.addWidget(line2, 0, i, 2, 1)
+        i += 1
+        layG_io_file.addWidget(self.lbl_csv_options, 0, i)
+        layG_io_file.addWidget(self.but_csv_options, 1, i)
+        i += 1
+        layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
         layG_io_file.addWidget(self.cmb_select_chan_export_l, 1, i)
