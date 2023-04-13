@@ -232,6 +232,7 @@ class PlotImpz_UI(QWidget):
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
 
         self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
+        self.lbl_N_frame.setVisible(False)
         self.led_N_frame = QLineEdit(self)
         self.led_N_frame.setText(str(self.N_frame))
         self.led_N_frame.setToolTip(
@@ -239,6 +240,7 @@ class PlotImpz_UI(QWidget):
             "be stopped so quickly. "
             "<i>N</i><sub>Frame</sub> = 0 calculates all samples in one frame.</span>")
         self.led_N_frame.setMaximumWidth(qtext_width(N_x=8))
+        self.led_N_frame.setVisible(False)
 
         self.frm_file_io = QFrame(self)
         self.frm_file_io.setContentsMargins(0, 0, 0, 0)
@@ -279,12 +281,12 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.cmb_sim_select)
         layH_ctrl_run.addWidget(self.prg_wdg)
         layH_ctrl_run.addSpacing(10)
+        layH_ctrl_run.addWidget(self.lbl_N_frame)
+        layH_ctrl_run.addWidget(self.led_N_frame)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
-        layH_ctrl_run.addWidget(self.lbl_N_frame)
-        layH_ctrl_run.addWidget(self.led_N_frame)
         layH_ctrl_run.addWidget(self.frm_file_io)
         layH_ctrl_run.addSpacing(5)
         layH_ctrl_run.addWidget(self.lbl_stim_cmplx_warn)
