@@ -78,7 +78,7 @@ class Tran_IO_UI(QWidget):
         self.but_load = QPushButton("Load:")
         self.but_load.setObjectName("large")
         self.but_load.setSizePolicy(QSizePolicy.Expanding,
-                                      QSizePolicy.Expanding)
+                                    QSizePolicy.Expanding)
         self.but_load.setToolTip(
             self.tr("<span>Load file to memory.</span>"))
         self.but_load.setEnabled(False)
@@ -204,13 +204,12 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
         layG_io_file.addWidget(self.cmb_select_chan_export_r, 1, i)
 
-
-
-        layV_io = QVBoxLayout()
-        layV_io.addLayout(layG_io_file)
+        # layV_io = QVBoxLayout()
+        # layV_io.addLayout(layG_io_file)
 
         layH_io = QHBoxLayout()
-        layH_io.addLayout(layV_io)
+        # layH_io.addLayout(layV_io)
+        layH_io.addLayout(layG_io_file)
         layH_io.addStretch(10)
 
         self.wdg_top = QWidget(self)
