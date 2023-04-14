@@ -561,9 +561,9 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz = QPushButtonRT(text="<b><i>E<sub>X</sub></i> = 1</b>",
                                                 margin=5)
         self.but_freq_norm_impz.setToolTip(
-            "<span>Normalize the FFT of the stimulus with <i>N<sub>FFT</sub></i> for "
-            "<i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
-            "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC and Noise need to be "
+            "<span>Normalize the FFT of an impulse stimulus with <i>N<sub>FFT</sub></i> "
+            "to an energy <i>E<sub>X</sub></i> = 1. For a dirac pulse, this yields "
+            "|<i>Y(f)</i>| = |<i>H(f)</i>|. DC, Noise and file I/O need to be "
             "turned off, window should be <b>Rectangular</b>.</span>")
         self.but_freq_norm_impz.setCheckable(True)
         self.but_freq_norm_impz.setChecked(True)
