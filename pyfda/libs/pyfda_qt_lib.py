@@ -349,7 +349,7 @@ def qstyle_widget(widget, state):
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state.
 
-    This requires settinng the property, "unpolishing" and "polishing" the widget
+    This requires setting the property, "unpolishing" and "polishing" the widget
     and finally forcing an update.
 
     - "normal": default, no color styling
