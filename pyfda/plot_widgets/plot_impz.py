@@ -147,6 +147,8 @@ class Plot_Impz(QWidget):
         # This places the combo box for adding / using file data to the
         # run control toolbar:
         self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
+        # self.color = self.ui.frm_file_io.palette().color(QPalette.Background)
+        # logger.warning(f"color = {self.color.red()}, {self.color.green()}, {self.color.blue()}")
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
@@ -190,7 +192,6 @@ class Plot_Impz(QWidget):
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
         # When user has selected a different local tab, trigger a redraw of current tab
         self.tab_mpl_w.currentChanged.connect(self.draw)  # passes # of active tab
-
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------

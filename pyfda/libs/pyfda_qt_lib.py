@@ -371,6 +371,7 @@ def qstyle_widget(widget, state):
     elif state == 'd':
         state = "disabled"
         # QLineEdit:disabled{background-color:darkgrey;}
+    # widget.setAttribute(Qt.WA_StyledBackground, True)
     widget.setProperty("state", state)
     widget.style().unpolish(widget)
     widget.style().polish(widget)
