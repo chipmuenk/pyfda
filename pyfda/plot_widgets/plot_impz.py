@@ -280,14 +280,6 @@ class Plot_Impz(QWidget):
         # logger.warning(f"w = {self.tab_mpl_w.tabBar().width()}, "
         #                f"h = {self.tab_mpl_w.tabBar().height()}")
         # tabBar height is also the width / hight of the tab icons
-        if self.tab_stim_w.currentIndex() == 1 and self.ui.frm_file_io.isEnabled():
-            # TODO: This doesn't work: # qstyle_widget(self.ui.frm_file_io, state='ok')
-            # self.ui.frm_file_io.setAttribute(Qt.WA_StyledBackground, True)
-            self.ui.frm_file_io.setStyleSheet('QComboBox{background-color:lightblue;}')
-        else:
-            # TODO: this doesn't work: # qstyle_widget(self.ui.frm_file_io, state='normal')
-            # Set background to white and fully transparent (original setting)
-            self.ui.frm_file_io.setStyleSheet('QComboBox{background-color: none;}')
 
         h_min = self.tab_stim_w.tabBar().height()
         # logger.warning(f"min hint = {self.stim_wdg.minimumSizeHint()}, h_min = {h_min}")
