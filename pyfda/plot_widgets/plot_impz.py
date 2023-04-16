@@ -480,7 +480,7 @@ class Plot_Impz(QWidget):
         """
         # No file has been loaded or number of data points is zero
         #    -> set file_io combobox to off and disable it:
-        if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
+        if not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.ui.frm_file_io.setEnabled(False)
         # File is loaded, enable file_io combobox

@@ -243,14 +243,10 @@ class Tran_IO(QWidget):
         if self.nchans == 1:
             data = self.data_raw
         else:
+            data_valid = True
             item = qget_cmb_box(self.ui.cmb_chan_import)
-
             if item == "del":  # delete data
-                self.x = self.data_raw = None
-                self.emit({'data_changed': 'file_io'})
-                qstyle_widget(self.ui.but_load, "normal")
-                self.ui.but_load.setText("Load:")
-                return -1
+                data_valid = False
             elif item == "1":  # use channel 1 (mono)
                 data = self.data_raw[:, 0]
             elif item == "2":  # use channel 2 (mono)
@@ -262,7 +258,14 @@ class Tran_IO(QWidget):
                 data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
                 logger.error(f'Unknown item "{item}"')
-                return -1
+                data_valid = False
+
+        if not data_valid:
+            self.x = self.data_raw = None
+            qstyle_widget(self.ui.but_load, "normal")
+            self.ui.but_load.setText("Load:")
+            self.emit({'data_changed': 'file_io'})
+            return -1
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
