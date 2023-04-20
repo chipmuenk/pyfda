@@ -133,12 +133,49 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> N
         if type(items_list[i][1]) == QtGui.QIcon:
             cmb_box.addItem("", items_list[i][0])
             cmb_box.setItemIcon(i-1, items_list[i][1])
-            # cmb_box.setItemData(i-1, items_list[i][0])
         else:
             cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
         if len(items_list[i]) == 3:  # add item tool tip (optional)
             cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
     qset_cmb_box(cmb_box, item_init, data=True)
+
+    """ icon = QIcon('logo.png')
+    # adding icon to the given index
+    self.combo_box.setItemIcon(i, icon)
+    size = QSize(10, 10)
+    self.combo_box.setIconSize(size)  """
+
+# ------------------------------------------------------------------------------
+def qcmb_box_add_items(cmb_box: QComboBox, items_list: list) -> None:
+    """
+    Add items to combo box `cmb_box` with text, data and tooltip from the list
+    `items_list`.
+
+    Text and tooltip are prepared for translation via `self.tr()`
+
+    Parameters
+    ----------
+
+    cmb_box: instance of QComboBox
+        Combobox to be populated
+
+    items_list: list
+        List of combobox entries, in the format
+         ("data 1st item", "text 1st item", "tooltip for 1st item" # [optional]),
+         ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
+
+    Returns
+    -------
+    None
+    """
+    for i in range(0, len(items_list)):
+        if type(items_list[i][1]) == QtGui.QIcon:
+            cmb_box.addItem("", items_list[i][0])
+            cmb_box.setItemIcon(i-1, items_list[i][1])
+        else:
+            cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
+        if len(items_list[i]) == 3:  # add item tool tip (optional)
+            cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
 
     """ icon = QIcon('logo.png')
     # adding icon to the given index
