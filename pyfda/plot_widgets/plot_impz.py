@@ -388,7 +388,6 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc or (fb.fil[0]['fx_sim'] and self.needs_calc_fx):
 
-                N_end = 0
                 # new file has been loaded
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
@@ -549,7 +548,7 @@ class Plot_Impz(QWidget):
             # TODO: np.iscomplexobj() returns true for an array with dtype complex
             #       although each item is real.
             self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
- 
+
             self.cmplx =\
                 (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
