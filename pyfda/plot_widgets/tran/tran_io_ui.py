@@ -29,7 +29,7 @@ class Tran_IO_UI(QWidget):
     def __init__(self, parent=None):
 
         # combobox tooltip + data / text / tooltip for channel import
-        self.cmb_select_chan_import_items = [
+        self.cmb_chan_import_items = [
             "<span>Select channel / column for data import. '&Sigma;' "
             "sums up all columns.</span>",
             ("del", "x", "Unload data from memory"),
@@ -38,22 +38,21 @@ class Tran_IO_UI(QWidget):
             ("12", "1|2", "Use data from both channels (stereo)"),
             ("sum", "Σ", "Sum data from both channels (mono)")
         ]
-        self.cmb_select_chan_import_init = "1"
+        self.cmb_chan_import_init = "1"
 
         self.led_normalize_default = 1  # default setting for normalization
 
         # combobox tooltip + data / text / item tooltip for channel export (real data)
-        self.cmb_select_chan_export_real_items = [
+        self.cmb_chan_export_real_items = [
             "<span>Select signals for data export. '&Sigma;' "
             "sums up all columns.</span>",
             ("none", "none", "no data"),
             ("x", "x", "Stimuli"),
             ("y", "y", "Response")
         ]
-        self.cmb_select_chan_export_init = "x"
 
         # combobox tooltip + data / text / item tooltip for channel export (complex data)
-        self.cmb_select_chan_export_complex_items = [
+        self.cmb_chan_export_complex_items = [
             "<span>Select signals for data export. '&Sigma;' "
             "sums up all columns.</span>",
             ("none", "none", "no data"),
@@ -62,7 +61,8 @@ class Tran_IO_UI(QWidget):
             ("y_re", "y_re", "Response (real part)"),
             ("y_im", "y_im", "Response (imag. part)")
         ]
-        self.cmb_select_chan_export_init = "x_re"
+        self.cmb_chan_export_cur_item_l = "x"
+        self.cmb_chan_export_cur_item_r = "y"
 
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
@@ -114,8 +114,8 @@ class Tran_IO_UI(QWidget):
         self.lbl_chan_import.setVisible(False)
         self.cmb_chan_import = QComboBox(self)
         qcmb_box_populate(
-            self.cmb_chan_import, self.cmb_select_chan_import_items,
-            self.cmb_select_chan_import_init)
+            self.cmb_chan_import, self.cmb_chan_import_items,
+            self.cmb_chan_import_init)
         self.cmb_chan_import.setVisible(False)
 
         layV_chan = QVBoxLayout()
@@ -151,16 +151,15 @@ class Tran_IO_UI(QWidget):
         self.but_export.setToolTip(
             self.tr("<span>Save selected signals to R/L file channels.</span>"))
         self.lbl_chan_export_l = QLabel(to_html("Left", frmt="b"))
+        self.cmb_chan_export_l = QComboBox(self)
         self.lbl_chan_export_r = QLabel(to_html("Right", frmt="b"))
-        # self.lbl_chan_export_l.setVisible(False)
-        self.cmb_select_chan_export_l = QComboBox(self)
-        qcmb_box_populate(self.cmb_select_chan_export_l,
-                          self.cmb_select_chan_export_real_items,
-                          self.cmb_select_chan_export_init)
-        self.cmb_select_chan_export_r = QComboBox(self)
-        qcmb_box_populate(self.cmb_select_chan_export_r,
-                          self.cmb_select_chan_export_real_items,
-                          self.cmb_select_chan_export_init)
+        self.cmb_chan_export_r = QComboBox(self)
+        qcmb_box_populate(self.cmb_chan_export_l,
+                            self.cmb_chan_export_real_items,
+                            self.cmb_chan_export_cur_item_l)
+        qcmb_box_populate(self.cmb_chan_export_r,
+                            self.cmb_chan_export_real_items,
+                            self.cmb_chan_export_cur_item_r)
 
         #-------------------------------
         layG_io_file = QGridLayout()
@@ -199,10 +198,10 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.but_export, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
-        layG_io_file.addWidget(self.cmb_select_chan_export_l, 1, i)
+        layG_io_file.addWidget(self.cmb_chan_export_l, 1, i)
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
-        layG_io_file.addWidget(self.cmb_select_chan_export_r, 1, i)
+        layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
 
         # layV_io = QVBoxLayout()
         # layV_io.addLayout(layG_io_file)
