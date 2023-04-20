@@ -703,6 +703,7 @@ class Plot_Impz(QWidget):
         - Calculate simulation time
         - Draw the signals
         - Reset Run Icon to normal state, reset `needs_calc` flag
+        - Update File IO save combo boxes
 
         """
         # step error calculation: calculate system DC response and subtract it
@@ -729,6 +730,8 @@ class Plot_Impz(QWidget):
                     .format((time.process_time() - self.t_resp)*1000, self.fx_str))
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
+        # update Tran_IO ui, depending on complex and fixpoint status
+        self.file_io_wdg.ui.update_ui(cmplx=self.cmplx, fx=fb.fil[0]['fx_sim'])
 
         if fb.fil[0]['fx_sim']:
             self.emit({'fx_sim': 'finish'})

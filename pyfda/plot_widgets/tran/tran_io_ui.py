@@ -15,7 +15,9 @@ from pyfda.libs.compat import (
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html
-from pyfda.libs.pyfda_qt_lib import QVLine, PushButton, qtext_width, qcmb_box_populate
+from pyfda.libs.pyfda_qt_lib import (
+    QVLine, PushButton, qget_cmb_box, qcmb_box_populate, qcmb_box_add_items,
+    qcmb_box_del_item)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -49,6 +51,17 @@ class Tran_IO_UI(QWidget):
             ("none", "none", "no data"),
             ("x", "x", "Stimuli"),
             ("y", "y", "Response")
+        ]
+
+        # additional data / text / item tooltip for channel export (real_fx data)
+        self.cmb_chan_export_real_fx_items = [
+            ("x_Q", "x_Q", "Quantized stimuli")
+        ]
+
+        # additional data / text / item tooltip for channel export (complex_fx data)
+        self.cmb_chan_export_complex_fx_items = [
+            ("x_re_Q", "x_re_Q", "Quantized stimuli (real part)"),
+            ("x_im_Q", "x_im_Q", "Quantized stimuli (imag. part)")
         ]
 
         # combobox tooltip + data / text / item tooltip for channel export (complex data)
@@ -214,6 +227,42 @@ class Tran_IO_UI(QWidget):
         self.wdg_top = QWidget(self)
         self.wdg_top.setLayout(layH_io)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+    # -------------------------------------------------------------------------
+    def update_ui(self, cmplx=False, fx=False):
+        """
+        Update the combo boxes for file saving, depending on whether signals are complex
+        and fixpoint simulation has been selected.
+        """
+        self.cmb_chan_export_cur_item_l = qget_cmb_box(self.cmb_chan_export_l)
+        self.cmb_chan_export_cur_item_r = qget_cmb_box(self.cmb_chan_export_r)
+        if cmplx:
+            qcmb_box_populate(self.cmb_chan_export_l,
+                            self.cmb_chan_export_complex_items,
+                            self.cmb_chan_export_cur_item_l)
+            qcmb_box_populate(self.cmb_chan_export_r,
+                            self.cmb_chan_export_complex_items,
+                            self.cmb_chan_export_cur_item_r)
+            if fx:
+                qcmb_box_add_items(self.cmb_chan_export_l,
+                                   self.cmb_chan_export_complex_fx_items)
+                qcmb_box_add_items(self.cmb_chan_export_r,
+                                   self.cmb_chan_export_complex_fx_items)
+        else:
+            qcmb_box_populate(self.cmb_chan_export_l,
+                            self.cmb_chan_export_real_items,
+                            self.cmb_chan_export_cur_item_l)
+            qcmb_box_populate(self.cmb_chan_export_r,
+                            self.cmb_chan_export_real_items,
+                            self.cmb_chan_export_cur_item_r)
+            if fx:
+                qcmb_box_add_items(self.cmb_chan_export_l,
+                                   self.cmb_chan_export_real_fx_items)
+                qcmb_box_add_items(self.cmb_chan_export_r,
+                                   self.cmb_chan_export_real_fx_items)
+            else:
+                qcmb_box_del_item(self.cmb_chan_export_l, "x_Q")
+                qcmb_box_del_item(self.cmb_chan_export_r, "x_Q")
 
 # ================================================================================
 if __name__ == "__main__":
