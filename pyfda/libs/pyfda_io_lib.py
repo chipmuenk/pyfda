@@ -1078,7 +1078,7 @@ def export_data(parent: object, data: str, fkey: str = "", title: str = "Export"
 
 
 # ------------------------------------------------------------------------------
-def generate_header(title: str) -> str:
+def coe_header(title: str) -> str:
     """
     Generate a file header (comment) for various FPGA FIR coefficient export formats
     with information on the filter type, corner frequencies, ripple etc
@@ -1207,7 +1207,7 @@ def export_coe_xilinx(f: TextIO) -> None:
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
-    exp_str = "; " + generate_header(
+    exp_str = "; " + coe_header(
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file").replace("\n", "\n; ")
 
     exp_str += "\nRadix = {0};\n".format(coe_radix)
@@ -1287,7 +1287,7 @@ def export_coe_vhdl_package(f: TextIO) -> None:
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
-    exp_str = "-- " + generate_header(
+    exp_str = "-- " + coe_header(
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
