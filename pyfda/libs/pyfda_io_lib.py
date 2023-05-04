@@ -800,9 +800,12 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def select_file(parent: object, title: str = "Import", mode: str = "r",
+def select_file(parent: object, title: str = "", mode: str = "r",
                 file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
     """
+    Select a file from a file dialog box for either reading or writing and return
+    the selected name and file type.
+
     Parameters
     ----------
     title : str
@@ -828,12 +831,17 @@ def select_file(parent: object, title: str = "Import", mode: str = "r",
     file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
     dlg = QFileDialog(parent)  # create instance for QFileDialog
-    dlg.setWindowTitle(title)
     dlg.setDirectory(dirs.last_file_dir)
     if mode in {"r", "rb"}:
+        if title == "":
+            title = "Import"
+        dlg.setWindowTitle(title)
         dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
         dlg.setFileMode(QFileDialog.ExistingFile)
     elif mode in {"w", "wb"}:
+        if title == "":
+            title = "Export"
+        dlg.setWindowTitle(title)
         dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
         dlg.setFileMode(QFileDialog.AnyFile)
     else:
