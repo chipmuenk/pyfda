@@ -145,7 +145,7 @@ class Tran_IO(QWidget):
 
         if self.nchans > 2:
             logger.warning(
-                f"Unsuitable file format with {io.read_csv_info} > 2 channels.")
+                f"Unsuitable file format with {self.nchans} > 2 channels.")
             self.file_load_status = 'error'
             return -1
         elif self.nchans == 1:
