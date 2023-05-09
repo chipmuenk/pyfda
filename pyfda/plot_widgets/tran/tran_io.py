@@ -105,7 +105,7 @@ class Tran_IO(QWidget):
         file_type_prev = self.file_type
 
         self.file_name, self.file_type = io.select_file(
-            self, title="Import Data", mode="r", file_types=('csv', 'wav'))
+            self, title="Select file for data import", mode="r", file_types=('csv', 'wav'))
 
         if self.file_name is None:  # operation cancelled
             self.file_name = file_name_prev

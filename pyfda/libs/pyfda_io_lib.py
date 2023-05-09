@@ -1423,7 +1423,7 @@ def save_filter(self):
     Save filter as zipped binary numpy array or pickle object
     """
     file_name, file_type = select_file(
-        self, title="Load Filter", mode='wb', file_types = ("npz", "pkl"))
+        self, title="Save Filter", mode='wb', file_types = ("npz", "pkl"))
 
     if file_name is None:
         return -1  # operation cancelled or other error
