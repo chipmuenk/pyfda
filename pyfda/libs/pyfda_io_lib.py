@@ -11,6 +11,7 @@ Library with classes and functions for file and text IO
 """
 import os, re, io
 import csv
+import wave
 import datetime
 import warnings
 from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
@@ -952,6 +953,92 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
         return None
 
+# ------------------------------------------------------------------------------
+def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
+                    title: str = "Export"):
+    """
+    Export a frame of data in wav format
+
+    Parameters
+    ----------
+    parent: handle to calling instance for creating file dialog instance
+
+    data: np.array
+        data to be exported
+
+    title: str
+        title string for the file dialog box (e.g. "audio data ")
+
+    """
+    file_name, file_type = select_file(parent, title=title, mode='wb', file_types=('wav'))
+    if file_name is None:
+        return None  # file operation cancelled or other error
+
+    try:
+        if np.ndim(data) == 1:  # mono
+            audio = data
+            n_chan = 1
+        elif np.ndim(data) != 2:
+            logger.error(f"Unsuitable data format, ndim = {np.ndim(data)}.")
+            return
+        elif np.shape(data)[1] != 2:
+            logger.error(f"Unsuitable number of channels = {np.shape(data)[1]}")
+            return
+        else:
+            audio = data.T  # transpose data
+            n_chan = np.shape(data)[1]
+            # audio = np.array([left_channel, right_channel]).T
+        with wave.open(file_name, "w") as f:
+            # 2 Channels.
+            f.setnchannels(n_chan)
+            # 2 bytes per sample.
+            f.setsampwidth(2)
+            f.setframerate(f_S)
+            f.writeframes(audio.tobytes())
+        with open(file_name, 'w', encoding="utf8", newline='') as f:
+                        f.write(data)
+
+        logger.info(f'Filter saved as\n\t"{file_name}"')
+
+    except IOError as e:
+        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
+
+# ------------------------------------------------------------------------------
+def write_np_wav(parent, file_name, data: np.array, f_S = 1, title: str = "Export"):
+    """
+    Export numpy array data in wav format
+
+    Parameters
+    ----------
+    parent: handle to calling instance for creating file dialog instance
+
+    data: np.array
+        data to be exported
+
+    title: str
+        title string for the file dialog box (e.g. "audio data ")
+
+    """
+    file_name, file_type = select_file(parent, title=title, mode='wb', file_types=('wav'))
+    if file_name is None:
+        return None  # file operation cancelled or other error
+
+    try:
+        if np.ndim(data) < 1 or np.ndim(data) > 2:
+            logger.error(f"Unsuitable data format, ndim = {np.ndim(data)}.")
+            return
+        else:
+            audio = data.T  # transpose data, needed?
+
+        wavfile.write(file_name, f_S, data)
+        # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
+        # The bits-per-sample and PCM/float will be determined by the data-type
+        # uint8, int16, int32, float32
+
+        logger.info(f'Filter saved as\n\t"{file_name}"')
+
+    except IOError as e:
+        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
 
 # ------------------------------------------------------------------------------
 def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
