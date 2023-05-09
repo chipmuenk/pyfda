@@ -350,6 +350,25 @@ def np_type(a):
 
 
 # -----------------------------------------------------------------------------
+def np_shape(data):
+    """
+    Return the shape of `data` as tuple (rows, columns) for up to
+    2-dimensional data. Otherwise, return None
+    """
+    d = np.ndim(data)
+    if d == 0:
+        return (0, 0)
+    elif d == 1:
+        return(len(data), 1)
+    elif  d == 2:
+        return np.shape(data)
+    else:
+        logger.warning("Unsuitable data shape with "
+        f"{d} dimensions.")
+        return (None, None)
+
+
+# -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
     """
     Add the key:value pairs of `default_dict` to dictionary `d` for all missing
