@@ -553,6 +553,8 @@ def csv2array(f: TextIO):
     if use_header:
         logger.info("Header detected:\n{0}".format(next(data_iter, None)))
 
+    csv2array.info = f"'{lineterminator}' # '{delimiter}'"
+
     # ------- Read CSV file into a list --------------------
     data_list = []
     try:
@@ -595,6 +597,7 @@ def csv2array(f: TextIO):
                 or params['CSV']['orientation'] == 'auto' and cols > rows:
             # returned table is transposed, swap cols and rows
             logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
+            csv2array.info = "T:" + csv2array.info
             return data_arr.T
         else:
             logger.info(f"Building table with {cols} column(s) and {rows} rows.")
