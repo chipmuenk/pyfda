@@ -236,12 +236,12 @@ class Tran_IO(QWidget):
 
 
         """
-        logger.info("select_chan_normalize")
+#        logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
             return -1
-        logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
-        logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
+        # logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
+        # logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
 
         if self.nchans == 1:
             data = self.data_raw
@@ -284,8 +284,6 @@ class Tran_IO(QWidget):
         self.ui.but_load.setText("Loaded")
         self.ui.but_load.setEnabled(True)
         self.ui.but_normalize.setEnabled(True)
-
-        logger.warning(f"normalized data: rows x columns = {np.shape(self.x)}, {self.x.dtype}")
 
         self.emit({'data_changed': 'file_io'})
         return 0
