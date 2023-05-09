@@ -227,11 +227,14 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
-        - For two channel data, select one channel, average the channels or
-          from `self.data_raw`
+        - For two channel `data_raw`, assign one channel or the sum of both channels
+          to `data`. Alternatively, assign one channel of `data_raw` as real and the
+          other as imaginary component of `data`.
 
-        - Scale `self.data` to the maximum specified by self.ui.led_normalize and
-            assign normalized result to `self.x`
+        - Scale `data` to the maximum specified by `self.ui.led_normalize` and
+            assign normalized result to `self.x`.
+
+
         """
         logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
