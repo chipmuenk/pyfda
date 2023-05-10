@@ -137,7 +137,7 @@ class Tran_IO(QWidget):
             self.ui.frm_f_s.setVisible(False)
             self.N = io.read_csv_info.N
             self.nchans = io.read_csv_info.nchans
-            info_str = f" ({io.read_csv_info.info})"
+            info_str = f" ({io.import_data.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
             self.file_load_status = 'error'

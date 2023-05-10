@@ -464,6 +464,7 @@ def csv2array(f: TextIO):
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
     io_error = ""  # initialize string for I/O error messages
+    csv2array.info_str = ""  # initialize function attribute
     CSV_dict = params['CSV']
     try:
         header = CSV_dict['header'].lower()
@@ -597,7 +598,7 @@ def csv2array(f: TextIO):
                 or params['CSV']['orientation'] == 'auto' and cols > rows:
             # returned table is transposed, swap cols and rows
             logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
-            csv2array.info = "T:" + csv2array.info
+            csv2array.info_str = "T:" + csv2array.info_str
             return data_arr.T
         else:
             logger.info(f"Building table with {cols} column(s) and {rows} rows.")
@@ -711,7 +712,7 @@ def read_csv_info(filename):
     read_csv_info.file_size = file_size
     read_csv_info.N = N
     read_csv_info.nchans = nchans
-    read_csv_info.info = f"{transpose} '{lineterminator}' # '{delimiter}'"
+    read_csv_info.info_str = f"{transpose} '{lineterminator}' # '{delimiter}'"
 
     return 0
 
@@ -898,6 +899,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     ndarray of float
         Data from the file
     """
+    import_data.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled
         return -1
 
@@ -912,9 +914,11 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
+                import_data.info_str = csv2array.info_str
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
+                    import_data.info_str = ""
                     logger.error(f"Error loading file '{file_name}':\n{data_arr}")
                     return None
         else:
