@@ -553,7 +553,7 @@ def csv2array(f: TextIO):
     if use_header:
         logger.info("Header detected:\n{0}".format(next(data_iter, None)))
 
-    csv2array.info = f"'{lineterminator}' # '{delimiter}'"
+    csv2array.info_str = f"'{repr(lineterminator)}' # '{repr(delimiter)}'"
 
     # ------- Read CSV file into a list --------------------
     data_list = []
