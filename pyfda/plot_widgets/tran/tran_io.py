@@ -14,7 +14,7 @@ import numpy as np
 
 import pyfda.libs.pyfda_io_lib as io
 
-from pyfda.libs.pyfda_lib import safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import safe_eval, pprint_log, np_shape
 from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box
 from pyfda.libs.csv_option_box import CSV_option_box
 import pyfda.libs.pyfda_dirs as dirs
@@ -92,7 +92,7 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_file(self):
         """
-        Select a file in a UI dialog and peek into it to find the dimensions
+        Select a file in a UI dialog (CSV or WAV) and try to find the dimensions
         and some other infos (depending on the file type).
 
         When the selection was successful, store the fully qualified file name
@@ -117,9 +117,14 @@ class Tran_IO(QWidget):
         self.f_S = None
         self.WL = None
 
+        info_str = ""
+
         if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
+                return -1
+            self.data_raw = io.import_data(self.file_name, 'wav')
+            if np.isscalar(self.data_raw):  # None or -1
                 return -1
             self.N = io.read_wav_info.N
             self.nchans = io.read_wav_info.nchans
@@ -130,13 +135,22 @@ class Tran_IO(QWidget):
             self.ui.lbl_f_s_value.setText(str(self.f_S))
 
         elif self.file_type == 'csv':
-            ret = io.read_csv_info(self.file_name)
-            if ret < 0:
-                self.file_load_status = 'error'
-                return -1
             self.ui.frm_f_s.setVisible(False)
-            self.N = io.read_csv_info.N
-            self.nchans = io.read_csv_info.nchans
+            # ret = io.read_csv_info(self.file_name)
+            # if ret < 0:
+            #     self.file_load_status = 'error'
+            #     return -1
+            # self.N = io.read_csv_info.N
+            # self.nchans = io.read_csv_info.nchans
+            # info_str = f" ({io.read_csv_info.info})"
+            self.data_raw = io.import_data(self.file_name, 'csv')
+            # data = io.csv2array(self.file_name)
+
+            self.N, self.nchans = np_shape(self.data_raw)
+            if self.N in {None, 0}:  # data is scalar, None or multidim
+                self.file_load_status = 'error'
+                logger.warning("Unsuitable data format")
+                return -1
             info_str = f" ({io.import_data.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
@@ -177,48 +191,54 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def import_data(self):
         logger.info("import data")
+        # TODO:
+        # test_column_FIR_default_MAC.csv yields nchan = 6 > 2 (additional linebreaks)
+        # crashes with when selecting 1 | 2 
+        # line 264, in select_chan_normalize
+        # if data_raw.ndim == 1:
+        #       AttributeError: 'int' object has no attribute 'ndim'
+        # test_row_ba_IIR_header.csv crashes due to header?
         err = False
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
             self.ui.but_load.setEnabled(False)
             self.file_load_status = 'none'
             return -1
-
-        self.data_raw = io.import_data(self.file_name, self.file_type)
-        logger.warning(f"data_raw: {np.shape(self.data_raw)}")
-
-        if self.data_raw is None:  # file operation cancelled
-            err = True
-        elif type(self.data_raw) != np.ndarray:
+        try:
+            # use np.ravel() to enforce ndim == 1 instead for (N, 1) arrays which have
+            # ndim == 2. ravel() creates only a view on the array, not a new array.
+            self.data_raw = np.ravel(io.import_data(self.file_name, self.file_type))
+            logger.info(f"data_raw: {np.shape(self.data_raw)}")
+        except TypeError:
             logger.warning("Unsuitable file / data format")
             err = True
+
+        # if self.data_raw is None:  # file operation cancelled
+        #     err = True
+        # elif type(self.data_raw) != np.ndarray:
+        #     logger.warning("Unsuitable file / data format")
+        #     err = True
 
         if err:
             self.ui.but_load.setEnabled(False)
             self.file_load_status = 'error'
             return -1
 
-        if self.data_raw.ndim == 1:
-            nchans_actual = 1
-            N_actual = len(self.data_raw)
-            logger.warning(f"imported data: ndim = 1, len = {len(self.data_raw)}")
-        elif self.data_raw.ndim == 2:
-            N_actual, nchans_actual = np.shape(self.data_raw)
-            logger.warning(f"imported data: ndim = 2, rows (N) x colums (chans) = {np.shape(self.data_raw)}")
-        else:
+        if self.data_raw.ndim < 1 or self.data_raw.ndim > 2:
             logger.warning("Unsuitable data shape with "
                            f"{self.data_raw.ndim} dimensions.")
             self.file_load_status = 'error'
             return -1
 
-        # if (nchans_actual, N_actual) != (self.nchans, self.N):
-        #     logger.warning(f"Actual data shape {(nchans_actual, N_actual)} is different "
-        #                    f"from guestimated shape {(self.nchans, self.N)}, "
-        #                    "using actual shape.")
-        #     self.nchans, self.N = (nchans_actual, N_actual)
-
-        if self.select_chan_normalize() == 0:
+        if np.any(self.select_chan_normalize()):
             self.file_load_status = 'loaded'
+            if self.data_raw.ndim == 1:
+                r = len(self.data_raw)
+                c = 1
+            else:
+                r, c = np.shape(self.data_raw)
+            logger.info(
+                f"Imported data with N = {r} rows and N_chans = {c} columns.")
             return 0
         else:
             self.file_load_status = 'error'
@@ -233,20 +253,22 @@ class Tran_IO(QWidget):
 
         - Scale `data` to the maximum specified by `self.ui.led_normalize` and
             assign normalized result to `self.x`.
-
-
         """
 #        logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
-            return -1
+            return None
         # logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
         # logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
-
-        if self.nchans == 1:
+        logger.info(type(self.data_raw))
+        logger.info(pprint_log(self.data_raw))
+#        if self.nchans == 1:
+        if self.data_raw.ndim == 1:
             data = self.data_raw
-        else:
             data_valid = True
+        else:
+            # TODO: Fails for "test_column_FIR_27.csv" due to wrong ndim / Nchans
+            data_valid = True  # default
             item = qget_cmb_box(self.ui.cmb_chan_import)
             if item == "del":  # delete data
                 data_valid = False
@@ -268,7 +290,7 @@ class Tran_IO(QWidget):
             qstyle_widget(self.ui.but_load, "normal")
             self.ui.but_load.setText("Load:")
             self.emit({'data_changed': 'file_io'})
-            return -1
+            return None
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
@@ -276,9 +298,9 @@ class Tran_IO(QWidget):
             self.ui.led_normalize.setText(str(self.norm))
             # use data.ravel() to enforce ndim == 1 instead of (N, 1) which is ndim == 2
             # ravel() creates only a view on the array, not a new array.
-            self.x = data.ravel() * self.norm / np.max(np.abs(data))
+            self.x = data * self.norm / np.max(np.abs(data))  # .ravel()
         else:
-            self.x = data.ravel()
+            self.x = data  # .ravel()
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
@@ -286,7 +308,7 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.setEnabled(True)
 
         self.emit({'data_changed': 'file_io'})
-        return 0
+        return self.x
 
     # ------------------------------------------------------------------------------
     def open_csv_win(self):
