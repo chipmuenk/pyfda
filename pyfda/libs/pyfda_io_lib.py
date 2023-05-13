@@ -896,8 +896,8 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 
     Returns
     -------
-    ndarray of float
-        Data from the file
+    ndarray of float or int
+        Data from the file (ndarray) or None (error), -1 for file cancel
     """
     import_data.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled
