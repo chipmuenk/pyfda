@@ -655,7 +655,9 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
 #-------------------------------------------------------------------------------
 def read_csv_info(filename):
+#-------------------------------------------------------------------------------
     """
+    DON'T USE ANYMORE!
     Get infos about the size of a csv file without actually loading the whole
     file into memory.
 
