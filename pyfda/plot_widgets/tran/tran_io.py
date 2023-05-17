@@ -80,7 +80,7 @@ class Tran_IO(QWidget):
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
-        self.ui.but_select.clicked.connect(self.select_file)
+        self.ui.but_select.clicked.connect(self.load_data_raw)
         self.ui.cmb_chan_import.currentIndexChanged.connect(self.select_chan_normalize)
         self.ui.but_load.clicked.connect(self.import_data)
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
@@ -90,7 +90,7 @@ class Tran_IO(QWidget):
         self.setLayout(layVMain)
 
     # ------------------------------------------------------------------------------
-    def select_file(self):
+    def load_data_raw(self):
         """
         Select a file in a UI dialog (CSV or WAV) and load it into `self.data_raw`
         Try to find the dimensions and some other infos.
