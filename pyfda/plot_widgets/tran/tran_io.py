@@ -92,10 +92,10 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_file(self):
         """
-        Select a file in a UI dialog (CSV or WAV) and try to find the dimensions
-        and some other infos (depending on the file type).
+        Select a file in a UI dialog (CSV or WAV) and load it into `self.data_raw`
+        Try to find the dimensions and some other infos.
 
-        When the selection was successful, store the fully qualified file name
+        When loading the file was successful, store the fully qualified file name
         and the file type in the attributes `self.file_name` and `self.file_type`
         and return 0.
         When an error occurred, return -1.
@@ -136,15 +136,7 @@ class Tran_IO(QWidget):
 
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
-            # ret = io.read_csv_info(self.file_name)
-            # if ret < 0:
-            #     self.file_load_status = 'error'
-            #     return -1
-            # self.N = io.read_csv_info.N
-            # self.nchans = io.read_csv_info.nchans
-            # info_str = f" ({io.read_csv_info.info})"
             self.data_raw = io.import_data(self.file_name, 'csv')
-            # data = io.csv2array(self.file_name)
 
             self.N, self.nchans = np_shape(self.data_raw)
             if self.N in {None, 0}:  # data is scalar, None or multidim
@@ -190,14 +182,10 @@ class Tran_IO(QWidget):
 
     # ------------------------------------------------------------------------------
     def import_data(self):
+        # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
+        # TODO: Data is read for the second time here?!
+        # TODO: getProperty() doesn't exist
         logger.info("import data")
-        # TODO:
-        # test_column_FIR_default_MAC.csv yields nchan = 6 > 2 (additional linebreaks)
-        # crashes with when selecting 1 | 2 
-        # line 264, in select_chan_normalize
-        # if data_raw.ndim == 1:
-        #       AttributeError: 'int' object has no attribute 'ndim'
-        # test_row_ba_IIR_header.csv crashes due to header?
         err = False
         if self.file_name is None:
             logger.warning("No valid file has been selected yet!")
@@ -247,27 +235,34 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
-        - For two channel `data_raw`, assign one channel or the sum of both channels
-          to `data`. Alternatively, assign one channel of `data_raw` as real and the
+        `select_chan_normalize()` is triggered by `import_data()` and by signal-slot
+        connections
+            * self.ui.cmb_chan_import.currentIndexChanged
+            * self.ui.but_normalize.clicked
+            * self.ui.led_normalize.editingFinished
+
+        It processes `self.data_raw` and yields `self.x` as a result.
+
+        - For two channel `self.data_raw`, assign one channel or the sum of both channels
+          to `data`. Alternatively, assign one channel of `self.data_raw` as real and the
           other as imaginary component of `data`.
 
         - Scale `data` to the maximum specified by `self.ui.led_normalize` and
             assign normalized result to `self.x`.
         """
-#        logger.info("select_chan_normalize")
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
             return None
-        # logger.warning(f"self.data_raw: rows x columns = {np.shape(self.data_raw)}")
-        # logger.warning(f"self.data_raw: {pprint_log(self.data_raw)}")
+
         logger.info(type(self.data_raw))
         logger.info(pprint_log(self.data_raw))
-#        if self.nchans == 1:
+
         if self.data_raw.ndim == 1:
             data = self.data_raw
             data_valid = True
         else:
-            # TODO: Fails for "test_column_FIR_27.csv" due to wrong ndim / Nchans
+            # TODO: Delete data should not be in the combo box but be triggered by 
+            #       unloading LOAD button
             data_valid = True  # default
             item = qget_cmb_box(self.ui.cmb_chan_import)
             if item == "del":  # delete data
@@ -294,11 +289,7 @@ class Tran_IO(QWidget):
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
-            # logger.info(f"norm: {type(self.norm)}, data: {type(self.data)} / {self.data.dtype}")
             self.ui.led_normalize.setText(str(self.norm))
-            # use data.ravel() to enforce ndim == 1 instead of (N, 1) which is ndim == 2
-            # ravel() creates only a view on the array, not a new array.
-            self.x = data * self.norm / np.max(np.abs(data))  # .ravel()
         else:
             self.x = data  # .ravel()
 
