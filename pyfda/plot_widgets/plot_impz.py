@@ -555,7 +555,8 @@ class Plot_Impz(QWidget):
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
                     or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
                 or (qget_cmb_box(self.stim_wdg.ui.cmb_file_io) in {"use", "add"}
-                    and self.file_io_wdg.file_load_status == 'loaded'
+                    and self.file_io_wdg.ui.but_load.property("state") == 'ok'
+                    # and self.file_io_wdg.file_load_status == 'loaded'
                     and np.iscomplexobj(self.file_io_wdg.x))\
                 or np.any(np.iscomplex(x_test))
 
