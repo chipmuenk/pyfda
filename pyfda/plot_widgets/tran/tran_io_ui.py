@@ -32,9 +32,8 @@ class Tran_IO_UI(QWidget):
 
         # combobox tooltip + data / text / tooltip for channel import
         self.cmb_chan_import_items = [
-            "<span>Select channel / column for data import. '&Sigma;' "
-            "sums up all columns.</span>",
-            ("del", "x", "Unload data from memory"),
+            "<span>Select channel(s) / column(s) for data import. '&Sigma;' "
+            "sums up the columns.</span>",
             ("1", "1", "Use data from channel 1 (left, mono)"),
             ("2", "2", "Use data from channel 2 (right, mono)"),
             ("12", "1|2", "Use data from both channels (stereo)"),
@@ -93,10 +92,13 @@ class Tran_IO_UI(QWidget):
         self.but_load.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_load.setToolTip(
-            self.tr("<span>Load file to memory.</span>"))
+            self.tr("<span>Load / unload file.</span>"))
         self.but_load.setEnabled(False)
 
         self.but_select = PushButton("Select", checkable=False)
+        self.but_select.setObjectName("large")
+        self.but_select.setSizePolicy(QSizePolicy.Expanding,
+                                    QSizePolicy.Expanding)
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
                    " it yet.</span>"))
@@ -121,9 +123,7 @@ class Tran_IO_UI(QWidget):
         self.frm_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s.setVisible(False)
 
-        self.line_chan = QVLine()
-        self.line_chan.setVisible(False)
-        self.lbl_chan_import = QLabel(to_html("Col.", frmt="b"))
+        self.lbl_chan_import = QLabel(to_html("Column", frmt="b"))
         self.lbl_chan_import.setVisible(False)
         self.cmb_chan_import = QComboBox(self)
         qcmb_box_populate(
@@ -177,10 +177,8 @@ class Tran_IO_UI(QWidget):
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
-        layG_io_file.addWidget(self.but_load, 0, i, 2, 1)
-        i += 1
         layG_io_file.addWidget(self.but_select, 0, i)
-        # layG_io_file.addWidget(self.but_load, 1, i)
+        layG_io_file.addWidget(self.but_load, 1, i)
         i += 1
         layG_io_file.addWidget(self.lbl_file, 0, i)
         layG_io_file.addWidget(self.lbl_shape, 1, i)
@@ -190,8 +188,6 @@ class Tran_IO_UI(QWidget):
         i += 1
         # row 0 is used by the file name
         layG_io_file.addWidget(self.frm_f_s, 1, i)
-        i += 1
-        layG_io_file.addWidget(self.line_chan, 0, i, 2, 1)
         i+=1
         layG_io_file.addWidget(self.lbl_chan_import, 0, i)
         layG_io_file.addWidget(self.cmb_chan_import, 1, i)
@@ -216,11 +212,7 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
 
-        # layV_io = QVBoxLayout()
-        # layV_io.addLayout(layG_io_file)
-
         layH_io = QHBoxLayout()
-        # layH_io.addLayout(layV_io)
         layH_io.addLayout(layG_io_file)
         layH_io.addStretch(10)
 

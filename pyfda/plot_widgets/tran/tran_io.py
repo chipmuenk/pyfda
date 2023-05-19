@@ -157,11 +157,9 @@ class Tran_IO(QWidget):
         elif self.nchans == 1:
             self.ui.lbl_chan_import.setVisible(False)
             self.ui.cmb_chan_import.setVisible(False)
-            self.ui.line_chan.setVisible(False)
         else:
             self.ui.lbl_chan_import.setVisible(True)
             self.ui.cmb_chan_import.setVisible(True)
-            self.ui.line_chan.setVisible(True)
 
         if len(self.file_name) < 45:
             self.ui.lbl_filename.setText(self.file_name)
