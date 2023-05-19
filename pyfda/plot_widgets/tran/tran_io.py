@@ -42,7 +42,6 @@ class Tran_IO(QWidget):
         self.x = None  # array for file data
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
-        self.file_load_status = 'none'  # status flag ('none' / 'loaded' / 'error')
 
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
@@ -82,7 +81,7 @@ class Tran_IO(QWidget):
         # ---------------------------------------------------------------------
         self.ui.but_select.clicked.connect(self.load_data_raw)
         self.ui.cmb_chan_import.currentIndexChanged.connect(self.select_chan_normalize)
-        self.ui.but_load.clicked.connect(self.import_data)
+        self.ui.but_load.clicked.connect(self.load_button_clicked)
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
@@ -114,6 +113,8 @@ class Tran_IO(QWidget):
         When an error occurred, return -1.
 
         """
+        # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
+
         file_name_prev = self.file_name
         file_type_prev = self.file_type
 
@@ -155,19 +156,19 @@ class Tran_IO(QWidget):
 
             self.N, self.nchans = np_shape(self.data_raw)
             if self.N in {None, 0}:  # data is scalar, None or multidim
-                self.file_load_status = 'error'
+                qstyle_widget(self.ui.but_load, "error")
                 logger.warning("Unsuitable data format")
                 return -1
             info_str = f" ({io.import_data.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
-            self.file_load_status = 'error'
+            qstyle_widget(self.ui.but_load, "error")
             return -1
 
         if self.nchans > 2:
             logger.warning(
                 f"Unsuitable file format with {self.nchans} > 2 channels.")
-            self.file_load_status = 'error'
+            qstyle_widget(self.ui.but_load, "error")
             return -1
         elif self.nchans == 1:
             self.ui.lbl_chan_import.setVisible(False)
@@ -185,60 +186,22 @@ class Tran_IO(QWidget):
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
             f"{self.nchans} x {self.N}{info_str}")
-        self.file_load_status = 'none'
         return 0
 
     # ------------------------------------------------------------------------------
-    def import_data(self):
-        # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
-        # TODO: Data is read for the second time here?!
-        # TODO: getProperty() doesn't exist
-        logger.info("import data")
-        err = False
-        if self.file_name is None:
-            logger.warning("No valid file has been selected yet!")
-            self.ui.but_load.setEnabled(False)
-            self.file_load_status = 'none'
-            return -1
-        try:
-            # use np.ravel() to enforce ndim == 1 instead for (N, 1) arrays which have
-            # ndim == 2. ravel() creates only a view on the array, not a new array.
-            self.data_raw = np.ravel(io.import_data(self.file_name, self.file_type))
-            logger.info(f"data_raw: {np.shape(self.data_raw)}")
-        except TypeError:
-            logger.warning("Unsuitable file / data format")
-            err = True
+    def load_button_clicked(self):
+        """
+        When load button was clicked, determine its state. When it was "ok" (loaded),
+        unload data and reset button.
 
-        # if self.data_raw is None:  # file operation cancelled
-        #     err = True
-        # elif type(self.data_raw) != np.ndarray:
-        #     logger.warning("Unsuitable file / data format")
-        #     err = True
-
-        if err:
-            self.ui.but_load.setEnabled(False)
-            self.file_load_status = 'error'
-            return -1
-
-        if self.data_raw.ndim < 1 or self.data_raw.ndim > 2:
-            logger.warning("Unsuitable data shape with "
-                           f"{self.data_raw.ndim} dimensions.")
-            self.file_load_status = 'error'
-            return -1
-
-        if np.any(self.select_chan_normalize()):
-            self.file_load_status = 'loaded'
-            if self.data_raw.ndim == 1:
-                r = len(self.data_raw)
-                c = 1
-            else:
-                r, c = np.shape(self.data_raw)
-            logger.info(
-                f"Imported data with N = {r} rows and N_chans = {c} columns.")
-            return 0
+        Continue with select_chan_normalize() otherwise.
+        """
+        # ------------------------------------------------------------------------------
+        if self.ui.but_load.property("state") == "ok":
+            self.unload_data()
         else:
-            self.file_load_status = 'error'
-            return -1
+            self.select_chan_normalize()
+
 
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
@@ -267,15 +230,10 @@ class Tran_IO(QWidget):
 
         if self.data_raw.ndim == 1:
             data = self.data_raw
-            data_valid = True
         else:
-            # TODO: Delete data should not be in the combo box but be triggered by 
-            #       unloading LOAD button
-            data_valid = True  # default
             item = qget_cmb_box(self.ui.cmb_chan_import)
-            if item == "del":  # delete data
-                data_valid = False
-            elif item == "1":  # use channel 1 (mono)
+
+            if item == "1":  # use channel 1 (mono)
                 data = self.data_raw[:, 0]
             elif item == "2":  # use channel 2 (mono)
                 data = self.data_raw[:, 1]
@@ -286,25 +244,21 @@ class Tran_IO(QWidget):
                 data = self.data_raw.sum(1)  # sum all channels along dim 1 (columns)
             else:
                 logger.error(f'Unknown item "{item}"')
-                data_valid = False
-
-        if not data_valid:
-            self.x = self.data_raw = None
-            qstyle_widget(self.ui.but_load, "normal")
-            self.ui.but_load.setText("Load:")
-            self.emit({'data_changed': 'file_io'})
-            return None
-
-        if self.ui.but_normalize.isChecked() == True:
-            self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
-            self.ui.led_normalize.setText(str(self.norm))
-        else:
-            self.x = data  # .ravel()
+                self.unload_data()
+                return None
 
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
         self.ui.but_load.setEnabled(True)
         self.ui.but_normalize.setEnabled(True)
+        self.ui.led_normalize.setEnabled(True)
+
+        if self.ui.but_normalize.isChecked() == True:
+            self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
+            self.ui.led_normalize.setText(str(self.norm))
+            self.x = data * self.norm / np.max(np.abs(data))
+        else:
+            self.x = data
 
         self.emit({'data_changed': 'file_io'})
         return self.x
