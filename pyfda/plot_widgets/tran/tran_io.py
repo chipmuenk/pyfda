@@ -89,6 +89,19 @@ class Tran_IO(QWidget):
         self.ui.but_csv_options.clicked.connect(self.open_csv_win)
         self.setLayout(layVMain)
 
+    def unload_data(self):
+        """
+        Enable load button and set to normal mode, replace label "Loaded" by "Load",
+        clear loaded data, disable normalize button and emit 'data_changed' signal
+        """
+        self.ui.but_load.setEnabled(True)
+        qstyle_widget(self.ui.but_load, "normal")
+        self.ui.but_load.setText("Load:")
+        self.ui.but_normalize.setEnabled(False)
+        self.ui.led_normalize.setEnabled(False)
+        self.x = None
+        self.emit({'data_changed': 'file_io'})
+
     # ------------------------------------------------------------------------------
     def load_data_raw(self):
         """
@@ -111,6 +124,8 @@ class Tran_IO(QWidget):
             self.file_name = file_name_prev
             self.file_type = file_type_prev
             return -1
+
+        self.unload_data()  # reset load and normalize button
 
         self.N = None
         self.nchans = None
@@ -166,11 +181,6 @@ class Tran_IO(QWidget):
         else:
             self.ui.lbl_filename.setText(
                 self.file_name[:10] + ' ... ' + self.file_name[-20:])
-
-        self.ui.but_load.setEnabled(True)
-        self.ui.but_load.setText("Load:")
-        qstyle_widget(self.ui.but_load, "normal")
-        self.ui.but_normalize.setEnabled(False)
 
         self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
