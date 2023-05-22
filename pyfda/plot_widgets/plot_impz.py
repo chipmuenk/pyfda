@@ -141,8 +141,12 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         self.stim_wdg = Plot_Tran_Stim()
         # set "Stim:" label width to same width as "Plots:" label:
-        self.stim_wdg.ui.lbl_title_stim.setFixedWidth(self.ui.lbl_title_plot_time.sizeHint().width())
+        self.stim_wdg.ui.lbl_title_stim.setFixedWidth(
+            self.ui.lbl_title_plot_time.sizeHint().width())
         self.file_io_wdg = Tran_IO()
+        # set "File:" label width to same width as "Plots:" label:
+        self.file_io_wdg.ui.lbl_title_io_file.setFixedWidth(
+            self.ui.lbl_title_plot_time.sizeHint().width())
 
         # This places the combo box for adding / using file data to the
         # run control toolbar:

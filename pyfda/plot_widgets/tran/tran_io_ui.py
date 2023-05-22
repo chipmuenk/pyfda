@@ -83,7 +83,8 @@ class Tran_IO_UI(QWidget):
         # =====================================================================
         # Controls
         # =====================================================================
-
+        self.lbl_title_io_file = QLabel("File:")
+        self.lbl_title_io_file.setObjectName("large")
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
@@ -211,13 +212,29 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
+        #
+        layG_io_file.setColumnStretch(i+1, 1)
+        # --------
+
+        layH_title_io_file = QHBoxLayout()
+        layH_title_io_file.addWidget(self.lbl_title_io_file)
+        self.wdg_title_io_file = QWidget(self)
+        self.wdg_title_io_file.setLayout(layH_title_io_file)
+        self.wdg_title_io_file.setContentsMargins(0, 0, 0, 0)
+
+        self.wdg_ctrl_io_file = QWidget(self)
+        self.wdg_ctrl_io_file.setLayout(layG_io_file)
+        self.wdg_ctrl_io_file.setContentsMargins(0, 0, 0, 0)
 
         layH_io = QHBoxLayout()
-        layH_io.addLayout(layG_io_file)
-        layH_io.addStretch(10)
+        layH_io.addWidget(self.wdg_title_io_file)
+        layH_io.addWidget(self.wdg_ctrl_io_file)
+        layH_io.setContentsMargins(0, 0, 0, 0)
 
         self.wdg_top = QWidget(self)
+        self.wdg_top.setObjectName("transparent")
         self.wdg_top.setLayout(layH_io)
+        self.wdg_top.setContentsMargins(0, 0, 0, 0)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
     # -------------------------------------------------------------------------
