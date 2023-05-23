@@ -315,7 +315,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     Returns
     -------
     None
-        Nothing, text is exported to clipboard or to file via ``export_csv_data``
+        Nothing, text is exported to clipboard or to file via ``save_data_csv``
     """
 
     text = ""
@@ -421,7 +421,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     if params['CSV']['clipboard']:
         fb.clipboard.setText(text)
     else:
-        export_csv_data(parent, text, fkey, title=title)
+        save_data_csv(parent, text, fkey, title=title)
 
 # ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -1052,7 +1052,7 @@ def write_np_wav(parent, file_name, data: np.array, f_S = 1, title: str = "Expor
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
 
 # ------------------------------------------------------------------------------
-def export_csv_data(parent: object, data: str, fkey: str = "", title: str = "Export",
+def save_data_csv(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')):
     """
     Export coefficients or pole/zero data in various formats
