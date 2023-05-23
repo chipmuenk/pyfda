@@ -158,11 +158,11 @@ class Tran_IO_UI(QWidget):
             "to copy to/from clipboard or file.</span>")
         line3 = QVLine()  # width=5
 
-        self.but_export = QPushButton("Save:")
-        self.but_export.setObjectName("large")
-        self.but_export.setSizePolicy(QSizePolicy.Expanding,
+        self.but_save = QPushButton("Save:")
+        self.but_save.setObjectName("large")
+        self.but_save.setSizePolicy(QSizePolicy.Expanding,
                                       QSizePolicy.Expanding)
-        self.but_export.setToolTip(
+        self.but_save.setToolTip(
             self.tr("<span>Save selected signals to R/L file channels.</span>"))
         self.lbl_chan_export_l = QLabel(to_html("Left", frmt="b"))
         self.cmb_chan_export_l = QComboBox(self)
@@ -205,7 +205,7 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.but_export, 0, i, 2, 1)
+        layG_io_file.addWidget(self.but_save, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_l, 1, i)
