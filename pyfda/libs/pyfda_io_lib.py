@@ -136,6 +136,127 @@ def extract_file_ext(file_type: str) -> str:
 
 
 # ------------------------------------------------------------------------------
+def create_file_filters(file_types: tuple, file_filters: str = ""):
+    """
+    Create a string with file filters for QFileDialog object from `file_types`,
+    a tuple of file extensions and the global `file_filters_dict`.
+
+    When the file extension stored after last QFileDialog operation is in the tuple
+    of file types, return this file extension for e.g. preselecting the file type
+    in QFileDialog.
+
+    Parameters
+    ----------
+    file_types : tuple of str
+        list of file extensions which are used to create a file filter.
+
+    file_filters : str
+        String with file filters for QFileDialog object with the form
+        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
+        this string is empty, but it can be used to add file filters not contained
+        in the global `file_filters_dict`.
+
+    Returns
+    -------
+    file_filters : str
+        String containing file filters for a QFileDialog object
+
+    last_file_filter : str
+        Single file filter to setup the default file extension in QFileDialog
+
+    """
+    for t in file_types:
+        if t in file_filters_dict:
+            file_filters += file_filters_dict[t] + f" (*.{t});;"
+        else:
+            logger.warning(f"Unknown file extension '.{t}'")
+    # remove trailing ';;', otherwise file filter '*' is appended
+    file_filters = file_filters.rstrip(';;')
+
+    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
+        last_file_filter =\
+            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
+    else:
+        last_file_filter = ""
+
+    return file_filters, last_file_filter
+
+
+# ------------------------------------------------------------------------------
+def select_file(parent: object, title: str = "", mode: str = "r",
+                file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
+    """
+    Select a file from a file dialog box for either reading or writing and return
+    the selected file name and type.
+
+    Parameters
+    ----------
+    title : str
+        title string for the file dialog box (e.g. "Filter Coefficients"),
+
+    mode : str
+        file access mode, must be either "r" or "w" for read / write access
+
+    file_types : tuple of str
+        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
+        of `file_filters_dict`
+
+    Returns
+    -------
+    file_name: str
+        Fully qualified name of selected file. `None` when operation has been
+        cancelled.
+
+    file_type: str
+        File type, e.g. 'wav'. `None` when operation has been cancelled.
+    """
+
+    file_filters, last_file_filter = create_file_filters(file_types=file_types)
+
+    dlg = QFileDialog(parent)  # create instance for QFileDialog
+    dlg.setDirectory(dirs.last_file_dir)
+    if mode in {"r", "rb"}:
+        if title == "":
+            title = "Import"
+        dlg.setWindowTitle(title)
+        dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
+        dlg.setFileMode(QFileDialog.ExistingFile)
+    elif mode in {"w", "wb"}:
+        if title == "":
+            title = "Export"
+        dlg.setWindowTitle(title)
+        dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
+        dlg.setFileMode(QFileDialog.AnyFile)
+    else:
+        logger.error(f"Unknown mode '{mode}'")
+        return None, None
+
+    dlg.setNameFilter(file_filters)  # pass available file filters
+    # dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
+    if last_file_filter:
+        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
+
+    if dlg.exec_() == QFileDialog.Accepted:
+        file_name = dlg.selectedFiles()[0]  # pick only first selected file
+        file_type = os.path.splitext(file_name)[-1].strip('.')
+        sel_filt = dlg.selectedNameFilter()  # selected file filter
+
+        if file_type == "":
+            # No file type specified, add the type from the file filter
+            file_type = extract_file_ext(sel_filt)[0].strip('.')
+            file_name = file_name + '.' + file_type
+
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)
+        dirs.last_file_type = file_type
+    else:  # operation cancelled
+        file_name = None
+        file_type = None
+
+    return file_name, file_type
+
+
+# ------------------------------------------------------------------------------
 def qtable2text(table: object, data: np.ndarray, parent: object,
                 fkey: str, frmt: str = 'float', title: str = "Export"):
     """
@@ -607,54 +728,8 @@ def csv2array(f: TextIO):
         return "Unsuitable data shape: ndim = {0}, shape = {1}"\
             .format(np.ndim(data_arr), np.shape(data_arr))
 
-# ------------------------------------------------------------------------------
-def create_file_filters(file_types: tuple, file_filters: str = ""):
-    """
-    Create a string with file filters for QFileDialog object from `file_types`,
-    a tuple of file extensions and the global `file_filters_dict`.
-
-    When the file extension stored after last QFileDialog operation is in the tuple
-    of file types, return this file extension for e.g. preselecting the file type
-    in QFileDialog.
-
-    Parameters
-    ----------
-    file_types : tuple of str
-        list of file extensions which are used to create a file filter.
-
-    file_filters : str
-        String with file filters for QFileDialog object with the form
-        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
-        this string is empty, but it can be used to add file filters not contained
-        in the global `file_filters_dict`.
-
-    Returns
-    -------
-    file_filters : str
-        String containing file filters for a QFileDialog object
-
-    last_file_filter : str
-        Single file filter to setup the default file extension in QFileDialog
-
-    """
-    for t in file_types:
-        if t in file_filters_dict:
-            file_filters += file_filters_dict[t] + f" (*.{t});;"
-        else:
-            logger.warning(f"Unknown file extension '.{t}'")
-    # remove trailing ';;', otherwise file filter '*' is appended
-    file_filters = file_filters.rstrip(';;')
-
-    if dirs.last_file_type and dirs.last_file_type in file_filters_dict:
-        last_file_filter =\
-            file_filters_dict[dirs.last_file_type] + f" (*.{dirs.last_file_type})"
-    else:
-        last_file_filter = ""
-
-    return file_filters, last_file_filter
-
 #-------------------------------------------------------------------------------
-def read_csv_info(filename):
+def read_csv_info_old(filename):
 #-------------------------------------------------------------------------------
     """
     DON'T USE ANYMORE!
@@ -805,79 +880,6 @@ def read_wav_info(file):
     read_wav_info.ms = read_wav_info.N * 1000 / (f_S * nchans)
 
     return 0
-
-# ------------------------------------------------------------------------------
-def select_file(parent: object, title: str = "", mode: str = "r",
-                file_types: Tuple[str, ...] = ('csv', 'txt')) -> Tuple[str, str]:
-    """
-    Select a file from a file dialog box for either reading or writing and return
-    the selected name and file type.
-
-    Parameters
-    ----------
-    title : str
-        title string for the file dialog box (e.g. "Filter Coefficients"),
-
-    mode : str
-        file access mode, must be either "r" or "w" for read / write access
-
-    file_types : tuple of str
-        supported file types, e.g. `('txt', 'npy', 'mat') which need to be keys
-        of `file_filters_dict`
-
-    Returns
-    -------
-    file_name: str
-        Fully qualified name of selected file. `None` when operation has been
-        cancelled.
-
-    file_type: str
-        File type, e.g. 'wav'. `None` when operation has been cancelled.
-    """
-
-    file_filters, last_file_filter = create_file_filters(file_types=file_types)
-
-    dlg = QFileDialog(parent)  # create instance for QFileDialog
-    dlg.setDirectory(dirs.last_file_dir)
-    if mode in {"r", "rb"}:
-        if title == "":
-            title = "Import"
-        dlg.setWindowTitle(title)
-        dlg.setAcceptMode(QFileDialog.AcceptOpen)  # set dialog to "file open" mode
-        dlg.setFileMode(QFileDialog.ExistingFile)
-    elif mode in {"w", "wb"}:
-        if title == "":
-            title = "Export"
-        dlg.setWindowTitle(title)
-        dlg.setAcceptMode(QFileDialog.AcceptSave) # set dialog to "file save" mode
-        dlg.setFileMode(QFileDialog.AnyFile)
-    else:
-        logger.error(f"Unknown mode '{mode}'")
-        return None, None
-
-    dlg.setNameFilter(file_filters)  # pass available file filters
-    # dlg.setDefaultSuffix(file_types[0])  # default suffix when none is given
-    if last_file_filter:
-        dlg.selectNameFilter(last_file_filter)  # filter selected in last file dialog
-
-    if dlg.exec_() == QFileDialog.Accepted:
-        file_name = dlg.selectedFiles()[0]  # pick only first selected file
-        file_type = os.path.splitext(file_name)[-1].strip('.')
-        sel_filt = dlg.selectedNameFilter()  # selected file filter
-
-        if file_type == "":
-            # No file type specified, add the type from the file filter
-            file_type = extract_file_ext(sel_filt)[0].strip('.')
-            file_name = file_name + '.' + file_type
-
-        dirs.last_file_name = file_name
-        dirs.last_file_dir = os.path.dirname(file_name)
-        dirs.last_file_type = file_type
-    else:  # operation cancelled
-        file_name = None
-        file_type = None
-
-    return file_name, file_type
 
 # ------------------------------------------------------------------------------
 def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
