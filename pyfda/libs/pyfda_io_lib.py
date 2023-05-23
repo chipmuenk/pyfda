@@ -505,7 +505,7 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
         if file_name is None:  # operation cancelled or error
             return None
         else:
-            data_arr = import_data(file_name, file_type)
+            data_arr = load_data_np(file_name, file_type)
             # pass data as numpy array
             logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
                         .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
@@ -882,7 +882,7 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
+def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
 
@@ -903,7 +903,7 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     ndarray of float or int
         Data from the file (ndarray) or None (error), -1 for file cancel
     """
-    import_data.info_str = "" # function attribute for file infos
+    load_data_np.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled
         return -1
 
@@ -918,11 +918,11 @@ def import_data(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
-                import_data.info_str = csv2array.info_str
+                load_data_np.info_str = csv2array.info_str
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
-                    import_data.info_str = ""
+                    load_data_np.info_str = ""
                     logger.error(f"Error loading file '{file_name}':\n{data_arr}")
                     return None
         else:

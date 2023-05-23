@@ -141,7 +141,7 @@ class Tran_IO(QWidget):
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
                 return -1
-            self.data_raw = io.import_data(self.file_name, 'wav')
+            self.data_raw = io.load_data_np(self.file_name, 'wav')
             if np.isscalar(self.data_raw):  # None or -1
                 return -1
             self.N = io.read_wav_info.N
@@ -154,14 +154,14 @@ class Tran_IO(QWidget):
 
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
-            self.data_raw = io.import_data(self.file_name, 'csv')
+            self.data_raw = io.load_data_np(self.file_name, 'csv')
 
             self.N, self.nchans = np_shape(self.data_raw)
             if self.N in {None, 0}:  # data is scalar, None or multidim
                 qstyle_widget(self.ui.but_load, "error")
                 logger.warning("Unsuitable data format")
                 return -1
-            info_str = f" ({io.import_data.info_str})"
+            info_str = f" ({io.load_data_np.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
             qstyle_widget(self.ui.but_load, "error")
@@ -208,7 +208,7 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
-        `select_chan_normalize()` is triggered by `import_data()` and by signal-slot
+        `select_chan_normalize()` is triggered by `load_data_np()` and by signal-slot
         connections
             * self.ui.cmb_chan_import.currentIndexChanged
             * self.ui.but_normalize.clicked
