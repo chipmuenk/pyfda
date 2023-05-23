@@ -149,14 +149,14 @@ class Tran_IO_UI(QWidget):
 
         line1 = QVLine()
 
-        line2 = QVLine(width=5)
+        line2 = QVLine()
         self.lbl_csv_options = QLabel(to_html("CSV", frmt='b'))
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
-        line3 = QVLine(width=5)
+        line3 = QVLine()  # width=5
 
         self.but_export = QPushButton("Save:")
         self.but_export.setObjectName("large")
