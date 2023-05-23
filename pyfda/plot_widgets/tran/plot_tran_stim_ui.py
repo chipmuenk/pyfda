@@ -817,10 +817,6 @@ class Plot_Tran_Stim_UI(QWidget):
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
         not_use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
-        if qget_cmb_box(self.cmb_file_io) in {'use', 'add'}: # and self.ui.frm_file_io.isEnabled():
-            self.cmb_file_io.setStyleSheet('QComboBox{background-color:lightblue;}')
-        else:
-            self.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
         self.wdg_ctrl_stim.setEnabled(not_use_file_io)
         self.wdg_formula_stim.setVisible(self.stim == "formula" and not_use_file_io)
 

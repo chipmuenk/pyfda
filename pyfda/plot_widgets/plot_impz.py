@@ -478,14 +478,18 @@ class Plot_Impz(QWidget):
         if not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.ui.frm_file_io.setEnabled(False)
+            self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
         # File is loaded, enable file_io combobox
         else:
             self.ui.frm_file_io.setEnabled(True)
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
+                self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
                 return
             else:
                 # "use" or "add", map data from file io widget to stimulus widget:
+                self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color:lightblue;}')
                 self.stim_wdg.x_file = self.file_io_wdg.x
+
 
     # =========================================================================
     # Simulation: Calculate stimulus, response and draw them
