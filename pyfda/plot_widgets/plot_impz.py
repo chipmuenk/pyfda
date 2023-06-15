@@ -21,6 +21,7 @@ from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
+import pyfda.libs.pyfda_io_lib as io
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
     safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
@@ -231,6 +232,8 @@ class Plot_Impz(QWidget):
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
         self.ui.but_freq_norm_impz.clicked.connect(self.draw)
         self.ui.but_freq_show_info.clicked.connect(self.draw)
+        # --- subwidgets
+        self.file_io_wdg.ui.but_save.clicked.connect(self.save_data)
 
 # ------------------------------------------------------------------------------
     def toggle_stim_options(self):
@@ -1953,6 +1956,20 @@ class Plot_Impz(QWidget):
 #        self.mplwidget_t.redraw()
 #        self.mplwidget_f.redraw()
 
+    # ### VARIOUS STUFF #############################################################
+    def save_data(self):
+        """
+        Save a file with UI dialog (CSV or WAV) and load it into `self.data_raw`
+        Try to find the dimensions and some other infos.
+        """
+        self.file_name, self.file_type = io.select_file(
+            self, title="Select file for data export", mode="wb",
+            file_types=('csv', 'wav'))
+
+        f_S = fb.fil[0]['f_S']
+        data = self.x
+
+        io.save_data_np(self.file_name, self.file_type, data, f_S)
 
 # ------------------------------------------------------------------------------
 
