@@ -146,6 +146,7 @@ class Tran_IO_UI(QWidget):
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
         self.led_normalize.setText(str(self.led_normalize_default))
+        # self.led_normalize.setFixedWidth(self.but_normalize.width())
 
         line1 = QVLine()
 
