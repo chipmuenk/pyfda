@@ -189,6 +189,13 @@ class Tran_IO_UI(QWidget):
                             self.cmb_chan_export_real_items,
                             self.cmb_chan_export_cur_item_r)
 
+        self.lbl_save_nr_repetitions = QLabel(to_html("Repeats", frmt='b'))
+
+        self.led_save_nr_repetitions = QLineEdit()
+        self.led_save_nr_repetitions.setToolTip(self.tr(
+            "<span>Set how many times waveforms are repeated for saving.</span>"))
+        self.led_save_nr_repetitions.setText("1")
+
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
@@ -226,6 +233,9 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
+        i+= 1
+        layG_io_file.addWidget(self.lbl_save_nr_repetitions, 0, i)
+        layG_io_file.addWidget(self.led_save_nr_repetitions, 1, i)
         #
         layG_io_file.setColumnStretch(i+1, 1)
         # --------
