@@ -151,6 +151,9 @@ class Tran_IO_UI(QWidget):
         self.but_normalize.setToolTip(
             self.tr("<span>Normalize data to the value below.</span>"))
         self.but_normalize.setEnabled(False)
+        self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
+                                    QSizePolicy.Expanding)
+
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
         self.led_normalize.setText(str(self.led_normalize_default))
