@@ -15,7 +15,7 @@ import numpy as np
 import pyfda.libs.pyfda_io_lib as io
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, np_shape
-from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box, qset_cmb_box
 from pyfda.libs.csv_option_box import CSV_option_box
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -117,15 +117,18 @@ class Tran_IO(QWidget):
         """
         # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
 
+        file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
         file_name_prev = self.file_name
         file_type_prev = self.file_type
 
         self.file_name, self.file_type = io.select_file(
-            self, title="Select file for data import", mode="r", file_types=('csv', 'wav'))
+            self, title="Select file for data import", mode="r",
+            file_types=file_type)
 
         if self.file_name is None:  # operation cancelled
             self.file_name = file_name_prev
             self.file_type = file_type_prev
+            qset_cmb_box(self.ui.cmb_file_format, self.file_type)
             return -1
 
         self.unload_data()  # reset load and normalize button

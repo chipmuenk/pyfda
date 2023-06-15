@@ -43,6 +43,14 @@ class Tran_IO_UI(QWidget):
 
         self.led_normalize_default = 1  # default setting for normalization
 
+        self.cmb_file_format_items = [
+            "<span>Select file format for data import and export.</span>",
+            ("csv", "csv", "Comma / tab separated values text format"),
+            ("wav", "wav", "Wave audio file format")
+        ]
+
+        self.cmb_file_format_init = "csv"
+
         # combobox tooltip + data / text / item tooltip for channel export (real data)
         self.cmb_chan_export_real_items = [
             "<span>Select signals for data export. '&Sigma;' "
@@ -151,7 +159,9 @@ class Tran_IO_UI(QWidget):
         line1 = QVLine()
 
         line2 = QVLine()
-        self.lbl_csv_options = QLabel(to_html("CSV", frmt='b'))
+        self.cmb_file_format = QComboBox()
+        qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
+                          self.cmb_file_format_init)
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
         self.but_csv_options.setToolTip(
@@ -201,7 +211,7 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.lbl_csv_options, 0, i)
+        layG_io_file.addWidget(self.cmb_file_format, 0, i)
         layG_io_file.addWidget(self.but_csv_options, 1, i)
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
