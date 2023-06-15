@@ -87,9 +87,9 @@ class Tran_IO(QWidget):
 
         self.ui.but_csv_options.clicked.connect(self.open_csv_win)
 
-        self.ui.but_save.clicked.connect(self.save_data)
         self.setLayout(layVMain)
 
+    # ------------------------------------------------------------------------------
     def unload_data(self):
         """
         Enable load button and set to normal mode, replace label "Loaded" by "Load",
@@ -267,14 +267,6 @@ class Tran_IO(QWidget):
 
         self.emit({'data_changed': 'file_io'})
         return self.x
-
-    # ------------------------------------------------------------------------------
-    def save_data(self):
-        """
-        Save a file with UI dialog (CSV or WAV) and load it into `self.data_raw`
-        Try to find the dimensions and some other infos.
-        """
-        pass
 
     # ------------------------------------------------------------------------------
     def open_csv_win(self):
