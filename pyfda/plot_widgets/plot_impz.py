@@ -55,7 +55,6 @@ class Plot_Impz(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.ACTIVE_3D = False
         self.ui = PlotImpz_UI()  # create the UI part with buttons etc.
 
         # initial settings
@@ -1083,7 +1082,7 @@ class Plot_Impz(QWidget):
         if self.spgr:
             self.ax_s = self.axes_time[-1]  # assign last axis
 
-        if self.ACTIVE_3D:  # not implemented / tested yet
+        if False:  # not implemented / tested yet: complex data as 3D plot
             self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
         for ax in self.axes_time:
@@ -1431,7 +1430,7 @@ class Plot_Impz(QWidget):
                 self.ax_s.set_ylabel(fb.fil[0]['plt_fLabel'])
 
         # --------------- 3D Complex  -----------------------------------------
-        if self.ACTIVE_3D:  # not implemented / tested yet
+        if False:  # not implemented / tested yet: complex data as 3D plot
             # plotting the stems
             for i in range(self.ui.N_start, self.ui.N_end):
                 self.ax3d.plot([self.t[i], self.t[i]], [y_r[i], y_r[i]], [0, y_i[i]],
