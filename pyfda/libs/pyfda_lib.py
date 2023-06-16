@@ -610,9 +610,9 @@ def safe_eval(expr, alt_expr=0, return_type: str = "float", sign: str = None) ->
     Function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
-    # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
-    expr = clean_ascii(qstr(expr))
-    alt_expr = clean_ascii(qstr(alt_expr))
+    # convert to str and remove non-ascii characters
+    expr = clean_ascii(str(expr))
+    alt_expr = clean_ascii(str(alt_expr))
 
     result = None
     fallback = ""
