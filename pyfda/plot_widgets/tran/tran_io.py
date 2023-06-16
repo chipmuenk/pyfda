@@ -45,6 +45,7 @@ class Tran_IO(QWidget):
 
         self._construct_UI()
         self.norm = self.ui.led_normalize_default
+        self.nr_repetitions = self.ui.led_nr_repetitions_default
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None) -> None:
@@ -86,6 +87,8 @@ class Tran_IO(QWidget):
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
         self.ui.but_csv_options.clicked.connect(self.open_csv_win)
+
+        self.ui.led_nr_repetitions.editingFinished.connect(self.save_nr_repetitions)
 
         self.setLayout(layVMain)
 
@@ -292,3 +295,10 @@ class Tran_IO(QWidget):
     def close_csv_win(self):
         dirs.csv_options_handle = None
         self.ui.but_csv_options.setChecked(False)
+
+    # ------------------------------------------------------------------------------
+    def save_nr_repetitions(self):
+        self.nr_repetitions = safe_eval(
+            self.ui.led_nr_repetitions.text(), alt_expr=self.nr_repetitions,
+            return_type='int', sign='pos')
+        self.ui.led_nr_repetitions.setText(str(self.nr_repetitions))
