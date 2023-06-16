@@ -282,12 +282,16 @@ def clean_ascii(arg):
     Parameters
     ----------
     arg: str
-        This is a unicode string under Python 3 and a "normal" string under Python 2.
+        This is a unicode string under Python 3
 
     Returns
     -------
     arg: str
-         Input string, cleaned from non-ASCII characters
+         Input string, cleaned from non-ASCII characters when `arg` is a string
+
+         or
+
+         Unchanged parameter `arg` when not a string
 
     """
     if isinstance(arg, str):
@@ -576,7 +580,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
 
 # ------------------------------------------------------------------------------
-def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
+def safe_eval(expr, alt_expr=0, return_type: str = "float", sign: str = None) -> str:
     """
     Try ... except wrapper around numexpr to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`.
