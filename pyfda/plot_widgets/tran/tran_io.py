@@ -13,11 +13,12 @@ from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 
 import pyfda.libs.pyfda_io_lib as io
+import pyfda.filterbroker as fb
+import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, np_shape
 from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box, qset_cmb_box
 from pyfda.libs.csv_option_box import CSV_option_box
-import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
@@ -34,10 +35,13 @@ class Tran_IO(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, x, y, x_q):
         super().__init__()
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
+        self.x_tran = x
+        self.y_tran = y
+        self.x_q_tran = x_q
         # initial settings
         self.x = None  # array for file data
         self.file_name = None  # full name of loaded file
@@ -89,6 +93,7 @@ class Tran_IO(QWidget):
         self.ui.but_csv_options.clicked.connect(self.open_csv_win)
 
         self.ui.led_nr_repetitions.editingFinished.connect(self.save_nr_repetitions)
+        self.ui.but_save.clicked.connect(self.save_data)
 
         self.setLayout(layVMain)
 
@@ -210,7 +215,6 @@ class Tran_IO(QWidget):
         else:
             self.select_chan_normalize()
 
-
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
@@ -302,3 +306,26 @@ class Tran_IO(QWidget):
             self.ui.led_nr_repetitions.text(), alt_expr=self.nr_repetitions,
             return_type='int', sign='pos')
         self.ui.led_nr_repetitions.setText(str(self.nr_repetitions))
+
+    # ------------------------------------------------------------------------------
+    def save_data(self) -> None:
+        """
+        Save a file with UI dialog (CSV or WAV), using the data for left and right
+        channel, selected in the UI.
+        """
+        file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
+
+        self.file_name, self.file_type = io.select_file(
+            self, title="Select file for data export", mode="wb",
+            file_types=file_type)
+
+        if self.file_name is None:  # operation cancelled
+            return -1
+
+        sel_r = qget_cmb_box(self.ui.cmb_chan_export_r)
+        sel_l = qget_cmb_box(self.ui.cmb_chan_export_l)
+
+        f_S = fb.fil[0]['f_S']
+        data = self.x_tran
+
+        io.save_data_np(self.file_name, self.file_type, data, f_S)
