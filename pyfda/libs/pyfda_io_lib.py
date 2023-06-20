@@ -992,19 +992,22 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int
 
     if file_name is None:  # error or operation cancelled
         return -1
-
+    elif np.ndim(data) < 1 or np.ndim(data) > 2:
+        logger.error(f"Unsuitable data format for a wav file, ndim = {np.ndim(data)}.")
+        logger.error(data)
+        return -1
     try:
         if file_type == 'wav':
-            if np.ndim(data) < 1 or np.ndim(data) > 2:
-                logger.error(f"Unsuitable data format for a wav file, ndim = {np.ndim(data)}.")
-                return -1
-            else:
-                audio = data.T  # transpose data, needed?
-
+            audio = data.T  # transpose data, needed?
             wavfile.write(file_name, fb.fil[0]['f_S_wav'], data)
             # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
             # The bits-per-sample and PCM/float will be determined by the data-type
             # uint8, int16, int32, float32
+        elif file_type == 'csv':
+            np.savetxt(file_name, data, fmt="%f",
+                       delimiter=params['CSV']['delimiter'].lower())
+            # use %1.2f for reduced number of digits, %d for integer, %s for strings
+            # TODO: Integer formats like int16 should be stored as integers
         else:
             logger.error(f"File type {file_type} not supported!")
             return -1
