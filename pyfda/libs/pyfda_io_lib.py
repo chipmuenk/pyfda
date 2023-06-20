@@ -968,7 +968,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 # ------------------------------------------------------------------------------
 def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int:
     """
-    Save numpy data to a file
+    Save numpy data to a file in wav or csv format
 
     Parameters
     ----------
@@ -1006,7 +1006,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int
             # The bits-per-sample and PCM/float will be determined by the data-type
             # uint8, int16, int32, float32
         else:
-            logger.error(f"Unknown file type {file_type}!")
+            logger.error(f"File type {file_type} not supported!")
             return -1
 
         logger.info(f'Filter saved as\n\t"{file_name}"')
