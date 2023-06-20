@@ -146,7 +146,7 @@ class Plot_Impz(QWidget):
         # set "Stim:" label width to same width as "Plots:" label:
         self.stim_wdg.ui.lbl_title_stim.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
-        self.file_io_wdg = Tran_IO(x=self.x, y=self.y, x_q=self.x_q)
+        self.file_io_wdg = Tran_IO()
         # set "File:" label width to same width as "Plots:" label:
         self.file_io_wdg.ui.lbl_title_io_file.setFixedWidth(
             self.ui.lbl_title_plot_time.sizeHint().width())
