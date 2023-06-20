@@ -35,7 +35,7 @@ class Tran_IO(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, x, y, x_q):
+    def __init__(self, x=None, y=None, x_q=None):
         super().__init__()
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
