@@ -1,7 +1,7 @@
 ### MIT License
 
 
-**Copyright (c) 2013 - 2021** pyFDA Development Team and others (see AUTHORS.md)
+**Copyright (c) 2013 - 2023** pyFDA Development Team and others (see AUTHORS.md)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
