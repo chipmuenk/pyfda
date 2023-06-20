@@ -561,7 +561,9 @@ class Plot_Impz(QWidget):
             #       although each item is real.
             self.stim_wdg.calc_stimulus_frame(x_test, N_frame = min(10, self.ui.N_end))
 
-            self.cmplx =\
+            # convert from np.bool to bool to avoid deprecation warning concerning
+            # 'np.bool_' scalars to be interpreted as an index.
+            self.cmplx = bool(\
                 (self.stim_wdg.ui.ledDC.isVisible and type(self.stim_wdg.ui.DC) == complex)\
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
@@ -570,7 +572,7 @@ class Plot_Impz(QWidget):
                     and self.file_io_wdg.ui.but_load.property("state") == 'ok'
                     # and self.file_io_wdg.file_load_status == 'loaded'
                     and np.iscomplexobj(self.file_io_wdg.x))\
-                or np.any(np.iscomplex(x_test))
+                or np.any(np.iscomplex(x_test)))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)
 
