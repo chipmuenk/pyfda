@@ -106,7 +106,7 @@ class Tran_IO(QWidget):
         self.ui.but_load.setText("Load:")
         self.ui.but_normalize.setEnabled(False)
         self.ui.led_normalize.setEnabled(False)
-        self.x = None
+        self.x_file = None
         self.emit({'data_changed': 'file_io'})
 
     # ------------------------------------------------------------------------------
@@ -222,14 +222,16 @@ class Tran_IO(QWidget):
             * self.ui.but_normalize.clicked
             * self.ui.led_normalize.editingFinished
 
-        It processes `self.data_raw` and yields `self.x` as a result.
+        It processes `self.data_raw` and yields `self.x_file` as a result which
+        is assigned as `self.stim_wdg.x_file = self.file_io_wdg.x_file` in the class
+        `Plot_Impz()` when the signal `{'data_changed': 'file_io'}` is received.
 
         - For two channel `self.data_raw`, assign one channel or the sum of both channels
           to `data`. Alternatively, assign one channel of `self.data_raw` as real and the
           other as imaginary component of `data`.
 
         - Scale `data` to the maximum specified by `self.ui.led_normalize` and
-            assign normalized result to `self.x`.
+            assign normalized result to `self.x_file`.
         """
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
@@ -266,9 +268,9 @@ class Tran_IO(QWidget):
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
             self.ui.led_normalize.setText(str(self.norm))
-            self.x = data * self.norm / np.max(np.abs(data))
+            self.x_file = data * self.norm / np.max(np.abs(data))
         else:
-            self.x = data
+            self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
         return

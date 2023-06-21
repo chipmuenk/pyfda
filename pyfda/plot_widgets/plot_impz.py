@@ -492,7 +492,7 @@ class Plot_Impz(QWidget):
             else:
                 # "use" or "add", map data from file io widget to stimulus widget:
                 self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color:lightblue;}')
-                self.stim_wdg.x_file = self.file_io_wdg.x
+                self.stim_wdg.x_file = self.file_io_wdg.x_file
 
 
     # =========================================================================
@@ -1958,7 +1958,6 @@ class Plot_Impz(QWidget):
         self.needs_redraw[idx] = False
 #        self.mplwidget_t.redraw()
 #        self.mplwidget_f.redraw()
-
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
