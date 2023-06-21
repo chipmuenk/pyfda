@@ -35,16 +35,17 @@ class Tran_IO(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
-        self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
 
         # initial settings
-        self.x = None  # array for file data
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
 
+        self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
+        self.parent = parent    # handle to instantiating object
         self._construct_UI()
+
         self.norm = self.ui.led_normalize_default
         self.nr_repetitions = self.ui.led_nr_repetitions_default
 
@@ -318,11 +319,18 @@ class Tran_IO(QWidget):
 
         if self.file_name is None:  # operation cancelled
             return -1
-
+        # select which data is saved (stimulus, response, quantized stimulus)
         sel_r = qget_cmb_box(self.ui.cmb_chan_export_r)
         sel_l = qget_cmb_box(self.ui.cmb_chan_export_l)
 
-        f_S = fb.fil[0]['f_S']
-        data = self.x_tran
+        # number of repetitions
+        cycles = int(self.ui.led_nr_repetitions.text())
 
-        io.save_data_np(self.file_name, self.file_type, data, f_S)
+        data = np.tile(self.parent.x, cycles)  # TODO: Pass selected data here
+
+        f_S = fb.fil[0]['f_S']
+
+        try:
+            io.save_data_np(self.file_name, self.file_type, data, f_S)
+        except IOError as e:
+            logger.warning(f"File could not be saved:\n{e}")
