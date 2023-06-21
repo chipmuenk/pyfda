@@ -271,7 +271,7 @@ class Tran_IO(QWidget):
             self.x = data
 
         self.emit({'data_changed': 'file_io'})
-        return self.x
+        return
 
     # ------------------------------------------------------------------------------
     def open_csv_win(self):
