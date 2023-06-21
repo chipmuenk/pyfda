@@ -998,8 +998,8 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int
         return -1
     try:
         if file_type == 'wav':
-            audio = data.T  # transpose data, needed?
-            wavfile.write(file_name, fb.fil[0]['f_S_wav'], data)
+            # audio = data.T  # transpose data, needed?
+            wavfile.write(file_name, fb.fil[0]['f_S_wav'], data.astype(np.int16))
             # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
             # The bits-per-sample and PCM/float will be determined by the data-type
             # uint8, int16, int32, float32
