@@ -52,34 +52,40 @@ class Tran_IO_UI(QWidget):
         self.cmb_file_format_init = "csv"
 
         # combobox tooltip + data / text / item tooltip for channel export (real data)
+        # The data field needs to contain the exact name of the corresponding variable (`x`, `y`)
         self.cmb_chan_export_real_items = [
             "<span>Select signals for data export. '&Sigma;' "
             "sums up all columns.</span>",
-            ("none", "none", "no data"),
+            ("", "none", "no data"),
             ("x", "x", "Stimuli"),
             ("y", "y", "Response")
         ]
 
-        # additional data / text / item tooltip for channel export (real_fx data)
+        # Additional data / text / item tooltip for channel export (real_fx data)
+        # The data field needs to contain the exact name of the corresponding variable (`x_Q`)
         self.cmb_chan_export_real_fx_items = [
-            ("x_Q", "x_Q", "Quantized stimuli")
+            ("x_q", "x_Q", "Quantized stimuli")
         ]
 
-        # additional data / text / item tooltip for channel export (complex_fx data)
+        # Additional data / text / item tooltip for channel export (complex_fx data)
+        # The data field needs to contain the exact name of the corresponding variable (`x_Q`),
+        # followed by `.re` resp. `.im` for real resp. imaginary component
         self.cmb_chan_export_complex_fx_items = [
-            ("x_re_Q", "x_re_Q", "Quantized stimuli (real part)"),
-            ("x_im_Q", "x_im_Q", "Quantized stimuli (imag. part)")
+            ("x_q.re", "x_re_Q", "Quantized stimuli (real part)"),
+            ("x_q.im", "x_im_Q", "Quantized stimuli (imag. part)")
         ]
 
         # combobox tooltip + data / text / item tooltip for channel export (complex data)
+        # The data field needs to contain the exact name of the corresponding variable (`x`, `y`),
+        # followed by `.re` resp. `.im` for real resp. imaginary component
         self.cmb_chan_export_complex_items = [
             "<span>Select signals for data export. '&Sigma;' "
             "sums up all columns.</span>",
-            ("none", "none", "no data"),
-            ("x_re", "x_re", "Stimuli (real part)"),
-            ("x_im", "x_im", "Stimuli (imag. part)"),
-            ("y_re", "y_re", "Response (real part)"),
-            ("y_im", "y_im", "Response (imag. part)")
+            ("", "none", "no data"),
+            ("x.re", "x_re", "Stimuli (real part)"),
+            ("x.im", "x_im", "Stimuli (imag. part)"),
+            ("y.re", "y_re", "Response (real part)"),
+            ("y.im", "y_im", "Response (imag. part)")
         ]
         self.cmb_chan_export_cur_item_l = "x"
         self.cmb_chan_export_cur_item_r = "y"
@@ -89,6 +95,7 @@ class Tran_IO_UI(QWidget):
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
 
+    # -------------------------------------------------------------------------
     def _construct_UI(self):
         # =====================================================================
         # Controls
