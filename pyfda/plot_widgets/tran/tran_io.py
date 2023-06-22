@@ -41,6 +41,7 @@ class Tran_IO(QWidget):
         # initial settings
         self.file_name = None  # full name of loaded file
         self.file_type = None  # type of loaded file
+        self.x_file = None     # data loaded from file
 
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
         self.parent = parent    # handle to instantiating object
@@ -325,10 +326,34 @@ class Tran_IO(QWidget):
         sel_r = qget_cmb_box(self.ui.cmb_chan_export_r)
         sel_l = qget_cmb_box(self.ui.cmb_chan_export_l)
 
-        # number of repetitions
-        cycles = int(self.ui.led_nr_repetitions.text())
+        data = None
+        if not sel_l and not sel_r:
+            logger.warning("No signal selected for saving.")
+            return
 
-        data = np.tile(self.parent.x, cycles)  # TODO: Pass selected data here
+        if sel_l:
+            if not '.' in sel_l:
+                data = getattr(self.parent, sel_l)
+            elif 'im' in sel_l:
+                data = getattr(self.parent, sel_l.split('.')[0]).imag
+            else:
+                data = getattr(self.parent, sel_l.split('.')[0]).real
+        if sel_r:
+            if not '.' in sel_r:
+                data_r = getattr(self.parent, sel_r)
+            elif 'im' in sel_r:
+                data_r = getattr(self.parent, sel_r.split('.')[0]).imag
+            else:
+                data_r = getattr(self.parent, sel_r.split('.')[0]).real
+
+            if data is None:
+                data = data_r
+            else:
+                # create 2D-array from 1D arrays and transpose them for row based form
+                data = np.vstack((data, data_r)).T
+        # repeat selected signal(s)
+        cycles = int(self.ui.led_nr_repetitions.text())
+        data = np.tile(data, cycles))
 
         f_S = fb.fil[0]['f_S']
 
