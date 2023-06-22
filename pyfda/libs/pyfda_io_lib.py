@@ -1004,8 +1004,10 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int
             # The bits-per-sample and PCM/float will be determined by the data-type
             # uint8, int16, int32, float32
         elif file_type == 'csv':
-            np.savetxt(file_name, data, fmt="%f",
-                       delimiter=params['CSV']['delimiter'].lower())
+            delimiter = params['CSV']['delimiter'].lower()
+            if delimiter == 'auto':
+                delimiter = ','
+            np.savetxt(file_name, data, fmt="%f", delimiter=delimiter)
             # use %1.2f for reduced number of digits, %d for integer, %s for strings
             # TODO: Integer formats like int16 should be stored as integers
         else:
