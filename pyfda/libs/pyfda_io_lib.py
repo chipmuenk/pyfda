@@ -966,7 +966,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 
 
 # ------------------------------------------------------------------------------
-def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int:
+def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1)-> int:
     """
     Save numpy data to a file in wav or csv format
 
@@ -998,8 +998,16 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1.)-> int
         return -1
     try:
         if file_type == 'wav':
+            f_S_int = int(abs(f_S))
+            if f_S_int == 0:
+                f_S_int = 1
+            if f_S != f_S_int:
+                logger.warning(
+                    "Only integer sampling frequencies can be used for WAV files,\n"
+                    f"sampling frequency has been changed to f_S = {f_S_int}")
+
             # audio = data.T  # transpose data, needed?
-            wavfile.write(file_name, f_S, data.astype(np.int16))
+            wavfile.write(file_name, f_S_int, data.astype(np.int16))
             # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
             # TODO: data type cannot be modified yet
             # The bits-per-sample and PCM/float will be determined by the data-type
