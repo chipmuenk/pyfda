@@ -48,8 +48,16 @@ class Tran_IO_UI(QWidget):
             ("csv", "csv", "Comma / tab separated values text format"),
             ("wav", "wav", "Wave audio file format")
         ]
-
         self.cmb_file_format_init = "csv"
+
+        self.cmb_data_format_items = [
+            "<span>Data format for export</span>",
+            ("float32", "Float", "Floating Point"),
+            ("int32", "Long", "32 Bit Signed Integer"),
+            ("int16", "Short", "16 Bit Signed Integer"),
+            ("uint8", "UInt8", "8 Bit Unsigned Integer")
+        ]
+        self.cmb_data_format_init = "float32"
 
         # combobox tooltip + data / text / item tooltip for channel export (real data)
         # The data field needs to contain the exact name of the corresponding variable (`x`, `y`)
@@ -156,6 +164,8 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
+        line1 = QVLine()
+
         self.but_normalize = PushButton("Norm")
         self.but_normalize.setToolTip(
             self.tr("<span>Normalize data to the value below.</span>"))
@@ -168,9 +178,8 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setText(str(self.led_normalize_default))
         # self.led_normalize.setFixedWidth(self.but_normalize.width())
 
-        line1 = QVLine()
-
         line2 = QVLine()
+
         self.cmb_file_format = QComboBox()
         qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
                           self.cmb_file_format_init)
@@ -179,6 +188,12 @@ class Tran_IO_UI(QWidget):
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
+
+        self.lbl_data_format = QLabel((to_html("Format", frmt="b")))
+        self.cmb_data_format = QComboBox()
+        qcmb_box_populate(self.cmb_data_format, self.cmb_data_format_items,
+                          self.cmb_data_format_init)
+
         line3 = QVLine()  # width=5
 
         self.but_save = QPushButton("Save:")
@@ -232,6 +247,9 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.cmb_file_format, 0, i)
         layG_io_file.addWidget(self.but_csv_options, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.lbl_data_format, 0, i)
+        layG_io_file.addWidget(self.cmb_data_format, 1, i)
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
