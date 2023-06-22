@@ -350,10 +350,10 @@ class Tran_IO(QWidget):
                 data = data_r
             else:
                 # create 2D-array from 1D arrays and transpose them for row based form
-                data = np.vstack((data, data_r)).T
+                data = np.vstack((data, data_r))
         # repeat selected signal(s)
         cycles = int(self.ui.led_nr_repetitions.text())
-        data = np.tile(data, cycles))
+        data = np.tile(data, cycles).T
 
         f_S = fb.fil[0]['f_S']
 
