@@ -158,7 +158,8 @@ class Tran_IO(QWidget):
             self.nchans = io.read_wav_info.nchans
             self.f_S = io.read_wav_info.f_S
             self.WL = io.read_wav_info.WL
-            info_str = f" x {self.WL * 8} bits,"
+            # info_str = f" x {self.WL * 8} bits,"
+            info_str = f" x {io.read_wav_info.sample_format},"
             self.ui.frm_f_s.setVisible(True)
             self.ui.lbl_f_s_value.setText(str(self.f_S))
 
