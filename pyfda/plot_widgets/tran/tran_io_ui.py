@@ -52,10 +52,11 @@ class Tran_IO_UI(QWidget):
 
         self.cmb_data_format_items = [
             "<span>Data format for export</span>",
-            ("float32", "Float", "Floating Point"),
-            ("int32", "Long", "32 Bit Signed Integer"),
-            ("int16", "Short", "16 Bit Signed Integer"),
-            ("uint8", "UInt8", "8 Bit Unsigned Integer")
+            ("uint8", "UInt8", "8 Bit Unsigned Integer (0 ... 255)"),
+            ("int16", "Int16", "16 Bit signed integer (CD-quality), standard WAV-format"),
+            ("int32", "Int32", "32 Bit signed integer for High-Res audio"),
+            ("float32", "Float32", "Floating point single precision"),
+            ("float64", "Float64", "Floating point double precision")
         ]
         self.cmb_data_format_init = "float32"
 
@@ -190,8 +191,9 @@ class Tran_IO_UI(QWidget):
             "to copy to/from clipboard or file.</span>")
 
         self.but_scale_int = PushButton("Scale Int ", checked=True)
-        self.but_scale_int.setToolTip("Autoscale integer data formats for import and"
-                                      "export to represent a signal range of +/- 1")
+        self.but_scale_int.setToolTip(
+            "<span>Autoscale integer data formats for import and"
+            "export to a signal range of +/- 1.</span>")
         layH_file_fmt_options = QHBoxLayout()
         layH_file_fmt_options.addWidget(self.but_csv_options)
         layH_file_fmt_options.addWidget(self.but_scale_int)
@@ -220,11 +222,11 @@ class Tran_IO_UI(QWidget):
                             self.cmb_chan_export_real_items,
                             self.cmb_chan_export_cur_item_r)
 
-        self.lbl_nr_repetitions = QLabel(to_html("Repetitions", frmt='b'))
+        self.lbl_nr_repetitions = QLabel(to_html("Loops", frmt='b'))
 
         self.led_nr_repetitions = QLineEdit()
         self.led_nr_repetitions.setToolTip(self.tr(
-            "<span>Set how many times waveforms are repeated for saving.</span>"))
+            "<span>Select how many times the signal is looped when saving.</span>"))
         self.led_nr_repetitions.setText(str(self.led_nr_repetitions_default))
 
         #-------------------------------
