@@ -354,6 +354,40 @@ class Tran_IO(QWidget):
             else:
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
+
+        # convert to selected data format
+        frmt = qget_cmb_box(self.ui.cmb_data_format)
+        scale_int = self.ui.but_scale_int.isChecked()
+        logger.error(f"frmt = {frmt}, scale_int = {scale_int}")
+        if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
+            logger.error(f"Unsupported format {frmt} for data export.")
+            return -1
+        # elif np.issubdtype(data.dtype, float):
+        elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
+            logger.warning(f"Data has format '{data.dtype}', instead of 'float', "
+                           "scaling may yield incorrect results.")
+        if frmt == 'int16':
+            if scale_int:
+                data = (data * (1 << 15)).astype(np.int16)
+            else:
+                data = data.astype(np.int16)
+        elif frmt == 'int32':
+            if scale_int:
+                data = (data * (1 << 31)).astype(np.int32)
+            else:
+                data = data.astype(np.int32)
+        elif frmt == 'uint8':
+            if scale_int:
+                data = (data * 128 + 128).astype(np.uint8)
+            else:
+                data = data.astype(np.uint8)
+        elif frmt == 'float32':
+            data = data.astype(np.float32)
+        else:
+            data = data.astype(np.float64)            
+
+
+        # repeat selected signal(s) for specified number of cycles
         cycles = int(self.ui.led_nr_repetitions.text())
         data = np.tile(data, cycles).T
 
