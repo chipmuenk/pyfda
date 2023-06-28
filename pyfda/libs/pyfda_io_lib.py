@@ -800,7 +800,7 @@ def read_wav_info(file):
     loading the whole file into memory. This is achieved by reading the
     header.
     """
-
+    # https://wavefilegem.com/how_wave_files_work.html
     # https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
     # http://soundfile.sapp.org/doc/WaveFormat/
     # https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
@@ -831,15 +831,22 @@ def read_wav_info(file):
         logger.error(f"Invalid format header '{FMT}' instead of 'fmt'!")
         return -1
 
-    # Pos. 16: Size of subchunk with format infos, must be 16 bytes for PCM
-    fmt_chnk_size1 = str2int(HEADER[16:20])  # pos. 16
-    if fmt_chnk_size1 != 16:
+    # Pos. 16: Size of subchunk with format infos in bytes, 16 for Int., 18 for float
+    fmt_chnk_size1 = str2int(HEADER[16:20])
+    if fmt_chnk_size1 not in {16, 18}:
         logger.error(f"Invalid size {fmt_chnk_size1} of format subchunk!")
         return -1
 
     # Pos. 20: Audio encoding format, must be 1 for uncompressed PCM
-    if str2int(HEADER[20:22]) != 1:
-        logger.error(f"Invalid audio encoding, only PCM supported!")
+    encoding = str2int(HEADER[20:22])
+    if encoding == 1:
+        sample_format = "int"  # Integer PCM
+    elif encoding == 3:
+        sample_format = "float"  # IEEE Float PCM
+    else:
+        logger.error(f"Invalid audio encoding {encoding}, only uncompressed "
+                     "PCM supported!")
+        sample_format = ""
         return -1
 
     # Pos. 22: Number of channels
@@ -858,19 +865,56 @@ def read_wav_info(file):
     # Pos. 34: Bits per sample, WL = wordlength in bytes
     bits_per_sample = str2int(f.read(2))
 
-    # Pos. 36: String 'data' marks beginning of data subchunk
+    if sample_format == "float":
+        # Format subchunk is 18 bytes long for float samples, hence file pointer
+        # has to be advanced by two bytes
+        _ = f.read(2)
+
+        # ###################### FACT Subchunk ###################################
+        # The fact chunk indicates how many sample frames are in the file. For
+        # integer formats the tag it’s optional; otherwise it’s required. For float
+        # PCM, calculation is performed exactly as for integer PCM, hence, it is not
+        # evaluated here.
+        FACT = f.read(12)
+
+    # ###################### DATA Subchunk #######################################
+    # String 'data' marks beginning of data subchunk
     DATA = f.read(4)
     if DATA != "data":
-        logger.error(f"Invalid data header {DATA}!")
+        logger.error(f"Invalid data header '{DATA}' instead of 'data'!")
         return -1
 
     # -- Function attributes that are accessible from outside
     # ------------------------------------------------------------
     read_wav_info.file_size = file_size
+
+    if sample_format == "int":
+        if bits_per_sample == 8:
+            read_wav_info.sample_format = "UInt8"
+        elif bits_per_sample == 16:
+            read_wav_info.sample_format = "Int16"
+        elif bits_per_sample == 24:
+            read_wav_info.sample_format = "Int24"
+        elif bits_per_sample == 32:
+            read_wav_info.sample_format = "Int32"
+        else:
+            logger.error("Unsupported integer sample format with {bits_per_sample} "
+                         "bits per sample.")
+            return -1
+    else:
+        if bits_per_sample == 32:
+            read_wav_info.sample_format = "Float32"
+        elif bits_per_sample == 64:
+            read_wav_info.sample_format = "Float64"
+        else:
+            logger.error("Unsupported float sample format with {bits_per_sample} "
+                         "bits per sample.")
+            return -1
+
     read_wav_info.WL = bits_per_sample // 8  # Wordlength in bytes
 
-    # Pos. 40: Total number of samples per channel
-    read_wav_info.N = str2int(HEADER[40:44]) // (nchans * read_wav_info.WL)
+    # Pos. 40 or 42: Total number of samples per channel
+    read_wav_info.N = str2int(f.read(4)) // (nchans * read_wav_info.WL)
 
     read_wav_info.nchans = nchans  # number of channels
 
