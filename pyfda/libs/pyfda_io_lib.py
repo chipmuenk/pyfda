@@ -1010,7 +1010,8 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
 
 
 # ------------------------------------------------------------------------------
-def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1)-> int:
+def save_data_np(file_name: str, file_type: str, data: np.ndarray,
+                 f_S: int = 1, fmt: str = '%f') -> int:
     """
     Save numpy data to a file in wav or csv format
 
@@ -1023,10 +1024,17 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1)-> int:
         File type (e.g. 'wav')
 
     data : np.ndarray
-        Data to be saved to a file
+        Data to be saved to a file. The data dtype (uint8, int16, int32, float32)
+        determines the bits-per-sample and PCM/float of the WAV file
 
-    f_S : float
-        Sampling frequency
+    f_S : int (optional)
+        Sampling frequency (only used for WAV file format), only integer sampling
+        frequencies are supported by the WAV format.
+
+    fmt : str (optional)
+        Optional, default '%f'. Format string, only used for exporting data in CSV
+        format. Other options are e.g. '%1.2f' for reduced number of digits, '%d' for
+        integer format or '%s' for strings.
 
     Returns
     -------
@@ -1051,17 +1059,14 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray, f_S=1)-> int:
                     f"sampling frequency has been changed to f_S = {f_S_int}")
 
             # audio = data.T  # transpose data, needed?
-            wavfile.write(file_name, f_S_int, data.astype(np.int16))
+            wavfile.write(file_name, f_S_int, data)
             # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
-            # TODO: data type cannot be modified yet
-            # The bits-per-sample and PCM/float will be determined by the data-type
-            # uint8, int16, int32, float32
+
         elif file_type == 'csv':
             delimiter = params['CSV']['delimiter'].lower()
             if delimiter == 'auto':
                 delimiter = ','
-            np.savetxt(file_name, data, fmt="%f", delimiter=delimiter)
-            # use %1.2f for reduced number of digits, %d for integer, %s for strings
+            np.savetxt(file_name, data, fmt=fmt, delimiter=delimiter)
             # TODO: Integer formats like int16 should be stored as integers
         else:
             logger.error(f"File type {file_type} not supported!")
