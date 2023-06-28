@@ -189,6 +189,13 @@ class Tran_IO_UI(QWidget):
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
+        self.but_scale_int = PushButton("Scale Int ", checked=True)
+        self.but_scale_int.setToolTip("Autoscale integer data formats for import and"
+                                      "export to represent a signal range of +/- 1")
+        layH_file_fmt_options = QHBoxLayout()
+        layH_file_fmt_options.addWidget(self.but_csv_options)
+        layH_file_fmt_options.addWidget(self.but_scale_int)
+
         self.lbl_data_format = QLabel((to_html("Format", frmt="b")))
         self.cmb_data_format = QComboBox()
         qcmb_box_populate(self.cmb_data_format, self.cmb_data_format_items,
@@ -246,10 +253,8 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.cmb_file_format, 0, i)
-        layG_io_file.addWidget(self.but_csv_options, 1, i)
-        i += 1
-        layG_io_file.addWidget(self.lbl_data_format, 0, i)
-        layG_io_file.addWidget(self.cmb_data_format, 1, i)
+        # layG_io_file.addWidget(self.but_csv_options, 1, i)
+        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
@@ -260,6 +265,9 @@ class Tran_IO_UI(QWidget):
         i += 1
         layG_io_file.addWidget(self.cmb_chan_export_l, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.lbl_data_format, 0, i)
+        layG_io_file.addWidget(self.cmb_data_format, 1, i)
         i+= 1
         layG_io_file.addWidget(self.lbl_nr_repetitions, 0, i)
         layG_io_file.addWidget(self.led_nr_repetitions, 1, i)
