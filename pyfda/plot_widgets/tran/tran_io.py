@@ -358,7 +358,7 @@ class Tran_IO(QWidget):
         # convert to selected data format
         frmt = qget_cmb_box(self.ui.cmb_data_format)
         scale_int = self.ui.but_scale_int.isChecked()
-        logger.error(f"frmt = {frmt}, scale_int = {scale_int}")
+
         if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
             logger.error(f"Unsupported format {frmt} for data export.")
             return -1
