@@ -295,6 +295,22 @@ class Tran_IO_UI(QWidget):
         self.wdg_top.setLayout(layH_io)
         self.wdg_top.setContentsMargins(0, 0, 0, 0)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # ------ Local signal-slot-connections
+        self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
+        self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
+        # inizialize data format dependent widgets
+        self.set_ui_visibility()
+
+    # -------------------------------------------------------------------------
+    def set_ui_visibility(self):
+        is_csv_format = qget_cmb_box(self.cmb_file_format) == 'csv'
+        self.but_csv_options.setVisible(is_csv_format)
+
+        int_data_format = qget_cmb_box(self.cmb_data_format)\
+            in {'uint8', 'int16', 'int32'}
+        self.lbl_data_format.setVisible(not is_csv_format)
+        self.cmb_data_format.setVisible(not is_csv_format)
+        self.but_scale_int.setVisible(not is_csv_format and int_data_format)
 
     # -------------------------------------------------------------------------
     def update_ui(self, cmplx=False, fx=False):
