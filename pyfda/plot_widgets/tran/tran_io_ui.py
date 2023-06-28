@@ -63,8 +63,8 @@ class Tran_IO_UI(QWidget):
         # combobox tooltip + data / text / item tooltip for channel export (real data)
         # The data field needs to contain the exact name of the corresponding variable (`x`, `y`)
         self.cmb_chan_export_real_items = [
-            "<span>Select signals for data export. '&Sigma;' "
-            "sums up all columns.</span>",
+            "<span>Select signals for exporting data (one or two channels resp. L / R "
+            "channel for WAV format).</span>",
             ("", "none", "no data"),
             ("x", "x", "Stimuli"),
             ("y", "y", "Response")
