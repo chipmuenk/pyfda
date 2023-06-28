@@ -202,9 +202,9 @@ class Tran_IO_UI(QWidget):
                                       QSizePolicy.Expanding)
         self.but_save.setToolTip(
             self.tr("<span>Save selected signals to R/L file channels.</span>"))
-        self.lbl_chan_export_l = QLabel(to_html("Left", frmt="b"))
+        self.lbl_chan_export_l = QLabel(to_html("L:", frmt="b"))
         self.cmb_chan_export_l = QComboBox(self)
-        self.lbl_chan_export_r = QLabel(to_html("Right", frmt="b"))
+        self.lbl_chan_export_r = QLabel(to_html("R:", frmt="b"))
         self.cmb_chan_export_r = QComboBox(self)
         qcmb_box_populate(self.cmb_chan_export_l,
                             self.cmb_chan_export_real_items,
@@ -213,7 +213,7 @@ class Tran_IO_UI(QWidget):
                             self.cmb_chan_export_real_items,
                             self.cmb_chan_export_cur_item_r)
 
-        self.lbl_nr_repetitions = QLabel(to_html("Repeats", frmt='b'))
+        self.lbl_nr_repetitions = QLabel(to_html("Repetitions", frmt='b'))
 
         self.led_nr_repetitions = QLineEdit()
         self.led_nr_repetitions.setToolTip(self.tr(
@@ -291,8 +291,8 @@ class Tran_IO_UI(QWidget):
     # -------------------------------------------------------------------------
     def update_ui(self, cmplx=False, fx=False):
         """
-        Update the combo boxes for file saving, depending on whether signals are complex
-        and fixpoint simulation has been selected.
+        Update the combo boxes for file saving, depending on whether signals are
+        complex and fixpoint simulation has been selected.
         """
         self.cmb_chan_export_cur_item_l = qget_cmb_box(self.cmb_chan_export_l)
         self.cmb_chan_export_cur_item_r = qget_cmb_box(self.cmb_chan_export_r)

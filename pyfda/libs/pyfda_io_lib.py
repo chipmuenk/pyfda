@@ -828,7 +828,7 @@ def read_wav_info(file):
     # Pos. 12: String 'fmt ' marks beginning of format subchunk
     FMT = HEADER[12:16]  # f.read(4)
     if FMT != "fmt ":  # pos. 12
-        logger.error(f"Invalid format header {FMT}!")
+        logger.error(f"Invalid format header '{FMT}' instead of 'fmt'!")
         return -1
 
     # Pos. 16: Size of subchunk with format infos, must be 16 bytes for PCM

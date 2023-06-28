@@ -313,6 +313,8 @@ class Tran_IO(QWidget):
         """
         Save a file with UI dialog (CSV or WAV), using the data for left and right
         channel, selected in the UI.
+
+        TODO: uint8 export doesn't work, real export produces incompatible format?
         """
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
 
@@ -349,9 +351,8 @@ class Tran_IO(QWidget):
             if data is None:
                 data = data_r
             else:
-                # create 2D-array from 1D arrays and transpose them for row based form
+                # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
-        # repeat selected signal(s)
         cycles = int(self.ui.led_nr_repetitions.text())
         data = np.tile(data, cycles).T
 
