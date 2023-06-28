@@ -256,9 +256,9 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.but_save, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.lbl_chan_export_l, 0, i)
-        layG_io_file.addWidget(self.cmb_chan_export_l, 1, i)
+        layG_io_file.addWidget(self.lbl_chan_export_r, 1, i)
         i += 1
-        layG_io_file.addWidget(self.lbl_chan_export_r, 0, i)
+        layG_io_file.addWidget(self.cmb_chan_export_l, 0, i)
         layG_io_file.addWidget(self.cmb_chan_export_r, 1, i)
         i+= 1
         layG_io_file.addWidget(self.lbl_nr_repetitions, 0, i)
