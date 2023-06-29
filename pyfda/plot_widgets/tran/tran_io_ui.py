@@ -17,7 +17,7 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     QVLine, PushButton, qget_cmb_box, qcmb_box_populate, qcmb_box_add_items,
-    qcmb_box_del_item)
+    qcmb_box_del_item, qtext_width)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -177,7 +177,9 @@ class Tran_IO_UI(QWidget):
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
         self.led_normalize.setText(str(self.led_normalize_default))
-        # self.led_normalize.setFixedWidth(self.but_normalize.width())
+        self.led_normalize.setEnabled(False)
+        self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
+        # self.led_normalize.setFixedWidth(self.but_normalize.sizeHint().width())
 
         line2 = QVLine()
 
