@@ -181,7 +181,7 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
         # self.led_normalize.setFixedWidth(self.but_normalize.sizeHint().width())
 
-        line2 = QVLine()
+        line2 = QVLine(width=5)
 
         self.cmb_file_format = QComboBox()
         qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
@@ -205,7 +205,7 @@ class Tran_IO_UI(QWidget):
         qcmb_box_populate(self.cmb_data_format, self.cmb_data_format_items,
                           self.cmb_data_format_init)
 
-        line3 = QVLine()  # width=5
+        line3 = QVLine(width=5)
 
         self.but_save = QPushButton("Save:")
         self.but_save.setObjectName("large")
