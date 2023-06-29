@@ -99,7 +99,7 @@ class Tran_IO_UI(QWidget):
         self.cmb_chan_export_cur_item_l = "x"
         self.cmb_chan_export_cur_item_r = "y"
 
-        self.led_nr_repetitions_default = 1
+        self.led_nr_loops_default = 1
 
         super(Tran_IO_UI, self).__init__(parent)
         self._construct_UI()
@@ -222,12 +222,13 @@ class Tran_IO_UI(QWidget):
                             self.cmb_chan_export_real_items,
                             self.cmb_chan_export_cur_item_r)
 
-        self.lbl_nr_repetitions = QLabel(to_html("Loops", frmt='b'))
+        self.lbl_nr_loops = QLabel(to_html("Loops", frmt='b'))
 
-        self.led_nr_repetitions = QLineEdit()
-        self.led_nr_repetitions.setToolTip(self.tr(
+        self.led_nr_loops = QLineEdit()
+        self.led_nr_loops.setToolTip(self.tr(
             "<span>Select how many times the signal is looped when saving.</span>"))
-        self.led_nr_repetitions.setText(str(self.led_nr_repetitions_default))
+        self.led_nr_loops.setText(str(self.led_nr_loops_default))
+        self.led_nr_loops.setMaximumWidth(qtext_width(N_x=8))
 
         #-------------------------------
         layG_io_file = QGridLayout()
@@ -271,8 +272,8 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_data_format, 0, i)
         layG_io_file.addWidget(self.cmb_data_format, 1, i)
         i+= 1
-        layG_io_file.addWidget(self.lbl_nr_repetitions, 0, i)
-        layG_io_file.addWidget(self.led_nr_repetitions, 1, i)
+        layG_io_file.addWidget(self.lbl_nr_loops, 0, i)
+        layG_io_file.addWidget(self.led_nr_loops, 1, i)
         #
         layG_io_file.setColumnStretch(i+1, 1)
         # --------
