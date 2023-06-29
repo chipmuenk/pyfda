@@ -362,7 +362,6 @@ class Tran_IO(QWidget):
         if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
             logger.error(f"Unsupported format {frmt} for data export.")
             return -1
-        # elif np.issubdtype(data.dtype, float):
         elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
             logger.warning(f"Data has format '{data.dtype}', instead of 'float', "
                            "scaling may yield incorrect results.")
