@@ -119,7 +119,7 @@ class Tran_IO_UI(QWidget):
         self.but_load.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_load.setToolTip(
-            self.tr("<span>Load / unload file.</span>"))
+            self.tr("<span>Load / unload selected file.</span>"))
         self.but_load.setEnabled(False)
 
         self.but_select = PushButton("Select", checkable=False)
