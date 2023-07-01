@@ -387,7 +387,7 @@ class Tran_IO(QWidget):
 
 
         # repeat selected signal(s) for specified number of cycles
-        cycles = int(self.ui.led_nr_repetitions.text())
+        cycles = int(self.ui.led_nr_loops.text())
         data = np.tile(data, cycles).T
 
         f_S = fb.fil[0]['f_S']
