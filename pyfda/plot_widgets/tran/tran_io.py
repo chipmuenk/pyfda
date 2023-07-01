@@ -267,6 +267,21 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.setEnabled(True)
         self.ui.led_normalize.setEnabled(True)
 
+        scale_int = 1
+        offset_int = 0
+        if self.file_type == 'wav' and self.ui.but_scale_int.isChecked() == True:
+            if io.read_wav_info.sample_format == "int16":
+                scale_int = 1 << 15 - 1
+            elif io.read_wav_info.sample_format == "int24":
+                scale_int = 1 << 23 - 1
+            elif io.read_wav_info.sample_format == "int32":
+                scale_int = 1 << 31 - 1
+            elif io.read_wav_info.sample_format == "uint8":
+                scale_int = 1 << 7 - 1
+                offset_int = 128
+
+        data = data / scale_int + offset_int
+
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
             self.ui.led_normalize.setText(str(self.norm))
