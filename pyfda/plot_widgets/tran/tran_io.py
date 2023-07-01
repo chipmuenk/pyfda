@@ -367,17 +367,17 @@ class Tran_IO(QWidget):
                            "scaling may yield incorrect results.")
         if frmt == 'int16':
             if scale_int:
-                data = (data * (1 << 15)).astype(np.int16)
+                data = (data * (1 << 15 - 1)).astype(np.int16)
             else:
                 data = data.astype(np.int16)
         elif frmt == 'int32':
             if scale_int:
-                data = (data * (1 << 31)).astype(np.int32)
+                data = (data * (1 << 31 - 1)).astype(np.int32)
             else:
                 data = data.astype(np.int32)
         elif frmt == 'uint8':
             if scale_int:
-                data = (data * 128 + 128).astype(np.uint8)
+                data = (data * 127 + 128).astype(np.uint8)
             else:
                 data = data.astype(np.uint8)
         elif frmt == 'float32':
