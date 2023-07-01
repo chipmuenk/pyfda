@@ -890,13 +890,13 @@ def read_wav_info(file):
 
     if sample_format == "int":
         if bits_per_sample == 8:
-            read_wav_info.sample_format = "UInt8"
+            read_wav_info.sample_format = "uint8"
         elif bits_per_sample == 16:
-            read_wav_info.sample_format = "Int16"
+            read_wav_info.sample_format = "int16"
         elif bits_per_sample == 24:
-            read_wav_info.sample_format = "Int24"
+            read_wav_info.sample_format = "int24"
         elif bits_per_sample == 32:
-            read_wav_info.sample_format = "Int32"
+            read_wav_info.sample_format = "int32"
         else:
             logger.error("Unsupported integer sample format with {bits_per_sample} "
                          "bits per sample.")
