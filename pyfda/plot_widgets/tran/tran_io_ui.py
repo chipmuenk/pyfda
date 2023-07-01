@@ -114,14 +114,25 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        self.but_load = QPushButton("Load:")
-        self.but_load.setObjectName("large")
-        self.but_load.setSizePolicy(QSizePolicy.Expanding,
-                                    QSizePolicy.Expanding)
-        self.but_load.setToolTip(
-            self.tr("<span>Load / unload selected file.</span>"))
-        self.but_load.setEnabled(False)
+        self.cmb_file_format = QComboBox()
+        qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
+                          self.cmb_file_format_init)
+        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+                                          checked=False)
+        self.but_csv_options.setToolTip(
+            "<span>Select CSV format and whether "
+            "to copy to/from clipboard or file.</span>")
 
+        self.but_scale_int = PushButton("Scale Int ", checked=True)
+        self.but_scale_int.setToolTip(
+            "<span>Autoscale integer data formats with the max. number "
+            "when importing and exporting.</span>")
+        layH_file_fmt_options = QHBoxLayout()
+        layH_file_fmt_options.addWidget(self.but_csv_options)
+        layH_file_fmt_options.addWidget(self.but_scale_int)
+
+        # ----------- LOAD ------------------------------------------------------------
+        line1 = QVLine(width=10)
         self.but_select = PushButton("Select", checkable=False)
         self.but_select.setObjectName("large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
@@ -129,6 +140,14 @@ class Tran_IO_UI(QWidget):
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load"
                    " it yet.</span>"))
+
+        self.but_load = QPushButton("Load:")
+        self.but_load.setObjectName("large")
+        self.but_load.setSizePolicy(QSizePolicy.Expanding,
+                                    QSizePolicy.Expanding)
+        self.but_load.setToolTip(
+            self.tr("<span>Load / unload selected file.</span>"))
+        self.but_load.setEnabled(False)
 
         self.lbl_file = QLabel(to_html("Name:", frmt="b"))
         self.lbl_filename = QLabel("None")
@@ -165,8 +184,6 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        line1 = QVLine()
-
         self.but_normalize = PushButton("Norm")
         self.but_normalize.setToolTip(
             self.tr("<span>Normalize data to the value below.</span>"))
@@ -174,6 +191,7 @@ class Tran_IO_UI(QWidget):
         self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
+        line2 = QVLine(width=5)
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
         self.led_normalize.setText(str(self.led_normalize_default))
@@ -181,32 +199,8 @@ class Tran_IO_UI(QWidget):
         self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
         # self.led_normalize.setFixedWidth(self.but_normalize.sizeHint().width())
 
-        line2 = QVLine(width=5)
-
-        self.cmb_file_format = QComboBox()
-        qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
-                          self.cmb_file_format_init)
-        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
-                                          checked=False)
-        self.but_csv_options.setToolTip(
-            "<span>Select CSV format and whether "
-            "to copy to/from clipboard or file.</span>")
-
-        self.but_scale_int = PushButton("Scale Int ", checked=True)
-        self.but_scale_int.setToolTip(
-            "<span>Autoscale integer data formats with the max. number "
-            "when importing and exporting.</span>")
-        layH_file_fmt_options = QHBoxLayout()
-        layH_file_fmt_options.addWidget(self.but_csv_options)
-        layH_file_fmt_options.addWidget(self.but_scale_int)
-
-        self.lbl_data_format = QLabel((to_html("Format", frmt="b")))
-        self.cmb_data_format = QComboBox()
-        qcmb_box_populate(self.cmb_data_format, self.cmb_data_format_items,
-                          self.cmb_data_format_init)
-
+        # ----------- SAVE ------------------------------------------------------------
         line3 = QVLine(width=5)
-
         self.but_save = QPushButton("Save:")
         self.but_save.setObjectName("large")
         self.but_save.setSizePolicy(QSizePolicy.Expanding,
@@ -224,6 +218,11 @@ class Tran_IO_UI(QWidget):
                             self.cmb_chan_export_real_items,
                             self.cmb_chan_export_cur_item_r)
 
+        self.lbl_data_format = QLabel((to_html("Format", frmt="b")))
+        self.cmb_data_format = QComboBox()
+        qcmb_box_populate(self.cmb_data_format, self.cmb_data_format_items,
+                          self.cmb_data_format_init)
+
         self.lbl_nr_loops = QLabel(to_html("Loops", frmt='b'))
 
         self.led_nr_loops = QLineEdit()
@@ -235,6 +234,12 @@ class Tran_IO_UI(QWidget):
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
+        layG_io_file.addWidget(self.cmb_file_format, 0, i)
+        # layG_io_file.addWidget(self.but_csv_options, 1, i)
+        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
+        i += 1
+        layG_io_file.addWidget(line1, 0, i, 2, 1)
+        i += 1
         layG_io_file.addWidget(self.but_select, 0, i)
         layG_io_file.addWidget(self.but_load, 1, i)
         i += 1
@@ -250,16 +255,10 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.lbl_chan_import, 0, i)
         layG_io_file.addWidget(self.cmb_chan_import, 1, i)
         i+=1
-        layG_io_file.addWidget(line1, 0, i, 2, 1)
+        layG_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
         layG_io_file.addWidget(self.but_normalize, 0, i)
         layG_io_file.addWidget(self.led_normalize, 1, i)
-        i += 1
-        layG_io_file.addWidget(line2, 0, i, 2, 1)
-        i += 1
-        layG_io_file.addWidget(self.cmb_file_format, 0, i)
-        # layG_io_file.addWidget(self.but_csv_options, 1, i)
-        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
@@ -311,11 +310,11 @@ class Tran_IO_UI(QWidget):
         is_csv_format = qget_cmb_box(self.cmb_file_format) == 'csv'
         self.but_csv_options.setVisible(is_csv_format)
 
-        int_data_format = qget_cmb_box(self.cmb_data_format)\
-            in {'uint8', 'int16', 'int32'}
+        # int_data_format = qget_cmb_box(self.cmb_data_format)\
+        #    in {'uint8', 'int16', 'int32'}
         self.lbl_data_format.setVisible(not is_csv_format)
         self.cmb_data_format.setVisible(not is_csv_format)
-        self.but_scale_int.setVisible(not is_csv_format and int_data_format)
+        self.but_scale_int.setVisible(not is_csv_format)
 
     # -------------------------------------------------------------------------
     def update_ui(self, cmplx=False, fx=False):
