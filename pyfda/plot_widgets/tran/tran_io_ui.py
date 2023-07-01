@@ -125,7 +125,7 @@ class Tran_IO_UI(QWidget):
 
         self.but_scale_int = PushButton("Scale Int ", checked=True)
         self.but_scale_int.setToolTip(
-            "<span>Autoscale integer data formats with the max. number "
+            "<span>Autoscale integer data with the max. pos. value "
             "when importing and exporting.</span>")
         layH_file_fmt_options = QHBoxLayout()
         layH_file_fmt_options.addWidget(self.but_csv_options)
@@ -184,16 +184,16 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        self.but_normalize = PushButton("Norm")
+        self.but_normalize = PushButton("Scale")
         self.but_normalize.setToolTip(
-            self.tr("<span>Normalize data to the value below.</span>"))
+            self.tr("<span>Scale data to the maximum value below.</span>"))
         self.but_normalize.setEnabled(False)
         self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
         line2 = QVLine(width=5)
         self.led_normalize = QLineEdit()
-        self.led_normalize.setToolTip(self.tr("Max. value for normalization"))
+        self.led_normalize.setToolTip(self.tr("Max. value after scaling"))
         self.led_normalize.setText(str(self.led_normalize_default))
         self.led_normalize.setEnabled(False)
         self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
