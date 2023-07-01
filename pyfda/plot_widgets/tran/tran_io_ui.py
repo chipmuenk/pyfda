@@ -125,8 +125,8 @@ class Tran_IO_UI(QWidget):
 
         self.but_scale_int = PushButton("Scale Int ", checked=True)
         self.but_scale_int.setToolTip(
-            "<span>Autoscale integer data with the max. pos. value "
-            "when importing and exporting.</span>")
+            "<span>Autoscale integer data when importing and exporting so that "
+            "1.0 represents the max. positive value.</span>")
         layH_file_fmt_options = QHBoxLayout()
         layH_file_fmt_options.addWidget(self.but_csv_options)
         layH_file_fmt_options.addWidget(self.but_scale_int)
