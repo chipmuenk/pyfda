@@ -468,7 +468,7 @@ class Plot_Tran_Stim(QWidget):
         # ######################################################################
 
         # Add noise to stimulus when enabled:
-        if noi != 0:
+        if qget_cmb_box(self.ui.cmb_stim_noise) != "none":
             x[frm_slc] = add_signal(x[frm_slc], noi)
 
         # Add DC to stimulus when visible / enabled

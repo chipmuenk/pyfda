@@ -413,13 +413,13 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_BW2.setObjectName("stimBW2")
         # ----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
-        self.cmbNoise = QComboBox(self)
-        qcmb_box_populate(self.cmbNoise, self.cmb_stim_noise_items, self.noise)
+        self.cmb_stim_noise = QComboBox(self)
+        qcmb_box_populate(self.cmb_stim_noise, self.cmb_stim_noise_items, self.noise)
 
         line2 = QVLine()
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
-        self.ledNoi.setMaximumWidth(self.cmbNoise.width())
+        self.ledNoi.setMaximumWidth(self.cmb_stim_noise.width())
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
@@ -490,7 +490,7 @@ class Plot_Tran_Stim_UI(QWidget):
         layG_ctrl_stim.addWidget(self.lblNoise, 0, i)
         layG_ctrl_stim.addWidget(self.lblNoi, 1, i)
         i += 1
-        layG_ctrl_stim.addWidget(self.cmbNoise, 0, i)
+        layG_ctrl_stim.addWidget(self.cmb_stim_noise, 0, i)
         layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
@@ -564,7 +564,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.chk_step_err.clicked.connect(self._enable_stim_widgets)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
 
-        self.cmbNoise.currentIndexChanged.connect(self._update_noi)
+        self.cmb_stim_noise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledNoi_par.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
@@ -974,7 +974,7 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
-        self.noise = qget_cmb_box(self.cmbNoise)
+        self.noise = qget_cmb_box(self.cmb_stim_noise)
         self.lblNoi.setVisible(self.noise != 'none')
         self.ledNoi.setVisible(self.noise != 'none')
         self.lblNoi_par.setVisible(self.noise == 'mls')

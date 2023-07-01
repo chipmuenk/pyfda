@@ -531,7 +531,7 @@ class Plot_Impz(QWidget):
         # button is only visible for impulse-shaped stimuli
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
-             self.stim_wdg.ui.cmbNoise.currentText() == 'None')
+             self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
             and qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off"
