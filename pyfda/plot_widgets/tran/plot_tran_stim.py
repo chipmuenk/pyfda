@@ -264,9 +264,7 @@ class Plot_Tran_Stim(QWidget):
         # calculate stimuli x[n]
         #
         # ######################################################################
-        if self.ui.stim == "none":
-            pass
-        elif qget_cmb_box(self.ui.cmb_file_io) == "use":
+        if qget_cmb_box(self.ui.cmb_file_io) == "use":
             if self.x_file is None:
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
@@ -280,6 +278,9 @@ class Plot_Tran_Stim(QWidget):
                 # file data has been consumed, nothing left to be added
                 pass
             return
+        # ----------------------------------------------------------------------
+        elif self.ui.stim == "none":
+            pass
         # ----------------------------------------------------------------------
         elif self.ui.stim == "dirac":
             if N_first <= self.T1_idx < N_last:
