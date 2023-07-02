@@ -9,7 +9,7 @@
 #   git push
 #   git push origin --tags
 ---
-name: build_pyinstaller
+name: build_pyinstaller_bak
 
 on:
   push:
