@@ -271,16 +271,16 @@ class Tran_IO(QWidget):
         offset_int = 0
         if self.file_type == 'wav' and self.ui.but_scale_int.isChecked() == True:
             if io.read_wav_info.sample_format == "int16":
-                scale_int = 1 << 15 - 1
+                scale_int = (1 << 15) - 1
             elif io.read_wav_info.sample_format == "int24":
-                scale_int = 1 << 23 - 1
+                scale_int = (1 << 23) - 1
             elif io.read_wav_info.sample_format == "int32":
-                scale_int = 1 << 31 - 1
+                scale_int = (1 << 31) - 1
             elif io.read_wav_info.sample_format == "uint8":
-                scale_int = 1 << 7 - 1
+                scale_int = (1 << 7) - 1
                 offset_int = 128
 
-        data = data / scale_int + offset_int
+        data = (data - offset_int) / scale_int
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
@@ -330,7 +330,7 @@ class Tran_IO(QWidget):
         Save a file with UI dialog (CSV or WAV), using the data for left and right
         channel, selected in the UI.
 
-        TODO: uint8 export doesn't work, real export produces incompatible format?
+        TODO: uint8 export doesn't work
         """
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
 
@@ -382,12 +382,12 @@ class Tran_IO(QWidget):
                            "scaling may yield incorrect results.")
         if frmt == 'int16':
             if scale_int:
-                data = (data * (1 << 15 - 1)).astype(np.int16)
+                data = (data * ((1 << 15) - 1)).astype(np.int16)
             else:
                 data = data.astype(np.int16)
         elif frmt == 'int32':
             if scale_int:
-                data = (data * (1 << 31 - 1)).astype(np.int32)
+                data = (data * ((1 << 31) - 1)).astype(np.int32)
             else:
                 data = data.astype(np.int32)
         elif frmt == 'uint8':
