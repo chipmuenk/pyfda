@@ -58,7 +58,7 @@ class Tran_IO_UI(QWidget):
             ("float32", "Float32", "Floating point single precision"),
             ("float64", "Float64", "Floating point double precision")
         ]
-        self.cmb_data_format_init = "float32"
+        self.cmb_data_format_init = "int16"
 
         # combobox tooltip + data / text / item tooltip for channel export (real data)
         # The data field needs to contain the exact name of the corresponding variable (`x`, `y`)
