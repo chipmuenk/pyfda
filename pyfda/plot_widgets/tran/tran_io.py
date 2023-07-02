@@ -280,7 +280,7 @@ class Tran_IO(QWidget):
                 scale_int = 1 << 7 - 1
                 offset_int = 128
 
-        data = data / scale_int + offset_int
+        data = data / scale_int - offset_int
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
