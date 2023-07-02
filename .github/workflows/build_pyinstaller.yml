@@ -33,8 +33,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         # tag_name: ${{ github.ref }}
-        tag_name: latest     
-        release_name: Release ${{ github.ref }}
+        # tag_name: latest     
+        # release_name: Release ${{ github.ref }}
+        release_name: Release Latest
         draft: false
         prerelease: false
     - name: Output Release URL File
