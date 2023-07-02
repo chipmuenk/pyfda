@@ -41,6 +41,8 @@ jobs:
         MY_RELEASE_NAME: Release Latest
         MY_PRERELEASE: true
       run: echo "No tag name was given, use commit SHA $MY_TAG_NAME instead and create a 'Latest' pre-release."
+      
+      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
