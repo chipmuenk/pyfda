@@ -24,34 +24,33 @@ jobs:
   createrelease:
     name: Pre-Release
     runs-on: [ubuntu-latest]
+
     steps:
+    - name: Set tag and release name to specified label
+      if: github.ref_type == 'tag'
+      run: echo "Use given tag name for the name of the release"
+      env:
+        MY_TAG_NAME: ${{ github.ref_name }}
+        MY_RELEASE_NAME: Release ${{ github.ref_name }}
+        MY_PRERELEASE: false
+
+    - name: Set tag and release name to sha / latest if no tag was given
+      if: github.ref_type != 'tag'
+      run: echo "No tag name was given, use commit SHA instead and create a 'Latest' pre-release"
+      env:
+        MY_TAG_NAME: ${{ github.sha }}
+        MY_RELEASE_NAME: Release Latest
+        MY_PRERELEASE: true
     - name: Create Release
       id: create_release
-    - name: Tag name specified, use it
-      if: github.ref_type == 'tag'
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }} 
+        tag_name: $MY_TAG_NAME
+        release_name: $MY_RELEASE_NAME
         draft: false
-        prerelease: false
-
-    - name: Push without tag name, use commit id instead
-      if: github.ref_type != 'tag'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # tag_name: ${{ github.ref }}
-        # tag_name: latest
-        # release_name: Release ${{ github.ref }}
-        tag_name: ${{ github.sha }}
-        release_name: Release Latest
-        draft: false
-        prerelease: true
-          
+        prerelease: $MY_PRERELEASE     
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
