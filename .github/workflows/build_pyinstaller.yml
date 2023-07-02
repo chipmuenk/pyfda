@@ -31,7 +31,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
+        # tag_name: ${{ github.ref }}
+        tag_name: latest     
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
@@ -42,6 +43,18 @@ jobs:
       with:
         name: release_url
         path: release_url.txt
+
+  create_latest_tag:
+    name: Create 'latest' tag
+    runs-on: [ubuntu-latest]
+    needs: createrelease
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Create 'latest' tag
+        run: |
+          git tag -fa latest -m "Latest version"
+          git push origin -f latest
 
   build:
     name: Build packages
