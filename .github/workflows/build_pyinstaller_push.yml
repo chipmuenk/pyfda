@@ -47,10 +47,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: $MY_TAG_NAME
-        release_name: $MY_RELEASE_NAME
+        tag_name: ${{ env.MY_TAG_NAME }}
+        release_name: ${{ env.MY_RELEASE_NAME }}
         draft: false
-        prerelease: $MY_PRERELEASE
+        prerelease: ${{ env.MY_PRERELEASE }}
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
