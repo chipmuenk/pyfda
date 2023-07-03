@@ -156,6 +156,7 @@ class Plot_Impz(QWidget):
         self.ui.frm_file_io.setLayout(self.stim_wdg.ui.layH_file_io)
         # self.color = self.ui.frm_file_io.palette().color(QPalette.Background)
         # logger.warning(f"color = {self.color.red()}, {self.color.green()}, {self.color.blue()}")
+        # self.stim_wdg.ui.cmb_file_io.setStyleSheet("border: 2px solid red;")
 
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
@@ -482,16 +483,17 @@ class Plot_Impz(QWidget):
         if not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.ui.frm_file_io.setEnabled(False)
-            self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
+            # self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
         # File is loaded, enable file_io combobox
         else:
             self.ui.frm_file_io.setEnabled(True)
+            # File is loaded but combobox is set to 'off' - alert user
             if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
-                self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
+                self.stim_wdg.ui.lbl_file_io.setStyleSheet("border: 2px solid red;")
                 return
             else:
                 # "use" or "add", map data from file io widget to stimulus widget:
-                self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color:lightblue;}')
+                self.stim_wdg.ui.lbl_file_io.setStyleSheet("border: None;")
                 self.stim_wdg.x_file = self.file_io_wdg.x_file
 
 
