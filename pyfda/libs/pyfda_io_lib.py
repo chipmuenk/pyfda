@@ -1072,12 +1072,12 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
             logger.error(f"File type {file_type} not supported!")
             return -1
 
-        logger.info(f'Filter saved as\n\t"{file_name}"')
+        logger.info(f'Saved data as\n\t"{file_name}".')
         return 0
 
 
     except IOError as e:
-        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
+        logger.error(f'Failed saving "{file_name}"!\n{e}\n')
         return -1
 
 # ------------------------------------------------------------------------------
