@@ -28,19 +28,14 @@ jobs:
     steps:
     - name: Set tag and release name to specified label
       if: github.ref_type == 'tag'
-      env:
-        MY_TAG_NAME: ${{ github.ref_name }}
-        MY_RELEASE_NAME: Release ${{ github.ref_name }}
-        MY_PRERELEASE: false
-      run: echo "Use given tag name for the name of the release"
-
+      run: |
+        echo "${{ github.ref_name }}" > tag_name.txt
+        echo Release "${{ github.ref_name }}" > release_name.txt
     - name: Set tag and release name $MY_TAG_NAME to sha / latest if no tag was given
       if: github.ref_type != 'tag'
-      env:
-        MY_TAG_NAME: ${{ github.sha }}
-        MY_RELEASE_NAME: Release Latest
-        MY_PRERELEASE: true
-      run: echo "No tag name was given, use commit SHA $MY_TAG_NAME instead and create a 'Latest' pre-release."
+      run: |
+        echo "${{ github.sha }}" > tag_name.txt
+        echo Release latest" > release_name.txt
       
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
@@ -49,10 +44,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.MY_TAG_NAME }}
-        release_name: ${{ env.MY_RELEASE_NAME }}
+        tag_name: tag_name.txt
+        release_name: release_name.txt
         draft: false
-        prerelease: ${{ env.MY_PRERELEASE }}
+        prerelease: true
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
