@@ -30,8 +30,8 @@ jobs:
       if: github.ref_type == 'tag'
       run: |
         echo "${{ github.ref_name }}" > tag_name.txt
-        echo Release "${{ github.ref_name }}" > release_name.txt
-    - name: Set tag and release name $MY_TAG_NAME to sha / latest if no tag was given
+        echo "Release ${{ github.ref_name }}" > release_name.txt
+    - name: Set tag and release name to sha / latest if no tag was given
       if: github.ref_type != 'tag'
       run: |
         echo "${{ github.sha }}" > tag_name.txt
