@@ -35,7 +35,7 @@ jobs:
       if: github.ref_type != 'tag'
       run: |
         echo "${{ github.sha }}" > tag_name.txt
-        echo Release latest" > release_name.txt
+        echo "Release latest" > release_name.txt
       
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
