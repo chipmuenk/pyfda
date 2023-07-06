@@ -458,10 +458,9 @@ class Plot_Impz(QWidget):
         """
         Check status of file_io widget:
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
-        - if `cmb_file_io == 'add'` or `use`, set N_end = len(file_data) in the UI
+        - else set N_end = len(file_data) in the UI
         """
         if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
-            qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.ui.frm_file_io.setEnabled(False)
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to N_end
@@ -472,29 +471,27 @@ class Plot_Impz(QWidget):
     def file_io(self):
         """
         Check status of file_io widget:
-        - if no file is loaded or `cmb_file_io == 'off'`, do nothing and return 0
-        - if `cmb_file_io == 'add'`, map the file data to `self.stim_wdg.x_file`
-          to make it accessible from the stimulus widget
-        - if `cmb_file_io == 'use'` do the same and set N_end = len(file_data) in the UI
+        - if no file is loaded, do nothing and return 0, disable `cmb_file_io` and
+          the option to transfer the number of samples to N
+        - else map the file data to `self.stim_wdg.x_file` to make it accessible
+           from the stimulus widget. If `cmb_file_io == `use`, disable the widget to
+           modify stimuli
         """
         # No file has been loaded or number of data points is zero
-        #    -> set file_io combobox to off and disable it:
-        if not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
-            qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
+        #    -> disable file_io combobox:
+        if self.file_io_wdg.ui.but_load.property("state") != "ok" or\
+            not self.file_io_wdg.ui.but_load.isEnabled() or\
+                not hasattr(self.file_io_wdg, 'x') or self.file_io_wdg.x is None:
             self.ui.frm_file_io.setEnabled(False)
-            # self.stim_wdg.ui.cmb_file_io.setStyleSheet('QComboBox{background-color: none;}')
-        # File is loaded, enable file_io combobox
+            self.stim_wdg.ui.wdg_stim.setEnabled(True)
+
+        # File is loaded, enable file_io combobox, disable stimulus and formula
+        # widget if file_io is set to "use" (in contrast to "add")
         else:
             self.ui.frm_file_io.setEnabled(True)
-            # File is loaded but combobox is set to 'off' - alert user
-            if qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off":
-                self.stim_wdg.ui.lbl_file_io.setStyleSheet("border: 2px solid red;")
-                return
-            else:
-                # "use" or "add", map data from file io widget to stimulus widget:
-                self.stim_wdg.ui.lbl_file_io.setStyleSheet("border: None;")
-                self.stim_wdg.x_file = self.file_io_wdg.x_file
-
+            self.stim_wdg.x_file = self.file_io_wdg.x_file
+            self.stim_wdg.ui.wdg_stim.setEnabled(
+                qget_cmb_box(self.stim_wdg.ui.cmb_file_io) != "use")
 
     # =========================================================================
     # Simulation: Calculate stimulus, response and draw them
@@ -535,7 +532,7 @@ class Plot_Impz(QWidget):
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
-            and qget_cmb_box(self.stim_wdg.ui.cmb_file_io) == "off"
+            and self.file_io_wdg.ui.but_load.property("state") == "normal"
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
@@ -569,10 +566,8 @@ class Plot_Impz(QWidget):
                     or (self.stim_wdg.ui.ledAmp1.isVisible and type(self.stim_wdg.ui.A1) == complex)\
                 or (self.stim_wdg.ui.ledAmp2.isVisible and type(self.stim_wdg.ui.A2) == complex)\
                     or np.any(np.iscomplex(np.asarray(fb.fil[0]['ba'])))\
-                or (qget_cmb_box(self.stim_wdg.ui.cmb_file_io) in {"use", "add"}
-                    and self.file_io_wdg.ui.but_load.property("state") == 'ok'
-                    # and self.file_io_wdg.file_load_status == 'loaded'
-                    and np.iscomplexobj(self.file_io_wdg.x))\
+                or self.file_io_wdg.ui.but_load.property("state") == 'ok'\
+                    and np.iscomplexobj(self.file_io_wdg.x)\
                 or np.any(np.iscomplex(x_test)))
 
             self.ui.lbl_stim_cmplx_warn.setVisible(self.cmplx)

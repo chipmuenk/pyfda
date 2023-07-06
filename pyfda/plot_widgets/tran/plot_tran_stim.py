@@ -166,10 +166,11 @@ class Plot_Tran_Stim(QWidget):
             if self.ui.ledDC.isVisible and self.ui.DC != 0:
                 self.title_str += r' + DC'
             # ==================================================================
-            if qget_cmb_box(self.ui.cmb_file_io) == "add":
-                self.title_str += r' + File Data'
-            elif qget_cmb_box(self.ui.cmb_file_io) == "use":
-                self.title_str = r'File Data'
+            if self.ui.cmb_file_io.isEnabled():  # File is loaded, data is available
+                if qget_cmb_box(self.ui.cmb_file_io) == "add":
+                    self.title_str += r' + File Data'
+                elif qget_cmb_box(self.ui.cmb_file_io) == "use":
+                    self.title_str = r'File Data'
         # ----------------------------------------------------------------------
 
 
@@ -264,7 +265,7 @@ class Plot_Tran_Stim(QWidget):
         # calculate stimuli x[n]
         #
         # ######################################################################
-        if qget_cmb_box(self.ui.cmb_file_io) == "use":
+        if self.ui.cmb_file_io.isEnabled() and qget_cmb_box(self.ui.cmb_file_io) == "use":
             if self.x_file is None:
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:
@@ -477,7 +478,7 @@ class Plot_Tran_Stim(QWidget):
             x[frm_slc] = add_signal(x[frm_slc], self.ui.DC)
 
         # Add file data to stimulus for combobox setting "add"
-        if qget_cmb_box(self.ui.cmb_file_io) == "add":
+        if self.ui.cmb_file_io.isEnabled() and qget_cmb_box(self.ui.cmb_file_io) == "add":
             if self.x_file is None:
                 logger.warning("No file loaded!")
             # file data is longer than frame, use only a part:

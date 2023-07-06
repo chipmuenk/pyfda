@@ -80,7 +80,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.sinusoid_type = "sine"
 
         self.chirp_type = "linear"
-        self.cmb_file_io_default = "off"
+        self.cmb_file_io_default = "use"
 
         self.f1 = 0.02
         self.f2 = 0.03
@@ -146,7 +146,6 @@ class Plot_Tran_Stim_UI(QWidget):
         # combobox tooltip + data / text / tooltip for file I/O usage
         self.cmb_file_io_items = [
             ("<span>Select data from File I/O widget</span>"),
-            ("off", "Off", "<span>Don't use file I/O data.</span>"),
             ("use", "Use", "<span><b>Use</b> file I/O data as stimuli.</span>"),
             ("add", "Add", "<span><b>Add</b> file I/O data to other stimuli</span>")
         ]
@@ -816,11 +815,11 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus """
-        not_use_file_io = qget_cmb_box(self.cmb_file_io) != "use"
-        self.wdg_ctrl_stim.setEnabled(not_use_file_io)
-        self.wdg_formula_stim.setVisible(self.stim == "formula" and not_use_file_io)
 
         self.cmb_stim = qget_cmb_box(self.cmbStimulus)
+
+        self.wdg_formula_stim.setVisible(self.cmb_stim == "formula")
+
         if self.cmb_stim == "impulse":
             self.stim = qget_cmb_box(self.cmbImpulseType)
             # recalculate the energy scaling for impulse functions
