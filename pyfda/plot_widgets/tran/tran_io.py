@@ -108,6 +108,7 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.setEnabled(False)
         self.ui.led_normalize.setEnabled(False)
         self.x_file = None
+
         self.emit({'data_changed': 'file_io'})
 
     # ------------------------------------------------------------------------------

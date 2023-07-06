@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class Plot_Tran_Stim(QWidget):
     """
-    Construct a widget for plotting transient responses
+    Construct a widget for defining transient signals
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated

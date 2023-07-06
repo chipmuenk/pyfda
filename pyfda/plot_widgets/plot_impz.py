@@ -192,8 +192,8 @@ class Plot_Impz(QWidget):
         # connect UI to widgets and signals upstream:
         self.ui.sig_tx.connect(self.process_sig_rx)
 
-        self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.stim_wdg.sig_rx)
+        self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
@@ -397,7 +397,7 @@ class Plot_Impz(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                     or self.needs_calc or (fb.fil[0]['fx_sim'] and self.needs_calc_fx):
 
-                # new file has been loaded
+                # a file has been loaded or unloaded
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
                     # data points to be used:
@@ -457,10 +457,9 @@ class Plot_Impz(QWidget):
     def set_N_to_file_len(self):
         """
         Check status of file_io widget:
-        - if no file is loaded or `cmb_file_io == 'off'`, do nothing. This shouldn't happen.
+        - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
         - if `cmb_file_io == 'add'` or `use`, set N_end = len(file_data) in the UI
         """
-        # This case should never happen, just to be sure ...
         if not hasattr(self.file_io_wdg, 'N') or self.file_io_wdg.N == 0:
             qset_cmb_box(self.stim_wdg.ui.cmb_file_io, "off", data=True)
             self.ui.frm_file_io.setEnabled(False)
