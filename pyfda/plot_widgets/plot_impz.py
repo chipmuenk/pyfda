@@ -413,8 +413,12 @@ class Plot_Impz(QWidget):
                 qstyle_widget(self.ui.but_run, "changed")
                 self.impz_init()
 
-            elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+            elif 'mpl_toolbar' in dict_sig:
+                if dict_sig['mpl_toolbar'] == 'ui_level':
                     self.set_ui_level(dict_sig['value'])
+                elif dict_sig['mpl_toolbar'] == 'home':
+                    self.zoom_home()
+                    self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
             elif 'ui_local_changed' in dict_sig:
                 if dict_sig['ui_local_changed'] == 'csv':
@@ -432,15 +436,6 @@ class Plot_Impz(QWidget):
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
                 self.draw()
-
-            elif 'mpl_toolbar' in dict_sig:
-                if dict_sig['mpl_toolbar'] == 'ui_level':
-                    ui_level = dict_sig['value']
-                    self.mplwidget_t.mplToolbar.a_ui_state = ui_level
-                    self.mplwidget_f.mplToolbar.a_ui_state = ui_level
-                elif dict_sig['mpl_toolbar'] == 'home':
-                    self.redraw()
-                    self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
 
         else:  # invisible
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
@@ -1092,7 +1087,7 @@ class Plot_Impz(QWidget):
             ax.yaxis.set_minor_locator(AutoMinorLocator())
 
     # ------------------------------------------------------------------------
-    def draw_time(self, N_start, N_end):
+    def draw_time(self, N_start=0, N_end=0):
         """
         (Re-)draw the time domain mplwidget
         """
@@ -1100,6 +1095,8 @@ class Plot_Impz(QWidget):
             for ax in self.mplwidget_t.fig.get_axes():  # remove all axes
                 self.mplwidget_t.fig.delaxes(ax)
             return
+        if N_end == 0:
+            N_end = self.ui.N_end
 
         H_str = self.stim_wdg.H_str
 
@@ -1944,16 +1941,26 @@ class Plot_Impz(QWidget):
     # -------------------------------------------------------------------------
     def redraw(self):
         """
-        Redraw the currently visible canvas when e.g. the canvas size has changed
+        Redraw the currently visible canvas (but not the plot!) when e.g. the canvas
+        size has changed
         """
         idx = self.tab_mpl_w.currentIndex()
         self.tab_mpl_w.currentWidget().redraw()
-        # wdg = getattr(self, self.tab_mplwidget_list[idx])
         logger.debug("Redrawing tab {0}".format(idx))
-        # wdg_cur.redraw()
         self.needs_redraw[idx] = False
 #        self.mplwidget_t.redraw()
-#        self.mplwidget_f.redraw()
+
+     # -------------------------------------------------------------------------
+    def zoom_home(self):   
+        """
+        Zoom to home settings
+        """
+        idx = self.tab_mpl_w.currentIndex()   
+        if idx == 0:  # time plot widget
+            self.draw_time()
+        else:
+            self.draw_freq()
+
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
