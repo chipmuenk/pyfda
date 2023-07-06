@@ -1,4 +1,4 @@
-# workflow for buildung pyinstaller packages for windows and MacOS
+# workflow for buildung pyinstaller packages for windows and MacOS and creating a pre-release, triggered by a push to main
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
 # The workflow runs:
@@ -9,35 +9,45 @@
 #   git push
 #   git push origin --tags
 ---
-name: build_pyinstaller_bak
+name: build_pyinstaller
 
 on:
   push:
     branches:
-#       - develop
     - main
     tags:
     - 'v*' # Push events with proper version number, i.e. v1.0, v20.15.10
-  workflow_dispatch:
+
+    workflow_dispatch:
 
 jobs:
-
   createrelease:
-    name: Create Release
+    name: Pre-Release
     runs-on: [ubuntu-latest]
+
     steps:
+    - name: Set tag and release name to specified label
+      if: github.ref_type == 'tag'
+      run: |
+        echo "${{ github.ref_name }}" > tag_name.txt
+        echo "Release ${{ github.ref_name }}" > release_name.txt
+    - name: Set tag and release name to sha / latest if no tag was given
+      if: github.ref_type != 'tag'
+      run: |
+        echo "${{ github.sha }}" > tag_name.txt
+        echo "Release latest" > release_name.txt
+      
+      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # tag_name: ${{ github.ref }}
-        # tag_name: latest     
-        # release_name: Release ${{ github.ref }}
-        release_name: Release Latest
+        tag_name: `cat tag_name.txt`
+        release_name: `cat release_name.txt`
         draft: false
-        prerelease: false
+        prerelease: true
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
@@ -116,3 +126,4 @@ jobs:
         asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
         asset_name: ${{ matrix.OUT_FILE_NAME}}
         asset_content_type: ${{ matrix.ASSET_MIME}}
+  
