@@ -112,7 +112,7 @@ class QPushButtonRT(QPushButton):
             QSizePolicy.Expanding,
         )
         self.__lbl.setTextFormat(Qt.RichText)
-        self.__lyt.addWidget(self.__lbl)
+        self.__lyt.addWidget(self.__lbl, Qt.AlignHCenter)
         return
 
     def setText(self, text):
