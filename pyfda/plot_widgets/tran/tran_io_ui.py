@@ -11,7 +11,7 @@ Create the UI for the Tran_IO class
 """
 from PyQt5.QtWidgets import QSizePolicy
 from pyfda.libs.compat import (
-    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QLineEdit, QFrame,
+    QWidget, QComboBox, QLineEdit, QLabel, QPushButton, QPushButtonRT, QLineEdit, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout, QIcon)
 
 from pyfda.libs.pyfda_lib import to_html
@@ -131,6 +131,21 @@ class Tran_IO_UI(QWidget):
         layH_file_fmt_options.addWidget(self.but_csv_options)
         layH_file_fmt_options.addWidget(self.but_scale_int)
 
+        self.but_f_s_wav = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
+        self.but_f_s_wav.setCheckable(True)
+        self.but_f_s_wav.setChecked(True)
+        self.but_f_s_wav.setToolTip(
+            "<span>Copy pyfda sampling frequency to / from WAV file during export / import</span>"
+            )
+        self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
+        self.led_f_s_wav = QLineEdit(self)
+        self.led_f_s_wav.setToolTip("<span>Manual f_S for import / export of WAV file. "
+                                    "Only integer </span>")
+
+        layH_lbl_led_f_s_wav = QHBoxLayout()
+        layH_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
+        layH_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
+
         # ----------- LOAD ------------------------------------------------------------
         line1 = QVLine(width=10)
         self.but_select = PushButton("Select", checkable=False)
@@ -191,7 +206,7 @@ class Tran_IO_UI(QWidget):
         self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
-        line2 = QVLine(width=5)
+        line2 = QVLine(width=1)
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value after scaling"))
         self.led_normalize.setText(str(self.led_normalize_default))
@@ -237,6 +252,9 @@ class Tran_IO_UI(QWidget):
         layG_io_file.addWidget(self.cmb_file_format, 0, i)
         # layG_io_file.addWidget(self.but_csv_options, 1, i)
         layG_io_file.addLayout(layH_file_fmt_options, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.but_f_s_wav, 0, i)
+        layG_io_file.addLayout(layH_lbl_led_f_s_wav, 1, i)
         i += 1
         layG_io_file.addWidget(line1, 0, i, 2, 1)
         i += 1
@@ -302,19 +320,30 @@ class Tran_IO_UI(QWidget):
         # ------ Local signal-slot-connections
         self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
         self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
+        self.but_f_s_wav.clicked.connect(self.set_ui_visibility)
         # inizialize data format dependent widgets
         self.set_ui_visibility()
 
     # -------------------------------------------------------------------------
     def set_ui_visibility(self):
+        """
+        Update visiblity and accessibility of some widgets, depending on the settings of
+        other widgets.
+        """
         is_csv_format = qget_cmb_box(self.cmb_file_format) == 'csv'
         self.but_csv_options.setVisible(is_csv_format)
 
         # int_data_format = qget_cmb_box(self.cmb_data_format)\
         #    in {'uint8', 'int16', 'int32'}
+        self.but_f_s_wav.setVisible(not is_csv_format)
+        self.lbl_f_s_wav.setVisible(not is_csv_format)
+        self.led_f_s_wav.setVisible(not is_csv_format)
         self.lbl_data_format.setVisible(not is_csv_format)
         self.cmb_data_format.setVisible(not is_csv_format)
         self.but_scale_int.setVisible(not is_csv_format)
+
+        self.lbl_f_s_wav.setEnabled(not self.but_f_s_wav.isChecked())
+        self.led_f_s_wav.setEnabled(not self.but_f_s_wav.isChecked())
 
     # -------------------------------------------------------------------------
     def update_ui(self, cmplx=False, fx=False):
