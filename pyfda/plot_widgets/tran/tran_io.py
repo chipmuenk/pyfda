@@ -85,18 +85,38 @@ class Tran_IO(QWidget):
         # ---------------------------------------------------------------------
         # UI SIGNALS & SLOTs
         # ---------------------------------------------------------------------
+        self.ui.but_csv_options.clicked.connect(self.open_csv_win)
+        self.ui.led_f_s_wav.editingFinished.connect(self.set_f_s_wav)
+
         self.ui.but_select.clicked.connect(self.load_data_raw)
         self.ui.cmb_chan_import.currentIndexChanged.connect(self.select_chan_normalize)
         self.ui.but_load.clicked.connect(self.load_button_clicked)
         self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
         self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
 
-        self.ui.but_csv_options.clicked.connect(self.open_csv_win)
-
         self.ui.led_nr_loops.editingFinished.connect(self.save_nr_loops)
         self.ui.but_save.clicked.connect(self.save_data)
 
         self.setLayout(layVMain)
+
+        self.set_f_s_wav(fb.fil[0]['f_S'])
+
+    # ------------------------------------------------------------------------------
+    def set_f_s_wav(self, f_s_wav=None):
+        """
+        Set sampling frequency for wav files, either from LineEdit (button `Auto f_s`
+        unchecked) or from argument `f_s_wav` (button `Auto f_s` checked), passed either
+        from loaded wav file or from updated f_S.
+        """
+        logger.error(f"type f_s_wav = {type(f_s_wav)}")
+        if not self.ui.but_f_s_wav.isChecked() or f_s_wav is None:
+        #     f_s_wav = f_s
+        # else:
+            f_s_wav = self.ui.led_f_s_wav.text()
+
+        self.f_s_wav = safe_eval(f_s_wav, alt_expr=self.f_s_wav,
+                                 return_type='int', sign='pos')
+        self.ui.led_f_s_wav.setText(str(self.f_s_wav))
 
     # ------------------------------------------------------------------------------
     def unload_data(self):
