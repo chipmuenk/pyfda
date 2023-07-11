@@ -261,7 +261,6 @@ class Tran_IO(QWidget):
             logger.warning("No data loaded yet.")
             return None
 
-        logger.info(type(self.data_raw))
         logger.info(pprint_log(self.data_raw))
 
         if self.data_raw.ndim == 1:
@@ -289,20 +288,23 @@ class Tran_IO(QWidget):
         self.ui.but_normalize.setEnabled(True)
         self.ui.led_normalize.setEnabled(True)
 
-        scale_int = 1
-        offset_int = 0
-        if self.file_type == 'wav' and self.ui.but_scale_int.isChecked() == True:
-            if io.read_wav_info.sample_format == "int16":
-                scale_int = (1 << 15) - 1
-            elif io.read_wav_info.sample_format == "int24":
-                scale_int = (1 << 23) - 1
-            elif io.read_wav_info.sample_format == "int32":
-                scale_int = (1 << 31) - 1
-            elif io.read_wav_info.sample_format == "uint8":
-                scale_int = (1 << 7) - 1
-                offset_int = 128
+        if self.file_type == 'wav':
+            self.set_f_s_wav(self.f_s_file)  # copy f_s read from wav file info to line edit
+            scale_int = 1
+            offset_int = 0
 
-        data = (data - offset_int) / scale_int
+            if self.ui.but_scale_int.isChecked() == True:
+                if io.read_wav_info.sample_format == "int16":
+                    scale_int = (1 << 15) - 1
+                elif io.read_wav_info.sample_format == "int24":
+                    scale_int = (1 << 23) - 1
+                elif io.read_wav_info.sample_format == "int32":
+                    scale_int = (1 << 31) - 1
+                elif io.read_wav_info.sample_format == "uint8":
+                    scale_int = (1 << 7) - 1
+                    offset_int = 128
+
+            data = (data - offset_int) / scale_int
 
         if self.ui.but_normalize.isChecked() == True:
             self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
@@ -352,6 +354,9 @@ class Tran_IO(QWidget):
         Save a file with UI dialog (CSV or WAV), using the data for left and right
         channel, selected in the UI.
 
+        WAV files can be exported in various int formats, the sampling frequency is
+        read from the line edit field.
+
         TODO: uint8 export doesn't work
         """
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
@@ -392,36 +397,35 @@ class Tran_IO(QWidget):
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
 
-        # convert to selected data format
-        frmt = qget_cmb_box(self.ui.cmb_data_format)
-        scale_int = self.ui.but_scale_int.isChecked()
-
-        if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
-            logger.error(f"Unsupported format {frmt} for data export.")
-            return -1
-        elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
-            logger.warning(f"Data has format '{data.dtype}', instead of 'float', "
-                           "scaling may yield incorrect results.")
-        if frmt == 'int16':
-            if scale_int:
-                data = (data * ((1 << 15) - 1)).astype(np.int16)
+        if self.file_type == 'wav':
+            # convert to selected data format
+            frmt = qget_cmb_box(self.ui.cmb_data_format)
+            scale_int = self.ui.but_scale_int.isChecked()
+            if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
+                logger.error(f"Unsupported format {frmt} for data export.")
+                return -1
+            elif data.dtype not in {np.dtype('float32'), np.dtype('float64')}:
+                logger.warning(f"Data has format '{data.dtype}', instead of 'float', "
+                            "scaling may yield incorrect results.")
+            if frmt == 'int16':
+                if scale_int:
+                    data = (data * ((1 << 15) - 1)).astype(np.int16)
+                else:
+                    data = data.astype(np.int16)
+            elif frmt == 'int32':
+                if scale_int:
+                    data = (data * ((1 << 31) - 1)).astype(np.int32)
+                else:
+                    data = data.astype(np.int32)
+            elif frmt == 'uint8':
+                if scale_int:
+                    data = (data * 127 + 128).astype(np.uint8)
+                else:
+                    data = data.astype(np.uint8)
+            elif frmt == 'float32':
+                data = data.astype(np.float32)
             else:
-                data = data.astype(np.int16)
-        elif frmt == 'int32':
-            if scale_int:
-                data = (data * ((1 << 31) - 1)).astype(np.int32)
-            else:
-                data = data.astype(np.int32)
-        elif frmt == 'uint8':
-            if scale_int:
-                data = (data * 127 + 128).astype(np.uint8)
-            else:
-                data = data.astype(np.uint8)
-        elif frmt == 'float32':
-            data = data.astype(np.float32)
-        else:
-            data = data.astype(np.float64)            
-
+                data = data.astype(np.float64)
 
         # repeat selected signal(s) for specified number of cycles
         cycles = int(self.ui.led_nr_loops.text())
