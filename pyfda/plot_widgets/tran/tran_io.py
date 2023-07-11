@@ -431,9 +431,7 @@ class Tran_IO(QWidget):
         cycles = int(self.ui.led_nr_loops.text())
         data = np.tile(data, cycles).T
 
-        f_S = fb.fil[0]['f_S']
-
         try:
-            io.save_data_np(self.file_name, self.file_type, data, f_S)
+            io.save_data_np(self.file_name, self.file_type, data, self.f_s_wav)
         except IOError as e:
             logger.warning(f"File could not be saved:\n{e}")
