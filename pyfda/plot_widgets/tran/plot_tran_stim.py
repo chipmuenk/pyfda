@@ -209,8 +209,6 @@ class Plot_Tran_Stim(QWidget):
             If `add_sig` has the shape (N x 2), the two columns are added as real and
             imaginary values.
             """
-            logger.info(f"Stim: is_cmplx = {np.iscomplexobj(stim)}, {stim.dtype}\n"
-                        f"add_sig: is_cmplx = {np.iscomplexobj(add_sig)}")
             if np.ndim(add_sig) == 0:
                 if add_sig is None or add_sig == 0:
                     return stim
@@ -228,21 +226,23 @@ class Plot_Tran_Stim(QWidget):
                 return stim
             # add_sig is 2D, add it to stimulus as a complex signal
             elif np.ndim(add_sig) == 2:
+                logger.info("add_sig has two channels, casting to complex")
                 stim = stim.astype(complex) + add_sig[:, 0] + 1j * add_sig[:, 1]
                 return stim
 
             # ---
-            # add_sig is complex, cast stim to complex as well before adding
-            if np.any(type(add_sig) == complex):
+            # add_sig contains complex items (the array is always complex),
+            # cast stim to complex as well before adding
+            if np.any(np.iscomplex(add_sig)):
                 logger.info("add_sig is complex")
                 stim = stim.astype(complex) + add_sig
             # add_sig is real and stimulus is complex:
             # -> add add_sig to both real and imaginary part of stimulus
-            elif np.any(type(stim) == complex):
+            elif np.any(np.iscomplex(stim)):
                 logger.info("stim is complex")
-                stim += add_sig + 1j * add_sig
+                stim = stim + add_sig + 1j * add_sig
             else:  # stim and add_sig are real-valued
-                stim += add_sig
+                stim = stim + add_sig
             return stim
 
         # ====================================================================
