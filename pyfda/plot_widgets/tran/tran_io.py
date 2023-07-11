@@ -45,10 +45,12 @@ class Tran_IO(QWidget):
 
         self.ui = Tran_IO_UI()  # create the UI part with buttons etc.
         self.parent = parent    # handle to instantiating object
-        self._construct_UI()
 
         self.norm = self.ui.led_normalize_default
         self.nr_loops = self.ui.led_nr_loops_default
+        self.f_s_wav = self.f_s_file = fb.fil[0]['f_S']  # ['f_s_wav']
+
+        self._construct_UI()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None) -> None:
