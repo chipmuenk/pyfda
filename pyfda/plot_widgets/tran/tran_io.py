@@ -108,10 +108,7 @@ class Tran_IO(QWidget):
         unchecked) or from argument `f_s_wav` (button `Auto f_s` checked), passed either
         from loaded wav file or from updated f_S.
         """
-        logger.error(f"type f_s_wav = {type(f_s_wav)}")
         if not self.ui.but_f_s_wav.isChecked() or f_s_wav is None:
-        #     f_s_wav = f_s
-        # else:
             f_s_wav = self.ui.led_f_s_wav.text()
 
         self.f_s_wav = safe_eval(f_s_wav, alt_expr=self.f_s_wav,
