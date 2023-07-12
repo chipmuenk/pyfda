@@ -71,6 +71,9 @@ class Tran_IO(QWidget):
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             # Set CSV options button according to state of CSV popup handle
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            logger.warning("f_S changed!")
+            self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_S_scale'])
 
     # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -97,9 +100,15 @@ class Tran_IO(QWidget):
         self.ui.led_nr_loops.editingFinished.connect(self.save_nr_loops)
         self.ui.but_save.clicked.connect(self.save_data)
 
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect rx global events to process_sig_rx() and to listening subwidgets
+        self.sig_rx.connect(self.process_sig_rx)
+
         self.setLayout(layVMain)
 
-        self.set_f_s_wav(fb.fil[0]['f_S'])
+        self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_S_scale'])
 
     # ------------------------------------------------------------------------------
     def set_f_s_wav(self, f_s_wav=None):
