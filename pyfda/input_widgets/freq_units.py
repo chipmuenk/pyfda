@@ -216,7 +216,7 @@ class FreqUnits(QWidget):
         self.ledF_S.setVisible(not is_normalized_freq)  # only vis. when
         self.lblF_S.setVisible(not is_normalized_freq)  # not normalized
         self.butLock.setVisible(not is_normalized_freq)
-        f_S_scale = 1  # default setting for f_S scale
+        f_S_scale = 1  # default setting, used for units f_S, f_Ny, k
 
         if is_normalized_freq:
             # store current sampling frequency to restore it when returning to

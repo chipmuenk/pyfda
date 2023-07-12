@@ -135,12 +135,13 @@ class Tran_IO_UI(QWidget):
         self.but_f_s_wav.setCheckable(True)
         self.but_f_s_wav.setChecked(True)
         self.but_f_s_wav.setToolTip(
-            "<span>Copy pyfda sampling frequency to / from WAV file during export / import</span>"
-            )
+            "<span>Copy pyfda sampling frequency to / from WAV file during export / import "
+            "when selected.</span>")
         self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
         self.led_f_s_wav = QLineEdit(self)
-        self.led_f_s_wav.setToolTip("<span>Manual f_S for import / export of WAV file. "
-                                    "Only integer </span>")
+        self.led_f_s_wav.setMaximumWidth(qtext_width(N_x=8))
+        self.led_f_s_wav.setToolTip(
+            "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
 
         layH_lbl_led_f_s_wav = QHBoxLayout()
         layH_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
@@ -153,8 +154,8 @@ class Tran_IO_UI(QWidget):
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_select.setToolTip(
-            self.tr("<span>Select file, get its shape and size but don't load"
-                   " it yet.</span>"))
+            self.tr("<span>Select file, get its shape and size but don't load "
+                    "it yet.</span>"))
 
         self.but_load = QPushButton("Load:")
         self.but_load.setObjectName("large")
@@ -199,16 +200,16 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        self.but_normalize = PushButton("Scale")
+        self.but_normalize = PushButton("Norm")
         self.but_normalize.setToolTip(
-            self.tr("<span>Scale data to the maximum value below.</span>"))
+            self.tr("<span>Normalize loaded data to the maximum value below.</span>"))
         self.but_normalize.setEnabled(False)
         self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
         line2 = QVLine(width=1)
         self.led_normalize = QLineEdit()
-        self.led_normalize.setToolTip(self.tr("Max. value after scaling"))
+        self.led_normalize.setToolTip(self.tr("Max. value after normalizing"))
         self.led_normalize.setText(str(self.led_normalize_default))
         self.led_normalize.setEnabled(False)
         self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
