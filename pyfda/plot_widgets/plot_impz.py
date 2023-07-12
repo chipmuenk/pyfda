@@ -188,16 +188,18 @@ class Plot_Impz(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
+        # connect rx global events to process_sig_rx() and to listening subwidgets
         self.sig_rx.connect(self.process_sig_rx)
-        # connect UI to widgets and signals upstream:
-        self.ui.sig_tx.connect(self.process_sig_rx)
-
         self.sig_rx.connect(self.stim_wdg.sig_rx)
+        self.sig_rx.connect(self.file_io_wdg.sig_rx)
+        # connect UI and subwidgets tx events to process_sig_rx()
+        self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
+
         # When user has selected a different local tab, trigger a redraw of current tab
         self.tab_mpl_w.currentChanged.connect(self.draw)  # passes # of active tab
         # ---------------------------------------------------------------------
@@ -1951,11 +1953,11 @@ class Plot_Impz(QWidget):
 #        self.mplwidget_t.redraw()
 
      # -------------------------------------------------------------------------
-    def zoom_home(self):   
+    def zoom_home(self):
         """
         Zoom to home settings
         """
-        idx = self.tab_mpl_w.currentIndex()   
+        idx = self.tab_mpl_w.currentIndex()
         if idx == 0:  # time plot widget
             self.draw_time()
         else:
