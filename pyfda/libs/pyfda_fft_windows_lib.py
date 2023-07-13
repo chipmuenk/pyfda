@@ -269,21 +269,21 @@ all_windows_dict = {
             See also: Boxcar and Triangular / Bartlett windows.
             </span>'''
             },
-    'Slepian': {
-        'fn_name': 'slepian',
-        'par': [{
-             'name': 'BW', 'name_tex': r'$BW$',
-             'val': 0.3, 'min': 0, 'max': 100,
-             'tooltip': '<span>Bandwidth</span>'}],
-        'info':
-            '''<span>
-            Used to maximize the energy concentration in the main lobe.
-            Also called the digital prolate spheroidal sequence (DPSS).
-            <br /><br />
+    # 'Slepian': {
+    #     'fn_name': 'slepian',
+    #     'par': [{
+    #          'name': 'BW', 'name_tex': r'$BW$',
+    #          'val': 0.3, 'min': 0, 'max': 100,
+    #          'tooltip': '<span>Bandwidth</span>'}],
+    #     'info':
+    #         '''<span>
+    #         Used to maximize the energy concentration in the main lobe.
+    #         Also called the digital prolate spheroidal sequence (DPSS).
+    #         <br /><br />
 
-            See also: Kaiser window.
-            </span>'''
-        },
+    #         See also: Kaiser window.
+    #         </span>'''
+    #     },
     'Triangular': {
         'fn_name': 'triang',
         'info': bartlett_info
@@ -782,7 +782,7 @@ class QFFTWinSelector(QWidget):
         try:
             if fn_name == 'dpss':
                 logger.info("dpss!")
-                w = scipy.signal.windows.dpss(N, self.in_dict[win_name]['par'][0]['val'],
+                w = scipy.signal.windows.dpss(N, self.win_dict[win_name]['par'][0]['val'],
                                               sym=sym)
             elif n_par == 0:
                 w = win_fnct(N, sym=sym)
