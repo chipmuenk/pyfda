@@ -551,8 +551,8 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, win_dict):
-        super(QFFTWinSelector, self).__init__(parent)
+    def __init__(self, win_dict):
+        super().__init__()
 
         self.win_dict = win_dict
         self.err = False  # error flag for window calculation
@@ -974,3 +974,18 @@ class QFFTWinSelector(QWidget):
                 self.cmb_win_par_1.setVisible(False)
                 self.led_win_par_1.setText(str(self.win_dict[cur]['par'][1]['val']))
                 self.led_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+
+# ------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    """ Run widget standalone with `python -m pyfda.libs.pyfda_fft_windows` """
+    import sys
+    from pyfda.libs.compat import QApplication
+    from pyfda import pyfda_rc as rc
+
+    app = QApplication(sys.argv)
+    app.setStyleSheet(rc.qss_rc)
+    mainw = QFFTWinSelector(all_windows_dict)
+    app.setActiveWindow(mainw)
+    mainw.show()
+    sys.exit(app.exec_())
