@@ -1,7 +1,7 @@
 Plot h[n]
 =========
 
-:numref:`fig_plot_impz` shows a typical view of the **h[n]** tab for plotting
+:numref:`fig_plot_impz` shows a typical view of the **y[n]** tab for plotting
 the transient response and its Fourier transformation, here, an elliptical filter (IIR) is shown.
 
 .. _fig_plot_impz:
@@ -11,7 +11,7 @@ the transient response and its Fourier transformation, here, an elliptical filte
    :align: center
    :width: 70%
 
-   Screenshot of the h[n] tab (time domain)
+   Screenshot of the y[n] tab (time domain)
    
 There are a lot of options in this tab:
 
@@ -26,7 +26,7 @@ Time / Frequency
     - The number of data points **N** is chosen in such a way that an integer
       number of periods is transformed.
       
-    - The FFT window is set (in the Frequency tab) to rectangular. Other windows
+    - The FFT window is set to rectangular. Other windows
       work as well but they distribute spectral lines over several bins. When it
       is not possible to capture an integer number of periods, use another window
       as the rectangular window has the worst leakage effect.
@@ -59,7 +59,7 @@ simulations where the frequency response cannot be calculated analytically.
    :align: center
    :width: 80%
 
-   Screenshot of the h[n] tab (frequency domain)
+   Screenshot of the y[n] tab (frequency domain)
 
    
 Development
