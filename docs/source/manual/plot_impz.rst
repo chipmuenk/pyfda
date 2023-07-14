@@ -1,4 +1,4 @@
-Plot h[n]
+Plot y[n]
 =========
 
 :numref:`fig_plot_impz` shows a typical view of the **y[n]** tab for plotting
@@ -7,18 +7,20 @@ the transient response and its Fourier transformation, here, an elliptical filte
 .. _fig_plot_impz:
 
 .. figure:: ../img/manual/pyfda_plot_impz.png
-   :alt: Screenshot of the h[n] tab (time domain)
+   :alt: Screenshot of the y[n] tab (time domain)
    :align: center
    :width: 70%
 
    Screenshot of the y[n] tab (time domain)
    
-There are a lot of options in this tab:
+This tab is split into several subwindows:
 
 Time / Frequency
     These vertical tabs select between the time (transient) and frequency (spectral)
     domain. Signals are calculated in the time domain and then transformed using 
-    Fourier transform. For an transform of periodic signals without leakage effect,
+    Fourier transform.
+
+For an transform of periodic signals without leakage effect,
     ("smeared" spectral lines) take care that:
     
     - The filter has settled sufficiently. Select a suitable value of **N0**.
