@@ -668,10 +668,11 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
     fb.clipboard = QApplication.clipboard()  # create clipboard instance
-    win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
-                      "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
-                      "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
-                      "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
+    # win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
+    #                   "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
+    #                   "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
+    #                   "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
+    win_names_list = []
 
     # initialize windows dict with the list above and an initial window
     win_dict = get_windows_dict(
