@@ -124,7 +124,6 @@ class MplWidget(QWidget):
         #    Key press events in general are not processed unless you
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
-
         self.canvas.setFocusPolicy(Qt.ClickFocus)  # Qt.StrongFocus
         # self.canvas.setFocus()
 
@@ -138,8 +137,10 @@ class MplWidget(QWidget):
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.zoom_locked = False
         self.mplToolbar.cursor_enabled = False
-        self.mplToolbar.enable_plot(state = True)
-        self.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplToolbar.plot_enabled = True
+        self.mplToolbar.save_button_states()  # store initial setting of buttons
+
+        # self.mplToolbar.sig_rx.connect(self.sig_rx)  # TODO: Doesn't exist yet
 
         layHToolbar = QHBoxLayout()
         layHToolbar.addWidget(self.mplToolbar, 1, Qt.AlignLeft)
@@ -153,17 +154,6 @@ class MplWidget(QWidget):
         self.layVMainMpl.addWidget(self.canvas)
 
         self.setLayout(self.layVMainMpl)
-
-# ------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, dict_sig):
-        """
-        Process sig
-        """
-#        if 'enabled' in dict_sig:
-#            self.clear_disabled_figure(dict_sig['enabled'])
-#        else:
-        pass
 
 # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -215,9 +205,12 @@ class MplWidget(QWidget):
 # ------------------------------------------------------------------------------
     def redraw(self):
         """
-        Redraw the figure with new properties (grid, linewidth)
+        Redraw the figure with new properties (grid, linewidth) and restore the plot
+        limits when `zoom_locked` is True
+
+        When zoom lock is used and / or plot limits shall be pushed into the queue,
+        you need to call redraw()
         """
-        # only execute when at least one axis exists -> tight_layout crashes otherwise
         if self.fig.axes:
             self.mplToolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
             for ax in self.fig.axes:
@@ -227,23 +220,7 @@ class MplWidget(QWidget):
                 else:
                     self.limits = ax.axis()  # save old limits
 
-#            try:
-#                # tight_layout() crashes with small figure sizes
-#               self.fig.tight_layout(pad = 0.1)
-#            except(ValueError, np.linalg.linalg.LinAlgError):
-#                logger.debug("error in tight_layout")
         self.canvas.draw()  # now (re-)draw the figure
-
-# ------------------------------------------------------------------------------
-#    def clear_disabled_figure(self, enabled):
-#        """
-#        Clear the figure when it is disabled in the mplToolbar
-#        """
-#        if not enabled:
-#            self.fig.clf()
-#            self.pltCanv.draw()
-#        else:
-#            self.redraw()
 
 # ----------------------------------------------------------------------------
     def plt_full_view(self):
@@ -365,7 +342,7 @@ class MplToolbar(NavigationToolbar):
     def __init__(self, canv, mpl_widget, *args, **kwargs):
         NavigationToolbar.__init__(self, canv, mpl_widget, *args, **kwargs)
 
-        self.mpl_widget = mpl_widget
+        self.mpl_widget = mpl_widget  # create a reference to the parent
 
     # --------------------------------------------------------------------------
     # ----  Construct Toolbar using QRC icons -------------------
@@ -378,7 +355,7 @@ class MplToolbar(NavigationToolbar):
         self.a_en.setToolTip('Enable / disable plot')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
-        self.a_en.setVisible(False)
+        self.a_en.setVisible(False)  # invisible by default, only needed by y[n]
 
         # ---------------------------------------------
         # UI Detail Level:
@@ -446,7 +423,6 @@ class MplToolbar(NavigationToolbar):
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
         self.a_zo.setShortcut('Ctrl+O')
-
 
         # ---------------------------------------------
         # FULL VIEW:
@@ -562,8 +538,10 @@ class MplToolbar(NavigationToolbar):
         self.a_he.setToolTip('Open help page from https://pyfda.rtfd.org in browser')
         self.a_he.setDisabled(True)
         self.a_he.setShortcut(self.tr('F1'))
+# ------- end of __init__() ----------------------------------------------------------
+# ====================================================================================
+# ------------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
     if figureoptions is not None:
         def edit_parameters(self):
             allaxes = self.canvas.figure.get_axes()
@@ -606,7 +584,7 @@ class MplToolbar(NavigationToolbar):
         """
         self.push_current()
         self.emit({'mpl_toolbar': 'home'})
-        self.mpl_widget.redraw()
+        self.mpl_widget.redraw()  # Redraw with saving / restoring plot limit
 
 # ------------------------------------------------------------------------------
     def help(self):
@@ -624,6 +602,15 @@ class MplToolbar(NavigationToolbar):
 
         # https://stackoverflow.com/questions/28494571/how-in-qt5-to-check-if-url-is-available
         # https://stackoverflow.com/questions/16778435/python-check-if-website-exists
+
+# ------------------------------------------------------------------------------
+    def save_button_states(self):
+        # Save enabled state of the following zoom-related UI elements
+        self.a_ho_prev_state = self.a_ho.isEnabled()  # home
+        self.a_pa_prev_state = self.a_pa.isEnabled()  # pan
+        self.a_zo_prev_state = self.a_zo.isEnabled()  # zoom
+        self.a_fv_prev_state = self.a_fv.isEnabled()  # full view
+        self.a_ho_prev_state = self.a_lk.isEnabled()  # lock zoom
 
 # ------------------------------------------------------------------------------
     def cycle_draw_grid(self, cycle=True, axes=None):
@@ -644,7 +631,6 @@ class MplToolbar(NavigationToolbar):
         None.
 
         """
-
         if cycle:
             self.a_gr_state = (self.a_gr_state + 1) % 3
 
@@ -668,20 +654,19 @@ class MplToolbar(NavigationToolbar):
                     self.a_gr.setIcon(QIcon(':/grid_fine.svg'))
 
         if cycle:
-            self.canvas.draw()  # don't use self.draw(), use FigureCanvasQTAgg.draw()
+            self.canvas.draw()   # Redraw without saving / restoring plot limits
 
 # ------------------------------------------------------------------------------
     def cycle_ui_level(self, ui_level : int = -1) -> None:
         """
-        Cycle th UI level (full / )
+        Cycle the UI level: UI elements fully / partially / invisible)
 
         Parameters
         ----------
         ui_level : int, optional
             Set the ui level and the icon accordingly when ui_level != -1,
-            don't emit a signal
-            When ui_level is not passed as a parameter, cycle through the
-            `self.ai_num_levels`
+            (was not passed as a parameter), cycle through the `self.ai_num_levels`
+            and emit `{'mpl_toolbar': 'ui_level', 'value': self.a_ui_level}`
 
         Returns
         -------
@@ -731,38 +716,56 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
 
-        self.emit({'lock_zoom': self.zoom_locked})
+        self.emit({'mpl_toolbar': 'lock_zoom', 'value': self.zoom_locked})  # unused?
 
 # ------------------------------------------------------------------------------
     def enable_plot(self, state=None):
         """
-        Toggle the enable button and setting
+        Toggle the plot enable button, enable / disable other plot buttons accordingly
+        and emit
         """
         if state is not None:
-            self.enabled = state
+            self.plot_enabled = state
         else:
-            self.enabled = not self.enabled
+            self.plot_enabled = not self.plot_enabled
 
-        if self.enabled:
+        if self.plot_enabled:
             self.a_en.setIcon(QIcon(':/circle-check.svg'))
+            # These UI elements can be enabled / disabled elsewhere,
+            # restore their previous state
+            self.a_ho.setEnabled(self.a_ho_prev_state)  # home
+            self.a_pa.setEnabled(self.a_pa_prev_state)  # pan
+            self.a_zo.setEnabled(self.a_zo_prev_state)  # zoom
+            self.a_fv.setEnabled(self.a_fv_prev_state)  # full view
+            self.a_lk.setEnabled(self.a_ho_prev_state)  # lock zoom
         else:
             self.a_en.setIcon(QIcon(':/circle-x.svg'))
+            # Some UI elements can be enabled / disabled elsewhere,
+            # save their state before disabling them
+            self.save_button_states()
 
-#         self.a_ho.setEnabled(self.enabled)
-#         self.a_ba.setEnabled(self.enabled)
-#         self.a_fw.setEnabled(self.enabled)
-#         self.a_pa.setEnabled(self.enabled)
-#         self.a_zo.setEnabled(self.enabled)
-#         self.a_fv.setEnabled(self.enabled)
-#         self.a_lk.setEnabled(self.enabled)
-#         self.a_gr.setEnabled(self.enabled)
-#         #self.a_rd.setEnabled(self.enabled)
-#         self.a_sv.setEnabled(self.enabled)
-#         self.a_cb.setEnabled(self.enabled)
-#         self.a_op.setEnabled(self.enabled)
-#
-#         self.emit({'enabled':self.enabled})
-#
+            self.a_ho.setEnabled(False)  # home
+            self.a_pa.setEnabled(False)  # pan
+            self.a_zo.setEnabled(False)  # zoom
+            self.a_fv.setEnabled(False)  # full view
+            self.a_lk.setEnabled(False)  # lock zoom
+
+            # Clear the Matplotlib canvas
+            self.mpl_widget.fig.clf()
+            self.mpl_widget.redraw() # redraw the canvas to remove old plot
+
+        # These UI elements are always enabled (if not disabled here),
+        # no need to save their state
+        self.a_ba.setEnabled(self.plot_enabled)  # back
+        self.a_fw.setEnabled(self.plot_enabled)  # forward
+        self.a_gr.setEnabled(self.plot_enabled)  # grid
+        self.a_sv.setEnabled(self.plot_enabled)  # save
+        self.a_cr.setEnabled(self.plot_enabled)  # cursor
+        self.a_cb.setEnabled(self.plot_enabled)  # clipboard
+        self.a_op.setEnabled(self.plot_enabled)  # options
+
+        self.emit({'mpl_toolbar': 'enable_plot', 'value': self.plot_enabled})
+
 # =============================================================================
 # ------------------------------------------------------------------------------
     def _save_figure(self):
