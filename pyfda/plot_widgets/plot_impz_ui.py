@@ -203,7 +203,7 @@ class PlotImpz_UI(QWidget):
         self.but_run.setIcon(QIcon(":/play.svg"))
 
         self.but_run.setIconSize(QSize(but_height, but_height))
-        self.but_run.setFixedSize(QSize(2*but_height, but_height))
+        self.but_run.setFixedSize(QSize(2 * but_height, but_height))
         self.but_run.setToolTip("Run simulation")
         self.but_run.setEnabled(True)
 
