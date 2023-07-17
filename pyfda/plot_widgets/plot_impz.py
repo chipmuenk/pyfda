@@ -531,7 +531,7 @@ class Plot_Impz(QWidget):
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
             and self.stim_wdg.ui.DC == 0
             and self.stim_wdg.ui.cmb_stim == "impulse"
-            and self.file_io_wdg.ui.but_load.property("state") == "normal"
+            and self.file_io_wdg.ui.but_load.property("state") != "ok"
             )
         self.ui.but_freq_norm_impz.setVisible(self.stim_wdg.ui.cmb_stim == "impulse")
 
