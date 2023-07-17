@@ -187,7 +187,7 @@ class Plot_Tran_Stim_UI(QWidget):
             ("sine", "Sine", "Sine signal"),
             ("cos", "Cos", "Cosine signal"),
             ("exp", "Exp", "Complex exponential"),
-            ("diric", "Sinc", "<span>Periodic Sinc (Dirichlet function)</span>")
+            ("diric", "Diric", "<span>Periodic Sinc (Dirichlet function)</span>")
         ]
 
         self.cmb_stim_modulation_items = [
