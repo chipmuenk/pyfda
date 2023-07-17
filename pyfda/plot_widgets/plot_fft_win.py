@@ -77,9 +77,9 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, win_dict, sym=False,
+    def __init__(self, win_dict, sym=False,
                  title='pyFDA Window Viewer', ignore_close_event=True):
-        super(Plot_FFT_win, self).__init__(parent)
+        super().__init__()
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
@@ -678,7 +678,7 @@ if __name__ == '__main__':
         win_names_list=win_names_list,
         cur_win_name="Hann")
 
-    mainw = Plot_FFT_win(None, win_dict, ignore_close_event=False)
+    mainw = Plot_FFT_win(win_dict, ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()
