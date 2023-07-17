@@ -90,7 +90,7 @@ class Firwin(QWidget):
 
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(
-            self, win_dict=self.win_dict, sym=True, title="pyFDA FIR Window Viewer")
+            win_dict=self.win_dict, sym=True, title="pyFDA FIR Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
 
@@ -175,7 +175,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
-        self.qfft_win_select = QFFTWinSelector(self, self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self.win_dict)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
