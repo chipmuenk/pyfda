@@ -74,9 +74,9 @@ class Firwin(QWidget):
         self.ft = 'FIR'
 
         win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
-                          "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev",
+                          "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
                           "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
-                          "Kaiser", "Nuttall", "Parzen", "Slepian", "Triangular", "Tukey"]
+                          "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
         self.cur_win_name = "Kaiser"  # set initial window type
         self.alg = "ichige"
 
