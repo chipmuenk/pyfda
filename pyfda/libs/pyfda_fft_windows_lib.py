@@ -311,7 +311,7 @@ all_windows_dict = {
     'Ultraspherical': {
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'par': [{
-            'name': '&mu;', 'name_tex': r'$\mu',
+            'name': '&mu;', 'name_tex': r'$\mu$',
             'val': 0.5, 'min': -0.5, 'max': 10,
             'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
             },
