@@ -138,7 +138,7 @@ class MplWidget(QWidget):
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.zoom_locked = False
         self.mplToolbar.cursor_enabled = False
-        # self.mplToolbar.enable_plot(state = True)
+        self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
 
         layHToolbar = QHBoxLayout()
@@ -371,7 +371,7 @@ class MplToolbar(NavigationToolbar):
     # ----  Construct Toolbar using QRC icons -------------------
 
         # ---------------------------------------------
-        # ENABLE:
+        # Enable Plot:
         # ---------------------------------------------
         self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Update',
                                    self.enable_plot)

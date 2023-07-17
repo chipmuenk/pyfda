@@ -112,6 +112,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['mpl_margins'])
+        self.mplwidget_t.mplToolbar.a_en.setVisible(True)
         self.mplwidget_t.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_t.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_t.mplToolbar.a_ui_num_levels = 4
@@ -122,6 +123,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['mpl_margins'])
+        self.mplwidget_f.mplToolbar.a_en.setVisible(True)
         self.mplwidget_f.mplToolbar.a_he.setEnabled(True)
         self.mplwidget_f.mplToolbar.a_he.info = "manual/plot_impz.html"
         self.mplwidget_f.mplToolbar.a_ui_num_levels = 4
