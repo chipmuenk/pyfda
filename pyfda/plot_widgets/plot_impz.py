@@ -905,9 +905,11 @@ class Plot_Impz(QWidget):
 
         idx = self.tab_mpl_w.currentIndex()
 
-        if idx == 0 and self.needs_redraw[0]:
+        if idx == 0 and self.needs_redraw[0]\
+                and self.mplwidget_t.mplToolbar.plot_enabled:
             self.draw_time(N_start=self.ui.N_start, N_end=self.ui.N_end)
-        elif idx == 1 and self.needs_redraw[1]:
+        elif idx == 1 and self.needs_redraw[1]\
+                and self.mplwidget_f.mplToolbar.plot_enabled:
             self.draw_freq()
 
     # ------------------------------------------------------------------------
