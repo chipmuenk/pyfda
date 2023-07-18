@@ -388,13 +388,12 @@ class Plot_Tran_Stim(QWidget):
                           np.sin(2*pi * n * self.ui.f2 + self.rad_phi2)))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "formula":
-            param_dict = {"A1": self.ui.A1, "A2": self.ui.A2,
-                          "f1": self.ui.f1, "f2": self.ui.f2,
-                          "phi1": self.ui.phi1, "phi2": self.ui.phi2,
-                          "T1": self.ui.T1, "T2": self.ui.T2,
-                          "N1": self.ui.N1, "N2": self.ui.N2,
-                          "BW1": self.ui.BW1, "BW2": self.ui.BW2,
-                          "f_S": fb.fil[0]['f_S'], "n": n, "t": t, "j": 1j}
+            param_dict = {
+                "A1": self.ui.A1, "A2": self.ui.A2, "f1": self.ui.f1, "f2": self.ui.f2,
+                "phi1": self.ui.phi1, "phi2": self.ui.phi2,
+                "T1": self.ui.T1, "T2": self.ui.T2, "N1": self.ui.N1, "N2": self.ui.N2,
+                "BW1": self.ui.BW1, "BW2": self.ui.BW2, "f_S": fb.fil[0]['f_S'],
+                "n": n, "t": t, "j": 1j}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
         else:
