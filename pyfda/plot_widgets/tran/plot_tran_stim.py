@@ -329,9 +329,13 @@ class Plot_Tran_Stim(QWidget):
                 self.ui.A2 * np.exp(1j * (2 * pi * n * self.ui.f2 + self.rad_phi2))
         # ----------------------------------------------------------------------
         elif self.ui.stim == "diric":
+            # scipy:  diric(x, N) = sin(Nx/2) / N*sin(x/2)
+            # we use: x = 2 pi t = 2 pi f_1 n
+            # diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n
             x[frm_slc] = self.ui.A1 * diric(
-                (4 * pi * (n - self.ui.T1) * self.ui.f1 + self.rad_phi1 * 2)
-                / self.ui.TW1, self.ui.TW1)
+                (2 * pi * (n - self.ui.T1) * self.ui.f1 / self.ui.N1),
+                self.ui.N1)
+
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
             if self.ui.T2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end

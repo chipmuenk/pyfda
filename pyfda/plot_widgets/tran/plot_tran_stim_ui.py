@@ -116,7 +116,7 @@ class Plot_Tran_Stim_UI(QWidget):
             "cos":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "sine":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "exp":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
-            "diric":   {"dc", "a1", "phi1", "T1", "TW1", "f1", "noise"},
+            "diric":   {"dc", "a1", "T1", "N1", "f1", "noise"},
 
             "chirp":   {"dc", "a1", "phi1", "f1", "f2", "T2", "noise"},
             "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
@@ -547,6 +547,7 @@ class Plot_Tran_Stim_UI(QWidget):
         layH_formula_stim = QHBoxLayout()
         layH_formula_stim.addWidget(self.lblStimFormula)
         layH_formula_stim.addWidget(self.ledStimFormula)
+# TODO: this!        layH_formula_stim.setContentsMargins(0, 0, 0, 0)
         self.wdg_formula_stim = QWidget(self)
         self.wdg_formula_stim.setLayout(layH_formula_stim)
         self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
