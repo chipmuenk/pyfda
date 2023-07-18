@@ -90,6 +90,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.T1 = self.T2 = 0
         self.TW1 = self.TW2 = 1
         self.BW1 = self.BW2 = 0.5
+        self.N1 = self.N2 = 5
         self.noi = 0.1
         self.noise = "none"
         self.mls_b = 8
@@ -125,8 +126,8 @@ class Plot_Tran_Stim_UI(QWidget):
             "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "pwm":     {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise", "bl"},
-            "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "BW1",
-                        "BW2", "noise"}
+            "formula": {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "N1", "N2",
+                        "T1", "T2", "BW1", "BW2", "noise"}
         })
 
         # combobox tooltip + data / text / tooltip for stimulus category items
@@ -352,7 +353,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
         self.led_T1 = QLineEdit(self)
         self.led_T1.setText(str(self.T1))
-        self.led_T1.setToolTip("Time shift")
+        self.led_T1.setToolTip("Time shift 1")
         self.led_T1.setObjectName("stimT1")
         self.lbl_TU1 = QLabel(to_html("T_S", frmt='i'), self)
 
@@ -362,6 +363,19 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_T2.setToolTip("Time shift 2")
         self.led_T2.setObjectName("stimT2")
         self.lbl_TU2 = QLabel(to_html("T_S", frmt='i'), self)
+
+        # ----------------------------------------------
+        self.lbl_N1 = QLabel(to_html("&nbsp;N_1", frmt='bi') + " =", self)
+        self.led_N1 = QLineEdit(self)
+        self.led_N1.setText(str(self.N1))
+        self.led_N1.setToolTip("Parameter N1")
+        self.led_N1.setObjectName("stimN1")
+
+        self.lbl_N2 = QLabel(to_html("&nbsp;N_2", frmt='bi') + " =", self)
+        self.led_N2 = QLineEdit(self)
+        self.led_N2.setText(str(self.N2))
+        self.led_N2.setToolTip("Parameter N2")
+        self.led_N2.setObjectName("stimN2")
         # ---------------------------------------------
         self.lbl_TW1 = QLabel(
             to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
@@ -460,6 +474,12 @@ class Plot_Tran_Stim_UI(QWidget):
         layG_ctrl_stim.addWidget(self.lbl_TU1, 0, i)
         layG_ctrl_stim.addWidget(self.lbl_TU2, 1, i)
         i += 1
+        layG_ctrl_stim.addWidget(self.lbl_N1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_N2, 1, i)
+        i += 1
+        layG_ctrl_stim.addWidget(self.led_N1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_N2, 1, i)
+        i += 1
         layG_ctrl_stim.addWidget(self.lbl_TW1, 0, i)
         layG_ctrl_stim.addWidget(self.lbl_TW2, 1, i)
         i += 1
@@ -496,7 +516,9 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledStimFormula = QLineEdit(self)
         self.ledStimFormula.setText(str(self.stim_formula))
         self.ledStimFormula.setToolTip(
-            "<span>Enter formula for stimulus in numexpr syntax.</span>")
+            "<span>Enter formula for stimulus in numexpr syntax, using the time vector "
+            "<i>n</i> or <i>t</i>. Additionally, the UI defined variables A1, A2, phi1, "
+            "phi2, f1, f2, T1, T2, BW1, BW2 are available.</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
         # ----------------------------------------------------------------------
@@ -572,6 +594,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledPhi2.editingFinished.connect(self._update_phi2)
         self.led_BW1.editingFinished.connect(self._update_BW1)
         self.led_BW2.editingFinished.connect(self._update_BW2)
+        self.led_N1.editingFinished.connect(self._update_N1)
+        self.led_N2.editingFinished.connect(self._update_N2)
 
         self.cmb_file_io.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbImpulseType.currentIndexChanged.connect(
@@ -855,6 +879,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lbl_T1.setVisible("T1" in stim_wdg)
         self.led_T1.setVisible("T1" in stim_wdg)
         self.lbl_TU1.setVisible("T1" in stim_wdg)
+        self.lbl_N1.setVisible("N1" in stim_wdg)
+        self.led_N1.setVisible("N1" in stim_wdg)
         self.lbl_TW1.setVisible("TW1" in stim_wdg)
         self.led_TW1.setVisible("TW1" in stim_wdg)
         self.lbl_TWU1.setVisible("TW1" in stim_wdg)
@@ -872,6 +898,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lbl_T2.setVisible("T2" in stim_wdg)
         self.led_T2.setVisible("T2" in stim_wdg)
         self.lbl_TU2.setVisible("T2" in stim_wdg)
+        self.lbl_N2.setVisible("N2" in stim_wdg)
+        self.led_N2.setVisible("N2" in stim_wdg)
         self.lbl_TW2.setVisible("TW2" in stim_wdg)
         self.led_TW2.setVisible("TW2" in stim_wdg)
         self.lbl_TWU2.setVisible("TW2" in stim_wdg)
@@ -908,6 +936,18 @@ class Plot_Tran_Stim_UI(QWidget):
                               self.phi1, return_type='float')
         self.ledPhi1.setText(str(self.phi1))
         self.emit({'ui_local_changed': 'phi1'})
+
+    def _update_N1(self):
+        """ Update value for self.N1 from `self.led_N1`"""
+        self.N1 = safe_eval(self.led_N1.text(), self.N1, return_type='int', sign='pos')
+        self.led_N1.setText(str(self.N1))
+        self.emit({'ui_local_changed': 'N1'})
+
+    def _update_N2(self):
+        """ Update value for self.N2 from `self.led_N2`"""
+        self.N2 = safe_eval(self.led_N2.text(), self.N2, return_type='int', sign='pos')
+        self.led_N2.setText(str(self.N2))
+        self.emit({'ui_local_changed': 'N2'})
 
     def _update_BW1(self):
         """ Update value for self.BW1 from QLineEditWidget"""
