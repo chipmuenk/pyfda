@@ -188,7 +188,8 @@ class Plot_Tran_Stim_UI(QWidget):
             ("sine", "Sine", "Sine signal"),
             ("cos", "Cos", "Cosine signal"),
             ("exp", "Exp", "Complex exponential"),
-            ("diric", "Diric", "<span>Periodic Sinc (Dirichlet function)</span>")
+            ("diric", "Diric", "<span>Periodic sinc (Dirichlet) function, "
+             "diric(x, N) = sin(Nx/2) / N*sin(x/2)</span>")
         ]
 
         self.cmb_stim_modulation_items = [
@@ -517,8 +518,9 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledStimFormula.setText(str(self.stim_formula))
         self.ledStimFormula.setToolTip(
             "<span>Enter formula for stimulus in numexpr syntax, using the time vector "
-            "<i>n</i> or <i>t</i>. Additionally, the UI defined variables A1, A2, phi1, "
-            "phi2, f1, f2, T1, T2, BW1, BW2 are available.</span>")
+            "<i>n</i> or <i>t</i> and the following UI settings: "
+            + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
+                      frmt='i') + ".</span>")
         self.ledStimFormula.setObjectName("stimFormula")
 
         # ----------------------------------------------------------------------
