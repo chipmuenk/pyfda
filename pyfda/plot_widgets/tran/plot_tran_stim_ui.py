@@ -446,7 +446,6 @@ class Plot_Tran_Stim_UI(QWidget):
         layH_noi_params.addWidget(self.ledNoi_par)
 
         layG_ctrl_stim = QGridLayout()
-        layG_ctrl_stim.setContentsMargins(0, 0, 0, 0)
         i = 0
         layG_ctrl_stim.addLayout(layHCmbStim, 0, i)
         layG_ctrl_stim.addLayout(layHStimDC, 1, i)
@@ -512,6 +511,8 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         layG_ctrl_stim.addWidget(self.cmb_stim_noise, 0, i)
         layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
+        i += 1
+        layG_ctrl_stim.setColumnStretch(i, 1)
         # ----------------------------------------------
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
         self.ledStimFormula = QLineEdit(self)
@@ -537,14 +538,6 @@ class Plot_Tran_Stim_UI(QWidget):
         # Widget containing all control elements for stimuli except "formula"
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
-        self.wdg_ctrl_stim.setContentsMargins(0, 0, 0, 0)
-
-        layH_io_stim = QHBoxLayout()
-        layH_io_stim.addWidget(self.wdg_ctrl_stim)
-        layH_io_stim.addStretch(10)
-        self.wdg_io_stim = QWidget(self)
-        self.wdg_io_stim.setLayout(layH_io_stim)
-        self.wdg_io_stim.setContentsMargins(0, 0, 0, 0)
 
         layH_formula_stim = QHBoxLayout()
         layH_formula_stim.addWidget(self.lblStimFormula)
@@ -556,7 +549,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         layG_stim = QGridLayout()
         layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
-        layG_stim.addWidget(self.wdg_io_stim, 0, 1)
+        layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
         layG_stim.addWidget(self.wdg_formula_stim, 1, 1)
         layG_stim.setContentsMargins(0, 0, 0, 0)
         layG_stim.setVerticalSpacing(0)
