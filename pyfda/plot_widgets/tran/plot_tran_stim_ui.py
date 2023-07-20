@@ -517,8 +517,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledStimFormula = QLineEdit(self)
         self.ledStimFormula.setText(str(self.stim_formula))
         self.ledStimFormula.setToolTip(
-            "<span>Enter formula for stimulus in numexpr syntax, using the time vector "
-            "<i>n</i> or <i>t</i> and the following UI settings: "
+            "<span>Enter formula for stimulus in numexpr syntax, using the index "
+            "<i>n</i> or the time vector <i>t</i> and the following UI settings: "
             + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
                       frmt='i') + ".</span>")
         self.ledStimFormula.setObjectName("stimFormula")
@@ -527,12 +527,14 @@ class Plot_Tran_Stim_UI(QWidget):
         # Main Widget
         # ----------------------------------------------------------------------
 
+        # Widget with the text block "Stim:"
         layH_title_stim = QHBoxLayout()
         layH_title_stim.addWidget(self.lbl_title_stim)
         self.wdg_title_stim = QWidget(self)
         self.wdg_title_stim.setLayout(layH_title_stim)
         self.wdg_title_stim.setContentsMargins(0, 0, 0, 0)
 
+        # Widget containing all control elements for stimuli except "formula"
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
         self.wdg_ctrl_stim.setContentsMargins(0, 0, 0, 0)
