@@ -465,6 +465,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_formula_stim.setLayout(layH_formula_stim)
         self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
 
+        # Main grid layout for all control elements
         layG_ctrl_stim = QGridLayout()
         i = 0
         layG_ctrl_stim.addLayout(layHCmbStim, 0, i)
@@ -548,19 +549,18 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_title_stim.setLayout(layH_title_stim)
         self.wdg_title_stim.setContentsMargins(0, 0, 0, 0)
 
-        # Widget containing all control elements for stimuli except "formula"
+        # Widget containing all control elements for stimuli
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
 
-        layG_stim = QGridLayout()
-        layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
-        layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
-        layG_stim.setContentsMargins(0, 0, 0, 0)
-        layG_stim.setVerticalSpacing(0)
+        layH_stim = QHBoxLayout()
+        layH_stim.addWidget(self.wdg_title_stim)
+        layH_stim.addWidget(self.wdg_ctrl_stim)
+        layH_stim.setContentsMargins(0, 0, 0, 0)
 
         self.wdg_stim = QWidget(self)
         self.wdg_stim.setObjectName("transparent")
-        self.wdg_stim.setLayout(layG_stim)
+        self.wdg_stim.setLayout(layH_stim)
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
 
         # ----------------------------------------------------------------------
