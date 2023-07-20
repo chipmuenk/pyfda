@@ -343,7 +343,6 @@ class Tran_IO_UI(QWidget):
         self.cmb_data_format.setVisible(not is_csv_format)
         self.but_scale_int.setVisible(not is_csv_format)
 
-        self.lbl_f_s_wav.setEnabled(not self.but_f_s_wav.isChecked())
         self.led_f_s_wav.setEnabled(not self.but_f_s_wav.isChecked())
 
     # -------------------------------------------------------------------------
