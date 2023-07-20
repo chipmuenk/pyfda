@@ -194,7 +194,7 @@ class FreqUnits(QWidget):
             fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        self.emit({'view_changed': 'f_S'})
+#        self.emit({'view_changed': 'f_S'})
 
 # -------------------------------------------------------------
     def update_UI(self):
