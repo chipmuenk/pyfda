@@ -445,6 +445,26 @@ class Plot_Tran_Stim_UI(QWidget):
         layH_noi_params.addWidget(self.lblNoi_par)
         layH_noi_params.addWidget(self.ledNoi_par)
 
+        # ----------------------------------------------
+        # Widget and Layout containing formula editor
+        self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
+        self.ledStimFormula = QLineEdit(self)
+        self.ledStimFormula.setText(str(self.stim_formula))
+        self.ledStimFormula.setToolTip(
+            "<span>Enter formula for stimulus in numexpr syntax, using the index "
+            "<i>n</i> or the time vector <i>t</i> and the following UI settings: "
+            + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
+                      frmt='i') + ".</span>")
+        self.ledStimFormula.setObjectName("stimFormula")
+
+        layH_formula_stim = QHBoxLayout()
+        layH_formula_stim.addWidget(self.lblStimFormula)
+        layH_formula_stim.addWidget(self.ledStimFormula)
+        layH_formula_stim.setContentsMargins(0, 0, 0, 0)
+        self.wdg_formula_stim = QWidget(self)
+        self.wdg_formula_stim.setLayout(layH_formula_stim)
+        self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
+
         layG_ctrl_stim = QGridLayout()
         i = 0
         layG_ctrl_stim.addLayout(layHCmbStim, 0, i)
@@ -513,16 +533,9 @@ class Plot_Tran_Stim_UI(QWidget):
         layG_ctrl_stim.addLayout(layH_noi_params, 1, i)
         i += 1
         layG_ctrl_stim.setColumnStretch(i, 1)
-        # ----------------------------------------------
-        self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
-        self.ledStimFormula = QLineEdit(self)
-        self.ledStimFormula.setText(str(self.stim_formula))
-        self.ledStimFormula.setToolTip(
-            "<span>Enter formula for stimulus in numexpr syntax, using the index "
-            "<i>n</i> or the time vector <i>t</i> and the following UI settings: "
-            + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
-                      frmt='i') + ".</span>")
-        self.ledStimFormula.setObjectName("stimFormula")
+        i += 1
+        # place formula widget in row 2, stretching over i columns
+        layG_ctrl_stim.addWidget(self.wdg_formula_stim, 2, 0, 1, i)
 
         # ----------------------------------------------------------------------
         # Main Widget
@@ -539,18 +552,9 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_ctrl_stim = QWidget(self)
         self.wdg_ctrl_stim.setLayout(layG_ctrl_stim)
 
-        layH_formula_stim = QHBoxLayout()
-        layH_formula_stim.addWidget(self.lblStimFormula)
-        layH_formula_stim.addWidget(self.ledStimFormula)
-# TODO: this!        layH_formula_stim.setContentsMargins(0, 0, 0, 0)
-        self.wdg_formula_stim = QWidget(self)
-        self.wdg_formula_stim.setLayout(layH_formula_stim)
-        self.wdg_formula_stim.setContentsMargins(0, 0, 0, 0)
-
         layG_stim = QGridLayout()
         layG_stim.addWidget(self.wdg_title_stim, 0, 0, 2, 1)
         layG_stim.addWidget(self.wdg_ctrl_stim, 0, 1)
-        layG_stim.addWidget(self.wdg_formula_stim, 1, 1)
         layG_stim.setContentsMargins(0, 0, 0, 0)
         layG_stim.setVerticalSpacing(0)
 
@@ -558,7 +562,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_stim.setObjectName("transparent")
         self.wdg_stim.setLayout(layG_stim)
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
-        # self.wdg_stim.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         # ----------------------------------------------------------------------
         # Event Filter
