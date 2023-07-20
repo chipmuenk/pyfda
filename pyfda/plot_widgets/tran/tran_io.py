@@ -115,7 +115,7 @@ class Tran_IO(QWidget):
         """
         Set sampling frequency for wav files, either from LineEdit (button `Auto f_s`
         unchecked) or from argument `f_s_wav` (button `Auto f_s` checked), passed either
-        from loaded wav file or from updated f_S.
+        from loaded wav file or from updated f_S some other place in the app.
         """
         if not self.ui.but_f_s_wav.isChecked() or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()

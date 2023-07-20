@@ -135,7 +135,7 @@ class Tran_IO_UI(QWidget):
         self.but_f_s_wav.setCheckable(True)
         self.but_f_s_wav.setChecked(True)
         self.but_f_s_wav.setToolTip(
-            "<span>Copy pyfda sampling frequency to / from WAV file during export / import "
+            "<span>Copy pyfda sampling frequency to WAV file during export "
             "when selected.</span>")
         self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
         self.led_f_s_wav = QLineEdit(self)
