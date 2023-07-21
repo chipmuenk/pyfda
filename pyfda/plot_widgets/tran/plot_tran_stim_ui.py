@@ -724,7 +724,7 @@ class Plot_Tran_Stim_UI(QWidget):
                         str(params['FMT'].format(self.TW2 * self.t_scale)))
 
                 self.spec_edited = False  # reset flag
-                self._update_scale_impz()
+                self._update_energy_scaling_impz()
                 self.emit({'ui_local_changed': 'stim'})
 
             # nothing has changed, but display frequencies in rounded format anyway
@@ -767,7 +767,7 @@ class Plot_Tran_Stim_UI(QWidget):
             self.TW1 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
             self.TW2 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
 
-        self._update_scale_impz()
+        self._update_energy_scaling_impz()
 
         self.update_freqs()
 
@@ -848,7 +848,7 @@ class Plot_Tran_Stim_UI(QWidget):
         if self.cmb_stim == "impulse":
             self.stim = qget_cmb_box(self.cmbImpulseType)
             # recalculate the energy scaling for impulse functions
-            self._update_scale_impz()
+            self._update_energy_scaling_impz()
 
         elif self.cmb_stim == "sinusoid":
             self.stim = qget_cmb_box(self.cmbSinusoidType)
@@ -955,7 +955,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.BW1 = safe_eval(
             self.led_BW1.text(), self.BW1, return_type='float', sign='pos')
         self.led_BW1.setText(str(self.BW1))
-        self._update_scale_impz()
+        self._update_energy_scaling_impz()
         self.emit({'ui_local_changed': 'BW1'})
 
     def _update_BW2(self):
@@ -965,7 +965,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_BW2.setText(str(self.BW2))
         self.emit({'ui_local_changed': 'BW2'})
 
-    def _update_scale_impz(self):
+    def _update_energy_scaling_impz(self):
         """
         recalculate the energy scaling for impulse functions when impulse type or
         relevant frequency / bandwidth parameter have been updated
