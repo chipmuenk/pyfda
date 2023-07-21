@@ -756,8 +756,10 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies if required. This is called via signal
-        ['ui_global_changed':'f_S'] from plot_impz.process_sig_rx
+        Update normalized frequencies and periods if required.
+
+        Triggered by signal {'ui_global_changed':'f_S'} from plot_impz.process_sig_rx
+        and by eventFilter -> _store_entry()
         """
         if fb.fil[0]['freq_locked']:
             self.f1 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
@@ -786,11 +788,13 @@ class Plot_Tran_Stim_UI(QWidget):
         `self.f_scale` (except when the frequency unit is k when `f_scale = self.N_FFT`).
 
         Frequency field entries are always stored normalized w.r.t. f_S in the
-        dictionary: When the `f_S` lock button is unlocked, only the displayed
-        values for frequency entries are updated with f_S, not the dictionary.
+        dictionary:
 
-        When the `f_S` lock button is pressed, the absolute frequency values in
-        the widget fields are kept constant, and the dictionary entries are updated.
+        - When the `f_S` lock button is unlocked, only the displayed
+          values for frequency entries are updated with f_S, not the dictionary.
+
+        - When the `f_S` lock button is pressed, the absolute frequency values in
+          the widget fields are kept constant, and the dictionary entries are updated.
 
         """
 
