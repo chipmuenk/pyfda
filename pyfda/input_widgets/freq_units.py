@@ -179,10 +179,12 @@ class FreqUnits(QWidget):
         the displayed value `f_a * f_S`.
 
         This has to be accomplished by each frequency widget (currently, these are
-        freq_specs and freq_units).
+        freq_specs and plot_tran_stim) when receiving the signal {'view_changed': 'f_S'}.
+        TODO: Should this be 'data_changed' when the lock is active?
 
-        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`,
-        the signal 'view_changed':'f_S' is emitted.
+        The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`.
+        No signal is emitted because there is no immediate need for action, all the values
+        remain unchanged.
         """
 
         if self.butLock.isChecked():
@@ -193,8 +195,6 @@ class FreqUnits(QWidget):
             # Lock has been unlocked, scale displayed frequencies with f_S
             fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
-
-#        self.emit({'view_changed': 'f_S'})
 
 # -------------------------------------------------------------
     def update_UI(self):
@@ -313,7 +313,7 @@ class FreqUnits(QWidget):
                 self._freq_range(emit=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
                 self.spec_edited = False  # reset flag, changed entry has been saved
-
+        # ----------------------
         if source.objectName() == 'f_S':
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
@@ -326,7 +326,6 @@ class FreqUnits(QWidget):
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
                     source.setText(str(fb.fil[0]['f_S']))  # full precision
-
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
                 source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced prec.

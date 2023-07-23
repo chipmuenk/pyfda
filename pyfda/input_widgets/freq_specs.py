@@ -258,16 +258,17 @@ class FreqSpecs(QWidget):
 # -------------------------------------------------------------
     def load_dict(self):
         """
-        Reload textfields from filter dictionary
-        Transform the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
-        in the dictionary; when f_S or the unit are changed, only the displayed values
-        of the frequency entries are updated, not the dictionary!
+        - Reload textfields from filter dictionary
 
-        Update the displayed frequency unit
+        - Transform the displayed frequency spec input fields according to the units
+          setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
+          in the dictionary; when f_S or the unit are changed, only the displayed values
+          of the frequency entries are updated, not the dictionary!
 
-        load_dict is called during init and when the frequency unit or the
-        sampling frequency have been changed.
+        - Update the displayed frequency unit
+
+        `load_dict()` is called during init and when the frequency unit or the
+          sampling frequency have been changed.
 
         It should be called when `specs_changed` or `data_changed` is emitted
         at another place, indicating that a reload is required.
@@ -284,7 +285,7 @@ class FreqSpecs(QWidget):
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(f_value))  # TODO: WTF?!
+                self.qlineedit[i].setText(params['FMT'].format(f_value))
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(f_value))
