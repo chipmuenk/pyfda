@@ -761,7 +761,8 @@ class Plot_Tran_Stim_UI(QWidget):
         Triggered by signal {'ui_global_changed':'f_S'} from plot_impz.process_sig_rx
         and by eventFilter -> _store_entry()
         """
-        if fb.fil[0]['freq_locked']:
+        logger.error(f"freq_locked: {fb.fil[0]['freq_locked']}")
+        if False: # not fb.fil[0]['freq_locked']:
             self.f1 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
             self.f2 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
             self.T1 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
