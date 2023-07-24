@@ -283,9 +283,8 @@ qss_light = """
 
     .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
 
-    QLineEdit{background: white;
-                border-color: darkgrey;}
-    QLineEdit:disabled{background-color:lightgrey; color:blue}
+    QLineEdit{background: white; border-color: darkgrey;}
+    QLineEdit:disabled{background-color:lightgrey; color:blue;}
 
     QPushButton{
          background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
