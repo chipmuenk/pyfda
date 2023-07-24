@@ -492,9 +492,9 @@ qss_common = """
                 QPushButton:pressed {background-color:black; color:white}
 
                 QPushButton:checked{
-                    background-color:lightblue; color:black;font-weight:800;}
+                    background-color:lightblue; color:black;font-weight: bold;}
                 QPushButtonRT:checked{
-                    background-color:lightblue; color:black;font-weight:800;}
+                    background-color:lightblue; color:black;font-weight: bold;}
 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
