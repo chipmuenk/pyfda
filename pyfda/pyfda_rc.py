@@ -410,7 +410,8 @@ qss_common = """
                 * [state="highlight"]{background-color: rgba(173, 216, 230, 25%)}
                 * [state="unused"], *[state="u"]{background-color: white; color:darkgrey}
                 /* semi-transparent red */
-                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
+                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black;
+                    font-weight:800;}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
 
