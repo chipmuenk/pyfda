@@ -283,9 +283,8 @@ qss_light = """
 
     .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
 
-    QLineEdit{background: white;
-                border-color: darkgrey;}
-    QLineEdit:disabled{background-color:lightgrey; color:blue}
+    QLineEdit{background: white; border-color: darkgrey;}
+    QLineEdit:disabled{background-color:lightgrey; color:blue;}
 
     QPushButton{
          background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -410,7 +409,8 @@ qss_common = """
                 * [state="highlight"]{background-color: rgba(173, 216, 230, 25%)}
                 * [state="unused"], *[state="u"]{background-color: white; color:darkgrey}
                 /* semi-transparent red */
-                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black}
+                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black;
+                    font-weight:800;}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
 
@@ -491,9 +491,9 @@ qss_common = """
                 QPushButton:pressed {background-color:black; color:white}
 
                 QPushButton:checked{
-                    background-color:lightblue; color:black;font-weight:800;}
+                    background-color:lightblue; color:black;font-weight: bold;}
                 QPushButtonRT:checked{
-                    background-color:lightblue; color:black;font-weight:800;}
+                    background-color:lightblue; color:black;font-weight: bold;}
 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */

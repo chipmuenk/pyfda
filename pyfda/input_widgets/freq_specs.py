@@ -23,9 +23,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 MIN_FREQ_STEP = 1e-4
-MIN_FREQ = 0.0  # min. frequency
-MAX_FREQ = 0.5  # max. frequency (normalize w.r.t. f_S)
-
 
 class FreqSpecs(QWidget):
     """
@@ -258,16 +255,17 @@ class FreqSpecs(QWidget):
 # -------------------------------------------------------------
     def load_dict(self):
         """
-        Reload textfields from filter dictionary
-        Transform the displayed frequency spec input fields according to the units
-        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
-        in the dictionary; when f_S or the unit are changed, only the displayed values
-        of the frequency entries are updated, not the dictionary!
+        - Reload textfields from filter dictionary
 
-        Update the displayed frequency unit
+        - Transform the displayed frequency spec input fields according to the units
+          setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S
+          in the dictionary; when f_S or the unit are changed, only the displayed values
+          of the frequency entries are updated, not the dictionary!
 
-        load_dict is called during init and when the frequency unit or the
-        sampling frequency have been changed.
+        - Update the displayed frequency unit
+
+        `load_dict()` is called during init and when the frequency unit or the
+          sampling frequency have been changed.
 
         It should be called when `specs_changed` or `data_changed` is emitted
         at another place, indicating that a reload is required.
@@ -284,7 +282,7 @@ class FreqSpecs(QWidget):
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(f_value))  # TODO: WTF?!
+                self.qlineedit[i].setText(params['FMT'].format(f_value))
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(f_value))
@@ -354,23 +352,17 @@ class FreqSpecs(QWidget):
         # Make sure normalized freqs are in the range ]0, 0.5[ and are different
         # by at least MIN_FREQ_STEP
         for i in range(self.n_cur_labels):
-            if f_specs[i] <= MIN_FREQ:
+            if f_specs[i] <= 0:
                 logger.warning(
-                    "Frequencies must be > 0, changed {0} from {1:.4g} to {2:.4g}."
-                    .format(str(self.qlineedit[i].objectName()),
-                            f_specs[i]*fb.fil[0]['f_S'],
-                            (MIN_FREQ + MIN_FREQ_STEP)*fb.fil[0]['f_S']))
-                f_specs[i] = MIN_FREQ + MIN_FREQ_STEP
-
-            if f_specs[i] >= MAX_FREQ:
+                    f"Frequency {str(self.qlineedit[i].objectName())} has to be >= 0")
+                self.qlineedit[i].setProperty("state", 'failed')
+            elif f_specs[i] >= 0.5:
                 logger.warning(
-                    "Frequencies must be < f_S /2, changed {0} from {1:.4g} to {2:.4g}."
-                    .format(str(self.qlineedit[i].objectName()),
-                            f_specs[i]*fb.fil[0]['f_S'],
-                            (MAX_FREQ - MIN_FREQ_STEP)*fb.fil[0]['f_S']))
-                f_specs[i] = MAX_FREQ - MIN_FREQ_STEP
-
-            fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
+                    f"Frequency {str(self.qlineedit[i].objectName())} has to be < f_S /2.")
+                qstyle_widget(self.qlineedit[i], 'failed')
+            else:
+                fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
+                qstyle_widget(self.qlineedit[i], 'normal')
 
         # check for (nearly) identical elements:
         _, mult = unique_roots(f_specs, tol=MIN_FREQ_STEP)
