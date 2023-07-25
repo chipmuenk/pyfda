@@ -679,7 +679,7 @@ class Plot_Tran_Stim_UI(QWidget):
                 scale = getattr(self, param_name)
                 source.setText(str(params['FMT'].format(var * scale)))
             except KeyError:
-                pass
+                logger.warning(f"Unknown objectName {source.objectName}!")
         #------------------------------------------------------------
 
         def _store_entry(source):
