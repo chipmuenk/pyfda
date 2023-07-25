@@ -18,7 +18,7 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qtext_width, QVLine, PushButton)
+    qcmb_box_populate, qget_cmb_box, qtext_width, qstyle_widget, QVLine, PushButton)
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
@@ -228,6 +228,7 @@ class Plot_Tran_Stim_UI(QWidget):
         # =====================================================================
         # Controls for stimuli
         # =====================================================================
+
         self.lbl_title_stim = QLabel("Stim:")
         self.lbl_title_stim.setObjectName("large")
         #
@@ -576,6 +577,15 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_TW1.installEventFilter(self)
         self.led_TW2.installEventFilter(self)
 
+        # Connect Object IDs with normalized variables and scaling factors
+        self.dict_filtered_widgets = {
+            'stimFreq1': ('f1', 'f_scale'),
+            'stimFreq2': ('f2', 'f_scale'),
+            'stimT1': ('T1', 't_scale'),
+            'stimT2': ('T2', 't_scale'),
+            'stimTW1': ('TW1', 't_scale'),
+            'stimTW2': ('TW2', 't_scale')
+        }
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
@@ -614,6 +624,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledDC.editingFinished.connect(self._update_DC)
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
+
 
 # ------------------------------------------------------------------------------
     def update_freq_units(self):
@@ -661,70 +672,38 @@ class Plot_Tran_Stim_UI(QWidget):
           Emit 'ui_local_changed':'stim'
         """
         def _reload_entry(source):
-            """ Reload text entry for active line edit field in rounded format """
-            if source.objectName() == "stimFreq1":
-                source.setText(
-                    str(params['FMT'].format(self.f1 * self.f_scale)))
-            elif source.objectName() == "stimFreq2":
-                source.setText(
-                    str(params['FMT'].format(self.f2 * self.f_scale)))
-            elif source.objectName() == "stimT1":
-                source.setText(
-                    str(params['FMT'].format(self.T1 * self.t_scale)))
-            elif source.objectName() == "stimT2":
-                source.setText(
-                    str(params['FMT'].format(self.T2 * self.t_scale)))
-            elif source.objectName() == "stimTW1":
-                source.setText(
-                    str(params['FMT'].format(self.TW1 * self.t_scale)))
-            elif source.objectName() == "stimTW2":
-                source.setText(
-                    str(params['FMT'].format(self.TW2 * self.t_scale)))
+            """
+            Reload text entry for active line edit field in rounded, denormalized format
+            """
+            try:
+                var_name, param_name = self.dict_filtered_widgets[source.objectName()]
+                var = getattr(self, var_name)
+                scale = getattr(self, param_name)
+                source.setText(str(params['FMT'].format(var * scale)))
+            except KeyError:
+                pass
+        #------------------------------------------------------------
 
         def _store_entry(source):
             """ Store transformed frequency / time values """
             if self.spec_edited:
-                if source.objectName() == "stimFreq1":
-                    self.f1 = safe_eval(
-                        source.text(), self.f1 * self.f_scale,
-                        return_type='float') / self.f_scale
-                    source.setText(
-                        str(params['FMT'].format(self.f1 * self.f_scale)))
+                try:
+                    var_name, param_name = self.dict_filtered_widgets[source.objectName()]
+                    scale = getattr(self, param_name)  # get scale value
+                    var_old = getattr(self, var_name)  # get old var value
+                    # assign var with either content of text field or fallback value:
+                    var = safe_eval(source.text(), var_old * scale,
+                                    sign='pos', return_type='float') / scale
 
-                elif source.objectName() == "stimFreq2":
-                    self.f2 = safe_eval(
-                        source.text(), self.f2 * self.f_scale,
-                        return_type='float') / self.f_scale
-                    source.setText(
-                        str(params['FMT'].format(self.f2 * self.f_scale)))
-
-                elif source.objectName() == "stimT1":
-                    self.T1 = safe_eval(
-                        source.text(), self.T1 * self.t_scale,
-                        return_type='float') / self.t_scale
-                    source.setText(
-                        str(params['FMT'].format(self.T1 * self.t_scale)))
-
-                elif source.objectName() == "stimT2":
-                    self.T2 = safe_eval(
-                        source.text(), self.T2 * self.t_scale,
-                        return_type='float') / self.t_scale
-                    source.setText(
-                        str(params['FMT'].format(self.T2 * self.t_scale)))
-
-                elif source.objectName() == "stimTW1":
-                    self.TW1 = safe_eval(
-                        source.text(), self.TW1 * self.t_scale, sign='pos',
-                        return_type='float') / self.t_scale
-                    source.setText(
-                        str(params['FMT'].format(self.TW1 * self.t_scale)))
-
-                elif source.objectName() == "stimTW2":
-                    self.TW2 = safe_eval(
-                        source.text(), self.TW2 * self.t_scale, sign='pos',
-                        return_type='float') / self.t_scale
-                    source.setText(
-                        str(params['FMT'].format(self.TW2 * self.t_scale)))
+                    setattr(self, var_name, var)
+                    # set textfield with scaled value of `var_name`:
+                    source.setText(str(params['FMT'].format(var * scale)))
+                    if var < 0.5:
+                        qstyle_widget(source, 'normal')
+                    else:
+                        qstyle_widget(source, 'failed')
+                except KeyError:
+                    pass
 
                 self.spec_edited = False  # reset flag
                 self._update_energy_scaling_impz()
@@ -764,12 +743,13 @@ class Plot_Tran_Stim_UI(QWidget):
         and by eventFilter -> _store_entry()
         """
         if fb.fil[0]['freq_locked']:
-            self.f1 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
-            self.f2 *= fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
-            self.T1 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
-            self.T2 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
-            self.TW1 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
-            self.TW2 *= fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
+            f_corr = fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
+            self.f1 *= f_corr
+            self.f2 *= f_corr
+            self.T1 /= f_corr
+            self.T2 /= f_corr
+            self.TW1 /= f_corr
+            self.TW2 /= f_corr
 
         self._update_energy_scaling_impz()
 
