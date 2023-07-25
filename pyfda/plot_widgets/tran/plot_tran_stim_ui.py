@@ -565,6 +565,11 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
 
         # ----------------------------------------------------------------------
+        # Initialization
+        # ----------------------------------------------------------------------
+        self.update_freqs()  # set f_scale and t_scale factors
+
+        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
@@ -625,6 +630,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_T2.installEventFilter(self)
         self.led_TW1.installEventFilter(self)
         self.led_TW2.installEventFilter(self)
+
 # ------------------------------------------------------------------------------
     def update_freq_units(self):
         """
@@ -669,15 +675,19 @@ class Plot_Tran_Stim_UI(QWidget):
 
           Emit 'ui_local_changed':'stim'
         """
-        def _reload_entry(source):
+        def _reload_entry(source, full_prec=False):
             """
-            Reload text entry for active line edit field in rounded, denormalized format
+            Reload text entry for active line edit field in denormalized format,
+            either with full precision (`full_prec == True`) or rounded.
             """
             try:
                 var_name, param_name = self.dict_filtered_widgets[source.objectName()]
                 var = getattr(self, var_name)
                 scale = getattr(self, param_name)
-                source.setText(str(params['FMT'].format(var * scale)))
+                if full_prec:
+                    source.setText(str(var * scale))
+                else:
+                    source.setText(str(params['FMT'].format(var * scale)))
             except KeyError:
                 logger.warning(f"Unknown objectName {source.objectName}!")
         #------------------------------------------------------------
@@ -716,7 +726,7 @@ class Plot_Tran_Stim_UI(QWidget):
         if event.type() in {QEvent.FocusIn, QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.update_freqs()
+                _reload_entry(source, full_prec=True)
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -758,17 +768,12 @@ class Plot_Tran_Stim_UI(QWidget):
     # -------------------------------------------------------------
     def update_freqs(self):
         """
-        `update_freqs()` is called:
+        `update_freqs()` is called when sampling frequency has been changed via
+        signal ['view_changed':'f_S'] from plot_impz.process_sig_rx -> self.recalc_freqs
 
-        - when one of the stimulus frequencies gains focus via eventFilter()
-
-        - sampling frequency has been changed via signal ['view_changed':'f_S']
-          from plot_impz.process_sig_rx -> self.recalc_freqs
-
-        The sampling frequency is loaded from filter dictionary and stored as
-        `self.f_scale` (except when the frequency unit is k when `f_scale = self.N_FFT`).
-
-        Frequency and time related entries are always stored normalized w.r.t. f_S:
+        Frequency and time related entries are always stored normalized w.r.t. f_S
+        which is loaded from filter dictionary and stored as  `self.f_scale`
+        (except when the frequency unit is k when `f_scale = self.N_FFT`).
 
         - When the `f_S` lock button is unchecked, only the displayed
           values for frequency entries are updated with f_S, not the dictionary.
