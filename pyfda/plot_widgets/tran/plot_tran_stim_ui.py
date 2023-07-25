@@ -341,14 +341,14 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
         self.ledPhi1 = QLineEdit(self)
         self.ledPhi1.setText(str(self.phi1))
-        self.ledPhi1.setToolTip("Stimulus phase")
+        self.ledPhi1.setToolTip("Stimulus phase 1 in degrees")
         self.ledPhi1.setObjectName("stimPhi1")
         self.lblPhU1 = QLabel(to_html("&deg;", frmt='i'), self)
 
         self.lblPhi2 = QLabel(to_html("&nbsp;&phi;_2", frmt='bi') + " =", self)
         self.ledPhi2 = QLineEdit(self)
         self.ledPhi2.setText(str(self.phi2))
-        self.ledPhi2.setToolTip("Stimulus phase 2")
+        self.ledPhi2.setToolTip("Stimulus phase 2 in degrees")
         self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='i'), self)
         # ----------------------------------------------
@@ -660,7 +660,7 @@ class Plot_Tran_Stim_UI(QWidget):
          to this eventFilter, evaluated and passed on to the next hierarchy level.
 
         - When a QLineEdit widget gains input focus (``QEvent.FocusIn``), display
-          the stored value from filter dict with full precision
+          the stored value from filter dict with full precision via
         - When a key is pressed inside the text field, set the `spec_edited` flag
           to True.
         - When a QLineEdit widget loses input focus (``QEvent.FocusOut``), store
@@ -770,10 +770,10 @@ class Plot_Tran_Stim_UI(QWidget):
 
         Frequency and time related entries are always stored normalized w.r.t. f_S:
 
-        - When the `f_S` lock button is unlocked, only the displayed
+        - When the `f_S` lock button is unchecked, only the displayed
           values for frequency entries are updated with f_S, not the dictionary.
 
-        - When the `f_S` lock button is pressed, the absolute frequency values in
+        - When the `f_S` lock button is checked, the absolute frequency values in
           the widget fields are kept constant, and the dictionary entries are updated.
 
         """
