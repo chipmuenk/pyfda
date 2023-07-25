@@ -47,9 +47,6 @@ class Plot_Tran_Stim(QWidget):
         self.error = False
         self.x_file = None  # data mapped from file io in Plot_Impz.file_io()
 
-        self.rad_phi1 = self.ui.phi1 / 180 * pi  # precalculate constants
-        self.rad_phi2 = self.ui.phi2 / 180 * pi
-
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -251,6 +248,8 @@ class Plot_Tran_Stim(QWidget):
         if N_first == 0:
             # calculate index for T1, only needed for dirac, step and rect
             self.T1_idx = int(np.round(self.ui.T1))
+            self.rad_phi1 = self.ui.phi1 / 180 * pi
+            self.rad_phi2 = self.ui.phi2 / 180 * pi
         # -------------------------------------------------------------------
         # Initialization for current frame
         # -------------------------------------------------------------------
