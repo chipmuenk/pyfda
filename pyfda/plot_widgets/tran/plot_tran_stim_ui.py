@@ -788,41 +788,38 @@ class Plot_Tran_Stim_UI(QWidget):
             self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        if self.ledFreq1.hasFocus():
-            # widget has focus, show full precision
-            self.ledFreq1.setText(str(self.f1 * self.f_scale))
+        # if self.ledFreq1.hasFocus():
+        #     # widget has focus, show full precision
+        #     self.ledFreq1.setText(str(self.f1 * self.f_scale))
 
-        elif self.ledFreq2.hasFocus():
-            self.ledFreq2.setText(str(self.f2 * self.f_scale))
+        # elif self.ledFreq2.hasFocus():
+        #     self.ledFreq2.setText(str(self.f2 * self.f_scale))
 
-        elif self.led_T1.hasFocus():
-            self.led_T1.setText(str(self.T1 * self.t_scale))
+        # elif self.led_T1.hasFocus():
+        #     self.led_T1.setText(str(self.T1 * self.t_scale))
 
-        elif self.led_T2.hasFocus():
-            self.led_T2.setText(str(self.T2 * self.t_scale))
+        # elif self.led_T2.hasFocus():
+        #     self.led_T2.setText(str(self.T2 * self.t_scale))
 
-        elif self.led_TW1.hasFocus():
-            self.led_TW1.setText(str(self.TW1 * self.t_scale))
+        # elif self.led_TW1.hasFocus():
+        #     self.led_TW1.setText(str(self.TW1 * self.t_scale))
 
-        elif self.led_TW2.hasFocus():
-            self.led_TW2.setText(str(self.TW2 * self.t_scale))
+        # elif self.led_TW2.hasFocus():
+        #     self.led_TW2.setText(str(self.TW2 * self.t_scale))
 
-        else:
-            # widgets have no focus, round the display
-            self.ledFreq1.setText(
-                str(params['FMT'].format(self.f1 * self.f_scale)))
-            self.ledFreq2.setText(
-                str(params['FMT'].format(self.f2 * self.f_scale)))
-            self.led_T1.setText(
-                str(params['FMT'].format(self.T1 * self.t_scale)))
-            self.led_T2.setText(
-                str(params['FMT'].format(self.T2 * self.t_scale)))
-            self.led_TW1.setText(
-                str(params['FMT'].format(self.TW1 * self.t_scale)))
-            self.led_TW2.setText(
-                str(params['FMT'].format(self.TW2 * self.t_scale)))
-
-        self.update_freq_units()  # TODO: should only be called at f_S / unit update
+        # widgets have no focus, round the display
+        self.ledFreq1.setText(
+            str(params['FMT'].format(self.f1 * self.f_scale)))
+        self.ledFreq2.setText(
+            str(params['FMT'].format(self.f2 * self.f_scale)))
+        self.led_T1.setText(
+            str(params['FMT'].format(self.T1 * self.t_scale)))
+        self.led_T2.setText(
+            str(params['FMT'].format(self.T2 * self.t_scale)))
+        self.led_TW1.setText(
+            str(params['FMT'].format(self.TW1 * self.t_scale)))
+        self.led_TW2.setText(
+            str(params['FMT'].format(self.TW2 * self.t_scale)))
 
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
