@@ -666,14 +666,13 @@ class Plot_Tran_Stim_UI(QWidget):
          to this eventFilter, evaluated and passed on to the next hierarchy level.
 
         - When a QLineEdit widget gains input focus (``QEvent.FocusIn``), display
-          the stored value from filter dict with full precision via
+          the stored value from filter dict with full precision
         - When a key is pressed inside the text field, set the `spec_edited` flag
           to True.
-        - When a QLineEdit widget loses input focus (``QEvent.FocusOut``), store
-          current value normalized to f_S with full precision (only if
-          ``spec_edited == True``) and display the stored value in selected format
-
-          Emit 'ui_local_changed':'stim'
+        - When a QLineEdit widget loses input focus (``QEvent.FocusOut``) or when
+          the Return key is pressed, store current value normalized to f_S with
+          full precision (only if ``spec_edited == True``) and display the
+          denormalized value in selected format. Emit 'ui_local_changed':'stim'
         """
         def _reload_entry(source, full_prec=False):
             """
@@ -748,7 +747,6 @@ class Plot_Tran_Stim_UI(QWidget):
         Update normalized frequencies and periods if required.
 
         Triggered by signal {'ui_global_changed':'f_S'} from plot_impz.process_sig_rx
-        and by eventFilter -> _store_entry()
         """
         if fb.fil[0]['freq_locked']:
             f_corr = fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
