@@ -565,28 +565,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
 
         # ----------------------------------------------------------------------
-        # Event Filter
-        # ----------------------------------------------------------------------
-        # time / frequency related widgets have to be scaled with f_s, this
-        # special handling is performed in an EventFilter (hence no regular
-        # signal-slot connection).
-        self.ledFreq1.installEventFilter(self)
-        self.ledFreq2.installEventFilter(self)
-        self.led_T1.installEventFilter(self)
-        self.led_T2.installEventFilter(self)
-        self.led_TW1.installEventFilter(self)
-        self.led_TW2.installEventFilter(self)
-
-        # Connect Object IDs with normalized variables and scaling factors
-        self.dict_filtered_widgets = {
-            'stimFreq1': ('f1', 'f_scale'),
-            'stimFreq2': ('f2', 'f_scale'),
-            'stimT1': ('T1', 't_scale'),
-            'stimT2': ('T2', 't_scale'),
-            'stimTW1': ('TW1', 't_scale'),
-            'stimTW2': ('TW2', 't_scale')
-        }
-        # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
@@ -625,13 +603,33 @@ class Plot_Tran_Stim_UI(QWidget):
         self.ledStimFormula.editingFinished.connect(self._update_stim_formula)
         self.ledStimPar1.editingFinished.connect(self._update_stim_par1)
 
-
+        # ----------------------------------------------------------------------
+        # Event Filter
+        # ----------------------------------------------------------------------
+        # time / frequency related widgets have to be scaled with f_s, this
+        # special handling is performed in an EventFilter (hence no regular
+        # signal-slot connection).
+        # Dict with objectNames as keys and tuples with normalized variables
+        # and scaling factors as values, e.g. {'stimFreq1': (self.f1, self.f_scale)}
+        self.dict_filtered_widgets = {
+            'stimFreq1': ('f1', 'f_scale'),
+            'stimFreq2': ('f2', 'f_scale'),
+            'stimT1': ('T1', 't_scale'),
+            'stimT2': ('T2', 't_scale'),
+            'stimTW1': ('TW1', 't_scale'),
+            'stimTW2': ('TW2', 't_scale')
+        }
+        self.ledFreq1.installEventFilter(self)
+        self.ledFreq2.installEventFilter(self)
+        self.led_T1.installEventFilter(self)
+        self.led_T2.installEventFilter(self)
+        self.led_TW1.installEventFilter(self)
+        self.led_TW2.installEventFilter(self)
 # ------------------------------------------------------------------------------
     def update_freq_units(self):
         """
-        Update labels referrring to frequency specs
+        Update labels for time / frequency related specs
         """
-
         if fb.fil[0]['freq_specs_unit'] == 'k':
             f_unit = ''
             t_unit = ''
