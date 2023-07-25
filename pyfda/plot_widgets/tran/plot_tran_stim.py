@@ -12,7 +12,7 @@ Widget for plotting impulse and general transient responses
 from pyfda.libs.compat import QWidget, pyqtSignal, QVBoxLayout
 import numpy as np
 from numpy import ndarray, pi
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 import scipy.signal as sig
 from scipy.special import sinc, diric
 
@@ -400,6 +400,10 @@ class Plot_Tran_Stim(QWidget):
                 "n": n, "t": t, "j": 1j}
 
             x[frm_slc] = safe_numexpr_eval(self.ui.stim_formula, (N_frame,), param_dict)
+            if safe_numexpr_eval.err > 0:
+                qstyle_widget(self.ui.ledStimFormula, 'failed')
+            else:
+                qstyle_widget(self.ui.ledStimFormula, 'normal')
         else:
             logger.error('Unknown stimulus format "{0}"'.format(self.ui.stim))
             return None

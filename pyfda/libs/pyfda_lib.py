@@ -517,6 +517,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
         `expr` converted to a numpy array or scalar
 
     """
+    safe_numexpr_eval.err = 0  # function attribute, providing some sort of "memory"
     local_dict.update({'j': 1j, 'None': 0})
     if type(fallback) == tuple:
         np_expr = np.zeros(fallback)  # fallback defines the shape
@@ -528,6 +529,7 @@ def safe_numexpr_eval(expr: str, fallback=None,
     if type(expr) != str or expr == "None":
         logger.warning(f"numexpr: Unsuitable input '{expr}' of type "
                        f"'{type(expr).__name__}', replacing with zero.")
+        safe_numexpr_eval.err = 10
         expr = "0.0"
 
     # Find one or more redundant zeros '0+' at the beginning '^' leading a number [0-9]
@@ -543,16 +545,22 @@ def safe_numexpr_eval(expr: str, fallback=None,
         np_expr = numexpr.evaluate(expr.strip(), local_dict=local_dict)
     except SyntaxError as e:
         logger.warning(f"numexpr: Syntax error:\n\t{e}")
-    except KeyError as e:
-        logger.warning(f"numexpr: Unknown variable {e}")
-    except TypeError as e:
-        logger.warning(f"numexpr: Type error\n\t{e}")
+        safe_numexpr_eval.err = 1
     except AttributeError as e:
         logger.warning(f"numexpr: Attribute error:\n\t{e}")
+        safe_numexpr_eval.err = 2
+    except KeyError as e:
+        logger.warning(f"numexpr: Unknown variable {e}")
+        safe_numexpr_eval.err = 3
+    except TypeError as e:
+        logger.warning(f"numexpr: Type error\n\t{e}")
+        safe_numexpr_eval.err = 4
     except ValueError as e:
         logger.warning(f"numexpr: Value error:\n\t{e}")
+        safe_numexpr_eval.err = 5
     except ZeroDivisionError:
         logger.warning("numexpr: Zero division error in formula.")
+        safe_numexpr_eval.err = 6
 
     if np_expr is None:
         return None  # no fallback, no error checking!
@@ -566,11 +574,15 @@ def safe_numexpr_eval(expr: str, fallback=None,
             # return array of zeros in the shape of the fallback
             logger.warning(
                 f"numexpr: Expression has unexpected dimension {np.ndim(np_expr)}!")
+            safe_numexpr_eval.err = 11
+
             np_expr = np.zeros(fallback_shape)
 
     if np.shape(np_expr) != fallback_shape:
         logger.warning(
             f"numexpr: Expression has unsuitable length {np.shape(np_expr)[0]}!")
+        safe_numexpr_eval.err = 12
+
         np_expr = np.zeros(fallback_shape)
 
     if not type(np_expr.item(0)) in {float, complex}:
