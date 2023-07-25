@@ -567,7 +567,7 @@ class Plot_Tran_Stim_UI(QWidget):
         # ----------------------------------------------------------------------
         # Initialization
         # ----------------------------------------------------------------------
-        self.update_freqs()  # set f_scale and t_scale factors
+        self.recalc_freqs()  # set f_scale and t_scale factors
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -759,12 +759,10 @@ class Plot_Tran_Stim_UI(QWidget):
 
         self._update_energy_scaling_impz()
 
-        self.update_freqs()
-
-        self.emit({'ui_local_changed': 'f1_f2'})
+#        self.update_freqs()
 
     # -------------------------------------------------------------
-    def update_freqs(self):
+#    def update_freqs(self):
         """
         `update_freqs()` is called when sampling frequency has been changed via
         signal ['view_changed':'f_S'] from plot_impz.process_sig_rx -> self.recalc_freqs
@@ -820,6 +818,11 @@ class Plot_Tran_Stim_UI(QWidget):
             str(params['FMT'].format(self.TW1 * self.t_scale)))
         self.led_TW2.setText(
             str(params['FMT'].format(self.TW2 * self.t_scale)))
+
+        self.update_freq_units()
+
+
+        self.emit({'ui_local_changed': 'f1_f2'})  # TODO: Is this needed?
 
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
