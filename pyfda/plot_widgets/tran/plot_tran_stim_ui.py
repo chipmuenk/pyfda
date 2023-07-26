@@ -671,8 +671,8 @@ class Plot_Tran_Stim_UI(QWidget):
           to True.
         - When a QLineEdit widget loses input focus (``QEvent.FocusOut``) or when
           the Return key is pressed, store current value normalized to f_S with
-          full precision (only if ``spec_edited == True``) and display the
-          denormalized value in selected format. Emit 'ui_local_changed':'stim'
+          full precision and display the denormalized value in selected format
+          or full precision when `spec_edited == True`. Emit 'ui_local_changed':'stim'.
         """
         def _reload_entry(source, full_prec=False):
             """
@@ -720,7 +720,6 @@ class Plot_Tran_Stim_UI(QWidget):
             else:
                 _reload_entry(source)
         # --------------------------------------------------------------------
-
         # ------ EventFilter main part ---------------------------------------
         if event.type() in {QEvent.FocusIn, QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
@@ -746,7 +745,18 @@ class Plot_Tran_Stim_UI(QWidget):
         """
         Update normalized frequencies and periods if required.
 
-        Triggered by signal {'ui_global_changed':'f_S'} from plot_impz.process_sig_rx
+        `normalize_freqs()` is called when sampling frequency has been changed
+        via signal ['view_changed':'f_S'] from plot_impz.process_sig_rx
+
+        Frequency and time related entries are always stored normalized w.r.t. f_S
+        which is loaded from filter dictionary and stored as  `self.f_scale`
+        (except when the frequency unit is k when `f_scale = self.N_FFT`).
+
+        - When the `f_S` lock button is unchecked, only the displayed
+          values for frequency entries are updated with f_S, not the dictionary.
+
+        - When the `f_S` lock button is checked, the absolute frequency values in
+          the widget fields are kept constant, and the dictionary entries are updated.
         """
         if fb.fil[0]['freq_locked']:
             f_corr = fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
@@ -759,26 +769,6 @@ class Plot_Tran_Stim_UI(QWidget):
 
         self._update_energy_scaling_impz()
 
-#        self.update_freqs()
-
-    # -------------------------------------------------------------
-#    def update_freqs(self):
-        """
-        `update_freqs()` is called when sampling frequency has been changed via
-        signal ['view_changed':'f_S'] from plot_impz.process_sig_rx -> self.recalc_freqs
-
-        Frequency and time related entries are always stored normalized w.r.t. f_S
-        which is loaded from filter dictionary and stored as  `self.f_scale`
-        (except when the frequency unit is k when `f_scale = self.N_FFT`).
-
-        - When the `f_S` lock button is unchecked, only the displayed
-          values for frequency entries are updated with f_S, not the dictionary.
-
-        - When the `f_S` lock button is checked, the absolute frequency values in
-          the widget fields are kept constant, and the dictionary entries are updated.
-
-        """
-
         # recalculate displayed freq spec values for (maybe) changed f_S
         if fb.fil[0]['freq_specs_unit'] == 'k':
             self.f_scale = self.N_FFT
@@ -786,26 +776,7 @@ class Plot_Tran_Stim_UI(QWidget):
             self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        # if self.ledFreq1.hasFocus():
-        #     # widget has focus, show full precision
-        #     self.ledFreq1.setText(str(self.f1 * self.f_scale))
-
-        # elif self.ledFreq2.hasFocus():
-        #     self.ledFreq2.setText(str(self.f2 * self.f_scale))
-
-        # elif self.led_T1.hasFocus():
-        #     self.led_T1.setText(str(self.T1 * self.t_scale))
-
-        # elif self.led_T2.hasFocus():
-        #     self.led_T2.setText(str(self.T2 * self.t_scale))
-
-        # elif self.led_TW1.hasFocus():
-        #     self.led_TW1.setText(str(self.TW1 * self.t_scale))
-
-        # elif self.led_TW2.hasFocus():
-        #     self.led_TW2.setText(str(self.TW2 * self.t_scale))
-
-        # widgets have no focus, round the display
+        # update and round the display
         self.ledFreq1.setText(
             str(params['FMT'].format(self.f1 * self.f_scale)))
         self.ledFreq2.setText(
