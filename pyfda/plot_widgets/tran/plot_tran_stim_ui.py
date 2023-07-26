@@ -356,14 +356,14 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_T1 = QLineEdit(self)
         self.led_T1.setText(str(self.T1))
         self.led_T1.setToolTip("Time shift 1")
-        self.led_T1.setObjectName("stimT1")
+        self.led_T1.setObjectName("led_T1")
         self.lbl_TU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_T2 = QLabel(to_html("&nbsp;T_2", frmt='bi') + " =", self)
         self.led_T2 = QLineEdit(self)
         self.led_T2.setText(str(self.T2))
         self.led_T2.setToolTip("Time shift 2")
-        self.led_T2.setObjectName("stimT2")
+        self.led_T2.setObjectName("led_T2")
         self.lbl_TU2 = QLabel(to_html("T_S", frmt='i'), self)
 
         # ----------------------------------------------
@@ -384,7 +384,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_TW1 = QLineEdit(self)
         self.led_TW1.setText(str(self.TW1))
         self.led_TW1.setToolTip("Time width")
-        self.led_TW1.setObjectName("stimTW1")
+        self.led_TW1.setObjectName("led_TW1")
         self.lbl_TWU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_TW2 = QLabel(
@@ -392,7 +392,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_TW2 = QLineEdit(self)
         self.led_TW2.setText(str(self.TW2))
         self.led_TW2.setToolTip("Time width 2")
-        self.led_TW2.setObjectName("stimTW2")
+        self.led_TW2.setObjectName("led_TW2")
         self.lbl_TWU2 = QLabel(to_html("T_S", frmt='i'), self)
         # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
@@ -401,7 +401,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_f1 = QLineEdit(self)
         self.led_f1.setText(str(self.f1))
         self.led_f1.setToolTip("Stimulus frequency")
-        self.led_f1.setObjectName("stimFreq1")
+        self.led_f1.setObjectName("led_f1")
         self.lblFreqUnit1 = QLabel(to_html("f_S", frmt='i'), self)
 
         self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
@@ -410,7 +410,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.led_f2 = QLineEdit(self)
         self.led_f2.setText(str(self.f2))
         self.led_f2.setToolTip("Stimulus frequency 2")
-        self.led_f2.setObjectName("stimFreq2")
+        self.led_f2.setObjectName("led_f2")
         self.lblFreqUnit2 = QLabel(to_html("f_S", frmt='i'), self)
         # ----------------------------------------------
         self.lbl_BW1 = QLabel(
@@ -615,14 +615,14 @@ class Plot_Tran_Stim_UI(QWidget):
         # special handling is performed in an EventFilter (hence no regular
         # signal-slot connection).
         # Dict with objectNames as keys and tuples with normalized variables
-        # and scaling factors as values, e.g. {'stimFreq1': (self.f1, self.f_scale)}
+        # and scaling factors as values, e.g. {'led_f1': (self.f1, self.f_scale)}
         self.dict_filtered_widgets = {
-            'stimFreq1': ('f1', 'f_scale'),
-            'stimFreq2': ('f2', 'f_scale'),
-            'stimT1': ('T1', 't_scale'),
-            'stimT2': ('T2', 't_scale'),
-            'stimTW1': ('TW1', 't_scale'),
-            'stimTW2': ('TW2', 't_scale')
+            'led_f1': ('f1', 'f_scale'),
+            'led_f2': ('f2', 'f_scale'),
+            'led_T1': ('T1', 't_scale'),
+            'led_T2': ('T2', 't_scale'),
+            'led_TW1': ('TW1', 't_scale'),
+            'led_TW2': ('TW2', 't_scale')
         }
         self.led_f1.installEventFilter(self)
         self.led_f2.installEventFilter(self)
