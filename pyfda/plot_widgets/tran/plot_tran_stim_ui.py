@@ -755,10 +755,10 @@ class Plot_Tran_Stim_UI(QWidget):
         (except when the frequency unit is k when `f_scale = self.N_FFT`).
 
         - When the `f_S` lock button is unchecked, only the displayed
-          values for frequency entries are updated with f_S, not the dictionary.
+          values for frequency entries are updated with f_S, not the normalized freqs.
 
         - When the `f_S` lock button is checked, the absolute frequency values in
-          the widget fields are kept constant, and the dictionary entries are updated.
+          the widget fields are kept constant, and the normalized freqs are updated.
         """
 
         if fb.fil[0]['freq_locked']:
