@@ -438,7 +438,8 @@ class Plot_Impz(QWidget):
 
             elif 'view_changed' in dict_sig:
                 if dict_sig['view_changed'] == 'f_S':
-                    self.stim_wdg.ui.recalc_freqs()
+                    # re-normalize frequencies and update widget display
+                    self.stim_wdg.ui.normalize_freqs()
                 self.draw()
 
         else:  # invisible

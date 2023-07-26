@@ -56,7 +56,7 @@ class Plot_Tran_Stim_UI(QWidget):
             return
         elif 'view_changed' in dict_sig:
             if dict_sig['view_changed'] == 'f_S':
-                self.recalc_freqs()
+                self.normalize_freqs()
 
 # ------------------------------------------------------------------------------
     def __init__(self):
@@ -567,7 +567,7 @@ class Plot_Tran_Stim_UI(QWidget):
         # ----------------------------------------------------------------------
         # Initialization
         # ----------------------------------------------------------------------
-        self.recalc_freqs()  # set f_scale and t_scale factors
+        self.normalize_freqs()  # set f_scale and t_scale factors
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -742,7 +742,7 @@ class Plot_Tran_Stim_UI(QWidget):
         return super(Plot_Tran_Stim_UI, self).eventFilter(source, event)
 
     # -------------------------------------------------------------
-    def recalc_freqs(self):
+    def normalize_freqs(self):
         """
         Update normalized frequencies and periods if required.
 
