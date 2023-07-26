@@ -220,6 +220,17 @@ class Plot_Tran_Stim_UI(QWidget):
              " std. deviation &sigma;.</span>")
         ]
 
+        # Dict with objectNames as keys and tuples with normalized variables
+        # and scaling factors as values, e.g. {'led_f1': (self.f1, self.f_scale)}
+        self.dict_filtered_widgets = {
+            'led_f1': ('f1', 'f_scale'),
+            'led_f2': ('f2', 'f_scale'),
+            'led_T1': ('T1', 't_scale'),
+            'led_T2': ('T2', 't_scale'),
+            'led_TW1': ('TW1', 't_scale'),
+            'led_TW2': ('TW2', 't_scale')
+        }
+
         self._construct_UI()
         self._enable_stim_widgets()
         self._update_noi()
@@ -614,16 +625,6 @@ class Plot_Tran_Stim_UI(QWidget):
         # time / frequency related widgets have to be scaled with f_s, this
         # special handling is performed in an EventFilter (hence no regular
         # signal-slot connection).
-        # Dict with objectNames as keys and tuples with normalized variables
-        # and scaling factors as values, e.g. {'led_f1': (self.f1, self.f_scale)}
-        self.dict_filtered_widgets = {
-            'led_f1': ('f1', 'f_scale'),
-            'led_f2': ('f2', 'f_scale'),
-            'led_T1': ('T1', 't_scale'),
-            'led_T2': ('T2', 't_scale'),
-            'led_TW1': ('TW1', 't_scale'),
-            'led_TW2': ('TW2', 't_scale')
-        }
         self.led_f1.installEventFilter(self)
         self.led_f2.installEventFilter(self)
         self.led_T1.installEventFilter(self)
