@@ -761,8 +761,9 @@ class Plot_Tran_Stim_UI(QWidget):
           the widget fields are kept constant, and the normalized freqs are updated.
         """
 
-        if fb.fil[0]['freq_locked']:
-            f_corr = fb.fil[0]['f_S'] / fb.fil[0]['f_S_prev']
+        f_corr = 1
+        if fb.fil[0]['freq_locked'] and fb.fil[0]['freq_specs_unit'] != 'k':
+            f_corr = fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
             self.f1 *= f_corr
             self.f2 *= f_corr
             self.T1 /= f_corr
