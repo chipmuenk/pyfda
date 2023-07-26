@@ -780,27 +780,29 @@ class Plot_Tran_Stim_UI(QWidget):
             self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        logger.warning(f"f_S = {fb.fil[0]['f_S']}, prev = {fb.fil[0]['f_S_prev']}\n"
-                       f"f_scale = {self.f_scale}, f_1 = {self.f1}")
+        # logger.warning(f"f_S = {fb.fil[0]['f_S']}, prev = {fb.fil[0]['f_S_prev']}\n"
+        #                f"f_scale = {self.f_scale}, f_1 = {self.f1}, f_corr = {f_corr}")
 
-        # # update and round the display
-        # for w in self.dict_filtered_widgets:
+        # update and round the display
+        for w in self.dict_filtered_widgets:
+            var_name, param_name = self.dict_filtered_widgets[w]
+            # read value and scale of normalized frequency / time value
+            var = getattr(self, var_name)
+            scale = getattr(self, param_name)
+            # access lineedit object
+            led = getattr(self, w)
+            # logger.warning(f"{w} - {var} - {getattr(self, w).text()}")
+            # update the text with the denormalized frequency / time variable
+            led.setText(str(params['FMT'].format(var * scale)))
+            # self.led_f1.setText(str(params['FMT'].format(self.f1 * self.f_scale)))
 
-        self.led_f1.setText(
-            str(params['FMT'].format(self.f1 * self.f_scale)))
-        self.led_f2.setText(
-            str(params['FMT'].format(self.f2 * self.f_scale)))
-        self.led_T1.setText(
-            str(params['FMT'].format(self.T1 * self.t_scale)))
-        self.led_T2.setText(
-            str(params['FMT'].format(self.T2 * self.t_scale)))
-        self.led_TW1.setText(
-            str(params['FMT'].format(self.TW1 * self.t_scale)))
-        self.led_TW2.setText(
-            str(params['FMT'].format(self.TW2 * self.t_scale)))
+            # highlight lineedit field in red when normalized frequency is > 0.5
+            if var >= 0.5 and "_f" in w:  # only test this for 'led_f1' and 'led_f2'
+                qstyle_widget(led, 'failed')
+            else:
+                qstyle_widget(led, 'normal')
 
         self.update_freq_units()
-
 
         self.emit({'ui_local_changed': 'f1_f2'})  # TODO: Is this needed?
 
