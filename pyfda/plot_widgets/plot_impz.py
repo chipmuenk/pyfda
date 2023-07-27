@@ -398,10 +398,9 @@ class Plot_Impz(QWidget):
 
         # --- widget is visible, handle all signals except 'fx_sim' -----------
         elif self.isVisible():
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
+            if 'data_changed' in dict_sig \
                     or self.needs_calc or (fb.fil[0]['fx_sim'] and self.needs_calc_fx):
-
-                # a file has been loaded or unloaded
+                # a file has been loaded or unloaded:
                 if 'data_changed' in dict_sig and dict_sig['data_changed'] == 'file_io':
                     # make file data available to stimulus widget and modify number of
                     # data points to be used:
@@ -442,9 +441,8 @@ class Plot_Impz(QWidget):
                 self.draw()
 
         else:  # invisible
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
+            if 'data_changed' in dict_sig in dict_sig:
                 self.needs_calc = True
-
             elif 'view_changed' in dict_sig:
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
