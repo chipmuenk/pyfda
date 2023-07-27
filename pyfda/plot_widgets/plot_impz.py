@@ -430,7 +430,6 @@ class Plot_Impz(QWidget):
                     self.emit({'ui_global_changed': 'csv'})
                 else:
                     # treat all other local UI events here
-                    self.resize_stim_tab_widget()
                     self.needs_calc = True
                     # make file data available to stimulus widget:
                     self.file_io()
@@ -520,6 +519,7 @@ class Plot_Impz(QWidget):
         The following tasks are performed:
             - Enable energy scaling for impulse stimuli when requirements are met
             - check for and enable fixpoint settings
+            - resize stimulus widget
             - when triggered by `but_run` or when `Auto`== pressed and
               `self.needs_calc == True`, continue with calculating stimulus / response
             - When in fixpoint mode, initialize quantized stimulus `x_q` and input
@@ -527,6 +527,7 @@ class Plot_Impz(QWidget):
         """
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
+        self.resize_stim_tab_widget()
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or
              self.stim_wdg.ui.cmb_stim_noise.currentText() == 'None')
