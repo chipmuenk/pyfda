@@ -121,7 +121,12 @@ jobs:
         asset_name: ${{ matrix.OUT_FILE_NAME}}
         asset_content_type: ${{ matrix.ASSET_MIME}}
 
-    # https://dev.to/derlin/how-to-create-nightly-releases-with-github-actions-fpp
+    # https://github.com/marketplace/actions/deploy-nightly
+    #
+    # https://dev.to/derlin/how-to-create-nightly-releases-with-github-actions-fpp ->
+    # https://github.com/eine/tip ->
+    # https://github.com/pyTooling/Actions
+
     # - name: Create info file
     #   run: |
     #     echo -e "ref: $GITHUB_REF \ncommit: $GITHUB_SHA\nbuild: $(date +"%Y-%m-%dT%H:%M:%SZ")" \
