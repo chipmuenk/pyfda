@@ -11,7 +11,6 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
-
 jobs:
   createrelease:
     name: Pre-Release
@@ -121,3 +120,18 @@ jobs:
         asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
         asset_name: ${{ matrix.OUT_FILE_NAME}}
         asset_content_type: ${{ matrix.ASSET_MIME}}
+
+    # https://dev.to/derlin/how-to-create-nightly-releases-with-github-actions-fpp
+    # - name: Create info file
+    #   run: |
+    #     echo -e "ref: $GITHUB_REF \ncommit: $GITHUB_SHA\nbuild: $(date +"%Y-%m-%dT%H:%M:%SZ")" \
+    #     > build/libs/info.txt
+
+    # - name: Update nightly release
+    #   uses: eine/tip@master
+    #   with:
+    #     tag: nightly
+    #     rm: true
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     files: build/libs/*.*
+
