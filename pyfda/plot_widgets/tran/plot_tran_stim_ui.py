@@ -804,7 +804,10 @@ class Plot_Tran_Stim_UI(QWidget):
 
         self.update_freq_units()
 
-        self.emit({'ui_local_changed': 'f1_f2'})  # TODO: Is this needed?
+        # emit a signal if normalized frequencies have changed due to an update
+        # of f_S
+        if fb.fil[0]['freq_locked'] and fb.fil[0]['freq_specs_unit'] != 'k':
+            self.emit({'ui_local_changed': 'f1_f2'})
 
     # -------------------------------------------------------------
     def _enable_stim_widgets(self):
