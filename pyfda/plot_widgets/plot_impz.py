@@ -579,6 +579,7 @@ class Plot_Impz(QWidget):
 
             self.n = np.arange(self.ui.N_end, dtype=float)
 
+            # initialize arrays for stimulus and response
             if self.cmplx:
                 self.x = np.zeros(self.ui.N_end, dtype=complex)
                 self.y = np.zeros(self.ui.N_end, dtype=complex)
@@ -599,7 +600,8 @@ class Plot_Impz(QWidget):
                 # - setup input quantizer self.q_i
                 # - emit {'fx_sim': 'init'} to listening widgets (input_fixpoint_specs)
                 self.title_str = r'$Fixpoint$ ' + self.title_str
-                self.x_q = np.empty_like(self.x, dtype=np.float64)  # quantized stimulus
+                 # initialize array for quantized stimulus
+                self.x_q = np.empty_like(self.x, dtype=np.float64)
                 if np.any(np.iscomplex(x_test)):
                     logger.warning(
                         "Complex stimulus: Only its real part is used for the "
