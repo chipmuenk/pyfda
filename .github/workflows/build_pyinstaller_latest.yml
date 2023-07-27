@@ -22,7 +22,7 @@ on:
 #           spec: 'src/build.spec'
 #           requirements: 'src/requirements.txt'
 #           upload_exe_with_name: 'My executable'
-#           options: --onefile, --name "My App", --windowed, 
+#           options: --onefile, --name "My App", --windowed,
 
 
 jobs:
@@ -32,13 +32,27 @@ jobs:
 
     steps:
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
+
+    - name: Run latest-tag
+      uses: EndBug/latest-tag@latest
+      with:
+        # You can change the name of the tag or branch with this input (default: 'latest').
+        # ref: someCustomTagName
+
+        # If a description is provided, the action will use it to create an annotated tag.
+        # If none is given, the action will create a lightweight tag (default: '').
+        description: Description for the tag
+
+        # Force-update a branch instead of using a tag (default: false).
+        #force-branch: true
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
+        tag_name: latest # ${{ github.sha }} full sha is not accepted
         release_name: "Release latest"
         draft: false
         prerelease: true
@@ -120,4 +134,3 @@ jobs:
         asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
         asset_name: ${{ matrix.OUT_FILE_NAME}}
         asset_content_type: ${{ matrix.ASSET_MIME}}
-  
