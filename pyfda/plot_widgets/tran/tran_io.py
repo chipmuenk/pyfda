@@ -320,6 +320,10 @@ class Tran_IO(QWidget):
             self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
+        if self.ui.but_f_s_wav.isChecked():
+            fb.fil[0]['f_S'] = self.f_s_file
+            fb.fil[0]['freq_specs_unit'] = 'Hz'
+            self.emit({'view_changed': 'f_S'})  # TODO: this needs to update f_S and units and trigger redraw
         return
 
     # ------------------------------------------------------------------------------
