@@ -9,7 +9,7 @@ name: build_pyinstaller_latest
 on:
   push:
     branches: [main, develop]
-    workflow_dispatch:
+  workflow_dispatch:
 
 
 jobs:
