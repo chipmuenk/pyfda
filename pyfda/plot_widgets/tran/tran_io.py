@@ -130,6 +130,7 @@ class Tran_IO(QWidget):
         Enable load button and set to normal mode, replace label "Loaded" by "Load",
         clear loaded data, disable normalize button and emit 'data_changed' signal
         """
+        was_loaded = self.ui.but_load.property("state") == "ok"
         self.ui.but_load.setEnabled(True)
         qstyle_widget(self.ui.but_load, "normal")
         self.ui.but_load.setText("Load:")
@@ -137,7 +138,8 @@ class Tran_IO(QWidget):
         self.ui.led_normalize.setEnabled(False)
         self.x_file = None
 
-        self.emit({'data_changed': 'file_io'})
+        if was_loaded:
+            self.emit({'data_changed': 'file_io'})
 
     # ------------------------------------------------------------------------------
     def load_data_raw(self):
