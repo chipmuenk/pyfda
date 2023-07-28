@@ -422,6 +422,9 @@ class Plot_Impz(QWidget):
                 elif dict_sig['mpl_toolbar'] == 'home':
                     self.zoom_home()
                     self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
+                elif dict_sig['mpl_toolbar'] == 'enable_plot'\
+                        and dict_sig['value']:  # enabled is True
+                    self.draw()
 
             elif 'ui_local_changed' in dict_sig:
                 if dict_sig['ui_local_changed'] == 'csv':
