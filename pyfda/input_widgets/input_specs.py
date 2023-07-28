@@ -130,7 +130,6 @@ class Input_Specs(QWidget):
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
-        self.f_units.sig_tx.connect(self.sig_rx_local)
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -156,8 +155,7 @@ class Input_Specs(QWidget):
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
-        self.t_specs.sig_tx.connect(self.sig_rx_local)
-        self.sig_tx.connect(self.t_specs.sig_rx)
+
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -194,6 +192,11 @@ class Input_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
+        self.sig_tx.connect(self.t_specs.sig_rx)
+
+        self.t_specs.sig_tx.connect(self.sig_rx_local)
+        self.f_units.sig_tx.connect(self.sig_rx_local)
+
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
