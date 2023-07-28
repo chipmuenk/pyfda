@@ -72,7 +72,7 @@ class FreqUnits(QWidget):
             logger.warning("Stopped infinite loop")
             return
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-            self.update_UI(f_S=fb.fil[0]['f_S'])
+            self.update_UI(emit=False)
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -218,19 +218,23 @@ class FreqUnits(QWidget):
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
 # -------------------------------------------------------------
-    def update_UI(self, f_S=None):
+    def update_UI(self, emit=True):
         """
         update_UI is called
         - during init
         - when the unit combobox is changed
+        - when the signal {'view_changed': 'f_S'} has been received. In this case,
+          the UI is updated from the fb.fil[0] dictionary and no signal is emitted.
 
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
-        if not f_S is None:  # triggered from outside
-            self.led_f_s.setText(str(f_S))
+        if not emit:  # triggered from outside
+            self.led_f_s.setText(str(f_S=fb.fil[0]['f_S']))
+            qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_units'])
+
         f_unit = str(self.cmb_units.currentText())  # selected frequency unit
         idx = self.cmb_units.currentIndex()  # and its index
 
@@ -302,7 +306,8 @@ class FreqUnits(QWidget):
 
         self._freq_range(emit=False)  # update f_lim setting without emitting signal
 
-        self.emit({'view_changed': 'f_S'})
+        if emit:  # UI was updated by user, not by an external trigger
+            self.emit({'view_changed': 'f_S'})
 
 # ------------------------------------------------------------------------------
 
