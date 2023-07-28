@@ -438,6 +438,9 @@ class Plot_Impz(QWidget):
                     self.impz_init()
 
             elif 'view_changed' in dict_sig:
+                if 'f_S' in dict_sig['view_changed']:
+                    logger.error("Emit f_S")
+                    self.emit({'view_changed': 'f_S', 'id': id(self)})
                 self.draw()  # redraw a.o. changed axes scaling
 
         else:  # invisible
@@ -447,6 +450,8 @@ class Plot_Impz(QWidget):
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
                     self.stim_wdg.ui.recalc_freqs()
+                    logger.error("Emit f_S")
+                    self.emit({'view_changed': 'f_S', 'id': id(self)})
             elif 'ui_local_changed' in dict_sig:
                 self.needs_redraw = [True] * 2
 
