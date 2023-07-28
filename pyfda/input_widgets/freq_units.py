@@ -93,13 +93,13 @@ class FreqUnits(QWidget):
 
         self.fs_old = fb.fil[0]['f_S']  # store current sampling frequency
 
-        self.lblF_S = QLabel(self)
-        self.lblF_S.setText(to_html("f_S =", frmt='bi'))
+        self.lbl_f_s = QLabel(self)
+        self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
 
-        self.ledF_S = QLineEdit()
-        self.ledF_S.setText(str(fb.fil[0]["f_S"]))
-        self.ledF_S.setObjectName("f_S")
-        self.ledF_S.installEventFilter(self)  # filter events
+        self.led_f_s = QLineEdit()
+        self.led_f_s.setText(str(fb.fil[0]["f_S"]))
+        self.led_f_s.setObjectName("f_S")
+        self.led_f_s.installEventFilter(self)  # filter events
 
         self.butLock = QToolButton(self)
         self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
@@ -113,20 +113,20 @@ class FreqUnits(QWidget):
         # self.butLock.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
         layHF_S = QHBoxLayout()
-        layHF_S.addWidget(self.ledF_S)
+        layHF_S.addWidget(self.led_f_s)
         layHF_S.addWidget(self.butLock)
 
-        self.cmbUnits = QComboBox(self)
-        self.cmbUnits.setObjectName("cmbUnits")
-        self.cmbUnits.addItems(f_units)
-        self.cmbUnits.setToolTip(
+        self.cmb_units = QComboBox(self)
+        self.cmb_units.setObjectName("cmb_units")
+        self.cmb_units.addItems(f_units)
+        self.cmb_units.setToolTip(
         'Select whether frequencies are specified w.r.t. \n'
         'the sampling frequency "f_S", to the Nyquist frequency \n'
         'f_Ny = f_S/2 or as absolute values. "k" specifies frequencies w.r.t. f_S '
         'but plots graphs over the frequency index k.')
-        self.cmbUnits.setCurrentIndex(1)
-#        self.cmbUnits.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
-#        self.cmbUnits.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
+        self.cmb_units.setCurrentIndex(1)
+#        self.cmb_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
+#        self.cmb_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
         fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
         self.cmbFRange = QComboBox(self)
@@ -137,7 +137,7 @@ class FreqUnits(QWidget):
         self.cmbFRange.setCurrentIndex(0)
 
         # Combobox resizes with longest entry
-        self.cmbUnits.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbFRange.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.butSort = QToolButton(self)
@@ -150,15 +150,15 @@ class FreqUnits(QWidget):
         self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
         self.layHUnits = QHBoxLayout()
-        self.layHUnits.addWidget(self.cmbUnits)
+        self.layHUnits.addWidget(self.cmb_units)
         self.layHUnits.addWidget(self.cmbFRange)
         self.layHUnits.addWidget(self.butSort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
         self.layGSpecWdg = QGridLayout()  # sublayout for spec fields
-        self.layGSpecWdg.addWidget(self.lblF_S, 1, 0)
-        # self.layGSpecWdg.addWidget(self.ledF_S,1,1)
+        self.layGSpecWdg.addWidget(self.lbl_f_s, 1, 0)
+        # self.layGSpecWdg.addWidget(self.led_f_s,1,1)
         self.layGSpecWdg.addLayout(layHF_S, 1, 1)
         self.layGSpecWdg.addWidget(self.lblUnits, 0, 0)
         self.layGSpecWdg.addLayout(self.layHUnits, 0, 1)
@@ -174,7 +174,7 @@ class FreqUnits(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.cmbUnits.currentIndexChanged.connect(self.update_UI)
+        self.cmb_units.currentIndexChanged.connect(self.update_UI)
         self.butLock.clicked.connect(self._lock_freqs)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
@@ -229,13 +229,15 @@ class FreqUnits(QWidget):
 
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
-        f_unit = str(self.cmbUnits.currentText())  # selected frequency unit
-        idx = self.cmbUnits.currentIndex()  # and its index
+        if not f_S is None:  # triggered from outside
+            self.led_f_s.setText(str(f_S))
+        f_unit = str(self.cmb_units.currentText())  # selected frequency unit
+        idx = self.cmb_units.currentIndex()  # and its index
 
         is_normalized_freq = f_unit in {"f_S", "f_Ny", "k"}
 
-        self.ledF_S.setVisible(not is_normalized_freq)  # only vis. when
-        self.lblF_S.setVisible(not is_normalized_freq)  # not normalized
+        self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
+        self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
         self.butLock.setVisible(not is_normalized_freq)
         f_S_scale = 1  # default setting, used for units f_S, f_Ny, k
 
@@ -261,14 +263,14 @@ class FreqUnits(QWidget):
                 f_label = r"$k \; \rightarrow$"
                 t_label = r"$n\; \rightarrow$"
 
-            self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
+            self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else:  # Hz, kHz, ...
             # Restore sampling frequency when returning from f_S / f_Ny / k
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}:  # previous setting normalized?
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old  # yes, restore prev.
                 fb.fil[0]['T_S'] = 1./self.fs_old  # settings for sampling frequency
-                self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
+                self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             if f_unit == "Hz":
                 f_S_scale = 1.
@@ -387,12 +389,12 @@ class FreqUnits(QWidget):
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets
         """
-        self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
+        self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
-        qset_cmb_box(self.cmbUnits, fb.fil[0]['freq_specs_unit'])
+        qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_unit'])
         is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
-        self.ledF_S.setVisible(not is_normalized_freq)  # only vis. when
-        self.lblF_S.setVisible(not is_normalized_freq)  # not normalized
+        self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
+        self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
         self.butLock.setVisible(not is_normalized_freq)
 
         qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
