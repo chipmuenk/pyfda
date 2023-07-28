@@ -192,6 +192,8 @@ class Input_Specs(QWidget):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
+        self.sig_rx.connect(self.f_units.sig_rx)
+
         self.sig_tx.connect(self.t_specs.sig_rx)
 
         self.t_specs.sig_tx.connect(self.sig_rx_local)
