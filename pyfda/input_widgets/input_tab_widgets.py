@@ -90,8 +90,10 @@ class InputTabWidgets(QWidget):
                 tabWidget.addTab(inst, "not set")
             if hasattr(inst, 'tool_tip'):
                 tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
+            # collect all instance tx signals in self.sig_tx
             if hasattr(inst, 'sig_tx'):
                 inst.sig_tx.connect(self.sig_tx)
+            # distribute self.sig_rx signal to all instance rx signals
             if hasattr(inst, 'sig_rx'):
                 self.sig_rx.connect(inst.sig_rx)
 
@@ -115,7 +117,8 @@ class InputTabWidgets(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.sig_tx.connect(self.sig_rx)  # loop back to local inputs
+        # connect collected tx signals to all rx signal inputs
+        self.sig_tx.connect(self.sig_rx)
         # self.sig_rx.connect(self.log_rx) # enable for debugging
         # When user has selected a different tab, trigger a redraw of current tab
         tabWidget.currentChanged.connect(self.current_tab_changed)
