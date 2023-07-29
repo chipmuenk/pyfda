@@ -97,7 +97,6 @@ class FreqUnits(QWidget):
         """
         self.layVMain = QVBoxLayout() # Widget main layout
 
-        # f_units = ['k','f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
         self.t_units = ['', 'T_S', 'T_S', 's', 'ms', r'$\mu$s', 'ns']
 
         bfont = QFont()
@@ -126,7 +125,6 @@ class FreqUnits(QWidget):
             "widgets are updated, normalized frequencies stay the same.<br />"
             "<b>Locked:</b> When f_S is changed, displayed absolute frequency "
             "values don't change but normalized frequencies do.</span>")
-        # self.butLock.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
         layHF_S = QHBoxLayout()
         layHF_S.addWidget(self.led_f_s)
@@ -135,13 +133,6 @@ class FreqUnits(QWidget):
         self.cmb_f_units = QComboBox(self)
         self.cmb_f_units.setObjectName("cmb_f_units")
         qcmb_box_populate(self.cmb_f_units, self.cmb_f_unit_items, self.cmb_f_unit_init)
-        # self.cmb_f_units.addItems(f_units)
-        # self.cmb_f_units.setToolTip(
-        # 'Select whether frequencies are specified w.r.t. \n'
-        # 'the sampling frequency "f_S", to the Nyquist frequency \n'
-        # 'f_Ny = f_S/2 or as absolute values. "k" specifies frequencies w.r.t. f_S '
-        # 'but plots graphs over the frequency index k.')
-        # self.cmb_f_units.setCurrentIndex(1)
 #        self.cmb_f_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
 #        self.cmb_f_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
