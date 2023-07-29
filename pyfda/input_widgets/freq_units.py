@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -55,6 +55,22 @@ class FreqUnits(QWidget):
         self.title = title
         self.spec_edited = False  # flag whether QLineEdit field has been edited
 
+        # combobox tooltip + data / text / tooltip for frequency unit
+        self.cmb_f_unit_items = [
+            "<span>Select whether frequencies are specified w.r.t. the sampling "
+            "frequency 'f_S', to the Nyquist frequency f_Ny = f_S/2 or "
+            "as absolute values. 'k' specifies frequencies w.r.t. f_S "
+            "but plots graphs over the frequency index k.</span>",
+            ("k", "k", "Frequency index k = 0 ... N_FFT - 1"),
+            ("fs", "f_S", "Relative to sampling frequency, F = f / f_S"),
+            ("fny", "f_Ny", "Relative to Nyquist frequency, F = f / f_Ny"),
+            ("hz", "Hz", "Sampling frequency in Hz"),
+            ("khz", "kHz", "Sampling frequency in kHz"),
+            ("mhz", "MHz", "Sampling frequency in MHz"),
+            ("ghz", "GHz", "Sampling frequency in GHz")
+        ]
+        self.cmb_f_unit_init = "fs"
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -81,7 +97,7 @@ class FreqUnits(QWidget):
         """
         self.layVMain = QVBoxLayout() # Widget main layout
 
-        f_units = ['k','f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
+        # f_units = ['k','f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
         self.t_units = ['', 'T_S', 'T_S', 's', 'ms', r'$\mu$s', 'ns']
 
         bfont = QFont()
@@ -116,17 +132,18 @@ class FreqUnits(QWidget):
         layHF_S.addWidget(self.led_f_s)
         layHF_S.addWidget(self.butLock)
 
-        self.cmb_units = QComboBox(self)
-        self.cmb_units.setObjectName("cmb_units")
-        self.cmb_units.addItems(f_units)
-        self.cmb_units.setToolTip(
-        'Select whether frequencies are specified w.r.t. \n'
-        'the sampling frequency "f_S", to the Nyquist frequency \n'
-        'f_Ny = f_S/2 or as absolute values. "k" specifies frequencies w.r.t. f_S '
-        'but plots graphs over the frequency index k.')
-        self.cmb_units.setCurrentIndex(1)
-#        self.cmb_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
-#        self.cmb_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
+        self.cmb_f_units = QComboBox(self)
+        self.cmb_f_units.setObjectName("cmb_f_units")
+        qcmb_box_populate(self.cmb_f_units, self.cmb_f_unit_items, self.cmb_f_unit_init)
+        # self.cmb_f_units.addItems(f_units)
+        # self.cmb_f_units.setToolTip(
+        # 'Select whether frequencies are specified w.r.t. \n'
+        # 'the sampling frequency "f_S", to the Nyquist frequency \n'
+        # 'f_Ny = f_S/2 or as absolute values. "k" specifies frequencies w.r.t. f_S '
+        # 'but plots graphs over the frequency index k.')
+        # self.cmb_f_units.setCurrentIndex(1)
+#        self.cmb_f_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
+#        self.cmb_f_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
         fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
         self.cmbFRange = QComboBox(self)
@@ -137,7 +154,7 @@ class FreqUnits(QWidget):
         self.cmbFRange.setCurrentIndex(0)
 
         # Combobox resizes with longest entry
-        self.cmb_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbFRange.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.butSort = QToolButton(self)
@@ -150,7 +167,7 @@ class FreqUnits(QWidget):
         self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
         self.layHUnits = QHBoxLayout()
-        self.layHUnits.addWidget(self.cmb_units)
+        self.layHUnits.addWidget(self.cmb_f_units)
         self.layHUnits.addWidget(self.cmbFRange)
         self.layHUnits.addWidget(self.butSort)
 
@@ -179,7 +196,8 @@ class FreqUnits(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.cmb_units.currentIndexChanged.connect(self.update_UI)
+        # swallow index passed by "IndexChanged":
+        self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_UI(self))
         self.butLock.clicked.connect(self._lock_freqs)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
@@ -237,10 +255,10 @@ class FreqUnits(QWidget):
         """
         if not emit:  # triggered from outside
             self.led_f_s.setText(str(fb.fil[0]['f_S']))
-            qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_unit'])
+            qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
 
-        f_unit = str(self.cmb_units.currentText())  # selected frequency unit
-        idx = self.cmb_units.currentIndex()  # and its index
+        f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit
+        idx = self.cmb_f_units.currentIndex()  # and its index
 
         is_normalized_freq = f_unit in {"f_S", "f_Ny", "k"}
 
@@ -400,7 +418,7 @@ class FreqUnits(QWidget):
         """
         self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
-        qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_unit'])
+        qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
         is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
         self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
         self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
