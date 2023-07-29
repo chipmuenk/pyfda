@@ -195,6 +195,7 @@ class Input_Specs(QWidget):
         self.sig_rx.connect(self.f_units.sig_rx)
 
         self.sig_tx.connect(self.t_specs.sig_rx)
+        self.sig_tx.connect(self.f_units.sig_rx)
 
         self.t_specs.sig_tx.connect(self.sig_rx_local)
         self.f_units.sig_tx.connect(self.sig_rx_local)
