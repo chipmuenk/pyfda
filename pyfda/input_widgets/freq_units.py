@@ -172,6 +172,11 @@ class FreqUnits(QWidget):
         self.setLayout(self.layVMain)
 
         #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
+        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmb_units.currentIndexChanged.connect(self.update_UI)
