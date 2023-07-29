@@ -231,8 +231,8 @@ class FreqUnits(QWidget):
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
         if not emit:  # triggered from outside
-            self.led_f_s.setText(str(f_S=fb.fil[0]['f_S']))
-            qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_units'])
+            self.led_f_s.setText(str(fb.fil[0]['f_S']))
+            qset_cmb_box(self.cmb_units, fb.fil[0]['freq_specs_unit'])
 
         f_unit = str(self.cmb_units.currentText())  # selected frequency unit
         idx = self.cmb_units.currentIndex()  # and its index
