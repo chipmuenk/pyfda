@@ -449,7 +449,6 @@ class Plot_Impz(QWidget):
             elif 'view_changed' in dict_sig:
                 # update frequency related widgets (visible or not)
                 if dict_sig['view_changed'] == 'f_S':
-                    self.stim_wdg.ui.recalc_freqs()
                     logger.error("Emit f_S")
                     self.emit({'view_changed': 'f_S', 'id': id(self)})
             elif 'ui_local_changed' in dict_sig:
