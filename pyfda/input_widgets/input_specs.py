@@ -125,7 +125,6 @@ class Input_Specs(QWidget):
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
-        self.sel_fil.sig_tx.connect(self.sig_rx_local)
 
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
@@ -142,16 +141,15 @@ class Input_Specs(QWidget):
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
-        self.f_specs.sig_tx.connect(self.sig_rx_local)
-        self.sig_tx.connect(self.f_specs.sig_rx)
+
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
-        self.a_specs.sig_tx.connect(self.sig_rx_local)
+
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
-        self.w_specs.sig_tx.connect(self.sig_rx_local)
+
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
@@ -194,10 +192,15 @@ class Input_Specs(QWidget):
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.f_units.sig_rx)
 
+        self.sig_tx.connect(self.f_specs.sig_rx)
         self.sig_tx.connect(self.t_specs.sig_rx)
         self.sig_tx.connect(self.f_units.sig_rx)
 
+        self.sel_fil.sig_tx.connect(self.sig_rx_local)
+        self.f_specs.sig_tx.connect(self.sig_rx_local)
+        self.a_specs.sig_tx.connect(self.sig_rx_local)
         self.t_specs.sig_tx.connect(self.sig_rx_local)
+        self.w_specs.sig_tx.connect(self.sig_rx_local)
         self.f_units.sig_tx.connect(self.sig_rx_local)
 
         # ----------------------------------------------------------------------
