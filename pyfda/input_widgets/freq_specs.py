@@ -59,7 +59,6 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs()
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.recalc_freqs()
-            # self.load_dict()
 
 # -------------------------------------------------------------
     def _construct_UI(self):

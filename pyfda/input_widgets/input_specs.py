@@ -191,6 +191,7 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.f_units.sig_rx)
+        self.sig_rx_local.connect(self.process_sig_rx_local)
 
         self.sig_tx.connect(self.f_specs.sig_rx)
         self.sig_tx.connect(self.t_specs.sig_rx)
@@ -206,7 +207,6 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.sig_rx_local.connect(self.process_sig_rx_local)
         self.butLoadFilt.clicked.connect(self._load_filter)
         self.butSaveFilt.clicked.connect(lambda: save_filter(self))
         self.butDesignFilt.clicked.connect(self.start_design_filt)

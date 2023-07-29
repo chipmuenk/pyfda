@@ -201,7 +201,6 @@ class FreqUnits(QWidget):
 
         This has to be accomplished by each frequency widget (currently, these are
         freq_specs and plot_tran_stim) when receiving the signal {'view_changed': 'f_S'}.
-        TODO: Should this be 'data_changed' when the lock is active?
 
         The setting is stored as bool in the global dict entry `fb.fil[0]['freq_locked'`.
         No signal is emitted because there is no immediate need for action, all the values
