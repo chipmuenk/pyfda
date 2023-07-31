@@ -77,7 +77,7 @@ jobs:
                 mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
-          - uses: actions/upload-artifact@v3
+            uses: actions/upload-artifact@v3
             with:
               name: win-pyfdax
               path: dist/pyfdax_win.exe
