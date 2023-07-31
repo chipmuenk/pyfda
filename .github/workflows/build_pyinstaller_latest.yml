@@ -166,6 +166,8 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: .
+    # not specifying the file names downloads all artifacts. However, 
+    # an individual directory is created for each file identical to its name
 
     - name: Display structure of downloaded files
       run: ls -R  
@@ -178,6 +180,6 @@ jobs:
         rm: true
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          pyfdax_win.exe
-          pyfdax_osx
+          pyfdax_win.exe/pyfdax_win.exe
+          pyfdax_osx/pyfdax_osx
 
