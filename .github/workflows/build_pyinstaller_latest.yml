@@ -77,6 +77,10 @@ jobs:
                 mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
+          - uses: actions/upload-artifact@v3
+            with:
+              name: win-pyfdax
+              path: dist/pyfdax_win.exe
           # ---
           - os: macos-latest
           # ---
@@ -86,6 +90,11 @@ jobs:
                 mv dist/pyfdax dist/pyfdax_osx
             OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
+            uses: actions/upload-artifact@v3
+            with:
+              name: win-pyfdax
+              path: dist/pyfdax_win.exe
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -142,12 +151,12 @@ jobs:
     #     token: ${{ secrets.GITHUB_TOKEN }}
     #     files: build/libs/*.*
 
-    - name: Update nightly release
-      if: success()
-      uses: pyTooling/Actions/releaser@main
-      with:
-        tag: latest
-        rm: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        files: dist/pyfdax_win.exe
+    # - name: Update nightly release
+    #   if: success()
+    #   uses: pyTooling/Actions/releaser@main
+    #   with:
+    #     tag: latest
+    #     rm: true
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     files: dist/pyfdax_win.exe
 
