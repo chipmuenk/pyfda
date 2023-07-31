@@ -175,5 +175,7 @@ jobs:
         tag: latest
         rm: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        files: pyfdax_win.exe, pyfdax_osx
+        files: |
+          pyfdax_win.exe
+          pyfdax_osx
 
