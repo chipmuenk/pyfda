@@ -12,9 +12,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  createrelease:
-    name: Pre-Release
-    runs-on: [ubuntu-latest]
+  # createrelease:
+  #   name: Pre-Release
+  #   runs-on: [ubuntu-latest]
 
     # steps:
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
@@ -61,10 +61,9 @@ jobs:
 #        run: |
 #          git tag -fa latest -m "Latest version"
 #          git push origin -f latest
-
   build:
     name: Build packages
-    needs: createrelease
+#    needs: createrelease
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
