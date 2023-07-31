@@ -164,6 +164,8 @@ jobs:
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v3
+      with:
+        path: .
 
     - name: Display structure of downloaded files
       run: ls -R  
