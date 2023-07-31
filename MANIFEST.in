@@ -22,7 +22,7 @@ include pyfda/*.qrc
 
 # exclude byte-code files
 global-exclude *.py[cod]
-exclude bak
-exclude tests
-exclude docs
-exclude recipe
+prune bak
+prune pyfda/tests
+prune docs
+prune recipe
