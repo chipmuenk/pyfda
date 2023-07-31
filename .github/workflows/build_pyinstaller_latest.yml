@@ -113,7 +113,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.OUT_FILE_NAME}}
-        path: ./dist/
+        path: ./dist/${{ matrix.OUT_FILE_NAME}}
 
     # - name: Load Release URL File from release job
     #   uses: actions/download-artifact@v1
@@ -159,7 +159,7 @@ jobs:
 
   release:
     name: Release packages
-    #    needs: createrelease
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Download all artifacts
