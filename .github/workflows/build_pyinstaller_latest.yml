@@ -77,10 +77,10 @@ jobs:
                 mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
-            uses: actions/upload-artifact@v3
-            with:
-              name: win-pyfdax
-              path: dist/pyfdax_win.exe
+            # uses: actions/upload-artifact@v3
+            # with:
+            #   name: win-pyfdax
+            #   path: dist/pyfdax_win.exe
           # ---
           - os: macos-latest
           # ---
@@ -90,15 +90,15 @@ jobs:
                 mv dist/pyfdax dist/pyfdax_osx
             OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
-            uses: actions/upload-artifact@v3
-            with:
-              name: win-pyfdax
-              path: dist/pyfdax_win.exe
+            # uses: actions/upload-artifact@v3
+            # with:
+            #   name: osx-pyfdax
+            #   path: dist/pyfdax_osx
 
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     - name: Install dependencies
@@ -108,6 +108,12 @@ jobs:
         pip install pyinstaller pyinstaller-hooks-contrib
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
+
+    - name: Upload builds as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.OUT_FILE_NAME}}
+        path: ./dist/
 
     # - name: Load Release URL File from release job
     #   uses: actions/download-artifact@v1
@@ -151,12 +157,23 @@ jobs:
     #     token: ${{ secrets.GITHUB_TOKEN }}
     #     files: build/libs/*.*
 
-    # - name: Update nightly release
-    #   if: success()
-    #   uses: pyTooling/Actions/releaser@main
-    #   with:
-    #     tag: latest
-    #     rm: true
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     files: dist/pyfdax_win.exe
+  release:
+    name: Release packages
+    #    needs: createrelease
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Display structure of downloaded files
+      run: ls -R  
+
+    - name: Update release
+      if: success()
+      uses: pyTooling/Actions/releaser@main
+      with:
+        tag: latest
+        rm: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: pyfdax_win.exe, pyfdax_osx
 
