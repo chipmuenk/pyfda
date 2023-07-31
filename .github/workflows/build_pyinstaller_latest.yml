@@ -16,7 +16,7 @@ jobs:
     name: Pre-Release
     runs-on: [ubuntu-latest]
 
-    steps:
+    # steps:
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
 
     # - name: Run latest-tag
