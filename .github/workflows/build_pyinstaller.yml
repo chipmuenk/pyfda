@@ -26,17 +26,17 @@ jobs:
     runs-on: [ubuntu-latest]
 
     steps:
-    - name: Set tag and release name to specified label
-      if: github.ref_type == 'tag'
-      run: |
-        echo "${{ github.ref_name }}" > tag_name.txt
-        echo "Release ${{ github.ref_name }}" > release_name.txt
-    - name: Set tag and release name to sha / latest if no tag was given
-      if: github.ref_type != 'tag'
-      run: |
-        echo "${{ github.sha }}" > tag_name.txt
-        echo "Release latest" > release_name.txt
-      
+    # - name: Set tag and release name to specified label
+    #   if: github.ref_type == 'tag'
+    #   run: |
+    #     echo "${{ github.ref_name }}" > tag_name.txt
+    #     echo "Release ${{ github.ref_name }}" > release_name.txt
+    # - name: Set tag and release name to sha / latest if no tag was given
+    #   if: github.ref_type != 'tag'
+    #   run: |
+    #     echo "${{ github.sha }}" > tag_name.txt
+    #     echo "Release latest" > release_name.txt
+  
       # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
     - name: Create Release
       id: create_release
@@ -44,8 +44,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: `cat tag_name.txt`
-        release_name: `cat release_name.txt`
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
         draft: false
         prerelease: true
     - name: Output Release URL File
