@@ -86,11 +86,11 @@ class FreqUnits(QWidget):
         - qfft_win_select
         """
 
-        logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
-                    .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
+        #            .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop")
+            logger.debug("Stopped infinite loop")
             return
         elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
             or 'data_changed' in dict_sig:
@@ -289,16 +289,13 @@ class FreqUnits(QWidget):
                 f_label = r"$k \; \rightarrow$"
                 t_label = r"$n\; \rightarrow$"
 
-            # Set the value for normalized f_S although invisible right now
-            # self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
-
         else:  # Hz, kHz, ...
             # Restore sampling frequency when user selected an absolute sampling frequency,
             # returning from f_S / f_Ny / k
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}:  # previous setting normalized?
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old  # yes, restore prev. f_S
 
-            # --- ry to pick the most suitable unit for f_S --------------
+            # --- try to pick the most suitable unit for f_S --------------
             f_S = fb.fil[0]['f_S'] * f_s_scale
             if f_S >= 1e9:
                 f_unit = "GHz"

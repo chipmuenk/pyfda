@@ -312,9 +312,9 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.warning(
-            f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
-            f"{pprint_log(dict_sig)}\n")
+        # logger.warning(
+        #     f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
+        #     f"{pprint_log(dict_sig)}\n")
         # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):

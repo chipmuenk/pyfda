@@ -60,8 +60,8 @@ class Tran_IO(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        logger.warning("SIG_RX - vis: {0}\n{1}"
-                       .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.warning("SIG_RX - vis: {0}\n{1}"
+        #                .format(self.isVisible(), pprint_log(dict_sig)))
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
