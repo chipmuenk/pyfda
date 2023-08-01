@@ -228,7 +228,7 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             'f_s_wav': 16000,  # sampling frequency for wav files
             'f_S_prev': 1,  # previous sampling frequency
             'freq_locked': False,  # don't update absolute frequencies when f_S is changed
-            'f_S_scale': 1,  #
+            'f_s_scale': 1,  #
             'f_max': 1,
             'freqSpecsRangeType': 'Half',
             'freqSpecsRange': [0, 0.5],

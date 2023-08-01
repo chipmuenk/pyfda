@@ -73,7 +73,7 @@ class Tran_IO(QWidget):
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             logger.warning("f_S changed!")
-            self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_S_scale'])
+            self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
 
     # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -108,7 +108,7 @@ class Tran_IO(QWidget):
 
         self.setLayout(layVMain)
 
-        self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_S_scale'])
+        self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
 
     # ------------------------------------------------------------------------------
     def set_f_s_wav(self, f_s_wav=None):

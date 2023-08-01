@@ -61,15 +61,20 @@ class FreqUnits(QWidget):
             "frequency 'f_S', to the Nyquist frequency f_Ny = f_S/2 or "
             "as absolute values. 'k' specifies frequencies w.r.t. f_S "
             "but plots graphs over the frequency index k.</span>",
-            ("k", "k", "Frequency index k = 0 ... N_FFT - 1"),
             ("fs", "f_S", "Relative to sampling frequency, F = f / f_S"),
             ("fny", "f_Ny", "Relative to Nyquist frequency, F = f / f_Ny"),
-            ("hz", "Hz", "Sampling frequency in Hz"),
-            ("khz", "kHz", "Sampling frequency in kHz"),
-            ("mhz", "MHz", "Sampling frequency in MHz"),
-            ("ghz", "GHz", "Sampling frequency in GHz")
+            ("k", "k", "Frequency index k = 0 ... N_FFT - 1"),
+            ("mhz", "mHz", "Absolute sampling frequency in mHz"),
+            ("hz", "Hz", "Absolute sampling frequency in Hz"),
+            ("khz", "kHz", "Absolute sampling frequency in kHz"),
+            ("meghz", "MHz", "Absolute sampling frequency in MHz"),
+            ("ghz", "GHz", "Absolute sampling frequency in GHz")
         ]
         self.cmb_f_unit_init = "fs"
+
+        # t_units and f_scale have the same index as the f_unit_items
+        self.t_units = ['T_S', 'T_S', '', 'ks', 's', 'ms', r'$\mu$s', 'ns']
+        self.f_scale = [1, 1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
 
         self._construct_UI()
 
@@ -87,10 +92,9 @@ class FreqUnits(QWidget):
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop")
             return
-        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+        elif ('view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S')\
+            or 'data_changed' in dict_sig:
             self.update_UI(emit=False)
-        elif 'data_changed' in dict_sig:
-            pass
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -98,8 +102,6 @@ class FreqUnits(QWidget):
         Construct the User Interface
         """
         self.layVMain = QVBoxLayout() # Widget main layout
-
-        self.t_units = ['', 'T_S', 'T_S', 's', 'ms', r'$\mu$s', 'ns']
 
         bfont = QFont()
         bfont.setBold(True)
@@ -248,17 +250,22 @@ class FreqUnits(QWidget):
         """
         if not emit:  # triggered from outside
             self.led_f_s.setText(str(fb.fil[0]['f_S']))
-            qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
+            idx = qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'],
+                               caseSensitive=True)
+            if idx == -1:
+                logger.warning(
+                    f"Unknown frequency unit {fb.fil[0]['freq_specs_unit']}, "
+                    "using 'f_S'.")
 
-        f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit
-        idx = self.cmb_f_units.currentIndex()  # and its index
+        f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit,
+        idx = self.cmb_f_units.currentIndex()  # its index
+        f_s_scale = self.f_scale[idx]  # and its scaling factor
 
         is_normalized_freq = f_unit in {"f_S", "f_Ny", "k"}
 
         self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
         self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
         self.butLock.setVisible(not is_normalized_freq)
-        f_S_scale = 1  # default setting, used for units f_S, f_Ny, k
 
         if is_normalized_freq:
             # store current sampling frequency to restore it when returning to
@@ -282,25 +289,37 @@ class FreqUnits(QWidget):
                 f_label = r"$k \; \rightarrow$"
                 t_label = r"$n\; \rightarrow$"
 
-            self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
+            # Set the value for normalized f_S although invisible right now
+            # self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else:  # Hz, kHz, ...
-            # Restore sampling frequency when returning from f_S / f_Ny / k
+            # Restore sampling frequency when user selected an absolute sampling frequency,
+            # returning from f_S / f_Ny / k
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}:  # previous setting normalized?
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old  # yes, restore prev.
-                fb.fil[0]['T_S'] = 1./self.fs_old  # settings for sampling frequency
-                self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old  # yes, restore prev. f_S
 
-            if f_unit == "Hz":
-                f_S_scale = 1.
-            elif f_unit == "kHz":
-                f_S_scale = 1.e3
-            elif f_unit == "MHz":
-                f_S_scale = 1.e6
-            elif f_unit == "GHz":
-                f_S_scale = 1.e9
+            # --- ry to pick the most suitable unit for f_S --------------
+            f_S = fb.fil[0]['f_S'] * f_s_scale
+            if f_S >= 1e9:
+                f_unit = "GHz"
+            elif f_S >= 1e6:
+                f_unit = "MHz"
+            elif f_S >= 1e3:
+                f_unit = "kHz"
+            elif f_S >= 1:
+                f_unit = "Hz"
             else:
-                logger.warning("Unknown frequency unit {0}".format(f_unit))
+                f_unit = "mHz"
+
+            new_idx = qset_cmb_box(self.cmb_f_units, f_unit, caseSensitive=True)
+            if new_idx != idx:  # sampling frequency needs to be scaled
+                idx = new_idx
+                f_s_scale = self.f_scale[idx]
+                fb.fil[0]['f_S'] = f_S / f_s_scale
+                emit = True
+            # -------------------------------------------------------------
+
+            self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
@@ -310,7 +329,9 @@ class FreqUnits(QWidget):
         else:
             plt_f_unit = f_unit
 
-        fb.fil[0].update({'f_S_scale': f_S_scale})  # scale factor for f_S (Hz, kHz, ...)
+        fb.fil[0]['T_S'] = 1./fb.fil[0]['f_S']
+
+        fb.fil[0].update({'f_s_scale': f_s_scale})  # scale factor for f_S (Hz, kHz, ...)
         fb.fil[0].update({'freq_specs_unit': f_unit})  # frequency unit
         # time and frequency unit as string e.g. for plot axis labeling
         fb.fil[0].update({"plt_fUnit": plt_f_unit})
@@ -321,11 +342,18 @@ class FreqUnits(QWidget):
 
         self._freq_range(emit=False)  # update f_lim setting without emitting signal
 
-        if emit:  # UI was updated by user, not by an external trigger
+        if emit:  # UI was updated by user or a rescaling of f_S
             self.emit({'view_changed': 'f_S'})
 
 # ------------------------------------------------------------------------------
+    def load_dict(self):
+        """
+        Reload settings for f_S and units from dictionary
+        """
+        self.led_f_s.setText(str(fb.fil[0]['f_S']))
+        qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
 
+# ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
 
         """
@@ -427,7 +455,7 @@ class FreqUnits(QWidget):
         # self.butLock.setChecked(fb.fil[0]['but_locked?'])
         # self.butSort.blockSignals(False)
         # set f_S_last?!
-        # f_S_scale = 1  # default setting for f_S scale
+        # f_s_scale = 1  # default setting for f_S scale
 
         # self.update_UI()
 
