@@ -443,7 +443,7 @@ class Plot_Impz(QWidget):
                 self.draw()  # redraw a.o. changed axes scaling
 
         else:  # invisible
-            if 'data_changed' in dict_sig in dict_sig:
+            if 'data_changed' in dict_sig:
                 self.needs_calc = True
             elif 'view_changed' in dict_sig:
                 # update frequency related widgets (visible or not)
