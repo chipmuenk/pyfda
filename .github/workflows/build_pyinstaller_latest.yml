@@ -1,4 +1,4 @@
-# workflow for buildung pyinstaller packages for windows and MacOS and creating a pre-release, triggered by a push to main
+# workflow for buildung pyinstaller packages for windows and MacOS and creating a pre-release
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
 # The workflow runs for push events on the main branch and when manually triggered
@@ -8,62 +8,12 @@ name: build_pyinstaller_latest
 
 on:
   push:
-    branches: [main, develop]
+    branches: main
   workflow_dispatch:
 
 jobs:
-  # createrelease:
-  #   name: Pre-Release
-  #   runs-on: [ubuntu-latest]
-
-    # steps:
-      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
-
-    # - name: Run latest-tag
-    #   uses: EndBug/latest-tag@latest
-    #   with:
-    #     # You can change the name of the tag or branch with this input (default: 'latest').
-    #     # ref: someCustomTagName
-
-    #     # If a description is provided, the action will use it to create an annotated tag.
-    #     # If none is given, the action will create a lightweight tag (default: '').
-    #     description: Description for the tag
-
-    #     # Force-update a branch instead of using a tag (default: false).
-    #     #force-branch: true
-
-    # - name: Create Release
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     tag_name: latest # ${{ github.sha }} full sha is not accepted
-    #     release_name: "Release latest"
-    #     draft: false
-    #     prerelease: true
-    # - name: Output Release URL File
-    #   run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-    # - name: Save Release URL File for publish
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: release_url
-    #     path: release_url.txt
-
-#  create_latest_tag:
-#    name: Create 'latest' tag
-#    runs-on: [ubuntu-latest]
-#    needs: createrelease
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#      - name: Create 'latest' tag
-#        run: |
-#          git tag -fa latest -m "Latest version"
-#          git push origin -f latest
   build:
     name: Build packages
-#    needs: createrelease
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -77,10 +27,6 @@ jobs:
                 mv dist/pyfdax.exe dist/pyfdax_win.exe
             OUT_FILE_NAME: pyfdax_win.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
-            # uses: actions/upload-artifact@v3
-            # with:
-            #   name: win-pyfdax
-            #   path: dist/pyfdax_win.exe
           # ---
           - os: macos-latest
           # ---
@@ -90,10 +36,6 @@ jobs:
                 mv dist/pyfdax dist/pyfdax_osx
             OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
-            # uses: actions/upload-artifact@v3
-            # with:
-            #   name: osx-pyfdax
-            #   path: dist/pyfdax_osx
 
     steps:
     - uses: actions/checkout@v3
@@ -114,48 +56,6 @@ jobs:
       with:
         name: ${{ matrix.OUT_FILE_NAME}}
         path: ./dist/${{ matrix.OUT_FILE_NAME}}
-
-    # - name: Load Release URL File from release job
-    #   uses: actions/download-artifact@v1
-    #   with:
-    #     name: release_url
-    # - name: Get Release File Name & Upload URL
-    #   id: get_release_info
-    #   shell: bash
-    #   run: |
-    #     value=`cat release_url/release_url.txt`
-    #     echo ::set-output name=upload_url::$value
-
-    #### Old upload script ####    
-    # - name: Upload Release Asset
-    #   id: upload-release-asset
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-    #     asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
-    #     asset_name: ${{ matrix.OUT_FILE_NAME}}
-    #     asset_content_type: ${{ matrix.ASSET_MIME}}
-
-    # https://github.com/marketplace/actions/deploy-nightly
-    #
-    # https://dev.to/derlin/how-to-create-nightly-releases-with-github-actions-fpp ->
-    # https://github.com/eine/tip ->
-    # https://github.com/pyTooling/Actions
-
-    # - name: Create info file
-    #   run: |
-    #     echo -e "ref: $GITHUB_REF \ncommit: $GITHUB_SHA\nbuild: $(date +"%Y-%m-%dT%H:%M:%SZ")" \
-    #     > build/libs/info.txt
-
-    # - name: Update nightly release
-    #   uses: eine/tip@master
-    #   with:
-    #     tag: nightly
-    #     rm: true
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     files: build/libs/*.*
 
   release:
     name: Release packages
