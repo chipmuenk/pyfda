@@ -1609,6 +1609,7 @@ def save_filter(self):
     try:
         with io.open(file_name, 'wb') as f:
             if file_type == 'npz':
+                logger.warning(pprint_log(fb.fil[0]))
                 np.savez(f, **fb.fil[0])
             elif file_type == 'pkl':
                 pickle.dump(fb.fil[0], f)  # save in default pickle version
