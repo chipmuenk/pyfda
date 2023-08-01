@@ -110,7 +110,7 @@ class FreqUnits(QWidget):
         self.lblUnits.setText("Freq. Unit")
         self.lblUnits.setFont(bfont)
 
-        self.fs_old = fb.fil[0]['f_S']  # store current sampling frequency
+        self.f_s_old = fb.fil[0]['f_S']  # store current sampling frequency
 
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
@@ -270,8 +270,6 @@ class FreqUnits(QWidget):
         if is_normalized_freq:
             # store current sampling frequency to restore it when returning to
             # unnormalized frequencies
-            self.fs_old = fb.fil[0]['f_S']
-
             if f_unit == "f_S":  # normalized to f_S
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
                 fb.fil[0]['T_S'] = 1.
@@ -293,7 +291,7 @@ class FreqUnits(QWidget):
             # Restore sampling frequency when user selected an absolute sampling frequency,
             # returning from f_S / f_Ny / k
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}:  # previous setting normalized?
-                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.fs_old  # yes, restore prev. f_S
+                fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.f_s_old  # yes, restore prev. f_S
 
             # --- try to pick the most suitable unit for f_S --------------
             f_S = fb.fil[0]['f_S'] * f_s_scale
@@ -315,7 +313,7 @@ class FreqUnits(QWidget):
                 fb.fil[0]['f_S'] = f_S / f_s_scale
                 emit = True
             # -------------------------------------------------------------
-
+            self.f_s_old = fb.fil[0]['f_S']
             self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
