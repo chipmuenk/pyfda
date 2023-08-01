@@ -89,6 +89,8 @@ class FreqUnits(QWidget):
             return
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.update_UI(emit=False)
+        elif 'data_changed' in dict_sig:
+            pass
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
