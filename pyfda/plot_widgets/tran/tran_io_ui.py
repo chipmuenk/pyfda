@@ -131,10 +131,10 @@ class Tran_IO_UI(QWidget):
         layH_file_fmt_options.addWidget(self.but_csv_options)
         layH_file_fmt_options.addWidget(self.but_scale_int)
 
-        self.but_f_s_wav = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
-        self.but_f_s_wav.setCheckable(True)
-        self.but_f_s_wav.setChecked(True)
-        self.but_f_s_wav.setToolTip(
+        self.but_f_s_wav_auto = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
+        self.but_f_s_wav_auto.setCheckable(True)
+        self.but_f_s_wav_auto.setChecked(True)
+        self.but_f_s_wav_auto.setToolTip(
             "<span>Copy pyfda sampling frequency to WAV file during export "
             "when selected.</span>")
         self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
@@ -254,7 +254,7 @@ class Tran_IO_UI(QWidget):
         # layG_io_file.addWidget(self.but_csv_options, 1, i)
         layG_io_file.addLayout(layH_file_fmt_options, 1, i)
         i += 1
-        layG_io_file.addWidget(self.but_f_s_wav, 0, i)
+        layG_io_file.addWidget(self.but_f_s_wav_auto, 0, i)
         layG_io_file.addLayout(layH_lbl_led_f_s_wav, 1, i)
         i += 1
         layG_io_file.addWidget(line1, 0, i, 2, 1)
@@ -321,7 +321,7 @@ class Tran_IO_UI(QWidget):
         # ------ Local signal-slot-connections
         self.cmb_file_format.currentIndexChanged.connect(self.set_ui_visibility)
         self.cmb_data_format.currentIndexChanged.connect(self.set_ui_visibility)
-        self.but_f_s_wav.clicked.connect(self.set_ui_visibility)
+        self.but_f_s_wav_auto.clicked.connect(self.set_ui_visibility)
         # inizialize data format dependent widgets
         self.set_ui_visibility()
 
@@ -336,14 +336,14 @@ class Tran_IO_UI(QWidget):
 
         # int_data_format = qget_cmb_box(self.cmb_data_format)\
         #    in {'uint8', 'int16', 'int32'}
-        self.but_f_s_wav.setVisible(not is_csv_format)
+        self.but_f_s_wav_auto.setVisible(not is_csv_format)
         self.lbl_f_s_wav.setVisible(not is_csv_format)
         self.led_f_s_wav.setVisible(not is_csv_format)
         self.lbl_data_format.setVisible(not is_csv_format)
         self.cmb_data_format.setVisible(not is_csv_format)
         self.but_scale_int.setVisible(not is_csv_format)
 
-        self.led_f_s_wav.setEnabled(not self.but_f_s_wav.isChecked())
+        self.led_f_s_wav.setEnabled(not self.but_f_s_wav_auto.isChecked())
 
     # -------------------------------------------------------------------------
     def update_ui(self, cmplx=False, fx=False):

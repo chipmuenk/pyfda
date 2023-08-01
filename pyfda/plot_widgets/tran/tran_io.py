@@ -48,7 +48,7 @@ class Tran_IO(QWidget):
 
         self.norm = self.ui.led_normalize_default
         self.nr_loops = self.ui.led_nr_loops_default
-        self.f_s_wav = self.f_s_file = fb.fil[0]['f_S']  # ['f_s_wav']
+        self.f_s_wav = self.f_s_file = fb.fil[0]['f_S']
 
         self._construct_UI()
 
@@ -72,7 +72,6 @@ class Tran_IO(QWidget):
             # Set CSV options button according to state of CSV popup handle
             self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-            logger.warning("f_S changed!")
             self.set_f_s_wav(fb.fil[0]['f_S'] * fb.fil[0]['f_s_scale'])
 
     # ------------------------------------------------------------------------------
@@ -117,7 +116,7 @@ class Tran_IO(QWidget):
         unchecked) or from argument `f_s_wav` (button `Auto f_s` checked), passed either
         from loaded wav file or from updated f_S some other place in the app.
         """
-        if not self.ui.but_f_s_wav.isChecked() or f_s_wav is None:
+        if not self.ui.but_f_s_wav_auto.isChecked() or f_s_wav is None:
             f_s_wav = self.ui.led_f_s_wav.text()
 
         self.f_s_wav = safe_eval(f_s_wav, alt_expr=self.f_s_wav,
@@ -322,7 +321,7 @@ class Tran_IO(QWidget):
             self.x_file = data
 
         self.emit({'data_changed': 'file_io'})
-        if self.ui.but_f_s_wav.isChecked():
+        if self.ui.but_f_s_wav_auto.isChecked():
             fb.fil[0]['f_S'] = self.f_s_file
             fb.fil[0]['freq_specs_unit'] = 'Hz'
             self.emit({'view_changed': 'f_S'})
