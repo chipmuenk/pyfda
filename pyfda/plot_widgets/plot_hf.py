@@ -506,7 +506,7 @@ class Plot_Hf(QWidget):
                 rect = Rectangle((extent.xmin, extent.ymin), extent.width,
                         extent.height, facecolor=rcParams['figure.facecolor'], edgecolor='none',
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
-                self.ax_i.patches.append(rect)
+                self.ax_i.add_patch(rect)
 
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
                 if self.chk_show_H_abs.isChecked():
