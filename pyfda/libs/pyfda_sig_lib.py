@@ -94,9 +94,34 @@ Examples
         hn = np.cumsum(hn)
 
     return hn, td
+# --------------------------------------------------------------------------
+def zeros_with_val(N: int, val: float, pos: int = 0):
+    """
+    Create a 1D array of `N` zeros where the element at position `pos` has the
+    value `val`.
 
+    Parameters
+    ----------
 
-# ------------------------------------------------------------------------------
+    N: int
+        number of elements
+    val: scalar
+        value to be inserted at position `pos`
+    pos: int
+        Position of `val` to be inserted
+
+    Returns
+    -------
+    arr: np.ndarray
+       Array with zeros except for element at position `pos`
+    """
+    if pos >= N or -pos > N:
+        raise(IndexError)
+    a = np.zeros(N)
+    a[pos] = val
+    return a
+
+# ------------------- -----------------------------------------------------------
 def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
 
     """
