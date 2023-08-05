@@ -225,7 +225,7 @@ fil_tree = freeze_hierarchical({
 fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             'N': 10,  # filter order
             'f_S': 1, 'T_S': 1,  # current sampling frequency and period
-            'f_s_wav': 16000,  # sampling frequency for wav files
+            # 'f_s_wav': 16000,  # sampling frequency for wav files
             'f_S_prev': 1,  # previous sampling frequency
             'freq_locked': False,  # don't update absolute frequencies when f_S is changed
             'f_s_scale': 1,  #
