@@ -1405,18 +1405,19 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
-        if any(isinstance(el, list) for el in arg):
-            frmt = "lol"  # list or ndarray or tuple of lists
-        elif any(isinstance(el, np.ndarray) for el in arg):
-            frmt = "lon"  # list or ndarray or tuple of ndarrays
-        elif isinstance(arg, list):
-            frmt = "lst"
-        elif isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
+        if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
             frmt = "nd1"
             logger.warning(f"shape(zpk) = {np.shape(arg)}")
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
             frmt = "nd2"
             logger.warning(f"shape(zpk) = {np.shape(arg)}")
+        elif any(isinstance(el, list) for el in arg):
+            frmt = "lol"  # list or ndarray or tuple of lists
+        elif any(isinstance(el, np.ndarray) for el in arg):
+            frmt = "lon"  # list or ndarray or tuple of ndarrays
+        elif isinstance(arg, list):
+            frmt = "lst"
+
         format_error = False
         logger.warning(f"zpk format is '{frmt}'")
 
@@ -1575,16 +1576,19 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 
         if 'zpk' not in format_in:
             try:
-                fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+                # returns a tuple (zeros, poles, gain) where gain is scalar:
+                zpk = list(sig.sos2zpk(fil_dict['sos']))
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created a additional (superfluous)
             # pole and zero at the origin and delete them:
-            z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
-            p_0 = np.where(fil_dict['zpk'][1] == 0)[0]
+            z_0 = np.where(zpk[0] == 0)[0]
+            p_0 = np.where(zpk[1] == 0)[0]
             if p_0 and z_0:  # eliminate z = 0 and p = 0 from list:
-                fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0], z_0)
-                fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1], p_0)
+                zpk[0] = np.delete(zpk[0], z_0)
+                zpk[1] = np.delete(zpk[1], p_0)
+            fil_dict['zpk'] = np.array(
+                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])], dtype=complex)
 
         if 'ba' not in format_in:
             try:
@@ -1616,10 +1620,11 @@ def fil_convert(fil_dict: dict, format_in) -> None:
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite([b, a])):
             zpk = sig.tf2zpk(b, a)
-            fil_dict['zpk'] = [np.nan_to_num(zpk[0]).astype(complex),
-                               np.nan_to_num(zpk[1]).astype(complex),
-                               np.nan_to_num(zpk[2])
-                               ]
+            fil_dict['zpk'] = np.array(
+                [np.nan_to_num(zpk[0]).astype(complex),
+                 np.nan_to_num(zpk[1]).astype(complex),
+                 np.nan_to_num(zeros_with_val(len(zpk[0]), zpk[2]))
+                ], dtype=complex)
         else:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
