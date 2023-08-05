@@ -65,15 +65,15 @@ jobs:
     - name: Download all artifacts
       uses: actions/download-artifact@v3
       with:
-        path: .
+        path: ./
     # not specifying the file names downloads all artifacts. However, 
     # an individual directory is created for each file identical to its name
 
     - name: Display structure of downloaded files
       run: ls -R  
 
-    - name: Update release
-      if: success()
+    - name: Update release latest
+      if: success() && github.ref_type != 'tag'
       uses: pyTooling/Actions/releaser@main
       with:
         tag: latest
