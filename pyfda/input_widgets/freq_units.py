@@ -340,13 +340,6 @@ class FreqUnits(QWidget):
         if emit:  # UI was updated by user or a rescaling of f_S
             self.emit({'view_changed': 'f_S'})
 
-# ------------------------------------------------------------------------------
-    def load_dict(self):
-        """
-        Reload settings for f_S and units from dictionary
-        """
-        self.led_f_s.setText(str(fb.fil[0]['f_S']))
-        qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
 
 # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
