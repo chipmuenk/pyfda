@@ -463,7 +463,6 @@ class Input_PZ(QWidget):
                            f"with len = {len(fb.fil[0]['zpk'])}")
         
         zpk = list(fb.fil[0]['zpk'])
-        logger.warning(zpk)
 
         if len(zpk) == 3:  # number of rows
             if np.isscalar(zpk[2]):
@@ -483,8 +482,7 @@ class Input_PZ(QWidget):
             logger.warning("fb.fil[0]['zpk'] has differing row lengths, "
                            f"{len(fb.fil[0]['zpk'][0])} != {len(fb.fil[0]['zpk'][1])}")
             return
-        logger.warning(f"Shape (zpk) = {np.shape(zpk)}")
-        logger.warning(zpk)
+        # logger.warning(f"New shape (zpk) = {np.shape(zpk)}")
         self.zpk = np.array(zpk)  # this enforces a deep copy
         qstyle_widget(self.ui.butSave, 'normal')
         self._refresh_table()
