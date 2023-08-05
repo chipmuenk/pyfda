@@ -1516,14 +1516,6 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
     fil_dict['creator'] = (format_in, sender)
     fil_dict['timestamp'] = time.time()
 
-    # Remove any antiCausal zero/poles
-    if 'zpkA' in fil_dict:
-        fil_dict.pop('zpkA')
-    if 'baA' in fil_dict:
-        fil_dict.pop('baA')
-    if 'rpk' in fil_dict:
-        fil_dict.pop('rpk')
-
     if convert:
         fil_convert(fil_dict, format_in)
 
