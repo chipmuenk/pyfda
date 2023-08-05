@@ -264,6 +264,8 @@ class FreqUnits(QWidget):
                 logger.warning(
                     f"Unknown frequency unit {fb.fil[0]['freq_specs_unit']}, "
                     "using 'f_S'.")
+            qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'],
+                         data=True, fireSignals=True)
 
         f_unit = qget_cmb_box(self.cmb_f_units, data=False)  # selected frequency unit,
         idx = self.cmb_f_units.currentIndex()  # its index
@@ -347,7 +349,6 @@ class FreqUnits(QWidget):
 
         if emit:  # UI was updated by user or a rescaling of f_S
             self.emit({'view_changed': 'f_S'})
-
 
 # ------------------------------------------------------------------------------
     def eventFilter(self, source, event):
