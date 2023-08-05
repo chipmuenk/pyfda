@@ -75,6 +75,14 @@ class FreqUnits(QWidget):
         ]
         self.cmb_f_unit_init = "fs"
 
+        self.cmb_f_range_items = [
+            "Select one- or two-sided spectrum and symmetry around <i>f</i> = 0",
+            ("half", "0...½", "One-sided spectrum"),
+            ("whole", "0...1", "Two-sided spectrum, starting at <i>f</i> = 0"),
+            ("sym", "-½...½", "Two-sided spectrum, symmetrical around <i>f</i> = 0")
+            ]
+        self.cmb_f_range_init = "half"
+
         # t_units and f_scale have the same index as the f_unit_items
         self.t_units = ['T_S', 'T_S', '', 'ks', 's', 'ms', r'$\mu$s', 'ns']
         self.f_scale = [1, 1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
@@ -143,13 +151,10 @@ class FreqUnits(QWidget):
 #        self.cmb_f_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
 #        self.cmb_f_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
-        fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
-        self.cmbFRange = QComboBox(self)
-        self.cmbFRange.setObjectName("cmbFRange")
-        for f in fRanges:
-            self.cmbFRange.addItem(f[0],f[1])
-        self.cmbFRange.setToolTip("Select frequency range (whole or half).")
-        self.cmbFRange.setCurrentIndex(0)
+        self.cmb_f_range = QComboBox(self)
+        self.cmb_f_range.setObjectName("cmb_f_range")
+        qcmb_box_populate(self.cmb_f_range, self.cmb_f_range_items,
+                          self.cmb_f_range_init)
 
         # Combobox resizes with longest entry
         self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
