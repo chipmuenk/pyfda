@@ -244,8 +244,9 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             #
             'ba': ([1, 1, 1], [1, 0.1, 0.5]),  # (bb, aa) tuple coefficient lists
             # causal zeros/poles/gain
-            'zpk': ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-                   [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
+            'zpk': [[-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+                   [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j],
+                   [1, 0]],
             #
             'sos': [],
             # input, output, accu, coeffs, ... fixpoint word formats and quantizer

@@ -1601,7 +1601,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
         zpk = fil_dict['zpk']
         if 'ba' not in format_in:
             try:
-                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2][0])
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
