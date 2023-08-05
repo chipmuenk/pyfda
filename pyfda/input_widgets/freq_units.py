@@ -58,12 +58,15 @@ class FreqUnits(QWidget):
         # combobox tooltip + data / text / tooltip for frequency unit
         self.cmb_f_unit_items = [
             "<span>Select whether frequencies are specified w.r.t. the sampling "
-            "frequency 'f_S', to the Nyquist frequency f_Ny = f_S/2 or "
-            "as absolute values. 'k' specifies frequencies w.r.t. f_S "
-            "but plots graphs over the frequency index k.</span>",
-            ("fs", "f_S", "Relative to sampling frequency, F = f / f_S"),
-            ("fny", "f_Ny", "Relative to Nyquist frequency, F = f / f_Ny"),
-            ("k", "k", "Frequency index k = 0 ... N_FFT - 1"),
+            "frequency " + to_html("f_S", frmt = 'i') + ", to the Nyquist frequency "
+            + to_html("f_Ny = f_S", frmt='i') + "/2 or as absolute values."
+            "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
+            " but plots graphs over the frequency index <i>k</i>.</span>",
+            ("fs", "f_S", "Relative to sampling frequency, "
+             + to_html("F = f / f_S", frmt='i')),
+            ("fny", "f_Ny", "Relative to Nyquist frequency, "
+             + to_html("F = f / f_Ny", frmt='i')),
+            ("k", "k", "Frequency index " + to_html("k = 0 ... N_FFT - 1", frmt='i')),
             ("mhz", "mHz", "Absolute sampling frequency in mHz"),
             ("hz", "Hz", "Absolute sampling frequency in Hz"),
             ("khz", "kHz", "Absolute sampling frequency in kHz"),
@@ -150,7 +153,7 @@ class FreqUnits(QWidget):
 
         # Combobox resizes with longest entry
         self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbFRange.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_f_range.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.butSort = QToolButton(self)
         self.butSort.setText("Sort")
@@ -163,7 +166,7 @@ class FreqUnits(QWidget):
 
         self.layHUnits = QHBoxLayout()
         self.layHUnits.addWidget(self.cmb_f_units)
-        self.layHUnits.addWidget(self.cmbFRange)
+        self.layHUnits.addWidget(self.cmb_f_range)
         self.layHUnits.addWidget(self.butSort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
@@ -194,7 +197,7 @@ class FreqUnits(QWidget):
         # swallow index passed by "IndexChanged":
         self.cmb_f_units.currentIndexChanged.connect(lambda: self.update_UI(self))
         self.butLock.clicked.connect(self._lock_freqs)
-        self.cmbFRange.currentIndexChanged.connect(self._freq_range)
+        self.cmb_f_range.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
         # ----------------------------------------------------------------------
 
@@ -402,7 +405,7 @@ class FreqUnits(QWidget):
         if type(emit) == int:  # signal was emitted by combobox
             emit = True
 
-        rangeType = qget_cmb_box(self.cmbFRange)
+        rangeType = qget_cmb_box(self.cmb_f_range)
 
         fb.fil[0].update({'freqSpecsRangeType': rangeType})
         f_max = fb.fil[0]["f_max"]
@@ -434,7 +437,7 @@ class FreqUnits(QWidget):
         self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
         self.butLock.setVisible(not is_normalized_freq)
 
-        qset_cmb_box(self.cmbFRange, fb.fil[0]['freqSpecsRangeType'])
+        qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'])
 
         self.butSort.blockSignals(True)
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
