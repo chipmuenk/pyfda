@@ -95,7 +95,7 @@ Examples
 
     return hn, td
 # --------------------------------------------------------------------------
-def zeros_with_val(N: int, val: float, pos: int = 0):
+def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     """
     Create a 1D array of `N` zeros where the element at position `pos` has the
     value `val`.
@@ -106,9 +106,9 @@ def zeros_with_val(N: int, val: float, pos: int = 0):
     N: int
         number of elements
     val: scalar
-        value to be inserted at position `pos`
+        value to be inserted at position `pos` (default: 1)
     pos: int
-        Position of `val` to be inserted
+        Position of `val` to be inserted (default: 0)
 
     Returns
     -------

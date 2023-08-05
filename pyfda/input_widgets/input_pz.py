@@ -375,7 +375,7 @@ class Input_PZ(QWidget):
             if len(self.zpk) == 3:  # number of rows
                 pass
             elif len(self.zpk) == 2:  # k is missing in zpk:
-                self.zpk.append(zeros_with_val(len(self.zpk[0], 1)))  # add a row with k = 1
+                self.zpk.append(zeros_with_val(len(self.zpk[0])))  # add a row with k = 1
             else:
                 logger.error(f"P/Z array 'self.zpk' has wrong number of rows = {len(self.zpk)}")
                 logger.error(self.zpk)
@@ -472,7 +472,7 @@ class Input_PZ(QWidget):
             elif len(zpk[2]) != len(zpk[0]):
                 zpk[2] = zeros_with_val(len(zpk[0]), zpk[2][0])
         elif len(zpk) == 2:  # k is missing in zpk:
-            zpk.append(zeros_with_val(len(zpk[0], 1)))  # add a row with k = 1
+            zpk.append(zeros_with_val(len(zpk[0])))  # add a row with k = 1
         else:
             logger.error("P/Z array 'fb.fil[0]['zpk']' has wrong number of "
                          f"rows = {len(zpk)}")
