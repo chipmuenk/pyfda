@@ -23,6 +23,7 @@ import scipy.signal as sig
 
 from distutils.version import LooseVersion
 import pyfda.libs.pyfda_dirs as dirs
+from pyfda.libs.pyfda_sig_lib import zeros_with_val
 
 # ###### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
@@ -1410,17 +1411,29 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             frmt = "lon"  # list or ndarray or tuple of ndarrays
         elif isinstance(arg, list):
             frmt = "lst"
-        elif isinstance(arg, np.ndarray):
-            frmt = "nd"
+        elif isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
+            frmt = "nd1"
+            logger.warning(f"shape(zpk) = {np.shape(arg)}")
+        elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
+            frmt = "nd2"
+            logger.warning(f"shape(zpk) = {np.shape(arg)}")
         format_error = False
+        logger.warning(f"zpk format is '{frmt}'")
 
-        if frmt in {'lst', 'nd'}:  # list / array with z only -> FIR
+        if frmt == "nd2":
+            fil_dict['zpk'] = arg
+            if np.any(arg[1]):  # non-zero poles -> IIR
+                fil_dict['ft'] = 'IIR'
+            else:
+                fil_dict['ft'] = 'FIR'
+
+        if frmt in {'lst', 'nd1'}:  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
-            k = 1
-            fil_dict['zpk'] = [z, p, k]
+            k = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
+            fil_dict['zpk'] = np.array([z, p, k])
             fil_dict['ft'] = 'FIR'
-        elif frmt in {'lol', 'lon'}:  # list of lists
+        elif frmt in {'lol', 'lon'}:  # list of lists or ndarrays
             if len(arg) == 3:
                 fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
                 if np.any(arg[1]):  # non-zero poles -> IIR
