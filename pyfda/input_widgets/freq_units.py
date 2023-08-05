@@ -424,6 +424,7 @@ class FreqUnits(QWidget):
         """
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets
+        This is called from `input_specs.load_dict()`
         """
         self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
