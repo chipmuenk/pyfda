@@ -435,27 +435,20 @@ class FreqUnits(QWidget):
         Block signals during update of combobox / lineedit widgets
         This is called from `input_specs.load_dict()`
         """
-        self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
+        # self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
-        qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
-        is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
-        self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
-        self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
-        self.butLock.setVisible(not is_normalized_freq)
+        # qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
+        # is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
+        # self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
+        # self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
+        # self.butLock.setVisible(not is_normalized_freq)
 
-        qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'])
+        # qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'])
 
-        self.butSort.blockSignals(True)
-        self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
-        self.butSort.blockSignals(False)
-
-        # Is this required?
-        # self.butLock.setChecked(fb.fil[0]['but_locked?'])
+        # self.butSort.blockSignals(True)
+        # self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         # self.butSort.blockSignals(False)
-        # set f_S_last?!
-        # f_s_scale = 1  # default setting for f_S scale
-
-        # self.update_UI()
+        self.update_UI(emit=False)
 
 # -------------------------------------------------------------
     def _store_sort_flag(self):
