@@ -1572,7 +1572,7 @@ def load_filter(self) -> int:
                     return -1
                 elif 'zpk' not in fb.fil[0]\
                     or type(fb.fil[0]['zpk']) not in {list, np.ndarray}\
-                        or np.ndim(fb.fil[0]['zpk']) != 1:
+                        or np.ndim(fb.fil[0]['zpk']) != 2:
                     logger.error("Missing key 'zpk' or wrong data type!")
                     return -1
                 elif 'sos' not in fb.fil[0]\
