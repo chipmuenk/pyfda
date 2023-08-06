@@ -274,17 +274,6 @@ class Plot_PZ(QWidget):
 
         zpk = fb.fil[0]['zpk']
 
-        # add antiCausals if they exist (must take reciprocal to plot)
-        if 'rpk' in fb.fil[0]:
-            zA = fb.fil[0]['zpk'][0]
-            zA = np.conj(1./zA)
-            pA = fb.fil[0]['zpk'][1]
-            pA = np.conj(1./pA)
-            zC = np.append(zpk[0], zA)
-            pC = np.append(zpk[1], pA)
-            zpk[0] = zC
-            zpk[1] = pC
-
         self.ax.clear()
 
         [z, p, k] = self.zplane(
