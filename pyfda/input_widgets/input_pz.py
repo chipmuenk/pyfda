@@ -461,7 +461,7 @@ class Input_PZ(QWidget):
         if not type(fb.fil[0]['zpk']) is np.ndarray:
             logger.warning(f"fb.fil[0]['zpk'] is of type {type(fb.fil[0]['zpk'])} "
                            f"with len = {len(fb.fil[0]['zpk'])}")
-        
+
         zpk = list(fb.fil[0]['zpk'])
 
         if len(zpk) == 3:  # number of rows
@@ -662,9 +662,13 @@ class Input_PZ(QWidget):
         zeros = self.zpk[0]
         poles = self.zpk[1]
         gain = self.zpk[2]
+        changed = False
         for z in range(len(zeros)-1, -1, -1):  # start at the bottom
             for p in range(len(poles)-1, -1, -1):
                 if np.isclose(zeros[z], poles[p], rtol=0, atol=self.ui.eps):
+                    # zeros / poles to be deleted have values != 0, mark as changed
+                    if zeros[z] != 0 and poles[p] != 0:
+                        changed = True
                     zeros = np.delete(zeros, z)
                     poles = np.delete(poles, p)
                     gain = np.delete(gain, -1)  # delete last element (= 0)
@@ -676,6 +680,9 @@ class Input_PZ(QWidget):
             gain = [1]
 
         self.zpk = np.array((zeros, poles, gain))
+
+        if changed:
+            qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
 
     # ------------------------------------------------------------------------------
     def cmplx2frmt(self, text, places=-1):
