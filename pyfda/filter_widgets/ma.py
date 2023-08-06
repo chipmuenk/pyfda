@@ -44,6 +44,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
 from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_sig_lib import zeros_with_val
 
 __version__ = "2.2"
 
@@ -346,8 +347,10 @@ near ``f_S/2`` (highpass).
             k = 1./norm ** self.stages
         p = np.zeros(len(z))
 
+        gain = zeros_with_val(len(z), k)
+
         # store in class attributes for the _save method
-        self.zpk = [z,p,k]
+        self.zpk = [z,p,gain]
         self.b = b
         self._save(fil_dict)
 
