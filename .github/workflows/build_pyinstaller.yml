@@ -1,76 +1,33 @@
-# workflow for buildung pyinstaller packages for windows and MacOS and creating a pre-release, triggered by a push to main
+# Workflow for buildung pyinstaller packages for windows and MacOS and creating a (pre-)release
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
 # The workflow runs:
-#  - for push events on the main branch
-#  - for push events with a proper tag v*, requiring something similar to
+#  - when manually triggered
+#  - for push events on the main branch, creating a "latest" pre-release
+#  - for push events with a proper tag v*, creating a versioned release
+#    This requires something similar to
 #
-#   git tag v0.4.5
-#   git push
-#   git push origin --tags
+#     git tag v0.4.5
+#     git push
+#     git push origin --tags
+#
+# When the 'build_flatpak' workflow has finished, this workflow is triggered as well.
+
 ---
 name: build_pyinstaller
 
 on:
   push:
-    branches:
-    - main
-    tags:
-    - 'v*' # Push events with proper version number, i.e. v1.0, v20.15.10
-
-    workflow_dispatch:
+    branches: main
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['build_flatpak']
+    types:
+      - completed
 
 jobs:
-  createrelease:
-    name: Pre-Release
-    runs-on: [ubuntu-latest]
-
-    steps:
-    # - name: Set tag and release name to specified label
-    #   if: github.ref_type == 'tag'
-    #   run: |
-    #     echo "${{ github.ref_name }}" > tag_name.txt
-    #     echo "Release ${{ github.ref_name }}" > release_name.txt
-    # - name: Set tag and release name to sha / latest if no tag was given
-    #   if: github.ref_type != 'tag'
-    #   run: |
-    #     echo "${{ github.sha }}" > tag_name.txt
-    #     echo "Release latest" > release_name.txt
-  
-      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
-        draft: false
-        prerelease: true
-    - name: Output Release URL File
-      run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-    - name: Save Release URL File for publish
-      uses: actions/upload-artifact@v1
-      with:
-        name: release_url
-        path: release_url.txt
-
-#  create_latest_tag:
-#    name: Create 'latest' tag
-#    runs-on: [ubuntu-latest]
-#    needs: createrelease
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#      - name: Create 'latest' tag
-#        run: |
-#          git tag -fa latest -m "Latest version"
-#          git push origin -f latest
-
   build:
     name: Build packages
-    needs: createrelease
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -93,10 +50,11 @@ jobs:
                 mv dist/pyfdax dist/pyfdax_osx
             OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
             ASSET_MIME: application/zip
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     - name: Install dependencies
@@ -106,24 +64,47 @@ jobs:
         pip install pyinstaller pyinstaller-hooks-contrib
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
-    - name: Load Release URL File from release job
-      uses: actions/download-artifact@v1
+
+    - name: Upload builds as artifacts
+      uses: actions/upload-artifact@v3
       with:
-        name: release_url
-    - name: Get Release File Name & Upload URL
-      id: get_release_info
-      shell: bash
-      run: |
-        value=`cat release_url/release_url.txt`
-        echo ::set-output name=upload_url::$value
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: ${{ matrix.OUT_FILE_NAME}}
+        path: ./dist/${{ matrix.OUT_FILE_NAME}}
+
+  release:
+    name: Release packages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
       with:
-        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-        asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
-        asset_name: ${{ matrix.OUT_FILE_NAME}}
-        asset_content_type: ${{ matrix.ASSET_MIME}}
-  
+        path: ./
+    # not specifying the file names downloads all artifacts. However, 
+    # an individual directory is created for each file identical to its name
+
+    - name: Display structure of downloaded files
+      run: ls -R  
+
+    - name: Update release latest
+      if: success() && github.ref_type != 'tag'
+      uses: pyTooling/Actions/releaser@main
+      with:
+        tag: latest
+        rm: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          pyfdax_win.exe/pyfdax_win.exe
+          pyfdax_osx/pyfdax_osx
+
+    - name: Update versioned release
+      if: success() && github.ref_type == 'tag'
+      uses: pyTooling/Actions/releaser@main
+      with:
+        tag: ${{ github.ref_name }}
+        rm: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          pyfdax_win.exe/pyfdax_win.exe
+          pyfdax_osx/pyfdax_osx
+    

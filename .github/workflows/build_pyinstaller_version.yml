@@ -1,0 +1,129 @@
+# workflow for buildung pyinstaller packages for windows and MacOS and creating a pre-release, triggered by a push to main
+# see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
+#
+# The workflow runs:
+#  - for push events on the main branch
+#  - for push events with a proper tag v*, requiring something similar to
+#
+#   git tag v0.4.5
+#   git push
+#   git push origin --tags
+---
+name: build_pyinstaller_version
+
+on:
+  push:
+    branches:
+    - main
+    tags:
+    - 'v*' # Push events with proper version number, i.e. v1.0, v20.15.10
+
+  workflow_dispatch:
+
+jobs:
+  createrelease:
+    name: Pre-Release
+    runs-on: [ubuntu-latest]
+
+    steps:
+    # - name: Set tag and release name to specified label
+    #   if: github.ref_type == 'tag'
+    #   run: |
+    #     echo "${{ github.ref_name }}" > tag_name.txt
+    #     echo "Release ${{ github.ref_name }}" > release_name.txt
+    # - name: Set tag and release name to sha / latest if no tag was given
+    #   if: github.ref_type != 'tag'
+    #   run: |
+    #     echo "${{ github.sha }}" > tag_name.txt
+    #     echo "Release latest" > release_name.txt
+  
+      # TODO: Use https://github.com/softprops/action-gh-release instead of create_release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: true
+    - name: Output Release URL File
+      run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+    - name: Save Release URL File for publish
+      uses: actions/upload-artifact@v1
+      with:
+        name: release_url
+        path: release_url.txt
+
+#  create_latest_tag:
+#    name: Create 'latest' tag
+#    runs-on: [ubuntu-latest]
+#    needs: createrelease
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#      - name: Create 'latest' tag
+#        run: |
+#          git tag -fa latest -m "Latest version"
+#          git push origin -f latest
+
+  build:
+    name: Build packages
+    needs: createrelease
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          # ---
+          - os: windows-latest
+          # ---
+            TARGET: windows
+            CMD_BUILD: >
+                pyinstaller pyfdax.spec &&
+                mv dist/pyfdax.exe dist/pyfdax_win.exe
+            OUT_FILE_NAME: pyfdax_win.exe
+            ASSET_MIME: application/vnd.microsoft.portable-executable
+          # ---
+          - os: macos-latest
+          # ---
+            TARGET: macos
+            CMD_BUILD: >
+                pyinstaller pyfdax.spec &&
+                mv dist/pyfdax dist/pyfdax_osx
+            OUT_FILE_NAME: pyfdax_osx  # .app  # pyfda.zip
+            ASSET_MIME: application/zip
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller pyinstaller-hooks-contrib
+    - name: Build with pyinstaller for ${{matrix.TARGET}}
+      run: ${{matrix.CMD_BUILD}}
+    - name: Load Release URL File from release job
+      uses: actions/download-artifact@v1
+      with:
+        name: release_url
+    - name: Get Release File Name & Upload URL
+      id: get_release_info
+      shell: bash
+      run: |
+        value=`cat release_url/release_url.txt`
+        echo ::set-output name=upload_url::$value
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
+        asset_name: ${{ matrix.OUT_FILE_NAME}}
+        asset_content_type: ${{ matrix.ASSET_MIME}}
+  
