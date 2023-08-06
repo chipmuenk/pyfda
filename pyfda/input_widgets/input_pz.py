@@ -168,6 +168,7 @@ class Input_PZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.angle_char = "\u2220"
+        self.pi_char = "pi" # "\u03C0" looks ugly
 
         self.tab_label = "P/Z"
         self.tool_tip = "Display and edit filter poles and zeros."
@@ -711,29 +712,27 @@ class Input_PZ(QWidget):
         elif frmt == 'polar_rad':
             r, phi = np.absolute(data), np.angle(data, deg=False)
             if full_prec:
-                return "{r} * {angle_char}{p} rad"\
-                    .format(r=r, p=phi, angle_char=self.angle_char)
+                return f"{r} {self.angle_char}{phi} rad"
             else:
-                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g} rad"\
+                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} rad"\
                     .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
         elif frmt == 'polar_deg':
             r, phi = np.absolute(data), np.angle(data, deg=True)
             if full_prec:
-                return "{r} * {angle_char}{p}°"\
-                    .format(r=r, p=phi, angle_char=self.angle_char)
+                return f"{r} {self.angle_char}{phi}°"
             else:
-                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g}°"\
+                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g}°"\
                     .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
         elif frmt == 'polar_pi':
             r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
             if full_prec:
-                return "{r} * {angle_char}{p} pi"\
-                    .format(r=r, p=phi, angle_char=self.angle_char)
+                return f"{r} {self.angle_char}{phi} {self.pi_char}"
             else:
-                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g} pi"\
-                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+                return "{r:.{plcs}g} {angle_char}{p:.{plcs}g} {pi_char}"\
+                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char,
+                            pi_char=self.pi_char)
 
         else:
             logger.error("Unknown format {0}.".format(frmt))
