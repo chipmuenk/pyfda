@@ -185,7 +185,7 @@ class Input_PZ(QWidget):
         #              f"{self.isVisible()}\n{pprint_log(dict_sig)}")
 
         if dict_sig['id'] == id(self):
-            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
 
         if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
