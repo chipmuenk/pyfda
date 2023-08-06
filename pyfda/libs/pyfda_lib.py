@@ -1428,11 +1428,11 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             else:
                 fil_dict['ft'] = 'FIR'
 
-        if frmt in {'lst', 'nd1'}:  # list / array with z only -> FIR
+        elif frmt == 'nd1':  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
-            k = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
-            fil_dict['zpk'] = np.array([z, p, k])
+            gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
+            fil_dict['zpk'] = np.array([z, p, gain])
             fil_dict['ft'] = 'FIR'
 
         elif frmt == 'lon':  # list of  ndarrays
