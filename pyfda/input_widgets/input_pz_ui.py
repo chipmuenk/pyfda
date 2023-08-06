@@ -42,15 +42,22 @@ class Input_PZ_UI(QWidget):
         self.eps = 1.e-4  # tolerance value for e.g. setting P/Z to zero
 
         # Items for PZ-format combobox (data, display text, tool tip):
-        self.cmb_pz_frmt_list = [
+        self.cmb_pz_frmt_items = [
             """<span>Set display format for poles and zeros to
             either cartesian (x + jy) or polar (r * &ang; &Omega;).
             Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.
             Typing just the angle '&lt;45 o' creates a pole or zero on the
-            unit circle.</span>""",
+            unit circle (<i>r = 1</i>).</span>""",
             #
-            ('cartesian', 'Cartesian'), ('polar_rad', 'Polar (rad)'),
-            ('polar_pi', 'Polar (pi)'), ('polar_deg', 'Polar (°)')]
+            ("cartesian", "Cartesian", "Cartesian coordinates (x + jy)"),
+            ("polar_rad", "Polar (rad)",
+             "Polar coordinates (r * &ang; &Omega;) with &ang; in rad."),
+            ('polar_pi', 'Polar (pi)',
+             "<span>Polar coordinates (r * &ang; &Omega;) with &ang; in multiples "
+             "of &pi;, type 'pi' instead of &pi;.</span>"),
+            ('polar_deg', 'Polar (°)',
+            "<span>Polar coordinates (r * &ang; &Omega;) with &ang; in degrees, "
+            "use 'o' or '°' as the degree sign.</span>"),]
         # π: u'3C0, °: u'B0, ∠: u'2220
         self.cmb_pz_frmt_init = 'polar_deg'  # initial setting
 
@@ -97,7 +104,7 @@ class Input_PZ_UI(QWidget):
 
         self.cmbPZFrmt = QComboBox(self)
         qcmb_box_populate(
-            self.cmbPZFrmt, self.cmb_pz_frmt_list, self.cmb_pz_frmt_init)
+            self.cmbPZFrmt, self.cmb_pz_frmt_items, self.cmb_pz_frmt_init)
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
