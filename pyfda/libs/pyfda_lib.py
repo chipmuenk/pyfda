@@ -1434,9 +1434,10 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             k = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
             fil_dict['zpk'] = np.array([z, p, k])
             fil_dict['ft'] = 'FIR'
-        elif frmt in {'lol', 'lon'}:  # list of lists or ndarrays
+
+        elif frmt == 'lon':  # list of  ndarrays
             if len(arg) == 3:
-                fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+                fil_dict['zpk'] = np.array([arg[0], arg[1], arg[2]])
                 if np.any(arg[1]):  # non-zero poles -> IIR
                     fil_dict['ft'] = 'IIR'
                 else:
