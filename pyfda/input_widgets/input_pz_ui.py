@@ -220,7 +220,8 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------------------------------
         self.butSetZero = QPushButton("= 0", self)
         self.butSetZero.setToolTip(
-            "<span>Set selected poles / zeros = 0 with a magnitude &lt; &epsilon;. "
+            "<span>Check whether selected poles / zeros are equal or zero with a "
+            "tolerance oe &lt; &epsilon;. "
             "When nothing is selected, test the whole table.</span>")
         self.butSetZero.setIconSize(q_icon_size)
 
@@ -228,7 +229,7 @@ class Input_PZ_UI(QWidget):
         lblEps.setText("<b><i>for &epsilon;</i> &lt;</b>")
 
         self.ledEps = QLineEdit(self)
-        self.ledEps.setToolTip("Specify tolerance value.")
+        self.ledEps.setToolTip("Specify absolute tolerance value.")
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(self.butSetZero)
