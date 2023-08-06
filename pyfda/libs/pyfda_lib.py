@@ -1442,6 +1442,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
                 else:
                     fil_dict['ft'] = 'FIR'
             else:
+                logger.error(f"{len(arg)} rows instead of 3!")
                 format_error = True
         else:
             format_error = True
