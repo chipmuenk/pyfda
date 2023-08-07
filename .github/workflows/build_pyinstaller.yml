@@ -4,14 +4,15 @@
 # The workflow runs:
 #  - when manually triggered
 #  - for push events on the main branch, creating a "latest" pre-release
-#  - for push events with a proper tag v*, creating a versioned release
+#  - for tagged release events, creating a versioned release
 #
-#    This requires a workflow like:
+#    The latter requires a workflow like:
 #
-#     <update version.py>      # PyPI version number is created from this
-#     git tag v0.4.5           # create new local tag
-#     git push                 # push to origin (without tag)
-#     git push origin --tags   # push tag to origin
+#    * <update version.py>      # PyPI version number is created from this
+#    * git tag v0.4.5           # create new local tag
+#    * git push                 # push to origin (without tag)
+#    * git push origin --tags   # push tag to origin
+#    * <draft a release on Github from tag, select prerelease or release>
 #
 #   Tags can be deleted with:
 #
@@ -59,12 +60,18 @@ jobs:
             ASSET_MIME: application/zip
 
     steps:
-    - name: Infos
+    - name: Infos abour github trigger event and ref
       run: |
-          echo github.ref: ${{ github.ref }}
-          echo github.ref_type:  ${{ github.ref_type }}
-          echo github.ref_name:  ${{ github.ref_name }}
-          echo github.event_name:  ${{ github.event_name }}
+        echo github.event_name:  ${{ github.event_name }}
+        echo github.ref: ${{ github.ref }}
+        echo github.ref_type:  ${{ github.ref_type }}
+        echo github.ref_name:  ${{ github.ref_name }}
+
+      # Example result for tagged release:
+      #    github.event_name: release
+      #    github.ref: refs/tags/v0.8.0a3
+      #    github.ref_type: tag
+      #    github.ref_name: v0.8.0a3
 
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
