@@ -4,8 +4,8 @@ on:
   push:
     branches:
     - main
-    tags:
-    - 'v*' # Push tagged events, this doesn't happen?
+    # tags:
+    # - 'v*' # Push a tag (this is not a release!)
   release:  # new version with tag
   pull_request:
   page_build:
