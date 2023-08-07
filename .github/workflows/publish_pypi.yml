@@ -6,10 +6,10 @@ name: Publish to PyPI.org
 on:
   release:
     types: [published]
-  # Run upon push to master branch
-  push:
-   branches: [ master ]
-  # Run manually from the Actions tab
+  # Run upon push to main branch (disabled, only for tagged releases):
+  # push:
+  #  branches: [ main ]
+  # Run manually from the Actions tab:
   workflow_dispatch:
 
 jobs:
