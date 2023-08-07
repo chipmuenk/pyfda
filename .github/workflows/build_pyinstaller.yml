@@ -52,6 +52,12 @@ jobs:
             ASSET_MIME: application/zip
 
     steps:
+    - name: Infos
+      run: |
+          echo github.ref: ${{ github.ref }}
+          echo githug.ref_type:  ${{ github.ref_type }}
+          echo githug.ref_name:  ${{ github.ref_name }}
+
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
@@ -80,11 +86,11 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: ./
-    # not specifying the file names downloads all artifacts. However, 
+    # not specifying the file names downloads all artifacts. However,
     # an individual directory is created for each file identical to its name
 
     - name: Display structure of downloaded files
-      run: ls -R  
+      run: ls -R
 
     - name: Update release latest
       if: success() && github.ref_type != 'tag'
@@ -107,4 +113,4 @@ jobs:
         files: |
           pyfdax_win.exe/pyfdax_win.exe
           pyfdax_osx/pyfdax_osx
-    
+
