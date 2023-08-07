@@ -3,8 +3,8 @@
 #
 # The workflow runs:
 #  - when manually triggered
-#  - for push events on the main branch, creating a "latest" pre-release
-#  - for tagged release events, creating a versioned release
+#  - for push events on the main branch, creating a "latest" pre-release, triggered by 'build_flatpak'
+#  - for tagged release events, creating a versioned release, triggered by 'build_flatpak'
 #
 #    The latter requires a workflow like:
 #
@@ -61,7 +61,7 @@ jobs:
             ASSET_MIME: application/zip
 
     steps:
-    - name: Infos abour github trigger event and ref
+    - name: Infos about github trigger event and ref
       run: |
         echo github.event_name:  ${{ github.event_name }}
         echo github.ref: ${{ github.ref }}
