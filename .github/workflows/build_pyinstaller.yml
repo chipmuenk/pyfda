@@ -5,12 +5,18 @@
 #  - when manually triggered
 #  - for push events on the main branch, creating a "latest" pre-release
 #  - for push events with a proper tag v*, creating a versioned release
-#    This requires something similar to
+#
+#    This requires a workflow like:
 #
 #     <update version.py>      # PyPI version number is created from this
 #     git tag v0.4.5           # create new local tag
 #     git push                 # push to origin (without tag)
 #     git push origin --tags   # push tag to origin
+#
+#   Tags can be deleted with:
+#
+#     git tag -d <tag_name>
+#     git push --delete origin <tag_name>
 #
 # When the 'build_flatpak' workflow has finished, this workflow is triggered as well.
 
