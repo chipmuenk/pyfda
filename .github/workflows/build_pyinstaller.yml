@@ -27,6 +27,7 @@ name: build_pyinstaller
 on:
   push:
     branches: main
+  # release:  # already triggered by build_flatpak
   workflow_dispatch:
   workflow_run:
     workflows: ['build_flatpak']
