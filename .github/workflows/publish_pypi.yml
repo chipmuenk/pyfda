@@ -32,6 +32,15 @@ on:
 jobs:
   pypi:
     runs-on: ubuntu-latest
+    # ---- only needed for 'trusted publishing' from Github -> PyPI ---- #
+    # ---- via OIDC, no username / password or API token is needed  ---- #
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyfda
+    # IMPORTANT: this permission is mandatory for trusted publishing
+    permissions:
+      id-token: write
+    # ------------------------------------------------------------------ #
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
@@ -52,8 +61,11 @@ jobs:
       - run: |
           python3 -m pip install --upgrade build
           python3 -m build
-      # Upload the package to PyPI
+          echo Build successful!
+      # Upload the package to PyPI for tagged releases only
       - name: Publish package
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        # not needed for trusted publishing
+        # with:
+        #  password: ${{ secrets.PYPI_API_TOKEN }}
