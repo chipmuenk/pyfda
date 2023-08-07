@@ -104,7 +104,7 @@ jobs:
     # https://github.com/marvinpinto/actions/issues/177
     needs: [flatpak]
     runs-on: ubuntu-latest # does not matter which
-    if: ${{ github.ref == 'refs/heads/main' }}
+    # if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Infos about github trigger event and ref after flatpak generation
