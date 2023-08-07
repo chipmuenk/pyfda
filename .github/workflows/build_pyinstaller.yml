@@ -75,6 +75,9 @@ jobs:
       #    github.ref_name: v0.8.0a3
 
     - uses: actions/checkout@v3
+      with:
+        ref: main  # enforce using main branch
+
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
