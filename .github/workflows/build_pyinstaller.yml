@@ -1,4 +1,4 @@
-# Workflow for buildung pyinstaller packages for windows and MacOS and creating a (pre-)release
+# Workflow for building pyinstaller packages for windows and MacOS and creating a (pre-)release
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
 # The workflow runs:
@@ -7,9 +7,10 @@
 #  - for push events with a proper tag v*, creating a versioned release
 #    This requires something similar to
 #
-#     git tag v0.4.5
-#     git push
-#     git push origin --tags
+#     <update version.py>      # PyPI version number is created from this
+#     git tag v0.4.5           # create new local tag
+#     git push                 # push to origin (without tag)
+#     git push origin --tags   # push tag to origin
 #
 # When the 'build_flatpak' workflow has finished, this workflow is triggered as well.
 
@@ -55,8 +56,9 @@ jobs:
     - name: Infos
       run: |
           echo github.ref: ${{ github.ref }}
-          echo githug.ref_type:  ${{ github.ref_type }}
-          echo githug.ref_name:  ${{ github.ref_name }}
+          echo github.ref_type:  ${{ github.ref_type }}
+          echo github.ref_name:  ${{ github.ref_name }}
+          echo github.event_name:  ${{ github.event_name }}
 
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
