@@ -5,7 +5,8 @@ on:
     branches:
     - main
     tags:
-    - 'v*' # Push events with proper version number, i.e. v1.0, v20.15.10
+    - 'v*' # Push tagged events, this doesn't happen?
+  release:  # new version with tag
   pull_request:
   page_build:
   workflow_dispatch:
