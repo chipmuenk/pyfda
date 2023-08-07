@@ -25,12 +25,12 @@
 name: build_pyinstaller
 
 on:
-  # push:
-  #  branches: main  # already triggered by 'build_flatpak'
-  # release:  # already triggered by 'build_flatpak'
+  push:
+    branches: main
+  release:
   workflow_dispatch:
-  workflow_run:
-    workflows: ['build_flatpak']
+#  workflow_run:
+#    workflows: ['build_flatpak']
     types:
       - completed
 
@@ -111,12 +111,12 @@ jobs:
     - name: Display structure of downloaded files
       run: ls -R
 
-    - name: Update release latest
+    - name: Update Github prerelease latest
       if: success() && github.ref_type != 'tag'
       uses: pyTooling/Actions/releaser@main
       with:
         tag: latest
-        rm: false
+        rm: true
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
           pyfdax_win.exe/pyfdax_win.exe
