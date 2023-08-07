@@ -20,6 +20,19 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:kde-5.15-21.08
       options: --privileged
     steps:
+    - name: Infos about github trigger event and ref
+      run: |
+        echo github.event_name:  ${{ github.event_name }}
+        echo github.ref: ${{ github.ref }}
+        echo github.ref_type:  ${{ github.ref_type }}
+        echo github.ref_name:  ${{ github.ref_name }}
+
+      # Example result for tagged release:
+      #    github.event_name: release
+      #    github.ref: refs/tags/v0.8.0a3
+      #    github.ref_type: tag
+      #    github.ref_name: v0.8.0a3
+
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -94,6 +107,19 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
+      - name: Infos about github trigger event and ref after flatpak generation
+        run: |
+          echo github.event_name:  ${{ github.event_name }}
+          echo github.ref: ${{ github.ref }}
+          echo github.ref_type:  ${{ github.ref_type }}
+          echo github.ref_name:  ${{ github.ref_name }}
+
+        # Example result for tagged release:
+        #    github.event_name: release
+        #    github.ref: refs/tags/v0.8.0a3
+        #    github.ref_type: tag
+        #    github.ref_name: v0.8.0a3
+
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
