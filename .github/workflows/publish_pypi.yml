@@ -17,8 +17,8 @@
 #
 #     <update version.py>      # PyPI version number is created from this
 #     git tag v0.4.5           # create new local tag
-#     git push                 # push to origin (without tag)
-#     git push origin --tags   # push tag to origin
+#     git push origin --tags   # push only tag to origin
+#     git push                 # push changes to origin - this triggers workflows
 #
 #   Tags can be deleted with:
 #
@@ -51,9 +51,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v3
-        # fetch complete history for all branches
         with:
-          fetch-depth: 0
+          # fetch-depth: 0         # fetch complete history for all branches
+          ref: main
 
       # Sets up python3, installing a version of Python or PyPy and (by default)
       # adds it to the PATH
