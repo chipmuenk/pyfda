@@ -11,15 +11,17 @@
 #
 # The workflow runs:
 #  - when manually triggered
-#  - for push events with a proper tag v*, creating a versioned release
+#  - for tagged release events, creating a versioned release
 #
-#    This requires a workflow like
+#    The latter requires a workflow like
 #
-#     <update version.py>      # PyPI version number is created from this
-#     <merge develop and main, push develop (default branch)
-#     git tag v0.4.5           # create new local tag
-#     git push origin --tags   # push only tag to origin
-#     git push                 # push changes to origin - this triggers workflows
+#    * <update version.py>      # PyPI version number is created from this
+#    * <merge develop and main, push develop (default branch)
+#    * git tag v0.4.5           # create new local tag
+#    * git push origin --tags   # push only tag to origin
+#    * git push                 # push changes to origin, sending a 'push' event
+#    * <draft a (pre)release on Github from tag,
+#       sending a 'release' event>
 #
 #   Tags can be deleted with:
 #
@@ -49,13 +51,19 @@ jobs:
       id-token: write
     # ------------------------------------------------------------------ #
     steps:
-      - name: Some infos about the run
+      - name: Infos about github event and ref
         run: |
-            echo github.ref: ${{ github.ref }}
-            echo github.ref_type:  ${{ github.ref_type }}
-            echo github.ref_name:  ${{ github.ref_name }}
-            echo github.event_name:  ${{ github.event_name }}
-            echo
+          echo github.event_name:  ${{ github.event_name }}
+          echo github.ref: ${{ github.ref }}
+          echo github.ref_type:  ${{ github.ref_type }}
+          echo github.ref_name:  ${{ github.ref_name }}
+
+      # Example result for tagged release:
+      #    github.event_name: release
+      #    github.ref: refs/tags/v0.8.0a3
+      #    github.ref_type: tag
+      #    github.ref_name: v0.8.0a3
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v3
