@@ -39,14 +39,14 @@ on:
 jobs:
   pypi:
     runs-on: ubuntu-latest
-    # ---- only needed for 'trusted publishing' from Github -> PyPI ---- #
-    # ---- via OIDC, no username / password or API token is needed  ---- #
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pyfda
-    # IMPORTANT: this permission is mandatory for trusted publishing
-    permissions:
-      id-token: write
+    ## ---- only needed for 'trusted publishing' from Github -> PyPI ---- #
+    ## ---- via OIDC, no username / password or API token is needed  ---- #
+    # environment:
+    #   name: pypi
+    #   url: https://pypi.org/p/pyfda
+    ## IMPORTANT: this permission is mandatory for trusted publishing
+    # permissions:
+    #   id-token: write
     # ------------------------------------------------------------------ #
     steps:
       - name: Some infos about the run
@@ -80,6 +80,6 @@ jobs:
       - name: Publish package
         # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
-        # not needed for trusted publishing
-        # with:
-        #  password: ${{ secrets.PYPI_API_TOKEN }}
+        # not needed for trusted publishing:
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
