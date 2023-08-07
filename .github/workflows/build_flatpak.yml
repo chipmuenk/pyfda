@@ -28,7 +28,7 @@ jobs:
       with:
         owner: 'flathub'
         repository: 'com.github.chipmuenk.pyfda'
-        
+
     - name: list
       run: ls
 
@@ -81,7 +81,7 @@ jobs:
     - name: validation
       # Command copied from flathub build process
       run: |
-        sudo apt-get update 
+        sudo apt-get update
         sudo apt install flatpak
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         sudo flatpak install -y org.freedesktop.appstream-glib
@@ -108,15 +108,38 @@ jobs:
           echo "Show artifacts/com.github.chipmuenk.pyfda-x86_64:"
           ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
 
+      # - name: Update GitHub prerelease
+      #   if: ${{ github.ref == 'refs/heads/main' }}
+      #   uses: marvinpinto/action-automatic-releases@latest
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     automatic_release_tag: latest
+      #     prerelease: true
+      #     title: "Latest Build"
+      #     files: |
+      #       **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yaml
+      #       **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
+
       - name: Update GitHub prerelease
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: marvinpinto/action-automatic-releases@latest
+        if: success() && github.ref_type != 'tag'
+        uses: pyTooling/Actions/releaser@main
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: latest
-          prerelease: true
-          title: "Latest Build"
+          tag: latest
+          rm: false
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yaml
             **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
+
+      - name: Update versioned Github release
+        if: success() && github.ref_type == 'tag'
+        uses: pyTooling/Actions/releaser@main
+        with:
+          tag: ${{ github.ref_name }}
+          rm: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yaml
+            **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
+
 ...
