@@ -78,7 +78,7 @@ jobs:
           echo Build successful!
       # Upload the package to PyPI for tagged releases only
       - name: Publish package
-        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         # not needed for trusted publishing:
         # with:
