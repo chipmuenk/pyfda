@@ -189,7 +189,7 @@ class Plot_Tran_Stim_UI(QWidget):
             ("cos", "Cos", "Cosine signal"),
             ("exp", "Exp", "Complex exponential"),
             ("diric", "Diric", "<span>Periodic sinc (Dirichlet) function, "
-             "diric(x, N) = sin(Nx/2) / N*sin(x/2)</span>")
+             "diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n</span>")
         ]
 
         self.cmb_stim_modulation_items = [

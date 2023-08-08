@@ -332,7 +332,7 @@ class Plot_Tran_Stim(QWidget):
             # we use: x = 2 pi t = 2 pi f_1 n
             # diric(x, N) = sin(Nx/2) / N*sin(x/2) with x = 2 pi f_1 n
             x[frm_slc] = self.ui.A1 * diric(
-                (2 * pi * (n - self.ui.T1) * self.ui.f1 / self.ui.N1),
+                (2 * pi * (n - self.ui.T1) * self.ui.f1),
                 self.ui.N1)
 
         # ----------------------------------------------------------------------
