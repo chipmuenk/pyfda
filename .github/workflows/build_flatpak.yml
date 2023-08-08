@@ -20,7 +20,7 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:kde-5.15-21.08
       options: --privileged
     steps:
-    - name: Infos about github trigger event and ref
+    - name: Infos about github ref and trigger event
       run: |
         echo github.event_name:  ${{ github.event_name }}
         echo github.ref: ${{ github.ref }}
