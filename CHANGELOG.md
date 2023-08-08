@@ -1,16 +1,46 @@
 # Changelog
-## [v0.7.2](https://github.com/chipmuenk/pyfda/tree/v0.7.2) (2023-02-xx)
+## [v0.8.0](https://github.com/chipmuenk/pyfda/tree/v0.8.0) (2023-08-xx)
 ### Bugfixes
-- Various crashes related to file imports
-
+- Several tabs: Various crashes related to file imports
+- 'H(f'): Fix deprecation error w.r.t. matplotlib, causing a crash when using
+  inset plot in the H(f) tab (#234)
+- 'Specs': Fix wrong / erroneous behaviour of 'Lock frequencies' button
+- 'Specs': Sampling frequency, unit and display mode are now exported and 
+  imported to /from filters.
+- 'FFT': Replace deprecated Slepian window by DPSS
+- Several tabs: Fixed some strange behaviours and crashes with complex data / plots
+- Several tabs: Fix deprecation error w.r.t. to 'ragged arrays' in numpy which made
+  filter import / export unusable. The format of the npz file had to be
+  changed, so old filter designs can no longer be read with this version.
 ### New features
-- Allow plotting magnitude, real and imaginary part of H(F) at the same time
-- Add legend for H(F) plot
-- Show interpolated waveform x(t) for discrete time stimuli (mainly for didactic
-  purposes)
-- Make UI for y[n] cleaner
-- Allow hiding the control options for maximum plotting area via a new button in the toolbar
+- Github action workflows for creating Flatpak installation files, as Github
+  release and on Flathub (thanks to @Martin Marmsoler). This now works for
+  tagged (pre)releases and 'latest' releases from the main branch.
+- 'y[n]': Stimulus can be loaded from wav and csv files,
+  additionally  response / quantized response can be saved in those formats.
+- 'y[n]': Plotting can be disabled, as plotting of large data sets takes the
+   most time by far compared to calculating the response.
+- 'y[n]': Frequency input fields are highlighted in red when the value is
+   outside the first Nyquist zone. The value is used anyway but will be
+   aliased.
+- 'y[n]': Improve overall UI
+- 'y[n]': Show interpolated waveform x(t) for discrete time stimuli (mainly
+   for didactic purposes)
+- 'y[n]: Periodic sinc is now correctly called 'diric' and properly defined.
 
+- 'H(f)': Allow plotting magnitude, real and imaginary part of H(F) at the same time
+- 'H(f)': Add legend
+
+- Make the display of polar coordinates in the P/Z input tab more compact
+
+- 'Specs': Frequency input fields are highlighted in red when the value is
+   outside the first Nyquist zone. The value is passed to filter design routines
+   anyway where it usually raises an error.
+
+- All tabs: Allow hiding the control options for maximum plotting area via a new
+   button in the toolbar
+
+- All tabs: Lots of little UI and tooltip improvements 
 ## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.1) (2022-10-05)
 ### Bugfixes
 - Fix crash in 'y[n]' tab when no file is loaded
