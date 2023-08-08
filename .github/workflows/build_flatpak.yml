@@ -127,11 +127,11 @@ jobs:
 
       - name: list artifacts folder
         run: |
-          echo "Show artifacts folder:"
+          echo "*** Show artifacts folder: ***"
           ls artifacts
-          echo "Show artifacts/pyfda Flatpak folder:"
+          echo "*** Show artifacts/pyfda Flatpak folder: ***"
           ls "artifacts/pyfda Flatpak"
-          echo "Show artifacts/com.github.chipmuenk.pyfda-x86_64:"
+          echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
           ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
 
       # - name: Update GitHub prerelease
