@@ -154,7 +154,7 @@ jobs:
           rm: false
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            "artifacts/pyfda\ Flatpak/com.github.chipmuenk.pyfda.yaml"
+            artifacts/pyfda\ Flatpak/com.github.chipmuenk.pyfda.yaml
             artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
       - name: Update versioned Github release
