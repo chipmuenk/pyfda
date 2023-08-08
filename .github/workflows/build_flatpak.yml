@@ -107,65 +107,52 @@ jobs:
     # if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
-      - name: Infos about github trigger event and ref after flatpak generation
-        run: |
-          echo github.event_name:  ${{ github.event_name }}
-          echo github.ref: ${{ github.ref }}
-          echo github.ref_type:  ${{ github.ref_type }}
-          echo github.ref_name:  ${{ github.ref_name }}
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
 
-        # Example result for tagged release:
-        #    github.event_name: release
-        #    github.ref: refs/tags/v0.8.0a3
-        #    github.ref_type: tag
-        #    github.ref_name: v0.8.0a3
+    - name: list artifacts folder
+      run: |
+        echo "*** Show artifacts folder: ***"
+        ls artifacts
+        echo "*** Show artifacts/pyfda Flatpak folder: ***"
+        ls "artifacts/pyfda Flatpak"
+        echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
+        ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts
+    # - name: Update GitHub prerelease
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   uses: marvinpinto/action-automatic-releases@latest
+    #   with:
+    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #     automatic_release_tag: latest
+    #     prerelease: true
+    #     title: "Latest Build"
+    #     files: |
+    #       **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yaml
+    #       **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
-      - name: list artifacts folder
-        run: |
-          echo "*** Show artifacts folder: ***"
-          ls artifacts
-          echo "*** Show artifacts/pyfda Flatpak folder: ***"
-          ls "artifacts/pyfda Flatpak"
-          echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
-          ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
+    - name: Update GitHub prerelease
+      if: success() && github.ref_type != 'tag'
+      uses: pyTooling/Actions/releaser@main
+      with:
+        tag: latest
+        rm: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
+          artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
-      # - name: Update GitHub prerelease
-      #   if: ${{ github.ref == 'refs/heads/main' }}
-      #   uses: marvinpinto/action-automatic-releases@latest
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     automatic_release_tag: latest
-      #     prerelease: true
-      #     title: "Latest Build"
-      #     files: |
-      #       **/artifacts/pyfda Flatpak/com.github.chipmuenk.pyfda.yaml
-      #       **/com.github.chipmuenk.pyfda-x86_64/*.flatpak
-
-      - name: Update GitHub prerelease
-        if: success() && github.ref_type != 'tag'
-        uses: pyTooling/Actions/releaser@main
-        with:
-          tag: latest
-          rm: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
-            artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
-
-      - name: Update versioned Github release
-        if: success() && github.ref_type == 'tag'
-        uses: pyTooling/Actions/releaser@main
-        with:
-          tag: ${{ github.ref_name }}
-          rm: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
-            artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
+    - name: Update versioned Github release
+      if: success() && github.ref_type == 'tag'
+      uses: pyTooling/Actions/releaser@main
+      with:
+        tag: ${{ github.ref_name }}
+        rm: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
+          artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
 ...
