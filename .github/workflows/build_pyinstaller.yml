@@ -28,7 +28,7 @@ on:
   push:
     branches: main
   release:
-    types: [created]  # published 
+    types: [published]
   workflow_dispatch:
 #  workflow_run:
 #    workflows: ['build_flatpak']

@@ -7,7 +7,7 @@ on:
     # tags:
     # - 'v*' # Push a tag (this is not a release!)
   release:  # new version with tag
-    types: [created]  # published
+    types: [published]
   pull_request:
   page_build:
   workflow_dispatch:
