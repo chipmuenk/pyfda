@@ -100,7 +100,7 @@ jobs:
         sudo flatpak install -y org.freedesktop.appstream-glib
         flatpak run --env=G_DEBUG=fatal-criticals org.freedesktop.appstream-glib validate ./ressource/linux/pyfda.appdata.xml
 
-  prerelease:
+  release:
     # https://github.com/marvinpinto/actions/issues/177
     needs: [flatpak]
     runs-on: ubuntu-latest # does not matter which
