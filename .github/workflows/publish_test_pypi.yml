@@ -2,7 +2,7 @@
 # Install the uploaded package using
 #   > python3 -m pip install --index-url https://test.pypi.org/simple/ pyfda
 
-name: Test & Upload to TestPyPI
+name: Publish to TestPyPI
 
 # Controls when the action will run. 
 on:
