@@ -117,7 +117,8 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     """
     if pos >= N or -pos > N:
         raise(IndexError)
-    a = np.zeros(N)
+
+    a = np.zeros(N, dtype=type(val))
     a[pos] = val
     return a
 
