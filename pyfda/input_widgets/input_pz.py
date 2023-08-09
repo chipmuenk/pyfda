@@ -20,7 +20,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table
-from pyfda.libs.pyfda_sig_lib import zeros_with_val
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
@@ -846,30 +846,32 @@ class Input_PZ(QWidget):
                 zpk[2] = [conv(s) for s in data_str[2]]
 
 
-        # test and equalize if P and Z lists have different lengths:
-        try:
-            p_len = len(zpk[1])
-        except IndexError:
-            p_len = 0
-        try:
-            z_len = len(zpk[0])
-        except IndexError:
-            z_len = 0
+        # sanitize zpk; test and equalize if P and Z lists have different lengths,
+        # convert gain to a vector with same length as zpk[0]
+        fb.fil['zpk'] = zpk2array(zpk)
+        # try:
+        #     p_len = len(zpk[1])
+        # except IndexError:
+        #     p_len = 0
+        # try:
+        #     z_len = len(zpk[0])
+        # except IndexError:
+        #     z_len = 0
 
-        D = z_len - p_len
-        if D > 0:  # more zeros than poles
-            zpk[1] = np.append(self.zpk[1], np.zeros(D))
-        elif D < 0:  # more poles than zeros
-            zpk[0] = np.append(self.zpk[0], np.zeros(-D))
+        # D = z_len - p_len
+        # if D > 0:  # more zeros than poles
+        #     zpk[1] = np.append(self.zpk[1], np.zeros(D))
+        # elif D < 0:  # more poles than zeros
+        #     zpk[0] = np.append(self.zpk[0], np.zeros(-D))
 
-        if len(zpk[2] > 0):
-            k = zpk[2][0]  # read gain
-        else:
-            k = 1  # or set = 1
+        # if len(zpk[2] > 0):
+        #     k = zpk[2][0]  # read gain
+        # else:
+        #     k = 1  # or set = 1
 
-        zpk[2] = zeros_with_val(len(zpk[0]), k)
+        # zpk[2] = zeros_with_val(len(zpk[0]), k)
 
-        self.zpk = np.asarray(zpk)
+        # self.zpk = np.asarray(zpk)
 
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()

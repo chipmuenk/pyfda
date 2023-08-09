@@ -23,7 +23,7 @@ import scipy.signal as sig
 
 from distutils.version import LooseVersion
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_sig_lib import zeros_with_val
+from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 # ###### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
@@ -1614,11 +1614,10 @@ def fil_convert(fil_dict: dict, format_in) -> None:
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite([b, a])):
             zpk = sig.tf2zpk(b, a)
-            fil_dict['zpk'] = np.array(
-                [np.nan_to_num(zpk[0]).astype(complex),
-                 np.nan_to_num(zpk[1]).astype(complex),
-                 np.nan_to_num(zeros_with_val(len(zpk[0]), zpk[2]))
-                ], dtype=complex)
+            if len(zpk[0]) != len(zpk[1]):
+                logger.warning("Bad coefficients, some values of b are too close to zero,"
+                               "\n\tresults may be inaccurate.")
+            fil_dict['zpk'] = zpk2array(zpk)
         else:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "

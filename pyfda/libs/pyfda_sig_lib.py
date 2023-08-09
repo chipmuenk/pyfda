@@ -122,6 +122,62 @@ def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     a[pos] = val
     return a
 
+# ------------------------------------------------------------------------------
+def zpk2array(zpk):
+    """
+    Test whether Z = zpk[0] and P = zpk[1] have the same length, if not, equalize
+    the lengths by adding zeros.
+
+    Test whether gain = zpk[2] is a scalar or a vector
+    and whether it (or the first element of the vector) is != 0. If the gain is 0,
+    set gain = 1.
+
+    Finally, convert the gain into an vector with the same length as P and Z and
+    return the the three vectors as one array.
+
+    Parameters
+    ----------
+    zpk :  list, tuple or ndarray
+        Zeros, poles and gain of the system
+
+    Returns
+    -------
+    zpk as an array
+    """
+
+    try:
+        p_len = len(zpk[1])
+    except IndexError:
+        p_len = 0
+    try:
+        z_len = len(zpk[0])
+    except IndexError:
+        z_len = 0
+
+    z = zpk[0]
+    p = zpk[1]
+
+    D = z_len - p_len
+    if D > 0:  # more zeros than poles
+        p = np.append(zpk[1], np.zeros(D))
+    elif D < 0:  # more poles than zeros
+        z = np.append(zpk[0], np.zeros(-D))
+
+    if np.isscalar(zpk[2]):
+        k = zpk[2]
+    else:
+        k = zpk[2][0]  # read the gain
+
+    if k == 0:
+        k = 1  # or set = 1
+
+    gain = zeros_with_val(len(z), k)
+
+    return np.asarray([
+        np.nan_to_num(z).astype(complex),
+        np.nan_to_num(p).astype(complex),
+        gain.astype(complex)])
+
 # ------------------- -----------------------------------------------------------
 def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
 
