@@ -37,7 +37,7 @@ pyfda
 pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Binaries / Bundles
-Currently, binaries (created with **[pyInstaller](https://www.pyinstaller.org/))** are provided for 64 bit Windows and for OS X. The binaries don't modify the system (except for two ASCII configuration files and a log file), they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
+Currently, binaries (created with **[pyInstaller](https://www.pyinstaller.org/))** are provided for 64 bit Windows and for OS X. The binaries don't modify the system except for two ASCII configuration files and a log file, they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
 
 A flatpak (Linux only) for pyfda is available on **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Some Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
@@ -78,6 +78,7 @@ If you have cloned `pyfda` to your local drive you can install the local copy (i
 
 For more details and options see [INSTALLATION.md](INSTALLATION.md).
 
+<!-- 
 ### setup.py   
 You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
 
@@ -86,6 +87,8 @@ You can also download the zip file and extract it to a temp directory of your ch
 or just create a link to where you have copied the python source files (for testing / development) using
 
     > python setup.py develop
+
+-->
 
 ### git
 For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
