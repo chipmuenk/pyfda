@@ -97,10 +97,9 @@ For development purposes, you should fork the latest version of pyfda from https
 
 	> git clone https://github.com/<your pyfda fork>
 
-This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it.
+This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it. The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point for working with git repos.
 
-The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point for working with git repos. pyfda can then be 
-installed from local files using
+pyfda can then be installed (i.e. creating local config files and the `pyfdax` starter script) from local files using
 
     > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
