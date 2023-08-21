@@ -72,9 +72,12 @@ Upgrade using
 
     > pip3 install pyfda -U
     
+
+<!--
 If you have cloned `pyfda` to your local drive you can install the local copy (i.e. create local config files and the `pyfdax` starter script) via
 
     > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
+-->
 
 For more details and options see [INSTALLATION.md](INSTALLATION.md).
 
@@ -87,7 +90,6 @@ You can also download the zip file and extract it to a temp directory of your ch
 or just create a link to where you have copied the python source files (for testing / development) using
 
     > python setup.py develop
-
 -->
 
 ### git
@@ -97,14 +99,11 @@ For development purposes, you should fork the latest version of pyfda from https
 
 This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it.
 
-The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point for working with git repos. As described above, pyfda can then be 
-installed from local files using either 
+The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point for working with git repos. pyfda can then be 
+installed from local files using
 
     > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
- or
- 
-    > python setup.py develop
 
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
