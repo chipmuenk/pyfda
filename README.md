@@ -36,39 +36,16 @@ pyfda
 ## License
 pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
-## Binaries / Bundles
-
-
-## Prerequisites
-
-* Python versions: **3.7 ... 3.10**
-* All operating systems - there should be no OS specific requirements.
-### Libraries ###
-The following libraries are required and automatically installed by pip when missing.
-* [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
-* [**numpy**](https://numpy.org/)
-* [**numexpr**](https://github.com/pydata/numexpr)
-* [**scipy**](https://scipy.org/): **1.2.0** or higher
-* [**matplotlib**](https://matplotlib.org/): **3.1** or higher
-* [**Markdown**](https://github.com/Python-Markdown/markdown)
-  
-### Optional libraries:
-* [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
-* [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
-* **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
-
 ## Installing and running pyfda
-Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.
+### Binaries
+Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.  For details, see [INSTALLATION.md](INSTALLATION.md).
 
-Binaries for **64 bit Windows** and **OS X** created with **[pyInstaller](https://www.pyinstaller.org/)**. These binaries self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations. For details, see [INSTALLATION.md](INSTALLATION.md).
+Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These binaries self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations.
 
-A Flatpak for **Linux** can be downloaded from  [Releases](https://github.com/chipmuenk/pyfda/releases) or from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
+Binaries for **Linux** are created as Flatpaks, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
-Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
-
-There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you can install pyfda using one of the following options: 
 ### pip
-Installation from PyPI works the usual way, required libraries are installed automatically if missing:
+Supported Python versions are 3.7 ... 3.10, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
 
     > pip3 install pyfda
 
@@ -95,6 +72,19 @@ or just create a link to where you have copied the python source files (for test
 
     > python setup.py develop
 -->
+
+The following libraries are required and automatically installed by pip when missing.
+* [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
+* [**numpy**](https://numpy.org/)
+* [**numexpr**](https://github.com/pydata/numexpr)
+* [**scipy**](https://scipy.org/): **1.2.0** or higher
+* [**matplotlib**](https://matplotlib.org/): **3.1** or higher
+* [**Markdown**](https://github.com/Python-Markdown/markdown)
+  
+**Optional libraries:**
+* [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
+* [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
+* **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### git
 For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
