@@ -38,9 +38,6 @@ pyfda source code ist distributed under a permissive MIT license, binaries / bun
 
 ## Binaries / Bundles
 
-Binaries created with **[pyInstaller](https://www.pyinstaller.org/)** for **64 bit Windows** and **OS X** can be downloaded for each [release](https://github.com/chipmuenk/pyfda/releases). The binaries don't modify the system except for two ASCII configuration files and a log file, they self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes). No additionaly software / libraries need to be installed. For details, see [INSTALLATION.md](INSTALLATION.md).
-
-A Flatpak for **Linux** can be downloaded for each release or from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
 ## Prerequisites
 
@@ -60,7 +57,13 @@ The following libraries are required and automatically installed by pip when mis
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
-## Installing pyfda
+## Installing and running pyfda
+Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.
+
+Binaries for **64 bit Windows** and **OS X** created with **[pyInstaller](https://www.pyinstaller.org/)**. These binaries self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations. For details, see [INSTALLATION.md](INSTALLATION.md).
+
+A Flatpak for **Linux** can be downloaded from  [Releases](https://github.com/chipmuenk/pyfda/releases) or from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
+
 Unless running a binary, you need to have a working Python installation on your computer, preferrably including the libraries listed above. 
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As pyfda is a pure Python project (no binaries, no compilation required), you can install pyfda using one of the following options: 
