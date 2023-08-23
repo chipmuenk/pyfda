@@ -59,8 +59,10 @@ If you have cloned `pyfda` to your local drive you can install the local copy (i
     > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
 -->
 
-For more details and options see [INSTALLATION.md](INSTALLATION.md).
+#### Starting pyfda
+A pip installation creates a start script `pyfdax` in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
+    > pyfdax
 <!-- 
 ### setup.py   
 You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
@@ -97,11 +99,6 @@ pyfda can then be installed (i.e. creating local config files and the `pyfdax` s
     > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
-
-## Starting pyfda
-In any case, a start script `pyfdax` should have been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
-
-    > pyfdax
    
 ### Customization
 The location of the following two configuration files (copied to user space) can be checked via the tab `Files -> About`:
