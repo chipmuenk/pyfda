@@ -40,7 +40,7 @@ pyfda source code ist distributed under a permissive MIT license, binaries / bun
 ### Binaries
 Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.  For details, see [INSTALLATION.md](INSTALLATION.md).
 
-Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These binaries self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations.
+Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations.
 
 Binaries for **Linux** are created as Flatpaks, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
@@ -53,7 +53,6 @@ Upgrade using
 
     > pip3 install pyfda -U
     
-
 <!--
 If you have cloned `pyfda` to your local drive you can install the local copy (i.e. create local config files and the `pyfdax` starter script) via
 
@@ -87,9 +86,9 @@ The following libraries are required and automatically installed by pip when mis
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### git
-For development purposes, you should fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
+For development purposes, fork the latest version of pyfda from https://github.com/chipmuenk/pyfda.git and create a local copy using
 
-	> git clone https://github.com/<your pyfda fork>
+	> git clone https://github.com/<your_username>pyfda
 
 This command creates a new folder "pyfda" at your current directory level and copies the complete pyfda project into it. The tutorial at https://help.github.com/en/articles/fork-a-repo provides a good starting point for working with git repos.
 
@@ -97,7 +96,6 @@ pyfda can then be installed (i.e. creating local config files and the `pyfdax` s
 
     > pip3 install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
-
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
 
 ## Starting pyfda
@@ -106,7 +104,6 @@ In any case, a start script `pyfdax` should have been created in `<python>/Scrip
     > pyfdax
    
 ### Customization
-
 The location of the following two configuration files (copied to user space) can be checked via the tab `Files -> About`:
 
 * Logging verbosity can be controlled via the file `pyfda_log.conf` 
@@ -139,14 +136,15 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 ### Modular Architecture ###
 facilitates the implementation of new filter design and analysis methods. Generate your own
-* Filter design files, containing the actual algorithm and optional GUI widgets
+* Filter design widgets with your algorithm
 * Plotting widgets
 * Input widgets
 * Fixpoint filter widgets, using the integrated `Fixed()` class 
 
 ### Import / Export ###
-* Export and import filter designs in pickled and in numpy's NPZ-format
-* Export and import coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R), as a Matlab (R) workspace or in FPGA vendor specific formats like Xilinx (R) COE-format
+* Filter designs in pickled and in numpy's NPZ-format
+* Coefficients and poles/zeros as comma-separated values (CSV) in numpy's NPY- and NPZ-formats, in Excel (R), as a Matlab (R) workspace or in FPGA vendor specific formats like Xilinx (R) COE-format
+* Transient stimuli (y[n] tab) as wav and csv files
 
 ## Why yet another filter design tool?
 * **Education:** Provide an easy-to-use FOSS tool for demonstrating basic digital stuff and filter design interactively that also works with the limited resolution of a beamer.
@@ -164,11 +162,9 @@ For details, see [CHANGELOG.md](./CHANGELOG.md).
 * HDL filter implementation: Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder.
 
 #### Ideas (for the not so near future or for )
-* Use audio files as stimuli in the impz widget and store results. Maybe real-time for FIR filters?
 * Keep multiple designs in memory, switch between them, compare results and store the whole set
 * Graphical modification of poles / zeros
 * Document filter designs in PDF / HTML format
 * Design, analysis and export of filters as second-order sections, display and edit them in the P/Z widget
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...) for fixpoint filters with a low number of multipliers (or none at all)
-* Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
