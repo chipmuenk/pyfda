@@ -37,8 +37,9 @@ pyfda
 pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
 ## Installing and running pyfda
+For details, see [INSTALLATION.md](INSTALLATION.md).
 ### Binaries
-Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.  For details, see [INSTALLATION.md](INSTALLATION.md).
+Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.
 
 Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations.
 
@@ -63,16 +64,6 @@ If you have cloned `pyfda` to your local drive you can install the local copy (i
 A pip installation creates a start script `pyfdax` in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     > pyfdax
-<!-- 
-### setup.py   
-You can also download the zip file and extract it to a temp directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory (this creates a copy) using
-
-    > python setup.py install
-
-or just create a link to where you have copied the python source files (for testing / development) using
-
-    > python setup.py develop
--->
 
 The following libraries are required and installed automatically by pip when missing.
 * [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
@@ -99,8 +90,11 @@ pyfda can then be installed (i.e. creating local config files and the `pyfdax` s
     > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
     
 Now you can edit the code and test it. If you're happy with it, push it to your repo and create a Pull Request so that the code can be reviewed and merged into the `chipmuenk/pyfda` repo.
+
+## Building pyfda
+For details on how to publish pyfda to PyPI, how to create pyInstaller and Flatpak bundles, see [BUILDING.md](BUILDING.md).
    
-### Customization
+## Customization
 The location of the following two configuration files (copied to user space) can be checked via the tab `Files -> About`:
 
 * Logging verbosity can be controlled via the file `pyfda_log.conf` 
