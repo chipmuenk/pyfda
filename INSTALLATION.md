@@ -1,4 +1,4 @@
-# Installing and packaging pyFDA
+# Installing pyfda
 
 There are several options to install pyfda either from source or from a binary / 
 bundle. The ">" signs below only indicate the command lines, don't enter them.
