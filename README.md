@@ -117,7 +117,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 * tooltips for all UI widgets and help files
 * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
 * specify ripple and attenuations in dB, as voltage or as power ratios
-* enter values as expressions like exp(-pi/4 * 1j) or your ou (using the numexpr module)
+* enter values as expressions like `exp(-pi/4 * 1j)` using [numexpr](https://github.com/pydata/numexpr) syntax
 
 ### Graphical Analyses
 * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
