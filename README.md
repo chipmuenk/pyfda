@@ -82,6 +82,15 @@ The following libraries are required and installed automatically by pip when mis
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
+### conda
+If you're working with Anaconda's packet manager conda, there is a recipe for pyfda on `conda-forge` since July 2023:
+
+    > conda install --channel=conda-forge pyfda
+
+Start pyfda with
+
+    > pyfdax
+
 ### git
 If you want to contribute to pyfda (great idea!), fork the latest version from https://github.com/chipmuenk/pyfda.git and create a local copy using
 
