@@ -67,6 +67,10 @@ In that case, you need to activate the environment each time you want to use pyf
 
     > conda activate pyfda-env
 
+In any case, start pyfda with
+
+    > pyfdax
+
 You could also install pyfda with pip under Anaconda but this is *not* recommended. One potential 
 problem is that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`:
 
