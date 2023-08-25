@@ -59,7 +59,7 @@ If you're working with Anaconda's packet manager conda, there is a recipe for py
 
     > conda install --channel=conda-forge pyfda
 
-It is recommended to install pyfda in a seperate environment, e.g. called `pyfda-env`:
+It is recommended to install pyfda in a seperate environment instead of the `base` environment, e.g. called `pyfda-env`:
 
     > conda install --name pyfda-env --channel=conda-forge pyfda
 
@@ -67,7 +67,7 @@ In that case, you need to activate the environment each time you want to use pyf
 
     > conda activate pyfda-env
 
-You could also install pyfda with pip under Anaconda but this is not recommended. One potential 
+You could also install pyfda with pip under Anaconda but this is *not* recommended. One potential 
 problem is that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`:
 
 - `pip install` **`pyqt5`** installs system wide
@@ -86,15 +86,6 @@ If you end up having *both* installed, you're in
     PyQt5                     5.8.2                     <pip>
     
 gives you a similar result as above, you probably have a corrupted system. 
-
-Don't use the `base` environment  for installing pyfda (you shouldn't do this 
-for *any* software) but rather switch to another environment 
-
-    > conda activate my_fancy_environment
-
-or create a new one 
-
-    > conda create --name my_new_environment
 
 ### setuptools   
 You can also download the project as a zip file from GitHub and extract it to 
