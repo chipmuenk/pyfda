@@ -5,8 +5,7 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 
 ## Installation
 ### pip and PyPI
-If there is a working Python interpreter on your computer, installing pyfda from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing: Just run (you might need `pip3` instead
-of `pip`)
+If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing: Just run 
 
     > pip install pyfda
     
@@ -56,10 +55,20 @@ However, installing pyfda makes life easier as it creates a run script `pyfdax`
 in your path.
 
 ### conda
-I'm not providing conda builds for the Anaconda distribution but since July 2023 there is a recipe on `conda-forge`
+If you're working with Anaconda's packet manager conda, there is a recipe for pyfda on `conda-forge` since July 2023:
 
-You can also install pyfda with pip under Anaconda but this is not recommended. One potential problem is
-that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`:
+    > conda install --channel=conda-forge pyfda
+
+It is recommended to install pyfda in a seperate environment, e.g. called `pyfda-env`:
+
+    > conda install --name pyfda-env --channel=conda-forge pyfda
+
+In that case, you need to activate the environment each time you want to use pyfda with:
+
+    > conda activate pyfda-env
+
+You could also install pyfda with pip under Anaconda but this is not recommended. One potential 
+problem is that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`:
 
 - `pip install` **`pyqt5`** installs system wide
 
@@ -67,7 +76,6 @@ that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`
 
 `pip install pyfda` checks whether PyQt5 is installed already (but conda doesn't) 
 so you **need** to do `conda install pyqt` before running `pip install pyfda` .
-
 
 If you end up having *both* installed, you're in 
 [trouble](https://github.com/ContinuumIO/anaconda-issues/issues/1554): If
