@@ -36,12 +36,12 @@ pyfda
 ## License
 pyfda source code ist distributed under a permissive MIT license, binaries / bundles come with a GPLv3 license due to bundled components with stricter licenses.
 
-## Installing and running pyfda
+## Installing, running and uninstalling pyfda
 For details, see [INSTALLATION.md](INSTALLATION.md).
 ### Binaries
-Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for pushes to the main branch.
+Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for each push to the main branch.
 
-Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations.
+Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating.
 
 Binaries for **Linux** are created as Flatpaks, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
@@ -50,10 +50,14 @@ Supported Python versions are 3.7 ... 3.10, there is only one version of pyfda f
 
     > pip install pyfda
 
-Upgrade using
+Upgrade:
 
     > pip install pyfda -U
-    
+
+Uninstall:
+
+    > pip uninstall pyfda
+ 
 <!--
 If you have cloned `pyfda` to your local drive you can install the local copy (i.e. create local config files and the `pyfdax` starter script) via
 
