@@ -119,7 +119,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',  # 'stix',
           'mathtext.default'          : 'it',
-          # 'font.size'                 : 12, # TODO: set this depending on resolution
+          'font.size'                 : 10, # TODO: set this depending on resolution
           'legend.fontsize'           : 'medium',
           'axes.labelsize'            : 'medium',
           'axes.titlesize'            : 'large',
