@@ -5,17 +5,21 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 
 ## Installation
 ### pip and PyPI
-If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing: Just run 
+If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing. 
+
+You should create a separate environment for pyfda to avoid e.g. unwanted updating of installed python modules:
+
+    > python -m venv <PATH_TO_ENVIRONMENT>
+
+This creates the subdirectory if it doesn't exist. Activation of the environment depends on your OS, see https://docs.python.org/3/library/venv.html for details.
+
+Installation pyfda with
 
     > pip install pyfda
 
-Ideally, install pyfda in a separate environment
+and start it with
 
-    > python -m venv <PATH TO ENVIRONMENT>
-
-and activate the environment (OS dependendent, see xxx)
-
-
+    > pyfdax
     
 A **specific version** instead of the latest stable version can be selected with e.g.
 
@@ -79,7 +83,7 @@ In any case, start pyfda with
 
     > pyfdax
 
-You could also install pyfda with pip under Anaconda but this is *not* recommended. One potential 
+It is *not* recommended to install pyfda with pip under Anaconda. One potential 
 problem is that conda installs `PyQt5` under the name `pyqt` and pip under the name `pyqt5`:
 
 - `pip install` **`pyqt5`** installs system wide
