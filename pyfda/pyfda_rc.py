@@ -119,10 +119,10 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',  # 'stix',
           'mathtext.default'          : 'it',
-          'font.size'                 : 12,
-          'legend.fontsize'           : 12,
-          'axes.labelsize'            : 12,
-          'axes.titlesize'            : 14,
+          # 'font.size'                 : 12, # TODO: set this depending on resolution
+          'legend.fontsize'           : 'medium',
+          'axes.labelsize'            : 'medium',
+          'axes.titlesize'            : 'large',
           'axes.linewidth'            : 1,  # linewidth for coordinate system
           # grid settings are partially overwritten in mpl_widget.py
           'axes.formatter.use_mathtext': True,  # use mathtext for scientific notation.
