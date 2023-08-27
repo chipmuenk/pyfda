@@ -8,6 +8,14 @@ bundle. The ">" signs below only indicate the command lines, don't enter them.
 If there is a working Python interpreter on your computer, installing pyfda with `pip` (or `pip3`) from the Python Package Inventory [PyPI](https://pypi.org) is most straightforward, required libraries are installed automatically if missing: Just run 
 
     > pip install pyfda
+
+Ideally, install pyfda in a separate environment
+
+    > python -m venv <PATH TO ENVIRONMENT>
+
+and activate the environment (OS dependendent, see xxx)
+
+
     
 A **specific version** instead of the latest stable version can be selected with e.g.
 
