@@ -46,7 +46,7 @@ Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](ht
 Binaries for **Linux** are created as Flatpaks, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
 ### pip
-Supported Python versions are 3.7 ... 3.10, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
+Supported Python versions are 3.7 ... 3.11, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
 
     > pip install pyfda
 
