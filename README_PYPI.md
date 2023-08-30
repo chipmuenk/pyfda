@@ -6,7 +6,7 @@ pyfda is a GUI based tool in Python / Qt for analysing and designing discrete ti
 
 For more info see the [`Github Repo`](https://github.com/chipmuenk/pyfda) and the documentation at [readthedocs.org](https://pyfda.readthedocs.io/en/latest/).
 
-![Screenshot](https://github.com/chipmuenk/pyfda/raw/develop/img/pyFDA_screenshot_3.png)
+![Screenshot](https://github.com/chipmuenk/pyfda/blob/94c719ec5149fd6f75af9b058ea923c67b2a3f83/img/pyfda_screenshot_3.png) 
 
 ## Prerequisites
 
