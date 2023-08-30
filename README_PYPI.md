@@ -10,8 +10,8 @@ For more info see the [`Github Repo`](https://github.com/chipmuenk/pyfda) and th
 
 ## Prerequisites
 
-* Python versions: **3.6 ... 3.10**
-* All operating systems - there should be no OS specific requirements.
+* Python versions: **3.7 ... 3.11**
+* All operating systems, no OS specific requirements.
 * Libraries:
   * **(Py)Qt5**
   * **numpy**
@@ -23,12 +23,12 @@ For more info see the [`Github Repo`](https://github.com/chipmuenk/pyfda) and th
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ## Installing pyfda
-Self-executing archives are available for Windows and OS X at https://github.com/chipmuenk/pyfda/releases which do not require a Python installation.
+Self-executing archives are available for Windows and OS X at https://github.com/chipmuenk/pyfda/releases which do not require a Python installation. Under Linux, pyfda can be installed as a flatpak. 
 
 Otherwise, installation is straight forward: There is only one version of pyfda for all supported operating systems, no compilation is required:
 
 ### pip
-You can install from PyPI using
+Install from PyPI using
 
     > pip install pyfda
 
