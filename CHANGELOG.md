@@ -1,5 +1,13 @@
 # Changelog
-## [v0.8.0](https://github.com/chipmuenk/pyfda/tree/v0.8.0) (2023-08-xx)
+## [v0.8.1](https://github.com/chipmuenk/pyfda/tree/v0.8.1)
+### Bugfixes
+- Correct scaling of 'UI detail' icon for high resolution screens
+- Increase Matplotlib font size for high resolution screens
+
+### Improvements
+- Nicer icons for 'UI detail' and 'Grid'
+
+## [v0.8.0](https://github.com/chipmuenk/pyfda/tree/v0.8.0) (2023-08-09)
 ### Bugfixes
 - Several tabs: Various crashes related to file imports
 - 'H(f'): Fix deprecation error w.r.t. matplotlib, causing a crash when using
