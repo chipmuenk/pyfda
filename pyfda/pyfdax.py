@@ -16,6 +16,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+import pyfda.pyfda_rc as rc
 
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
@@ -287,19 +288,25 @@ def main():
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
-        style = "Using 'pyfda' style sheet."
+        style = "'pyfda' style sheet"
     else:
         qstyle = QApplication.setStyle(rc.qss_rc) # no, this is just a name for a system stylesheet
         app = QApplication(sys.argv)
         if qstyle:
-            style = 'Using system style "{0}".'.format(rc.qss_rc)
+            style = f"system style sheet '{rc.qss_rc}'"
         else:
-            style = 'Style "{0}" not found, falling back to default style.'.format(rc.qss_rc)
+            style = f"default style sheet ('{rc.qss_rc}' not found)"
+
+    screen_resolution = app.desktop().screenGeometry()
+    screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
+    # try to find a good value for matplotlib font size depending on screen resolution
+    fontsize = min(round(screen_h / 80), (screen_w / 100))
+    rc.mpl_rc['font.size'] = fontsize
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
-    logger.info(style)
-
+    logger.info(f"Starting pyfda with screen resolution {screen_w} x {screen_h}")
+    logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
         # User Models", grouping several instances of an application under one
@@ -307,7 +314,7 @@ def main():
         # for Pythonw.exe, sometimes the icon is just blank. The following
         # instructions tell Windows that pythonw is merely hosting other applications.
         import ctypes
-        myappid = u'chipmuenk.pyfda.v0.4'
+        myappid = u'chipmuenk.pyfda.v0.8'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # set taskbar icon
@@ -317,10 +324,6 @@ def main():
     app.setActiveWindow(mainw)
     # Set default icon for window
     mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
-
-    screen_resolution = app.desktop().screenGeometry()
-    screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
-    logger.info("Starting pyfda with screen resolution: %d x %d", screen_w, screen_h)
 
     if screen_h < 800:
         delta = 50

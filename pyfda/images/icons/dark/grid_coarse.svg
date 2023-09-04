@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="8.47mm" height="8.47mm" fill-rule="evenodd" stroke-linejoin="round" stroke-width="28.222" preserveAspectRatio="xMidYMid" version="1.2" viewBox="0 0 847 847"><defs class="ClipPathGroup"><clipPath id="a"><path d="M0 0h847v847H0z"/></clipPath></defs><g class="SlideGroup"><g class="Slide" clip-path="url(#a)"><g class="Page"><g fill="none" class="com.sun.star.drawing.LineShape"><path d="M294 94h13v613h-13z" class="BoundingBox"/><path stroke="#000" stroke-width="11" d="M300 100v600"/></g><g fill="none" class="com.sun.star.drawing.CustomShape"><path d="M22 23h755v754H22z" class="BoundingBox"/><path stroke="#000" stroke-linecap="square" stroke-linejoin="miter" stroke-width="78" d="M399 737H61V62h676v675H399z"/></g><g class="com.sun.star.drawing.PolyPolygonShape"><path fill="none" d="M0 0h849v849H0z" class="BoundingBox"/></g><g fill="none" class="com.sun.star.drawing.LineShape"><path d="M494 94h13v613h-13z" class="BoundingBox"/><path stroke="#000" stroke-width="11" d="M500 100v600"/><path d="M94 294h613v13H94z" class="BoundingBox"/><path stroke="#000" stroke-width="11" d="M700 300H100"/><path d="M94 494h613v13H94z" class="BoundingBox"/><path stroke="#000" stroke-width="11" d="M700 500H100"/></g></g></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 20 20" width="20">
+    <style type="text/css">line { stroke: grey; }</style>
+<line x1="5" y1="1" x2="5" y2="19"/>
+<line x1="10" y1="1" x2="10" y2="19"/>
+<line x1="15" y1="1" x2="15" y2="19"/>
+<line x1="1" y1="5" x2="19" y2="5"/>
+<line x1="1" y1="10" x2="19" y2="10"/>
+<line x1="1" y1="15" x2="19" y2="15"/>
+<rect height="18" width="18" x="1" y="1" stroke="black" stroke-width="2" fill="none"/>
+</svg>

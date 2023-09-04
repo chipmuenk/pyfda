@@ -361,7 +361,7 @@ class MplToolbar(NavigationToolbar):
         # UI Detail Level:
         # ---------------------------------------------
         self.a_ui = self.addAction(
-            QIcon(':/ui_level_max'), 'UI detail', self.cycle_ui_level)
+            QIcon(':/ui_level_max.svg'), 'UI detail', self.cycle_ui_level)
         self.a_ui.setToolTip('Show / hide UI elements (CTRL-U)')
         self.a_ui_num_levels = 3
         self.a_ui_level = 0  # 0: full ui, 1: reduced, 2: compact ui
@@ -679,11 +679,11 @@ class MplToolbar(NavigationToolbar):
             self.a_ui_level = ui_level
 
         if self.a_ui_level == 0:
-            self.a_ui.setIcon(QIcon(':/ui_level_max'))
+            self.a_ui.setIcon(QIcon(':/ui_level_max.svg'))
         elif self.a_ui_level == self.a_ui_num_levels - 1:
-            self.a_ui.setIcon(QIcon(':/ui_level_min'))
+            self.a_ui.setIcon(QIcon(':/ui_level_min.svg'))
         else:
-            self.a_ui.setIcon(QIcon(':/ui_level_mid'))
+            self.a_ui.setIcon(QIcon(':/ui_level_mid.svg'))
 
         if ui_level == -1:
             self.emit({'mpl_toolbar': 'ui_level', 'value': self.a_ui_level})
