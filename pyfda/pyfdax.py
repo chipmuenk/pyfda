@@ -27,7 +27,7 @@ mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
 from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon,
-                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal)
+                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QScreen)
 
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_lib import ANSIcolors as ACol

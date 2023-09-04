@@ -16,7 +16,7 @@ from PyQt5 import QtGui, QtCore, QtTest, QtWidgets
 from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, PYQT_VERSION_STR, QSize, QSysInfo,
                           QObject, QVariant, QPoint, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor,
-                         QBrush, QPalette, QPixmap, QPainter)
+                         QBrush, QPalette, QPixmap, QPainter, QScreen)
 from PyQt5.QtWidgets import (QAction, QMenu,
                              QMainWindow, QTabWidget, QApplication, QRadioButton,
                              QScrollArea, QSplitter, QMessageBox, QDialog,
