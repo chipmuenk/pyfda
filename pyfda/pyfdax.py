@@ -27,8 +27,8 @@ matplotlib.use("Qt5Agg")
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
-from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon,
-                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QScreen)
+from pyfda.libs.compat import (Qt, QtCore, QtGui, QMainWindow, QApplication, QSplitter, QIcon,
+                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QScreen, QtWidgets)
 
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_lib import ANSIcolors as ACol
@@ -297,16 +297,30 @@ def main():
         else:
             style = f"default style sheet ('{rc.qss_rc}' not found)"
 
+    app.setAttribute(Qt.AA_EnableHighDpiScaling)
+    # Enable High DPI display with PyQt5
+    if hasattr(QtWidgets.QStyleFactory, 'AA_UseHighDpiPixmaps'):
+        app.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    # Windows: A 72-point font is defined to be one logical inch = 96 pixels tall. 
+    # 12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
+    ldpi = app.primaryScreen().logicalDotsPerInch()
+#    ldpix = app.primaryScreen().logicalDotsPerInchX()
+#    ldpiy = app.primaryScreen().logicalDotsPerInchY()
+    pdpi = app.primaryScreen().physicalDotsPerInch()
+    pdpix = app.primaryScreen().physicalDotsPerInchX()
+    pdpiy = app.primaryScreen().physicalDotsPerInchY()
+    # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
     # try to find a good value for matplotlib font size depending on screen resolution
-    fontsize = min(round(screen_h / 80), (screen_w / 100))
+    fontsize = round(8.5 * pdpiy/96)
     rc.mpl_rc['font.size'] = fontsize
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
     logger.info(f"Starting pyfda with screen resolution {screen_w} x {screen_h}")
     logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
+    logger.info(f"lDPI = {ldpi}, pDPI = {pdpi} ({pdpix} x {pdpiy})")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
         # User Models", grouping several instances of an application under one
