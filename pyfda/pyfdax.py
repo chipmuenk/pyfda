@@ -28,7 +28,7 @@ mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
 from pyfda.libs.compat import (Qt, QtCore, QtGui, QMainWindow, QApplication, QSplitter, QIcon,
-                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QtWidgets)
+                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QtWidgets, QFont, QFontMetrics)
 
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_lib import ANSIcolors as ACol
@@ -348,21 +348,29 @@ def main():
     ldpi = app.primaryScreen().logicalDotsPerInch()
 #    ldpix = app.primaryScreen().logicalDotsPerInchX()
 #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
-    # pdpi = app.primaryScreen().physicalDotsPerInch()
-    # pdpix = app.primaryScreen().physicalDotsPerInchX()
+    pdpi = app.primaryScreen().physicalDotsPerInch()
+    pdpix = app.primaryScreen().physicalDotsPerInchX()
     pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
+
+    font = QFont()
+    # font.setPointSize(yourPointSize)
+    fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
-    fontsize = round(8 * pdpiy / 96 * ldpi / 96)
+
+    fontsize = round(9 * pdpiy / 96 * ldpi / 96)
+    fontsize = round(font.pointSizeF() * 1.25 * ldpi / 96)
+
     rc.mpl_rc['font.size'] = fontsize
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
     logger.info(f"Starting pyfda with screen resolution {screen_w} x {screen_h}")
     logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
-    logger.info(f"lDPI = {ldpi}, pDPI = {pdpi} ({pdpix} x {pdpiy})")
+    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f})")
+    logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
         # User Models", grouping several instances of an application under one
