@@ -361,7 +361,7 @@ def main():
     # try to find a good value for matplotlib font size depending on screen resolution
 
     fontsize = round(9 * pdpiy / 96 * ldpi / 96)
-    fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
+    # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
 
@@ -370,7 +370,7 @@ def main():
     logger.info(f"Starting pyfda with screen resolution {screen_w} x {screen_h}")
     logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
     logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f})")
-    logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
+    # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
         # User Models", grouping several instances of an application under one
