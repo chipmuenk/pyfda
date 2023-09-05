@@ -325,7 +325,7 @@ QTabWidget {
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
     border: 1px solid #C4C4C3;
-    border-top-left-radius: 4px;
+    border-top-left-radius: 0.2em;
  }
 
 QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
@@ -339,30 +339,34 @@ QTabBar::tab:only-one {
  }
 
 QTabBar::tab::top{
-    border-top-right-radius: 4px;
+    border-top-right-radius: 0.2em;
     min-width: 2em;
     margin-bottom: -0.2em;
     padding: 0.2em;
     padding-bottom: 0.4em;
     }
-QTabBar::tab::left{
-    border-bottom-left-radius: 4px;
-    width: 26px;
-    margin-right: -4px;
-    padding: 2px;
-    padding-right: 2px;
+
+ QTabBar::tab::left{
+    border-bottom-left-radius: 0.1em;
+    /* width: 26px; */
+    width: 1.5em;
+    margin-right: -0.2em;
+    padding: 0.1em;
+    padding-right: 0.1em;
  }
 
-/* separate styling for stimuli / audio widget with icons @ tabs */
+/* separate styling for stimuli / audio widget with icons @ tabs  */
  QTabWidget#tab_stim_w QTabBar::tab{
-     width: 30 px;
-     height: 30 px;
-     padding: 0;
+     width: 1.5em;
+     height: 1.5em;
+     margin-right: -0.2em;
+     /*padding: 0;
+     margin: 0;*/
  }
 
  /* small gap above vertical mplwidget tabs */
  QTabWidget#tab_mpl_w QTabBar::tab::left:first{
-    margin-top: 2px;
+    margin-top: 0.1em;
  }
 
 QTabBar::tab::top:selected {
@@ -420,7 +424,7 @@ qss_common = """
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
                     border-top: solid darkgrey;
-                    border-width: 2px;
+                    border-width: 0.1em;
                     margin: 0;
                     padding: 0;
                     }
@@ -431,7 +435,7 @@ qss_common = """
                 {
                     /* background-color: pink; */
                     border: solid darkgrey;
-                    border-width: 1px 0 1px 0;
+                    border-width: 0.05em 0 0.05em 0;
                     padding: 0;
                     margin: 0 0 0 0; /* was: 1px 0 0 0 */
                     }
@@ -441,7 +445,7 @@ qss_common = """
                 {
                     /* background-color:lime; */
                     border: solid darkgrey;
-                    border-width: 1px 0 0 0;
+                    border-width: 0.05em 0 0 0;
                     padding: 0;
                     margin: 0;
                     }
@@ -452,7 +456,7 @@ qss_common = """
                 #wdg_fil{
                     /*background-color:lightblue;*/
                     border: none;
-                    padding: 5px 0 0 0;
+                    padding: 0.2em 0 0 0;
                     }
 
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
@@ -497,7 +501,7 @@ qss_common = """
 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
-                                border-width: 2px;}
+                                border-width: 0.1em;}
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
