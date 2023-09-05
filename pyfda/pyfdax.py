@@ -361,7 +361,7 @@ def main():
     # try to find a good value for matplotlib font size depending on screen resolution
 
     fontsize = round(9 * pdpiy / 96 * ldpi / 96)
-    fontsize = round(font.pointSizeF() * 1.25 * ldpi / 96)
+    fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
 
