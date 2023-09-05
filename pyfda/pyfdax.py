@@ -283,8 +283,46 @@ def main():
     ...
     Since the QApplication object does so much initialization, it must be created
     *before* any other objects related to the user interface are created."
+
+    Environment variables controlling Qt behaviour need to be set even before initializing
+    the QApplication object
+
+    Scaling
+    -------
+    - DPI: The resolution number of dots per inch in a digital print
+    - PPI: Pixel density of an electronic image device (e.g. computer monitor)
+    - Point: 1/72 Inch = 0.3582 mm, physical measure in typography
+    - em: Equal to font height. For e.g. a 12 pt font, 1 em = 12 pt
+
+    - Physical DPI: The PPI that a physical screen actually provides.
+    - Logical DPI: The PPI that software claims a screen provides. This can be thought
+        of as the PPI provided by a virtual screen created by the operating system.
+        Font sizes are specified in logical DPI
+    - Screen scaling: High-Resolution screens have a very high physical DPI, resulting
+        in very small characters. Screen scaling by e.g. 125 ... 200% increases the
+        logical DPI and hence the character size by the same amount.
+
+    MacOS
+    ~~~~~
+        Early displays had 72 PPI, equaling 72 Pt/Inch, i.e. 1 Pixel = 1 Point. Print-out
+        size was equal to screen size.
+
+    Windows
+    ~~~~~~~
+      A 72-point font is defined to be one logical inch = 96 pixels tall.
+    12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
+
+
+
+    # Enable automatic scaling based on the monitor's pixel density. This doesn't change the
+    # size of point based fonts!
+    # os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+    # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"  # replaced by QT_ENABLE_HIGHDPI_SCALING
+    # Define global scale factor for the whole application, including point-sized fonts:
+    # os.environ["QT_SCALE_FACTOR"]             = "1"
     """
-     # instantiate QApplication object, passing command line arguments
+
+    # Instantiate QApplication object, passing command line arguments
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
@@ -297,23 +335,27 @@ def main():
         else:
             style = f"default style sheet ('{rc.qss_rc}' not found)"
 
-    app.setAttribute(Qt.AA_EnableHighDpiScaling)
     # Enable High DPI display with PyQt5
     if hasattr(QtWidgets.QStyleFactory, 'AA_UseHighDpiPixmaps'):
-        app.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    # Windows: A 72-point font is defined to be one logical inch = 96 pixels tall. 
-    # 12 pt = 12/72 = 1/6 logical inch = 96/6 pixels = 16 pixels @ 96 dpi
+        app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    else:
+        logger.warning("No Qt attribute 'AA_UseHighDpiPixmaps'.")
+
+    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+        app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    else:
+        logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     ldpi = app.primaryScreen().logicalDotsPerInch()
 #    ldpix = app.primaryScreen().logicalDotsPerInchX()
 #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
-    pdpi = app.primaryScreen().physicalDotsPerInch()
-    pdpix = app.primaryScreen().physicalDotsPerInchX()
+    # pdpi = app.primaryScreen().physicalDotsPerInch()
+    # pdpix = app.primaryScreen().physicalDotsPerInchX()
     pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
     # try to find a good value for matplotlib font size depending on screen resolution
-    fontsize = round(8.5 * pdpiy/96)
+    fontsize = round(8 * pdpiy / 96 * ldpi / 96)
     rc.mpl_rc['font.size'] = fontsize
 
     mainw = pyFDA()
