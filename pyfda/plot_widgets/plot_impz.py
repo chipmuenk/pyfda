@@ -11,7 +11,7 @@ Widget for plotting impulse and general transient responses
 """
 import time
 from pyfda.libs.compat import (
-    QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy)
+    QWidget, pyqtSignal, QTabWidget, QVBoxLayout, QIcon, QSize, QSizePolicy, QFont, QFontMetrics)
 
 import numpy as np
 import scipy.signal as sig
@@ -163,11 +163,8 @@ class Plot_Impz(QWidget):
         self.tab_stim_w = QTabWidget(self)
         self.tab_stim_w.setObjectName("tab_stim_w")
         self.tab_stim_w.setTabPosition(QTabWidget.West)
-        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+#        self.tab_stim_w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        tab_w = 30  # needs to fit with the tab size defined in pyfda_rc.py
-        # tab_w = self.tab_mpl_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
-        self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         self.tab_stim_w.addTab(self.stim_wdg, QIcon(":/graph_90.svg"), "")
         self.tab_stim_w.setTabToolTip(0, "Stimuli")
 
@@ -175,6 +172,15 @@ class Plot_Impz(QWidget):
         self.tab_stim_w.setTabToolTip(1, "File I/O")
 
         self.resize_stim_tab_widget()
+
+        # tab_w = self.tab_stim_w.tabBar().geometry().width()
+        # tab_w2 = self.tab_stim_w.tabBar().height()
+        # tab_w = self.tab_stim_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
+        tab_w = self.tab_stim_w.tabBar().minimumSizeHint().width()
+        # Doesn't work, always yields w = 30. Try {font.pixelSize()} ?
+        # logger.warning(f"w={tab_w}, h={tab_w2}")
+        tab_w = 25
+        self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         # ----------------------------------------------------------------------
         # ---------------- GLOBAL LAYOUT ---------------------------------------
         # ----------------------------------------------------------------------
@@ -186,7 +192,6 @@ class Plot_Impz(QWidget):
 
         self.setLayout(layVMain)
         self.updateGeometry()
-
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
