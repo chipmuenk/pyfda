@@ -173,13 +173,14 @@ class Plot_Impz(QWidget):
 
         self.resize_stim_tab_widget()
 
-        # tab_w = self.tab_stim_w.tabBar().geometry().width()
+        # All the following do not reflect QSS settings always yields w = 30.
+        # Try {font.pixelSize()} ?
+        # tab_w = self.tab_stim_w.tabBar().geometry().height()
         # tab_w2 = self.tab_stim_w.tabBar().height()
-        # tab_w = self.tab_stim_w.tabBar().tabSizeHint(0).width()  # crashes under Linux
-        tab_w = self.tab_stim_w.tabBar().minimumSizeHint().width()
-        # Doesn't work, always yields w = 30. Try {font.pixelSize()} ?
-        # logger.warning(f"w={tab_w}, h={tab_w2}")
-        tab_w = 25
+        # The following works somewhat under Windwos, but crashes under Linux
+        # tab_w2 = self.tab_stim_w.tabBar().tabSizeHint(0).width()
+        # logger.warning(f"w={tab_w}, w2={tab_w2}")
+        tab_w = int(round(25 * params['screen']['scaling']))  # TODO: hacky ...
         self.tab_stim_w.setIconSize(QSize(tab_w, tab_w))
         # ----------------------------------------------------------------------
         # ---------------- GLOBAL LAYOUT ---------------------------------------
@@ -192,6 +193,7 @@ class Plot_Impz(QWidget):
 
         self.setLayout(layVMain)
         self.updateGeometry()
+
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
