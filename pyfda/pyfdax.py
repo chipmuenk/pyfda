@@ -358,21 +358,24 @@ def main():
     pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
-    screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
+    height, width = screen_resolution.height(), screen_resolution.width()
+    scaling = ldpi / ref_dpi
 
-    font = QFont()
+    # font = QFont()
     # font.setPointSize(yourPointSize)
-    fm = QFontMetrics(font)
+    # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = round(9 * pdpiy / ref_dpi * ldpi / ref_dpi)
+    fontsize = round(9 * pdpiy / ref_dpi * scaling)
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
+    rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
+                           'height': height, 'width': width}
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
-    logger.info(f"Starting pyfda with screen resolution {screen_w} x {screen_h}")
+    logger.info(f"Starting pyfda with screen resolution {width} x {height}")
     logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
     logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f})")
     # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
@@ -394,12 +397,12 @@ def main():
     # Set default icon for window
     mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
-    if screen_h < 800:
+    if height < 800:
         delta = 50
     else:
         delta = 100
     # set position + size of main window on desktop
-    mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
+    mainw.setGeometry(20, 20, width - delta, height - delta) # top L / top R, dx, dy
     # Give the keyboard input focus to this widget if this widget
     # or one of its parents is the active window:
 #    mainw.setFocus()
