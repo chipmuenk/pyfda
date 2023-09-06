@@ -523,7 +523,8 @@ def qtext_width(text: str = '', N_x: int = 17, bold: bool = True, font=None) -> 
 
     document = QtGui.QTextDocument(text)
     document.setDefaultFont(font)
-    width = int(document.idealWidth())
+    # width = int(document.idealWidth())
+    width = int(document.size().width())
 
     return width
 
