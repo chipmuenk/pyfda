@@ -251,7 +251,7 @@ def update_conf_files(logger):
 # is the software running in a bundled PyInstaller environment?
 PYINSTALLER = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
-OS     = platform.system()
+OS     = platform.system()  # Windows / Linux / Darwin
 OS_VER = platform.release()
 
 CONF_FILE = 'pyfda.conf'            #: name for general configuration file

@@ -335,6 +335,11 @@ def main():
         else:
             style = f"default style sheet ('{rc.qss_rc}' not found)"
 
+    if dirs.OS.lower() == "darwin":  # Mac OS
+        ref_dpi = 72
+    else:
+        ref_dpi = 96
+
     # Enable High DPI display with PyQt5
     if hasattr(QtWidgets.QStyleFactory, 'AA_UseHighDpiPixmaps'):
         app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
@@ -360,7 +365,7 @@ def main():
     fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = round(9 * pdpiy / 96 * ldpi / 96)
+    fontsize = round(9 * pdpiy / ref_dpi * ldpi / ref_dpi)
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
