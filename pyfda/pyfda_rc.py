@@ -42,26 +42,31 @@ THEME = 'light'     # select 'dark' or 'light' theme or 'none' or use one of the
 
 mpl_ms = 8  # base size for matplotlib markers
 # Various parameters for calculation and plotting
-params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
-          'FMT': '{:.3g}',  # format string for QLineEdit fields
-          'CSV':  {  # format options and parameters for CSV-files and clipboard
-                  'delimiter': 'auto',  # default delimiter
-                  'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
-                  'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
-                  'header': 'auto',  # 'auto', 'on', 'off'
-                  'cmsis' : False,  # True, False
-                  'clipboard': False  # source/target is QClipboard or file
-                  },
-          'FMT_ba': 4,      # number of digits for coefficient table
-          'FMT_pz': 5,      # number of digits for Pole/Zero table
-          'P_Marker': [mpl_ms, 'r'],  # size and color for poles' marker
-          'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
-          'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
-          'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
-          'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
-          'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
-          'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}
+params = {
+    'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
+    'FMT': '{:.3g}',  # format string for QLineEdit fields
+    'CSV': {  # format options and parameters for CSV-files and clipboard
+            'delimiter': 'auto',  # default delimiter
+            'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
+            'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
+            'header': 'auto',  # 'auto', 'on', 'off'
+            'cmsis' : False,  # True, False
+            'clipboard': False  # source/target is QClipboard or file
+            },
+    'screen': { # screen properties, filled with values in pyfdax.py
+        'ref_dpi': None, 'scaling': None, # dpi for scaling = 1 and scaling factor
+        'height': None, 'width': None}, # height and width in pixels
+    'FMT_ba': 4,      # number of digits for coefficient table
+    'FMT_pz': 5,      # number of digits for Pole/Zero table
+    'P_Marker': [mpl_ms, 'r'],  # size and color for poles' marker
+    'Z_Marker': [mpl_ms, 'b'],  # size and color for zeros' marker
+    'wdg_margins': (2, 1, 2, 0),  # (R, T, L, B) widget margins
+    'wdg_margins_spc': (2, 2, 2, 2),  # widget margins with more vertical spacing
+    'wdg_margins_0': (0, 0, 0, 0),  # set margins to zero
+    'mpl_margins': (0, 0, 0, 0),  # margins around matplotlib widgets
+    'mpl_hatch_border': {'linewidth': 1.0, 'color': 'blue', 'linestyle': '--'}
           }
+
 mpl_params_dark = {
             'mpl_hatch': {                          # hatched area for specs
                          'facecolor': 'none',
@@ -523,7 +528,7 @@ qss_common = """
                                         stop:0.407273 rgba(200, 200, 200, 255),
                                         stop:0.4825 rgba(101, 104, 113, 235),
                                         stop:0.6 rgba(255, 255, 255, 0));
-                    width: 8px;
+                    width: 0.2em;
                     image: url(':/ellipses_h.svg');
                     }
 
