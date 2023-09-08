@@ -32,6 +32,7 @@ from pyfda.libs.compat import (Qt, QtCore, QtGui, QMainWindow, QApplication, QSp
 
 from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_lib import ANSIcolors as ACol
+import numpy as np
 
 #========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
@@ -357,6 +358,9 @@ def main():
     pdpiy = app.primaryScreen().physicalDotsPerInchY()
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
+    avail_geometry = app.desktop().availableGeometry()
+    # avail_size = app.desktop().availableSize()
+    pixel_ratio = app.desktop().devicePixelRatio()
     height, width = screen_resolution.height(), screen_resolution.width()
     scaling = ldpi / ref_dpi
 
@@ -365,7 +369,7 @@ def main():
     # fm = QFontMetrics(font)
     # try to find a good value for matplotlib font size depending on screen resolution
 
-    fontsize = round(9 * pdpiy / ref_dpi * scaling)
+    fontsize = round(9 * np.sqrt(pdpiy / ref_dpi) * scaling)
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
     rc.mpl_rc['font.size'] = fontsize
