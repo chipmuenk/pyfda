@@ -1,5 +1,9 @@
 # Changelog
-## [v0.8.1](https://github.com/chipmuenk/pyfda/tree/v0.8.1)
+## [v0.8.2](https://github.com/chipmuenk/pyfda/tree/v0.8.2) (2023-09-08)
+### Bugfixes
+- Fine-tuning of Matplotlib font size for different screens, scalings and resolutions
+
+## [v0.8.1](https://github.com/chipmuenk/pyfda/tree/v0.8.1) (2023-09-08)
 ### Bugfixes
 - Correct scaling of 'UI detail' icon for high resolution screens
 - Increase Matplotlib font size for high resolution screens
