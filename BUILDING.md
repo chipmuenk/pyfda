@@ -2,10 +2,17 @@
 
 This document needs to be updated. Building is now performed by the following github actions:
 
-- [publish_pypi.yml](../.github/workflows/publish_pypi.yml): Build and publish a release on the [PyPI Archive](https://pypi.org/project/pyfda/). Triggered by pushing a proper version tag (v*.*) to the main branch.
+- [publish_pypi.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/publish_pypi.yml): Build and publish a release on the [PyPI Archive](https://pypi.org/project/pyfda/). Triggered by pushing a proper version tag (v*.*) to the main branch.
 - [build_pyinstaller.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as "latest" release. Triggered by every push to the main branch.
 - [build_pyinstaller_version.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller_version.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as a versioned release. Triggered by pushing a proper version tag (v*.*) to the main branch.
 - [build_flatpak.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_flatpak.yml): Build a flatpak archive and publish it either as "latest" or a "versioned" release. Triggered by a push to the main branch or by pushing a proper version tag (v*.*). For a versioned tag, the archive is also published on [Flathub](https://flathub.org/de/apps/com.github.chipmuenk.pyfda).
+
+Create a "proper" version tag by doing
+
+    git tag v0.4.5  # use the suiting tag number (Captain Obvious)
+    git push  # optional, only when there are commits that have not been pushed
+    git push origin --tags
+
 ## pip and PyPI
 Pip packages (source only) are created using the `setuptools` flow:
 
