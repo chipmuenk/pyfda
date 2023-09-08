@@ -321,7 +321,11 @@ def main():
     # Define global scale factor for the whole application, including point-sized fonts:
     # os.environ["QT_SCALE_FACTOR"]             = "1"
     """
-
+    # Enable High DPI display with PyQt5
+    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+        Qt.AA_EnableHighDpiScaling = True
+    else:
+        logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
@@ -340,16 +344,11 @@ def main():
     else:
         ref_dpi = 96
 
-    # Enable High DPI display with PyQt5
-    if hasattr(QtWidgets.QStyleFactory, 'AA_UseHighDpiPixmaps'):
+    if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
         app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     else:
-        logger.warning("No Qt attribute 'AA_UseHighDpiPixmaps'.")
+        logger.warning("Qt attribute 'AA_UseHighDpiPixmaps' not available.")
 
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-        app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-    else:
-        logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     ldpi = app.primaryScreen().logicalDotsPerInch()
 #    ldpix = app.primaryScreen().logicalDotsPerInchX()
 #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
