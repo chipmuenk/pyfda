@@ -378,10 +378,10 @@ def main():
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
-    logger.info(f"Starting pyfda with screen resolution {width} x {height}")
-    logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
-    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f})")
-    logger.info(f"{avail_geometry} - {pixel_ratio}")
+    logger.info(f"Starting pyfda with screen resolution {width} x {height}, "
+                f"avail: {avail_geometry.width()}x{avail_geometry.height()}")
+    logger.info(f"with {style} and matplotlib fontsize {fontsize}.")
+    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), pix.ratio = {pixel_ratio}")
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
