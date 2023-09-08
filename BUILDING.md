@@ -14,8 +14,8 @@ Creating a versioned release requires a workflow like
 
 ```
 git tag v0.4.5           # create new local tag (adapt version number says Capt. Obvious)
-git push origin --tags   # push only tag to origin
-git push                 # push changes to origin, creating a 'push' event
+git push origin v0.4.5   # push only tag to origin
+git push                 # push all matching repos to origin, creating a 'push' event
 ```
 
 * draft a (pre)release on Github from tag, creating a 'release' event
