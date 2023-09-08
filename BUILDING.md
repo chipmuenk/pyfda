@@ -7,12 +7,24 @@ This document needs to be updated. Building is now performed by the following gi
 - [build_pyinstaller_version.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller_version.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as a versioned release. Triggered by pushing a proper version tag (v*.*) to the main branch.
 - [build_flatpak.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_flatpak.yml): Build a flatpak archive and publish it either as "latest" or a "versioned" release. Triggered by a push to the main branch or by pushing a proper version tag (v*.*). For a versioned tag, the archive is also published on [Flathub](https://flathub.org/de/apps/com.github.chipmuenk.pyfda).
 
-Create a "proper" version tag by doing
+The latter requires a workflow like
 
-    git tag v0.4.5  # use the suiting tag number (Captain Obvious)
-    git push  # optional, only when there are commits that have not been pushed
-    git push origin --tags
+* update version.py      # PyPI version number is created from this
+* merge develop and main, push develop (default branch)  
 
+```
+git tag v0.4.5           # create new local tag (adapt version number says Capt. Obvious)
+git push origin --tags   # push only tag to origin
+git push                 # push changes to origin, creating a 'push' event
+```
+
+* draft a (pre)release on Github from tag, creating a 'release' event
+
+Tags can be deleted with:
+
+    git tag -d <tag_name>
+    git push --delete origin <tag_name>
+     
 ## pip and PyPI
 Pip packages (source only) are created using the `setuptools` flow:
 
