@@ -332,7 +332,7 @@ def main():
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
         style = "'pyfda' style sheet"
     else:
-        qstyle = QApplication.setStyle(rc.qss_rc) # no, this is just a name for a system stylesheet
+        qstyle = QApplication.setStyle(rc.qss_rc) # this is just a name for a system stylesheet
         app = QApplication(sys.argv)
         if qstyle:
             style = f"system style sheet '{rc.qss_rc}'"
@@ -377,6 +377,14 @@ def main():
     logger.info(f"Starting pyfda with screen resolution {width} x {height}")
     logger.info(f"With {style} and matplotlib fontsize {fontsize}.")
     logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f})")
+    logger.info(f"{avail_geometry} - {pixel_ratio}")
+
+    # Available signals:
+    # - logicalDotsPerInchChanged(qreal dpi)
+    # - physicalDotsPerInchChanged(qreal dpi)
+    # - geometryChanged(const QRect &geometry)
+    # - availableGeometryChanged(const QRect &geometry)
+
     # logger.info(f"size = {font.pointSize()}, {font.pointSizeF()}, {font.pixelSize()},  height = {fm.height()}")
     if dirs.OS.lower() == "windows":
         # Windows taskbar is not for "Application Windows" but for "Application
