@@ -396,13 +396,9 @@ def main():
     app.setActiveWindow(mainw)
     # Set default icon for window
     mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
-
-    if height < 800:
-        delta = 50
-    else:
-        delta = 100
-    # set position + size of main window on desktop
-    mainw.setGeometry(20, 20, width - delta, height - delta) # top L / top R, dx, dy
+    # set main window on desktop to full size
+    # mainw.setGeometry(0, 0, width, height) # top L / top R, dx, dy
+    mainw.setGeometry(app.desktop().availableGeometry())
     # Give the keyboard input focus to this widget if this widget
     # or one of its parents is the active window:
 #    mainw.setFocus()
