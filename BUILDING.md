@@ -2,14 +2,14 @@
 
 This document needs to be updated. Building is now performed by the following github actions:
 
-- [publish_pypi.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/publish_pypi.yml): Build and publish a release on the [PyPI Archive](https://pypi.org/project/pyfda/). Triggered by pushing a proper version tag ```v*``` to the main branch.
+- [publish_pypi.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/publish_pypi.yml): Build and publish a release on the [PyPI Archive](https://pypi.org/project/pyfda/). Triggered by pushing a proper version tag ```v*```.
 - [build_pyinstaller.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as "latest" release. Triggered by every push to the main branch.
-- [build_pyinstaller_version.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller_version.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as a versioned release. Triggered by pushing a proper version tag ```v*``` to the main branch.
+- [build_pyinstaller_version.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_pyinstaller_version.yml): Build self-extracting executables for Windows and MacOS using pyinstaller and publish as a versioned release. Triggered by pushing a proper version tag ```v*```.
 - [build_flatpak.yml](https://github.com/chipmuenk/pyfda/blob/develop/.github/workflows/build_flatpak.yml): Build a flatpak archive and publish it either as "latest" or a "versioned" release. Triggered by a push to the main branch or by pushing a proper version tag ```v*``` . For a versioned tag, the archive is also published on [Flathub](https://flathub.org/de/apps/com.github.chipmuenk.pyfda).
 
 Creating a versioned release requires a workflow like
 
-* update version.py      # PyPI version number is created from this
+* update ```version.py```, PyPI version number is created from this
 * merge develop and main, push develop (default branch)  
 
 ```
