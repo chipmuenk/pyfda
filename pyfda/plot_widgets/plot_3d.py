@@ -321,6 +321,8 @@ class Plot_3D(QWidget):
 
         self.mplwidget.fig.clf()  # needed to get rid of colorbar
         self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+        # self.ax3d.set_box_aspect(aspect=(4, 1, 0.5), zoom=1.3)
+        # self.ax3d.set_aspect('auto', adjustable='box')
         # self.ax3d = self.mplwidget.fig.subplots(nrows=1, ncols=1, projection='3d')
 
         self._restore_axes()
