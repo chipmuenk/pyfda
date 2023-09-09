@@ -504,7 +504,7 @@ class PlotImpz_UI(QWidget):
         self.lbl_title_plot_freq = QLabel("Plots:")
         self.lbl_title_plot_freq.setObjectName("large")
         #
-        self.lbl_plt_freq_stim = QLabel(to_html("Stimulus X", frmt='bi'), self)
+        self.lbl_plt_freq_stim = QLabel(to_html("Stim. X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_stim, self.plot_styles_list, self.plt_freq_stim)
@@ -512,7 +512,7 @@ class PlotImpz_UI(QWidget):
             "<span>Plot style for stimulus.</span>")
 
         self.lbl_plt_freq_stmq = QLabel(
-            to_html("&nbsp;Fixp. Stim. X_Q", frmt='bi'), self)
+            to_html("&nbsp;FX Stim. X_Q", frmt='bi'), self)
         self.cmb_plt_freq_stmq = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_stmq, self.plot_styles_list, self.plt_freq_stmq)
@@ -520,7 +520,7 @@ class PlotImpz_UI(QWidget):
             "<span>Plot style for <em>fixpoint</em> (quantized) stimulus.</span>")
 
         lbl_plt_freq_resp = QLabel(
-            to_html("&nbsp;Response Y", frmt='bi'), self)
+            to_html("&nbsp;Resp. Y", frmt='bi'), self)
         self.cmb_plt_freq_resp = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_freq_resp, self.plot_styles_list, self.plt_freq_resp)
