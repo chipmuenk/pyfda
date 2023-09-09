@@ -24,7 +24,7 @@ pyfda
     <tr>
         <td><img src = "img/pyfda_screenshot_3d_3.png" alt="Screenshot" width=300px></td>
         <td><img src = "img/pyfda_screenshot_pz.png" alt="Screenshot" width=300px></td>
-        <td><img src = "img/pyfda_screenshot_spec_error.png" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_screenshot_pz_hf.png" alt="Screenshot" width=300px></td>
     </tr>
   <tr>
         <td><img src = "img/pyfda_scr_shot_3d5_info.png" alt="Screenshot" width=300px></td> 
