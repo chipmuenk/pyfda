@@ -700,8 +700,12 @@ class Plot_Tran_Stim_UI(QWidget):
                     scale = getattr(self, param_name)  # get scale value
                     var_old = getattr(self, var_name)  # get old var value
                     # assign var with either content of text field or fallback value:
-                    var = safe_eval(source.text(), var_old * scale,
-                                    sign='pos', return_type='float') / scale
+                    if var_name in {'T1', 'T2'}:
+                        var = safe_eval(source.text(), var_old * scale,
+                                    return_type='float') / scale
+                    else:
+                        var = safe_eval(source.text(), var_old * scale,
+                                        sign='pos', return_type='float') / scale
                     # assign evaluated text field to variable
                     setattr(self, var_name, var)
                     # set textfield with scaled value of `var_name`:
