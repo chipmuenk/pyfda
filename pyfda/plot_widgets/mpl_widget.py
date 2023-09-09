@@ -143,7 +143,7 @@ class MplWidget(QWidget):
         # self.mplToolbar.sig_rx.connect(self.sig_rx)  # TODO: Doesn't exist yet
 
         layHToolbar = QHBoxLayout()
-        layHToolbar.addWidget(self.mplToolbar, 1, Qt.AlignLeft)
+        layHToolbar.addWidget(self.mplToolbar)
         layHToolbar.addStretch(1)
 
         # =============================================
