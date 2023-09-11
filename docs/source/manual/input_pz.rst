@@ -16,7 +16,7 @@ Cartesian format
 .. figure:: ../img/manual/pyfda_input_pz_cartesian.png
    :alt: Screenshot of the pole/zero tab in cartesian format
    :align: center
-   :width: 50%
+   :width: 30%
 
    Screenshot of the pole/zero tab in cartesian format
 
@@ -31,7 +31,7 @@ Polar format
 .. figure:: ../img/manual/pyfda_input_pz_polar.png
    :alt: Screenshot of the pole/zero tab in polar format
    :align: center
-   :width: 50%
+   :width: 30%
 
    Screenshot of the pole/zero tab in polar format
    
