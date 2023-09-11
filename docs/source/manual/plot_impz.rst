@@ -15,7 +15,7 @@ the transient response and its Fourier transformation, here, an elliptical filte
    
 This tab is split into several subwindows:
 
-Time / Frequency
+## Time / Frequency (main plotting area)
     These vertical tabs select between the time (transient) and frequency (spectral)
     domain. Signals are calculated in the time domain and then transformed using 
     Fourier transform.
@@ -32,10 +32,10 @@ For an transform of periodic signals without leakage effect, ("smeared" spectral
       is not possible to capture an integer number of periods, use another window
       as the rectangular window has the worst leakage effect.
       
-View
+## Plots
     What will be plotted and how. 
     
-Stimulus
+## Stim.
     Select the stimulus, its frequency, DC-content, noise ... When the BL checkbox
     is checked, the signal is bandlimited to the Nyquist frequency. Some signals
     have strong harmonic content which produces aliasing. This can be seen best
