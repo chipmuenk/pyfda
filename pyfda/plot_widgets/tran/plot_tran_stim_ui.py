@@ -73,7 +73,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # stimuli
         self.cmb_stim_item = "impulse"
-        self.cmb_stim_periodic_item = "square"
+        self.cmb_stim_periodic_item = "rect_per"
         self.cmb_stim_modulation_item = "am"
         self.stim = "dirac"
         self.impulse_type = "dirac"
@@ -121,7 +121,7 @@ class Plot_Tran_Stim_UI(QWidget):
             "chirp":   {"dc", "a1", "phi1", "f1", "f2", "T2", "noise"},
             "triang":  {"dc", "a1", "phi1", "f1", "noise", "bl"},
             "saw":     {"dc", "a1", "phi1", "f1", "noise", "bl"},
-            "square":  {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
+            "rect_per": {"dc", "a1", "phi1", "f1", "noise", "bl", "par1"},
             "comb":    {"dc", "a1", "phi1", "f1", "noise"},
             "am":      {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
             "pmfm":    {"dc", "a1", "a2", "phi1", "phi2", "f1", "f2", "noise"},
@@ -154,7 +154,7 @@ class Plot_Tran_Stim_UI(QWidget):
         # combobox tooltip + data / text / tooltip for periodic signals items
         self.cmb_stim_periodic_items = [
             "<span>Periodic functions with discontinuities.</span>",
-            ("square", "Square", "<span>Square signal with duty cycle &alpha;</span>"),
+            ("rect_per", "Rect", "<span>Rectangular signal with duty cycle &alpha;</span>"),
             ("saw", "Saw", "Sawtooth signal"),
             ("triang", "Triang", "Triangular signal"),
             ("comb", "Comb", "Comb signal")

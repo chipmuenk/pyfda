@@ -124,7 +124,7 @@ class Plot_Tran_Stim(QWidget):
                     self.title_str = r'Bandlim. Sawtooth Stimulus'
                 else:
                     self.title_str = r'Sawtooth Stimulus'
-            elif self.ui.stim == "square":
+            elif self.ui.stim == "rect_per":
                 if self.ui.but_stim_bl.isChecked():
                     self.title_str = r'Bandlimited Rect. Stimulus'
                 else:
@@ -358,7 +358,7 @@ class Plot_Tran_Stim(QWidget):
             else:
                 x[frm_slc] = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
-        elif self.ui.stim == "square":
+        elif self.ui.stim == "rect_per":
             if self.ui.but_stim_bl.isChecked():
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
