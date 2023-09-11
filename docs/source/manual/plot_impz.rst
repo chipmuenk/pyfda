@@ -20,8 +20,7 @@ Time / Frequency
     domain. Signals are calculated in the time domain and then transformed using 
     Fourier transform.
 
-For an transform of periodic signals without leakage effect,
-    ("smeared" spectral lines) take care that:
+For an transform of periodic signals without leakage effect, ("smeared" spectral lines) take care that:
     
     - The filter has settled sufficiently. Select a suitable value of **N0**.
     
