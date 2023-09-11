@@ -2,7 +2,7 @@ Plot y[n]
 =========
 
 :numref:`fig_plot_impz` shows a typical view of the **y[n]** tab for plotting
-the transient response and its Fourier transformation, here, an elliptical filter (IIR) is shown.
+the transient response and its Fourier transformation, here, for a Chebychev filter (IIR).
 
 .. _fig_plot_impz:
 
@@ -61,8 +61,7 @@ Stim.
 Select the stimulus, its frequency, DC-content, noise ... When the BL checkbox
 is checked, the signal is bandlimited to the Nyquist frequency. Some signals
 have strong harmonic content which produces aliasing. This can be seen best
-in the frequency domain (e.g. for a sawtooth signal with f = 0.15). The
-stimulus options can be hidden with the checkbox **Stim. Options**.
+in the frequency domain (e.g. for a sawtooth signal with f = 0.15).
 
 DC and Different sorts of noise can be added.
 
@@ -70,7 +69,7 @@ Run
 ---
 Usually, plots are updated as soon as an option has been changed. This can 
 be disabled with the **Auto** checkbox for cases where the simulation takes
-a long time (e.g. for some fixpoint simulations)
+a long time (e.g. for some fixpoint simulations).
 
    
 Development
