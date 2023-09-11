@@ -20,8 +20,6 @@
 Welcome to pyfda's documentation!
 =================================
 
-Version: 0.5.3
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
