@@ -15,7 +15,8 @@ the transient response and its Fourier transformation, here, an elliptical filte
    
 This tab is split into several subwindows:
 
-## Time / Frequency (main plotting area)
+Time / Frequency (main plotting area)
+-------------------------------------
     These vertical tabs select between the time (transient) and frequency (spectral)
     domain. Signals are calculated in the time domain and then transformed using 
     Fourier transform.
@@ -32,7 +33,8 @@ For an transform of periodic signals without leakage effect, ("smeared" spectral
       is not possible to capture an integer number of periods, use another window
       as the rectangular window has the worst leakage effect.
       
-## Plots
+Plots
+~~~~~
     What will be plotted and how. 
     
 ## Stim.
