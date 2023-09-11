@@ -489,6 +489,15 @@ class Plot_Tran_Stim_UI(QWidget):
         layG_ctrl_stim.addWidget(self.ledAmp1, 0, i)
         layG_ctrl_stim.addWidget(self.ledAmp2, 1, i)
         i += 1
+        layG_ctrl_stim.addWidget(self.lblFreq1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblFreq2, 1, i)
+        i += 1
+        layG_ctrl_stim.addWidget(self.led_f1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_f2, 1, i)
+        i += 1
+        layG_ctrl_stim.addWidget(self.lblFreqUnit1, 0, i)
+        layG_ctrl_stim.addWidget(self.lblFreqUnit2, 1, i)
+        i += 1
         layG_ctrl_stim.addWidget(self.lblPhi1, 0, i)
         layG_ctrl_stim.addWidget(self.lblPhi2, 1, i)
         i += 1
@@ -497,6 +506,12 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         layG_ctrl_stim.addWidget(self.lblPhU1, 0, i)
         layG_ctrl_stim.addWidget(self.lblPhU2, 1, i)
+        i += 1
+        layG_ctrl_stim.addWidget(self.lbl_BW1, 0, i)
+        layG_ctrl_stim.addWidget(self.lbl_BW2, 1, i)
+        i += 1
+        layG_ctrl_stim.addWidget(self.led_BW1, 0, i)
+        layG_ctrl_stim.addWidget(self.led_BW2, 1, i)
         i += 1
         layG_ctrl_stim.addWidget(self.lbl_T1, 0, i)
         layG_ctrl_stim.addWidget(self.lbl_T2, 1, i)
@@ -521,21 +536,6 @@ class Plot_Tran_Stim_UI(QWidget):
         i += 1
         layG_ctrl_stim.addWidget(self.lbl_TWU1, 0, i)
         layG_ctrl_stim.addWidget(self.lbl_TWU2, 1, i)
-        i += 1
-        layG_ctrl_stim.addWidget(self.lblFreq1, 0, i)
-        layG_ctrl_stim.addWidget(self.lblFreq2, 1, i)
-        i += 1
-        layG_ctrl_stim.addWidget(self.led_f1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_f2, 1, i)
-        i += 1
-        layG_ctrl_stim.addWidget(self.lblFreqUnit1, 0, i)
-        layG_ctrl_stim.addWidget(self.lblFreqUnit2, 1, i)
-        i += 1
-        layG_ctrl_stim.addWidget(self.lbl_BW1, 0, i)
-        layG_ctrl_stim.addWidget(self.lbl_BW2, 1, i)
-        i += 1
-        layG_ctrl_stim.addWidget(self.led_BW1, 0, i)
-        layG_ctrl_stim.addWidget(self.led_BW2, 1, i)
         i += 1
         layG_ctrl_stim.addWidget(line2, 0, i, 2, 1)
         i += 1
