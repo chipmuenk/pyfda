@@ -17,34 +17,37 @@ This tab is split into several subwindows:
 
 Time / Frequency (main plotting area)
 -------------------------------------
-    These vertical tabs select between the time (transient) and frequency (spectral)
-    domain. Signals are calculated in the time domain and then transformed using 
-    Fourier transform.
+These vertical tabs select between the time (transient) and frequency (spectral)
+domain. Signals are calculated in the time domain and then transformed using 
+Fourier transform.
 
+Frequency
+~~~~~~~~~
 For an transform of periodic signals without leakage effect, ("smeared" spectral lines) take care that:
     
-    - The filter has settled sufficiently. Select a suitable value of **N0**.
-    
-    - The number of data points **N** is chosen in such a way that an integer
-      number of periods is transformed.
-      
-    - The FFT window is set to rectangular. Other windows
-      work as well but they distribute spectral lines over several bins. When it
-      is not possible to capture an integer number of periods, use another window
-      as the rectangular window has the worst leakage effect.
+- The filter has settled sufficiently. Select a suitable value of **N0**.
+
+- The number of data points **N** is chosen in such a way that an integer
+  number of periods is transformed.
+
+- The FFT window is set to rectangular. Other windows
+  work as well but they distribute spectral lines over several bins. When it
+  is not possible to capture an integer number of periods, use another window
+  as the rectangular window has the worst leakage effect.
       
 Plots
-~~~~~
-    What will be plotted and how. 
+-----
+What will be plotted and how. 
     
-## Stim.
-    Select the stimulus, its frequency, DC-content, noise ... When the BL checkbox
-    is checked, the signal is bandlimited to the Nyquist frequency. Some signals
-    have strong harmonic content which produces aliasing. This can be seen best
-    in the frequency domain (e.g. for a sawtooth signal with f = 0.15). The
-    stimulus options can be hidden with the checkbox **Stim. Options**.
-    
-    DC and Different sorts of noise can be added.
+Stim.
+-----
+Select the stimulus, its frequency, DC-content, noise ... When the BL checkbox
+is checked, the signal is bandlimited to the Nyquist frequency. Some signals
+have strong harmonic content which produces aliasing. This can be seen best
+in the frequency domain (e.g. for a sawtooth signal with f = 0.15). The
+stimulus options can be hidden with the checkbox **Stim. Options**.
+
+DC and Different sorts of noise can be added.
 
 Run
     Usually, plots are updated as soon as an option has been changed. This can 
