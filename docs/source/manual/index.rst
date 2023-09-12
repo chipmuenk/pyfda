@@ -20,9 +20,12 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 The invidual windows can be resized using the handles (red dots).
 
+Contents
+--------
+
 .. toctree::
    :maxdepth: 1
-   :caption: Contents
+   :caption: Input Widgets
 
    input_specs
    input_coeffs
