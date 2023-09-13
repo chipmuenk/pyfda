@@ -13,23 +13,23 @@ pyfda
 
 **pyfda** is a tool written in Python / Qt for analyzing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
-![Screenshot](img/pyfda_screenshot.png)
+![Screenshot](docs/source/screenshots/pyfda_screenshot.png)
 
 <table>
     <tr>
-        <td><img src = "img/pyfda_screenshot_specs_3d_surface.png" alt="Screenshot pyfda, specifications and 3d surface plot" width=300px></td>
-        <td><img src = "img/pyfda_screenshot_specs_yn.png" alt="Screenshot pyfda, specs and transient response" width=300px></td>
-        <td><img src = "img/pyfda_screenshot_ba_yn_fir.png" alt="Screenshot pyfda, coefficients and transient response" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_specs_3d_surface.png" alt="Screenshot pyfda, specifications and 3d surface plot" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_specs_yn.png" alt="Screenshot pyfda, specs and transient response" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_ba_yn_fir.png" alt="Screenshot pyfda, coefficients and transient response" width=300px></td>
    </tr>
     <tr>
-        <td><img src = "img/pyfda_screenshot_pz_3d_contour.png" alt="Screenshot pyfda, poles / zeros and 3D contour plot" width=300px></td>
-        <td><img src = "img/pyfda_screenshot_coeffs_pz.png" alt="Screenshot pyfda, coefficients and pole-zero-plot" width=300px></td>
-        <td><img src = "img/pyfda_screenshot_info_pz_hf.png" alt="Screenshot pyfda, infos and pole-zero-plot with embedded amplitude magnitude" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_pz_3d_contour.png" alt="Screenshot pyfda, poles / zeros and 3D contour plot" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_coeffs_pz.png" alt="Screenshot pyfda, coefficients and pole-zero-plot" width=300px></td>
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_info_pz_hf.png" alt="Screenshot pyfda, infos and pole-zero-plot with embedded amplitude magnitude" width=300px></td>
     </tr>
   <tr>
-        <td><img src = "img/pyfda_screenshot_pz_yn_cmplx_stim.png" alt="Screenshot pyfda, poles / zeros and transient response with complex stimulus" width=300px></td> 
-        <td><img src = "img/pyfda_screenshot_fix_yn_t.png" alt="Screenshot pyfda, fixpoint and transient response" width=300px></td> 
-        <td><img src = "img/pyfda_screenshot_fix_yn_f.png" alt="Screenshot pyfda, fixpoint and transient response (frequency)" width=300px></td> 
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_pz_yn_cmplx_stim.png" alt="Screenshot pyfda, poles / zeros and transient response with complex stimulus" width=300px></td> 
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_fix_yn_t.png" alt="Screenshot pyfda, fixpoint and transient response" width=300px></td> 
+        <td><img src = "docs/source/screenshots/pyfda_screenshot_fix_yn_f.png" alt="Screenshot pyfda, fixpoint and transient response (frequency)" width=300px></td> 
   <tr>
 </table>
 
