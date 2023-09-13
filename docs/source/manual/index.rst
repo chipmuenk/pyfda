@@ -16,38 +16,33 @@ with the handles (red dots):
 *	**Inputs widgets:** The tabs on the left-hand side access widgets to enter and view various
    specification and parameters for the filter / system to be designed resp. analyzed.
 
+   .. toctree::
+      :maxdepth: 1
+
+      input_specs
+      input_coeffs
+      input_pz
+      input_info
+      input_files
+      input_fixpoint_specs
+
 *	**Plotting widgets**: The subwidgets on the right-hand side allow for graphical analyses of
    the system.
+
+   .. toctree::
+      :maxdepth: 1
+      :caption: Plotting Widgets
+
+      plot_hf
+      plot_phi
+      plot_tau_g
+      plot_pz
+      plot_impz
+      plot_3d
 
 *  **Logger window** is in the lower part of the plotting window, it can be resized
         or completely closed. The content of the logger window can be selected, copied
         or cleared with a right mouse button context menu.
-
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Input Widgets
-
-   input_specs
-   input_coeffs
-   input_pz
-   input_info
-   input_files
-   input_fixpoint_specs
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Plotting Widgets
-
-   plot_hf
-   plot_phi
-   plot_tau_g
-   plot_pz
-   plot_impz
-   plot_3d
 
 .. _man_customization:
 
