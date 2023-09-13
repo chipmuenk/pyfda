@@ -1,24 +1,28 @@
 User Manual
 ===========
 
-This part of the documentation is intended to describe the features of pyFDA that are relevant to a user (i.e. non-developer).
+:numref:`fig_pyfda_screenshot` shows main pyfda screen with three subwindows that can be resized
+with the handles (red dots):
 
-Once you have started up pyFDA, you'll see a screen similar to the following figure:
+.. _fig_pyfda_screenshot:
 
-.. figure:: ../img/pyfda_specs_Hf.png
+.. figure:: ../screenshots/pyfda_screenshot.png
    :alt: pyfda screenshot
+   :align: center
+   :width: 100%
 
    Screenshot of pyfda
 
-*	**Inputs widgets:** On the left-hand side you see tabs for different input widgets, i.e. where you can enter and modify parameters for the filter to be designed
+*	**Inputs widgets:** The tabs on the left-hand side access widgets to enter and view various
+   specification and parameters for the filter / system to be designed resp. analyzed.
 
-*	**Plotting widgets** can be selected on the right hand side of the application.
+*	**Plotting widgets**: The subwidgets on the right-hand side allow for graphical analyses of
+   the system.
 
-*   **Logger window** is in the lower part of the plotting window, it can be resized
+*  **Logger window** is in the lower part of the plotting window, it can be resized
         or completely closed. The content of the logger window can be selected, copied
         or cleared with a right mouse button context menu.
 
-The invidual windows can be resized using the handles (red dots).
 
 Contents
 --------
@@ -33,7 +37,7 @@ Contents
    input_info
    input_files
    input_fixpoint_specs
-   
+
 .. toctree::
    :maxdepth: 1
    :caption: Plotting Widgets
@@ -56,7 +60,7 @@ pyfda.conf
 
 A copy of ``pyfda/pyfda.conf`` is created in ``<USER_HOME>/.pyfda/pyfda.conf``
 where it can be edited by the user to choose which widgets and filters will be included.
-Fixpoint widgets can be assigned to filter designs and one or more user directories can 
+Fixpoint widgets can be assigned to filter designs and one or more user directories can
 be defined if you want to develop and integrate your own widgets (it's not so hard!):
 
 .. include:: pyfda_conf.rst
@@ -73,7 +77,7 @@ pyfda_rc.py
 ~~~~~~~~~~~~~~~
 
 Layout and some parameters can be customized with the file
-``pyfda/pyfda_rc.py`` (within the install directory right now, no user copy). 
+``pyfda/pyfda_rc.py`` (within the install directory right now, no user copy).
 
 
 

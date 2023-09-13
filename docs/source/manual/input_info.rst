@@ -1,8 +1,8 @@
 Input Info
 ============
 
-:numref:`fig_input_info` shows a typical view of the **Info** tab where
-information on the current filter design and design algorithm is displayed.
+The **Info** tab (:numref:`fig_input_info`) displays infos on the current filter design
+and design algorithm.
 
 .. _fig_input_info:
 
@@ -13,7 +13,7 @@ information on the current filter design and design algorithm is displayed.
 
    Screenshot of the info tab
 
-In the top row, buttons select which information is displayed.
+The buttons in the top row select which information is displayed:
 
 The **H(f)** button activates the display of specifications in the frequency domain and
 how well they are met. Failed specifications are highlighted in red.
