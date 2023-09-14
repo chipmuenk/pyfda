@@ -1,4 +1,14 @@
 # Changelog
+## [v0.8.3](https://github.com/chipmuenk/pyfda/tree/v0.8.3) (2023-09-14)
+### Bugfixes
+- Fix crashes when saving coefficients in fixpoint format ( [Issue \#230](https://github.com/chipmuenk/pyfda/issues/230) and [Issue \#238](https://github.com/chipmuenk/pyfda/issues/238))
+- Update images for README.md and readthedocs documentation
+- Rename square to rect stimulus in y[n] stimuli
+- Allow for zero or negative delays in y[n] stimuli
+- Correct wrong CSV defaults for header and row/column mode while saving
+- Fix improper alignment of matplotlib navigation bar
+- Minor UI improvements
+
 ## [v0.8.2](https://github.com/chipmuenk/pyfda/tree/v0.8.2) (2023-09-08)
 ### Bugfixes
 - Fine-tuning of Matplotlib font size for different screens, scalings and resolutions
