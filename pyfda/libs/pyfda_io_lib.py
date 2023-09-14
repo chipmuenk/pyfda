@@ -319,9 +319,9 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     """
 
     text = ""
-    if params['CSV']['header'] in {'auto', 'on'}:
+    if params['CSV']['header'] == 'on':
         use_header = True
-    elif params['CSV']['header'] == 'off':
+    elif params['CSV']['header'] in {'off', 'auto'}:
         use_header = False
     else:
         logger.error(
@@ -376,7 +376,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Copy only selected cells in displayed format:
     # =======================================================================
     else:
-        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
+        if params['CSV']['orientation'] == 'rows':  # write table in row(s)
             if use_header:  # insert table header at the beginning of row 1
                 text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
