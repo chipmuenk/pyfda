@@ -405,8 +405,8 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
             if use_header:
                 for c in sel_c:
                     text += table.horizontalHeaderItem(c).text() + delim
-                    # cr is added further below
-                text.rstrip(delim)
+                    # remove last delimiter and add line break
+                text = text.rstrip(delim) + cr
 
             for r in range(num_rows):  # iterate over whole table
                 for c in sel_c:
