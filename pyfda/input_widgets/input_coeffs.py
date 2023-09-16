@@ -575,7 +575,7 @@ class Input_Coeffs(QWidget):
         Called at the end of nearly every method.
         """
         params['FMT_ba'] = int(self.ui.spnDigits.text())
-        # quantize coefficient display and update overflow counter
+        # update quantized coefficient display and overflow counter
         self.quant_coeffs_view()
         if np.ndim(self.ba) == 1 or fb.fil[0]['ft'] == 'FIR':
             self.num_rows = len(self.ba[0])
@@ -645,8 +645,11 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def load_dict(self):
         """
-        Create a reference from filter dict `fb.fil[0]['ba']` to the coefficient list
-        `self.ba` and update the display via `self.refresh_table()`.
+        - Create a reference from filter dict `fb.fil[0]['ba']` to the coefficient list
+           `self.ba`
+        - Set quantization UI from dict, update quantized coeff. display / overflow
+          counter
+        - Update the display via `self.refresh_table()`.
 
         The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
@@ -654,7 +657,7 @@ class Input_Coeffs(QWidget):
         """
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
-        self.qdict2ui()  # set quantization UI from dictionary
+        self.qdict2ui()  # set quantization UI from dictionary and refresh table
 
         self.refresh_table()
 
@@ -768,7 +771,10 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def qdict2ui(self):
         """
-        Set the UI from the quantization dict and update the fixpoint quant. object.
+        - set the UI from the quantization dict
+        - Update the fixpoint quant. object
+        - Update the quantized coefficient view and the overflow counter
+        - Refresh the table
 
         Triggered by:
         - `process_sig_rx()`: self.fx_specs_changed == True or
