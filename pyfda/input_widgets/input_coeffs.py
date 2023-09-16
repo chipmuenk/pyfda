@@ -657,9 +657,9 @@ class Input_Coeffs(QWidget):
         """
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
-        self.qdict2ui()  # set quantization UI from dictionary and refresh table
-
-        self.refresh_table()
+        # set quantization UI from dictionary, update quantized coeff. display and 
+        # overflow counter, and refresh table
+        self.qdict2ui()
 
         qstyle_widget(self.ui.butSave, 'normal')
 
@@ -794,6 +794,7 @@ class Input_Coeffs(QWidget):
         # qset_cmb_box(self.ui.cmb_q_frmt, self.ui.wdg_wq_coeffs_b.q_dict['qfrmt'])
         # qset_cmb_box(self.ui.cmb_fx_base, self.ui.wdg_wq_coeffs_b.q_dict['fx_base'])
 
+        self.quant_coeffs_view()
         self.refresh_table()
 
 # ------------------------------------------------------------------------------
@@ -898,13 +899,13 @@ class Input_Coeffs(QWidget):
 
         if D > 0:  # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
-            self.quant_coeffs_view()
+            # self.quant_coeffs_view()
         elif D < 0:  # a is longer than b
             if fb.fil[0]['ft'] == 'IIR':
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D]  # discard last D elements of a
-            self.quant_coeffs_view()
+        self.quant_coeffs_view()
 
 # ------------------------------------------------------------------------------
     def _delete_cells(self):
