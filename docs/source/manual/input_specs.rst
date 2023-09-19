@@ -1,9 +1,13 @@
 Input Specs
 ===========
 
-:numref:`fig_specs_input_window` shows a typical view of the **Specs** tab where 
-you can specify the kind of filter to be designed and its specifications in the
-frequency domain:
+:numref:`fig_specs_input_window` shows a typical view of the **Specs** tab.
+
+"Load" and "Save" ... well, loads and saves complete filter designs. Coefficients and 
+poles / zeros can be imported and exported in the "b,a" resp. the "P/Z" tab.
+
+For the actual filter design, you can specify the kind of filter to be designed and its 
+specifications in the frequency domain:
 
 - **Response type** (low pass, band pass, ...)
 

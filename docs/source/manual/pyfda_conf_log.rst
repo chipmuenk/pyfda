@@ -1,2 +1,2 @@
-.. include:: ../../../pyfda/pyfda_log.conf
+.. include:: ../../../pyfda/libs/pyfda_log_template.conf
    :literal:

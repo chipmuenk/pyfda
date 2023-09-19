@@ -24,7 +24,7 @@ licensing and module versions (:numref:`fig_input_info_about`).
 .. _fig_input_info_about:
 
 .. figure:: ../img/manual/pyfda_input_info_about.png
-   :alt: Screenshot of the About pop-up window
+   :alt: Screenshot of the "About" pop-up window
    :align: center
    :width: 50%
 

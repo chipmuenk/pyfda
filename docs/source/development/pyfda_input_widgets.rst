@@ -59,21 +59,13 @@ input_info
 	:members:
 
 
-.. _dev_input_files:
-
-input_files
-------------
-
-.. automodule:: pyfda.input_widgets.input_files
-	:members:
-
 
 input_fixpoint_specs
 ---------------------
 
-The configuration file `pyfda.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
+The configuration file `libs.pyfda_template.conf` lists which fixpoint classes (e.g. ``FIR_DF`` 
 and ``IIR_DF1``) can be used with which filter design algorithm.
-`tree_builder` parses this file and writes all fixpoint modules
+`libs.tree_builder` parses this file and writes all fixpoint modules
 into the list `fb.fixpoint_widgets_list`. The input widget 
 :mod:`pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
 with references to all successfully imported fixpoint modules. The currently 

@@ -71,7 +71,7 @@ Configuration
 -------------
 
 The configuration file ``pyfda.conf`` lists the fixpoint classes to be used, 
-e.g. ``DF1`` and ``DF2``. :class:`pyfda.tree_builder.Tree_Builder` parses this file 
+e.g. ``DF1`` and ``DF2``. :class:`pyfda.libs.tree_builder.Tree_Builder` parses this file 
 and writes all fixpoint modules 
 into the list ``fb.fixpoint_widgets_list``. The input widget 
 :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs` constructs a combo box from this list 
