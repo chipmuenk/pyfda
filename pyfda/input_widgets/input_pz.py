@@ -73,12 +73,12 @@ class ItemDelegate(QStyledItemDelegate):
             option.backgroundBrush = QBrush(Qt.SolidPattern)
             option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
 
-    # --------------------------------------------------------------------------
-    # def text(self, item):
-    #     """
-    #     Return item text as string transformed by self.displayText()
-    #     """
-    #     return qstr(self.displayText(item.text(), QtCore.QLocale()))
+    --------------------------------------------------------------------------
+    def text(self, item):
+        """
+        Return item text as string transformed by self.displayText()
+        """
+        return qstr(self.displayText(item.text(), QtCore.QLocale()))
 
     # --------------------------------------------------------------------------
     def displayText(self, text, locale):
