@@ -62,6 +62,11 @@ table.
 When poles or zeros have been modified, the "upload values" icon becomes highlighted. Changes
 are only applied when stored in the internal dict.
 
+Poles and zeros can be saved in various formats, CSV option can be selected in the CSV 
+pop-up menu (the 'cog' icon). When cells have been selected before saving, only the selected
+cells are saved, *exactly as displayed*. This means, cells are saved with reduced number of
+digits and containing special characters like '<' etc. which cannot be read back.
+
 Development
 -----------
 
