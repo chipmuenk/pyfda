@@ -760,8 +760,9 @@ class Input_PZ(QWidget):
                 scale = np.pi
                 string = re.sub('π$|pi$|p$', '', string)
             else:
+                # this case also works when angle is a pure number
                 scale = 1.  # angle in rad
-                string = re.sub('rad', '', string)
+                string = re.sub('rad$|r$', '', string)
 
             phi = safe_eval(string) * scale
             return phi
