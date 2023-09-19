@@ -247,7 +247,7 @@ class Input_PZ(QWidget):
         self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
         self.ui.butLoad.clicked.connect(self.load_dict)
-        self.ui.butEnable.clicked.connect(self.load_dict)
+        # self.ui.butEnable.clicked.connect(self.load_dict)
 
         self.ui.butSave.clicked.connect(self._save_entries)
         self.ui.cmbNorm.activated.connect(self._normalize_gain)
@@ -372,21 +372,21 @@ class Input_PZ(QWidget):
         Called by eventFilter, _normalize_gain() and _refresh_table()
         """
 
-        if self.ui.butEnable.isChecked():
-            if len(self.zpk) == 3:  # number of rows
-                pass
-            elif len(self.zpk) == 2:  # k is missing in zpk:
-                self.zpk.append(zeros_with_val(len(self.zpk[0])))  # add a row with k = 1
-            else:
-                logger.error(f"P/Z array 'self.zpk' has wrong number of rows = {len(self.zpk)}")
-                logger.error(self.zpk)
+        # if self.ui.butEnable.isChecked():
+        if len(self.zpk) == 3:  # number of rows
+            pass
+        elif len(self.zpk) == 2:  # k is missing in zpk:
+            self.zpk.append(zeros_with_val(len(self.zpk[0])))  # add a row with k = 1
+        else:
+            logger.error(f"P/Z array 'self.zpk' has wrong number of rows = {len(self.zpk)}")
+            logger.error(self.zpk)
 
-            k = safe_eval(self.zpk[2][0], return_type='auto')
+        k = safe_eval(self.zpk[2][0], return_type='auto')
 
-            if not self.ui.ledGain.hasFocus():  # no focus, round the gain
-                self.ui.ledGain.setText(str(params['FMT'].format(k)))
-            else:  # widget has focus, show gain with full precision
-                self.ui.ledGain.setText(str(k))
+        if not self.ui.ledGain.hasFocus():  # no focus, round the gain
+            self.ui.ledGain.setText(str(params['FMT'].format(k)))
+        else:  # widget has focus, show gain with full precision
+            self.ui.ledGain.setText(str(k))
 
     # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -408,7 +408,8 @@ class Input_PZ(QWidget):
         desired number format.
 
         TODO:
-        Update zpk[2][0]?
+        - Update zpk[2][0]?
+        - Remove butEnable part
 
         Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(),
                 add_row(), _import()
@@ -416,11 +417,12 @@ class Input_PZ(QWidget):
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
 
-        self.tblPZ.setVisible(self.ui.butEnable.isChecked())
+        # self.tblPZ.setVisible(self.ui.butEnable.isChecked())
+        self.tblPZ.setVisible(True)
 
-        if self.ui.butEnable.isChecked():
+        if True: # self.ui.butEnable.isChecked():
 
-            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
+            # self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
 
             self._restore_gain()
 
@@ -437,8 +439,8 @@ class Input_PZ(QWidget):
             self.tblPZ.resizeRowsToContents()
             self.tblPZ.clearSelection()
 
-        else:  # disable widgets
-            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        # else:  # disable widgets
+        #     self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
 
     # ------------------------------------------------------------------------------
     def load_dict(self):

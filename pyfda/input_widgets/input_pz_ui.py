@@ -95,12 +95,12 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-        self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
-        q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
+        # self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
+        # q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
         # self.butEnable.setIconSize(q_icon_size)  # and set the size
-        self.butEnable.setToolTip(
-            "<span>Show / hide poles and zeros in an editable table."
-            " For high order systems, the table display might be slow.</span>")
+        # self.butEnable.setToolTip(
+        #    "<span>Show / hide poles and zeros in an editable table."
+        #    " For high order systems, the table display might be slow.</span>")
 
         self.cmbPZFrmt = QComboBox(self)
         qcmb_box_populate(
@@ -125,7 +125,7 @@ class Input_PZ_UI(QWidget):
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(self.butEnable)
+        # layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmbPZFrmt)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
@@ -162,11 +162,11 @@ class Input_PZ_UI(QWidget):
         # ---------------------------------------------
         self.butAddCells = QPushButton(self)
         self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
-        self.butAddCells.setIconSize(q_icon_size)
         self.butAddCells.setToolTip(
             "<span>Select cells to insert a new cell above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, add a row at the end.</span>")
+        q_icon_size = self.butAddCells.iconSize() 
 
         self.butDelCells = QPushButton(self)
         self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
