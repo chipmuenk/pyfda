@@ -51,7 +51,7 @@ class Input_PZ_UI(QWidget):
             #
             ("cartesian", "Cartesian", "Cartesian coordinates (x + jy)"),
             ("polar_rad", "Polar (rad)",
-             "Polar coordinates (r * &ang; &Omega;) with &ang; in rad."),
+             "<span>Polar coordinates (r * &ang; &Omega;) with &ang; in rad.</span>"),
             ('polar_pi', 'Polar (pi)',
              "<span>Polar coordinates (r * &ang; &Omega;) with &ang; in multiples "
              "of &pi;, type 'pi' instead of &pi;.</span>"),
