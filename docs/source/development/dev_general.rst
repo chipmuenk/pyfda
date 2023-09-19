@@ -85,8 +85,8 @@ Data can be transmitted via the global ``sig_tx`` signal (referenced by the impo
 
 .. code::
 
-        dict_sig = {'fx_sim':'update_data', 'fx_results':some_new_data}
-        self.emit(dict_sig)
+    dict_sig = {'fx_sim':'update_data', 'fx_results':some_new_data}
+    self.emit(dict_sig)
 
 The following dictionary keys are generally used, individual ones can be created
 as needed.
@@ -122,7 +122,7 @@ as needed.
 :'ui_local_changed': Propagate a change of the UI to the containing widget but not
     to other widgets, examples are:
     - ``'ui_local_changed': self.sender().objectName()'`` to propagate the name of
-        the emitting subwidget
+      the emitting subwidget
 
 :'ui_global_changed': Propagate a change of the UI to other widgets, examples are:
 

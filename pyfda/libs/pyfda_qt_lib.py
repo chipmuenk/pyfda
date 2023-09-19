@@ -31,7 +31,9 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
       signal. Otherwise, reduce the value by one.
     - If the sender has passed an objectName, add it with the key "sender_name"
       to the dict.
+
     """
+
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
     if 'class' not in dict_sig:

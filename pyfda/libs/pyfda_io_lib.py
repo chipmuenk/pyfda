@@ -533,11 +533,10 @@ def csv2array(f: TextIO):
     Parameters
     ----------
 
-    f: handle to file or file-like object
-        e.g.
+    f: handle to file or file-like object, e.g.
 
-        >>> f = open(file_name, 'r') # or
-        >>> f = io.StringIO(text)
+    >>> f = open(file_name, 'r') # or
+    >>> f = io.StringIO(text)
 
     Returns
     -------
@@ -570,10 +569,12 @@ def csv2array(f: TextIO):
 
       Example: convert from Windows-style line endings to Linux:
 
-      fileContents = open(filename,"r").read()
-      f = open(filename,"w", newline="\n")
-      f.write(fileContents)
-      f.close()
+    .. code-block:: python
+
+        fileContents = open(filename,"r").read()
+        f = open(filename,"w", newline="\n")
+        f.write(fileContents)
+        f.close()
 
       https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
     """

@@ -15,7 +15,7 @@ that can be resized with the handles (red dots):
 
    .. toctree::
       :maxdepth: 1
-      :caption: Subwwindow for Input Widgets
+      :caption: Subwindow for Input Widgets
 
       input_specs
       input_coeffs
