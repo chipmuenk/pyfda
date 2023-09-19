@@ -345,14 +345,15 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # ==========================================================================
     # Nothing selected, but cell format is non-float:
     # -> select whole table, copy all cells further down below:
+    # Attention: np.any() fails for inhomogeneous lists!
     # ==========================================================================
-    if not np.any(sel) and frmt != 'float':
+    if not any(sel) and frmt != 'float':
         sel = qget_selected(table, reverse=False, select_all=True)['sel']
 
     # ==========================================================================
     # Nothing selected, copy complete table from the model (data) in float format:
     # ==========================================================================
-    if not np.any(sel):
+    if not any(sel):
         if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
             for c in range(num_cols):
                 if use_header:  # add the table header at the beginning of the row(s)
