@@ -30,7 +30,7 @@ try:
 except ImportError:
     xlsx = None
 
-from .pyfda_lib import safe_eval, lin2unit, pprint_log
+from .pyfda_lib import safe_eval, lin2unit, pprint_log, iter2ndarray
 from .pyfda_qt_lib import qget_selected
 
 import pyfda.libs.pyfda_fix_lib as fx
@@ -1572,15 +1572,22 @@ def load_filter(self) -> int:
                             and np.shape(fb.fil[0]['ba'])[1] < 3):
                     logger.error("Missing key 'ba' or wrong data type!")
                     return -1
-                elif 'zpk' not in fb.fil[0]\
-                    or type(fb.fil[0]['zpk']) not in {list, np.ndarray}\
-                        or np.ndim(fb.fil[0]['zpk']) != 2:
-                    logger.error("Missing key 'zpk' or wrong data type!")
+                elif 'zpk' not in fb.fil[0]:
+                    logger.error("Missing key 'zpk'!")
                     return -1
                 elif 'sos' not in fb.fil[0]\
                         or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
                     logger.error("Missing key 'sos' or wrong data type!")
                     return -1
+                if type(fb.fil[0]['zpk']) == np.ndarray:
+                    if np.ndim(fb.fil[0]['zpk']) != 2:
+                        logger.error(
+                            f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
+                    elif np.shape(fb.fil[0]['zpk'])[0] != 3:
+                        logger.error(
+                            f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
+                elif type(fb.fil[0]['zpk']) == list:
+                    fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
 
                 logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
                 dirs.last_file_name = file_name
