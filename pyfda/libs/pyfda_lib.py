@@ -1437,6 +1437,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
+        format_error = False
         if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
             frmt = "nd1" #  one-dimensional numpy array
             logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
@@ -1448,8 +1449,8 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         elif any(isinstance(el, np.ndarray) for el in arg):
             frmt = "lon"  # list or tuple of ndarrays
             logger.warning(f"Format (zpk) is '{frmt}'.")
-
-        format_error = False
+        else:
+            format_error = True
 
         if frmt == "nd2":
             fil_dict['zpk'] = arg
