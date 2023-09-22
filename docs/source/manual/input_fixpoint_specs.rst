@@ -47,7 +47,7 @@ Typical simulation results are shown in :numref:`fig_pyfda_screenshot_hn_fix_t`
 
 .. _fig_pyfda_screenshot_hn_fix_t:
 
-.. figure:: ../img/pyfda_screenshot_hn_fix_t.png
+.. figure:: ../img/manual/pyfda_screenshot_hn_fix_t.png
    :alt: Screenshot of fixpoint simulation results (time domain)
    :width: 100%
    :align: center
@@ -60,7 +60,7 @@ simulation and calculating the Fourier response afterwards:
    
 .. _fig_pyfda_screenshot_hn_fix_f:
 
-.. figure:: ../img/pyfda_screenshot_hn_fix_f.png
+.. figure:: ../img/manual/pyfda_screenshot_hn_fix_f.png
    :alt: Screenshot of fixpoint simulation results (frequency domain)
    :width: 100%
    :align: center

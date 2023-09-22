@@ -550,7 +550,7 @@ def csv2array(f: TextIO):
     io_error: str
         String with the error message when import was unsuccessful
 
-    -----------------------------
+ 
     While opening a file, the `newline` parameter can be used to
     control how universal newlines works (it only applies to text mode).
     It can be None, '', '\n', '\r', and '\r\n'. It works as follows:
@@ -576,7 +576,8 @@ def csv2array(f: TextIO):
         f.write(fileContents)
         f.close()
 
-      https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
+    https://pythonconquerstheuniverse.wordpress.com/2011/05/08/newline-conversion-in-python-3/
+
     """
 
     # throw an error (instead of just issueing a deprecation warning) when trying to

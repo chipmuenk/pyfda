@@ -4,19 +4,19 @@ Main Routines
 =============
 
 :mod:`pyfda.libs.pyfda_dirs`
------------------------
+----------------------------
 .. automodule:: pyfda.libs.pyfda_dirs
     :members:
     
    
 :mod:`pyfda.libs.tree_builder`
--------------------------
+------------------------------
 
 .. automodule:: pyfda.libs.tree_builder
    :members: 
 
 :mod:`pyfda.libs.pyfda_lib`
-----------------------
+---------------------------
 .. automodule:: pyfda.libs.pyfda_lib
     :members:
     
@@ -33,7 +33,7 @@ Main Routines
    :members: 
 
 :mod:`pyfda.libs.pyfda_io_lib`
--------------------------
+------------------------------
 
 .. automodule:: pyfda.libs.pyfda_io_lib
     :members:

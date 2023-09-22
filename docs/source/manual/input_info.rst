@@ -1,5 +1,5 @@
 Input Info
-============
+==========
 
 The **Info** tab (:numref:`fig_input_info`) displays infos on the current filter design
 and design algorithm.
@@ -31,6 +31,7 @@ licensing and module versions (:numref:`fig_input_info_about`).
    Screenshot of the "About" pop-up window
 
 The **Debug** button enables some debugging options:
+
 - **Doc$**: Show docstring info from the corresponding python (usually scipy) module.
 - **RTF**: Use Rich Text Format for documentation.
 - **FiltDict**: Display the dictionary containing all current settings of the software.
