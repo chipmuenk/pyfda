@@ -372,7 +372,39 @@ def np_shape(data):
         f"{d} dimensions.")
         return (None, None)
 
+# -----------------------------------------------------------------------------
+def iter2ndarray(iterable) -> ndarray:
+    """
+    Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
+    different lengths of sub-iterables by adding zeros. This prevents
+    problems with inhomogeneous arrays.
+    """
+    try:
+        logger.warning(iterable)
+        if type(iterable) == np.ndarray:
+            # no need to convert argument
+            return iterable
+        elif type(iterable) in {tuple, list}:
+            arrs = []  # list of sub-arrays
+            max_l = 0  # maximum length of sub-array
+            for i in range(len(iterable)):
+                if np.isscalar(iterable[i]):
+                    arrs.append(np.array([iterable[i]]))
+                else:
+                    arrs.append(np.array(iterable[i]))
+                max_l = max(max_l, len(arrs[i]))
 
+            # equalize lengths of sub-arrays by filling up with zeros
+            for i in range(len(iterable)):
+                arrs[i] = np.append(arrs[i], np.zeros(max_l - len(arrs[i])))
+
+            return np.array(arrs)  # convert list of arrays to two-dimensional array
+        else:
+            logger.error(f"Unsupported type '{type(iterable)}' for conversion to ndarray.")
+            return None
+    except Exception as e:
+        logger.error(f"Error '{e}'\nfor iterable =\n{iterable}")
+        return None
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
     """
@@ -1405,21 +1437,20 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
+        format_error = False
         if isinstance(arg, np.ndarray) and np.ndim(arg) == 1:
-            frmt = "nd1"
+            frmt = "nd1" #  one-dimensional numpy array
             logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
-            frmt = "nd2"
+            frmt = "nd2" #  two-dimensional numpy array
             logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         # elif any(isinstance(el, list) for el in arg):
         #     frmt = "lol"  # list or ndarray or tuple of lists
         elif any(isinstance(el, np.ndarray) for el in arg):
             frmt = "lon"  # list or tuple of ndarrays
             logger.warning(f"Format (zpk) is '{frmt}'.")
-        # elif isinstance(arg, list):
-        #     frmt = "lst"
-
-        format_error = False
+        else:
+            format_error = True
 
         if frmt == "nd2":
             fil_dict['zpk'] = arg
