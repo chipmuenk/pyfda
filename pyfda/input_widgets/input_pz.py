@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table
+from pyfda.libs.pyfda_io_lib import qtable2csv, qtext2table, save_data_csv
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
@@ -804,10 +804,13 @@ class Input_PZ(QWidget):
         Export data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file using a selected format
         """
-        # pass table instance, numpy data and current class for accessing the
-        # clipboard instance or for constructing a QFileDialog instance
-        qtable2text(self.tblPZ, self.zpk, self, 'zpk', title="Export Poles / Zeros")
-
+        text = qtable2csv(self.tblPZ, self.zpk, zpk=True)
+        if params['CSV']['clipboard']:  # clipboard is selected as export target
+            fb.clipboard.setText(text)
+        else:
+            # pass csv formatted text, key for accessing data in ``*.npz`` file or
+            # Matlab workspace (``*.mat``) and a title for the file export dialog
+            save_data_csv(self, text, 'zpk', title="Export Poles / Zeros")
     # --------------------------------------------------------------------------
     def _import(self):
         """

@@ -30,8 +30,8 @@ try:
 except ImportError:
     xlsx = None
 
-from .pyfda_lib import safe_eval, lin2unit, pprint_log, iter2ndarray
-from .pyfda_qt_lib import qget_selected
+from pyfda.libs.pyfda_lib import safe_eval, lin2unit, pprint_log, iter2ndarray
+from pyfda.libs.pyfda_qt_lib import qget_selected
 
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
@@ -257,33 +257,26 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 
 
 # ------------------------------------------------------------------------------
-def qtable2text(table: object, data: np.ndarray, parent: object,
-                fkey: str, frmt: str = 'float', title: str = "Export"):
+def qtable2csv(table: object, data: np.ndarray, zpk=False,
+               frmt: str = 'float') -> str:
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
     Parameters
-    -----------
+    ----------
+
     table : object
             Instance of QTableWidget
 
     data:   object
-            Instance of the numpy variable containing table data
+            Instance of the numpy variable shadowing table data
 
-    parent: object
-            Used to get the clipboard instance from the parent instance (if copying
-            to clipboard) or to construct a QFileDialog instance (if copying to a file)
-
-    fkey:  str
-            Key for accessing data in ``*.npz`` file or Matlab workspace (``*.mat``)
+    zpk: bool
+            when True, append the gain (`data[2]`) to the table
 
     frmt: str
-           when ``frmt=='float'``, copy data from model, otherwise from the view
-           using the ``itemDelegate()`` method of the table.
-
-    comment: str
-            comment string indicating the type of data to be copied (e.g.
-            "filter coefficients ")
+           when ``frmt=='float'``, copy data from model ("shadow"), otherwise from the
+           view using the ``itemDelegate()`` method of the table.
 
 
     The following keys from the global dict dict ``params['CSV']`` are evaluated:
@@ -314,6 +307,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
 
     Returns
     -------
+
     None
         Nothing, text is exported to clipboard or to file via ``save_data_csv``
     """
@@ -342,6 +336,9 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
 
     sel = qget_selected(table, reverse=False)['sel']
 
+    if zpk and np.isscalar(data[2]):
+        data[2] = [data[2]]
+
     # ==========================================================================
     # Nothing selected, but cell format is non-float:
     # -> select whole table, copy all cells further down below:
@@ -361,14 +358,25 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
+            if zpk:
+                if use_header:
+                    text += 'k' + delim
+                for r in range(len(data[2])):
+                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
+                text = text.rstrip(delim) + cr
+
         else:  # write table in column(s)
             if use_header:  # add the table header at the top of the column(s)
                 for c in range(num_cols):
                     text += table.horizontalHeaderItem(c).text() + delim
+                if zpk:
+                    text += 'k' + delim
                 text = text.rstrip(delim) + cr
             for r in range(num_rows):
                 for c in range(num_cols):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
+                if zpk and r < len(data[2]):
+                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
 
         text = text.rstrip(cr)  # delete CR after last row
@@ -419,10 +427,8 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
                 text = text.rstrip(delim) + cr
             text.rstrip(cr)
 
-    if params['CSV']['clipboard']:
-        fb.clipboard.setText(text)
-    else:
-        save_data_csv(parent, text, fkey, title=title)
+    return text
+
 
 # ==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -550,7 +556,7 @@ def csv2array(f: TextIO):
     io_error: str
         String with the error message when import was unsuccessful
 
- 
+
     While opening a file, the `newline` parameter can be used to
     control how universal newlines works (it only applies to text mode).
     It can be None, '', '\n', '\r', and '\r\n'. It works as follows:

@@ -20,7 +20,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2text, qtext2table, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, qtext2table, save_data_csv
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -137,7 +137,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
 
-        This is needed by pyfda_io_lib.qtable2text() to read out a table in text
+        This is needed by pyfda_io_lib.qtable2csv() to read out a table in text
         mode, e.g. `text = table.itemDelegate().text(item)`
         """
         dtext = str(self.displayText(item.text(), QtCore.QLocale()))
@@ -679,8 +679,14 @@ class Input_Coeffs(QWidget):
         CSV format.
         """
         if not params['CSV']['cmsis']:
-            qtable2text(self.tblCoeff, self.ba, self, 'ba', self.QObj[0].q_dict['fx_base'],
-                        title="Export Filter Coefficients")
+            text = qtable2csv(self.tblCoeff, self.ba, frmt=self.QObj[0].q_dict['fx_base'])
+            if params['CSV']['clipboard']:  # clipboard is selected as export target
+                fb.clipboard.setText(text)
+            else:
+                # pass csv formatted text, key for accessing data in ``*.npz`` file or 
+                # Matlab workspace (``*.mat``) and a title for the file export dialog
+                save_data_csv(self, text, 'ba', title="Export Filter Coefficients")
+
         elif fb.fil[0]['ft'] != 'IIR':
             logger.warning("CMSIS SOS export is only possible for IIR filters!")
         else:
