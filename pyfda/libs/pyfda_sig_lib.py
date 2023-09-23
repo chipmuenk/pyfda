@@ -142,42 +142,34 @@ def zpk2array(zpk):
         Zeros, poles and gain of the system
 
     Returns
-    -------
-    zpk as an array
+    -----
+    zpk as an array or an error string
     """
-
     try:
-        p_len = len(zpk[1])
-    except IndexError:
-        p_len = 0
-    try:
-        z_len = len(zpk[0])
-    except IndexError:
-        z_len = 0
+        _ = len(zpk)
+    except TypeError:
+        return f"zpk is a scalar or 'None'!"
 
-    z = zpk[0]
-    p = zpk[1]
+    if type(zpk) in {np.ndarray, list, tuple}:
+        if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
+            if np.isscalar(zpk[2]):
+                if zpk[2] == 0:
+                    zpk[2] = 1
+            elif zpk[2][0] in {0, None}:
+                zpk[2][0] = 1
 
-    D = z_len - p_len
-    if D > 0:  # more zeros than poles
-        p = np.append(zpk[1], np.zeros(D))
-    elif D < 0:  # more poles than zeros
-        z = np.append(zpk[0], np.zeros(-D))
-
-    if np.isscalar(zpk[2]):
-        k = zpk[2]
+        elif len(zpk) == 2:  # only poles and zeros given, add gain = 1
+            zpk = list(zpk)
+            zpk.append([1])  # set the gain = 1
+        elif len(zpk) == 1:  # only zeros given, a
+            zpk = list(zpk)
+            zpk.append([0], [1])  # set pole = 0, gain = 1
+        else:
+            return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
     else:
-        k = zpk[2][0]  # read the gain
+        return f"'zpk' has an unsuitable type '{type(zpk)}'"
 
-    if k == 0:
-        k = 1  # or set = 1
-
-    gain = zeros_with_val(len(z), k)
-
-    return np.asarray([
-        np.nan_to_num(z).astype(complex),
-        np.nan_to_num(p).astype(complex),
-        gain.astype(complex)])
+    return pyfda_lib.iter2ndarray(zpk)
 
 # ------------------- -----------------------------------------------------------
 def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):

@@ -853,8 +853,20 @@ class Input_PZ(QWidget):
 
 
         # sanitize zpk; test and equalize if P and Z lists have different lengths,
-        # convert gain to a vector with same length as zpk[0]
-        fb.fil['zpk'] = zpk2array(zpk)
+        # convert gain to a vector wth same length as zpk[0]
+        zpk_arr = zpk2array(zpk)
+        if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
+            logger.error(zpk_arr)
+            qstyle_widget(self.ui.butSave, 'error')
+            return
+        else:
+            logger.warning(pprint_log(zpk_arr))
+            self.zpk = zpk_arr
+            qstyle_widget(self.ui.butSave, 'changed')
+            self._refresh_table()
+
+
+
         # try:
         #     p_len = len(zpk[1])
         # except IndexError:
@@ -878,9 +890,6 @@ class Input_PZ(QWidget):
         # zpk[2] = zeros_with_val(len(zpk[0]), k)
 
         # self.zpk = np.asarray(zpk)
-
-        qstyle_widget(self.ui.butSave, 'changed')
-        self._refresh_table()
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

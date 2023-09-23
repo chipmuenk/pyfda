@@ -372,7 +372,7 @@ def np_shape(data):
         return (None, None)
 
 # -----------------------------------------------------------------------------
-def iter2ndarray(iterable) -> ndarray:
+def iter2ndarray(iterable, dtype=complex) -> ndarray:
     """
     Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
     different lengths of sub-iterables by adding zeros. This prevents
@@ -384,8 +384,8 @@ def iter2ndarray(iterable) -> ndarray:
             # no need to convert argument
             return iterable
         elif type(iterable) in {tuple, list}:
-            arrs = []  # list of sub-arrays
-            max_l = 0  # maximum length of sub-array
+            arrs = []  # empty list for sub-arrays
+            max_l = 0  # maximum length of sub-arrays
             for i in range(len(iterable)):
                 if np.isscalar(iterable[i]):
                     arrs.append(np.array([iterable[i]]))
@@ -397,7 +397,7 @@ def iter2ndarray(iterable) -> ndarray:
             for i in range(len(iterable)):
                 arrs[i] = np.append(arrs[i], np.zeros(max_l - len(arrs[i])))
 
-            return np.array(arrs)  # convert list of arrays to two-dimensional array
+            return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
         else:
             logger.error(f"Unsupported type '{type(iterable)}' for conversion to ndarray.")
             return None
@@ -1648,7 +1648,12 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")
-            fil_dict['zpk'] = zpk2array(zpk)
+            zpk_arr = pyfda_sig_lib.zpk2array(zpk)
+            if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
+                logger.error(zpk_arr)
+                return
+            else:
+                fil_dict['zpk'] = zpk_arr
         else:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
