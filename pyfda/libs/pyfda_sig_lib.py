@@ -9,15 +9,16 @@
 """
 Library with various signal processing related functions
 """
+import logging
+logger = logging.getLogger(__name__)
+
 import time
 import numpy as np
 from numpy import pi
 import scipy.signal as sig
 
+import pyfda.libs.pyfda_lib as pyfda_lib
 import pyfda.filterbroker as fb
-
-import logging
-logger = logging.getLogger(__name__)
 
 
 def impz(b, a=1, FS=1, N=0, step=False):

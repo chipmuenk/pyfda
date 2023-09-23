@@ -9,6 +9,8 @@
 """
 Library with various general functions and variables needed by the pyfda routines
 """
+import logging
+logger = logging.getLogger(__name__)
 
 import os, re, io
 import sys, time
@@ -23,7 +25,7 @@ import scipy.signal as sig
 
 from distutils.version import LooseVersion
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
+import pyfda.libs.pyfda_sig_lib as pyfda_sig_lib
 
 # ###### VERSIONS and related stuff ############################################
 # ================ Required Modules ============================
@@ -34,9 +36,6 @@ from matplotlib import __version__ as V_MPL
 from .compat import QT_VERSION_STR as V_QT
 from .compat import PYQT_VERSION_STR as V_PYQT
 from markdown import __version__ as V_MD
-
-import logging
-logger = logging.getLogger(__name__)
 
 V_NP = np.__version__
 V_NUM = numexpr.__version__
@@ -1462,7 +1461,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
         elif frmt == 'nd1':  # list / array with z only -> FIR
             z = arg
             p = np.zeros(len(z))
-            gain = zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
+            gain = pyfda_sig_lib.zeros_with_val(len(z))  # create gain vector [1, 0, 0, ...]
             fil_dict['zpk'] = np.array([z, p, gain])
             fil_dict['ft'] = 'FIR'
 
@@ -1613,7 +1612,8 @@ def fil_convert(fil_dict: dict, format_in) -> None:
                 zpk[0] = np.delete(zpk[0], z_0)
                 zpk[1] = np.delete(zpk[1], p_0)
             fil_dict['zpk'] = np.array(
-                [zpk[0], zpk[1], zeros_with_val(len(zpk[0]), zpk[2])], dtype=complex)
+                [zpk[0], zpk[1], pyfda_sig_lib.zeros_with_val(len(zpk[0]), zpk[2])],
+                dtype=complex)
 
         if 'ba' not in format_in:
             try:
