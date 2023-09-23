@@ -354,7 +354,7 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
     # Nothing selected, copy complete table from the model (data) in float format:
     # ==========================================================================
     if not any(sel):
-        if params['CSV']['orientation'] in {'rows', 'auto'}:  # write table in row(s)
+        if params['CSV']['orientation'] == 'rows':  # write table in row(s)
             for c in range(num_cols):
                 if use_header:  # add the table header at the beginning of the row(s)
                     text += table.horizontalHeaderItem(c).text() + delim
