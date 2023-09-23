@@ -361,7 +361,6 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
-            text = text.rstrip(cr)  # delete last CR
         else:  # write table in column(s)
             if use_header:  # add the table header at the top of the column(s)
                 for c in range(num_cols):
@@ -371,7 +370,8 @@ def qtable2text(table: object, data: np.ndarray, parent: object,
                 for c in range(num_cols):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
-            text = text.rstrip(cr)  # delete CR after last row
+
+        text = text.rstrip(cr)  # delete CR after last row
 
     # =======================================================================
     # Copy only selected cells in displayed format:
