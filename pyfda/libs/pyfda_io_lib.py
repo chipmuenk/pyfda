@@ -681,16 +681,12 @@ def csv2array(f: TextIO):
 #     (https://stackoverflow.com/questions/3277503/how-to-read-a-file-line-by-line-into-a-list)
 # =============================================================================
 
-    if use_header:
-        logger.info("Header detected:\n{0}".format(next(data_iter, None)))
-
     csv2array.info_str = f"'{repr(lineterminator)}' # '{repr(delimiter)}'"
 
     # ------- Read CSV file into a list --------------------
     data_list = []
     try:
         for row in data_iter:
-            logger.debug("{0}".format(row))
             if row:  # only append non-empty rows
                 data_list.append(row)
     except csv.Error as e:
@@ -700,7 +696,7 @@ def csv2array(f: TextIO):
     if data_list == [] or data_list ==[""]:
             return "Imported data is empty."
 
-    # ------- Try to convert list to an array of str --------------------
+    # ------- Convert list to an array of str --------------------
     try:
         data_arr = np.array(data_list)
     except np.VisibleDeprecationWarning:
@@ -729,10 +725,18 @@ def csv2array(f: TextIO):
             # returned table is transposed, swap cols and rows
             logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
             csv2array.info_str = "T:" + csv2array.info_str
-            return data_arr.T
-        else:
+            if use_header:
+                logger.info(f"Skipping header {data_arr.T[0]}")
+                return data_arr.T[1:]
+            else:
+                return data_arr.T
+        else:  # column format
             logger.info(f"Building table with {cols} column(s) and {rows} rows.")
-            return data_arr
+            if use_header:
+                logger.info(f"Skipping header {data_arr[0]}")
+                return data_arr[1:]
+            else:
+                return data_arr
     else:
         return "Unsuitable data shape: ndim = {0}, shape = {1}"\
             .format(np.ndim(data_arr), np.shape(data_arr))
