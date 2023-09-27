@@ -379,7 +379,7 @@ def iter2ndarray(iterable, dtype=complex) -> ndarray:
     problems with inhomogeneous arrays.
     """
     try:
-        logger.warning(iterable)
+        # logger.warning(iterable)
         if type(iterable) == np.ndarray:
             # no need to convert argument
             return iterable
