@@ -20,7 +20,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2csv, qtext2table, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -723,7 +723,7 @@ class Input_Coeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
-        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")
+        data_str = table2array(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
             return
 

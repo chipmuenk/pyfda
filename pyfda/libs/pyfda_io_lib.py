@@ -449,9 +449,9 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
 
 
 # ------------------------------------------------------------------------------
-def qtext2table(parent: object, fkey: str, title: str = "Import"):
+def table2array(parent: object, fkey: str, title: str = "Import"):
     """
-    Copy data from clipboard or file to table
+    Copy tabular data from clipboard or file to a numpy array
 
     Parameters
     -----------
@@ -464,6 +464,11 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
 
     title: str
         title string for the file dialog box
+
+    Returns
+    --------
+    ndarray of str or None
+        table data
 
 
     The following keys from the global dict ``params['CSV']`` are evaluated:
@@ -491,10 +496,6 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
 
     Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
 
-    Returns
-    --------
-    ndarray of str
-        table data
     """
 
     if params['CSV']['clipboard']:  # data from clipboard
