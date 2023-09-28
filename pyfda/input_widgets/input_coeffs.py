@@ -740,8 +740,9 @@ class Input_Coeffs(QWidget):
             logger.error("Imported data is a single value or None.")
             return None
         logger.info(f"_import: c x r = {num_cols} x {num_rows}")
+        self.ba = [[], []]
+
         if orientation_horiz:
-            self.ba = [[], []]
             for c in range(num_cols):
                 self.ba[0].append(
                     self.QObj[0].frmt2float(data_str[c][0], frmt))
