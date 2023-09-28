@@ -18,6 +18,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
 from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
@@ -752,6 +753,7 @@ class Input_Coeffs(QWidget):
             if num_rows > 1:
                 self._filter_type(ftype='IIR')
             else:
+                self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
         else:
             self.ba[0] =\
@@ -761,7 +763,7 @@ class Input_Coeffs(QWidget):
                     [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
                 self._filter_type(ftype='IIR')
             else:
-                self.ba[1] = [1]
+                self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
 
         self.ba[0] = np.asarray(self.ba[0])
