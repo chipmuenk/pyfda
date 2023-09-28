@@ -727,10 +727,6 @@ class Input_Coeffs(QWidget):
         if data_str is None:  # file operation has been aborted or some other error
             return
 
-        logger.debug(
-            "importing data: dim - shape = {0} - {1} - {2}\n{3}"
-            .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
-
         frmt = self.QObj[0].q_dict['fx_base']
 
         if np.ndim(data_str) > 1:
@@ -743,7 +739,7 @@ class Input_Coeffs(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.info("_import: c x r = {0} x {1}".format(num_cols, num_rows))
+        logger.info(f"_import: c x r = {num_cols} x {num_rows}")
         if orientation_horiz:
             self.ba = [[], []]
             for c in range(num_cols):
