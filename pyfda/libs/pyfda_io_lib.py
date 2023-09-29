@@ -449,9 +449,9 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
 
 
 # ------------------------------------------------------------------------------
-def qtext2table(parent: object, fkey: str, title: str = "Import"):
+def table2array(parent: object, fkey: str, title: str = "Import"):
     """
-    Copy data from clipboard or file to table
+    Copy tabular data from clipboard or file to a numpy array
 
     Parameters
     -----------
@@ -464,6 +464,11 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
 
     title: str
         title string for the file dialog box
+
+    Returns
+    --------
+    ndarray of str or None
+        table data
 
 
     The following keys from the global dict ``params['CSV']`` are evaluated:
@@ -491,10 +496,6 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
 
     Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
 
-    Returns
-    --------
-    ndarray of str
-        table data
     """
 
     if params['CSV']['clipboard']:  # data from clipboard
@@ -513,11 +514,10 @@ def qtext2table(parent: object, fkey: str, title: str = "Import"):
             return None
         else:
             data_arr = load_data_np(file_name, file_type)
-            # pass data as numpy array
-            logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
-                        .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
-            if type(data_arr) == int and data_arr == -1:  # file operation cancelled
-                data_arr = None
+            if data_arr is not None:
+                # pass data as numpy array
+                logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
+                            .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
     return data_arr
 
 # ------------------------------------------------------------------------------
@@ -548,13 +548,8 @@ def csv2array(f: TextIO):
     -------
 
     data_arr: ndarray
-        numpy array of str with table data from file or text when import was
-        successful
-
-    OR
-
-    io_error: str
-        String with the error message when import was unsuccessful
+        numpy array of str with table data from file or `None` when import was
+        unsuccessful
 
 
     While opening a file, the `newline` parameter can be used to
@@ -690,37 +685,43 @@ def csv2array(f: TextIO):
             if row:  # only append non-empty rows
                 data_list.append(row)
     except csv.Error as e:
-        io_error = f"Error during CSV import:\n{e}"
-        return io_error
+        logger.error(f"Error during CSV import:\n{e}")
+        return None
 
     if data_list == [] or data_list ==[""]:
-            return "Imported data is empty."
+        logger.error("Imported data is empty.")
+        return None
 
     # ------- Convert list to an array of str --------------------
     try:
         data_arr = np.array(data_list)
     except np.VisibleDeprecationWarning:
         # prevent creation of numpy arrays from nested ragged sequences
-        return "Can't convert to array, columns have different lengths."
+        logger.error("Can't convert to array, columns have different lengths.")
+        return None
     except (TypeError, ValueError) as e:
-        io_error = f"{e}\nData = {pprint_log(data_list)}"
-        return io_error
+        logger.error(f"{e}\nData = {pprint_log(data_list)}")
+        return None
 
     if np.ndim(data_arr) == 0:
-        return f"Imported data is a scalar: '{data_arr}'"
+        logger.error(f"Imported data is a scalar: '{data_arr}'")
+        return None
 
     elif np.ndim(data_arr) == 1:
         if len(data_arr) < 2:
-            return f"Not enough data: '{data_arr}'"
+            logger.error(f"Not enough data: '{data_arr}'")
+            return None
         else:
             return data_arr
 
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
+        # The check for max. number of columns has to be handled downstream
         # logger.info(f"cols = {cols}, rows = {rows}, data_arr = {data_arr}\n")
-        if cols > 2 and rows > 2:
-            return f"Unsuitable data shape {np.shape(data_arr)}"
-        elif params['CSV']['orientation'] == 'rows'\
+        # if cols > max_cols and rows > max_cols:
+        #     logger.error(f"Unsuitable data shape {np.shape(data_arr)}")
+        #     return None
+        if params['CSV']['orientation'] == 'rows'\
                 or params['CSV']['orientation'] == 'auto' and cols > rows:
             # returned table is transposed, swap cols and rows
             logger.info(f"Building transposed table with {cols} row(s) and {rows} columns.")
@@ -738,8 +739,9 @@ def csv2array(f: TextIO):
             else:
                 return data_arr
     else:
-        return "Unsuitable data shape: ndim = {0}, shape = {1}"\
-            .format(np.ndim(data_arr), np.shape(data_arr))
+        logger.error(f"Unsuitable data shape: ndim = {np.ndim(data_arr)}, "
+                     f"shape = { np.shape(data_arr)}")
+        return None
 
 #-------------------------------------------------------------------------------
 def read_csv_info_old(filename):
@@ -964,7 +966,6 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     if file_name is None:  # error or operation cancelled
         return -1
 
-    err = False
     try:
         if file_type == 'wav':
             f_S, data_arr = wavfile.read(file_name, mmap=False)
@@ -977,10 +978,15 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
                 data_arr = csv2array(f)
                 load_data_np.info_str = csv2array.info_str
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
-                if isinstance(data_arr, str):
+                if data_arr is None:
+                    # an error has occurred
+                    logger.error(f"Error loading file '{file_name}'")
+                    return None
+                elif isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
                     load_data_np.info_str = ""
-                    logger.error(f"Error loading file '{file_name}':\n{data_arr}")
+                    logger.error(f"You shouldn't see this message!! \n"
+                                 "Error loading file '{file_name}':\n{data_arr}")
                     return None
         else:
             with open(file_name, 'rb') as f:
@@ -994,28 +1000,26 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
                     if fkey in{"", None}:
                         data_arr = fdict  # pick the whole array
                     elif fkey not in fdict:
-                        err = True
                         raise IOError(
                             f"Key '{fkey}' not in file '{file_name}'.\n"
                             f"Keys found: {fdict.files}")
                     else:
                         data_arr = fdict[fkey]  # pick the array `fkey` from the dict
                 else:
-                    logger.error('Unknown file type "{0}"'.format(file_type))
-                    err = True
-
-        if not err:
-            try:  # try to convert array elements to float
-                data_arr = data_arr.astype(float)
-            except ValueError as e:
-                try:
-                    data_arr = data_arr.astype(complex)
-                except ValueError:
-                    logger.error(f"{e},\n\tconversion to complex also failed.")
+                    logger.error(f'Unknown file type "{file_type}"')
                     return None
-            logger.info(
-                f'Imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
-            return data_arr  # returns numpy array of type float
+
+        try:  # try to convert array elements to float
+            data_arr = data_arr.astype(float)
+        except ValueError as e:
+            try:
+                data_arr = data_arr.astype(complex)
+            except ValueError:
+                logger.error(f"{e},\n\tconversion to float and complex failed.")
+                return None
+        logger.info(
+            f'Successfully imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
+        return data_arr  # returns numpy array of type float
 
     except IOError as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))

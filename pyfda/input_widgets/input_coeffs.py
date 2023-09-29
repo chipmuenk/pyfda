@@ -18,9 +18,10 @@ import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
+from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2csv, qtext2table, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -703,13 +704,9 @@ class Input_Coeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
-        data_str = qtext2table(self, 'ba', title="Import Filter Coefficients")
+        data_str = table2array(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
             return
-
-        logger.debug(
-            "importing data: dim - shape = {0} - {1} - {2}\n{3}"
-            .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
         frmt = self.QObj[0].q_dict['fx_base']
 
@@ -723,9 +720,10 @@ class Input_Coeffs(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.info("_import: c x r = {0} x {1}".format(num_cols, num_rows))
+        logger.info(f"_import: c x r = {num_cols} x {num_rows}, horiz = {orientation_horiz}")
+        self.ba = [[], []]
+
         if orientation_horiz:
-            self.ba = [[], []]
             for c in range(num_cols):
                 self.ba[0].append(
                     self.QObj[0].frmt2float(data_str[c][0], frmt))
@@ -735,6 +733,7 @@ class Input_Coeffs(QWidget):
             if num_rows > 1:
                 self._filter_type(ftype='IIR')
             else:
+                self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
         else:
             self.ba[0] =\
@@ -744,7 +743,7 @@ class Input_Coeffs(QWidget):
                     [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
                 self._filter_type(ftype='IIR')
             else:
-                self.ba[1] = [1]
+                self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
 
         self.ba[0] = np.asarray(self.ba[0])

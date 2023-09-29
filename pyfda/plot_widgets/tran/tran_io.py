@@ -183,7 +183,7 @@ class Tran_IO(QWidget):
             if ret < 0:
                 return -1
             self.data_raw = io.load_data_np(self.file_name, 'wav')
-            if np.isscalar(self.data_raw):  # None or -1
+            if self.data_raw is None:  # an error occurred
                 return -1
             self.N = io.read_wav_info.N
             self.nchans = io.read_wav_info.nchans
@@ -197,12 +197,16 @@ class Tran_IO(QWidget):
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
             self.data_raw = io.load_data_np(self.file_name, 'csv')
-
-            self.N, self.nchans = np_shape(self.data_raw)
-            if self.N in {None, 0}:  # data is scalar, None or multidim
+            if self.data_raw is None:
+                logger.error(f"Could not load '{self.file_name}'.")
                 qstyle_widget(self.ui.but_load, "error")
-                logger.warning("Unsuitable data format")
                 return -1
+
+            # self.N, self.nchans = np_shape(self.data_raw)
+            # if self.N in {None, 0}:  # data is scalar, None or multidim
+            #     qstyle_widget(self.ui.but_load, "error")
+            #     logger.warning("Unsuitable data format")
+            #     return -1
             info_str = f" ({io.load_data_np.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")

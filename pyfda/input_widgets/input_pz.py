@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.libs.pyfda_io_lib import qtable2csv, qtext2table, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
@@ -817,7 +817,7 @@ class Input_PZ(QWidget):
         Import data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, 'zpk', title="Import Poles / Zeros ")
+        data_str = table2array(self, 'zpk', title="Import Poles / Zeros ")
         if data_str is None:  # file operation has been aborted
             return
 
@@ -833,8 +833,9 @@ class Input_PZ(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.debug("_import: c x r:", num_cols, num_rows)
+        logger.info(f"_import: c x r = {num_cols} x {num_rows}")
         zpk = [[], [], []]
+
         if orientation_horiz:
             for c in range(num_cols):
                 zpk[0].append(conv(data_str[c][0]))
@@ -864,32 +865,6 @@ class Input_PZ(QWidget):
             self.zpk = zpk_arr
             qstyle_widget(self.ui.butSave, 'changed')
             self._refresh_table()
-
-
-
-        # try:
-        #     p_len = len(zpk[1])
-        # except IndexError:
-        #     p_len = 0
-        # try:
-        #     z_len = len(zpk[0])
-        # except IndexError:
-        #     z_len = 0
-
-        # D = z_len - p_len
-        # if D > 0:  # more zeros than poles
-        #     zpk[1] = np.append(self.zpk[1], np.zeros(D))
-        # elif D < 0:  # more poles than zeros
-        #     zpk[0] = np.append(self.zpk[0], np.zeros(-D))
-
-        # if len(zpk[2] > 0):
-        #     k = zpk[2][0]  # read gain
-        # else:
-        #     k = 1  # or set = 1
-
-        # zpk[2] = zeros_with_val(len(zpk[0]), k)
-
-        # self.zpk = np.asarray(zpk)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

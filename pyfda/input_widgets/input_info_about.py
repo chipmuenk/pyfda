@@ -24,10 +24,6 @@ import pyfda.libs.pyfda_dirs as dirs
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 # ------------------------------------------------------------------------------
 class AboutWindow(QDialog):
     """

@@ -20,10 +20,6 @@ from pyfda.libs.pyfda_lib import to_html, safe_eval
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 class WeightSpecs(QWidget):
     """
     Build and update widget for entering the weight
