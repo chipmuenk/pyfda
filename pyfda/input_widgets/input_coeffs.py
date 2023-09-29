@@ -695,13 +695,13 @@ class Input_Coeffs(QWidget):
                                 file_types=('csv',))
 
     # --------------------------------------------------------------------------
-    def _import(self):
+    def _import(self) -> None:
         """
         Import data from clipboard / file and copy it to `self.ba` as float / cmplx.
 
         Quantize data to `self.ba_q` and refresh table.
 
-        # TODO: More checks for swapped row <-> col, single values, wrong data type ...
+        TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
         data_str = table2array(self, 'ba', title="Import Filter Coefficients")
@@ -718,8 +718,9 @@ class Input_Coeffs(QWidget):
             num_cols = 1
             orientation_horiz = False
         else:
-            logger.error("Imported data is a single value or None.")
-            return None
+            logger.error(
+                "Data cannot be imported, it is a single value or None.")
+            return
         logger.info(f"_import: c x r = {num_cols} x {num_rows}, horiz = {orientation_horiz}")
         self.ba = [[], []]
 
