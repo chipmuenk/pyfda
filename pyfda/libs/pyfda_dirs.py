@@ -9,9 +9,9 @@
 """
 Handle directories in an OS-independent way, create logging directory etc.
 Upon import, all the variables are set.
-This is imported first by pyfdax.
+This is imported first by pyfdax, logger cannot be used yet. Hence, messages
+are printed to the console.
 """
-
 import os
 import sys
 from subprocess import check_output, CalledProcessError, STDOUT
