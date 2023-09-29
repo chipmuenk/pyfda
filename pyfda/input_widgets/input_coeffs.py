@@ -376,7 +376,6 @@ class Input_Coeffs(QWidget):
         # wdg.textChanged() is emitted when contents of widget changes
         # wdg.textEdited() is only emitted for user changes
         # wdg.editingFinished() is only emitted for user changes
-        self.ui.butEnable.clicked.connect(self.refresh_table)
         self.ui.spnDigits.editingFinished.connect(self.refresh_table)
 
         self.ui.butFromTable.clicked.connect(self._export)
@@ -592,56 +591,46 @@ class Input_Coeffs(QWidget):
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
 
-        if self.ui.butEnable.isChecked():
-            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
-            self.ui.frm_buttons_coeffs.setVisible(True)
-            self.tblCoeff.setVisible(True)
-
-            # check whether filter is FIR and only needs one column
-            if fb.fil[0]['ft'] == 'FIR':
-                self.num_cols = 1
-                self.tblCoeff.setColumnCount(1)
-                self.tblCoeff.setHorizontalHeaderLabels(["b"])
-                qset_cmb_box(self.ui.cmbFilterType, 'FIR')
-                self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
-            else:
-                self.num_cols = 2
-                self.tblCoeff.setColumnCount(2)
-                self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-                qset_cmb_box(self.ui.cmbFilterType, 'IIR')
-                # hide all q-settings for float:
-                self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
-
-                self.ba[1][0] = 1.0  # restore a[0] = 1 of denominator polynome
-
-            self.tblCoeff.setRowCount(self.num_rows)
-            self.tblCoeff.setColumnCount(self.num_cols)
-            # Create strings for index column (vertical header), starting with "0"
-            idx_str = [str(n) for n in range(self.num_rows)]
-            self.tblCoeff.setVerticalHeaderLabels(idx_str)
-            # ----------------------------------
-            self.tblCoeff.blockSignals(True)
-
-            for col in range(self.num_cols):
-                for row in range(self.num_rows):
-                    self._refresh_table_item(row, col)
-
-            # make a[0] selectable but not editable
-            if fb.fil[0]['ft'] == 'IIR':
-                item = self.tblCoeff.item(0, 1)
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                item.setFont(self.ui.bfont)
-
-            self.tblCoeff.blockSignals(False)
-            # ---------------------------------
-            self.tblCoeff.resizeColumnsToContents()
-            self.tblCoeff.resizeRowsToContents()
-            self.tblCoeff.clearSelection()
-
+        # check whether filter is FIR and only needs one column
+        if fb.fil[0]['ft'] == 'FIR':
+            self.num_cols = 1
+            self.tblCoeff.setColumnCount(1)
+            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            qset_cmb_box(self.ui.cmbFilterType, 'FIR')
+            self.ui.wdg_wq_coeffs_a.setVisible(False)  # always hide a coeffs for FIR
         else:
-            self.ui.frm_buttons_coeffs.setVisible(False)
-            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
-            self.tblCoeff.setVisible(False)
+            self.num_cols = 2
+            self.tblCoeff.setColumnCount(2)
+            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+            qset_cmb_box(self.ui.cmbFilterType, 'IIR')
+            # hide all q-settings for float:
+            self.ui.wdg_wq_coeffs_a.setVisible(not is_float)
+
+            self.ba[1][0] = 1.0  # restore a[0] = 1 of denominator polynome
+
+        self.tblCoeff.setRowCount(self.num_rows)
+        self.tblCoeff.setColumnCount(self.num_cols)
+        # Create strings for index column (vertical header), starting with "0"
+        idx_str = [str(n) for n in range(self.num_rows)]
+        self.tblCoeff.setVerticalHeaderLabels(idx_str)
+        # ----------------------------------
+        self.tblCoeff.blockSignals(True)
+
+        for col in range(self.num_cols):
+            for row in range(self.num_rows):
+                self._refresh_table_item(row, col)
+
+        # make a[0] selectable but not editable
+        if fb.fil[0]['ft'] == 'IIR':
+            item = self.tblCoeff.item(0, 1)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            item.setFont(self.ui.bfont)
+
+        self.tblCoeff.blockSignals(False)
+        # ---------------------------------
+        self.tblCoeff.resizeColumnsToContents()
+        self.tblCoeff.resizeRowsToContents()
+        self.tblCoeff.clearSelection()
 
     # --------------------------------------------------------------------------
     def load_dict(self):
@@ -663,15 +652,6 @@ class Input_Coeffs(QWidget):
         self.qdict2ui()
 
         qstyle_widget(self.ui.butSave, 'normal')
-
-    # # --------------------------------------------------------------------------
-    # def _copy_options(self):
-    #     """
-    #     Set options for copying to/from clipboard or file.
-    #     """
-    #     self.opt_widget = CSV_option_box(self)  # Handle must be class attribute!
-    #     # self.opt_widget.show() # modeless dialog, i.e. non-blocking
-    #     self.opt_widget.exec_()  # modal dialog (blocking)
 
     # --------------------------------------------------------------------------
     def _export(self):
@@ -715,13 +695,13 @@ class Input_Coeffs(QWidget):
                                 file_types=('csv',))
 
     # --------------------------------------------------------------------------
-    def _import(self):
+    def _import(self) -> None:
         """
         Import data from clipboard / file and copy it to `self.ba` as float / cmplx.
 
         Quantize data to `self.ba_q` and refresh table.
 
-        # TODO: More checks for swapped row <-> col, single values, wrong data type ...
+        TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
         data_str = table2array(self, 'ba', title="Import Filter Coefficients")
@@ -733,13 +713,18 @@ class Input_Coeffs(QWidget):
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
             orientation_horiz = num_cols > num_rows  # need to transpose data
+            if min(num_cols, num_rows) > 2:
+                logger.error(
+                    f"Data cannot be imported, its shape is {num_cols} x {num_rows}.")
+                return
         elif np.ndim(data_str) == 1:
             num_rows = len(data_str)
             num_cols = 1
             orientation_horiz = False
         else:
-            logger.error("Imported data is a single value or None.")
-            return None
+            logger.error(
+                "Data cannot be imported, it is a single value or None.")
+            return
         logger.info(f"_import: c x r = {num_cols} x {num_rows}, horiz = {orientation_horiz}")
         self.ba = [[], []]
 

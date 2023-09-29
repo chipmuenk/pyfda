@@ -504,8 +504,13 @@ def table2array(parent: object, fkey: str, title: str = "Import"):
             f"Importing data from clipboard:\n{np.shape(text)}\n{text}")
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
-        if isinstance(data_arr, str):  # returned an error message instead of numpy data
-            logger.error("Error importing clipboard data:\n\t{0}".format(data_arr))
+        if data_arr is None:
+            logger.error("Couldn't import clipboard data.")
+            return None
+        elif isinstance(data_arr, str):  # returned an error message instead of numpy data
+            logger.error(
+                "You shouldn't see this message!\n"
+                f"Error importing clipboard data:\n\t{data_arr}")
             return None
     else:  # data from file
         file_name, file_type = select_file(parent, title=title, mode="r",
@@ -588,7 +593,6 @@ def csv2array(f: TextIO):
     # ------------------------------------------------------------------------------
     # Get CSV parameter settings
     # ------------------------------------------------------------------------------
-    io_error = ""  # initialize string for I/O error messages
     csv2array.info_str = ""  # initialize function attribute
     CSV_dict = params['CSV']
     try:
@@ -610,8 +614,8 @@ def csv2array(f: TextIO):
         cr = CSV_dict['lineterminator'].lower()
 
     except KeyError as e:
-        io_error = "Dict 'params':\n{0}".format(e)
-        return io_error
+        logger.error(f"Dict 'params':\n{e}.")
+        return None
 
     sample = ""
 

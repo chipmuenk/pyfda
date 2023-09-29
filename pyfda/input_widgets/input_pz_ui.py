@@ -90,18 +90,11 @@ class Input_PZ_UI(QWidget):
         self.bifont = QFont()
         self.bifont.setBold(True)
         self.bifont.setItalic(True)
-#        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
+#        q_icon_size = QSize(20, 20) # optional, size is derived from butAddCells
 
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
-        # self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
-        # q_icon_size = self.butEnable.iconSize()  # <- set this for manual icon sizing
-        # self.butEnable.setIconSize(q_icon_size)  # and set the size
-        # self.butEnable.setToolTip(
-        #    "<span>Show / hide poles and zeros in an editable table."
-        #    " For high order systems, the table display might be slow.</span>")
-
         self.cmbPZFrmt = QComboBox(self)
         qcmb_box_populate(
             self.cmbPZFrmt, self.cmb_pz_frmt_items, self.cmb_pz_frmt_init)
@@ -125,7 +118,6 @@ class Input_PZ_UI(QWidget):
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
-        # layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmbPZFrmt)
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
@@ -211,7 +203,6 @@ class Input_PZ_UI(QWidget):
         self._set_load_save_icons()  # initialize icon / button settings
 
         layHButtonsCoeffs1 = QHBoxLayout()
-#        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)

@@ -109,11 +109,6 @@ class Input_Coeffs_UI(QWidget):
         #
         # UI Elements for controlling the display
         # ---------------------------------------------
-        self.butEnable = PushButton(self, icon=QIcon(':/circle-check.svg'), checked=True)
-        q_icon_size = self.butEnable.iconSize()  # <- uncomment this for manual sizing
-        self.butEnable.setToolTip(
-            "<span>Show / hide filter coefficients in an editable table."
-            " For high order systems, table display might be slow.</span>")
 
         self.cmb_fx_base = QComboBox(self)
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
@@ -147,7 +142,8 @@ class Input_Coeffs_UI(QWidget):
             "settings and save to dict. This modifies the data, not only the view."
             "</span>")
         self.but_quant.setIcon(QIcon(':/quantize.svg'))
-        self.but_quant.setIconSize(q_icon_size)
+        # self.but_quant.setIconSize(q_icon_size)
+        q_icon_size = self.but_quant.iconSize()  # <- comment this for manual sizing
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         layH_q_frmt = QHBoxLayout()
@@ -160,7 +156,6 @@ class Input_Coeffs_UI(QWidget):
         layH_display = QHBoxLayout()
         layH_display.setContentsMargins(*params['wdg_margins'])
         layH_display.setAlignment(Qt.AlignLeft)
-        layH_display.addWidget(self.butEnable)
         layH_display.addWidget(self.cmb_fx_base)
         layH_display.addWidget(self.spnDigits)
         layH_display.addWidget(self.lblDigits)
@@ -323,11 +318,6 @@ class Input_Coeffs_UI(QWidget):
         """
         Pop-up window for CSV options
         """
-        # if self.but_csv_options.isChecked():
-        #     qstyle_widget(self.but_csv_options, "changed")
-        # else:
-        #     qstyle_widget(self.but_csv_options, "normal")
-
         if dirs.csv_options_handle is None:
             # no handle to the window? Create a new instance
             if self.but_csv_options.isChecked():
