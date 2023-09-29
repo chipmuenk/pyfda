@@ -713,6 +713,10 @@ class Input_Coeffs(QWidget):
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
             orientation_horiz = num_cols > num_rows  # need to transpose data
+            if min(num_cols, num_rows) > 2:
+                logger.error(
+                    f"Data cannot be imported, its shape is {num_cols} x {num_rows}.")
+                return
         elif np.ndim(data_str) == 1:
             num_rows = len(data_str)
             num_cols = 1
