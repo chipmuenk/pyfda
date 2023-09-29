@@ -393,7 +393,9 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
             return -1
         self.N = ceil_even(self.N) # enforce even order
         if self.F_PB < 0.1:
-            logger.warning("Bandwidth for pass band ({0}) is too low, inreasing to 0.1".format(self.F_PB))
+            logger.warning(
+                f"Relative bandwidth {self.F_PB} for pass band is too low, "
+                "inreasing to 0.1.")
             self.F_PB = 0.1
             fil_dict['F_PB'] = self.F_PB
             self.emit({'specs_changed': 'equiripple'})

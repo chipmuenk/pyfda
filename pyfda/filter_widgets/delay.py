@@ -16,9 +16,6 @@ is selected, calling the __init__ method.
 API version info:   
     1.0: initial working release
 """
-import logging
-logger = logging.getLogger(__name__)
-
 from pyfda.libs.compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 
 import scipy.signal as sig

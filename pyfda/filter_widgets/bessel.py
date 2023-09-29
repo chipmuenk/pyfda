@@ -181,7 +181,7 @@ For scipy 0.18 and higher, more design options have been implemented
         """
         if self.N > 25:
             #in scipy, Bessel filter order is limited to 25
-            logger.warn("Order N = {0} is too high for Bessel filters, limiting to 25.".format(self.N))
+            logger.warning("Order N = {0} is too high for Bessel filters, limiting to 25.".format(self.N))
             self.N = 25
         return True
 
