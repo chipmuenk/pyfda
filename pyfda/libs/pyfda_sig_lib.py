@@ -152,11 +152,13 @@ def zpk2array(zpk):
 
     if type(zpk) in {np.ndarray, list, tuple}:
         if len(zpk) == 3:  # dimensions are ok, but poles / gain could be empty
-            if np.isscalar(zpk[2]):
+            if np.isscalar(zpk[2]) or zpk[2] == []:
                 if zpk[2] == 0:
                     zpk[2] = 1
-            elif zpk[2][0] in {0, None}:
-                zpk[2][0] = 1
+            else:
+                logger.error(zpk[2])
+                if zpk[2][0] in {0, None}:
+                    zpk[2][0] = 1
 
         elif len(zpk) == 2:  # only poles and zeros given:
             zpk = list(zpk)
