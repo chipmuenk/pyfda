@@ -514,9 +514,6 @@ def table2array(parent: object, fkey: str, title: str = "Import"):
             return None
         else:
             data_arr = load_data_np(file_name, file_type)
-            # pass data as numpy array
-            logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
-                        .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
             if type(data_arr) == int and data_arr == -1:  # file operation cancelled
                 data_arr = None
     return data_arr
@@ -549,13 +546,8 @@ def csv2array(f: TextIO):
     -------
 
     data_arr: ndarray
-        numpy array of str with table data from file or text when import was
-        successful
-
-    OR
-
-    io_error: str
-        String with the error message when import was unsuccessful
+        numpy array of str with table data from file or `None` when import was
+        unsuccessful
 
 
     While opening a file, the `newline` parameter can be used to

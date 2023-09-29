@@ -158,13 +158,14 @@ def zpk2array(zpk):
             elif zpk[2][0] in {0, None}:
                 zpk[2][0] = 1
 
-        elif len(zpk) == 2:  # only poles and zeros given, add gain = 1
+        elif len(zpk) == 2:  # only poles and zeros given:
             zpk = list(zpk)
-            zpk.append([1])  # set the gain = 1
-        elif len(zpk) == 1:  # only zeros given, a
+            zpk.append([1])  # set gain = 1
+        elif len(zpk) == 1:  # only zeros given:
             zpk = list(zpk)
             zpk.append([0], [1])  # set pole = 0, gain = 1
         else:
+            logger.error(f"'zpk' has unsuitable shape '{np.shape(zpk)}'")
             return f"'zpk' has unsuitable shape '{np.shape(zpk)}'"
     else:
         return f"'zpk' has an unsuitable type '{type(zpk)}'"
