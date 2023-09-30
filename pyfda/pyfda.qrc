@@ -36,6 +36,7 @@
     <file alias="speaker_90.svg">images/icons/dark/ic_volume_up_48px_90.svg</file>
     <file alias="sort-ascending.svg">images/icons/dark/sort-ascending.svg</file>
     <!-- <file alias="stop.svg">images/icons/dark/ic_stop_48px.svg</file> -->
+    <file alias="star.svg">images/icons/dark/stars_black_24dp.svg</file>
     <file alias="stop.svg">images/icons/dark/ic_play_arrow_48px.svg</file>
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
