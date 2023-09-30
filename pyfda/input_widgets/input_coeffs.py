@@ -660,7 +660,8 @@ class Input_Coeffs(QWidget):
         CSV format.
         """
         if not params['CSV']['cmsis']:
-            text = qtable2csv(self.tblCoeff, self.ba, frmt=self.QObj[0].q_dict['fx_base'])
+            text = qtable2csv(self.tblCoeff, self.ba, fx_base=self.QObj[0].q_dict['fx_base'],
+                              formatted=self.ui.but_format.isChecked())
             if params['CSV']['clipboard']:  # clipboard is selected as export target
                 fb.clipboard.setText(text)
             else:

@@ -258,7 +258,7 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 
 # ------------------------------------------------------------------------------
 def qtable2csv(table: object, data: np.ndarray, zpk=False,
-               frmt: str = 'float') -> str:
+               fx_base: str = 'float', formatted: bool = False) -> str:
     """
     Transform table to CSV formatted text and copy to clipboard or file
 
@@ -274,9 +274,13 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
     zpk: bool
             when True, append the gain (`data[2]`) to the table
 
-    frmt: str
-           when ``frmt=='float'``, copy data from model ("shadow"), otherwise from the
+    fx_base: str
+           when ``fx_base=='float'``, copy data from model ("shadow"), otherwise from the
            view using the ``itemDelegate()`` method of the table.
+
+    formatted: bool
+        When True, copy data as formatted in the table, otherwise copy from the
+        model ("shadow").
 
 
     The following keys from the global dict dict ``params['CSV']`` are evaluated:
@@ -334,23 +338,25 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
     num_cols = table.columnCount()
     num_rows = table.rowCount()
 
-    sel = qget_selected(table, reverse=False)['sel']
-
+    # If gain is just a scalar, convert to a list with one item
     if zpk and np.isscalar(data[2]):
         data[2] = [data[2]]
+
+    sel = qget_selected(table, reverse=False)['sel']
 
     # ==========================================================================
     # Nothing selected, but cell format is non-float:
     # -> select whole table, copy all cells further down below:
     # Attention: np.any() fails for inhomogeneous lists!
     # ==========================================================================
-    if not any(sel) and frmt != 'float':
+    # if not any(sel) and fx_base != 'float':
+    if formatted:
         sel = qget_selected(table, reverse=False, select_all=True)['sel']
 
     # ==========================================================================
-    # Nothing selected, copy complete table from the model (data) in float format:
+    # Copy data from the model in float format:
     # ==========================================================================
-    if not any(sel):
+    if not formatted:
         if params['CSV']['orientation'] == 'rows':  # write table in row(s)
             for c in range(num_cols):
                 if use_header:  # add the table header at the beginning of the row(s)
@@ -358,7 +364,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + delim
                 text = text.rstrip(delim) + cr
-            if zpk:
+            if zpk:  # add another row with the gain from the data
                 if use_header:
                     text += 'k' + delim
                 for r in range(len(data[2])):
@@ -382,28 +388,45 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
         text = text.rstrip(cr)  # delete CR after last row
 
     # =======================================================================
-    # Copy only selected cells in displayed format:
+    # Copy table in displayed format:
     # =======================================================================
     else:
-        if params['CSV']['orientation'] == 'rows':  # write table in row(s)
-            if use_header:  # insert table header at the beginning of row 1
-                text += table.horizontalHeaderItem(0).text() + delim
-            if sel[0]:
-                for r in sel[0]:
-                    item = table.item(r, 0)
+        if params['CSV']['orientation'] == 'rows':  # write table in row format
+            for c in range(num_cols):
+                if use_header:  # add the table header at the beginning of the row(s)
+                    text += table.horizontalHeaderItem(c).text() + delim
+                for r in range(num_rows):
+                    item = table.item(r, c)
                     if item and item.text() != "":
                         text += table.itemDelegate().text(item).lstrip(" ") + delim
-                text = text.rstrip(delim)  # remove last tab delimiter again
+                    else:
+                        text += "0" + delim
+                text = text.rstrip(delim) + cr
+            if zpk:  # add another row with the gain from the data
+                if use_header:
+                    text += 'k' + delim
+                for r in range(len(data[2])):
+                    text += str(safe_eval(data[2][r], return_type='auto')) + delim
+                text = text.rstrip(delim) + cr
 
-            if sel[1]:  # returns False for []
-                text += cr  # add a CRLF when there are two columns
-                if use_header:  # insert table header at the beginning of row 2
-                    text += table.horizontalHeaderItem(1).text() + delim
-                for r in sel[1]:
-                    item = table.item(r, 1)
-                    if item and item.text() != "":
-                        text += table.itemDelegate().text(item) + delim
-                text = text.rstrip(delim)  # remove last tab delimiter again
+            # if use_header:  # insert table header at the beginning of row 1
+            #     text += table.horizontalHeaderItem(0).text() + delim
+            # if sel[0]:
+            #     for r in sel[0]:
+            #         item = table.item(r, 0)
+            #         if item and item.text() != "":
+            #             text += table.itemDelegate().text(item).lstrip(" ") + delim
+            #     text = text.rstrip(delim)  # remove last tab delimiter again
+
+            # if sel[1]:  # returns False for []
+            #     text += cr  # add a CRLF when there are two columns
+            #     if use_header:  # insert table header at the beginning of row 2
+            #         text += table.horizontalHeaderItem(1).text() + delim
+            #     for r in sel[1]:
+            #         item = table.item(r, 1)
+            #         if item and item.text() != "":
+            #             text += table.itemDelegate().text(item) + delim
+            #    text = text.rstrip(delim)  # remove last tab delimiter again
         else:  # write table in column(s)
             sel_c = []
             if sel[0]:
