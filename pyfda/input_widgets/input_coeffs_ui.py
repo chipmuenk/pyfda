@@ -146,6 +146,14 @@ class Input_Coeffs_UI(QWidget):
         q_icon_size = self.but_quant.iconSize()  # <- comment this for manual sizing
         self.but_quant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
+        self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
+        self.but_format.setToolTip(
+            "<span>Load and save coefficients with the table format when activated, "
+            "i.e. with the selected number of digits, in Hex, Binary etc.</span>"
+            )
+        self.but_format.setIconSize(q_icon_size)
+        self.but_format.setCheckable(True)
+
         layH_q_frmt = QHBoxLayout()
         layH_q_frmt.addWidget(self.cmb_q_frmt)
         layH_q_frmt.addWidget(self.but_quant)
@@ -160,6 +168,7 @@ class Input_Coeffs_UI(QWidget):
         layH_display.addWidget(self.spnDigits)
         layH_display.addWidget(self.lblDigits)
         layH_display.addWidget(self.frm_q_frmt)
+        layH_display.addWidget(self.but_format)
         layH_display.addStretch()
 
         self.frm_display = QFrame(self)
@@ -205,8 +214,7 @@ class Input_Coeffs_UI(QWidget):
             "<span>Copy coefficient table to filter dict and update all plots "
             "and widgets.</span>")
 
-        self.butLoad = QPushButton(self)
-        self.butLoad.setIcon(QIcon(':/download.svg'))
+        self.butLoad = QPushButton(QIcon(':/download.svg'), "", self)
         self.butLoad.setIconSize(q_icon_size)
         self.butLoad.setToolTip(
             "<span>Reload coefficient table from filter dict.</span>")
@@ -216,9 +224,10 @@ class Input_Coeffs_UI(QWidget):
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all table entries.")
 
+        # Icon and tooltip are switched between file and clipboard,
+        # depending on CSV options in _set_load_save_icons()
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIconSize(q_icon_size)
-
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
 
