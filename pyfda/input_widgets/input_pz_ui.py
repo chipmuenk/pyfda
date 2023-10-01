@@ -107,8 +107,9 @@ class Input_PZ_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>Load and save coefficients with the table format when activated, "
-            "i.e. with the selected number of digits, in Hex, Binary etc.</span>"
+            "<span>Save poles, zeros and gain <i>k</i> with the table format when "
+            "activated, i.e. in polar coordinates, with the selected number of digits "
+            "etc. Loading formatted data is not yet supported.</span>"
             )
         q_icon_size = self.but_format.iconSize()
         self.but_format.setCheckable(True)
