@@ -314,7 +314,7 @@ class Input_PZ_UI(QWidget):
             self.butToTable.setToolTip(
                 "<span>Load table from clipboard in float format. "
                 "Importing formatted data (e.g. in polar format) is not supported yet, "
-                "the &lt;FORMAT&gt; button is ignored.</span>"))
+                "the &lt;FORMAT&gt; button is ignored.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
