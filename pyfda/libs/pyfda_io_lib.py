@@ -506,7 +506,7 @@ def table2array(parent: object, fkey: str, title: str = "Import"):
         if file_name is None:  # operation cancelled or error
             return None
         else:
-            data_arr = load_data_np(file_name, file_type)
+            data_arr = load_data_np(file_name, file_type, fkey=fkey)
             if data_arr is not None:
                 # pass data as numpy array
                 logger.debug("Importing data from file. shape = {0} | {1}\n{2}"
