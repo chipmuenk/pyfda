@@ -247,7 +247,6 @@ class Input_PZ(QWidget):
         self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
         self.ui.butLoad.clicked.connect(self.load_dict)
-        # self.ui.butEnable.clicked.connect(self.load_dict)
 
         self.ui.butSave.clicked.connect(self._save_entries)
         self.ui.cmbNorm.activated.connect(self._normalize_gain)
