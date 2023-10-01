@@ -358,29 +358,31 @@ class Input_Coeffs_UI(QWidget):
         if params['CSV']['clipboard']:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard.<br>For float format, SELECTED items "
-                "are copied as displayed. When nothing is selected, the whole table "
-                "is copied with full precision.</span>")
+                "<span>Copy table to clipboard in float format with full precision "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, copy the table as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip(
-                "<span>Copy clipboard to table. Table data format (e.g. 'Hex') has to "
-                "match the clipboard data format, otherwise data may be imported "
-                "incorrectly without warning.</span>")
+                "<span>Import clipboard in float format when the &lt;FORMAT&gt; "
+                "button is not selected.<br>"
+                "Otherwise, try to import data in the selected table data format "
+                "(e.g. 'Hex'). If this doesn't match the clipboard data format, "
+                "imported data may be corrupted.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
-                "<span>"
-                "Save table to file.<br>"
-                "For float format,  SELECTED items are copied as "
-                "displayed. When nothing is selected, the whole table "
-                "is copied with full precision.</span>")
+                "<span>Save table to file in float format with full precision "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, save the table as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
             self.butToTable.setToolTip(
-                "<span>Load table from file. Table data format (e.g. 'Hex') has to "
-                "match the data format in the file, otherwise data may be imported "
-                "incorrectly without warning.</span>")
+                "<span>Load table from file in float format when the &lt;FORMAT&gt; "
+                "button is not selected.<br>"
+                "Otherwise, try to import data in the selected table data format "
+                "(e.g. 'Hex'). If this doesn't match the file data format, "
+                "imported data may be corrupted.</span>")
 
         # set state of CSV options button according to state of handle
         self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
