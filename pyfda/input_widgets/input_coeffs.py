@@ -660,8 +660,8 @@ class Input_Coeffs(QWidget):
         CSV format.
         """
         if not params['CSV']['cmsis']:
-            text = qtable2csv(self.tblCoeff, self.ba, fx_base=self.QObj[0].q_dict['fx_base'],
-                              formatted=self.ui.but_format.isChecked())
+            text = qtable2csv(
+                self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
             if params['CSV']['clipboard']:  # clipboard is selected as export target
                 fb.clipboard.setText(text)
             else:
@@ -726,8 +726,6 @@ class Input_Coeffs(QWidget):
             logger.error(
                 "Data cannot be imported, it is a single value or None.")
             return
-        logger.info(f"_import: c x r = {num_cols} x {num_rows}, horiz = {orientation_horiz}")
-        self.ba = [[], []]
 
         if orientation_horiz:
             for c in range(num_cols):

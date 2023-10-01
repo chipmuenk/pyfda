@@ -804,7 +804,8 @@ class Input_PZ(QWidget):
         Export data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file using a selected format
         """
-        text = qtable2csv(self.tblPZ, self.zpk, zpk=True)
+        text = qtable2csv(
+            self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
         if params['CSV']['clipboard']:  # clipboard is selected as export target
             fb.clipboard.setText(text)
         else:
