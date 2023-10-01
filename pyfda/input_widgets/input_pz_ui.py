@@ -105,6 +105,14 @@ class Input_PZ_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
+        self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
+        self.but_format.setToolTip(
+            "<span>Load and save coefficients with the table format when activated, "
+            "i.e. with the selected number of digits, in Hex, Binary etc.</span>"
+            )
+        q_icon_size = self.but_format.iconSize()
+        self.but_format.setCheckable(True)
+
         # self.cmbCausal = QComboBox(self)
         # causal_types = ['Causal', 'Acausal', 'Anticausal']
         # for cs in causal_types:
@@ -122,6 +130,7 @@ class Input_PZ_UI(QWidget):
         layHDisplay.addWidget(self.spnDigits)
         layHDisplay.addWidget(self.lblDigits)
         # layHDisplay.addWidget(self.cmbCausal)
+        layHDisplay.addWidget(self.but_format)
         layHDisplay.addStretch()
 
         # ---------------------------------------------
@@ -158,7 +167,8 @@ class Input_PZ_UI(QWidget):
             "<span>Select cells to insert a new cell above each selected cell. "
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, add a row at the end.</span>")
-        q_icon_size = self.butAddCells.iconSize() 
+        self.butAddCells.setIconSize(q_icon_size)
+        # q_icon_size = self.butAddCells.iconSize()
 
         self.butDelCells = QPushButton(self)
         self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
