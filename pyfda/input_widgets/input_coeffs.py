@@ -432,7 +432,7 @@ class Input_Coeffs(QWidget):
         # false overflows during quantization. The "1" is always printed though
         # by the `ItemDelegate.initStyleOption()` method
         #
-        # TODO: Replacing the first element by 0  doesn't work, a is always converted 
+        # TODO: Replacing the first element by 0  doesn't work, a is always converted
         # to integer for non-dec formats somehwhere - Why???
 
         # logger.error(f"ba[1]: {self.ba[1].dtype}")
@@ -647,7 +647,7 @@ class Input_Coeffs(QWidget):
         """
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
-        # set quantization UI from dictionary, update quantized coeff. display and 
+        # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
         self.qdict2ui()
 
@@ -665,7 +665,7 @@ class Input_Coeffs(QWidget):
             if params['CSV']['clipboard']:  # clipboard is selected as export target
                 fb.clipboard.setText(text)
             else:
-                # pass csv formatted text, key for accessing data in ``*.npz`` file or 
+                # pass csv formatted text, key for accessing data in ``*.npz`` file or
                 # Matlab workspace (``*.mat``) and a title for the file export dialog
                 save_data_csv(self, text, 'ba', title="Export Filter Coefficients")
 
