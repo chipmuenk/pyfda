@@ -306,21 +306,27 @@ class Input_PZ_UI(QWidget):
         if params['CSV']['clipboard']:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard, SELECTED items are copied as "
-                "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "<span>Copy table to clipboard in float format with full precision "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, copy the table as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-            self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
+            self.butToTable.setToolTip(
+                "<span>Load table from clipboard in float format. "
+                "Importing formatted data (e.g. in polar format) is not supported yet, "
+                "the &lt;FORMAT&gt; button is ignored.</span>"))
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
-                "<span>Save table to file, SELECTED items are copied as "
-                "displayed. When nothing is selected, the whole table "
-                "is copied with full precision in decimal format.</span>")
+                "<span>Save table to file in float format with full precision "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, save the table as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
-            self.butToTable.setToolTip("<span>Load table from file.</span>")
+            self.butToTable.setToolTip(
+                "<span>Load table from file in float format. "
+                "Importing formatted data (e.g. in polar format) is not supported yet, "
+                "the &lt;FORMAT&gt; button is ignored.</span>")
 
         # set state of CSV options button according to state of handle
         self.but_csv_options.setChecked(not dirs.csv_options_handle is None)

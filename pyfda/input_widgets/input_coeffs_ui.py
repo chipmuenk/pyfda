@@ -367,7 +367,7 @@ class Input_Coeffs_UI(QWidget):
                 "<span>Import clipboard in float format when the &lt;FORMAT&gt; "
                 "button is not selected.<br>"
                 "Otherwise, try to import data in the selected table data format "
-                "(e.g. 'Hex'). If this doesn't match the clipboard data format, "
+                "(e.g. 'Hex'). If this differs from the clipboard data format, "
                 "imported data may be corrupted.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
@@ -381,7 +381,7 @@ class Input_Coeffs_UI(QWidget):
                 "<span>Load table from file in float format when the &lt;FORMAT&gt; "
                 "button is not selected.<br>"
                 "Otherwise, try to import data in the selected table data format "
-                "(e.g. 'Hex'). If this doesn't match the file data format, "
+                "(e.g. 'Hex'). If this differs from the file data format, "
                 "imported data may be corrupted.</span>")
 
         # set state of CSV options button according to state of handle
