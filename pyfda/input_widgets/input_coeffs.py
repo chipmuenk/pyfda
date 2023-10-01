@@ -707,6 +707,7 @@ class Input_Coeffs(QWidget):
         # get data as ndarray of str
         data_str = table2array(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
+            logger.info(f"Data was not imported.")
             return
 
         frmt = self.QObj[0].q_dict['fx_base']
@@ -727,6 +728,7 @@ class Input_Coeffs(QWidget):
                 "Data cannot be imported, it is a single value or None.")
             return
 
+        self.ba = [[], []]
         if orientation_horiz:
             for c in range(num_cols):
                 self.ba[0].append(
@@ -755,6 +757,7 @@ class Input_Coeffs(QWidget):
 
         self._equalize_ba_length()
         self.refresh_table()
+        logger.info(f"Successfully imported data.")
         qstyle_widget(self.ui.butSave, 'changed')
 
     # --------------------------------------------------------------------------

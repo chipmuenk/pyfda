@@ -509,7 +509,7 @@ def table2array(parent: object, fkey: str, title: str = "Import"):
             data_arr = load_data_np(file_name, file_type)
             if data_arr is not None:
                 # pass data as numpy array
-                logger.debug("Imported data from file. shape = {0} | {1}\n{2}"
+                logger.debug("Importing data from file. shape = {0} | {1}\n{2}"
                             .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
     return data_arr
 
