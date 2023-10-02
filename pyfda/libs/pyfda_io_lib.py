@@ -437,7 +437,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
 
 
 # ------------------------------------------------------------------------------
-def table2array(parent: object, fkey: str, title: str = "Import"):
+def data2array(parent: object, fkey: str, title: str = "Import"):
     """
     Copy tabular data from clipboard or file to a numpy array
 

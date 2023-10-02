@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, save_data_csv
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
@@ -818,7 +818,7 @@ class Input_PZ(QWidget):
         Import data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = table2array(self, 'zpk', title="Import Poles / Zeros ")
+        data_str = data2array(self, 'zpk', title="Import Poles / Zeros ")
         if data_str is None:  # file operation has been aborted
             return
 
@@ -852,7 +852,6 @@ class Input_PZ(QWidget):
                 zpk[1] = [conv(s) for s in data_str[1]]
             if num_cols > 2:
                 zpk[2] = [conv(s) for s in data_str[2]]
-
 
         # sanitize zpk; test and equalize if P and Z lists have different lengths,
         # convert gain to a vector wth same length as zpk[0]
