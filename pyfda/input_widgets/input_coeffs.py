@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2csv, table2array, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, save_data_csv
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -645,7 +645,10 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
+        logger.warning(fb.fil[0]['ba'])
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
+
+        logger.warning(self.ba)
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
@@ -705,7 +708,7 @@ class Input_Coeffs(QWidget):
         TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         # get data as ndarray of str
-        data_str = table2array(self, 'ba', title="Import Filter Coefficients")
+        data_str = data2array(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
             logger.info(f"Data was not imported.")
             return

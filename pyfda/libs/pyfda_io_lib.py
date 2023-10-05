@@ -437,7 +437,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
 
 
 # ------------------------------------------------------------------------------
-def table2array(parent: object, fkey: str, title: str = "Import"):
+def data2array(parent: object, fkey: str, title: str = "Import"):
     """
     Copy tabular data from clipboard or file to a numpy array
 
@@ -485,32 +485,31 @@ def table2array(parent: object, fkey: str, title: str = "Import"):
     Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
 
     """
-
     if params['CSV']['clipboard']:  # data from clipboard
         text = fb.clipboard.text()
         logger.debug(
             f"Importing data from clipboard:\n{np.shape(text)}\n{text}")
         # pass handle to text and convert to numpy array:
         data_arr = csv2array(io.StringIO(text))
-        if data_arr is None:
-            logger.error("Couldn't import clipboard data.")
-            return None
-        elif isinstance(data_arr, str):  # returned an error message instead of numpy data
-            logger.error(
-                "You shouldn't see this message!\n"
-                f"Error importing clipboard data:\n\t{data_arr}")
-            return None
+
     else:  # data from file
         file_name, file_type = select_file(parent, title=title, mode="r",
                                    file_types=('csv', 'mat', 'npy', 'npz'))
         if file_name is None:  # operation cancelled or error
             return None
-        else:
-            data_arr = load_data_np(file_name, file_type, fkey=fkey)
-            if data_arr is not None:
-                # pass data as numpy array
-                logger.debug("Importing data from file. shape = {0} | {1}\n{2}"
-                            .format(np.shape(data_arr), np.ndim(data_arr), data_arr))
+        elif file_type == 'csv':
+            data_arr = csv2array(io.StringIO(text))
+        else:  # file types 'mat', 'npy', 'npz'
+            data_arr = load_data_np(file_name, file_type, fkey)
+
+    if data_arr is None:
+            logger.error("Couldn't import data.")
+    elif isinstance(data_arr, str):  # returned an error message instead of numpy data
+        logger.error(
+            "You shouldn't see this message!\n"
+            f"Error importing data:\n\t{data_arr}")
+        return None
+
     return data_arr
 
 # ------------------------------------------------------------------------------
@@ -1013,7 +1012,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
             f'Successfully imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
         return data_arr  # returns numpy array of type float
 
-    except IOError as e:
+    except (IOError, KeyError) as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
         return None
 
