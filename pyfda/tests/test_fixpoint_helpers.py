@@ -15,7 +15,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 from pyfda.libs import pyfda_fix_lib as fx
 try:
-    from migen import Cat, If, Replicate, Signal, Module, run_simulation
+    from nmigen import Cat, If, Replicate, Signal, Module, run_simulation
     from pyfda.fixpoint_widgets.fixpoint_helpers import requant
     HAS_MIGEN = True
 except ImportError:
@@ -89,7 +89,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(2**(-self.myQ.q_dict['WI']), self.myQ.q_dict['scale'])
         # check whether option 'int' sets the correct scale
         self.myQ.set_qdict({'scale':'int'})
-        self.assertEqual(1<<self.myQ.q_dict['WF']), self.myQ.q_dict['scale'])
+        self.assertEqual(1<<self.myQ.q_dict['WF'], self.myQ.q_dict['scale'])
 
     #==========================================================================
     # Test requant routine, this needs a migen class (DUT)
