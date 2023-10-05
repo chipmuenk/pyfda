@@ -110,6 +110,13 @@ try:
 except ImportError:
     pass
 
+try:
+    from amaranth import __version__ as V_AMRN
+    MODULES.update({'amaranth': {'V_AMRN': V_AMRN}})
+except ImportError:
+    pass
+
+
 # Remove module names as keys and return a dict with items like
 #  {'V_MPL':'3.3.1', ...}
 MOD_VERSIONS = {}
