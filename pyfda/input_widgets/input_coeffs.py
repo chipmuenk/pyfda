@@ -132,21 +132,17 @@ class ItemDelegate(QStyledItemDelegate):
             super(ItemDelegate, self).initStyleOption(option, index)
 
     # -------------------------------------------------------------------------
-    def text(self, item):
+    def text(self, item) -> str:
         """
         Return item text as string transformed by self.displayText()
 
-        Used a.o. in `libs.pyfda_fix_lib` as `text += table.itemDelegate().text(item)`
-
-        This is needed by pyfda_io_lib.qtable2csv() to read out a table in text
-        mode, e.g. `text = table.itemDelegate().text(item)`
+        This is used a.o. by `pyfda_io_lib.qtable2csv()` and  `libs.pyfda_fix_lib`
+        to read out a table in text mode, e.g. `text = table.itemDelegate().text(item)`
         """
-        dtext = str(self.displayText(item.text(), QtCore.QLocale()))
-        # logger.warning(f"dtext={dtext}")
-        return dtext
+        return str(self.displayText(item.text(), QtCore.QLocale()))
 
     # -------------------------------------------------------------------------
-    def displayText(self, text, locale):
+    def displayText(self, text, locale) -> str:
         """
         Display `text` with selected fixpoint base and number of places
 
@@ -209,12 +205,13 @@ class ItemDelegate(QStyledItemDelegate):
                                   self.QObj[index.column()].q_dict['places']))
 
     # -------------------------------------------------------------------------
-    def setModelData(self, editor, model, index):
+    def setModelData(self, editor, model, index) -> None:
         """
-        When editor has finished, read the updated data from the editor,
-        convert it back to floating point format and store it in both the model
-        (= QTableWidget) and in self.ba_q. Finally, refresh the table item to
-        display it in the selected format (via `float2frmt()`).
+        When editing has finished, read the updated data from the editor (= QTableWidget),
+        convert it back to floating point format and store it in `self.ba` as float via
+        `float2frmt()`. Next, convert it back to fixpoint format via `frmt2float()`  and
+        store it in `self.ba_q`. Finally, refresh the table item to
+        display it in the selected format via `_refresh_table_item()`.
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
@@ -233,7 +230,7 @@ class ItemDelegate(QStyledItemDelegate):
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
             data_q = data  # TODO: complex data
-        else:   # transform to float
+        else:   # fixpoint format, transform to float
             data = self.QObj[index.column()].frmt2float(
                 str(editor.text()), self.QObj[index.column()].q_dict['fx_base'])
             data_q = self.QObj[index.column()].float2frmt(data)
@@ -249,6 +246,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent.ba_q[index.column()][index.row()] = data_q
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
+        logger.warning(fb.fil[0]['ba'])
 
 ###############################################################################
 
