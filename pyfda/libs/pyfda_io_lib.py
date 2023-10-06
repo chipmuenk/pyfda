@@ -260,7 +260,7 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 def qtable2csv(table: object, data: np.ndarray, zpk=False,
                formatted: bool = False) -> str:
     """
-    Transform table to CSV formatted text and copy to clipboard or file
+    Transform QTableWidget data to CSV formatted text
 
     Parameters
     ----------
@@ -497,9 +497,7 @@ def data2array(parent: object, fkey: str, title: str = "Import"):
                                    file_types=('csv', 'mat', 'npy', 'npz'))
         if file_name is None:  # operation cancelled or error
             return None
-        elif file_type == 'csv':
-            data_arr = csv2array(io.StringIO(text))
-        else:  # file types 'mat', 'npy', 'npz'
+        else:  # file types 'csv', 'mat', 'npy', 'npz'
             data_arr = load_data_np(file_name, file_type, fkey)
 
     if data_arr is None:
