@@ -246,7 +246,6 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent.ba_q[index.column()][index.row()] = data_q
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
-        logger.warning(fb.fil[0]['ba'])
 
 ###############################################################################
 
@@ -643,10 +642,8 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-        logger.warning(fb.fil[0]['ba'])
         self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
 
-        logger.warning(self.ba)
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
