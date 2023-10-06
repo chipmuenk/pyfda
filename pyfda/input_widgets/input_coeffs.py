@@ -632,8 +632,7 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def load_dict(self):
         """
-        - Create a reference from filter dict `fb.fil[0]['ba']` to the coefficient list
-           `self.ba`
+        - Copy filter dict array `fb.fil[0]['ba']` to the coefficient list `self.ba`
         - Set quantization UI from dict, update quantized coeff. display / overflow
           counter
         - Update the display via `self.refresh_table()`.
@@ -642,8 +641,7 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-        self.ba = [fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]]  # list of two arrays
-
+        self.ba = list(fb.fil[0]['ba'].copy())
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
