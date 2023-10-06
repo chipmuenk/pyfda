@@ -111,8 +111,8 @@ except ImportError:
     pass
 
 try:
-    from amaranth import __version__ as V_AMRN
-    MODULES.update({'amaranth': {'V_AMRN': V_AMRN}})
+    from amaranth import __version__ as V_AM
+    MODULES.update({'amaranth': {'V_AM': V_AM}})
 except ImportError:
     pass
 
