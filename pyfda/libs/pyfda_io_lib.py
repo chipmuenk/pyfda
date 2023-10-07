@@ -930,7 +930,7 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
+def load_data_np(file_name: str, file_type: str, fkey: str = "", to_num: bool = True)-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
 
@@ -945,6 +945,10 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
     fkey : str
         Key for accessing data in *.npz or Matlab workspace (*.mat) file with
         multiple entries.
+
+    to_num: bool
+        When True (default), try to convert to float or complex. Otherwise,
+        return the raw string format.
 
     Returns
     -------
@@ -998,17 +1002,19 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "")-> np.ndarray:
                     logger.error(f'Unknown file type "{file_type}"')
                     return None
 
-        try:  # try to convert array elements to float
-            data_arr = data_arr.astype(float)
-        except ValueError as e:
-            try:
-                data_arr = data_arr.astype(complex)
-            except ValueError:
-                logger.error(f"{e},\n\tconversion to float and complex failed.")
-                return None
+        if to_num:
+            try:  # try to convert array elements to float
+                data_arr = data_arr.astype(float)
+            except ValueError as e:
+                try: # try to convert array elements to complex
+                    data_arr = data_arr.astype(complex)
+                except ValueError:
+                    logger.error(f"{e},\n\tconversion to float and complex failed.")
+                    return None
+
         logger.info(
             f'Successfully imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
-        return data_arr  # returns numpy array of type float
+        return data_arr  # returns numpy array of type string or float/complex
 
     except (IOError, KeyError) as e:
         logger.error("Failed loading {0}!\n{1}".format(file_name, e))
