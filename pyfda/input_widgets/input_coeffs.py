@@ -700,6 +700,7 @@ class Input_Coeffs(QWidget):
 
         TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
+        formatted_import = self.ui.but_format.isChecked()
         # get data as ndarray of str
         data_str = data2array(self, 'ba', title="Import Filter Coefficients")
         if data_str is None:  # file operation has been aborted or some other error
@@ -727,26 +728,41 @@ class Input_Coeffs(QWidget):
         self.ba = [[], []]
         if orientation_horiz:
             for c in range(num_cols):
-                self.ba[0].append(
-                    self.QObj[0].frmt2float(data_str[c][0], frmt))
-                if num_rows > 1:
-                    self.ba[1].append(
-                        self.QObj[1].frmt2float(data_str[c][1], frmt))
+                if formatted_import:
+                    self.ba[0].append(
+                        self.QObj[0].frmt2float(data_str[c][0], frmt))
+                    if num_rows > 1:
+                        self.ba[1].append(
+                            self.QObj[1].frmt2float(data_str[c][1], frmt))
+                else:
+                    self.ba[0].append(data_str[c][0])
+                    if num_rows > 1:
+                        self.ba[1].append(data_str[c][1])
             if num_rows > 1:
                 self._filter_type(ftype='IIR')
             else:
                 self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
         else:
-            self.ba[0] =\
-                [self.QObj[0].frmt2float(s, frmt) for s in data_str[0]]
+            if formatted_import:
+                self.ba[0] =\
+                    [self.QObj[0].frmt2float(s, frmt) for s in data_str[0]]
+            else:
+                self.ba[0] = data_str[0]
+            # IIR
             if num_cols > 1:
-                self.ba[1] =\
-                    [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
+                if formatted_import:
+                    self.ba[1] =\
+                        [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
+                else:
+                    self.ba[1] = data_str[1]
                 self._filter_type(ftype='IIR')
             else:
                 self.ba[1] = zeros_with_val(len(self.ba[0]))
                 self._filter_type(ftype='FIR')
+
+        logger.warning(type(self.ba[0]))
+        logger.warning(self.ba)
 
         self.ba[0] = np.asarray(self.ba[0])
         self.ba[1] = np.asarray(self.ba[1])
