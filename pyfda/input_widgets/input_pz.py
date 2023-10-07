@@ -464,7 +464,7 @@ class Input_PZ(QWidget):
             logger.warning(f"fb.fil[0]['zpk'] is of type {type(fb.fil[0]['zpk'])} "
                            f"with len = {len(fb.fil[0]['zpk'])}")
 
-        zpk = list(fb.fil[0]['zpk'])
+        zpk = list(fb.fil[0]['zpk'].copy())
 
         if len(zpk) == 3:  # number of rows
             if np.isscalar(zpk[2]):
