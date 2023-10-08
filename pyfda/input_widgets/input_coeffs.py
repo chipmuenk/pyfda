@@ -702,7 +702,8 @@ class Input_Coeffs(QWidget):
         """
         formatted_import = self.ui.but_format.isChecked()
         # get data as ndarray of str
-        data_str = data2array(self, 'ba', title="Import Filter Coefficients")
+        data_str = data2array(self, 'ba', title="Import Filter Coefficients",
+                              as_str = self.ui.but_format.isChecked())
         if data_str is None:  # file operation has been aborted or some other error
             logger.info(f"Data was not imported.")
             return

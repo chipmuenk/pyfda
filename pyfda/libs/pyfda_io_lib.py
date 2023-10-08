@@ -437,7 +437,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
 
 
 # ------------------------------------------------------------------------------
-def data2array(parent: object, fkey: str, title: str = "Import"):
+def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = False):
     """
     Copy tabular data from clipboard or file to a numpy array
 
@@ -445,13 +445,16 @@ def data2array(parent: object, fkey: str, title: str = "Import"):
     -----------
 
     parent: object
-            parent instance, having a QClipboard and / or a QFileDialog attribute.
+            parent instance with a QFileDialog attribute.
 
     fkey: str
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
 
     title: str
         title string for the file dialog box
+
+    as_str: bool
+        When True, return ndarray in raw str format, otherwise convert to float or complex
 
     Returns
     --------
@@ -498,7 +501,7 @@ def data2array(parent: object, fkey: str, title: str = "Import"):
         if file_name is None:  # operation cancelled or error
             return None
         else:  # file types 'csv', 'mat', 'npy', 'npz'
-            data_arr = load_data_np(file_name, file_type, fkey)
+            data_arr = load_data_np(file_name, file_type, fkey, as_str = as_str)
 
     if data_arr is None:
             logger.error("Couldn't import data.")
@@ -930,7 +933,8 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def load_data_np(file_name: str, file_type: str, fkey: str = "", to_num: bool = True)-> np.ndarray:
+def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = False
+                 )-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
 
@@ -940,20 +944,20 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", to_num: bool = 
         Full path and name of the file to be imported
 
     file_type: str
-        File type (e.g. 'wav')
+        File type, currently supported are 'csv', 'mat', 'npy', 'npz, 'txt', 'wav'.
 
     fkey : str
-        Key for accessing data in *.npz or Matlab workspace (*.mat) file with
+        Key for accessing data in *.npz or Matlab workspace (*.mat) files with
         multiple entries.
 
-    to_num: bool
-        When True (default), try to convert to float or complex. Otherwise,
-        return the raw string format.
+    as_str: bool
+        When False (default), try to convert results to ndarray of float or complex.
+        Otherwise, return an ndarray of str.
 
     Returns
     -------
-    ndarray of float or int
-        Data from the file (ndarray) or None (error), -1 for file cancel
+    ndarray of float / complex / int or str
+        Data from the file (ndarray) or None (error)
     """
     load_data_np.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled
@@ -1002,7 +1006,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", to_num: bool = 
                     logger.error(f'Unknown file type "{file_type}"')
                     return None
 
-        if to_num:
+        if not as_str:
             try:  # try to convert array elements to float
                 data_arr = data_arr.astype(float)
             except ValueError as e:
@@ -1025,7 +1029,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", to_num: bool = 
 def save_data_np(file_name: str, file_type: str, data: np.ndarray,
                  f_S: int = 1, fmt: str = '%f') -> int:
     """
-    Save numpy data to a file in wav or csv format
+    Save numpy ndarray data to a file in wav or csv format
 
     Parameters
     ----------
@@ -1033,7 +1037,7 @@ def save_data_np(file_name: str, file_type: str, data: np.ndarray,
         Full path and name of the file to be imported
 
     file_type: str
-        File type (e.g. 'wav')
+        File type, currently supported are 'csv' or 'wav'
 
     data : np.ndarray
         Data to be saved to a file. The data dtype (uint8, int16, int32, float32)
