@@ -107,9 +107,9 @@ class Input_PZ_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>Save poles, zeros and gain <i>k</i> with the table format when "
-            "activated, i.e. in polar coordinates, with the selected number of digits "
-            "etc. Loading formatted data is not yet supported.</span>"
+            "<span>Save and load poles, zeros and gain <i>k</i> with the table format "
+            "when activated, e.g. in polar coordinates, with the selected number of "
+            "digits etc.</span>"
             )
         q_icon_size = self.but_format.iconSize()
         self.but_format.setCheckable(True)
@@ -313,9 +313,9 @@ class Input_PZ_UI(QWidget):
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip(
-                "<span>Load table from clipboard in float format. "
-                "Importing formatted data (e.g. in polar format) is not supported yet, "
-                "the &lt;FORMAT&gt; button is ignored.</span>")
+                "<span>Import table from clipboard in float format "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, import the table as displayed.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
@@ -325,9 +325,9 @@ class Input_PZ_UI(QWidget):
 
             self.butToTable.setIcon(QIcon(':/file.svg'))
             self.butToTable.setToolTip(
-                "<span>Load table from file in float format. "
-                "Importing formatted data (e.g. in polar format) is not supported yet, "
-                "the &lt;FORMAT&gt; button is ignored.</span>")
+                "<span>Import table from file in float format. "
+                "when the &lt;FORMAT&gt; button is not selected.<br>"
+                "Otherwise, import the table in file format.</span>")
 
         # set state of CSV options button according to state of handle
         self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
