@@ -68,7 +68,7 @@ jobs:
                 pyinstaller pyfdax.spec &&
                 mv dist/pyfdax dist/pyfdax_linux
             OUT_FILE_NAME: pyfdax_linux
-            ASSET_MIME: application/executable
+            ASSET_MIME: application/x-executable
 
     steps:
     - name: Infos about github trigger event and ref
