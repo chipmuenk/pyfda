@@ -56,17 +56,17 @@ def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     vlines (= LineCollection). LineCollection keywords are supported.
     """
     # create a copy of the kwargs dict without 'bottom' key-value pair, provide
-    # pop bottom from dict (defuault = 0), not compatible with vlines
+    # pop bottom from dict (default = 0), not compatible with vlines
     bottom = kwargs.pop('bottom', 0)
     ax.axhline(bottom, **kwargs)
-    if cmp_version("matplotlib", "3.1.0") >= 0:
-        ml, sl, bl = ax.stem(x, y, use_line_collection=True, bottom=bottom)
-        setp(ml, **mkr_fmt)
-        setp(bl, **kwargs)
-        setp(sl, **kwargs)
-    else:
-        ax.vlines(x, y, bottom, label=label, **kwargs)
-        scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
+    # if cmp_version("matplotlib", "3.1.0") >= 0:
+    ml, sl, bl = ax.stem(x, y, bottom=bottom)
+    setp(ml, **mkr_fmt)
+    setp(bl, **kwargs)
+    setp(sl, **kwargs)
+    # else:  # if matplotlib < 3.1.0
+    #     ax.vlines(x, y, bottom, label=label, **kwargs)
+    #     scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
 
     if mkr_fmt['marker']:
         handle = (lines.Line2D([], [], **kwargs), lines.Line2D([], [], **mkr_fmt))
