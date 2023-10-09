@@ -43,7 +43,7 @@ Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/r
 
 Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating.
 
-Binaries for **Linux** are created as Flatpaks, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
+Binaries for **Linux** are created as Flatpaks **(currently defunct)**, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
 ### pip
 Supported Python versions are 3.7 ... 3.11, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
