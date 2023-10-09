@@ -66,9 +66,9 @@ jobs:
             TARGET: ubuntu
             CMD_BUILD: >
                 pyinstaller pyfdax.spec &&
-                mv dist/pyfdax dist/pyfdax_nix
-            OUT_FILE_NAME: pyfdax_nix
-            ASSET_MIME: application/zip
+                mv dist/pyfdax dist/pyfdax_linux
+            OUT_FILE_NAME: pyfdax_linux
+            ASSET_MIME: application/executable
 
     steps:
     - name: Infos about github trigger event and ref
@@ -131,6 +131,7 @@ jobs:
         files: |
           pyfdax_win.exe/pyfdax_win.exe
           pyfdax_osx/pyfdax_osx
+          pyfdax_linux/pyfdax_linux
 
     - name: Update versioned release
       if: success() && github.ref_type == 'tag'
