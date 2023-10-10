@@ -12,7 +12,7 @@ pyqt5
 docutils
 nose
 mplcursors
-numexpr
+numexpr <= 2.8.4
 markdown
 # pyfixp # no PyPI package yet ...
 # pytest
