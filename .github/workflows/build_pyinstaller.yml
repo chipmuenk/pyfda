@@ -1,10 +1,11 @@
-# Workflow for building pyinstaller packages for windows and MacOS and creating a (pre-)release
+# Workflow for building pyinstaller packages for windows, MacOS and Ubuntu and
+# creating a (pre-)release
 # see https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions
 #
 # The workflow runs:
-#  - when manually triggered
-#  - for push events on the main branch, creating a "latest" pre-release, triggered by 'build_flatpak'
-#  - for tagged release events, creating a versioned release, triggered by 'build_flatpak'
+#  - for push events on the main branch or when manually triggered,
+#    creating a "latest" pre-release
+#  - for tagged release events, creating a versioned release
 #
 #    The latter requires a workflow like:
 #
@@ -18,8 +19,7 @@
 #
 #     git tag -d <tag_name>
 #     git push --delete origin <tag_name>
-#
-# When the 'build_flatpak' workflow has finished, this workflow is triggered as well.
+#     or git push origin :<tag_name>
 
 ---
 name: build_pyinstaller
@@ -143,4 +143,5 @@ jobs:
         files: |
           pyfdax_win.exe/pyfdax_win.exe
           pyfdax_osx/pyfdax_osx
+          pyfdax_linux/pyfdax_linux
 
