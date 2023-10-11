@@ -88,13 +88,13 @@ try:
     from docutils import __version__ as V_DOC
     MODULES.update({'docutils': {'V_DOC': V_DOC}})
 except ImportError:
-    pass
+    MODULES.update({'docutils': {'V_DOC': "not found"}})
 
 try:
     from mplcursors import __version__ as V_CUR
     MODULES.update({'mplcursors': {'V_CUR': V_CUR}})
 except ImportError:
-    pass
+    MODULES.update({'mplcursors': {'V_CUR': "not found"}})
 
 MODULES.update({'yosys': {'V_YO': dirs.YOSYS_VER}})
 
@@ -102,19 +102,19 @@ try:
     from xlwt import __version__ as V_XLWT
     MODULES.update({'xlwt': {'V_XLWT': V_XLWT}})
 except ImportError:
-    pass
+    MODULES.update({'xlwt': {'V_XLWT': "not found"}})
 
 try:
     from xlsxwriter import __version__ as V_XLSX
     MODULES.update({'xlsx': {'V_XLSX': V_XLSX}})
 except ImportError:
-    pass
+    MODULES.update({'xlsx': {'V_XLSX': "not found"}})
 
 try:
     from amaranth import __version__ as V_AM
     MODULES.update({'amaranth': {'V_AM': V_AM}})
 except ImportError:
-    pass
+    MODULES.update({'amaranth': {'V_AM': "not found"}})
 
 
 # Remove module names as keys and return a dict with items like
