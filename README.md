@@ -41,9 +41,9 @@ For details, see [INSTALLATION.md](INSTALLATION.md).
 ### Binaries
 Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/releases) for versioned releases and for a latest release, automatically created for each push to the main branch.
 
-Binaries for **64 bit Windows** and **OS X** are created with **[pyInstaller](https://www.pyinstaller.org/)**. These executables self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating.
+Self-extracting archives for **64 bit Windows**, **OS X** and **Ubuntu Linux** are created with **[pyInstaller](https://www.pyinstaller.org/)**. The archives self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating. After downloading the Linux archive, you need to make it executable (`chmod 775 pyfda_linux`).
 
-Binaries for **Linux** are created as Flatpaks **(currently defunct)**, they can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
+Binaries for **Linux** are created as Flatpaks as well **(currently defunct)** which can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
 ### pip
 Supported Python versions are 3.7 ... 3.11, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
@@ -86,6 +86,8 @@ The following libraries are required and installed automatically by pip when mis
 If you're working with Anaconda's packet manager conda, there is a recipe for pyfda on `conda-forge` since July 2023:
 
     > conda install --channel=conda-forge pyfda
+
+You should install pyfda into a new environment to avoid unwanted interaction with other installations.
 
 Start pyfda with
 
