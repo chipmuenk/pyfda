@@ -59,7 +59,7 @@ class Input_PZ_UI(QWidget):
             "<span>Polar coordinates (r * &ang; &Omega;) with &ang; in degrees, "
             "use 'o' or '°' as the degree sign.</span>"),]
         # π: u'3C0, °: u'B0, ∠: u'2220
-        self.cmb_pz_frmt_init = 'polar_deg'  # initial setting
+        self.cmb_pz_frmt_init = 'cartesian'  # initial setting
 
         self._construct_UI()
 
