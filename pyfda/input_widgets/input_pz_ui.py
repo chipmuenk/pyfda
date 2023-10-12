@@ -107,9 +107,9 @@ class Input_PZ_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>Save and load poles, zeros and gain <i>k</i> with the table format "
-            "when activated, e.g. in polar coordinates, with the selected number of "
-            "digits etc.</span>"
+            "<span>Save and load poles, zeros and gain <i>k</i> formatted as in the "
+            "table when activated, e.g. in polar coordinates, with the selected number "
+            "of digits etc.</span>"
             )
         q_icon_size = self.but_format.iconSize()
         self.but_format.setCheckable(True)
@@ -183,13 +183,13 @@ class Input_PZ_UI(QWidget):
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
         self.butSave.setToolTip(
-            "<span>Copy P/Z table to filter dict and update all plots and widgets."
+            "<span>Create filter from P/Z table and update all plots and widgets."
             "</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("Reload P/Z table from filter dict.")
+        self.butLoad.setToolTip("<span>(Re)Load P/Z table from current filter.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -315,11 +315,11 @@ class Input_PZ_UI(QWidget):
             self.butToTable.setToolTip(
                 "<span>Import table from clipboard in float format "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, import the table as displayed.</span>")
+                "Otherwise, import the table in display format.</span>")
         else:
             self.butFromTable.setIcon(QIcon(':/save.svg'))
             self.butFromTable.setToolTip(
-                "<span>Save table to file in float format with full precision "
+                "<span>Export table to file in float format with full precision "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
                 "Otherwise, save the table as displayed.</span>")
 
