@@ -11,14 +11,16 @@ Widget stacking all subwidgets for filter specification and design. The actual
 filter design is started here as well.
 """
 import sys
+import copy
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QVBoxLayout, QHBoxLayout)
+    QWidget, QLabel, QFrame, QPushButton, QComboBox, pyqtSignal,
+    QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 from pyfda.libs.pyfda_lib import pprint_log
-from pyfda.libs.pyfda_qt_lib import qstyle_widget
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, qget_selected
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter
 from pyfda.pyfda_rc import params
 
@@ -46,6 +48,21 @@ class Input_Specs(QWidget):
         super(Input_Specs, self).__init__(parent)
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
+
+        self.cmb_filter_selection_items = [
+            "<span>Select file or memory location for saving or loading filters.</span>",
+            ("file", "File", "Save / load filter to / from file."),
+            ("1", "Mem 1", "Save / load to / from memory 1"),
+            ("2", "Mem 2", "Save / load to / from memory 2"),
+            ("3", "Mem 3", "Save / load to / from memory 3"),
+            ("4", "Mem 4", "Save / load to / from memory 4"),
+            ("5", "Mem 5", "Save / load to / from memory 5"),
+            ("6", "Mem 6", "Save / load to / from memory 6"),
+            ("7", "Mem 7", "Save / load to / from memory 7"),
+            ("8", "Mem 8", "Save / load to / from memory 8"),
+            ("9", "Mem 9", "Save / load to / from memory 9")
+        ]
+        self.cmb_filter_selection_default = "file"
 
         self._construct_UI()
 
@@ -104,11 +121,17 @@ class Input_Specs(QWidget):
         Construct User Interface from all input subwidgets
         """
         self.butLoadFilt = QPushButton("LOAD FILTER", self)
-        self.butLoadFilt.setToolTip("Load filter from disk")
+        self.butLoadFilt.setToolTip("Load filter from disk or memory")
+        self.cmb_filter_selection = QComboBox(self)
+        qcmb_box_populate(self.cmb_filter_selection, self.cmb_filter_selection_items,
+                          self.cmb_filter_selection_default)
+        self.cmb_filter_selection.setSizePolicy(
+            QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.butSaveFilt = QPushButton("SAVE FILTER", self)
-        self.butSaveFilt.setToolTip("Save filter todisk")
+        self.butSaveFilt.setToolTip("Save filter to disk or memory")
         layHButtons1 = QHBoxLayout()
         layHButtons1.addWidget(self.butLoadFilt)  # <Load Filter> button
+        layHButtons1.addWidget(self.cmb_filter_selection)
         layHButtons1.addWidget(self.butSaveFilt)  # <Save Filter> button
         layHButtons1.setContentsMargins(*params['wdg_margins_spc'])
 
@@ -208,7 +231,7 @@ class Input_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.butLoadFilt.clicked.connect(self._load_filter)
-        self.butSaveFilt.clicked.connect(lambda: save_filter(self))
+        self.butSaveFilt.clicked.connect(self._save_filter)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
         # ----------------------------------------------------------------------
@@ -301,14 +324,29 @@ class Input_Specs(QWidget):
 
 # ------------------------------------------------------------------------------
     def _load_filter(self):
-        ret = load_filter(self)
-        if ret == 0:
+        sel = qget_cmb_box(self.cmb_filter_selection)
+        if sel == "file":
+            ret = load_filter(self)
+            if ret == 0:
+                self.load_dict()
+                self.emit({'data_changed': 'filter_loaded'})
+            elif ret == -1:
+                return  # error occurred, do nothing
+            else:
+                logger.error(f'Unknown return code "{ret}"!')
+        else:
+            fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
             self.load_dict()
             self.emit({'data_changed': 'filter_loaded'})
-        elif ret == -1:
-            return  # error occurred, do nothing
+
+# ------------------------------------------------------------------------------
+    def _save_filter(self):
+        """ Save current filter fb.fil[0] either to file or to one of the memories"""
+        sel = qget_cmb_box(self.cmb_filter_selection)
+        if sel == "file":
+            save_filter(self)
         else:
-            logger.error(f'Unknown return code "{ret}"!')
+            fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
 
 # ------------------------------------------------------------------------------
     def load_dict(self):

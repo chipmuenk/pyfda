@@ -10,6 +10,7 @@
 Library with classes and functions for file and text IO
 """
 import os, re, io
+import copy
 import csv
 import wave
 import datetime
@@ -1547,7 +1548,8 @@ def load_filter(self) -> int:
         return -1  # operation cancelled or some other error
 
     err = False
-    fb.fil[1] = fb.fil[0].copy()  # backup filter dict
+    fb.redo() # backup filter dict
+    # fb.fil[10] = copy.deepcopy(fb.fil[0])  # backup filter dict
     try:
         with io.open(file_name, 'rb') as f:
             if file_type == 'npz':
@@ -1614,7 +1616,8 @@ def load_filter(self) -> int:
         return -1
     except Exception as e:
         logger.error("Unexpected error:\n{0}".format(e))
-        fb.fil[0] = fb.fil[1]  # restore backup
+        # fb.fil[0] = copy.deepcopy(fb.fil[10])  # restore backup
+        fb.undo()
         return -1
 
 
