@@ -36,6 +36,7 @@ More info on data persistence and storing / accessing global variables:
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
 """
+import copy
 from collections import OrderedDict
 from pyfda.libs.frozendict import freeze_hierarchical
 
@@ -46,6 +47,10 @@ base_dir = ""  #: Project base directory
 
 # State of filter design: "ok", "changed", "error", "failed", "active"
 design_filt_state = "changed"
+
+UNDO_LEN = 10  # max. number of undos
+undo_step = 0  # number of undo steps
+undo_ptr = 0  # pointer to current undo memory
 
 #==============================================================================
 # -----------------------------------------------------------------------------
@@ -303,9 +308,12 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
                  }
             }
 
-fil = [None] * 10  # create empty list with length 10 for multiple filter designs
-# This functionality is not implemented yet, currently only fil[0] is used
+  # create empty lists with length 10 for multiple filter designs and undo functions
+fil = [None] * 10
+fil_undo = [None] * 10
 
+
+# https://nedbatchelder.com/text/names.html :
 # define fil[0] as a dict with "built-in" default. The argument defines the default
 # factory that is called when a key is missing. Here, lambda simply returns a float.
 # When e.g. list is given as the default_factory, an empty list is returned.
@@ -314,6 +322,40 @@ fil[0] = {}
 # Now, copy each key-value pair into the defaultdict
 for k in fil_init:
     fil[0].update({k: fil_init[k]})
+
+# Copy fil[0] to fil[1] ... fil[9] to initialize all memories
+for l in range(1,len(fil)):
+    fil[l] = copy.deepcopy(fil[0])
+
+def undo():
+    """
+    Restore current filter from undo memory `fil_undo`
+    """
+    global undo_step
+
+    # TODO: Limit undo memory to UNDO_LEN, implement circular buffer
+
+    # prevent buffer underflow
+    if undo_step < 1:
+        undo_step = 0
+        return -1
+    else:
+        fil[0] = copy.deepcopy(fil_undo[undo_step])
+        undo_step -= 1
+
+def redo():
+    """
+    Store current filter to undo memory `fil_undo`
+    """
+    global undo_step
+    global undo_ptr
+
+    # prevent buffer overflow
+    undo_step += 1
+    if undo_step > UNDO_LEN:
+        undo_step = UNDO_LEN
+    undo_ptr = (undo_ptr + 1) % UNDO_LEN
+    fil_undo[undo_step] = copy.deepcopy(fil[0])
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
 # 'fxqc'
