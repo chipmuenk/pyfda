@@ -332,6 +332,7 @@ def undo():
     Restore current filter from undo memory `fil_undo`
     """
     global undo_step
+    global undo_ptr
 
     # TODO: Limit undo memory to UNDO_LEN, implement circular buffer
 
@@ -340,8 +341,9 @@ def undo():
         undo_step = 0
         return -1
     else:
-        fil[0] = copy.deepcopy(fil_undo[undo_step])
+        fil[0] = copy.deepcopy(fil_undo[undo_ptr])
         undo_step -= 1
+        undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
 
 def redo():
     """
@@ -356,7 +358,7 @@ def redo():
         undo_step = UNDO_LEN
     # increase buffer pointer, allowing for circular wrap around
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
-    fil_undo[undo_step] = copy.deepcopy(fil[0])
+    fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
 # 'fxqc'
