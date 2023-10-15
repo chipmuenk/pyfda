@@ -641,7 +641,7 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-        self.ba = list(fb.fil[0]['ba'].copy())
+        self.ba = list(fb.fil[0]['ba']).copy()
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
