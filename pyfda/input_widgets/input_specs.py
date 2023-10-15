@@ -14,12 +14,12 @@ import sys
 import copy
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFrame, QPushButton, QComboBox, pyqtSignal,
+    QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_lib import pprint_log, to_html
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, qget_selected
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter
 from pyfda.pyfda_rc import params
@@ -129,11 +129,22 @@ class Input_Specs(QWidget):
             QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.butSaveFilt = QPushButton("SAVE FILTER", self)
         self.butSaveFilt.setToolTip("Save filter to disk or memory")
-        layHButtons1 = QHBoxLayout()
-        layHButtons1.addWidget(self.butLoadFilt)  # <Load Filter> button
-        layHButtons1.addWidget(self.cmb_filter_selection)
-        layHButtons1.addWidget(self.butSaveFilt)  # <Save Filter> button
-        layHButtons1.setContentsMargins(*params['wdg_margins_spc'])
+        self.lbl_info = QLabel(to_html("Info:", frmt='b'))
+        self.led_info = QLineEdit(fb.fil[0]['info'])
+        lay_h_buttons_load_save_1 = QHBoxLayout()
+        lay_h_buttons_load_save_1.addWidget(self.butLoadFilt)  # <Load Filter> button
+        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_selection) # File or memory
+        lay_h_buttons_load_save_1.addWidget(self.butSaveFilt)  # <Save Filter> button
+        lay_h_buttons_load_save_1.setContentsMargins(*params['wdg_margins_spc'])
+        lay_h_buttons_load_save_2 = QHBoxLayout()
+        lay_h_buttons_load_save_2.addWidget(self.lbl_info)
+        lay_h_buttons_load_save_2.addWidget(self.led_info)
+        lay_v_buttons_load_save = QVBoxLayout()
+        lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save_1)
+        lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save_2)
+        self.frm_buttons_load_save = QFrame()
+        self.frm_buttons_load_save.setLayout(lay_v_buttons_load_save)
+        self.frm_buttons_load_save.setContentsMargins(*params['wdg_margins'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butDesignFilt.setToolTip("Design filter with chosen specs")
@@ -193,7 +204,8 @@ class Input_Specs(QWidget):
         # LAYOUT for input specifications and buttons
         # ----------------------------------------------------------------------
         layVMain = QVBoxLayout(self)
-        layVMain.addLayout(layHButtons1)  # <Load> & <Save> buttons
+        # layVMain.addLayout(lay_v_buttons_load_save)  # <Load> & <Save> buttons
+        layVMain.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
         layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
         layVMain.addLayout(layHButtons2)  # <Design> & <Quit> buttons
         layVMain.addWidget(self.f_units)  # Frequency units
@@ -232,6 +244,7 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.butLoadFilt.clicked.connect(self._load_filter)
         self.butSaveFilt.clicked.connect(self._save_filter)
+        self.led_info.editingFinished.connect(self._save_info2dict)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
         # ----------------------------------------------------------------------
@@ -240,7 +253,14 @@ class Input_Specs(QWidget):
         self.start_design_filt()  # design first filter using default values
 
 # ------------------------------------------------------------------------------
-    def update_UI(self, dict_sig={}):
+    def _save_info2dict(self) -> None:
+        """
+        Update_filter dict every time the info field is changed
+        """
+        fb.fil[0]['info'] = self.led_info.text()
+
+# ------------------------------------------------------------------------------
+    def update_UI(self, dict_sig={}) -> None:
         """
         update_UI is called every time the filter design method or order
         (min / man) has been changed as this usually requires a different set of
@@ -352,8 +372,9 @@ class Input_Specs(QWidget):
     def load_dict(self):
         """
         Reload all specs/parameters entries from global dict fb.fil[0],
-        using the "load_dict" methods of the individual classes
+        directly or using the "load_dict" methods of the individual classes
         """
+        self.led_info.setText(str(fb.fil[0]['info']))
         self.sel_fil.load_dict()  # select filter widget
         self.f_units.load_dict()  # frequency units widget
         self.f_specs.load_dict()  # frequency specification widget

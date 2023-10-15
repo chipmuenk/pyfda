@@ -228,7 +228,8 @@ fil_tree = freeze_hierarchical({
 # auxiliary information, the initial definition here is copied into fil[0]
 # and can be overwritten by input widgets and design routines
 # ------------------------------------------------------------------------------
-fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
+fil_init = {'info': 'Initial filter design',
+            'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
             'N': 10,  # filter order
             'f_S': 1, 'T_S': 1,  # current sampling frequency and period
             # 'f_s_wav': 16000,  # sampling frequency for wav files
