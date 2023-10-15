@@ -48,9 +48,9 @@ base_dir = ""  #: Project base directory
 # State of filter design: "ok", "changed", "error", "failed", "active"
 design_filt_state = "changed"
 
-UNDO_LEN = 10  # max. number of undos
-undo_step = 0  # number of undo steps
-undo_ptr = 0  # pointer to current undo memory
+UNDO_LEN = 10  # depth of circular undo buffer
+undo_step = 0  # number of undo steps, limited to UNDO_LEN
+undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
 #==============================================================================
 # -----------------------------------------------------------------------------
@@ -335,7 +335,7 @@ def undo():
 
     # TODO: Limit undo memory to UNDO_LEN, implement circular buffer
 
-    # prevent buffer underflow
+    # undo buffer is empty, don't copy anything
     if undo_step < 1:
         undo_step = 0
         return -1
@@ -354,6 +354,7 @@ def redo():
     undo_step += 1
     if undo_step > UNDO_LEN:
         undo_step = UNDO_LEN
+    # increase buffer pointer, allowing for circular wrap around
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
     fil_undo[undo_step] = copy.deepcopy(fil[0])
 

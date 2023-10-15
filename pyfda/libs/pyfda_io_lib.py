@@ -1571,7 +1571,7 @@ def load_filter(self) -> int:
             elif file_type == 'pkl':
                 fb.fil[0] = pickle.load(f)
             else:
-                logger.error('Unknown file type "{0}"'.format(file_type))
+                logger.error(f'Unknown file type "{file_type}"')
                 err = True
             if not err:
                 # sanitize values in filter dictionary, keys are ok by now
@@ -1580,7 +1580,7 @@ def load_filter(self) -> int:
                     if type(fb.fil[0][k]) == bytes:
                         fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
                     if fb.fil[0][k] is None:
-                        logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+                        logger.warning(f"Entry fb.fil[0][{k}] is empty!")
                 if 'ba' not in fb.fil[0]\
                     or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
                         or np.ndim(fb.fil[0]['ba']) != 2\
@@ -1605,17 +1605,17 @@ def load_filter(self) -> int:
                 elif type(fb.fil[0]['zpk']) == list:
                     fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
 
-                logger.info('Successfully loaded filter\n\t"{0}"'.format(file_name))
+                logger.info(f'Successfully loaded filter\n\t"{file_name}"')
                 dirs.last_file_name = file_name
                 dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
                 dirs.last_file_type = file_type  # save file type
                 return 0
 
     except IOError as e:
-        logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+        logger.error(f"Failed loading {file_name}!\n{e}")
         return -1
     except Exception as e:
-        logger.error("Unexpected error:\n{0}".format(e))
+        logger.error(f"Unexpected error:\n{e}")
         # fb.fil[0] = copy.deepcopy(fb.fil[10])  # restore backup
         fb.undo()
         return -1
@@ -1650,7 +1650,7 @@ def save_filter(self):
             dirs.last_file_type = file_type  # save file type
 
     except IOError as e:
-        logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
+        logger.error(f'Failed saving "{file_name}"!\n{e}')
 
 
 # ==============================================================================
