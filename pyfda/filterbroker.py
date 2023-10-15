@@ -313,7 +313,6 @@ fil_init = {'info': 'Initial filter design',
 fil = [None] * 10
 fil_undo = [None] * 10
 
-
 # https://nedbatchelder.com/text/names.html :
 # define fil[0] as a dict with "built-in" default. The argument defines the default
 # factory that is called when a key is missing. Here, lambda simply returns a float.
@@ -367,26 +366,9 @@ def redo():
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
 
-d1= {'as': 1, 'a':
-        {'b':
-            {'cs':10,
-             'qqq': {'qwe':1}
-            },
-            'd': {'csd':30}
-        }
-    }
-d2= {'as': 3, 'a':
-        {'b':
-            {'cs':30,
-             'qqq': 123
-            },
-            'd':{'csd':20}
-        },
-        'newa':
-        {'q':
-            {'cs':50}
-        }
-    }
+d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
+d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
+        'newa': {'q': {'cs':50}}}
 def compare_dictionaries(dict_1, dict_2, dict_1_name, dict_2_name, path=""):
     """Compare two dictionaries recursively to find non matching elements
 
@@ -403,26 +385,26 @@ def compare_dictionaries(dict_1, dict_2, dict_1_name, dict_2_name, path=""):
     old_path = path
     for k in dict_1.keys():
         path = old_path + "[%s]" % k
-        if not dict_2.has_key(k):
+        if not k in dict_2:
             key_err += "Key %s%s not in %s\n" % (dict_1_name, path, dict_2_name)
         else:
             if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
                 err += compare_dictionaries(dict_1[k],dict_2[k],'d1','d2', path)
-            else:
-                if dict_1[k] != dict_2[k]:
-                    value_err += "Value of %s%s (%s) not same as %s%s (%s)\n"\
-                        % (dict_1_name, path, dict_1[k], dict_2_name, path, dict_2[k])
+            # else:
+            #     if dict_1[k] != dict_2[k]:
+            #         value_err += "Value of %s%s (%s) not same as %s%s (%s)\n"\
+            #             % (dict_1_name, path, dict_1[k], dict_2_name, path, dict_2[k])
 
     for k in dict_2.keys():
         path = old_path + "[%s]" % k
-        if not dict_1.has_key(k):
+        if not k in dict_1:
             key_err += "Key %s%s not in %s\n" % (dict_2_name, path, dict_1_name)
 
     return key_err + value_err + err
 
 # simpler version
-d1= {'a':{'b':{'cs':10},'d':{'cs':20}}}
-d2= {'a':{'b':{'cs':30} ,'d':{'cs':20}},'newa':{'q':{'cs':50}}}
+d1 = {'a':{'b':{'cs':10},'d':{'cs':20}}}
+d2 = {'a':{'b':{'cs':30} ,'d':{'cs':20}},'newa':{'q':{'cs':50}}}
 
 def findDiff(d1, d2, path=""):
     for k in d1:
@@ -435,7 +417,7 @@ def findDiff(d1, d2, path=""):
         else:
             print ("%s%s as key not in d2\n" % ("%s: " % path if path else "", k))
 
-print("comparing d1 to d2:")
-findDiff(d1,d2)
-print("comparing d2 to d1:")
-findDiff(d2,d1)
+# print("comparing d1 to d2:")
+# findDiff(d1,d2)
+# print("comparing d2 to d1:")
+# findDiff(d2,d1)
