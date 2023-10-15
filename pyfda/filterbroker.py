@@ -37,6 +37,7 @@ More info on data persistence and storing / accessing global variables:
 
 """
 import copy
+import time
 from collections import OrderedDict
 from pyfda.libs.frozendict import freeze_hierarchical
 
@@ -273,13 +274,11 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
                 # },
             'fx_sim': False,  # fixpoint simulation mode 
             'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
+            'timestamp': time.time(),
             'amp_specs_unit': 'dB',
-
             'plt_phiUnit': 'rad',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
                     + r'$\rightarrow $',
-            'time_designed': -1,
-            'wdg_dyn': {'win': 'hann'},
             # Parameters for spectral analysis window function
             'win_fft':
                 {'name': 'Kaiser',  # Window name
@@ -298,6 +297,7 @@ fil_init = {'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
                  'win_len': 1024,
                  },
             # Parameters for filter design window function
+            'wdg_dyn': {'win': 'hann'},
             'win_fir':
                 {'name': 'Hann',  # Window name
                  'fn_name': 'hann',  # function name or array with values
