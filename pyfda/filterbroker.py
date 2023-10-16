@@ -370,12 +370,16 @@ def redo():
 d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
 d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
         'newa': {'q': {'cs':50}}}
-def compare_dictionaries(dict_1, dict_2, dict_1_name, dict_2_name, path=""):
+def compare_dictionaries(
+        dict_1: dict, dict_2:dict, dict_1_name: str, dict_2_name: str, path: str = "") -> str:
     """Compare two dictionaries recursively to find non matching elements
 
     Args:
         dict_1: dictionary 1
         dict_2: dictionary 2
+        dict_1_name: name of dictionary 1 (only for error string)
+        dict_2_name: name of dictionary 2 (only for error string)
+        path: 
 
     Returns: string
 
