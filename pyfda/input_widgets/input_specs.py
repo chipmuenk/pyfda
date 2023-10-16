@@ -14,7 +14,7 @@ import sys
 import copy
 
 from pyfda.libs.compat import (
-    QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
+    Qt, QWidget, QLabel, QFrame, QPushButton, QComboBox, QLineEdit, pyqtSignal,
     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.filterbroker as fb
@@ -131,6 +131,7 @@ class Input_Specs(QWidget):
         self.butSaveFilt.setToolTip("Save filter to disk or memory")
         self.lbl_info = QLabel(to_html("Info:", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
+        self.led_info.setToolTip("Add an info / comment for the filter")
         lay_h_buttons_load_save_1 = QHBoxLayout()
         lay_h_buttons_load_save_1.addWidget(self.butLoadFilt)  # <Load Filter> button
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_selection) # File or memory
@@ -367,6 +368,9 @@ class Input_Specs(QWidget):
             save_filter(self)
         else:
             fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
+            # set info string as new tool tip
+            self.cmb_filter_selection.setItemData(
+                int(sel), self.led_info.text(), Qt.ToolTipRole)
 
 # ------------------------------------------------------------------------------
     def load_dict(self):
