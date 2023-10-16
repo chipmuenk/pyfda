@@ -396,34 +396,9 @@ def compare_dictionaries(
         else:
             if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
                 err += compare_dictionaries(dict_1[k],dict_2[k],'d1','d2', path)
-            # else:
-            #     if dict_1[k] != dict_2[k]:
-            #         value_err += "Value of %s%s (%s) not same as %s%s (%s)\n"\
-            #             % (dict_1_name, path, dict_1[k], dict_2_name, path, dict_2[k])
 
-    for k in dict_2.keys():
         path = old_path + f"[{k}]"
         if not k in dict_1:
             key_err += f"Key {dict_2_name}{path} not in {dict_1_name}\n"
 
     return key_err + value_err + err
-
-# simpler version
-d1 = {'a':{'b':{'cs':10},'d':{'cs':20}}}
-d2 = {'a':{'b':{'cs':30} ,'d':{'cs':20}},'newa':{'q':{'cs':50}}}
-
-def findDiff(d1, d2, path=""):
-    for k in d1:
-        if k in d2:
-            if type(d1[k]) is dict:
-                findDiff(d1[k],d2[k], "%s -> %s" % (path, k) if path else k)
-            if d1[k] != d2[k]:
-                result = [ "%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
-                print("\n".join(result))
-        else:
-            print ("%s%s as key not in d2\n" % ("%s: " % path if path else "", k))
-
-# print("comparing d1 to d2:")
-# findDiff(d1,d2)
-# print("comparing d2 to d1:")
-# findDiff(d2,d1)
