@@ -321,12 +321,12 @@ fil_undo = [None] * 10
 # fil[0] = defaultdict(lambda: 0.123)
 fil[0] = {}
 # Now, copy each key-value pair into the defaultdict
-for k in fil_init:
-    fil[0].update({k: fil_init[k]})
+# for k in fil_init:
+#     fil[0].update({k: fil_init[k]})
 
-# Copy fil[0] to fil[1] ... fil[9] to initialize all memories
-for l in range(1,len(fil)):
-    fil[l] = copy.deepcopy(fil[0])
+# Copy fil_init to fil[0] ... fil[9] to initialize all memories
+for l in range(len(fil)):
+    fil[l] = copy.deepcopy(fil_init)
 
 def undo():
     """
