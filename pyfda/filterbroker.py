@@ -228,86 +228,87 @@ fil_tree = freeze_hierarchical({
 # auxiliary information, the initial definition here is copied into fil[0]
 # and can be overwritten by input widgets and design routines
 # ------------------------------------------------------------------------------
-fil_init = {'info': 'Initial filter design',
-            'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
-            'N': 10,  # filter order
-            'f_S': 1, 'T_S': 1,  # current sampling frequency and period
-            # 'f_s_wav': 16000,  # sampling frequency for wav files
-            'f_S_prev': 1,  # previous sampling frequency
-            'freq_locked': False,  # don't update absolute frequencies when f_S is changed
-            'f_s_scale': 1,  #
-            'f_max': 1,
-            'freqSpecsRangeType': 'Half',
-            'freqSpecsRange': [0, 0.5],
-            'freq_specs_sort': True,  # sort freq. specs in ascending order
-            'freq_specs_unit': 'f_S',
-            'plt_fLabel': r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
-            'plt_fUnit': 'f_S',
-            'plt_tLabel': r'$n \; \rightarrow$',
-            'plt_tUnit': 's',
-            'A_PB': 0.02, 'A_PB2': 0.01, 'F_PB': 0.1, 'F_PB2': 0.4, 'F_C': 0.2, 'F_N': 0.2,
-            'A_SB': 0.001, 'A_SB2': 0.0001, 'F_SB': 0.2, 'F_SB2': 0.3, 'F_C2': 0.4, 'F_N2': 0.4,
-            'W_PB': 1, 'W_PB2': 1, 'W_SB': 1, 'W_SB2': 1,
-            #
-            'ba': ([1, 1, 1], [1, 0.1, 0.5]),  # (bb, aa) tuple coefficient lists
-            # causal zeros/poles/gain
-            'zpk': [[-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-                   [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j],
-                   [1, 0]],
-            #
-            'sos': [],
-            # input, output, accu, coeffs, ... fixpoint word formats and quantizer
-            # settings:
-            'fxqc':
-                {'QI': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round',
-                        'fx_base': 'dec'},
-                 'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                        'fx_base': 'dec'},
-                 'QACC': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor',
-                          'fx_base': 'dec'},
-                 'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 1, 'fx_base': 'float'},
-                 'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                         'scale': 1, 'fx_base': 'float'}
-                },
-                # 'b': [32768, 32768, 32768],
-                # 'a': [65536, 6553, 0]
-                # },
-            'fx_sim': False,  # fixpoint simulation mode 
-            'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
-            'timestamp': time.time(),
-            'amp_specs_unit': 'dB',
-            'plt_phiUnit': 'rad',
-            'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
-                    + r'$\rightarrow $',
-            # Parameters for spectral analysis window function
-            'win_fft':
-                {'name': 'Kaiser',  # Window name
-                 'fn_name': 'kaiser',  # function name or array with values
-                 'par': [{'name': '&beta;',
-                          'name_tex': r'$\beta$',
-                          'val': 10,
-                          'min': 0,
-                          'max': 30,
-                          'tooltip':
-                              ("<span>Shape parameter; lower values reduce main lobe width, "
-                              "higher values reduce side lobe level, typ. in the range "
-                              "5 ... 20.</span>")}],
-                 'n_par': 1,   # number of window parameters
-                 'info': "",     # Docstring for the window
-                 'win_len': 1024,
-                 },
-            # Parameters for filter design window function
-            'wdg_dyn': {'win': 'hann'},
-            'win_fir':
-                {'name': 'Hann',  # Window name
-                 'fn_name': 'hann',  # function name or array with values
-                 'par': [],    # set of list of window parameters
-                 'n_par': 0,   # number of window parameters
-                 'info': "",   # Docstring for the window
-                 'win_len': 1024
-                 }
-            }
+fil_init = {
+    'info': 'Initial filter design',
+    'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
+    'N': 10,  # filter order
+    'f_S': 1, 'T_S': 1,  # current sampling frequency and period
+    # 'f_s_wav': 16000,  # sampling frequency for wav files
+    'f_S_prev': 1,  # previous sampling frequency
+    'freq_locked': False,  # don't update absolute frequencies when f_S is changed
+    'f_s_scale': 1,  #
+    'f_max': 1,
+    'freqSpecsRangeType': 'Half',
+    'freqSpecsRange': [0, 0.5],
+    'freq_specs_sort': True,  # sort freq. specs in ascending order
+    'freq_specs_unit': 'f_S',
+    'plt_fLabel': r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
+    'plt_fUnit': 'f_S',
+    'plt_tLabel': r'$n \; \rightarrow$',
+    'plt_tUnit': 's',
+    'A_PB': 0.02, 'A_PB2': 0.01, 'F_PB': 0.1, 'F_PB2': 0.4, 'F_C': 0.2, 'F_N': 0.2,
+    'A_SB': 0.001, 'A_SB2': 0.0001, 'F_SB': 0.2, 'F_SB2': 0.3, 'F_C2': 0.4, 'F_N2': 0.4,
+    'W_PB': 1, 'W_PB2': 1, 'W_SB': 1, 'W_SB2': 1,
+    #
+    'ba': ([0.3, 0.3, 0.3], [1, 0, 0.66666666]),  # (bb, aa) tuple coefficient lists
+    # causal zeros/poles/gain
+    'zpk': [[-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+            [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j],
+            [0.3, 0]],
+    #
+    'sos': [],
+    # input, output, accu, coeffs, ... fixpoint word formats and quantizer
+    # settings:
+    'fxqc':{
+        'QI': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round',
+               'fx_base': 'dec'},
+        'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+            'fx_base': 'dec'},
+        'QACC': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor',
+                'fx_base': 'dec'},
+        'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                'scale': 1, 'fx_base': 'float'},
+        'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                'scale': 1, 'fx_base': 'float'}
+        },
+        # 'b': [32768, 32768, 32768],
+        # 'a': [65536, 6553, 0]
+        # },
+    'fx_sim': False,  # fixpoint simulation mode 
+    'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
+    'timestamp': time.time(),
+    'amp_specs_unit': 'dB',
+    'plt_phiUnit': 'rad',
+    'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
+            + r'$\rightarrow $',
+    # Parameters for spectral analysis window function
+    'win_fft':
+        {'name': 'Kaiser',  # Window name
+        'fn_name': 'kaiser',  # function name or array with values
+        'par': [{'name': '&beta;',
+                'name_tex': r'$\beta$',
+                'val': 10,
+                'min': 0,
+                'max': 30,
+                'tooltip':
+                    ("<span>Shape parameter; lower values reduce main lobe width, "
+                    "higher values reduce side lobe level, typ. in the range "
+                    "5 ... 20.</span>")}],
+        'n_par': 1,   # number of window parameters
+        'info': "",     # Docstring for the window
+        'win_len': 1024,
+        },
+    # Parameters for filter design window function
+    'wdg_dyn': {'win': 'hann'},
+    'win_fir':
+        {'name': 'Hann',  # Window name
+            'fn_name': 'hann',  # function name or array with values
+            'par': [],    # set of list of window parameters
+            'n_par': 0,   # number of window parameters
+            'info': "",   # Docstring for the window
+            'win_len': 1024
+        }
+    }
 
   # create empty lists with length 10 for multiple filter designs and undo functions
 fil = [None] * 10
