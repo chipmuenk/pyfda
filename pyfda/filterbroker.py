@@ -225,8 +225,8 @@ fil_tree = freeze_hierarchical({
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
-# auxiliary information, the initial definition here is copied into fil[0]
-# and can be overwritten by input widgets and design routines
+# auxiliary information, the initial definition here is copied into fil[0] ... [9]
+# which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
 fil_init = {
     'info': 'Initial filter design',
@@ -274,7 +274,7 @@ fil_init = {
         # 'b': [32768, 32768, 32768],
         # 'a': [65536, 6553, 0]
         # },
-    'fx_sim': False,  # fixpoint simulation mode 
+    'fx_sim': False,  # fixpoint simulation mode
     'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
     'timestamp': time.time(),
     'amp_specs_unit': 'dB',
