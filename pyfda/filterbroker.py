@@ -374,12 +374,15 @@ def compare_dictionaries(
         dict_1: dict, dict_2:dict, dict_1_name: str, dict_2_name: str, path: str = "") -> str:
     """Compare two dictionaries recursively to find non matching elements
 
+    Add key:value pairs not present in dict_2 from dict_1
+    Delete key:value pairs from dict_2 that are not present in dict_1
+
     Args:
         dict_1: dictionary 1
         dict_2: dictionary 2
         dict_1_name: name of dictionary 1 (only for error string)
         dict_2_name: name of dictionary 2 (only for error string)
-        path: 
+        path:
 
     Returns: string
 
@@ -388,17 +391,22 @@ def compare_dictionaries(
     key_err = ''
     value_err = ''
     old_path = path
-    for k in dict_1.keys():
+
+    for k in dict_1:
         path = old_path + f"[{k}]"
         if not k in dict_2:
             key_err += f"Key {dict_1_name}{path} not in {dict_2_name}\n"
-            # dict_2[path].update({k: dict_1[path][k]
+            dict_2.update({k: dict_1[k]})
         else:
             if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
                 err += compare_dictionaries(dict_1[k],dict_2[k],'d1','d2', path)
 
+    # emulate slightly inefficient Python 2 way of copying the dict keys to a list
+    # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
+    for k in list(dict_2):
         path = old_path + f"[{k}]"
         if not k in dict_1:
             key_err += f"Key {dict_2_name}{path} not in {dict_1_name}\n"
+            dict_2.pop(k)
 
     return key_err + value_err + err
