@@ -385,7 +385,7 @@ def compare_dictionaries(dict_1, dict_2, dict_1_name, dict_2_name, path=""):
     value_err = ''
     old_path = path
     for k in dict_1.keys():
-        path = old_path + "[%s]" % k
+        path = old_path + f"[{k}]"
         if not k in dict_2:
             key_err += f"Key {dict_1_name}{path} not in {dict_2_name}\n"
             # dict_2[path].update({k: dict_1[path][k]
