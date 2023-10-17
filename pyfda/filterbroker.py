@@ -371,21 +371,25 @@ d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
 d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
         'newa': {'q': {'cs':50}}}
 def compare_dictionaries(
-        dict_1: dict, dict_2:dict, dict_1_name: str, dict_2_name: str, path: str = "") -> str:
-    """Compare two dictionaries recursively to find non matching elements
+        dict_1: dict, dict_2: dict, dict_1_name: str, dict_2_name: str, path: str = "") -> str:
+    """
+    Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
+    Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
+    keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
 
     Add key:value pairs not present in dict_2 from dict_1
     Delete key:value pairs from dict_2 that are not present in dict_1
 
     Args:
-        dict_1: dictionary 1
-        dict_2: dictionary 2
-        dict_1_name: name of dictionary 1 (only for error string)
-        dict_2_name: name of dictionary 2 (only for error string)
-        path:
+        dict_1: dict, reference dictionary (1)
+        dict_2: dict, new dictionary (2)
+        dict_1_name: str, name of dictionary 1 (used to construct error string)
+        dict_2_name: str, name of dictionary 2 (used to construct error string)
+        path: str, contains current path while traversing through the dictionaries
 
-    Returns: string
-
+    Returns:
+        str: formatted string with all discarded keys from dict 2 and all key:value
+             pairs copied from ref_dict to new_dict
     """
     err = ''
     key_err = ''
@@ -398,7 +402,7 @@ def compare_dictionaries(
             dict_2.update({k: dict_1[k]})
         else:
             if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
-                err += compare_dictionaries(dict_1[k],dict_2[k],'d1','d2', path)
+                err += compare_dictionaries(dict_1[k],dict_2[k], 'd1', 'd2', path)
 
     # emulate slightly inefficient Python 2 way of copying the dict keys to a list
     # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
