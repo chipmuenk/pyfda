@@ -231,7 +231,7 @@ fil_tree = freeze_hierarchical({
 # auxiliary information, the initial definition here is copied into fil[0] ... [9]
 # which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
-fil_init = {
+fil_ref = {
     'info': 'Initial filter design',
     'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
     'N': 10,  # filter order
@@ -324,12 +324,12 @@ fil_undo = [None] * 10
 # fil[0] = defaultdict(lambda: 0.123)
 fil[0] = {}
 # Now, copy each key-value pair into the defaultdict
-# for k in fil_init:
-#     fil[0].update({k: fil_init[k]})
+# for k in fil_ref:
+#     fil[0].update({k: fil_ref[k]})
 
-# Copy fil_init to fil[0] ... fil[9] to initialize all memories
+# Copy fil_ref to fil[0] ... fil[9] to initialize all memories
 for l in range(len(fil)):
-    fil[l] = copy.deepcopy(fil_init)
+    fil[l] = copy.deepcopy(fil_ref)
 
 def undo():
     """
@@ -373,46 +373,66 @@ def redo():
 d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
 d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
         'newa': {'q': {'cs':50}}}
-def compare_dictionaries(
-        dict_1: dict, dict_2: dict, dict_1_name: str, dict_2_name: str, path: str = "") -> str:
-    """
-    Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
-    Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
-    keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
+def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> list:
 
-    Add key:value pairs not present in dict_2 from dict_1
-    Delete key:value pairs from dict_2 that are not present in dict_1
+    def compare_dictionaries(
+            dict_1: dict, dict_2: dict, dict_1_name: str, dict_2_name: str, path: str = "") -> list:
+        """
+        Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
+        Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
+        keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
 
-    Args:
-        dict_1: dict, reference dictionary (1)
-        dict_2: dict, new dictionary (2)
-        dict_1_name: str, name of dictionary 1 (used to construct error string)
-        dict_2_name: str, name of dictionary 2 (used to construct error string)
-        path: str, contains current path while traversing through the dictionaries
+        Add key:value pairs not present in dict_2 from dict_1
+        Delete key:value pairs from dict_2 that are not present in dict_1
 
-    Returns:
-        str: formatted string with all discarded keys from dict 2 and all key:value
-             pairs copied from ref_dict to new_dict
-    """
-    err = ''
-    key_err = ''
-    old_path = path
+        Args:
+            dict_1: dict, reference dictionary
+            dict_2: dict, new dictionary
+            dict_1_name: str, name of dictionary 1 (used to construct error string)
+            dict_2_name: str, name of dictionary 2 (used to construct error string)
+            path: str, contains current path while traversing through the dictionaries
 
-    for k in dict_1:
-        path = old_path + f"[{k}]"
-        if not k in dict_2:
-            key_err += f"Key {dict_1_name}{path} not in {dict_2_name}\n"
-            dict_2.update({k: dict_1[k]})
-        else:
-            if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
-                err += compare_dictionaries(dict_1[k],dict_2[k], 'd1', 'd2', path)
+        Returns:
+            str: formatted string with all discarded keys from dict 2 and all key:value
+                pairs copied from ref_dict to new_dict
+        """
+        key_errs = []
+        old_path = path
 
-    # emulate slightly inefficient Python 2 way of copying the dict keys to a list
-    # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
-    for k in list(dict_2):
-        path = old_path + f"[{k}]"
-        if not k in dict_1:
-            key_err += f"Key {dict_2_name}{path} not in {dict_1_name}\n"
-            dict_2.pop(k)
+        for k in dict_1:
+            path = old_path + f"[{k}]"
+            if not k in dict_2:
+                key_errs.append(f"Key {dict_1_name}{path} not in {dict_2_name}, copying.")
+                dict_2.update({k: dict_1[k]})
+            else:
+                if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
+                    key_errs += compare_dictionaries(dict_1[k], dict_2[k], 'd1', 'd2', path)
 
-    return key_err + err
+        # emulate slightly inefficient Python 2 way of copying the dict keys to a list
+        # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
+        for k in list(dict_2):
+            path = old_path + f"[{k}]"
+            if not k in dict_1:
+                key_errs.append(f"Delete Key {dict_2_name}{path} (not in {dict_1_name})")
+                dict_2.pop(k)
+
+        # logger.warning(key_errs)
+        return key_errs
+    # ----------------------------------------
+
+    errs = compare_dictionaries(fil_ref, new_dict, "fil_ref", new_dict_name)
+    errs.sort()
+    if False:
+        missing_keys =\
+        f"The following key(s) have not been found in '{new_dict_name}', "\
+        "they are copied with their values from the reference dict:\n"\
+        + missing_keys
+
+    if False:
+        key_err = "\nThe following key(s) are not part of the reference dict "\
+        "and have been deleted:\n" + key_err
+    # logger.warning(f"errs:\n{errs}\n")
+    # Convert list to multi-line string
+    errs = '\n'.join([i for i in errs])
+    return errs
+
