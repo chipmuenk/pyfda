@@ -1550,6 +1550,8 @@ def load_filter(self) -> int:
     err = False
     fb.redo() # backup filter dict
     # fb.fil[10] = copy.deepcopy(fb.fil[0])  # backup filter dict
+
+
     try:
         with io.open(file_name, 'rb') as f:
             if file_type == 'npz':
@@ -1578,6 +1580,10 @@ def load_filter(self) -> int:
                     fb.fil_init, fb.fil[0], 'fb.fil_init','fb.fil[0]')
                 if not ret == "":
                     logger.warning(ret)
+                ret = fb.compare_dictionaries(
+                    fb.fil_init, fb.fil[0], 'fb.fil_init','fb.fil[0]')
+                logger.warning("===")
+                logger.warning(ret)
                 # sanitize values in filter dictionary, keys are ok by now
                 for k in fb.fil[0]:
                     # Bytes need to be decoded for py3 to be used as keys later on
