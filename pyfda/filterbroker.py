@@ -36,6 +36,9 @@ More info on data persistence and storing / accessing global variables:
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
 """
+import logging
+logger = logging.getLogger(__name__)
+
 import copy
 import time
 from collections import OrderedDict
