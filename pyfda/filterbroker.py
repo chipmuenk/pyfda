@@ -389,7 +389,6 @@ def compare_dictionaries(
     """
     err = ''
     key_err = ''
-    value_err = ''
     old_path = path
 
     for k in dict_1:
@@ -409,4 +408,4 @@ def compare_dictionaries(
             key_err += f"Key {dict_2_name}{path} not in {dict_1_name}\n"
             dict_2.pop(k)
 
-    return key_err + value_err + err
+    return key_err + err
