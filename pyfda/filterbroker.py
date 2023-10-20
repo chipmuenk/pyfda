@@ -373,23 +373,21 @@ def redo():
 d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
 d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
         'newa': {'q': {'cs':50}}}
-def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> list:
+def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> str:
 
     def compare_dictionaries(
-            dict_1: dict, dict_2: dict, dict_1_name: str, dict_2_name: str, path: str = "") -> list:
+            dict_1: dict, dict_2: dict, path: str = "") -> list:
         """
         Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
         Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
         keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
 
-        Add key:value pairs not present in dict_2 from dict_1
+        Copy key:value pairs not present in dict_2 from dict_1
         Delete key:value pairs from dict_2 that are not present in dict_1
 
         Args:
             dict_1: dict, reference dictionary
             dict_2: dict, new dictionary
-            dict_1_name: str, name of dictionary 1 (used to construct error string)
-            dict_2_name: str, name of dictionary 2 (used to construct error string)
             path: str, contains current path while traversing through the dictionaries
 
         Returns:
@@ -402,37 +400,38 @@ def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> list:
         for k in dict_1:
             path = old_path + f"[{k}]"
             if not k in dict_2:
-                key_errs.append(f"Key {dict_1_name}{path} not in {dict_2_name}, copying.")
+                key_errs.append(f"Missing in d1:{path}")
                 dict_2.update({k: dict_1[k]})
             else:
                 if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
-                    key_errs += compare_dictionaries(dict_1[k], dict_2[k], 'd1', 'd2', path)
+                    key_errs += compare_dictionaries(dict_1[k], dict_2[k], path)
 
         # emulate slightly inefficient Python 2 way of copying the dict keys to a list
         # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
         for k in list(dict_2):
             path = old_path + f"[{k}]"
             if not k in dict_1:
-                key_errs.append(f"Delete Key {dict_2_name}{path} (not in {dict_1_name})")
+                key_errs.append(f"Unsupported in d2:{path}") # {dict_2_name}
                 dict_2.pop(k)
 
         # logger.warning(key_errs)
         return key_errs
     # ----------------------------------------
-
-    errs = compare_dictionaries(fil_ref, new_dict, "fil_ref", new_dict_name)
-    errs.sort()
-    if False:
-        missing_keys =\
-        f"The following key(s) have not been found in '{new_dict_name}', "\
-        "they are copied with their values from the reference dict:\n"\
-        + missing_keys
-
-    if False:
-        key_err = "\nThe following key(s) are not part of the reference dict "\
-        "and have been deleted:\n" + key_err
-    # logger.warning(f"errs:\n{errs}\n")
+    err_str = ""
+    err_list = compare_dictionaries(fil_ref, new_dict)
+    err_list.sort()
     # Convert list to multi-line string
-    errs = '\n'.join([i for i in errs])
-    return errs
+    err_unsupported = '\n'.join(
+        [i.replace("Unsupported in d2:", "\t") for i in err_list if "Unsupported in d2:" in i])
+    err_missing =' \n'.join(
+        [i.replace("Missing in d1:", "\t") for i in err_list if "Missing in d1:" in i])
+    logger.warning(f"d1: {len(err_missing)}, d2: {len(err_unsupported)}")
+    if err_missing != "":
+        err_str = f"The following key(s) have not been found in '{new_dict_name}', "\
+        "they are copied with their values from the reference dict:\n" + err_missing
+    if err_unsupported != "":
+        err_str += "\nThe following key(s) are not part of the reference dict "\
+        "and have been deleted:\n" + err_unsupported
+
+    return err_str
 
