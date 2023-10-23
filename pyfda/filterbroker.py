@@ -260,19 +260,24 @@ fil_ref = {
             [0.3, 0]],
     #
     'sos': [],
-    # input, output, accu, coeffs, ... fixpoint word formats and quantizer
-    # settings:
+    # Settings for fixpoint widgets: QI:input, QO: output, QCA: coeffs a, QCB: coeffs b,
+    #            QCA: coeffs a (recursive)
+    # WI: integer bits, WG: additional guard bits, WF: fractional bits, W: total word length
+    # ovfl: overflow behaviour, quant: quantizer behaviour,
+    # fx_base: number format for display,
+    # qfrmt: how to interprete fixpoint format: Integer, q31, normalized frac, ...
+    # TODO: are W, fx_base, qfrmt_last needed here?
     'fxqc':{
-        'QI': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round',
-               'fx_base': 'dec'},
-        'QO': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-            'fx_base': 'dec'},
-        'QACC': {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor',
-                'fx_base': 'dec'},
-        'QCB': {'WI': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                'scale': 1, 'fx_base': 'float'},
-        'QCA': {'WI': 2, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                'scale': 1, 'fx_base': 'float'}
+        'QI': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round',
+               'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'},
+        'QO': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+            'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'},
+        'QCB': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                'scale': 1, 'fx_base': 'float', 'qfrmt': 'float'},
+        'QCA': {'WI': 2, 'WG': 0, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
+                'scale': 1, 'fx_base': 'float', 'qfrmt': 'float'},
+        'QACC': {'WI': 0, 'WG': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor',
+                'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'}
         },
         # 'b': [32768, 32768, 32768],
         # 'a': [65536, 6553, 0]
