@@ -183,16 +183,24 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()
 
         # =================== DATA CHANGED =====================================
-        elif 'data_changed' in dict_sig and\
-                dict_sig['data_changed'] == "filter_designed":
-            # New filter has been designed, update list of available filter topologies
-            self._update_filter_cmb()
-            return
-
         elif 'data_changed' in dict_sig:
-            # Filter data has changed (but not the filter type):
-            # - reload UI from dict and set RUN button to "changed"
-            self.wdg_dict2ui()
+            if dict_sig['data_changed'] == "filter_designed":
+                # New filter has been designed, update list of available filter topologies
+                self._update_filter_cmb()
+                return
+
+            elif dict_sig['data_changed'] == "filter_loaded":
+                # New filter has been loaded, update fixpoint topologies and UI from dict,
+                # set RUN button to "changed"
+                # TODO: Is this needed? Is the fixpoint widget updated?
+                self._update_filter_cmb()
+                self.wdg_dict2ui()
+                return
+
+            else:
+                # Filter data has changed (but not the filter type):
+                # Reload UI from dict and set RUN button to "changed"
+                self.wdg_dict2ui()
 
         # =================== FX SIM ============================================
         elif 'fx_sim' in dict_sig:
