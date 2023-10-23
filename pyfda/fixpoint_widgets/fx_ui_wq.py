@@ -329,26 +329,35 @@ class FX_UI_WQ(QWidget):
         Update the overflow counter and MSB / LSB display (if visible)
         """
         if self.MSB_LSB_vis == 'off':
+            # Don't show any data
             self.lbl_MSB.setVisible(False)
             self.lbl_LSB.setVisible(False)
         elif self.MSB_LSB_vis == 'max':
+            # Show MAX and LSB data
             self.lbl_MSB.setVisible(True)
             self.lbl_LSB.setVisible(True)
             self.lbl_MSB.setText(
                 "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
-                f"{self.QObj.q_dict['MAX']:.{params['FMT_ba']}g}")
+                # f"{self.QObj.q_dict['MAX']:.{params['FMT_ba']}g}")
+                # MAX = 2 MSB - LSB = 2 ** (WG + WI) - 2 ** (-WF)
+                f"{2. ** (self.q_dict['WG'] + self.q_dict['WI']) - 2. ** -self.q_dict['WF']:.{params['FMT_ba']}g}")
             self.lbl_LSB.setText(
                 "<b><i>LSB</i><sub>10</sub> = </b>"
-                f"{self.QObj.q_dict['LSB']:.{params['FMT_ba']}g}")
+                # LSB = 2 ** (-WF)
+                f"{2. ** -self.q_dict['WF']:.{params['FMT_ba']}g}")
         elif self.MSB_LSB_vis == 'msb':
+            # Show MSB and LSB data
             self.lbl_MSB.setVisible(True)
             self.lbl_LSB.setVisible(True)
             self.lbl_MSB.setText(
                 "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
-                f"{self.QObj.q_dict['MSB']:.{params['FMT_ba']}g}")
+                #  MSB = 2 ** (WG + WI - 1)
+                f"{2. ** (self.q_dict['WG'] + self.q_dict['WI'] - 1):.{params['FMT_ba']}g}")
             self.lbl_LSB.setText(
                 "<b><i>LSB</i><sub>10</sub> = </b>"
-                f"{self.QObj.q_dict['LSB']:.{params['FMT_ba']}g}")
+                # f"{self.QObj.q_dict['LSB']:.{params['FMT_ba']}g}")
+                # LSB = 2 ** (-WF)
+                f"{2. ** -self.q_dict['WF']:.{params['FMT_ba']}g}")
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
