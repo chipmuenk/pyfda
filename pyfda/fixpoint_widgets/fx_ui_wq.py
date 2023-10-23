@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------
 class FX_UI_WQ(QWidget):
     """
-    Widget for selecting quantization / overflow options.
+    Subwidget for selecting and displaying quantization / overflow options.
 
-    A reference to a quantization dictionary `q_dict` is passed to the constructor.
+    A quantization dictionary `q_dict` is passed to the constructor.
     This can be a global quantization dict like `fb.fil[0]['fxqc']['QCB']` or a local
     dict.
 
@@ -49,9 +49,9 @@ class FX_UI_WQ(QWidget):
     These quantization settings are also stored in the instance quantizer object
     `self.QObj`.
 
-    Widget settings are stored in the local `dict_ui` dictionary with the keys and their
-    default settings described below. When instantiating the widget, these settings can
-    be modified by corresponding keyword parameters, e.g.
+    Widget (UI) settings are stored in the local `dict_ui` dictionary with the keys and
+    their default settings described below. When instantiating the widget, these settings
+    can be modified by corresponding keyword parameters, e.g.
 
     ```
         self.wdg_wq_accu = UI_WQ(
@@ -64,7 +64,6 @@ class FX_UI_WQ(QWidget):
     'wdg_name'      : 'fx_ui_wq'                # widget name, used to discern between
                                                 # multiple instances
     'label'         : ''                        # widget text label, usually set by the
-
     'label_q'       : 'Quant.'                  # subwidget text label
     'cmb_q'         : List with tooltip and combo box choices (default: 'round', 'fix',
                         'floor'), see `pyfda_qt_lib.qcmb_box_populate()` or code below
@@ -104,6 +103,7 @@ class FX_UI_WQ(QWidget):
         self.q_dict = q_dict
         self._construct_UI(**kwargs)
 
+    # This is not needed, it is called from one level above
     # # --------------------------------------------------------------------------
     # def process_sig_rx(self, dict_sig=None):
     #     """ Update the UI when the quantization dictionary has been updated outside
@@ -379,8 +379,9 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Update the entries in the quantization dict from the UI for `ovfl`, `quant`,
-        'WG', `WI`, `WF`, `W` when one of the widgets has been edited.
+        Update the quantization dict `self.q_dict` and the quantization object `self.QObj`
+        from the UI for `ovfl`, `quant`, 'WG', `WI`, `WF`, `W` when one of the widgets has
+        been edited.
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
@@ -414,11 +415,11 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self, q_dict=None):
         """
-        Use the passed dict `q_dict` to update:
+        Use the passed quantization dict `q_dict` to update:
 
         * UI widgets `WI`, `WF` `quant` and `ovfl`
         * the instance quantization dict `self.q_dict` (usually a reference to some
-          global quantization dict like `fb.fil[0]['fxqc']['QCB']`)
+          global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
         * the `scale` setting of the instance quantization dict if WF / WI require this
         * the instance quantization object `self.QObj` from the instance quantization dict
         * overflow counters need to be updated from calling instance
@@ -426,7 +427,6 @@ class FX_UI_WQ(QWidget):
         If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
         instead.
         """
-
         if q_dict is None:
             q_dict = self.q_dict
         else:
@@ -512,7 +512,7 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update(
             {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
-        self.QObj.set_qdict(self.q_dict)  # update instance q_dict
+        self.QObj.set_qdict(self.q_dict)  # update quantization object
         # logger.error(f"Aft: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
         #              f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
