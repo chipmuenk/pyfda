@@ -647,8 +647,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         Set the RUN button to "changed".
         """
-        self.wdg_wq_input.dict2ui()
-        self.wdg_wq_output.dict2ui()
+        self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+        self.wdg_wq_output.dict2ui((fb.fil[0]['fxqc']['QO']))
 
 #       The following should be connected via signal-slot
 #         if self.fx_wdg_found and hasattr(self.fx_filt_ui, "dict2ui"):
