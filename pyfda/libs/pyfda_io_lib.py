@@ -1392,9 +1392,9 @@ def export_coe_xilinx(f: TextIO) -> None:
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
     logger.debug("scale = {0}, WF = {1}".format(qc.q_dict['scale'], qc.q_dict['WF']))
 
-    if qc.q_dict['WF'] != 0:
+    if qc.q_dict['WF'] != 0 : # and qc.q_dict['qfrmt'] == 'int':
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.q_dict['fx_base'] == 'hex':  # select hex format
@@ -1437,7 +1437,7 @@ def export_coe_microsemi(f: TextIO) -> None:
 
     if qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength:
-        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     if qc.q_dict['fx_base'] != 'dec':
@@ -1466,7 +1466,7 @@ def export_coe_vhdl_package(f: TextIO) -> None:
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
     if not qc.q_dict['fx_base'] == 'float' and qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.set_qdict({'W': qc.q_dict['W'], 'scale': 1 << qc.q_dict['W']-1})
+        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     WO = fb.fil[0]['fxqc']['QO']['W']
