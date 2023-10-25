@@ -103,8 +103,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
         # widget for accumulator quantization
         if 'QACC' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QACC'] = {}
-        set_dict_defaults(fb.fil[0]['fxqc']['QACC'],
-                          {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
+        set_dict_defaults(
+            fb.fil[0]['fxqc']['QACC'],
+            {'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
