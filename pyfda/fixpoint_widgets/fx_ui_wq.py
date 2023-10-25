@@ -43,6 +43,7 @@ class FX_UI_WQ(QWidget):
     - `quant`   : quantization behaviour
     - `ovfl`    : overflow behaviour
     - `WI`      : number of integer bits
+    - `WG`      : number of guard bits
     - `WF`      : number of fractional bits
     - `scale`   : scaling factor between real world value and integer representation
 
@@ -426,7 +427,7 @@ class FX_UI_WQ(QWidget):
         """
         Use the passed quantization dict `q_dict` to update:
 
-        * UI widgets `WI`, `WF` `quant` and `ovfl`
+        * UI widgets `WI`, `WG`, `WF` `quant` and `ovfl`
         * the instance quantization dict `self.q_dict` (usually a reference to some
           global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
         * the `scale` setting of the instance quantization dict if WF / WI require this
@@ -440,7 +441,7 @@ class FX_UI_WQ(QWidget):
             q_dict = self.q_dict
         else:
             for k in q_dict:
-                if k not in {'quant', 'quant_last', 'ovfl', 'WI', 'WF', 'qfrmt'}:
+                if k not in {'quant', 'ovfl', 'WI', 'WF', 'WG', 'qfrmt', 'qfrmt_last'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
         if 'qfrmt' in q_dict:
@@ -466,7 +467,7 @@ class FX_UI_WQ(QWidget):
 
                 self.q_dict.update({'scale': 1, 'WG': 0})
 
-                if qfrmt == 'qnfrac':  # normalized fractional format
+                if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
                     self.q_dict.update({'WI': 0, 'WF': self.q_dict['W'] - 1})
                 elif qfrmt in {'qfrac', 'float'}:
                     pass
@@ -515,15 +516,10 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setText(str(WF))
             self.q_dict.update({'WF': WF})
 
-        # logger.error(f"Bef: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
-        #             f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
-
         self.q_dict.update(
             {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
         self.QObj.set_qdict(self.q_dict)  # update quantization object
-        # logger.error(f"Aft: WG = {self.q_dict['WG']}, WI = {self.q_dict['WI']}, "
-        #              f"WF = {self.q_dict['WF']}, W = {self.q_dict['W']}")
 
 
 # ==============================================================================
