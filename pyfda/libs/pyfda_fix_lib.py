@@ -13,6 +13,7 @@ numpy values and formatting reals in various formats
 # ===========================================================================
 import re
 import inspect
+import copy
 
 import numpy as np
 from numpy.lib.function_base import iterable
@@ -312,8 +313,8 @@ class Fixed(object):
 
     * **'WF'** : number of fractional bits; default: 15
 
-    * **'W'**  : total word length; WI + WF + 1 = W (1 sign bit). When WI and / or
-                 WF are missing, WI = W - 1 and WF = 0.
+    * **'W'**  : total word length; W = WG + WI + WF + 1 (1 sign bit). When WI, WG and
+                  / or WF are missing, WG = 0, WI = W - 1 and WF = 0.
 
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
                  to`WI` and `WF`. When both `Q` and `WI` / `WF`
@@ -379,17 +380,7 @@ class Fixed(object):
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
 
-    * **'LSB'** : float
-        value of LSB (smallest quantization step), calculated from `WI` and `WF`
 
-    * **'MSB'** : float
-        value of most significant bit (MSB), calculated from `WI` and `WF`
-
-    * **'MIN'** : float
-        most negative representable value, calculated from `WI` and `WF`
-
-    * **'MAX'** : float
-        largest representable value, calculated from `WI` and `WF`
 
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
 
@@ -423,6 +414,18 @@ class Fixed(object):
         (see above). This dictionary is updated here and can be accessed from
         outside.
 
+    LSB : float
+        value of LSB (smallest quantization step), `self.LSB = 2 ** -q_dict['WF']`
+
+            MSB : float
+        value of most significant bit (MSB),  `self.MSB = 2 ** (q_dict['WI'] - 1)`
+
+    MIN : float
+        most negative representable value, `self.MIN = -2 * self.MSB`
+
+    MAX : float
+        largest representable value, `self.MAX = 2 * self.MSB - self.LSB`
+
     Example
     -------
     class `Fixed()` can be used like Matlabs quantizer object / function from the
@@ -449,7 +452,12 @@ class Fixed(object):
         # these keys are calculated and should be regarded as read-only
         self.q_dict_default_ro = {
             'N': 0, 'ovr_flag': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0,
-            'MSB': 1, 'LSB': 6, 'MAX': 2, 'MIN': -2, 'places': 4}
+            'places': 4}
+
+        self.LSB = 2. ** -self.q_dict_default['WF']
+        self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
+        self.MAX = 2 * self.MSB - self.LSB
+        self.MIN = -2 * self.MSB
 
         # test if all passed keys of quantizer object are valid
         self.verify_q_dict_keys(q_dict)
@@ -493,7 +501,7 @@ class Fixed(object):
 
         * Transform dict entries for `WF`, `WI`, `W` and `Q` into each other
 
-        * Calculate parameters `MSB`, `LSB`, `MIN` and `MAX` from quantization params
+        * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX` from quantization params
 
         * Calculate number of places required for printing from `fx_base` and `W`
 
@@ -502,7 +510,7 @@ class Fixed(object):
 
         Check the docstring of class `Fixed()` for details on quantization
         """
-        q_d = d.copy()  # create local copy to avoid modification of passed dict
+        q_d = copy.deepcopy(d)  # create local copy to avoid modification of passed dict
 
         self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
@@ -536,11 +544,11 @@ class Fixed(object):
         self.q_dict.update(q_d)  # merge q_d into self.q_dict
 
         # Calculate min., max., LSB and MSB from word lengths
-        self.q_dict['LSB'] = 2. ** -self.q_dict['WF']
-        self.q_dict['MSB'] = 2. ** (self.q_dict['WG'] + self.q_dict['WI'] - 1)
+        self.LSB = 2. ** -self.q_dict['WF']
+        self.MSB = 2. ** (self.q_dict['WG'] + self.q_dict['WI'] - 1)
 
-        self.q_dict['MAX'] =  2. * self.q_dict['MSB'] - self.q_dict['LSB']
-        self.q_dict['MIN'] = -2. * self.q_dict['MSB']
+        self.MAX =  2. * self.MSB - self.LSB
+        self.MIN = -2. * self.MSB
 
         # Calculate required number of places for different bases from total
         # number of bits:
@@ -594,7 +602,7 @@ class Fixed(object):
         -------
         float scalar or ndarray
             with the same shape as `y`, in the range
-            `-2*self.q_dict['MSB']` ... `2*self.q_dict['MSB']-self.q_dict['LSB']`
+            `-2 * self.MSB` ... `2 * self.MSB - self.LSB`
 
         Examples
         --------
@@ -706,7 +714,7 @@ class Fixed(object):
         #       floating point inputs to "fixpoint integers".
         #       Finally, multiply by LSB to restore original scale.
         # ======================================================================
-        y = y / self.q_dict['LSB']
+        y = y / self.LSB
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -725,7 +733,7 @@ class Fixed(object):
                 H = synthesizeNTF(order=3, osr=64, opt=1)
                 # Calculate DSM stream and shift/scale it from -1 ... +1 to
                 # 0 ... 1 sequence
-                yq = (simulateDSM(y*self.q_dict['LSB'], H)[0]+1)/(2*self.q_dict['LSB'])
+                yq = (simulateDSM(y*self.LSB, H)[0]+1)/(2*self.LSB)
                 # returns four ndarrays:
                 # v: quantizer output (-1 or 1)
                 # xn: modulator states.
@@ -739,7 +747,7 @@ class Fixed(object):
         else:
             raise Exception(
                 f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
-        yq = yq * self.q_dict['LSB']
+        yq = yq * self.LSB
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         # ======================================================================
@@ -750,8 +758,8 @@ class Fixed(object):
             pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < self.q_dict['MIN'])
-            over_pos = (yq > self.q_dict['MAX'])
+            over_neg = (yq < self.MIN)
+            over_pos = (yq > self.MAX)
             # create flag / array of flags for pos. / neg. overflows
             ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
@@ -765,15 +773,13 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
-                yq = np.where(over_pos, self.q_dict['MAX'], yq)  # (cond, true, false)
-                yq = np.where(over_neg, self.q_dict['MIN'], yq)
+                yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
+                yq = np.where(over_neg, self.MIN, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.q_dict['ovfl'] == 'wrap':
                 yq = np.where(
-                    over_pos | over_neg,
-                    yq - 4. * self.q_dict['MSB'] * np.fix(
-                        (np.sign(yq) * 2 * self.q_dict['MSB'] + yq)
-                            / (4 * self.q_dict['MSB'])), yq)
+                    over_pos | over_neg, yq - 4. * self.MSB * np.fix(
+                        (np.sign(yq) * 2 * self.MSB + yq) / (4 * self.MSB)), yq)
             else:
                 raise Exception(
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
@@ -973,7 +979,7 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            # logger.debug(f"MSB={self.q_dict['MSB']} | LSB={self.q_dict['LSB']} | scale={self.q_dict['scale'])}")
+            # logger.debug(f"MSB={self.MSB} | LSB={self.LSB} | scale={self.q_dict['scale'])}")
             # logger.debug(f"y_in={y} | y_dec={y_dec}")
         # ----
         elif frmt == 'csd':
@@ -990,7 +996,7 @@ class Fixed(object):
 
         # if frmt != "float":
             # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
-            #             .format(self.q_dict['MSB'], self.q_dict['scale']), raw_str, val_str))
+            #             .format(self.MSB, self.q_dict['scale']), raw_str, val_str))
             # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
 
         if y_float is not None:
@@ -1064,7 +1070,7 @@ class Fixed(object):
 
             else:  # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
-                y_fix_int = np.int64(np.round(y_fix / self.q_dict['LSB']))
+                y_fix_int = np.int64(np.round(y_fix / self.LSB))
                 # convert to (array of) string with 2's complement binary
                 y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
 
