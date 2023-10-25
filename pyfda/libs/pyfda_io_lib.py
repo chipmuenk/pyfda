@@ -1145,7 +1145,7 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
         logger.info(f'Filter saved as\n\t"{file_name}"')
 
     except IOError as e:
-        logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
+        logger.error(f'Failed saving "{file_name}"!\n{e}\n')
 
 
 # ------------------------------------------------------------------------------
@@ -1266,7 +1266,7 @@ def save_data_csv(parent: object, data: str, fkey: str = "", title: str = "Expor
                     workbook.close()
 
                 else:
-                    logger.error('Unknown file type "{0}"'.format(file_type))
+                    logger.error(f'Unknown file type "{file_type}"')
                     err = True
 
         if not err:
@@ -1402,8 +1402,8 @@ def export_coe_xilinx(f: TextIO) -> None:
     if qc.q_dict['fx_base'] == 'bin':  # select binary format
         coe_radix = 2
     else:
-        logger.warning('Coefficients in "{0}" format are not supported in COE files, '
-                       'using decimal format.')
+        logger.warning(f'Coefficients in "{qc.q_dict['''fx_base''']}" format are '
+                       f'not supported in COE files, converting to decimal format.')
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         coe_radix = 10
 
@@ -1442,7 +1442,7 @@ def export_coe_microsemi(f: TextIO) -> None:
 
     if qc.q_dict['fx_base'] != 'dec':
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
-        logger.warning('Switching to decimal coefficient format, other numeric formats '
+        logger.warning('Converting to decimal coefficient format, other numeric formats '
                        'are not supported by Microsemi tools.')
 
     # Quantize coefficients to decimal integer format, returning an array of strings
@@ -1484,8 +1484,8 @@ def export_coe_vhdl_package(f: TextIO) -> None:
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         pre = ""
         post = ""
-        logger.warning('Coefficients in "{0}" format are currently not supported, '
-                       'using decimal format.'.format(qc.q_dict['fx_base']))
+        logger.warning(f'Coefficients in "{qc.q_dict['''fx_base''']}" format are '
+                       f'not supported, converting to decimal format.')
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
