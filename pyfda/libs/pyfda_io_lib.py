@@ -1402,7 +1402,7 @@ def export_coe_xilinx(f: TextIO) -> None:
     if qc.q_dict['fx_base'] == 'bin':  # select binary format
         coe_radix = 2
     else:
-        logger.warning(f'Coefficients in "{qc.q_dict['''fx_base''']}" format are '
+        logger.warning(f"Coefficients in {qc.q_dict['fx_base']} format are "
                        f'not supported in COE files, converting to decimal format.')
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         coe_radix = 10
@@ -1484,8 +1484,8 @@ def export_coe_vhdl_package(f: TextIO) -> None:
         qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
         pre = ""
         post = ""
-        logger.warning(f'Coefficients in "{qc.q_dict['''fx_base''']}" format are '
-                       f'not supported, converting to decimal format.')
+        logger.warning(f"Coefficients in {qc.q_dict['fx_base']} format are "
+                       'not supported, converting to decimal format.')
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
