@@ -367,10 +367,6 @@ class Fixed(object):
     * **'ovfl'**  : str
         Overflow behaviour ('wrap', 'sat', ...)
 
-    * **'fx_base'** : str
-        target output format ('float', 'dec', 'bin', 'hex', 'csd')
-
-
     The following key: value pairs are calculated from other parameters and
     can / should be considered as read-only.
 
@@ -380,32 +376,8 @@ class Fixed(object):
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
 
-
-
-    Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
-
-    * **'ovr_flag'** : integer or integer array (same shape as input argument)
-        overflow flag, meaning:
-
-                        0 : no overflow
-
-                        +1: positive overflow
-
-                        -1: negative overflow
-
-        has occured during last fixpoint conversion.
-
     * **'N'** : integer
         total number of simulation data points
-
-    * **'N_over'** : integer
-        total number of overflows
-
-    * **'N_over_neg'** : integer
-        number of negative overflows
-
-    * **'N_over_pos'** : integer
-        number of positive overflows
 
     Attributes
     ----------
@@ -425,6 +397,29 @@ class Fixed(object):
 
     MAX : float
         largest representable value, `self.MAX = 2 * self.MSB - self.LSB`
+
+    N_over : integer
+        total number of overflows
+
+    N_over_neg : integer
+        number of negative overflows
+
+    N_over_pos : integer
+        number of positive overflows
+
+    ovr_flag: integer or integer array (same shape as input argument)
+        overflow flag, meaning:
+
+            0 : no overflow
+
+            +1: positive overflow
+
+            -1: negative overflow
+
+        has occured during last fixpoint conversion.
+
+
+    Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
 
     Example
     -------
@@ -451,13 +446,18 @@ class Fixed(object):
             'scale': 1}
         # these keys are calculated and should be regarded as read-only
         self.q_dict_default_ro = {
-            'N': 0, 'ovr_flag': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0,
-            'places': 4}
+            'N': 0, 'N_over': 0, 'places': 4}
 
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
         self.MAX = 2 * self.MSB - self.LSB
         self.MIN = -2 * self.MSB
+
+        # self.ovr_flag = 0
+        # self.N_over_pos = 0
+        # self.N_over_neg = 0
+        # self.N_over = 0
+        # self.N = 0
 
         # test if all passed keys of quantizer object are valid
         self.verify_q_dict_keys(q_dict)
@@ -633,8 +633,6 @@ class Fixed(object):
         # ======================================================================
         scaling = scaling.lower()
         # use values from dict for initialization
-        N_over_neg = self.q_dict['N_over_neg']
-        N_over_pos = self.q_dict['N_over_pos']
         N = self.q_dict['N']
 
         if np.shape(y):
@@ -761,15 +759,16 @@ class Fixed(object):
             over_neg = (yq < self.MIN)
             over_pos = (yq > self.MAX)
             # create flag / array of flags for pos. / neg. overflows
-            ovr_flag = over_pos.astype(int) - over_neg.astype(int)
+            self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
-            N_over_neg += np.sum(over_neg)
-            N_over_pos += np.sum(over_pos)
-            N_over = N_over_neg + N_over_pos
+            self.N_over_neg += np.sum(over_neg)
+            self.N_over_pos += np.sum(over_pos)
+            self.N_over = self.N_over_neg + self.N_over_pos
 
             self.q_dict.update(
-               {'N_over_pos': N_over_pos, 'N_over_neg': N_over_neg, 'N_over': N_over,
-                'N': N, 'ovr_flag': ovr_flag})
+               {'N_over': self.N_over, 'N': N})
+
+            self.N = N
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
@@ -809,7 +808,14 @@ class Fixed(object):
                      format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
                             frm[3], frm[2]))
         self.q_dict.update(
-            {'N': 0, 'N_over': 0, 'N_over_neg': 0, 'N_over_pos': 0, 'ovr_flag' : 0})
+            {'N': 0, 'N_over': 0})
+
+        self.ovr_flag = 0
+        self.N_over_pos = 0
+        self.N_over_neg = 0
+        self.N_over = 0
+        self.N = 0
+
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):

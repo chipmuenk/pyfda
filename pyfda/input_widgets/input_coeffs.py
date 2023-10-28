@@ -449,15 +449,15 @@ class Input_Coeffs(QWidget):
                     for x in self.QObj[0].float2frmt(self.ba[0])],
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
                     for x in self.QObj[1].float2frmt(a)],
-                self.QObj[0].q_dict['ovr_flag'],
-                self.QObj[1].q_dict['ovr_flag']
+                self.QObj[0].ovr_flag,
+                self.QObj[1].ovr_flag
                         ]
         else:
             self.ba_q = [
                 self.QObj[0].float2frmt(self.ba[0]),
                 self.QObj[1].float2frmt(a),
-                self.QObj[0].q_dict['ovr_flag'],
-                self.QObj[1].q_dict['ovr_flag']
+                self.QObj[0].ovr_flag,
+                self.QObj[1].ovr_flag
                         ]
         self.ui.wdg_wq_coeffs_b.update_disp()
         self.ui.wdg_wq_coeffs_a.update_disp()

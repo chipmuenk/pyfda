@@ -225,10 +225,10 @@ class IIR_DF1_pyfixp(object):
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
-            logger.warning(f"Overflows: N_Acc = {self.Q_acc.q_dict['N_over']}, "
-                           f"N_Mul = {self.Q_mul.q_dict['N_over']}")
-        self.Q_acc.q_dict['N_over'] += self.Q_mul.q_dict['N_over']
+        if self.Q_acc.N_over > 0 or self.Q_mul.N_over > 0:
+            logger.warning(f"Overflows: N_Acc = {self.Q_acc.N_over}, "
+                           f"N_Mul = {self.Q_mul.N_over}")
+        self.Q_acc.N_over += self.Q_mul.N_over
         self.Q_mul.resetN()
 
         return self.Q_O.fixp(y_q[:len(x)]), self.zi_b, self.zi_a
