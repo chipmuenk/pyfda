@@ -447,9 +447,13 @@ class FX_UI_WQ(QWidget):
                              'fx_base'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
-        if 'qfrmt' in q_dict:
+        if not 'qfrmt' in q_dict:
+            logger.error("Missing quantization format key 'qfrmt' in quantizer dict!")
+            return
+        else:
             err = False
             qfrmt = q_dict['qfrmt']
+            logger.error(f"wdg: {self.q_dict['name']}, qfrmt: {qfrmt}")
             if 'qfrmt_last' not in q_dict:
                 q_dict['qfrmt_last'] = qfrmt
 
