@@ -502,16 +502,14 @@ class Fixed(object):
 
     def set_qdict(self, d: dict) -> None:
         """
-        Update the instance quantization dict `self.q_dict` from parameter `d`:
+        Update the instance quantization dict `self.q_dict` from passed dict `d`:
 
         * Transform dict entries for `WF`, `WI`, `W` and `Q` into each other
-
         * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX` from quantization params
+        * Calculate number of places needed for printing from `qfrmt` / `fx_base` and `W`
 
-        * Calculate number of places required for printing from `fx_base` and `W`
-
-        When the passed dictionary `d` is empty, update the quantization dict from
-        its `WF` and `WI` entries.
+        When `d` is empty, update the quantization dict from
+        its `WG`, `WF` and `WI` entries.
 
         Check the docstring of class `Fixed()` for details on quantization
         """
@@ -519,7 +517,7 @@ class Fixed(object):
 
         self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
-        # Transform `WG`,  `WI`, `WF`, `W` and `Q` parameters into each other
+        # Transform `WG`, `WI`, `WF`, `W` and `Q` parameters into each other
         if q_d == {}:
             q_d['W'] = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1
             q_d['Q'] = str(self.q_dict['WG'] + self.q_dict['WI']) + "."\
@@ -1002,11 +1000,6 @@ class Fixed(object):
         # ----
         else:
             logger.error(f'Unknown output format "{frmt}"!')
-
-        # if frmt != "float":
-            # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
-            #             .format(self.MSB, self.q_dict['scale']), raw_str, val_str))
-            # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
 
         if y_float is not None:
             return y_float

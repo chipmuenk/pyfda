@@ -87,7 +87,8 @@ class FX_UI_WQ(QWidget):
     'lock_vis'      : 'off''                    # Pushbutton for locking visible
     'tip_lock'      : 'Sync input/output quant.'# Tooltip for  lock push button
 
-    'cmb_w_vis'     : 'off'                     # Integrated combo widget visible?
+    'cmb_w_vis'     : 'off'                     # Is Auto/Man. selection visible?
+                                                #  ['A', 'M', 'F']
     'cmb_w_items'   : List with tooltip and combo box choices
     'cmb_w_init'    : 'man'                     # initial setting
     'count_ovfl_vis': 'on'                      # Is overflow counter visible?
@@ -132,7 +133,7 @@ class FX_UI_WQ(QWidget):
                    "<span>Saturation, i.e. limit at min. / max. value</span>"),
                   ("none", "None",
                    "<span>No overflow behaviour (only for debugging)</span>")]
-        cmb_w = ["<span>Set Accumulator word format</span>",
+        cmb_w = ["<span>Calculate word format manually / automatically</span>",
                  ("man", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
                  ("auto", "A",
                   "<span><b>Automatic</b> calculation for given input word format "
@@ -387,11 +388,14 @@ class FX_UI_WQ(QWidget):
         return
 
     # --------------------------------------------------------------------------
-    def ui2dict(self):
+    def ui2dict(self) -> None:
         """
-        Update the quantization dict `self.q_dict` and the quantization object `self.QObj`
-        from the UI for `ovfl`, `quant`, 'WG', `WI`, `WF`, `W` when one of the widgets has
-        been edited.
+        Update the quantization dict `self.q_dict` (usually a reference to a part of a
+        global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
+        and the quantization object `self.QObj` from the UI.
+
+        These are the subwidgets for `ovfl`, `quant`, 'WG', `WI`, `WF` which also
+        trigger this method when edited.
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
@@ -405,14 +409,12 @@ class FX_UI_WQ(QWidget):
                            sign='poszero'))
         self.ledWF.setText(str(WF))
 
-        # W = int(WG + WI + WF + 1)
-
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
-                                          # like W and Q and reset counter
+                                          # like W and Q and reset counters
 
         if self.sender():
             dict_sig = {'wdg_name': self.wdg_name,
@@ -423,11 +425,11 @@ class FX_UI_WQ(QWidget):
             logger.error("Sender has no object name!")
 
     # --------------------------------------------------------------------------
-    def dict2ui(self, q_dict=None):
+    def dict2ui(self, q_dict: dict = None) -> None:
         """
         Use the passed quantization dict `q_dict` to update:
 
-        * UI widgets `WI`, `WG`, `WF` `quant` and `ovfl`
+        * UI subwidgets `WI`, `WG`, `WF` `quant` and `ovfl`
         * the instance quantization dict `self.q_dict` (usually a reference to some
           global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
         * the `scale` setting of the instance quantization dict if WF / WI require this
@@ -435,10 +437,10 @@ class FX_UI_WQ(QWidget):
         * overflow counters need to be updated from calling instance
 
         If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
-        instead.
+        instead, this can be used to update the UI.
         """
         if q_dict is None:
-            q_dict = self.q_dict
+            q_dict = self.q_dict  # update UI from instance qdict
         else:
             for k in q_dict:
                 if k not in {'quant', 'ovfl', 'WI', 'WF', 'WG', 'qfrmt', 'qfrmt_last',
@@ -474,7 +476,7 @@ class FX_UI_WQ(QWidget):
                     pass
 
                 else:
-                    logger.warning(f"Unknown quantization format '{qfrmt}'")
+                    logger.error(f"Unknown quantization format '{qfrmt}'")
                     err = True
 
             if not err:
@@ -489,7 +491,7 @@ class FX_UI_WQ(QWidget):
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
 
-        q_dict['qfrmt_last'] = qfrmt  # store current setting
+        q_dict['qfrmt_last'] = qfrmt  # store current setting as 'qfrmt_last'
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
@@ -520,7 +522,7 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update(
             {'W': self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
-        self.QObj.set_qdict(self.q_dict)  # update quantization object
+        self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
 
 
 # ==============================================================================

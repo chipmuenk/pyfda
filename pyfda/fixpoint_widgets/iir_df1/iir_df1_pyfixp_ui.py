@@ -102,7 +102,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         # widget for accumulator quantization
         if 'QACC' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc']['QACC'] = {}
+            fb.fil[0]['fxqc']['QACC'] = {}  # initialize dict settings
         set_dict_defaults(
             fb.fil[0]['fxqc']['QACC'],
             {'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
