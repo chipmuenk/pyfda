@@ -260,24 +260,39 @@ fil_ref = {
             [0.3, 0]],
     #
     'sos': [],
-    # Settings for fixpoint widgets: QI:input, QO: output, QCA: coeffs a, QCB: coeffs b,
-    #            QCA: coeffs a (recursive)
-    # WI: integer bits, WG: additional guard bits, WF: fractional bits, W: total word length
-    # ovfl: overflow behaviour, quant: quantizer behaviour,
-    # fx_base: number format for display,
-    # qfrmt: how to interprete fixpoint format: Integer, q31, normalized frac, ...
-    # TODO: are W, fx_base, qfrmt_last needed here?
+    # Settings for fixpoint widgets:
+    #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
+    #  Keys:
+    #   'name': name of the fixpoint widget (for easier debugging)
+    #   'WG': guard bits, 'WI': integer bits, 'WF': fractional bits, 'W': total word length,
+    #   'scale': how the fractional data is to be interpreted
+    #   'qfrmt': how to interprete fixpoint format: Integer, q31, normalized frac, ...
+    #   'qfrmt_last': previous 'qfrmt' setting
+    #   'ovfl': overflow behaviour, 'quant': quantizer behaviour,
+    #   'fx_base': number format for fixpoint display
+
+    # TODO: are W, fx_base, qfrmt_last, scale really needed here?
     'fxqc':{
-        'QI': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'sat',  'quant': 'round',
-               'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'},
-        'QO': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-            'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'},
-        'QCB': {'WI': 0, 'WG': 0, 'WF': 15, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                'scale': 1, 'fx_base': 'float', 'qfrmt': 'float'},
-        'QCA': {'WI': 2, 'WG': 0, 'WF': 13, 'W': 16, 'ovfl': 'wrap', 'quant': 'floor',
-                'scale': 1, 'fx_base': 'float', 'qfrmt': 'float'},
-        'QACC': {'WI': 0, 'WG': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor',
-                'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac'}
+        # Input quantization
+        'QI': {'name': 'QI', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
+               'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac','ovfl': 'sat', 'quant': 'round',
+               'fx_base': 'dec'},
+        # Output quantization
+        'QO': {'name': 'QO', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
+               'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
+               'fx_base': 'dec'},
+        # 'b' coefficient quantization
+        'QCB': {'name': 'QCB', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
+                'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
+                'fx_base': 'dec'},
+        # 'a' coefficient quantization
+        'QCA': {'name': 'QCA', 'WG': 0, 'WI': 2, 'WF': 13, 'W': 16, 'scale': 1,
+                'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
+                'fx_base': 'dec'},
+        # accumulator quantization
+        'QACC': {'name': 'QACC', 'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'scale': 1,
+                 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
+                'fx_base': 'dec'}
         },
         # 'b': [32768, 32768, 32768],
         # 'a': [65536, 6553, 0]

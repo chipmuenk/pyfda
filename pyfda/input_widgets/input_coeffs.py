@@ -153,7 +153,7 @@ class ItemDelegate(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
 
-        if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
+        if fb.fil[0]['fxqc']['QCB']['qfrmt'] == 'float':
             data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
@@ -194,7 +194,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                  return_type="auto"))
-        if self.QObj[index.column()].q_dict['fx_base'] == 'float':
+        if self.QObj[index.column()].q_dict['qfrmt'] == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
@@ -225,7 +225,7 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.QObj[index.column()].q_dict['fx_base'] == 'float':
+        if self.QObj[index.column()].q_dict['qfrmt'] == 'float':
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
@@ -440,7 +440,7 @@ class Input_Coeffs(QWidget):
         # logger.error(f"a: {a.dtype}")
 
         # Float format: Set ba_q = ba, overflows are all = 0
-        if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
+        if fb.fil[0]['fxqc']['QCB']['qfrmt'] == 'float':
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),

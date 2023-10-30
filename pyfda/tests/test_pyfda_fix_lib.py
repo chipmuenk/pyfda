@@ -129,7 +129,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        q_dict = {'fx_base': 'float'}
+        q_dict = {'qfrmt': 'float'}
         self.myQ.set_qdict(q_dict)
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
@@ -359,7 +359,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Test conversion from float format to float
         """
         # return floats as float, no quantization options are regarded here
-        q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'fx_base': 'float', 'scale': 8}
+        q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'fx_base': 'dec', 'qfrmt': 'float', 'scale': 8}
         self.myQ.set_qdict(q_dict)
         # scalar format
         yq_list = list(map(self.myQ.frmt2float, self.y_list))

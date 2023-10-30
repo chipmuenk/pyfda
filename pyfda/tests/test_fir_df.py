@@ -130,7 +130,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        q_dict = {'fx_base': 'float'}
+        q_dict = {'qfrmt': 'float'}
         self.myQ.set_qdict(q_dict)
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)

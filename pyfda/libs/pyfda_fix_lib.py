@@ -339,13 +339,21 @@ class Fixed(object):
     Additionally, the following keys define the base / display format for the
     fixpoint number:
 
-    * **'fx_base'** : Output format, optional; default = 'float'
+    * **'fx_base'** : Display format for fixpoint data, optional; default = 'dec'
 
-      - 'float' : (default)
-      - 'dec'  : decimal integer, scaled by :math:`2^{WF}`
+      - 'dec'  : decimal integer, scaled by :math:`2^{WF}` (default)
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
+
+    * **'qfrmt'** : Quantization format, optional; default = 'float'
+
+      - 'float'  : floating point (unquantized)
+      - 'qfrac'  : general fixpoint format
+      - 'qnfrac'  : normalized fixpoint format with WI = 0
+      - 'q31'  : canonically signed digit string, scaled by :math:`2^{WF}`
+      - 'q15' : 16 bit normalized
+
 
     * **'scale'** : Float or a keyword, the factor between the fixpoint integer
             representation (FXP) and its "real world" floating point value (RWV).
@@ -441,9 +449,10 @@ class Fixed(object):
         """
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
-            'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'Q': '0.15', 'quant': 'round',
-            'ovfl': 'sat', 'fx_base': 'float', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac',
-            'scale': 1}
+            'name': 'unknown', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16,
+            'quant': 'round', 'ovfl': 'sat', 'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac',
+        # these keys are calculated and should be regarded as read-only
+            'scale': 1, 'N_over': 0, 'places': 4, 'Q': '0.15'}
         # these keys are calculated and should be regarded as read-only
         self.q_dict_default_ro = {
             'N_over': 0, 'places': 4}
@@ -561,7 +570,7 @@ class Fixed(object):
         elif self.q_dict['fx_base'] == 'hex':
             self.q_dict['places'] = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
-        elif self.q_dict['fx_base'] == 'float':
+        elif self.q_dict['qfrmt'] == 'float':
             self.q_dict['places'] = 4
             self.base = 0
         else:
@@ -843,7 +852,10 @@ class Fixed(object):
 
         # ----------------------------------------------------------------------
         if frmt is None:
-            frmt = self.q_dict['fx_base']
+            if 'float' in self.q_dict['qfrmt'].lower():
+                frmt = self.q_dict['qfrmt']
+            else:
+                frmt = self.q_dict['fx_base']
         frmt = frmt.lower()
 
         if y is None:
@@ -867,7 +879,7 @@ class Fixed(object):
             # TODO: not implemented yet
             float_frmt = np.float16
 
-        if frmt == 'float':
+        if 'float' in frmt:
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -1042,11 +1054,11 @@ class Fixed(object):
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         # ======================================================================
 
-        if self.q_dict['fx_base'] == 'float':  # return float input value unchanged (no string)
+        if self.q_dict['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
-        elif self.q_dict['fx_base'] == 'float32':
+        elif self.q_dict['qfrmt'] == 'float32':
             return np.float32(y)
-        elif self.q_dict['fx_base'] == 'float16':
+        elif self.q_dict['qfrmt'] == 'float16':
             return np.float16(y)
 
         elif self.q_dict['fx_base'] in {'hex', 'bin', 'dec', 'csd'}:
