@@ -823,10 +823,10 @@ class Input_Coeffs(QWidget):
         `{'fx_sim': 'specs_changed'}`.
         """
         fb.fil[0]['fxqc']['QCB'].update(
-            {'qfrmt_last': fb.fil[0]['fxqc']['QCB']['qfrmt'],
+            {#'qfrmt_last': fb.fil[0]['fxqc']['QCB']['qfrmt'],
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
         fb.fil[0]['fxqc']['QCA'].update(
-            {'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
+            {#'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
              'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
 
         # update quant. widgets and table with the new `qfrmt` settings
