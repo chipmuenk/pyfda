@@ -376,9 +376,6 @@ class Fixed(object):
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
 
-    * **'N'** : integer
-        total number of simulation data points
-
     Attributes
     ----------
     q_dict : dict
@@ -397,6 +394,9 @@ class Fixed(object):
 
     MAX : float
         largest representable value, `self.MAX = 2 * self.MSB - self.LSB`
+
+    N : integer
+        total number of simulation data points
 
     N_over : integer
         total number of overflows
@@ -446,18 +446,14 @@ class Fixed(object):
             'scale': 1}
         # these keys are calculated and should be regarded as read-only
         self.q_dict_default_ro = {
-            'N': 0, 'N_over': 0, 'places': 4}
+            'N_over': 0, 'places': 4}
 
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
         self.MAX = 2 * self.MSB - self.LSB
         self.MIN = -2 * self.MSB
 
-        # self.ovr_flag = 0
-        # self.N_over_pos = 0
-        # self.N_over_neg = 0
-        # self.N_over = 0
-        # self.N = 0
+        self.N = 0
 
         # test if all passed keys of quantizer object are valid
         self.verify_q_dict_keys(q_dict)
@@ -633,7 +629,6 @@ class Fixed(object):
         # ======================================================================
         scaling = scaling.lower()
         # use values from dict for initialization
-        N = self.q_dict['N']
 
         if np.shape(y):
             # Input is an array:
@@ -646,21 +641,21 @@ class Fixed(object):
             ovr_flag = np.zeros(y.shape, dtype=int)
 
             if np.issubdtype(y.dtype, np.number):  # numpy number type
-                N += y.size
+                self.N += y.size
             elif y.dtype.kind in {'U', 'S'}:  # string or unicode
                 try:
                     y = y.astype(np.float64)  # try to convert to float
-                    N += y.size
+                    self.N += y.size
                 except (TypeError, ValueError):
                     try:
                         np.char.replace(y, ' ', '')  # remove all whitespace
                         y = y.astype(complex)  # try to convert to complex
-                        N += y.size * 2
+                        self.N += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError):
                         y = np.asarray(list(map(lambda y_scalar:
                                             self.fixp(y_scalar, scaling=scaling), y)))
-                        N += y.size
+                        self.N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
@@ -686,7 +681,7 @@ class Fixed(object):
                         y = 0.0
             over_pos = over_neg = yq = 0
             ovr_flag = 0
-            N += 1
+            self.N += 1
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
@@ -765,10 +760,7 @@ class Fixed(object):
             self.N_over_pos += np.sum(over_pos)
             self.N_over = self.N_over_neg + self.N_over_pos
 
-            self.q_dict.update(
-               {'N_over': self.N_over, 'N': N})
-
-            self.N = N
+            self.q_dict.update({'N_over': self.N_over})
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
@@ -807,8 +799,7 @@ class Fixed(object):
         logger.debug("'reset_N' called from {0}.{1}():{2}.".
                      format(inspect.getmodule(frm[0]).__name__.split('.')[-1],
                             frm[3], frm[2]))
-        self.q_dict.update(
-            {'N': 0, 'N_over': 0})
+        self.q_dict.update({'N_over': 0})
 
         self.ovr_flag = 0
         self.N_over_pos = 0
