@@ -461,7 +461,7 @@ class FX_UI_WQ(QWidget):
             elif qfrmt == 'q15':  # Q0.15
                 self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
 
-            else:
+            else:  # 'qfrac', 'qnfrac', 'float'
                 if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
                     self.q_dict.update({'WF': self.q_dict['WI'], 'WI': self.q_dict['WG']})
 

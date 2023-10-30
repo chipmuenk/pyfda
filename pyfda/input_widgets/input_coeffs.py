@@ -415,6 +415,8 @@ class Input_Coeffs(QWidget):
         *  Store pos. / neg. overflows in the 3rd and 4th column of `self.ba_q` as
            0 or +/- 1.
         """
+
+        # Reset overflow counters of quantization objects
         self.QObj[0].resetN()
         self.QObj[1].resetN()
 
@@ -425,7 +427,7 @@ class Input_Coeffs(QWidget):
         len_b = len(self.ba[0])
         len_a = len(self.ba[1])
 
-        # Create a copy of the a coefficients without the "1" as this could create
+        # Create a copy of the 'a' coefficients without the "1" as this could create
         # false overflows during quantization. The "1" is always printed though
         # by the `ItemDelegate.initStyleOption()` method
         #
@@ -437,12 +439,15 @@ class Input_Coeffs(QWidget):
         # a = self.ba[1]
         # logger.error(f"a: {a.dtype}")
 
+        # Float format: Set ba_q = ba, overflows are all = 0
         if fb.fil[0]['fxqc']['QCB']['fx_base'] == 'float':
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
                          np.zeros(len_a),
                          ]
+        # Fixpoint decimal format: Print coefficients in numeric format
+        # with a defined number of places
         elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
             self.ba_q = [
                 ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
@@ -452,6 +457,7 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].ovr_flag,
                 self.QObj[1].ovr_flag
                         ]
+        # Other fixpoint formats: Print coefficients as strings
         else:
             self.ba_q = [
                 self.QObj[0].float2frmt(self.ba[0]),
@@ -543,11 +549,11 @@ class Input_Coeffs(QWidget):
         brush.setColor(QColor(255, 255, 255, 0))  # transparent white
 
         if self.ba_q[col + 2][row] > 0:
-            # Color item backgrounds with pos. Overflows red
+            # Color item backgrounds with pos. overflows in red
             brush.setColor(QColor(100, 0, 0, 80))
 
         elif self.ba_q[col + 2][row] < 0:
-            # Color item backgrounds with neg. Overflows blue
+            # Color item backgrounds with neg. overflows in blue
             brush.setColor(QColor(0, 0, 100, 80))
 
         item.setTextAlignment(Qt.AlignRight | Qt.AlignCenter)
