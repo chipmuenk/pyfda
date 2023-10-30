@@ -278,7 +278,7 @@ class FX_UI_WQ(QWidget):
         WG = int(dict_ui['WG'])
         WI = int(dict_ui['WI'])
         WF = int(dict_ui['WF'])
-        W = WI + WF + 1
+        W = WG + WI + WF + 1
         self.ledWG.setText(str(WG))
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
@@ -453,7 +453,8 @@ class FX_UI_WQ(QWidget):
             if 'qfrmt_last' not in q_dict:
                 q_dict['qfrmt_last'] = qfrmt
 
-            # logger.warning(f"qfrmt = {q_dict['qfrmt']} (was: {q_dict['qfrmt_last']})")
+            # calculate previous total wordlength
+            W = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF']
 
             if qfrmt == 'qint':  # integer format
                 if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
@@ -471,7 +472,7 @@ class FX_UI_WQ(QWidget):
                 self.q_dict.update({'scale': 1, 'WG': 0})
 
                 if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
-                    self.q_dict.update({'WI': 0, 'WF': self.q_dict['W'] - 1})
+                    self.q_dict.update({'WG': 0, 'WI': 0, 'WF': W - 1})
                 elif qfrmt in {'qfrac', 'float'}:
                     pass
 
