@@ -454,8 +454,8 @@ class Fixed(object):
         # these keys are calculated and should be regarded as read-only
             'scale': 1, 'N_over': 0, 'places': 4, 'Q': '0.15'}
         # these keys are calculated and should be regarded as read-only
-        self.q_dict_default_ro = {
-            'N_over': 0, 'places': 4}
+        # self.q_dict_default_ro = {
+        #     'N_over': 0, 'places': 4}
 
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
@@ -497,7 +497,8 @@ class Fixed(object):
         Unknown keys throw an error message
         """
         for k in q_dict.keys():
-            if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
+            #if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
+            if k not in self.q_dict_default:
                 logger.error(u'Unknown Key "{0:s}"!'.format(k))
 
     def set_qdict(self, d: dict) -> None:
