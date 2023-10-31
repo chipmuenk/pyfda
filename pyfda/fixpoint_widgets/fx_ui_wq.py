@@ -506,6 +506,11 @@ class FX_UI_WQ(QWidget):
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
+        if 'A_M' in q_dict:
+            qset_cmb_box(self.cmbW, q_dict['A_M'])
+            if q_dict['A_M'].lower() == 'a':
+                pass # update auto-calculation of integer bits
+
         if 'WG' in q_dict:
             WG = safe_eval(
                 q_dict['WG'], self.QObj.q_dict['WG'], return_type="int", sign='poszero')
