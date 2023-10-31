@@ -411,6 +411,7 @@ class FX_UI_WQ(QWidget):
 
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
+        w_a_m = qget_cmb_box(self.cmbW)
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
@@ -506,9 +507,9 @@ class FX_UI_WQ(QWidget):
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
-        if 'A_M' in q_dict:
-            qset_cmb_box(self.cmbW, q_dict['A_M'])
-            if q_dict['A_M'].lower() == 'a':
+        if 'w_a_m' in q_dict:
+            qset_cmb_box(self.cmbW, q_dict['w_a_m'])
+            if q_dict['w_a_m'].lower() == 'a':
                 pass # update auto-calculation of integer bits
 
         if 'WG' in q_dict:
