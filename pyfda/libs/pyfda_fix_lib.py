@@ -378,12 +378,6 @@ class Fixed(object):
     The following key: value pairs are calculated from other parameters and
     can / should be considered as read-only.
 
-    * **'places'** : integer
-        number of places required for printing in the selected number format.
-        For binary formats, this is the same as the wordlength. Calculated
-        from the numeric base 'self.base' (not used outside this class) and
-        the total word length 'W'.
-
     Attributes
     ----------
     q_dict : dict
@@ -426,6 +420,12 @@ class Fixed(object):
 
         has occured during last fixpoint conversion.
 
+    places : integer
+        number of places required for printing in the selected number format.
+        For binary formats, this is the same as the wordlength. Calculated
+        from the numeric base 'self.base' (not used outside this class) and
+        the total word length 'W'.
+
 
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
 
@@ -452,10 +452,8 @@ class Fixed(object):
             'name': 'unknown', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'm',
             'quant': 'round', 'ovfl': 'sat', 'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac',
         # these keys are calculated and should be regarded as read-only
-            'scale': 1, 'N_over': 0, 'places': 4, 'Q': '0.15'}
+            'scale': 1, 'N_over': 0, 'Q': '0.15'}
         # these keys are calculated and should be regarded as read-only
-        # self.q_dict_default_ro = {
-        #     'N_over': 0, 'places': 4}
 
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
@@ -557,20 +555,20 @@ class Fixed(object):
         # Calculate required number of places for different bases from total
         # number of bits:
         if self.q_dict['fx_base'] == 'dec':
-            self.q_dict['places'] = int(
+            self.places = int(
                 np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
             self.base = 10
         elif self.q_dict['fx_base'] == 'bin':
-            self.q_dict['places'] = self.q_dict['W'] + 1
+            self.places = self.q_dict['W'] + 1
             self.base = 2
         elif self.q_dict['fx_base'] == 'csd':
-            self.q_dict['places'] = self.q_dict['W'] + 1
+            self.places = self.q_dict['W'] + 1
             self.base = 2
         elif self.q_dict['fx_base'] == 'hex':
-            self.q_dict['places'] = int(np.ceil(self.q_dict['W'] / 4.)) + 1
+            self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
         elif self.q_dict['qfrmt'] == 'float':
-            self.q_dict['places'] = 4
+            self.places = 4
             self.base = 0
         else:
             raise Exception(

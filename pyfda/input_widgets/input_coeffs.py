@@ -158,7 +158,7 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
         elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
-            return "{0:>{1}}".format(text, self.QObj[0].q_dict['places'])
+            return "{0:>{1}}".format(text, self.QObj[0].places)
 
         else:
             return text
@@ -202,7 +202,7 @@ class ItemDelegate(QStyledItemDelegate):
             # pass requantized data with required number of decimal places
             editor.setText(
                 "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
-                                  self.QObj[index.column()].q_dict['places']))
+                                  self.QObj[index.column()].places))
 
     # -------------------------------------------------------------------------
     def setModelData(self, editor, model, index) -> None:
@@ -450,9 +450,9 @@ class Input_Coeffs(QWidget):
         # with a defined number of places
         elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
             self.ba_q = [
-                ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
+                ["{0:>{1}}".format(x, self.QObj[0].places)
                     for x in self.QObj[0].float2frmt(self.ba[0])],
-                ["{0:>{1}}".format(x, self.QObj[0].q_dict['places'])
+                ["{0:>{1}}".format(x, self.QObj[1].places)
                     for x in self.QObj[1].float2frmt(a)],
                 self.QObj[0].ovr_flag,
                 self.QObj[1].ovr_flag
