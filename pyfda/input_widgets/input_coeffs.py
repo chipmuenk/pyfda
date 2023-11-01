@@ -939,18 +939,20 @@ class Input_Coeffs(QWidget):
             # only complete rows selected or FIR -> delete row
             self.ba = np.delete(self.ba, sel[0], axis=1)
         else:
-            self.ba[0][sel[0]] = 0
-            self.ba[1][sel[1]] = 0
-            # self.ba[0] = np.delete(self.ba[0], sel[0])
-            # self.ba[1] = np.delete(self.ba[1], sel[1])
-        # test and equalize if b and a array have different lengths:
-        self._equalize_ba_length()
-        self.refresh_table()
-        # if length is less than 2, clear the table: this ain't no filter!
-        if len(self.ba[0]) < 2:
-            self.clear_table()  # sets 'changed' attribute
+            # self.ba[0][sel[0]] = 0
+            # self.ba[1][sel[1]] = 0
+            self.ba[0] = np.delete(self.ba[0], sel[0])
+            self.ba[1] = np.delete(self.ba[1], sel[1])
 
-        qstyle_widget(self.ui.butSave, 'changed')
+        # If length is less than 2, re-initialize the table: this ain't no filter!
+        # `_clear_table() also refreshes the table and sets 'changed' attribute
+        if len(self.ba[0]) < 2 and len(self.ba[1]) < 2:
+            self.clear_table()
+        else:
+            # test and equalize if b and a array have different lengths:
+            self._equalize_ba_length()
+            self.refresh_table()
+            qstyle_widget(self.ui.butSave, 'changed')
 
 # ------------------------------------------------------------------------------
     def _add_cells(self):

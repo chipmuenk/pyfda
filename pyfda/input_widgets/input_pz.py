@@ -561,36 +561,42 @@ class Input_PZ(QWidget):
         - deleting all P/Z pairs
         Finally, the table is refreshed from self.zpk.
         """
-        sel = self._get_selected(self.tblPZ)['idx']  # get all selected indices as 2D list
-        sel_z = [s[1] for s in sel if s[0] == 0]  # list with selected indices in 'Z' column
-        sel_p = [s[1] for s in sel if s[0] == 1]  # list with selected indices in 'P' column
+        sel = self._get_selected(self.tblPZ)['idx']  # get selected indices as 2D list
+        sel_z = [s[1] for s in sel if s[0] == 0]  # list with sel. indices in 'Z' column
+        sel_p = [s[1] for s in sel if s[0] == 1]  # list with sel. indices in 'P' column
 
         k = self.zpk[2][0]
 
         # Delete array entries with selected indices. If nothing is selected
-        # (Z and P are empty), delete the last row.
+        # (sel_z and sel_p are empty), delete the last row.
         if len(sel_z) < 1 and len(sel_p) < 1:
             sel_z = [len(self.zpk[0])-1]
             sel_p = [len(self.zpk[1])-1]
         zeros = np.delete(self.zpk[0], sel_z)
         poles = np.delete(self.zpk[1], sel_p)
 
-        # test and equalize if P and Z array have different lengths:
-        D = len(zeros) - len(poles)
-        if D > 0:
-            poles = np.append(poles, np.zeros(D))
-        elif D < 0:
-            zeros = np.append(zeros, np.zeros(-D))
+        # If resulting poles and zeros are empty, re-initialize using
+        # `self._clear_table()`. This also refreshes the table and marks
+        # the "Save" button as changed.
+        if len(zeros) == 0 and len(poles) == 0:
+            self._clear_table()
+        else:
+            # test and equalize if P and Z array have different lengths:
+            D = len(zeros) - len(poles)
+            if D > 0:
+                poles = np.append(poles, np.zeros(D))
+            elif D < 0:
+                zeros = np.append(zeros, np.zeros(-D))
 
-        gain = zeros_with_val(max(len(poles), len(zeros)), k)
+            gain = zeros_with_val(max(len(poles), len(zeros)), k)
 
-        # reconstruct array with new number of rows
-        self.zpk = np.array([zeros, poles, gain])
+            # reconstruct array with new number of rows
+            self.zpk = np.array([zeros, poles, gain])
 
-        self._delete_PZ_pairs()
-        self._normalize_gain()
-        qstyle_widget(self.ui.butSave, 'changed')
-        self._refresh_table()
+            self._delete_PZ_pairs()
+            self._normalize_gain()
+            qstyle_widget(self.ui.butSave, 'changed')
+            self._refresh_table()
 
     # ------------------------------------------------------------------------------
     def _add_rows(self):
