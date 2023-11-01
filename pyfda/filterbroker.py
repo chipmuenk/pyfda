@@ -282,15 +282,15 @@ fil_ref = {
                'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
                'fx_base': 'dec'},
         # 'b' coefficient quantization
-        'QCB': {'name': 'QCB', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
+        'QCB': {'name': 'QCB', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1, 'w_a_m': 'a',
                 'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
                 'fx_base': 'dec'},
         # 'a' coefficient quantization
-        'QCA': {'name': 'QCA', 'WG': 0, 'WI': 2, 'WF': 13, 'W': 16, 'scale': 1,
+        'QCA': {'name': 'QCA', 'WG': 0, 'WI': 2, 'WF': 13, 'W': 16, 'scale': 1, 'w_a_m': 'a',
                 'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
                 'fx_base': 'dec'},
         # accumulator quantization
-        'QACC': {'name': 'QACC', 'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'scale': 1,
+        'QACC': {'name': 'QACC', 'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'scale': 1, 'w_a_m': 'a',
                  'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
                 'fx_base': 'dec'}
         },
