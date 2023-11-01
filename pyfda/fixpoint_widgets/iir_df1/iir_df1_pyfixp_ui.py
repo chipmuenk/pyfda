@@ -49,29 +49,29 @@ class IIR_DF1_pyfixp_UI(QWidget):
 
         self.cmb_wq_accu_items = [
             "<span>Set Accumulator word format</span>",
-            ("man", "M", "<span><b>Manual</b> entry</span>"),
-            ("auto", "A",
+            ("m", "M", "<span><b>Manual</b> entry</span>"),
+            ("a", "A",
              "<span><b>Automatic</b> worst case estimation from coefficients "
              "and input word formats.</span>")
             ]
 
-        self.cmb_wq_accu_init = 'man'
+        self.cmb_wq_accu_init = 'm'
 
         self.cmb_wq_coeffs_a_items = [
             "<span>Number of integer bits</span>",
-            ("man", "M", "<span><b>Manual</b> entry</span>"),
-            ("auto", "A",
+            ("m", "M", "<span><b>Manual</b> entry</span>"),
+            ("a", "A",
              "<span><b>Automatic</b> calculation from largest coefficient.</span>")
             ]
-        self.cmb_wq_coeffs_a_init = 'auto'
+        self.cmb_wq_coeffs_a_init = 'a'
 
         self.cmb_wq_coeffs_b_items = [
             "<span>Number of integer bits</span>",
-            ("man", "M", "<span><b>Manual</b> entry</span>"),
-            ("auto", "A",
+            ("m", "M", "<span><b>Manual</b> entry</span>"),
+            ("a", "A",
              "<span><b>Automatic</b> calculation from largest coefficient.</span>")
             ]
-        self.cmb_wq_coeffs_b_init = 'auto'
+        self.cmb_wq_coeffs_b_init = 'a'
 
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
@@ -174,13 +174,13 @@ class IIR_DF1_pyfixp_UI(QWidget):
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                    if cmbW == 'man':
+                    if cmbW == 'm':
                         if ui_changed == 'cmbW':
                             # returning to manual setting, don't do anything
                             return
                         else:
                             pass  # WI or WF have been edited, emit 'specs_changed'
-                    elif cmbW == 'auto':
+                    elif cmbW == 'a':
                         # when switching to auto settings, run automatic accu calculation
                         # this also reverses manual edits of WI or WF wordlengths
                         # manual entry of word lengths cannot be disabled easily due to
@@ -193,14 +193,14 @@ class IIR_DF1_pyfixp_UI(QWidget):
             elif dict_sig['wdg_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:  # coeffs updated
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
-                    if cmbW == 'man':
+                    if cmbW == 'm':
                         if ui_changed == 'cmbW':
                             # returning to manual setting, don't do anything
                             return
                         else:
                             pass  # WI or WF have been edited, emit 'specs_changed'
 
-                    elif cmbW == 'auto':
+                    elif cmbW == 'a':
                         # when switching to auto settings, run automatic calculation
                         # of required integer bits for coeffs a
                         # this also reverses manual edits of WI or WF wordlengths
@@ -212,7 +212,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         return
 
                     # in case coefficient length has been changed, update accu as well
-                    if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'auto':
+                    if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
                         self.update_accu_settings()
 
             # emit signal, replace UI id with id of *this* widget
@@ -256,7 +256,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         #     logger.error("An error occured:", exc_info=True)
         #     return
 
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
             fb.fil[0]['fxqc']['QACC']['WF'] = max(
                 fb.fil[0]['fxqc']['QI']['WF'] + fb.fil[0]['fxqc']['QCB']['WF'],
                 fb.fil[0]['fxqc']['QO']['WF'] + fb.fil[0]['fxqc']['QCA']['WF'])

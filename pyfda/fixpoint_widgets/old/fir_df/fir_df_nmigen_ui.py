@@ -87,8 +87,8 @@ class FIR_DF_nmigen_UI(QWidget):
 
         # initial setting for accumulator
         cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-        self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
-        self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
+        self.wdg_w_accu.ledWF.setEnabled(cmbW == 'm')
+        self.wdg_w_accu.ledWI.setEnabled(cmbW == 'm')
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
@@ -129,13 +129,13 @@ class FIR_DF_nmigen_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
-                self.wdg_w_accu.ledWF.setEnabled(cmbW == 'man')
-                self.wdg_w_accu.ledWI.setEnabled(cmbW == 'man')
-                if cmbW in {'full', 'auto'}\
+                self.wdg_w_accu.ledWF.setEnabled(cmbW == 'm')
+                self.wdg_w_accu.ledWI.setEnabled(cmbW == 'm')
+                if cmbW in {'f', 'a'}\
                         or ('ui' in dict_sig and dict_sig['ui'] in {'WF', 'WI'}):
                     pass
 
-                elif cmbW == 'man':  # switched to manual, don't do anything
+                elif cmbW == 'm':  # switched to manual, don't do anything
                     return
 
             # Accu quantization or overflow settings have been changed
@@ -185,16 +185,16 @@ class FIR_DF_nmigen_UI(QWidget):
         `fb.fil[0]['fxqc']['QA']`.
         """
         try:
-            if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full":
+            if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f':
                 A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
-            elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+            elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
         except Exception as e:
             logger.error(e)
             return
 
-        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "full" or\
-                qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == "auto":
+        if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f' or\
+                qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
             fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
             fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\

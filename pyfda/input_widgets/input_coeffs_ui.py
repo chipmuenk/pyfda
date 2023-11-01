@@ -72,9 +72,9 @@ class Input_Coeffs_UI(QWidget):
 
         self.cmb_w_items = [
             "<span>Calculate word format manually / automatically</span>",
-            ("man", "M", "<span><b>Manual</b> entry of integer and fractional "
+            ("m", "M", "<span><b>Manual</b> entry of integer and fractional "
              "word length.</span>"),
-            ("auto", "A",
+            ("a", "A",
             "<span><b>Automatic</b> calculation of required integer and fractional "
             "word length.</span>")
             ]

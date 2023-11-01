@@ -45,6 +45,7 @@ class FX_UI_WQ(QWidget):
     - `WI`      : number of integer bits
     - `WG`      : number of guard bits
     - `WF`      : number of fractional bits
+    - `w_a_m`   : automatic or manual update of word format
     - `scale`   : scaling factor between real world value and integer representation
 
     These quantization settings are also stored in the instance quantizer object
@@ -88,9 +89,9 @@ class FX_UI_WQ(QWidget):
     'tip_lock'      : 'Sync input/output quant.'# Tooltip for  lock push button
 
     'cmb_w_vis'     : 'off'                     # Is Auto/Man. selection visible?
-                                                #  ['A', 'M', 'F']
+                                                #  ['a', 'm', 'f']
     'cmb_w_items'   : List with tooltip and combo box choices
-    'cmb_w_init'    : 'man'                     # initial setting
+    'cmb_w_init'    : 'm'                       # initial setting
     'count_ovfl_vis': 'on'                      # Is overflow counter visible?
                                                 #   ['on', 'off', 'auto']
     'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
@@ -134,11 +135,11 @@ class FX_UI_WQ(QWidget):
                   ("none", "None",
                    "<span>No overflow behaviour (only for debugging)</span>")]
         cmb_w = ["<span>Calculate word format manually / automatically</span>",
-                 ("man", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
-                 ("auto", "A",
+                 ("m", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
+                 ("a", "A",
                   "<span><b>Automatic</b> calculation for given input word format "
                   "and coefficients (<i>coefficient area</i>).</span>"),
-                 ("full", "F",
+                 ("f", "F",
                   "<span><b>Full</b> accumulator width for given input word format "
                   "and arbitrary coefficients.</span>")
                  ]
@@ -152,7 +153,7 @@ class FX_UI_WQ(QWidget):
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
-                   'cmb_w_vis': 'on', 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
+                   'cmb_w_vis': 'on', 'cmb_w_items': cmb_w, 'cmb_w_init': 'm',
                    'lock_vis': 'off',
                    'tip_lock':
                        '<span>Sync input and output quantization formats.</span>',
@@ -282,11 +283,10 @@ class FX_UI_WQ(QWidget):
         self.ledWG.setText(str(WG))
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
-        ovfl = qget_cmb_box(self.cmbOvfl)
-        quant = qget_cmb_box(self.cmbQuant)
 
-        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF,
-                            'WG': WG, 'W': W})
+        self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl), 'WG': WG, 'W': W,
+                            'quant': qget_cmb_box(self.cmbQuant), 'WI': WI, 'WF': WF,
+                            'w_a_m': qget_cmb_box(self.cmbW)})
         # create fixpoint quantization object from passed quantization dict
         self.QObj = fx.Fixed(self.q_dict)
 
@@ -412,15 +412,17 @@ class FX_UI_WQ(QWidget):
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
         w_a_m = qget_cmb_box(self.cmbW)
+        logger.error(w_a_m)
+        if not w_a_m in {'m', 'a', 'f'}:
+            logger.error(f"Unknown option '{w_a_m}' for cmbW combobox!")
 
-        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF})
+        self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
                                           # like W and Q and reset counters
 
         if self.sender():
             dict_sig = {'wdg_name': self.wdg_name,
                         'ui_local_changed': self.sender().objectName()}
-            # logger.warning(f"ui2dict:emit {dict_sig}")
             self.emit(dict_sig)
         else:
             logger.error("Sender has no object name!")
@@ -430,7 +432,7 @@ class FX_UI_WQ(QWidget):
         """
         Use the passed quantization dict `q_dict` to update:
 
-        * UI subwidgets `WI`, `WG`, `WF` `quant` and `ovfl`
+        * UI subwidgets `WI`, `WG`, `WF` `quant`, `ovfl`, `cmbW`
         * the instance quantization dict `self.q_dict` (usually a reference to some
           global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
         * the `scale` setting of the instance quantization dict if WF / WI require this
@@ -440,13 +442,19 @@ class FX_UI_WQ(QWidget):
         If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
         instead, this can be used to update the UI.
         """
+        logger.error("fx_ui.dict2ui")
         if q_dict is None:
             q_dict = self.q_dict  # update UI from instance qdict
         else:
             for k in q_dict:
                 if k not in {'name', 'quant', 'ovfl', 'WI', 'WF', 'WG', 'qfrmt', 'qfrmt_last',
-                             'fx_base'}:
+                             'fx_base', 'w_a_m'}:
                     logger.warning(f"Unknown quantization option '{k}'")
+
+        if 'w_a_m' in q_dict:
+            qset_cmb_box(self.cmbW, q_dict['w_a_m'])
+            self.q_dict.update({'w_a_m': qget_cmb_box(self.cmbW)})
+            # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
 
         if not 'qfrmt' in q_dict:
             logger.error("Missing quantization format key 'qfrmt' in quantizer dict!")
@@ -454,7 +462,6 @@ class FX_UI_WQ(QWidget):
         else:
             err = False
             qfrmt = q_dict['qfrmt']
-            logger.error(f"wdg: {self.q_dict['name']}, qfrmt: {qfrmt}")
             if 'qfrmt_last' not in q_dict:
                 q_dict['qfrmt_last'] = qfrmt
 
@@ -486,13 +493,16 @@ class FX_UI_WQ(QWidget):
                     err = True
 
             if not err:
-                self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'})
+                logger.error(f"{self.q_dict['name']}: {qfrmt}, {self.q_dict['w_a_m']}")
+                self.ledWG.setVisible(qfrmt == 'qint' and self.qdict['w_a_m'] == 'm')
+                self.ledWG.setEnabled(self.q_dict['w_a_m'] == 'm')
+                self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
                 self.ledWF.setVisible(qfrmt != 'qint')
-                self.ledWG.setVisible(qfrmt == 'qint')
-                self.ledWG.setEnabled(True)
+                self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
+
                 self.lblPlus.setVisible(qfrmt == 'qint')
                 self.lblDot.setVisible(qfrmt != 'qint')
-                self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'})
+
                 self.ledWG.setText(str(self.q_dict['WG']))
                 self.ledWF.setText(str(self.q_dict['WF']))
                 self.ledWI.setText(str(self.q_dict['WI']))
@@ -506,11 +516,6 @@ class FX_UI_WQ(QWidget):
         if 'ovfl' in q_dict:
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
-
-        if 'w_a_m' in q_dict:
-            qset_cmb_box(self.cmbW, q_dict['w_a_m'])
-            if q_dict['w_a_m'].lower() == 'a':
-                pass # update auto-calculation of integer bits
 
         if 'WG' in q_dict:
             WG = safe_eval(

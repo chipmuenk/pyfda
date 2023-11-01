@@ -56,7 +56,7 @@ class UI_W(QWidget):
     'tip_lock'      : 'Lock input/output quant.'# Tooltip for  lock push button
 
     'combo_visible' : False                     # Enable integrated combo widget
-    'combo_items'   : ['auto', 'full', 'man']   # Combo selection
+    'combo_items'   : ['a', 'f', 'm']           # Combo selection
     'tip_combo'     : 'Calculate Acc. width.'   # tooltip for combo
     """
     # sig_rx = pyqtSignal(object)  # incoming,
@@ -491,7 +491,7 @@ class UI_WQ(QWidget):
 
     'cmb_w_vis'     : False                     # Integrated combo widget visible?
     'cmb_w_items'   : List with tooltip and combo box choices
-    'cmb_w_init'    : 'man'                     # initial setting
+    'cmb_w_init'    : 'm'                       # initial setting
 
     'enabled'       : True                      # Is widget enabled?
     'visible'       : True                      # Is widget visible?
@@ -521,11 +521,11 @@ class UI_WQ(QWidget):
                   ("sat", "Sat",
                    "<span>Saturation, i.e. limit at min. / max. value</span>")]
         cmb_w = ["<span>Set Accumulator word format</span>",
-                 ("man", "Man", "<span>Manual entry of word format.</span>"),
-                 ("auto", "Auto",
+                 ("m", "Man", "<span>Manual entry of word format.</span>"),
+                 ("a", "Auto",
                   "<span>Automatic calculation from coefficients and input word formats "
                   "taking coefficients area into account.</span>"),
-                 ("full", "Full",
+                 ("f", "Full",
                   "<span>Automatic calculation from coefficients and input word formats "
                   "for arbitrary coefficients.</span>")
                  ]
@@ -539,7 +539,7 @@ class UI_WQ(QWidget):
                    'WI': 0, 'WI_len': 2, 'tip_WI': 'Number of integer bits',
                    'WF': 15, 'WF_len': 2, 'tip_WF': 'Number of fractional bits',
                    'fractional': True,
-                   'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'man',
+                   'cmb_w_vis': False, 'cmb_w_items': cmb_w, 'cmb_w_init': 'm',
                    'lock_visible': False, 'tip_lock': 'Lock input/output quantization.'
                    }
         # test whether quantization and overflow parameters in self.q_dict are

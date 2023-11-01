@@ -48,16 +48,16 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         self.cmb_wq_accu_items = [
             "<span>Calculate word format manually / automatically</span>",
-            ("man", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
-            ("auto", "A",
+            ("m", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
+            ("a", "A",
             "<span><b>Automatic</b> calculation for given input word format "
             "and coefficients (<i>coefficient area</i>).</span>"),
-            ("full", "F",
+            ("f", "F",
             "<span><b>Full</b> accumulator width for given input word format "
             "and arbitrary coefficients.</span>")
             ]
 
-        self.cmb_wq_accu_init = 'man'
+        self.cmb_wq_accu_init = 'm'
 
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
@@ -144,10 +144,10 @@ class FIR_DF_pyfixp_UI(QWidget):
 
             elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
-                if cmbW in {'full', 'auto'}\
+                if cmbW in {'f', 'a'}\
                         or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     self.update_accu_settings()
-                elif cmbW == 'man':  # switched to manual, don't do anything
+                elif cmbW == 'm':  # switched to manual, don't do anything
                     return
 
             # emit signal, replace id with id of *this* widget
@@ -174,9 +174,9 @@ class FIR_DF_pyfixp_UI(QWidget):
         `fb.fil[0]['fxqc']['QACC']`.
         """
         try:
-            if qget_cmb_box(self.wdg_wq_accu.cmbW) == "full":
+            if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
                 A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['ba'][0]))))
-            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == "auto":
+            elif qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
             else:
                 A_coeff = 0
@@ -185,7 +185,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             return
 
         # calculate required accumulator word format
-        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {"full", "auto"}:
+        if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
             fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
