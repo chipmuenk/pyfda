@@ -46,6 +46,19 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.description = "Standard FIR topology, suitable for most use cases."
         self.img_name = "fir_df.png"
 
+        self.cmb_wq_accu_items = [
+            "<span>Calculate word format manually / automatically</span>",
+            ("man", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
+            ("auto", "A",
+            "<span><b>Automatic</b> calculation for given input word format "
+            "and coefficients (<i>coefficient area</i>).</span>"),
+            ("full", "F",
+            "<span><b>Full</b> accumulator width for given input word format "
+            "and arbitrary coefficients.</span>")
+            ]
+
+        self.cmb_wq_accu_init = 'man'
+
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
         # the 'fxqc' quantizer dict
@@ -78,7 +91,7 @@ class FIR_DF_pyfixp_UI(QWidget):
                           {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu', cmb_w_vis='on',
-            cmb_w_init='auto',
+            cmb_w_items=self.cmb_wq_accu_items, cmb_w_init=self.cmb_wq_accu_init,
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
