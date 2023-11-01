@@ -430,14 +430,11 @@ class Input_Coeffs(QWidget):
         # Create a copy of the 'a' coefficients without the "1" as this could create
         # false overflows during quantization. The "1" is always printed though
         # by the `ItemDelegate.initStyleOption()` method
-        #
-        # TODO: Replacing the first element by 0  doesn't work, a is always converted
-        # to integer for non-dec formats somehwhere - Why???
 
-        # logger.error(f"ba[1]: {self.ba[1].dtype}")
-        a = np.concatenate(([0.123], self.ba[1][1:]))
+        a = np.concatenate(([0.], self.ba[1][1:]))
+        # self.ba[1][0] = 0  # Is this safe?
         # a = self.ba[1]
-        # logger.error(f"a: {a.dtype}")
+        # logger.error(f"a: {a[1].dtype}")
 
         # Float format: Set ba_q = ba, overflows are all = 0
         if fb.fil[0]['fxqc']['QCB']['qfrmt'] == 'float':
@@ -595,6 +592,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
 
         # check whether filter is FIR and only needs one column
+        logger.error(fb.fil[0]['ft'])
         if fb.fil[0]['ft'] == 'FIR':
             self.num_cols = 1
             self.tblCoeff.setColumnCount(1)
