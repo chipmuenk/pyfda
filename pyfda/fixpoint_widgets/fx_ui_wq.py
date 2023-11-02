@@ -415,6 +415,7 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WG': WG, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
                                           # like W and Q and reset counters
+        self.update_visibility()  # update visibility of WI and WF widgets, depending on 'qfrmt' and 'w_a_m'
 
         if self.sender():
             dict_sig = {'wdg_name': self.wdg_name,
@@ -446,63 +447,12 @@ class FX_UI_WQ(QWidget):
                              'fx_base', 'w_a_m'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
+        # Update all non-numeric instance quantization dict entries from passed `q_dict`
         if 'w_a_m' in q_dict:
             qset_cmb_box(self.cmbW, q_dict['w_a_m'])
+            # Re-read combobox setting to sanitize dictionary entry
             self.q_dict.update({'w_a_m': qget_cmb_box(self.cmbW)})
             # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
-
-        if not 'qfrmt' in q_dict:
-            logger.error("Missing quantization format key 'qfrmt' in quantizer dict!")
-            return
-        else:
-            err = False
-            qfrmt = q_dict['qfrmt']
-            if 'qfrmt_last' not in q_dict:
-                q_dict['qfrmt_last'] = qfrmt
-
-            # calculate previous total wordlength
-            W = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF']
-
-            if qfrmt == 'qint':  # integer format
-                if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
-                    self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
-                                        'WF': 0, 'scale': 1 << self.q_dict['WF']})
-            elif qfrmt == 'q31':  # Q0.31
-                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
-            elif qfrmt == 'q15':  # Q0.15
-                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
-
-            else:  # 'qfrac', 'qnfrac', 'float'
-                if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
-                    self.q_dict.update({'WF': self.q_dict['WI'], 'WI': self.q_dict['WG']})
-
-                self.q_dict.update({'scale': 1, 'WG': 0})
-
-                if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
-                    self.q_dict.update({'WG': 0, 'WI': 0, 'WF': W - 1})
-                elif qfrmt in {'qfrac', 'float'}:
-                    pass
-
-                else:
-                    logger.error(f"Unknown quantization format '{qfrmt}'")
-                    err = True
-
-            if not err:
-                logger.error(f"{self.q_dict['name']}: {qfrmt}, {self.q_dict['w_a_m']}")
-                self.ledWG.setVisible(qfrmt == 'qint' and self.qdict['w_a_m'] == 'm')
-                self.ledWG.setEnabled(self.q_dict['w_a_m'] == 'm')
-                self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
-                self.ledWF.setVisible(qfrmt != 'qint')
-                self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
-
-                self.lblPlus.setVisible(qfrmt == 'qint')
-                self.lblDot.setVisible(qfrmt != 'qint')
-
-                self.ledWG.setText(str(self.q_dict['WG']))
-                self.ledWF.setText(str(self.q_dict['WF']))
-                self.ledWI.setText(str(self.q_dict['WI']))
-
-        q_dict['qfrmt_last'] = qfrmt  # store current setting as 'qfrmt_last'
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
@@ -512,6 +462,45 @@ class FX_UI_WQ(QWidget):
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
+        if 'qfrmt' in q_dict:
+            self.q_dict.update({'qfrmt': q_dict['qfrmt']})
+            if 'qfrmt_last' not in q_dict:
+                q_dict['qfrmt_last'] = q_dict['qfrmt']
+        else:
+            logger.warning("Missing quantization format key 'qfrmt' in quantizer dict!")
+        qfrmt = self.q_dict['qfrmt']
+
+        # calculate previous total wordlength
+        W = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF']
+
+        if qfrmt == 'qint':  # integer format
+            if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
+                self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
+                                    'WF': 0, 'scale': 1 << self.q_dict['WF']})
+        elif qfrmt == 'q31':  # Q0.31
+            self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
+        elif qfrmt == 'q15':  # Q0.15
+            self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
+
+        else:  # 'qfrac', 'qnfrac', 'float'
+            if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
+                self.q_dict.update({'WF': self.q_dict['WI'], 'WI': self.q_dict['WG']})
+
+            self.q_dict.update({'scale': 1, 'WG': 0})
+
+            if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
+                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': W - 1})
+            elif qfrmt in {'qfrac', 'float'}:
+                pass
+
+            else:
+                logger.error(f"Unknown quantization format '{qfrmt}'")
+
+        self.update_visibility()  # set WI / WF widgets visibility
+
+        q_dict['qfrmt_last'] = qfrmt  # store current setting as 'qfrmt_last'
+
+        # Update UI widgets from dicts
         if 'WG' in q_dict:
             WG = safe_eval(
                 q_dict['WG'], self.QObj.q_dict['WG'], return_type="int", sign='poszero')
@@ -535,6 +524,26 @@ class FX_UI_WQ(QWidget):
 
         self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
 
+    # --------------------------------------------------------------------------
+    def update_visibility(self):
+        """
+        Update visibility / writability of integer and fractional part of the
+        quantization format. depending on 'qfrmt' and 'w_a_m' settings
+        """
+        qfrmt = self.q_dict['qfrmt']
+        logger.error(f"{self.q_dict['name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
+        self.ledWG.setVisible(qfrmt == 'qint')
+        self.ledWG.setEnabled(self.q_dict['w_a_m'] == 'm')
+        self.ledWI.setEnabled(qfrmt in {'qint', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
+        self.ledWF.setVisible(qfrmt != 'qint')
+        self.ledWF.setEnabled(qfrmt in {'qnfrac', 'qfrac'} and self.q_dict['w_a_m'] == 'm')
+
+        self.lblPlus.setVisible(qfrmt == 'qint')
+        self.lblDot.setVisible(qfrmt != 'qint')
+
+        self.ledWG.setText(str(self.q_dict['WG']))
+        self.ledWF.setText(str(self.q_dict['WF']))
+        self.ledWI.setText(str(self.q_dict['WI']))
 
 # ==============================================================================
 if __name__ == '__main__':
