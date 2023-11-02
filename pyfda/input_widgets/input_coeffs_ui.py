@@ -72,15 +72,6 @@ class Input_Coeffs_UI(QWidget):
             ]
         self.cmb_fx_base_default = "float"
 
-        self.cmb_w_items = [
-            "<span>Calculate word format manually / automatically</span>",
-            ("m", "M", "<span><b>Manual</b> entry of integer and fractional "
-             "word length.</span>"),
-            ("a", "A",
-            "<span><b>Automatic</b> calculation of required integer and fractional "
-            "word length.</span>")
-            ]
-
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -303,12 +294,12 @@ class Input_Coeffs_UI(QWidget):
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            cmb_w_items=self.cmb_w_items, MSB_LSB_vis='max')
+            MSB_LSB_vis='max')
         # -------------------
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
-            cmb_w_items=self.cmb_w_items, MSB_LSB_vis='max')
+            MSB_LSB_vis='max')
 
         #######################################################################
         # ########################  Main UI Layout ############################

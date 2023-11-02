@@ -134,15 +134,11 @@ class FX_UI_WQ(QWidget):
                    "<span>Saturation, i.e. limit at min. / max. value</span>"),
                   ("none", "None",
                    "<span>No overflow behaviour (only for debugging)</span>")]
-        cmb_w = ["<span>Calculate word format manually / automatically</span>",
-                 ("m", "M", "<span><b>Manual</b> entry of accumulator format.</span>"),
-                 ("a", "A",
-                  "<span><b>Automatic</b> calculation for given input word format "
-                  "and coefficients (<i>coefficient area</i>).</span>"),
-                 ("f", "F",
-                  "<span><b>Full</b> accumulator width for given input word format "
-                  "and arbitrary coefficients.</span>")
-                 ]
+        cmb_w = ["<span>Select word format manually / automatically</span>",
+                ("m", "M", "<span><b>Manual</b> entry of integer and fractional "
+                "word length.</span>"),
+                ("a", "A", "<span><b>Automatic</b> estimation of required integer "
+                 "and fractional word length.</span>")                 ]
         # default widget settings:
         dict_ui = {'wdg_name': 'fx_ui_wq', 'label': '',
                    'label_q': 'Quant.', 'cmb_q_items': cmb_q, 'quant': 'round',
