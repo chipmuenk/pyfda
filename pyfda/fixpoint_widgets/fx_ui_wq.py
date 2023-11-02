@@ -359,11 +359,11 @@ class FX_UI_WQ(QWidget):
         else:
             logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
-        frm = inspect.stack()[1]
-        logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
-                     f"{self.q_dict['N_over']} "
-                     f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}."
-                     f"{frm[3]}:{frm[2]}")
+        # frm = inspect.stack()[1]
+        # logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
+        #              f"{self.q_dict['N_over']} "
+        #              f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}."
+        #              f"{frm[3]}:{frm[2]}")
 
         if self.count_ovfl_vis == 'off':
             self.lbl_ovfl_count.setVisible(False)
@@ -438,7 +438,6 @@ class FX_UI_WQ(QWidget):
         If `q_dict is None`, use data from the instance quantization dict `self.q_dict`
         instead, this can be used to update the UI.
         """
-        logger.error("fx_ui.dict2ui")
         if q_dict is None:
             q_dict = self.q_dict  # update UI from instance qdict
         else:

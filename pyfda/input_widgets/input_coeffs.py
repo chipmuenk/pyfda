@@ -592,7 +592,6 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
 
         # check whether filter is FIR and only needs one column
-        logger.error(fb.fil[0]['ft'])
         if fb.fil[0]['ft'] == 'FIR':
             self.num_cols = 1
             self.tblCoeff.setColumnCount(1)
