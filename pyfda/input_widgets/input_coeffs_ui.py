@@ -54,6 +54,8 @@ class Input_Coeffs_UI(QWidget):
              "<span>Normalized fractional format with <i>WF</i> + 1 bits "
              "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
             ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
+             "(31 fractional bits).</span>"),
+            ("q15", "Q15", "<span>Normalized fractional format with 16 bits "
              "(31 fractional bits).</span>")
             ]
         self.cmb_q_frmt_default = "qfrac"
