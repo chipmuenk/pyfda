@@ -350,9 +350,9 @@ class Fixed(object):
 
       - 'float'  : floating point (unquantized)
       - 'qfrac'  : general fixpoint format
-      - 'qnfrac'  : normalized fixpoint format with WI = 0
-      - 'q31'  : canonically signed digit string, scaled by :math:`2^{WF}`
-      - 'q15' : 16 bit normalized
+      - 'qnfrac' : normalized fixpoint format with WI = 0
+      - 'q31'    : 32 bit normalized
+      - 'q15'    : 16 bit normalized
 
 
     * **'scale'** : Float or a keyword, the factor between the fixpoint integer
