@@ -89,7 +89,7 @@ class Input_Fixpoint_Specs(QWidget):
         Process signals coming in from input and output quantizer subwidget and
         emit {'fx_sim': 'specs_changed'} in the end.
         """
-        logger.debug(
+        logger.warning(
             f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(

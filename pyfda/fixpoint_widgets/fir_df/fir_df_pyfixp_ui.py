@@ -130,7 +130,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         the referenced dicts `fb.fil[0]['fxqc']['QCB']` and `...['QACC']` have already
         been updated by the corresponding subwidgets `FX_UI_WQ`
         """
-        logger.debug("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
@@ -148,6 +148,7 @@ class FIR_DF_pyfixp_UI(QWidget):
                         or dict_sig['ui_local_changed'] in {'WF', 'WI'}:
                     self.update_accu_settings()
                 elif cmbW == 'm':  # switched to manual, don't do anything
+                    # self.wdg_wq_accu.dict2ui()?
                     return
 
             # emit signal, replace id with id of *this* widget
