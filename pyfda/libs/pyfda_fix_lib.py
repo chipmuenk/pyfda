@@ -1129,7 +1129,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     # quantize floating point coefficients with the selected scale (WI.WF),
     # next convert array float  -> array of fixp
     #                           -> list of int (scaled by 2^WF) when `to_int == True`
-    if QObj.q_dict['qfrmt'] == 'int':
+    if QObj.q_dict['qfrmt'] == 'qint':
         QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
         # quantize coefficients except for first

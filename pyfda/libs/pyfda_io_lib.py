@@ -1392,7 +1392,7 @@ def export_coe_xilinx(f: TextIO) -> None:
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
     logger.debug("scale = {0}, WF = {1}".format(qc.q_dict['scale'], qc.q_dict['WF']))
 
-    if qc.q_dict['WF'] != 0 : # and qc.q_dict['qfrmt'] == 'int':
+    if qc.q_dict['WF'] != 0 : # and qc.q_dict['qfrmt'] == 'qint':
         # Set the fixpoint format to integer (WF=0) with the original wordlength
         qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
