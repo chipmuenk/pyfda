@@ -444,7 +444,7 @@ class FX_UI_WQ(QWidget):
         else:
             for k in q_dict:
                 if k not in {'name', 'quant', 'ovfl', 'WI', 'WF', 'WG', 'qfrmt', 'qfrmt_last',
-                             'fx_base', 'w_a_m'}:
+                             'fx_base', 'w_a_m', 'N_over'}:
                     logger.warning(f"Unknown quantization option '{k}'")
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`
