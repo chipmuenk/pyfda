@@ -746,7 +746,9 @@ class Fixed(object):
         #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
         # ====================================================================
         if self.q_dict['ovfl'] == 'none':
-            pass
+            # set all overflow flags to zero
+            self.N_over_neg = self.N_over_pos = self.N_over = 0
+            self.ovr_flag = np.zeros_like(yq)
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < self.MIN)
