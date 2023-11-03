@@ -349,11 +349,8 @@ class Fixed(object):
     * **'qfrmt'** : Quantization format, optional; default = 'float'
 
       - 'float'  : floating point (unquantized)
+      - 'qint'   : integer
       - 'qfrac'  : general fixpoint format
-      - 'qnfrac' : normalized fixpoint format with WI = 0
-      - 'q31'    : 32 bit normalized
-      - 'q15'    : 16 bit normalized
-
 
     * **'scale'** : Float or a keyword, the factor between the fixpoint integer
             representation (FXP) and its "real world" floating point value (RWV).

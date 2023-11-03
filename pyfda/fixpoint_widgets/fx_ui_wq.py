@@ -477,10 +477,10 @@ class FX_UI_WQ(QWidget):
             if self.q_dict['qfrmt_last'] != 'qint':  # convert to int
                 self.q_dict.update({'WG': self.q_dict['WI'], 'WI': self.q_dict['WF'],
                                     'WF': 0, 'scale': 1 << self.q_dict['WF']})
-        elif qfrmt == 'q31':  # Q0.31
-            self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
-        elif qfrmt == 'q15':  # Q0.15
-            self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
+        # elif qfrmt == 'q31':  # Q0.31
+        #     self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 31, 'scale': 1})
+        # elif qfrmt == 'q15':  # Q0.15
+        #     self.q_dict.update({'WG': 0, 'WI': 0, 'WF': 15, 'scale': 1})
 
         else:  # 'qfrac', 'qnfrac', 'float'
             if self.q_dict['qfrmt_last'] == 'qint':  # convert from int
@@ -488,9 +488,9 @@ class FX_UI_WQ(QWidget):
 
             self.q_dict.update({'scale': 1, 'WG': 0})
 
-            if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
-                self.q_dict.update({'WG': 0, 'WI': 0, 'WF': W - 1})
-            elif qfrmt in {'qfrac', 'float'}:
+            # if qfrmt == 'qnfrac':  # normalized fractional format, WG = WI = 0
+            #     self.q_dict.update({'WG': 0, 'WI': 0, 'WF': W - 1})
+            if qfrmt in {'qfrac', 'float'}:
                 pass
 
             else:

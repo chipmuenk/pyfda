@@ -41,27 +41,26 @@ class Input_Coeffs_UI(QWidget):
         self.eps = 1.e-6  # initialize tolerance value
 
         self.cmb_q_frmt_items = [
-            "<span>Quantization format for signed fixpoint coefficients (affects only "
+            "<span>Quantization format for coefficients (affects only "
             "the display, not the stored values).</span>",
-            # ("float", "Float", "<span>Coefficients with full precision in floating "
-            # "point format</span>"),
-            ("qint", "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
+            ('float', "Float", "<span>Full precision floating point format</span>"),
+            ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
-            ("qfrac", "Fractional",
+            ('qfrac', "Fractional",
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
-             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>"),
-            ("qnfrac", "Norm. Frac.",
-             "<span>Normalized fractional format with <i>WF</i> + 1 bits "
-             "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
-            ("q31", "Q31", "<span>Normalized fractional format with 32 bits "
-             "(31 fractional bits).</span>"),
-            ("q15", "Q15", "<span>Normalized fractional format with 16 bits "
-             "(31 fractional bits).</span>")
+             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
+            # ('qnfrac', "Norm. Frac.",
+            #  "<span>Normalized fractional format with <i>WF</i> + 1 bits "
+            #  "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
+            # ('q31', "Q31", "<span>Normalized fractional format with 32 bits "
+            #  "(31 fractional bits).</span>"),
+            # ('q15', "Q15", "<span>Normalized fractional format with 16 bits "
+            #  "(31 fractional bits).</span>")
             ]
         self.cmb_q_frmt_default = "qfrac"
 
         self.cmb_fx_base_items = [
-            "<span>Select the coefficient display format.</span>",
+            "<span>Select the coefficient fixpoint display format.</span>",
             ("float", "Float", "<span>Coefficients with full precision in floating "
              "point format</span>"),
             ("dec", "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
