@@ -61,13 +61,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual('12.0', self.myQ.Q)
 
 
-        # check whether option 'norm' sets the correct scale
-        self.myQ.set_qdict({'scale':'norm'})
-        self.assertEqual(2**(-self.myQ.WI), self.myQ.scale)
-        # check whether option 'int' sets the correct scale
-        self.myQ.set_qdict({'scale':'int'})
-        self.assertEqual(1<<self.myQ.WF, self.myQ.scale)
-
     def test_fix_no_ovfl(self):
         """
         Test the actual fixpoint quantization without saturation / wrap-around. The 'fx_base'

@@ -364,11 +364,6 @@ class Fixed(object):
                 WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
                 WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
 
-            Alternatively, if:
-
-                - ``q_dict['scale'] == 'int'``:   scale = 1 << self.q_dict['WF']
-
-                - ``q_dict['scale'] == 'norm'``:  scale = 2.**(-self.q_dict['WI'])
     * **quant** : str
         Quantization behaviour ('floor', 'round', ...)
 
