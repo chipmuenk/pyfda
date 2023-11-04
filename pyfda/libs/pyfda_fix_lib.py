@@ -439,7 +439,7 @@ class Fixed(object):
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
             'name': 'unknown', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'm',
-            'quant': 'round', 'ovfl': 'sat', 'fx_base': 'dec',
+            'quant': 'round', 'ovfl': 'sat',
         # these keys are calculated and should be regarded as read-only
             'N_over': 0, 'Q': '0.15'}
         # these keys are calculated and should be regarded as read-only
@@ -541,17 +541,17 @@ class Fixed(object):
 
         # Calculate required number of places for different bases from total
         # number of bits:
-        if self.q_dict['fx_base'] == 'dec':
+        if fb.fil[0]['fx_base'] == 'dec':
             self.places = int(
                 np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
             self.base = 10
-        elif self.q_dict['fx_base'] == 'bin':
+        elif fb.fil[0]['fx_base'] == 'bin':
             self.places = self.q_dict['W'] + 1
             self.base = 2
-        elif self.q_dict['fx_base'] == 'csd':
+        elif fb.fil[0]['fx_base'] == 'csd':
             self.places = self.q_dict['W'] + 1
             self.base = 2
-        elif self.q_dict['fx_base'] == 'hex':
+        elif fb.fil[0]['fx_base'] == 'hex':
             self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
         elif fb.fil[0]['qfrmt'] == 'float':
@@ -559,7 +559,7 @@ class Fixed(object):
             self.base = 0
         else:
             raise Exception(
-                u'Unknown number format "{0:s}"!'.format(self.q_dict['fx_base']))
+                u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
 
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
@@ -808,10 +808,10 @@ class Fixed(object):
 
 
     # --------------------------------------------------------------------------
-    def frmt2float(self, y, frmt=None):
+    def frmt2float(self, y):
         """
         Return floating point representation for fixpoint `y` (scalar or array)
-        given in format `frmt`.
+        given in format `fb.fil[0]['fx_base']`.
 
         When input format is float, return unchanged.
 
@@ -827,26 +827,14 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or string or array of scalars or strings in number format 'fx_base'
-
-        frmt: string (optional)
-            any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
-            When `frmt` is unspecified, the instance parameter `self.q_dict['fx_base']`
-            is used.
+        y: scalar or string or array of scalars or strings in number format float or
+            `fb.fil[0]['fx_base']` ('dec', 'hex', 'bin' or 'csd')
 
         Returns
         -------
         Quantized floating point (`dtype=np.float64`) representation of input string
         of same shape as `y`.
         """
-
-        # ----------------------------------------------------------------------
-        if frmt is None:
-            if 'float' in fb.fil[0].lower():
-                frmt = fb.fil[0]['qfrmt']
-            else:
-                frmt = self.q_dict['fx_base']
-        frmt = frmt.lower()
 
         if y is None:
             return 0
@@ -857,19 +845,12 @@ class Fixed(object):
                 if np.all((y == "")):
                     return np.zeros_like(y)
         if isinstance(y, np.str_):
-            # logger.warning("Input format 'np.str_' not supported!\n\t{0}".format(y))
+            # Convert 'np.str_' to "regular" string
             y = str(y)
 
-        y_float = y_dec = None
+        y_float = None
 
-        if frmt == 'float32':
-            float_frmt = np.float32
-            # TODO: not implemented yet
-        elif frmt == 'float16':
-            # TODO: not implemented yet
-            float_frmt = np.float16
-
-        if 'float' in frmt:
+        if 'float' in fb.fil[0]['qfrmt']:
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -882,14 +863,14 @@ class Fixed(object):
                         f'\n\tCannot convert "{y}" of type "{type(y).__name__}" '
                         f'to float or complex, setting to zero.')
             return y_float
-
+        # Convert various fixpoint formats to float
         elif np.isscalar(y):
-            return self.frmt2float_scalar(y, frmt=frmt)
+            return self.frmt2float_scalar(y)
         else:
-            return self.frmt2float_vec(y, frmt=frmt)
+            return self.frmt2float_vec(y)
 
     # --------------------------------------------------------------------------
-    def frmt2float_scalar(self, y, frmt=None):
+    def frmt2float_scalar(self, y):
         """
         Convert the formats 'dec', 'bin', 'hex', 'csd' to float
 
@@ -899,6 +880,7 @@ class Fixed(object):
         error handling of individual routines,
         remove illegal characters and trailing zeros
         """
+        frmt = fb.fil[0]['fx_base']
         val_str = re.sub(self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0')
         if len(val_str) > 0:
             val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
@@ -1017,7 +999,7 @@ class Fixed(object):
         Returns
         -------
         A string, a float or an ndarray of float or string is returned in the
-        numeric format set in `self.q_dict['fx_base'])`. It has the same shape as `y`.
+        numeric format set in `fb.fil[0]['fx_base'])`. It has the same shape as `y`.
          For all formats except `float` a fixpoint representation with
          `self.q_dict['W']` binary digits is returned.
 
@@ -1044,44 +1026,42 @@ class Fixed(object):
         elif fb.fil[0]['qfrmt'] == 'float16':
             return np.float16(y)
 
-        elif self.q_dict['fx_base'] in {'hex', 'bin', 'dec', 'csd'}:
-            # return a quantized & saturated / wrapped fixpoint (type float) for y
-            y_fix = self.fixp(y, scaling='mult')
+        # return a quantized & saturated / wrapped fixpoint (type float) for y
+        y_fix = self.fixp(y, scaling='mult')
 
-            if self.q_dict['fx_base'] == 'dec':
-                if self.q_dict['WF'] == 0:
-                    y_str = np.int64(y_fix)  # get rid of trailing zero
-                    # y_str = np.char.mod('%d', y_fix)
-                    # elementwise conversion from integer (%d) to string
-                    # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
+        if fb.fil[0]['fx_base'] == 'dec':
+            if self.q_dict['WF'] == 0:
+                y_str = np.int64(y_fix)  # get rid of trailing zero
+                # y_str = np.char.mod('%d', y_fix)
+                # elementwise conversion from integer (%d) to string
+                # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
+            else:
+                # y_str = np.char.mod('%f',y_fix)
+                y_str = y_fix
+        elif fb.fil[0]['fx_base'] == 'csd':
+            y_str = dec2csd_vec(y_fix, self.q_dict['WF'])  # convert with WF fractional bits
+
+        elif fb.fil[0]['fx_base'] in {'bin', 'hex'}:
+            # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
+            y_fix_int = np.int64(np.round(y_fix / self.LSB))
+            # convert to (array of) string with 2's complement binary
+            y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
+
+            if fb.fil[0]['fx_base'] == 'hex':
+                y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])
+            else:  # fb.fil[0]['fx_base'] == 'bin':
+                # insert radix point if required
+                if self.q_dict['WF'] > 0:
+                    y_str = insert_binary_point(y_bin_str, self.q_dict['WI'])
                 else:
-                    # y_str = np.char.mod('%f',y_fix)
-                    y_str = y_fix
-            elif self.q_dict['fx_base'] == 'csd':
-                y_str = dec2csd_vec(y_fix, self.q_dict['WF'])  # convert with WF fractional bits
-
-            else:  # bin or hex
-                # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
-                y_fix_int = np.int64(np.round(y_fix / self.LSB))
-                # convert to (array of) string with 2's complement binary
-                y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
-
-                if self.q_dict['fx_base'] == 'hex':
-                    y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])
-
-                else:  # self.q_dict['fx_base']t == 'bin':
-                    # insert radix point if required
-                    if self.q_dict['WF'] > 0:
-                        y_str = insert_binary_point(y_bin_str, self.q_dict['WI'])
-                    else:
-                        y_str = y_bin_str
-
-            if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
-                y_str = y_str.item()  # convert singleton array to scalar
-
-            return y_str
+                    y_str = y_bin_str
         else:
-            raise Exception(f"""Unknown number format "{self.q_dict['fx_base']}"!""")
+            raise Exception(f"""Unknown number format "{fb.fil[0]['fx_base']}"!""")
+
+        if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
+            y_str = y_str.item()  # convert singleton array to scalar
+
+        return y_str
 
 ########################################
 
@@ -1111,8 +1091,8 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     """
     logger.debug("quant_coeffs")
     # always use decimal display format for coefficient quantization
-    disp_frmt_tmp = QObj.q_dict['fx_base']
-    QObj.q_dict['fx_base'] = 'dec'
+    disp_frmt_tmp = fb.fil[0]['fx_base']
+    fb.fil[0]['fx_base'] = 'dec'
     QObj.resetN()  # reset all overflow counters
 
     if coeffs is None:
@@ -1131,7 +1111,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
 
     # self.update_disp()  # update display of overflow counter and MSB / LSB
 
-    QObj.q_dict['fx_base'] = disp_frmt_tmp  # restore previous display setting
+    fb.fil[0]['fx_base'] = disp_frmt_tmp  # restore previous display setting
     return coeff_q
 
 
@@ -1144,7 +1124,7 @@ if __name__ == '__main__':
     """
     import pprint
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec'}
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
@@ -1156,7 +1136,7 @@ if __name__ == '__main__':
         print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
     print("\nTesting frmt2float()\n====================")
-    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec'}
+    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'}
     pprint.pprint(q_dict)
     myQ.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]

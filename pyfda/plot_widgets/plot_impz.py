@@ -616,7 +616,7 @@ class Plot_Impz(QWidget):
                 # setup and initialize input quantizer
                 self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
                 # always use integer decimal format for input quantizer
-                self.q_i.set_qdict({'fx_base': 'dec'})
+                # self.q_i.set_qdict({'fx_base': 'dec'})
 
                 # initialize FX filter and get a handle for `fxfilter()` function
                 self.emit({'fx_sim': 'init'})

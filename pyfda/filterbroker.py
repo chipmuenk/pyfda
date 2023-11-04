@@ -261,39 +261,33 @@ fil_ref = {
     #
     'sos': [],
     # global quantization format {'float', 'qint', 'qfrac'}
-    'qfrmt': 'float',  
+    'qfrmt': 'float',
+    # number format for fixpoint display {'dec', 'hex', 'bin', 'csd'}
+    'fx_base': 'dec',
     # Settings for fixpoint widgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #  Keys:
     #   'name': name of the fixpoint widget (for easier debugging)
     #   'WI': integer bits, 'WF': fractional bits, 'W': total word length,
-    #   'qfrmt': how to interprete fixpoint format: Integer, q31, normalized frac, ...
-    #   'qfrmt_last': previous 'qfrmt' setting
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour,
-    #   'fx_base': number format for fixpoint display
 
     # TODO: are W, fx_base, qfrmt_last, scale really needed here?
     'fxqc':{
         # Input quantization
         'QI': {'name': 'QI', 'WI': 0, 'WF': 15, 'W': 16,
-               'ovfl': 'sat', 'quant': 'round',
-               'fx_base': 'dec', 'N_over': 0},
+               'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
         # Output quantization
         'QO': {'name': 'QO', 'WI': 0, 'WF': 15, 'W': 16,
-               'ovfl': 'wrap', 'quant': 'floor',
-               'fx_base': 'dec', 'N_over': 0},
+               'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'b' coefficient quantization
         'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor',
-                'fx_base': 'dec', 'N_over': 0},
+                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'a' coefficient quantization
         'QCA': {'name': 'QCA', 'WI': 2, 'WF': 13, 'W': 16, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor',
-                'fx_base': 'dec', 'N_over': 0},
+                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # accumulator quantization
         'QACC': {'name': 'QACC', 'WI': 0, 'WF': 31, 'W': 32, 'w_a_m': 'a',
-                 'ovfl': 'wrap', 'quant': 'floor',
-                 'fx_base': 'dec', 'N_over': 0}
+                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0}
         },
         # 'b': [32768, 32768, 32768],
         # 'a': [65536, 6553, 0]

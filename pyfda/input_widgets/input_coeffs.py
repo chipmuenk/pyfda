@@ -157,7 +157,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
-        elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
+        elif fb.fil[0]['fx_base'] == 'dec':
             return "{0:>{1}}".format(text, self.QObj[0].places)
 
         else:
@@ -231,8 +231,7 @@ class ItemDelegate(QStyledItemDelegate):
                 return_type='auto')  # raw data without fixpoint formatting
             data_q = data  # TODO: complex data
         else:   # fixpoint format, transform to float
-            data = self.QObj[index.column()].frmt2float(
-                str(editor.text()), self.QObj[index.column()].q_dict['fx_base'])
+            data = self.QObj[index.column()].frmt2float(str(editor.text()))
             data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
@@ -445,7 +444,7 @@ class Input_Coeffs(QWidget):
                          ]
         # Fixpoint decimal format: Print coefficients in numeric format
         # with a defined number of places
-        elif fb.fil[0]['fxqc']['QCB']['fx_base'] == 'dec':
+        elif fb.fil[0]['fx_base'] == 'dec':
             self.ba_q = [
                 ["{0:>{1}}".format(x, self.QObj[0].places)
                     for x in self.QObj[0].float2frmt(self.ba[0])],
@@ -563,7 +562,7 @@ class Input_Coeffs(QWidget):
         i.e. requantize displayed values (not `self.ba`) and overflow counters.
 
         Refresh the table from it. Data is displayed via `ItemDelegate.displayText()` in
-        the number format set by `self.q_dict['fx_base']`.
+        the number format set by `fb.fil[0]['fx_base']`.
 
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
@@ -712,7 +711,6 @@ class Input_Coeffs(QWidget):
             logger.info(f"Data was not imported.")
             return
 
-        frmt = self.QObj[0].q_dict['fx_base']
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
@@ -735,10 +733,10 @@ class Input_Coeffs(QWidget):
             for c in range(num_cols):
                 if formatted_import:
                     self.ba[0].append(
-                        self.QObj[0].frmt2float(data_str[c][0], frmt))
+                        self.QObj[0].frmt2float(data_str[c][0]))
                     if num_rows > 1:
                         self.ba[1].append(
-                            self.QObj[1].frmt2float(data_str[c][1], frmt))
+                            self.QObj[1].frmt2float(data_str[c][1]))
                 else:
                     self.ba[0].append(data_str[c][0])
                     if num_rows > 1:
@@ -751,14 +749,14 @@ class Input_Coeffs(QWidget):
         else:
             if formatted_import:
                 self.ba[0] =\
-                    [self.QObj[0].frmt2float(s, frmt) for s in data_str[0]]
+                    [self.QObj[0].frmt2float(s) for s in data_str[0]]
             else:
                 self.ba[0] = data_str[0]
             # IIR
             if num_cols > 1:
                 if formatted_import:
                     self.ba[1] =\
-                        [self.QObj[1].frmt2float(s, frmt) for s in data_str[1]]
+                        [self.QObj[1].frmt2float(s) for s in data_str[1]]
                 else:
                     self.ba[1] = data_str[1]
                 self._filter_type(ftype='IIR')
@@ -830,19 +828,13 @@ class Input_Coeffs(QWidget):
     def fx_base2qdict(self):
         """
         Read out the UI settings of `self.ui.cmb_fx_base` (triggering this method)
-        which specifies the number base (dec, bin, ...)
-
-        The coefficient quantization settings are copied to the quantization dicts
-        fb.fil[0]['fxqc']['QCB']` and `...['QCA']` inside the quantization widget
-        instances of `FX_UI_WQ` every time something is updated there. This information
-        is also kept in the quantization objects `QObj` of the quantization widgets.
+        which specifies the fx number base (dec, bin, ...) for display
+        and store it in `fb.fil[0]['fx_base'].
 
         Refresh the table and update quantization widgets. Don't emit a signal
         because this only influences the view not the data itself.
         """
-        fx_frmt = qget_cmb_box(self.ui.cmb_fx_base).lower()
-        fb.fil[0]['fxqc']['QCB'].update({'fx_base': fx_frmt})
-        fb.fil[0]['fxqc']['QCA'].update({'fx_base': fx_frmt})
+        fb.fil[0]['fx_base'] = qget_cmb_box(self.ui.cmb_fx_base)
 
         # update quant. widgets and table with the new `fx_base` settings
         self.qdict2ui()

@@ -1397,14 +1397,14 @@ def export_coe_xilinx(f: TextIO) -> None:
         qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
-    if qc.q_dict['fx_base'] == 'hex':  # select hex format
+    if fb.fil[0]['fx_base'] == 'hex':  # select hex format
         coe_radix = 16
-    if qc.q_dict['fx_base'] == 'bin':  # select binary format
+    if fb.fil[0]['fx_base'] == 'bin':  # select binary format
         coe_radix = 2
     else:
-        logger.warning(f"Coefficients in {qc.q_dict['fx_base']} format are "
+        logger.warning(f"Coefficients in {fb.fil[0]['fx_base']} format are "
                        f'not supported in COE files, converting to decimal format.')
-        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
+        fb.fil[0]['fx_base'] =  'dec'  # select decimal format in all other cases
         coe_radix = 10
 
     # Quantize coefficients to decimal / hex integer format, returning an array of strings
@@ -1440,8 +1440,8 @@ def export_coe_microsemi(f: TextIO) -> None:
         qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
-    if qc.q_dict['fx_base'] != 'dec':
-        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
+    if fb.fil[0]['fx_base'] != 'dec':
+        fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
         logger.warning('Converting to decimal coefficient format, other numeric formats '
                        'are not supported by Microsemi tools.')
 
@@ -1471,20 +1471,20 @@ def export_coe_vhdl_package(f: TextIO) -> None:
 
     WO = fb.fil[0]['fxqc']['QO']['W']
 
-    if qc.q_dict['fx_base'] == 'dec' or 'float' in fb.fil[0]['qfrmt']:
+    if fb.fil[0]['fx_base'] == 'dec' or 'float' in fb.fil[0]['qfrmt']:
         pre = ""
         post = ""
-    elif qc.q_dict['fx_base'] == 'hex':
+    elif fb.fil[0]['fx_base'] == 'hex':
         pre = "#16#"
         post = "#"
-    elif qc.q_dict['fx_base'] == 'bin':
+    elif fb.fil[0]['fx_base'] == 'bin':
         pre = "#2#"
         post = "#"
     else:
-        qc.set_qdict({'fx_base': 'dec'})  # select decimal format in all other cases
+        fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
         pre = ""
         post = ""
-        logger.warning(f"Coefficients in {qc.q_dict['fx_base']} format are "
+        logger.warning(f"Coefficients in {fb.fil[0]['fx_base']} format are "
                        'not supported, converting to decimal format.')
 
     # Quantize coefficients to selected fixpoint format, returning an array of strings
