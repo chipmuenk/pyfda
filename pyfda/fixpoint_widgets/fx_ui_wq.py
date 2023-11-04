@@ -278,9 +278,6 @@ class FX_UI_WQ(QWidget):
         # initialize button icon
         self.butLock_clicked(self.butLock.isChecked())
 
-        # initialize overflow counter and MSB / LSB display
-        self.update_disp()
-
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
         # ----------------------------------------------------------------------
@@ -295,6 +292,11 @@ class FX_UI_WQ(QWidget):
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
         self.butLock.clicked.connect(self.butLock_clicked)
+
+        # initialize the UI from the quantization and the global dictionary
+        self.dict2ui()
+        # initialize overflow counter and MSB / LSB display
+        self.update_disp()
 
     # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
