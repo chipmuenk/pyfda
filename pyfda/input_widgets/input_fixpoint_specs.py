@@ -168,9 +168,8 @@ class Input_Fixpoint_Specs(QWidget):
         2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
-        logger.warning(
-            "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-        # logger.debug(f'SIG_RX():  "{first_item(dict_sig)}"')
+        # logger.warning(
+        #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
