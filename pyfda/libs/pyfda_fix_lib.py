@@ -15,6 +15,7 @@ import re
 import inspect
 import copy
 
+import pyfda.filterbroker as fb
 import numpy as np
 from numpy.lib.function_base import iterable
 try:
@@ -307,14 +308,12 @@ class Fixed(object):
     q_dict : dict
         define quantization options with the following keys
 
-    * **'WG'** : number of guard bits, default: 0
-
     * **'WI'** : number of integer bits, default: 0
 
     * **'WF'** : number of fractional bits; default: 15
 
-    * **'W'**  : total word length; W = WG + WI + WF + 1 (1 sign bit). When WI, WG and
-                  / or WF are missing, WG = 0, WI = W - 1 and WF = 0.
+    * **'W'**  : total word length; W = WI + WF + 1 (1 sign bit). When WI and
+                  / or WF are missing, WI = W - 1 and WF = 0.
 
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
                  to`WI` and `WF`. When both `Q` and `WI` / `WF`
@@ -346,12 +345,6 @@ class Fixed(object):
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
 
-    * **'qfrmt'** : Quantization format, optional; default = 'float'
-
-      - 'float'  : floating point (unquantized)
-      - 'qint'   : integer
-      - 'qfrac'  : general fixpoint format
-
     * **'scale'** : Float or a keyword, the factor between the fixpoint integer
             representation (FXP) and its "real world" floating point value (RWV).
             If ``scale`` is a float, this value is used, RWV = FXP / scale.
@@ -367,8 +360,8 @@ class Fixed(object):
     * **'ovfl'**  : str
         Overflow behaviour ('wrap', 'sat', ...)
 
-    The following key: value pairs are calculated from other parameters and
-    can / should be considered as read-only.
+    * **N_over** : integer
+        total number of overflows
 
     Attributes
     ----------
@@ -391,9 +384,6 @@ class Fixed(object):
 
     N : integer
         total number of simulation data points
-
-    N_over : integer
-        total number of overflows
 
     N_over_neg : integer
         number of negative overflows
@@ -418,8 +408,15 @@ class Fixed(object):
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
 
-
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
+
+    Also used are the global dict entries
+
+    **`fb.fil[0]['qfrmt']`** : Quantization format, default = 'float'
+
+      - 'float'  : floating point (unquantized)
+      - 'qint'   : integer
+      - 'qfrac'  : general fixpoint format
 
     Example
     -------
@@ -441,10 +438,10 @@ class Fixed(object):
         """
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
-            'name': 'unknown', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'm',
-            'quant': 'round', 'ovfl': 'sat', 'fx_base': 'dec', 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac',
+            'name': 'unknown', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'm',
+            'quant': 'round', 'ovfl': 'sat', 'fx_base': 'dec',
         # these keys are calculated and should be regarded as read-only
-            'scale': 1, 'N_over': 0, 'Q': '0.15'}
+            'N_over': 0, 'Q': '0.15'}
         # these keys are calculated and should be regarded as read-only
 
         self.LSB = 2. ** -self.q_dict_default['WF']
@@ -500,7 +497,7 @@ class Fixed(object):
         * Calculate number of places needed for printing from `qfrmt` / `fx_base` and `W`
 
         When `d` is empty, update the quantization dict from
-        its `WG`, `WF` and `WI` entries.
+        its `WF` and `WI` entries.
 
         Check the docstring of class `Fixed()` for details on quantization
         """
@@ -508,29 +505,23 @@ class Fixed(object):
 
         self.verify_q_dict_keys(q_d)  # check whether all keys are valid
 
-        # Transform `WG`, `WI`, `WF`, `W` and `Q` parameters into each other
+        # Transform `WI`, `WF`, `W` and `Q` parameters into each other
         if q_d == {}:
-            q_d['W'] = self.q_dict['WG'] + self.q_dict['WI'] + self.q_dict['WF'] + 1
-            q_d['Q'] = str(self.q_dict['WG'] + self.q_dict['WI']) + "."\
+            q_d['W'] = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            q_d['Q'] = str(self.q_dict['WI']) + "."\
                 + str(self.q_dict['WF'])
         elif 'WI' in q_d and 'WF' in q_d:
-            if 'WG' in q_d:
-                q_d['WG'] = abs(int(q_d['WG']))  # sanitize WG
-            else:
-                q_d['WG'] = 0
             q_d['WI'] = int(q_d['WI'])  # sanitize WI
             q_d['WF'] = abs(int(q_d['WF']))  # and WF
-            q_d['W'] = q_d['WG'] + q_d['WI'] + q_d['WF'] + 1
+            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
             q_d['Q'] = str(q_d['WI']) + "." + str(q_d['WF'])
         elif 'W' in q_d:
             q_d['W'] = int(q_d['W'])  # sanitize W
-            q_d['WG'] = 0
             q_d['WI'] = int(q_d['W']) - 1
             q_d['WF'] = 0
             q_d['Q'] = str(q_d['WI']) + ".0"
         elif 'Q' in q_d:
             Q_str = str(q_d['Q']).split('.', 1)  # split 'Q':'1.4'
-            q_d['WG'] = 0
             q_d['WI'] = int(Q_str[0])
             q_d['WF'] = abs(int(Q_str[1]))
             q_d['W'] = q_d['WI'] + q_d['WF'] + 1
@@ -538,8 +529,12 @@ class Fixed(object):
         self.q_dict.update(q_d)  # merge q_d into self.q_dict
 
         # Calculate min., max., LSB and MSB from word lengths
-        self.LSB = 2. ** -self.q_dict['WF']
-        self.MSB = 2. ** (self.q_dict['WG'] + self.q_dict['WI'] - 1)
+        if fb.fil[0]['qfrmt'] == 'qint':
+            self.LSB = 1
+            self.MSB = 2 ** (self.q_dict['WI'] + self.q_dict['WF']- 1)
+        else:
+            self.LSB = 2. ** -self.q_dict['WF']
+            self.MSB = 2. ** (self.q_dict['WI'] - 1)
 
         self.MAX =  2. * self.MSB - self.LSB
         self.MIN = -2. * self.MSB
@@ -559,7 +554,7 @@ class Fixed(object):
         elif self.q_dict['fx_base'] == 'hex':
             self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
             self.base = 16
-        elif self.q_dict['qfrmt'] == 'float':
+        elif fb.fil[0]['qfrmt'] == 'float':
             self.places = 4
             self.base = 0
         else:
@@ -584,9 +579,9 @@ class Fixed(object):
             Determine the scaling before and after quantizing / saturation
 
             *'mult'* float in, int out:
-                `y` is multiplied by `self.q_dict['scale'])` *before* quantizing / saturating
+                `y` is multiplied by `self.scale` *before* quantizing / saturating
             **'div'**: int in, float out:
-                `y` is divided by `scale` *after* quantizing / saturating.
+                `y` is divided by `self.scale` *after* quantizing / saturating.
             **'multdiv'**: float in, float out (default):
                 both of the above
 
@@ -627,6 +622,10 @@ class Fixed(object):
         # ======================================================================
         scaling = scaling.lower()
         # use values from dict for initialization
+        if fb.fil[0]['qfrmt'] == 'qint':
+            self.scale = 2. ** self.q_dict['WF']
+        else:
+            self.scale = 1
 
         if np.shape(y):
             # Input is an array:
@@ -636,7 +635,7 @@ class Fixed(object):
             y = np.asarray(y)  # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype=bool)
-            ovr_flag = np.zeros(y.shape, dtype=int)
+            # ovr_flag = np.zeros(y.shape, dtype=int)
 
             if np.issubdtype(y.dtype, np.number):  # numpy number type
                 self.N += y.size
@@ -678,7 +677,7 @@ class Fixed(object):
                         logger.error(f"'{y}' cannot be converted to a number.")
                         y = 0.0
             over_pos = over_neg = yq = 0
-            ovr_flag = 0
+            # ovr_flag = 0
             self.N += 1
 
         # convert pseudo-complex (imag = 0) and complex values to real
@@ -695,7 +694,7 @@ class Fixed(object):
         #       when `scaling=='mult'`or 'multdiv'
         # ======================================================================
         if scaling in {'mult', 'multdiv'}:
-            y = y * self.q_dict['scale']
+            y = y * self.scale  # self.q_dict['scale']
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -760,8 +759,6 @@ class Fixed(object):
             self.N_over_pos += np.sum(over_pos)
             self.N_over = self.N_over_neg + self.N_over_pos
 
-            self.q_dict.update({'N_over': self.N_over})
-
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
                 yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
@@ -775,6 +772,8 @@ class Fixed(object):
                 raise Exception(
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
 
+        self.q_dict.update({'N_over': self.N_over})
+
         # ======================================================================
         # (5) : OUTPUT SCALING
         #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
@@ -785,7 +784,7 @@ class Fixed(object):
         # ======================================================================
 
         if scaling in {'div', 'multdiv'}:
-            yq = yq / self.q_dict['scale']
+            yq = yq / self.scale  # self.q_dict['scale']
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
@@ -843,8 +842,8 @@ class Fixed(object):
 
         # ----------------------------------------------------------------------
         if frmt is None:
-            if 'float' in self.q_dict['qfrmt'].lower():
-                frmt = self.q_dict['qfrmt']
+            if 'float' in fb.fil[0].lower():
+                frmt = fb.fil[0]['qfrmt']
             else:
                 frmt = self.q_dict['fx_base']
         frmt = frmt.lower()
@@ -979,8 +978,6 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            # logger.debug(f"MSB={self.MSB} | LSB={self.LSB} | scale={self.q_dict['scale'])}")
-            # logger.debug(f"y_in={y} | y_dec={y_dec}")
         # ----
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
@@ -1007,7 +1004,7 @@ class Fixed(object):
         with numeric format `self.frmt` and `self.q_dict['W']` bits. The result has the
         same shape as `y`.
 
-        The float is multiplied by `self.q_dict['scale'])` and quantized / saturated
+        The float is multiplied by `self.scale` and quantized / saturated
         using `self.fixp()` for all formats before it is converted to different number
         formats.
 
@@ -1040,11 +1037,11 @@ class Fixed(object):
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         # ======================================================================
 
-        if self.q_dict['qfrmt'] == 'float':  # return float input value unchanged (no string)
+        if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
-        elif self.q_dict['qfrmt'] == 'float32':
+        elif fb.fil[0]['qfrmt'] == 'float32':
             return np.float32(y)
-        elif self.q_dict['qfrmt'] == 'float16':
+        elif fb.fil[0]['qfrmt'] == 'float16':
             return np.float16(y)
 
         elif self.q_dict['fx_base'] in {'hex', 'bin', 'dec', 'csd'}:
@@ -1123,8 +1120,8 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
     # quantize floating point coefficients with the selected scale (WI.WF),
     # next convert array float  -> array of fixp
     #                           -> list of int (scaled by 2^WF) when `to_int == True`
-    if QObj.q_dict['qfrmt'] == 'qint':
-        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
+#    if fb.fil[0]['qfrmt'] == 'qint':
+#        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
         # quantize coefficients except for first
         coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
@@ -1147,7 +1144,7 @@ if __name__ == '__main__':
     """
     import pprint
 
-    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 1}
+    q_dict = {'WI': 0, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec'}
     myQ = Fixed(q_dict)  # instantiate fixpoint object with settings above
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
 
@@ -1159,7 +1156,7 @@ if __name__ == '__main__':
         print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
     print("\nTesting frmt2float()\n====================")
-    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec', 'scale': 2}
+    q_dict = {'WI': 3, 'WF': 3, 'ovfl': 'sat', 'quant': 'round', 'fx_base': 'dec'}
     pprint.pprint(q_dict)
     myQ.set_qdict(q_dict)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]

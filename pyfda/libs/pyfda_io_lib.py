@@ -1392,7 +1392,7 @@ def export_coe_xilinx(f: TextIO) -> None:
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
     logger.debug("scale = {0}, WF = {1}".format(qc.q_dict['scale'], qc.q_dict['WF']))
 
-    if qc.q_dict['WF'] != 0 : # and qc.q_dict['qfrmt'] == 'qint':
+    if qc.q_dict['WF'] != 0 : # and fb.fil[0]['qfrmt'] == 'qint':
         # Set the fixpoint format to integer (WF=0) with the original wordlength
         qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
@@ -1464,14 +1464,14 @@ def export_coe_vhdl_package(f: TextIO) -> None:
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    if not qc.q_dict['qfrmt'] == 'float' and qc.q_dict['WF'] != 0:
+    if not fb.fil[0]['qfrmt'] == 'float' and qc.q_dict['WF'] != 0:
         # Set the fixpoint format to integer (WF=0) with the original wordlength
         qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
         logger.warning("Fractional formats are not supported, using integer format.")
 
     WO = fb.fil[0]['fxqc']['QO']['W']
 
-    if qc.q_dict['fx_base'] == 'dec' or 'float' in qc.q_dict['qfrmt']:
+    if qc.q_dict['fx_base'] == 'dec' or 'float' in fb.fil[0]['qfrmt']:
         pre = ""
         post = ""
     elif qc.q_dict['fx_base'] == 'hex':
@@ -1494,12 +1494,12 @@ def export_coe_vhdl_package(f: TextIO) -> None:
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
-    if qc.q_dict['qfrmt'] == 'float':
+    if fb.fil[0]['qfrmt'] == 'float':
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    if qc.q_dict['qfrmt'] == 'float':
+    if fb.fil[0]['qfrmt'] == 'float':
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "

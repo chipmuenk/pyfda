@@ -49,27 +49,20 @@ class Input_Coeffs_UI(QWidget):
             ('qfrac', "Fractional",
              "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
              "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
-            # ('qnfrac', "Norm. Frac.",
-            #  "<span>Normalized fractional format with <i>WF</i> + 1 bits "
-            #  "(range -1 ... +1 - 2<sup>WF</sup>).</span>"),
-            # ('q31', "Q31", "<span>Normalized fractional format with 32 bits "
-            #  "(31 fractional bits).</span>"),
-            # ('q15', "Q15", "<span>Normalized fractional format with 16 bits "
-            #  "(31 fractional bits).</span>")
             ]
-        self.cmb_q_frmt_default = "qfrac"
+        self.cmb_q_frmt_default = "float"
 
         self.cmb_fx_base_items = [
             "<span>Select the coefficient fixpoint display format.</span>",
-            ("float", "Float", "<span>Coefficients with full precision in floating "
-             "point format</span>"),
+            # ("float", "Float", "<span>Coefficients with full precision in floating "
+            # "point format</span>"),
             ("dec", "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
             ("hex", "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
             ("bin", "Bin", "<span>Fixpoint coefficients in binary format</span>"),
             ("csd", "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
              "(ternary logic) format</span>")
             ]
-        self.cmb_fx_base_default = "float"
+        self.cmb_fx_base_default = "dec"
 
         self._construct_UI()
 
@@ -112,6 +105,11 @@ class Input_Coeffs_UI(QWidget):
         # UI Elements for controlling the display
         # ---------------------------------------------
 
+        self.cmb_q_frmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
+                          self.cmb_q_frmt_default)
+        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
         self.cmb_fx_base = QComboBox(self)
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
                           self.cmb_fx_base_default)
@@ -133,11 +131,6 @@ class Input_Coeffs_UI(QWidget):
         self.lblDigits = QLabel("Digits", self)
         self.lblDigits.setFont(self.bifont)
 
-        self.cmb_q_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
-                          self.cmb_q_frmt_default)
-        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.but_quant = QPushButton(self)
         self.but_quant.setToolTip(
             "<span>Quantize selected coefficients / whole table with specified "
@@ -156,20 +149,21 @@ class Input_Coeffs_UI(QWidget):
         self.but_format.setIconSize(q_icon_size)
         self.but_format.setCheckable(True)
 
-        layH_q_frmt = QHBoxLayout()
-        layH_q_frmt.addWidget(self.cmb_q_frmt)
-        layH_q_frmt.addWidget(self.but_quant)
-        layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
-        self.frm_q_frmt = QFrame(self)
-        self.frm_q_frmt.setLayout(layH_q_frmt)
+        # layH_q_frmt = QHBoxLayout()
+        # layH_q_frmt.addWidget(self.cmb_q_frmt)
+        # layH_q_frmt.addWidget(self.but_quant)
+        # layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
+        # self.frm_q_frmt = QFrame(self)
+        # self.frm_q_frmt.setLayout(layH_q_frmt)
 
         layH_display = QHBoxLayout()
         layH_display.setContentsMargins(*params['wdg_margins'])
         layH_display.setAlignment(Qt.AlignLeft)
-        layH_display.addWidget(self.cmb_fx_base)
+        layH_display.addWidget(self.cmb_q_frmt)
         layH_display.addWidget(self.spnDigits)
         layH_display.addWidget(self.lblDigits)
-        layH_display.addWidget(self.frm_q_frmt)
+        layH_display.addWidget(self.cmb_fx_base)
+        layH_display.addWidget(self.but_quant)
         layH_display.addWidget(self.but_format)
         layH_display.addStretch()
 

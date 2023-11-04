@@ -260,12 +260,13 @@ fil_ref = {
             [0.3, 0]],
     #
     'sos': [],
+    # global quantization format {'float', 'qint', 'qfrac'}
+    'qfrmt': 'float',  
     # Settings for fixpoint widgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #  Keys:
     #   'name': name of the fixpoint widget (for easier debugging)
-    #   'WG': guard bits, 'WI': integer bits, 'WF': fractional bits, 'W': total word length,
-    #   'scale': how the fractional data is to be interpreted
+    #   'WI': integer bits, 'WF': fractional bits, 'W': total word length,
     #   'qfrmt': how to interprete fixpoint format: Integer, q31, normalized frac, ...
     #   'qfrmt_last': previous 'qfrmt' setting
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour,
@@ -274,24 +275,24 @@ fil_ref = {
     # TODO: are W, fx_base, qfrmt_last, scale really needed here?
     'fxqc':{
         # Input quantization
-        'QI': {'name': 'QI', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
-               'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac','ovfl': 'sat', 'quant': 'round',
+        'QI': {'name': 'QI', 'WI': 0, 'WF': 15, 'W': 16,
+               'ovfl': 'sat', 'quant': 'round',
                'fx_base': 'dec', 'N_over': 0},
         # Output quantization
-        'QO': {'name': 'QO', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1,
-               'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
+        'QO': {'name': 'QO', 'WI': 0, 'WF': 15, 'W': 16,
+               'ovfl': 'wrap', 'quant': 'floor',
                'fx_base': 'dec', 'N_over': 0},
         # 'b' coefficient quantization
-        'QCB': {'name': 'QCB', 'WG': 0, 'WI': 0, 'WF': 15, 'W': 16, 'scale': 1, 'w_a_m': 'a',
-                'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
+        'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'a',
+                'ovfl': 'wrap', 'quant': 'floor',
                 'fx_base': 'dec', 'N_over': 0},
         # 'a' coefficient quantization
-        'QCA': {'name': 'QCA', 'WG': 0, 'WI': 2, 'WF': 13, 'W': 16, 'scale': 1, 'w_a_m': 'a',
-                'qfrmt': 'float', 'qfrmt_last': 'float', 'ovfl': 'wrap', 'quant': 'floor',
+        'QCA': {'name': 'QCA', 'WI': 2, 'WF': 13, 'W': 16, 'w_a_m': 'a',
+                'ovfl': 'wrap', 'quant': 'floor',
                 'fx_base': 'dec', 'N_over': 0},
         # accumulator quantization
-        'QACC': {'name': 'QACC', 'WG': 0, 'WI': 0, 'WF': 31, 'W': 32, 'scale': 1, 'w_a_m': 'a',
-                 'qfrmt': 'qfrac', 'qfrmt_last': 'qfrac', 'ovfl': 'wrap', 'quant': 'floor',
+        'QACC': {'name': 'QACC', 'WI': 0, 'WF': 31, 'W': 32, 'w_a_m': 'a',
+                 'ovfl': 'wrap', 'quant': 'floor',
                  'fx_base': 'dec', 'N_over': 0}
         },
         # 'b': [32768, 32768, 32768],

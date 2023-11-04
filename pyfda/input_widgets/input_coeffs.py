@@ -153,7 +153,7 @@ class ItemDelegate(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
 
-        if fb.fil[0]['fxqc']['QCB']['qfrmt'] == 'float':
+        if fb.fil[0]['qfrmt'] == 'float':
             data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
@@ -194,7 +194,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
                                  return_type="auto"))
-        if self.QObj[index.column()].q_dict['qfrmt'] == 'float':
+        if fb.fil[0]['qfrmt'] == 'float':
             # floating point format: pass data with full resolution
             editor.setText(data_str)
         else:
@@ -225,7 +225,7 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.QObj[index.column()].q_dict['qfrmt'] == 'float':
+        if fb.fil[0]['qfrmt'] == 'float':
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
@@ -437,7 +437,7 @@ class Input_Coeffs(QWidget):
         # logger.error(f"a: {a[1].dtype}")
 
         # Float format: Set ba_q = ba, overflows are all = 0
-        if fb.fil[0]['fxqc']['QCB']['qfrmt'] == 'float':
+        if fb.fil[0]['qfrmt'] == 'float':
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
@@ -583,10 +583,11 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = (qget_cmb_box(self.ui.cmb_fx_base, data=False).lower() == 'float')
+        is_float = (qget_cmb_box(self.ui.cmb_q_frmt) == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
-        self.ui.frm_q_frmt.setVisible(not is_float)  # hide quantization widgets
+        self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
+        self.ui.but_quant.setVisible(not is_float)  # hide quantization button
 
         # hide all q-settings for float
         self.ui.wdg_wq_coeffs_b.setVisible(not is_float)
@@ -813,12 +814,13 @@ class Input_Coeffs(QWidget):
         Refresh the table and update quantization widgets, finally emit a signal
         `{'fx_sim': 'specs_changed'}`.
         """
-        fb.fil[0]['fxqc']['QCB'].update(
-            {#'qfrmt_last': fb.fil[0]['fxqc']['QCB']['qfrmt'],
-             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
-        fb.fil[0]['fxqc']['QCA'].update(
-            {#'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
-             'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        # fb.fil[0]['fxqc']['QCB'].update(
+        #     {
+        #      'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        # fb.fil[0]['fxqc']['QCA'].update(
+        #     {#'qfrmt_last': fb.fil[0]['fxqc']['QCA']['qfrmt'],
+        #      'qfrmt': qget_cmb_box(self.ui.cmb_q_frmt)})
+        fb.fil[0]['qfrmt'] = qget_cmb_box(self.ui.cmb_q_frmt)
 
         # update quant. widgets and table with the new `qfrmt` settings
         self.qdict2ui()
@@ -839,15 +841,8 @@ class Input_Coeffs(QWidget):
         because this only influences the view not the data itself.
         """
         fx_frmt = qget_cmb_box(self.ui.cmb_fx_base).lower()
-        q_frmt = qget_cmb_box(self.ui.cmb_q_frmt).lower()
-        if fx_frmt == 'float':
-            fb.fil[0]['fxqc']['QCB'].update({'qfrmt': 'float'})
-            fb.fil[0]['fxqc']['QCA'].update({'qfrmt': 'float'})
-        else:
-            fb.fil[0]['fxqc']['QCB'].update({'qfrmt': q_frmt})
-            fb.fil[0]['fxqc']['QCA'].update({'qfrmt': q_frmt})
-            fb.fil[0]['fxqc']['QCB'].update({'fx_base': fx_frmt})
-            fb.fil[0]['fxqc']['QCA'].update({'fx_base': fx_frmt})
+        fb.fil[0]['fxqc']['QCB'].update({'fx_base': fx_frmt})
+        fb.fil[0]['fxqc']['QCA'].update({'fx_base': fx_frmt})
 
         # update quant. widgets and table with the new `fx_base` settings
         self.qdict2ui()

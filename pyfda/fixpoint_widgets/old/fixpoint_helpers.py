@@ -126,8 +126,8 @@ class UI_W(QWidget):
         self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
         self.ledWI.setObjectName("WI")
 
-        lblDot = QLabel(dict_ui['lbl_sep'], self)
-        lblDot.setVisible(dict_ui['fractional'])
+        lbl_sep = QLabel(dict_ui['lbl_sep'], self)
+        lbl_sep.setVisible(dict_ui['fractional'])
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
@@ -142,7 +142,7 @@ class UI_W(QWidget):
         layH.addWidget(self.cmbW)
         layH.addWidget(self.butLock)
         layH.addWidget(self.ledWI)
-        layH.addWidget(lblDot)
+        layH.addWidget(lbl_sep)
         layH.addWidget(self.ledWF)
         layH.setContentsMargins(0, 0, 0, 0)
 
@@ -593,8 +593,8 @@ class UI_WQ(QWidget):
         self.ledWI.setFixedWidth(dict_ui['max_led_width'])  # width of lineedit in points
         self.ledWI.setObjectName("WI")
 
-        lblDot = QLabel(dict_ui['lbl_sep'], self)
-        lblDot.setVisible(dict_ui['fractional'])
+        lbl_sep = QLabel(dict_ui['lbl_sep'], self)
+        lbl_sep.setVisible(dict_ui['fractional'])
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
@@ -610,7 +610,7 @@ class UI_WQ(QWidget):
         lay_W.addWidget(self.cmbW)
         lay_W.addWidget(self.butLock)
         lay_W.addWidget(self.ledWI)
-        lay_W.addWidget(lblDot)
+        lay_W.addWidget(lbl_sep)
         lay_W.addWidget(self.ledWF)
         lay_W.setContentsMargins(0, 0, 0, 0)
 

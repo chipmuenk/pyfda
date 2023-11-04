@@ -12,6 +12,7 @@ Test suite for fir_df
 
 import unittest
 import numpy as np
+import pyfda.filterbroker as fb
 from pyfda.libs import pyfda_fix_lib as fx
 from pyfda.fixpoint_widgets.fir_df import FIR_DF_wdg
 
@@ -122,8 +123,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        q_dict = {'qfrmt': 'float'}
-        self.myQ.set_qdict(q_dict)
+        fb.fil[0]['qfrmt'] = 'float'
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
 
