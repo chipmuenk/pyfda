@@ -320,7 +320,7 @@ class FX_UI_WQ(QWidget):
         else:
             LSB = 2 ** -self.q_dict['WF']
             MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
-        if self.MSB_LSB_vis == 'off':
+        if self.MSB_LSB_vis == 'off' or fb.fil[0]['qfrmt'] == 'float':
             # Don't show any data
             self.lbl_MSB.setVisible(False)
             self.lbl_LSB.setVisible(False)
