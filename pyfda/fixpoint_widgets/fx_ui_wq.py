@@ -194,9 +194,6 @@ class FX_UI_WQ(QWidget):
         sp_retain.setRetainSizeWhenHidden(True)
         self.butLock.setSizePolicy(sp_retain)
 
-        self.lblPlus = QLabel(to_html("+", frmt='b'), self)
-        self.lblPlus.setVisible(False)
-
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
         self.ledWI.setMaxLength(dict_ui['WI_len'])  # maximum of 2 digits
@@ -229,7 +226,6 @@ class FX_UI_WQ(QWidget):
         self.lbl_LSB.setText("undefined")
 
         layH_W = QHBoxLayout()
-        layH_W.addWidget(self.lblPlus)
         layH_W.addWidget(self.ledWI)
         layH_W.addWidget(self.lbl_sep)
         layH_W.addWidget(self.ledWF)
@@ -482,7 +478,6 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(qfrmt != 'float')
         self.ledWF.setEnabled(qfrmt == 'qfrac' and self.q_dict['w_a_m'] == 'm')
 
-        self.lblPlus.setVisible(qfrmt == 'qint')
         self.lbl_sep.setVisible(qfrmt != 'qint')
 
         self.ledWF.setText(str(self.q_dict['WF']))
