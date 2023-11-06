@@ -312,36 +312,6 @@ class FX_UI_WQ(QWidget):
         """
         Update the overflow counter and MSB / LSB display (if visible)
         """
-        if fb.fil[0]['qfrmt'] == 'qint':
-            LSB = 1.
-            MSB = 2. ** (self.q_dict['WI'] + self.q_dict['WF'] - 1)
-        else:
-            LSB = 2 ** -self.q_dict['WF']
-            MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
-        if self.MSB_LSB_vis == 'off' or fb.fil[0]['qfrmt'] == 'float':
-            # Don't show any data
-            self.lbl_MSB.setVisible(False)
-            self.lbl_LSB.setVisible(False)
-        elif self.MSB_LSB_vis == 'max':
-            # Show MAX and LSB data
-            self.lbl_MSB.setVisible(True)
-            self.lbl_LSB.setVisible(True)
-            self.lbl_MSB.setText(
-                "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
-                f"{2. * MSB - LSB:.{params['FMT_ba']}g}")
-            self.lbl_LSB.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
-        elif self.MSB_LSB_vis == 'msb':
-            # Show MSB and LSB data
-            self.lbl_MSB.setVisible(True)
-            self.lbl_LSB.setVisible(True)
-            self.lbl_MSB.setText(
-                "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
-                f"{MSB:.{params['FMT_ba']}g}")
-            self.lbl_LSB.setText(
-                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
-        else:
-            logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
         # -------
         # frm = inspect.stack()[1]
         # logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
@@ -379,26 +349,40 @@ class FX_UI_WQ(QWidget):
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
-        WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'], return_type="int",
-                           sign='poszero'))
-        self.ledWI.setText(str(WI))
         WF = int(safe_eval(self.ledWF.text(), self.QObj.q_dict['WF'], return_type="int",
                            sign='poszero'))
         self.ledWF.setText(str(WF))
 
+        WI = int(safe_eval(self.ledWI.text(), self.QObj.q_dict['WI'] + WF + 1, return_type="int",
+                           sign='poszero'))
+        if fb.fil[0]['qfrmt'] == 'qint':
+            if WI <= WF:
+                logger.warning(f"Total word length has to be larger than Fractional scaling WF = {WF}!")
+                WI = self.QObj.q_dict['WI'] + WF + 1
+
+        self.ledWI.setText(str(WI))
+
+        # In 'qint' mode, the WI field shows the total word lenghth W. Nevertheless, the value
+        # for 'WI' is stored in the dicts.
+        if fb.fil[0]['qfrmt'] == 'qint':
+            WI = WI - WF - 1
+
         ovfl = qget_cmb_box(self.cmbOvfl)
         quant = qget_cmb_box(self.cmbQuant)
         w_a_m = qget_cmb_box(self.cmbW)
-        logger.error(w_a_m)
         if not w_a_m in {'m', 'a', 'f'}:
             logger.error(f"Unknown option '{w_a_m}' for cmbW combobox!")
 
         self.q_dict.update({'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
         self.QObj.set_qdict(self.q_dict)  # set quant. object, update derived quantities
                                           # like W and Q and reset counters
-        self.update_visibility()  # update visibility of WI and WF widgets, depending on 'qfrmt' and 'w_a_m'
+
+        self.update_WI_WF()
 
         if self.sender():
+            logger.error(f"sender = {self.sender().objectName()}")
+#             if self.sender().objectName() == 'cmbW':
+#                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
             dict_sig = {'wdg_name': self.wdg_name,
                         'ui_local_changed': self.sender().objectName()}
             self.emit(dict_sig)
@@ -448,12 +432,11 @@ class FX_UI_WQ(QWidget):
         if qfrmt not in {'float', 'qfrac', 'qint'}:
             logger.error(f"Unknown quantization format '{qfrmt}'")
 
-        self.update_visibility()  # set WI / WF widgets visibility
-
         WI = safe_eval(
             q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
-        self.ledWI.setText(str(WI))
         self.q_dict.update({'WI': WI})
+
+        self.ledWI.setText(str(WI))
 
         WF = safe_eval(
             q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
@@ -465,8 +448,10 @@ class FX_UI_WQ(QWidget):
 
         self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
 
+        self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m_
+
     # --------------------------------------------------------------------------
-    def update_visibility(self):
+    def update_WI_WF(self):
         """
         Update visibility / writability of integer and fractional part of the
         quantization format. depending on 'qfrmt' and 'w_a_m' settings
@@ -474,15 +459,67 @@ class FX_UI_WQ(QWidget):
         qfrmt = fb.fil[0]['qfrmt']
         logger.error(f"{self.q_dict['name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
         self.ledWI.setVisible(qfrmt != 'float')
-        self.ledWI.setEnabled(self.q_dict['w_a_m'] == 'm')
         self.ledWF.setVisible(qfrmt != 'float')
-        self.ledWF.setEnabled(qfrmt == 'qfrac' and self.q_dict['w_a_m'] == 'm')
 
-        self.lbl_sep.setVisible(qfrmt != 'qint')
+        if qfrmt == 'qint':
+            self.lbl_sep.setText(to_html(">", frmt='b'))
+            self.ledWF.setToolTip("Integer scaling")
+            self.ledWI.setText(str(self.q_dict['WI'] + self.q_dict['WF'] + 1))
+            self.ledWI.setToolTip("Total number of bits")
+
+            LSB = 1.
+            MSB = 2. ** (self.q_dict['WI'] + self.q_dict['WF'] - 1)
+        elif qfrmt == "qfrac":
+            self.lbl_sep.setText(to_html(".", frmt='b'))
+            self.ledWF.setToolTip("Number of fractional bits")
+            self.ledWI.setText(str(self.q_dict['WI']))
+            self.ledWI.setToolTip("Number of integer bits")
+
+            LSB = 2 ** -self.q_dict['WF']
+            MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
+        elif qfrmt == 'float':
+            self.lbl_sep.setText(to_html("---", frmt='b'))
+        else:
+            logger.error(f"Unknown quantization format '{qfrmt}'!")
 
         self.ledWF.setText(str(self.q_dict['WF']))
-        self.ledWI.setText(str(self.q_dict['WI']))
 
+
+        if self.MSB_LSB_vis == 'off' or fb.fil[0]['qfrmt'] == 'float':
+            # Don't show any data
+            self.lbl_MSB.setVisible(False)
+            self.lbl_LSB.setVisible(False)
+        elif self.MSB_LSB_vis == 'max':
+            # Show MAX and LSB data
+            self.lbl_MSB.setVisible(True)
+            self.lbl_LSB.setVisible(True)
+            self.lbl_MSB.setText(
+                "<b><i>&nbsp;&nbsp;Max</i><sub>10</sub> = </b>"
+                f"{2. * MSB - LSB:.{params['FMT_ba']}g}")
+            self.lbl_LSB.setText(
+                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
+        elif self.MSB_LSB_vis == 'msb':
+            # Show MSB and LSB data
+            self.lbl_MSB.setVisible(True)
+            self.lbl_LSB.setVisible(True)
+            self.lbl_MSB.setText(
+                "<b><i>&nbsp;&nbsp;MSB</i><sub>10</sub> = </b>"
+                f"{MSB:.{params['FMT_ba']}g}")
+            self.lbl_LSB.setText(
+                f"<b><i>LSB</i><sub>10</sub> = </b>{LSB:.{params['FMT_ba']}g}")
+        else:
+            logger.error(f"Unknown option MSB_LSB_vis = '{self.MSB_LSB_vis}'")
+
+        self.enable_subwidgets()
+
+    # --------------------------------------------------------------------------
+    def enable_subwidgets(self):
+        """
+        Enable integer and fractional part of the quantization format, depending on 'qfrmt'
+        and 'w_a_m' settings.
+        """
+        self.ledWI.setEnabled(self.q_dict['w_a_m'] == 'm')
+        self.ledWF.setEnabled(self.q_dict['w_a_m'] == 'm')
 # ==============================================================================
 if __name__ == '__main__':
     """ Run widget standalone with `python -m pyfda.fixpoint_widgets.fx_ui_wq` """
