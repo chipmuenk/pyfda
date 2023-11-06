@@ -241,10 +241,12 @@ class Input_Fixpoint_Specs(QWidget):
             elif dict_sig['fx_sim'] == 'finish':
                 # update I/O widgets and dynamically instantiated filter widget with
                 # number of overflows etc.
-                self.wdg_wq_input.update_disp()
-                self.wdg_wq_output.update_disp()
-                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update'):
-                    self.fx_filt_ui.update_disp()
+                self.wdg_wq_input.update_ovfl_cnt()
+                self.wdg_wq_output.update_ovfl_cnt()
+                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update_ovfl_cnt_all'):
+                    self.fx_filt_ui.update_ovfl_cnt_all()
+                else:
+                    logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
             # somewhere else, update UI and set run button to "changed" in wdg_dict2ui()

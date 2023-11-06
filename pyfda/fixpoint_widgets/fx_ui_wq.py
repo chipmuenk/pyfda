@@ -296,7 +296,7 @@ class FX_UI_WQ(QWidget):
         # initialize the UI from the quantization and the global dictionary
         self.dict2ui()
         # initialize overflow counter and MSB / LSB display
-        self.update_disp()
+        self.update_ovfl_cnt()
 
     # --------------------------------------------------------------------------
     def butLock_clicked(self, clicked):
@@ -312,7 +312,7 @@ class FX_UI_WQ(QWidget):
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
-    def update_disp(self):
+    def update_ovfl_cnt(self):
         """
         Update the overflow counter and MSB / LSB display (if visible)
         """
