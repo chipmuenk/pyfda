@@ -51,10 +51,6 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
         self.myQ.set_qdict(q_dict)
         # self.assertEqual(q_dict, self.myQ.q_obj)
-        # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
-        q_dict2 = {'Q': '6.2'}
-        self.myQ.set_qdict(q_dict2)
-        # self.assertEqual(q_dict2, self.myQ.q_obj)
 
         self.myQ.set_qdict({'W': 13})
         self.assertEqual(12, self.myQ.WI)
@@ -279,7 +275,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # Fractional case: Q0.6,
-        self.myQ.set_qdict({'Q':'0.6', 'scale':1./64})
+        self.myQ.set_qdict({'WI': 0, 'WF': 6})
         yq_list = list(map(self.myQ.float2frmt, y_list))
         yq_list_goal = ['1.00', '1.04', '1.84', '1.FC', '0.00', '0.04', '0.7C', '0.80', '0.FC']
         self.assertEqual(yq_list, yq_list_goal)
@@ -327,7 +323,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # Fractional case: Q0.6, scalar, test float2frmt
-        self.myQ.set_qdict({'Q':'0.6', 'scale':1./64})
+        self.myQ.set_qdict({'WI': 0, 'WF': 6})
         yq_list = list(map(self.myQ.float2frmt, y_list))
         yq_list_goal = ['-.000000',  '-.00000+', '-.0+0+0+', '0.00000-', '0', '0.00000+', '+.0-0-0-', '+.0-0-0-', '+.00000-']
 # TODO: 3rd argument should be: '-.0000+', 7th argument should be '+.0000-', 8th argument should be '+.00000'

@@ -52,15 +52,10 @@ class TestSequenceFunctions(unittest.TestCase):
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
         self.myQ.set_qdict(q_dict)
         # self.assertEqual(q_dict, self.myQ.q_obj)
-        # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
-        q_dict2 = {'Q': '6.2'}
-        self.myQ.set_qdict(q_dict2)
-        # self.assertEqual(q_dict2, self.myQ.q_obj)
 
         self.myQ.set_qdict({'W': 13})
         self.assertEqual(12, self.myQ.q_dict['WI'])
         self.assertEqual(0, self.myQ.q_dict['WF'])
-        self.assertEqual('12.0', self.myQ.q_dict['Q'])
 
     def test_fix_no_ovfl(self):
         """
