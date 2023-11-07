@@ -240,16 +240,22 @@ if __name__ == '__main__':
     Run widget standalone with
     `python -m pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp`
     """
-
-    p = {'b': [-0.2, 0.2, 0], 'QACC': {'Q': '3.6', 'ovfl': 'wrap', 'quant': 'round'},
-         'a': [1, 0, -0.81],
-         'QI': {'Q': '1.3', 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'Q': '3.3', 'ovfl': 'sat', 'quant': 'round'}
+    p = {'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
+                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
+        'QCA': {'WI': 1, 'WF': 5, 'w_a_m': 'a',
+                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
+         'QACC': {'WI': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
+         'QO': {'WI': 5, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
+
     dut = IIR_DF1_pyfixp(p)
+    print("Filter fixpoint response and state variables for input =")
+    print("x = (1, 0, 0, 0, 0)")
     x = np.zeros(5)
     x[0] = 1
     y = dut.fxfilter(x=x)
     print(y)
+    print("\nfollowed by x = np.zeros(5):")
     y = dut.fxfilter(x=np.zeros(5))
     print(y)
