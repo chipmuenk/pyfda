@@ -314,10 +314,6 @@ class Fixed(object):
     * **'W'**  : total word length; W = WI + WF + 1 (1 sign bit). When WI and
                   / or WF are missing, WI = W - 1 and WF = 0.
 
-    * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
-                 to`WI` and `WF`. When both `Q` and `WI` / `WF`
-                 are given, `Q` is ignored
-
     * **'quant'** : Quantization method, optional; default = 'floor'
 
       - 'floor': (default) largest integer `I` such that :math:`I \\le x`
@@ -407,6 +403,9 @@ class Fixed(object):
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
 
+    Q : str
+        Quantization format as string, e.g. '0.15'
+
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
 
     Also used are the global dict entries
@@ -422,10 +421,12 @@ class Fixed(object):
     class `Fixed()` can be used like Matlabs quantizer object / function from the
     fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
 
-    >>> q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
+    MATLAB:
+    >>> q_dsp = quantizer('fixed', 'round', [16 15], 'wrap');
     >>> yq = quantize(q_dsp, y)
 
-    >>> q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
+    PYTHON
+    >>> q_dsp = {'WI':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
 
@@ -477,13 +478,12 @@ class Fixed(object):
 
     def verify_q_dict_keys(self, q_dict: dict) -> None:
         """
-        Check against the merged `self.q_dict_default` and `self.q_dict_default_ro`
-        dictionaries whether all keys in the passed `q_dict` dictionary are valid.
+        Check against `self.q_dict_default` dictionary
+        whether all keys in the passed `q_dict` dictionary are valid.
 
-        Unknown keys throw an error message
+        Unknown keys throw an error message.
         """
         for k in q_dict.keys():
-            #if k not in {**self.q_dict_default, **self.q_dict_default_ro}.keys():
             if k not in self.q_dict_default:
                 logger.error(u'Unknown Key "{0:s}"!'.format(k))
 
