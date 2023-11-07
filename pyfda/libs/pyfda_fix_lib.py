@@ -298,8 +298,7 @@ class Fixed(object):
 
     Define a dictionary with the format options and pass it to the constructor:
 
-    >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} # or
-    >>> q_dict = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
+    >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'}
     >>> myQ = Fixed(q_dict)
 
 

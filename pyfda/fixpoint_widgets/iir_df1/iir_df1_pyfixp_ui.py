@@ -233,7 +233,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         """
         WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
         fb.fil[0]['fxqc']['QCA']['WI'] = WI_A
-        # update quantization settings ('W', 'Q', ...) and UI
+        # update quantization settings and UI
         self.wdg_wq_coeffs_a.QObj.set_qdict({})  # update `self.wdg_wq_coeffs_a.q_dict`
         self.wdg_wq_coeffs_a.dict2ui()
 
@@ -265,7 +265,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 fb.fil[0]['fxqc']['QI']['WI'] + fb.fil[0]['fxqc']['QCB']['WI'],
                 fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QCA']['WI'])
 
-        # update quantization settings like 'Q', 'W' etc. and UI
+        # update quantization settings and UI
         self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
         self.wdg_wq_accu.dict2ui()
 

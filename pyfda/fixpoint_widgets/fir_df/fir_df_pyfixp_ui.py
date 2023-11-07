@@ -192,9 +192,9 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # update quantization settings like 'Q', 'W' etc. and UI
+        # update quantization settings and UI
         self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
-        self.wdg_wq_accu.dict2ui()
+        self.wdg_wq_accu.dict2ui()  # update UI
 
     # --------------------------------------------------------------------------
     def dict2ui(self):
