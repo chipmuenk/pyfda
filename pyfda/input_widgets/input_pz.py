@@ -525,7 +525,7 @@ class Input_PZ(QWidget):
         Clear & initialize table and zpk for two poles and zeros @ origin,
         P = Z = [0; 0], k = 1
         """
-        self.zpk = np.array([[0, 0], [0, 0], [1, 0]])
+        self.zpk = np.array([[0, 0], [0, 0], [1, 0]], dtype=complex)
         self.Hmax_last = 1.0
 
         qstyle_widget(self.ui.butSave, 'changed')
@@ -745,7 +745,7 @@ class Input_PZ(QWidget):
             logger.error("Unknown format {0}.".format(frmt))
 
     # ------------------------------------------------------------------------------
-    def frmt2cmplx(self, string, default=0.):
+    def frmt2cmplx(self, string: str, default: float = 0.) -> complex:
         """
         Convert string to real or complex, try to find out the format (cartesian,
         polar with various angle formats)
