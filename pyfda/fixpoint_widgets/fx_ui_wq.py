@@ -457,7 +457,7 @@ class FX_UI_WQ(QWidget):
         quantization format. depending on 'qfrmt' and 'w_a_m' settings
         """
         qfrmt = fb.fil[0]['qfrmt']
-        logger.error(f"{self.q_dict['name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
+        ## logger.error(f"{self.q_dict['name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
         self.ledWI.setVisible(qfrmt != 'float')
         self.ledWF.setVisible(qfrmt != 'float')
 
