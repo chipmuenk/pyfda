@@ -91,6 +91,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         logger.warning(
             f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
+
         if dict_sig['id'] == id(self):
             logger.warning(
                 f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -168,15 +169,21 @@ class Input_Fixpoint_Specs(QWidget):
         2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
 
-        # logger.warning(
-        #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning(
+            "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
-            # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
+        # have fixpoint specs been changed previously when widget was invisible?
+        if self.fx_specs_changed:
+            # update wordlengths in UI and set RUN button to 'changed':
+            self.wdg_dict2ui()
+            self.fx_specs_changed = False  # reset flag
+
         #  =================== UI_CHANGED =======================================
-        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+        if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                 in {'resized', 'tab'} and self.isVisible():
             # Widget size has changed / "Fixpoint" tab has been selected -> resize image
             self.resize_img()
@@ -203,7 +210,6 @@ class Input_Fixpoint_Specs(QWidget):
 
         # =================== FX SIM ============================================
         elif 'fx_sim' in dict_sig:
-
             # --------------- init -------------------
             if dict_sig['fx_sim'] == 'init':
                 # fixpoint simulation has been started externally, e.g. by
@@ -252,16 +258,12 @@ class Input_Fixpoint_Specs(QWidget):
             # somewhere else, update UI and set run button to "changed" in wdg_dict2ui()
 
             # --------------- fx specs_changed ------------
-            elif self.fx_specs_changed or\
-                    (dict_sig['fx_sim'] == 'specs_changed' and self.isVisible()):
+            elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
                 # update wordlengths in UI and set RUN button to 'changed':
                 self.wdg_dict2ui()
                 self.fx_specs_changed = False
-                # self.emit(dict_sig)  # TODO: ???
-                return
             elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                 self.fx_specs_changed = True
-
             else:
                 logger.error('Unknown "fx_sim" command option "{0}"\n'
                              '\treceived from "{1}".'
