@@ -200,11 +200,9 @@ class FIR_DF_nmigen_UI(QWidget):
             fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # calculate total accumulator word length and 'Q' format
+        # calculate total accumulator word length
         fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
             + fb.fil[0]['fxqc']['QA']['WF'] + 1
-        fb.fil[0]['fxqc']['QA']['Q'] = str(fb.fil[0]['fxqc']['QA']['WI'])\
-            + '.' + str(fb.fil[0]['fxqc']['QA']['WF'])
 
         # update quantization settings
         fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)

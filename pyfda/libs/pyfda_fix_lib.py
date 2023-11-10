@@ -507,23 +507,14 @@ class Fixed(object):
         # Transform `WI`, `WF`, `W` and `Q` parameters into each other
         if q_d == {}:
             q_d['W'] = self.q_dict['WI'] + self.q_dict['WF'] + 1
-            q_d['Q'] = str(self.q_dict['WI']) + "."\
-                + str(self.q_dict['WF'])
         elif 'WI' in q_d and 'WF' in q_d:
             q_d['WI'] = int(q_d['WI'])  # sanitize WI
             q_d['WF'] = abs(int(q_d['WF']))  # and WF
             q_d['W'] = q_d['WI'] + q_d['WF'] + 1
-            q_d['Q'] = str(q_d['WI']) + "." + str(q_d['WF'])
         elif 'W' in q_d:
             q_d['W'] = int(q_d['W'])  # sanitize W
             q_d['WI'] = int(q_d['W']) - 1
             q_d['WF'] = 0
-            q_d['Q'] = str(q_d['WI']) + ".0"
-        elif 'Q' in q_d:
-            Q_str = str(q_d['Q']).split('.', 1)  # split 'Q':'1.4'
-            q_d['WI'] = int(Q_str[0])
-            q_d['WF'] = abs(int(Q_str[1]))
-            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
 
         self.q_dict.update(q_d)  # merge q_d into self.q_dict
 
