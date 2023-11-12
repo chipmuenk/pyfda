@@ -1384,18 +1384,18 @@ def coe_header(title: str) -> str:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_xilinx(f: TextIO) -> None:
+def export_coe_xilinx(f: TextIO) -> bool:
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
+
+    Returns error status (False if the file was saved successfully)
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    logger.debug("scale = {0}, WF = {1}".format(qc.q_dict['scale'], qc.q_dict['WF']))
 
-    if qc.q_dict['WF'] != 0 : # and fb.fil[0]['qfrmt'] == 'qint':
-        # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
-        logger.warning("Fractional formats are not supported, using integer format.")
+    if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
+        logger.error("Fractional formats are not supported!")
+        return True
 
     if fb.fil[0]['fx_base'] == 'hex':  # select hex format
         coe_radix = 16
@@ -1426,7 +1426,7 @@ def export_coe_xilinx(f: TextIO) -> None:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_microsemi(f: TextIO) -> None:
+def export_coe_microsemi(f: TextIO) -> bool:
     """
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
@@ -1435,10 +1435,9 @@ def export_coe_microsemi(f: TextIO) -> None:
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
 
-    if qc.q_dict['WF'] != 0:
-        # Set the fixpoint format to integer (WF=0) with the original wordlength:
-        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
-        logger.warning("Fractional formats are not supported, using integer format.")
+    if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
+        logger.error("Fractional formats are not supported!")
+        return True
 
     if fb.fil[0]['fx_base'] != 'dec':
         fb.fil[0]['fx_base'] = 'dec'  # select decimal format in all other cases
@@ -1458,18 +1457,20 @@ def export_coe_microsemi(f: TextIO) -> None:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_vhdl_package(f: TextIO) -> None:
+def export_coe_vhdl_package(f: TextIO) -> bool:
     """
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    if not fb.fil[0]['qfrmt'] == 'float' and qc.q_dict['WF'] != 0:
-        # Set the fixpoint format to integer (WF=0) with the original wordlength
-        qc.set_qdict({'scale': 1 << qc.q_dict['W']-1})
-        logger.warning("Fractional formats are not supported, using integer format.")
+    if fb.fil[0]['qfrmt'] == 'float' or fb.fil[0]['qfrmt'] == 'qint'\
+        or fb.fil[0]['qfrmt'] == 'qint'and qc.q_dict['WF'] == 0:
+            pass
+    else:
+        logger.error("Fractional numbers are only supported f9r floats!")
+        return True
 
-    WO = fb.fil[0]['fxqc']['QO']['W']
+    WO = fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QO']['WF'] + 1
 
     if fb.fil[0]['fx_base'] == 'dec' or 'float' in fb.fil[0]['qfrmt']:
         pre = ""
@@ -1503,7 +1504,7 @@ def export_coe_vhdl_package(f: TextIO) -> None:
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "
-        exp_str += "range {0} to {1};\n\n".format(-1 << WO-1, (1 << WO-1) - 1)
+        exp_str += f"range {-1 << WO-1} to {(1 << WO-1) - 1};\n\n"
     exp_str += "constant coeff : coeff_type := "
 
     coeff_str = "(\n"
