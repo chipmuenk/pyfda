@@ -14,6 +14,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 from pyfda.libs import pyfda_fix_lib as fx
+import pyfda.filterbroker as fb
 try:
     from nmigen import Cat, If, Replicate, Signal, Module, run_simulation
     from pyfda.fixpoint_widgets.fixpoint_helpers import requant
@@ -32,8 +33,9 @@ class TestSequenceFunctions(unittest.TestCase):
 
         self.stim = np.array([0,1,15,64,32767,-1,-64,0]) # last zero isn't tested due to latency of 1
 
+        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'dec'})
         # initialize a pyfda fixpoint quantizer
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'fx_base': 'dec', 'scale': 1}
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round'}
         self.myQ = fx.Fixed(q_obj) # instantiate fixpoint object with settings above
 
 
@@ -80,27 +82,27 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
-
-        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'fx_base': 'hex', 'scale': 17}
+        fb.fil[0].update('qfrmt': 'qfrac', 'fx_base': 'hex')
+        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.myQ.set_qdict(q_obj)
 
     #==========================================================================
     # Test requant routine, this needs a migen class (DUT)
     #--------------------------------------------------------------------------
-    # - The input to the run_sim method needs to be an iterable of integers, 
+    # - The input to the run_sim method needs to be an iterable of integers,
     #    the output is a list of integers
-    # - migen moduls only use integer arithmetics, fractional arithmetics is 
+    # - migen moduls only use integer arithmetics, fractional arithmetics is
     #    only provided by the requant method. It accepts quantization dicts in
     #    the same format as the pyfda quantization library
     # - Due to latency of one, strip last element of input and first of output
-    # 
+    #
 
     # np.testing.assert_array_equal(yq_list, yq_list_goal) # compare arrays or lists
     # assert_array_almost_equal
 
     def test_fix_id(self):
         """
-        test identity of input integer list and output list, passed thru migen 
+        test identity of input integer list and output list, passed thru migen
         instance
         """
         response = self.run_sim(self.stim[:])
@@ -108,7 +110,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_fix_round_wi(self):
         """
-        Test rescaling for fixpoint integer representation when integer word 
+        Test rescaling for fixpoint integer representation when integer word
         is shortened by 3 bits.
         """
         # Input quantization format, range: -512 ... 511:
@@ -118,7 +120,7 @@ class TestSequenceFunctions(unittest.TestCase):
         targ_out = np.array([0,1,15,-64,-1,-1,-64,0])
 
         q_out_pyfda = q_out.copy()
-        self.myQ.set_qdict(q_out_pyfda)      
+        self.myQ.set_qdict(q_out_pyfda)
 
         self.dut = DUT(q_in, q_out) # pass quantization dicts
         response = self.run_sim(self.stim)
@@ -140,15 +142,15 @@ class TestSequenceFunctions(unittest.TestCase):
         q_out_pyfda = q_out.copy()
         q_out_pyfda.update({'WI':6, 'WF':0, 'W':7}) # use integer representation
         self.myQ.set_qdict(q_out_pyfda)
-      
+
         self.dut = DUT(q_in, q_out)
         response = self.run_sim(self.stim)
-        
+
         # Throwing away 3 LSBs reduces fixpoint value by a factor of 8
         assert_array_equal(self.myQ.fixp(self.stim/8)[:-1],response[1:])
         # compare target list to migen fixpoint quantization:
         assert_array_equal(targ_out[:-1], response[1:])
-        
+
 
 ###############################################################################
 # migen class for testing requant operation

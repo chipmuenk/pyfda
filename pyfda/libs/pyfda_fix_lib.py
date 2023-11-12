@@ -340,15 +340,6 @@ class Fixed(object):
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
 
-    * **'scale'** : Float or a keyword, the factor between the fixpoint integer
-            representation (FXP) and its "real world" floating point value (RWV).
-            If ``scale`` is a float, this value is used, RWV = FXP / scale.
-            By default, scale = 1 << WI.
-
-            Examples:
-                WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
-                WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
-
     * **quant** : str
         Quantization behaviour ('floor', 'round', ...)
 
@@ -402,6 +393,16 @@ class Fixed(object):
         For binary formats, this is the same as the wordlength. Calculated
         from the numeric base 'self.base' (not used outside this class) and
         the total word length 'W'.
+
+
+    scale : float or a keyword, the factor between the fixpoint integer
+            representation (FXP) and its "real world" floating point value (RWV).
+            If ``scale`` is a float, this value is used, RWV = FXP / scale.
+            By default, scale = 1 << WI.
+
+            Examples:
+                WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
+                WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
 
     Q : str
         Quantization format as string, e.g. '0.15'
@@ -684,7 +685,7 @@ class Fixed(object):
         #       when `scaling=='mult'`or 'multdiv'
         # ======================================================================
         if scaling in {'mult', 'multdiv'}:
-            y = y * self.scale  # self.q_dict['scale']
+            y = y * self.scale
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -774,7 +775,7 @@ class Fixed(object):
         # ======================================================================
 
         if scaling in {'div', 'multdiv'}:
-            yq = yq / self.scale  # self.q_dict['scale']
+            yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
@@ -1089,7 +1090,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
         logger.error("Coeffs empty!")
     # quantize floating point coefficients with the selected scale (WI.WF),
     # next convert array float  -> array of fixp
-    #                           -> list of int (scaled by 2^WF) when `to_int == True`
+    #                           -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
 #    if fb.fil[0]['qfrmt'] == 'qint':
 #        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
