@@ -14,14 +14,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
-if cmp_version("nmigen", "0.2") >= 0:
-    from nmigen import Signal, signed, Cat, Module, Repl
+if cmp_version("nmigen", "0.3") >= 0:
+    from amaranth import Signal, signed, Cat, Module, Repl
 
     def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         """
-        Change word length of input signal `sig_i` to `WO` bits, using the
-        quantization and saturation methods specified by ``QO['quant']`` and
-        ``QO['ovfl']``.
+        Change word length of input signal `sig_i` to the wordlength of the output
+        signal, using the quantization and saturation methods specified by
+        ``QO['quant']`` and ``QO['ovfl']``.
 
         Parameters
         ----------
@@ -46,7 +46,7 @@ if cmp_version("nmigen", "0.2") >= 0:
         Returns
         -------
 
-        sig_o: Signal (nmigen)
+        sig_o: Signal (amaranth)
             Requantized signal
 
         Documentation
@@ -62,9 +62,9 @@ if cmp_version("nmigen", "0.2") >= 0:
 
         S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
         0 |  1  |  0  *  1  |  0  |  1  |  1   =  43 (dec) or 43/16 = 2 + 11/16 (float)
-                        *
+                      *
                 |  S  * WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
-                    0  *  1  |  0  |  1         =  7 (dec) or 7/8 (float)
+                   0  *  1  |  0  |  1         =  7 (dec) or 7/8 (float)
 
 
         The float or "real (world) value" is calculated by multiplying the integer
@@ -78,20 +78,20 @@ if cmp_version("nmigen", "0.2") >= 0:
         ---------------
 
         - For reducing the number of fractional bits by `dWF`, simply right-shift the
-        integer number by `dWF`. For rounding, add '1' to the bit below the truncation
-        point before right-shifting.
+          integer number by `dWF`. For rounding, add '1' to the bit below the truncation
+          point before right-shifting.
 
         - Extend the number of fractional bits by left-shifting the integer by `dWF`,
-        LSB's are filled with zeros.
+          LSB's are filled with zeros.
 
         Integer Bits
         ------------
 
         - For reducing the number of integer bits by `dWI`, simply right-shift the
-        integer by `dWI`.
+          integer by `dWI`.
 
         - The number of fractional bits is SIGN-EXTENDED by filling up the left-most
-        bits with the sign bit.
+          bits with the sign bit.
 
         """
         WI_I = QI['WI']         # number of integer bits (input signal)
@@ -160,7 +160,7 @@ if cmp_version("nmigen", "0.2") >= 0:
 
         return sig_o
 else:
-    logger.error('Module "nmigen" not found!')
+    logger.error('Module "amaranth" not found!')
 
 # ==============================================================================
 if __name__ == '__main__':
