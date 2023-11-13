@@ -849,7 +849,7 @@ class Fixed(object):
             return self.frmt2float_vec(y)
 
     # --------------------------------------------------------------------------
-    def frmt2float_scalar(self, y):
+    def frmt2float_scalar(self, y) -> float:
         """
         Convert the formats 'dec', 'bin', 'hex', 'csd' to float
 
@@ -899,6 +899,10 @@ class Fixed(object):
             # - Transform numbers in negative 2's complement to negative floats.
             # - Calculate the fixpoint representation for correct saturation /
             #   quantization
+            if fb.fil[0]['qfrmt'] == 'qint':
+                W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            else:
+                W = self.q_dict['WI'] + 1
             neg_sign = False
             try:
                 if raw_str[0] == '-':
@@ -917,12 +921,12 @@ class Fixed(object):
 
                 int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # When number is outside fixpoint range, discard MSBs:
-                if int_bits > self.q_dict['WI'] + 1:
+                if int_bits > W:
                     # convert hex numbers to binary string for discarding bits bit-wise
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
                     # discard the upper bits outside the valid range
-                    raw_str = raw_str[int_bits - self.q_dict['WI'] - 1:]
+                    raw_str = raw_str[int_bits - W:]
 
                     # recalculate y_dec for truncated string
                     y_dec = int(raw_str, 2) / base**frc_places
@@ -932,9 +936,9 @@ class Fixed(object):
 
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # now, y_dec is in the correct range:
-                if int_bits <= self.q_dict['WI']:  # positive number
+                if int_bits <= W - 1:  # positive number
                     pass
-                elif int_bits == self.q_dict['WI'] + 1:
+                elif int_bits == W:
                     # negative, calculate 2's complement
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
