@@ -523,8 +523,6 @@ class Fixed(object):
 
         # Calculate required number of places for different bases from total
         # number of bits:
-
-        # total number of bits
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
         if fb.fil[0]['fx_base'] == 'dec':
@@ -1039,14 +1037,18 @@ class Fixed(object):
             # convert to (array of) string with 2's complement binary
             y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1)
 
+            if fb.fil[0]['qfrmt'] == 'qint':
+                W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+            else:
+                W = self.q_dict['WI']
             if fb.fil[0]['fx_base'] == 'hex':
-                y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])
-            else:  # fb.fil[0]['fx_base'] == 'bin':
+                y_str = bin2hex_vec(y_bin_str, W)
+            else:  # 'bin'
                 # insert radix point if required
-                if self.q_dict['WF'] > 0:
-                    y_str = insert_binary_point(y_bin_str, self.q_dict['WI'])
-                else:
+                if fb.fil[0]['qfrmt'] == 'qint':
                     y_str = y_bin_str
+                else:
+                    y_str = insert_binary_point(y_bin_str, W)
         else:
             raise Exception(f"""Unknown number format "{fb.fil[0]['fx_base']}"!""")
 
