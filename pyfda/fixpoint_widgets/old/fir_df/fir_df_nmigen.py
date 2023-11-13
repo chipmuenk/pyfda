@@ -92,8 +92,10 @@ class FIR_DF_nmigen(Elaboratable):
         """
         self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os --------------------------------------
-        self.i = Signal(signed(self.p['QI']['W']))  # input signal
-        self.o = Signal(signed(self.p['QO']['W']))  # output signal
+        self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
+        self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
+        self.i = Signal(signed(self.WI))  # input signal
+        self.o = Signal(signed(self.WO))  # output signal
 
     # ---------------------------------------------------------
     def elaborate(self, platform) -> Module:
@@ -103,19 +105,21 @@ class FIR_DF_nmigen(Elaboratable):
         m = Module()  # instantiate a module
         ###
         muls = [0] * len(self.p['b'])
+        WACC = p['QACC']['WI'] + p['QACC']['WF'] + 1  # total accu word length
 
         DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
         # word format for sum of partial products b_i * x_i
         QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
               'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
-        QP.update({'W': QP['WI'] + QP['WF'] + 1})
+        WP = QP['WI'] + QP['WF'] + 1
+        # QP.update({'W': QP['WI'] + QP['WF'] + 1})
 
         src = self.i  # first register is connected to input signal
 
         i = 0
         for b in self.p['b']:
-            sreg = Signal(signed(self.p['QI']['W']))  # create chain of registers
-            m.d.sync += sreg.eq(src)            # with input word length
+            sreg = Signal(signed(self.WI))  # create chain of registers
+            m.d.sync += sreg.eq(src)        # with input word length
             src = sreg
             # TODO: keep old data sreg to allow frame based processing (requiring reset)
             muls[i] = int(b)*sreg
@@ -123,11 +127,11 @@ class FIR_DF_nmigen(Elaboratable):
 
         # logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
-        sum_full = Signal(signed(QP['W']))  # sum of all multiplication products with
+        sum_full = Signal(signed(WP))  # sum of all multiplication products with
         m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
 
         # rescale from full product wordlength to accumulator format
-        sum_accu = Signal(signed(self.p['QA']['W']))
+        sum_accu = Signal(signed(WACC))
         m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QA']))
 
         # rescale from accumulator format to output width

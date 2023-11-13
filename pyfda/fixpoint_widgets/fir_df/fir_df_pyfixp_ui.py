@@ -88,7 +88,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         if 'QACC' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QACC'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QACC'],
-            {'WI': 0, 'WF': 31, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a'})
+            {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a'})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu', cmb_w_vis='on',
             cmb_w_items=self.cmb_wq_accu_items, cmb_w_init=self.cmb_wq_accu_init,

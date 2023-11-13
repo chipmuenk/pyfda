@@ -899,7 +899,8 @@ class Plot_Impz(QWidget):
                     # - multiply stimulus and response by 2 ** WF
                     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
                     self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
-                    self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['W']-1)
+                    self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
+                        + fb.fil[0]['fxqc']['QO']['WF'] + 1)
                     self.fx_max = -self.fx_min - 1
                 else:
                     # display values scaled as "real world (float) values"

@@ -265,9 +265,10 @@ class FX_UI_WQ(QWidget):
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
 
-        self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl), 'W': W,
-                            'quant': qget_cmb_box(self.cmbQuant), 'WI': WI, 'WF': WF,
-                            'w_a_m': qget_cmb_box(self.cmbW)})
+        self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl),
+                            'quant': qget_cmb_box(self.cmbQuant),
+                            'w_a_m': qget_cmb_box(self.cmbW),
+                            'WI': WI, 'WF': WF})
         # create fixpoint quantization object from passed quantization dict
         self.QObj = fx.Fixed(self.q_dict)
 
@@ -442,9 +443,6 @@ class FX_UI_WQ(QWidget):
             q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
         self.ledWF.setText(str(WF))
         self.q_dict.update({'WF': WF})
-
-        self.q_dict.update(
-            {'W': self.q_dict['WI'] + self.q_dict['WF'] + 1})
 
         self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
 

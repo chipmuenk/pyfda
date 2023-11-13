@@ -47,17 +47,16 @@ class TestSequenceFunctions(unittest.TestCase):
 #            self.assertTrue(element in self.seq)
     def test_write_q_dict(self):
         """
-        Check whether parameters are written correctly to the fixpoint instance
+        Check whether parameters are written correctly to the fixpoint quantizer
         """
         fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'hex'})  # set to fractional format
         q_dict = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.myQ.set_qdict(q_dict)
         # self.assertEqual(q_dict, self.myQ.q_obj)
 
-        self.myQ.set_qdict({'W': 13})
-        self.assertEqual(12, self.myQ.WI)
-        self.assertEqual(0, self.myQ.WF)
-        self.assertEqual('12.0', self.myQ.Q)
+        self.assertEqual(7, self.myQ.WI)
+        self.assertEqual(3, self.myQ.WF)
+        self.assertEqual('7.3', self.myQ.Q)
 
 
     def test_fix_no_ovfl(self):

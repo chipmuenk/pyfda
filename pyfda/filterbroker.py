@@ -268,25 +268,25 @@ fil_ref = {
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #  Keys:
     #   'name': name of the fixpoint widget (for easier debugging)
-    #   'WI': integer bits, 'WF': fractional bits, 'W': total word length,
-    #   'ovfl': overflow behaviour, 'quant': quantizer behaviour,
+    #   'WI': integer bits, 'WF': fractional bits,
+    #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
+    #   'N_over': number of overflows during last quantization process
 
-    # TODO: are W, fx_base, qfrmt_last, scale really needed here?
     'fxqc':{
         # Input quantization
-        'QI': {'name': 'QI', 'WI': 0, 'WF': 15, 'W': 16,
+        'QI': {'name': 'QI', 'WI': 0, 'WF': 15,
                'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
         # Output quantization
-        'QO': {'name': 'QO', 'WI': 0, 'WF': 15, 'W': 16,
+        'QO': {'name': 'QO', 'WI': 0, 'WF': 15,
                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'b' coefficient quantization
-        'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'a',
+        'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'a' coefficient quantization
-        'QCA': {'name': 'QCA', 'WI': 2, 'WF': 13, 'W': 16, 'w_a_m': 'a',
+        'QCA': {'name': 'QCA', 'WI': 2, 'WF': 13, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # accumulator quantization
-        'QACC': {'name': 'QACC', 'WI': 0, 'WF': 31, 'W': 32, 'w_a_m': 'a',
+        'QACC': {'name': 'QACC', 'WI': 0, 'WF': 31, 'w_a_m': 'a',
                  'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0}
         },
         # 'b': [32768, 32768, 32768],

@@ -311,9 +311,6 @@ class Fixed(object):
 
     * **'WF'** : number of fractional bits; default: 15
 
-    * **'W'**  : total word length; W = WI + WF + 1 (1 sign bit). When WI and
-                  / or WF are missing, WI = W - 1 and WF = 0.
-
     * **'quant'** : Quantization method, optional; default = 'floor'
 
       - 'floor': (default) largest integer `I` such that :math:`I \\le x`
@@ -389,10 +386,9 @@ class Fixed(object):
         has occured during last fixpoint conversion.
 
     places : integer
-        number of places required for printing in the selected number format.
+        number of places required for printing in the selected 'fx_base' format.
         For binary formats, this is the same as the wordlength. Calculated
-        from the numeric base 'self.base' (not used outside this class) and
-        the total word length 'W'.
+        from the numeric base 'fx_base' and the total word length WI + WF + 1.
 
 
     scale : float or a keyword, the factor between the fixpoint integer
@@ -439,12 +435,11 @@ class Fixed(object):
         """
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
-            'name': 'unknown', 'WI': 0, 'WF': 15, 'W': 16, 'w_a_m': 'm',
+            'name': 'unknown', 'WI': 0, 'WF': 15, 'w_a_m': 'm',
             'quant': 'round', 'ovfl': 'sat',
         # these keys are calculated and should be regarded as read-only
             'N_over': 0}
-        # these keys are calculated and should be regarded as read-only
-
+        # these attributes are calculated and should be regarded as read-only
         self.LSB = 2. ** -self.q_dict_default['WF']
         self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
         self.MAX = 2 * self.MSB - self.LSB
@@ -492,32 +487,19 @@ class Fixed(object):
         """
         Update the instance quantization dict `self.q_dict` from passed dict `d`:
 
-        * Transform dict entries for `WF`, `WI`, `W` and `Q` into each other
-        * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX` from quantization params
-        * Calculate number of places needed for printing from `qfrmt` / `fx_base` and `W`
-
-        When `d` is empty, update the quantization dict from
-        its `WF` and `WI` entries.
+        * Sanitize `WI` and `WF`
+        * Calculate attributes `MSB`, `LSB`, `MIN` and `MAX`
+        * Calculate number of places needed for printing from `qfrmt`,`fx_base` and `W`
+          and store it as attribute `self.places`
 
         Check the docstring of class `Fixed()` for details on quantization
         """
-        q_d = copy.deepcopy(d)  # create local copy to avoid modification of passed dict
+        self.verify_q_dict_keys(d)  # check whether all keys are valid
+        self.q_dict.update(d)  # merge d into self.q_dict
 
-        self.verify_q_dict_keys(q_d)  # check whether all keys are valid
-
-        # Transform `WI`, `WF`, `W` and `Q` parameters into each other
-        if q_d == {}:
-            q_d['W'] = self.q_dict['WI'] + self.q_dict['WF'] + 1
-        elif 'WI' in q_d and 'WF' in q_d:
-            q_d['WI'] = int(q_d['WI'])  # sanitize WI
-            q_d['WF'] = abs(int(q_d['WF']))  # and WF
-            q_d['W'] = q_d['WI'] + q_d['WF'] + 1
-        elif 'W' in q_d:
-            q_d['W'] = int(q_d['W'])  # sanitize W
-            q_d['WI'] = int(q_d['W']) - 1
-            q_d['WF'] = 0
-
-        self.q_dict.update(q_d)  # merge q_d into self.q_dict
+        # sanitize WI and WF
+        self.q_dict['WI'] = int(self.q_dict['WI'])
+        self.q_dict['WF'] = abs(int(self.q_dict['WF']))
 
         # Calculate min., max., LSB and MSB from word lengths
         if fb.fil[0]['qfrmt'] == 'qint':
@@ -532,18 +514,23 @@ class Fixed(object):
 
         # Calculate required number of places for different bases from total
         # number of bits:
+
+        # total number of bits
+        W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+        #
         if fb.fil[0]['fx_base'] == 'dec':
             self.places = int(
-                np.ceil(np.log10(self.q_dict['W']) * np.log10(2.))) + 1
+                np.ceil(np.log10(W) * np.log10(2.))) + 1
             self.base = 10
         elif fb.fil[0]['fx_base'] == 'bin':
-            self.places = self.q_dict['W'] + 1
+            self.places = W + 1
             self.base = 2
         elif fb.fil[0]['fx_base'] == 'csd':
-            self.places = self.q_dict['W'] + 1
+            self.places = W + 1
+            # int(np.ceil(W / 1.5)) + 1
             self.base = 2
         elif fb.fil[0]['fx_base'] == 'hex':
-            self.places = int(np.ceil(self.q_dict['W'] / 4.)) + 1
+            self.places = int(np.ceil(W / 4.)) + 1
             self.base = 16
         elif fb.fil[0]['qfrmt'] == 'float':
             self.places = 4
@@ -974,12 +961,12 @@ class Fixed(object):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
-        with numeric format `self.frmt` and `self.q_dict['W']` bits. The result has the
-        same shape as `y`.
+        with numeric format `self.frmt` and a total wordlength of
+        `W = self.q_dict['WI'] + self.q_dict['WF'] + 1` bits.
+        The result has the same shape as `y`.
 
-        The float is multiplied by `self.scale` and quantized / saturated
-        using `self.fixp()` for all formats before it is converted to different number
-        formats.
+        The float is always quantized / saturated using `self.fixp()` before it is
+        converted to different fixpoint number bases.
 
         Parameters
         ----------
@@ -991,8 +978,8 @@ class Fixed(object):
         -------
         A string, a float or an ndarray of float or string is returned in the
         numeric format set in `fb.fil[0]['fx_base'])`. It has the same shape as `y`.
-         For all formats except `float` a fixpoint representation with
-         `self.q_dict['W']` binary digits is returned.
+        For all formats except `float` a fixpoint representation with
+        a total number of W = WI + WF + 1 binary digits is returned.
 
 
         Define vectorized functions using numpys automatic type casting:
@@ -1036,7 +1023,7 @@ class Fixed(object):
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
             # convert to (array of) string with 2's complement binary
-            y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['W'])
+            y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1)
 
             if fb.fil[0]['fx_base'] == 'hex':
                 y_str = bin2hex_vec(y_bin_str, self.q_dict['WI'])

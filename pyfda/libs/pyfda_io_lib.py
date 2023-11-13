@@ -1408,14 +1408,15 @@ def export_coe_xilinx(f: TextIO) -> bool:
         fb.fil[0]['fx_base'] =  'dec'  # select decimal format in all other cases
         coe_radix = 10
 
-    # Quantize coefficients to decimal / hex integer format, returning an array of strings
+    # Quantize coefficients to decimal / hex integer format, return an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
     exp_str = "; " + coe_header(
         "XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file").replace("\n", "\n; ")
 
     exp_str += "\nRadix = {0};\n".format(coe_radix)
-    exp_str += f"Coefficient_width = {qc.q_dict['W']};\n"  # quantized wordlength
+      # quantized wordlength
+    exp_str += f"Coefficient_width = {qc.q_dict['WI'] + qc.q_dict['WF'] + 1};\n"
     coeff_str = "CoefData = "
     for b in bq:
         coeff_str += str(b) + ",\n"

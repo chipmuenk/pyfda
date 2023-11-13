@@ -132,7 +132,6 @@ class Input_Fixpoint_Specs(QWidget):
                     # button lock was activated or wordlength settings have been changed
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
-                    fb.fil[0]['fxqc']['QO']['W'] = fb.fil[0]['fxqc']['QI']['W']
 
             elif dict_sig['wdg_name'] == 'wq_output':
                 """
@@ -142,7 +141,6 @@ class Input_Fixpoint_Specs(QWidget):
                 if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
-                    fb.fil[0]['fxqc']['QI']['W'] = fb.fil[0]['fxqc']['QO']['W']
             else:
                 logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
                              .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
