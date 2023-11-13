@@ -391,7 +391,8 @@ class Fixed(object):
         from the numeric base 'fx_base' and the total word length WI + WF + 1.
 
 
-    scale : float or a keyword, the factor between the fixpoint integer
+    scale : *** obsolete, no longer used ! ***
+            float or a keyword, the factor between the fixpoint integer
             representation (FXP) and its "real world" floating point value (RWV).
             If ``scale`` is a float, this value is used, RWV = FXP / scale.
             By default, scale = 1 << WI.
@@ -412,6 +413,13 @@ class Fixed(object):
       - 'float'  : floating point (unquantized)
       - 'qint'   : integer
       - 'qfrac'  : general fixpoint format
+
+    **`fb.fil[0]['fx_base']`** : fixpoint number base, default = 'dec'
+
+      - 'dec'   : decimal (base = 10)
+      - 'bin'   : binary (base = 2)
+      - 'hex'   : hexadecimal (base = 16)
+      - 'csd'   : canonically signed digit (base = 2?)
 
     Example
     -------
