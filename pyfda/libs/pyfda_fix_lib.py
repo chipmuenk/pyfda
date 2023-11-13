@@ -533,8 +533,7 @@ class Fixed(object):
         elif fb.fil[0]['fx_base'] == 'bin':
             self.places = W + 1
         elif fb.fil[0]['fx_base'] == 'csd':
-            self.places = W + 1
-            # int(np.ceil(W / 1.5)) + 1
+            self.places = int(np.ceil(W / 1.5)) + 1
         elif fb.fil[0]['fx_base'] == 'hex':
             self.places = int(np.ceil(W / 4.)) + 1
         elif fb.fil[0]['qfrmt'] == 'float':
