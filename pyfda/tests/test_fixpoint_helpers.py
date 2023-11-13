@@ -82,7 +82,7 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Check whether parameters are written correctly to the fixpoint instance
         """
-        fb.fil[0].update('qfrmt': 'qfrac', 'fx_base': 'hex')
+        fb.fil[0].update({'qfrmt': 'qfrac', 'fx_base': 'hex'})
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix'}
         self.myQ.set_qdict(q_obj)
 
