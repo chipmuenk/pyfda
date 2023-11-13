@@ -491,6 +491,7 @@ class Fixed(object):
             if k not in self.q_dict_default:
                 logger.error(u'Unknown Key "{0:s}"!'.format(k))
 
+# ------------------------------------------------------------------------------
     def set_qdict(self, d: dict) -> None:
         """
         Update the instance quantization dict `self.q_dict` from passed dict `d`:
@@ -1017,7 +1018,7 @@ class Fixed(object):
         y_fix = self.fixp(y, scaling='mult')
 
         if fb.fil[0]['fx_base'] == 'dec':
-            if self.q_dict['WF'] == 0:
+            if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
                 y_str = np.int64(y_fix)  # get rid of trailing zero
                 # y_str = np.char.mod('%d', y_fix)
                 # elementwise conversion from integer (%d) to string
@@ -1026,7 +1027,12 @@ class Fixed(object):
                 # y_str = np.char.mod('%f',y_fix)
                 y_str = y_fix
         elif fb.fil[0]['fx_base'] == 'csd':
-            y_str = dec2csd_vec(y_fix, self.q_dict['WF'])  # convert with WF fractional bits
+            if fb.fil[0]['qfrmt'] == 'qint':
+                # integer case, convert with 0 fractional bits
+                y_str = dec2csd_vec(y_fix, 0)
+            else:
+                # fractional case, convert with WF fractional bits
+                y_str = dec2csd_vec(y_fix, self.q_dict['WF'])
 
         elif fb.fil[0]['fx_base'] in {'bin', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
