@@ -529,20 +529,15 @@ class Fixed(object):
         if fb.fil[0]['fx_base'] == 'dec':
             self.places = int(
                 np.ceil(np.log10(W) * np.log10(2.))) + 1
-            self.base = 10
         elif fb.fil[0]['fx_base'] == 'bin':
             self.places = W + 1
-            self.base = 2
         elif fb.fil[0]['fx_base'] == 'csd':
             self.places = W + 1
             # int(np.ceil(W / 1.5)) + 1
-            self.base = 2
         elif fb.fil[0]['fx_base'] == 'hex':
             self.places = int(np.ceil(W / 4.)) + 1
-            self.base = 16
         elif fb.fil[0]['qfrmt'] == 'float':
             self.places = 4
-            self.base = 0
         else:
             raise Exception(
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
@@ -912,7 +907,12 @@ class Fixed(object):
                     neg_sign = True
                     raw_str = raw_str.lstrip('-')
 
-                y_dec = abs(int(raw_str, self.base) / self.base**frc_places)
+                if frmt == 'hex':
+                    base = 16
+                else:
+                    base = 2
+
+                y_dec = abs(int(raw_str, base) / base**frc_places)
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
@@ -920,13 +920,14 @@ class Fixed(object):
                 int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
                 # When number is outside fixpoint range, discard MSBs:
                 if int_bits > self.q_dict['WI'] + 1:
+                    # convert hex numbers to binary string for discarding bits bit-wise
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
                     # discard the upper bits outside the valid range
                     raw_str = raw_str[int_bits - self.q_dict['WI'] - 1:]
 
                     # recalculate y_dec for truncated string
-                    y_dec = int(raw_str, 2) / self.base**frc_places
+                    y_dec = int(raw_str, 2) / base**frc_places
 
                     if y_dec == 0:  # avoid log2(0) error in code below
                         return 0
