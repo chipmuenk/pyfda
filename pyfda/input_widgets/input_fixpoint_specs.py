@@ -287,9 +287,9 @@ class Input_Fixpoint_Specs(QWidget):
         # left and right: Zero margin, top and bottom: default margin
         self.layH_fx_wdg.setContentsMargins(0, margins[1], 0, margins[3])
         # self.layH_fx_wdg.setContentsMargins(*params['wdg_margins'])
-        wdg_fx = QWidget(self)
-        wdg_fx.setStyleSheet(".QWidget { background-color:none; }")
-        wdg_fx.setLayout(self.layH_fx_wdg)
+        wdg_fx_dyn = QWidget(self)
+        wdg_fx_dyn.setStyleSheet(".QWidget { background-color:none; }")
+        wdg_fx_dyn.setLayout(self.layH_fx_wdg)
 
 # ------------------------------------------------------------------------------
 #       Initialize fixpoint filter combobox, title and description
@@ -389,7 +389,7 @@ class Input_Fixpoint_Specs(QWidget):
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmHdlBtns)
         layVMain.addWidget(self.wdg_wq_input)
-        layVMain.addWidget(wdg_fx)
+        layVMain.addWidget(wdg_fx_dyn)
         layVMain.addWidget(self.wdg_wq_output)
         layVMain.addWidget(self.frmImg)
         layVMain.addStretch()
