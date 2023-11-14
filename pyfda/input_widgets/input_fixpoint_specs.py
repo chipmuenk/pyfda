@@ -100,7 +100,7 @@ class Input_Fixpoint_Specs(QWidget):
         # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.wdg_dict2ui()  # update wordlengths in UI, set RUN button to 'changed'
+            self.dict2ui()  # update wordlengths in UI, set RUN button to 'changed'
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
             return
@@ -146,7 +146,7 @@ class Input_Fixpoint_Specs(QWidget):
                              .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
                 return
 
-            self.wdg_dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
 
@@ -177,7 +177,7 @@ class Input_Fixpoint_Specs(QWidget):
         # have fixpoint specs been changed previously when widget was invisible?
         if self.fx_specs_changed:
             # update wordlengths in UI and set RUN button to 'changed':
-            self.wdg_dict2ui()
+            self.dict2ui()
             self.fx_specs_changed = False  # reset flag
 
         #  =================== UI_CHANGED =======================================
@@ -198,13 +198,13 @@ class Input_Fixpoint_Specs(QWidget):
                 # set RUN button to "changed"
                 # TODO: Is this needed? Is the fixpoint widget updated?
                 self._update_filter_cmb()
-                self.wdg_dict2ui()
+                self.dict2ui()
                 return
 
             else:
                 # Filter data has changed (but not the filter type):
                 # Reload UI from dict and set RUN button to "changed"
-                self.wdg_dict2ui()
+                self.dict2ui()
 
         # =================== FX SIM ============================================
         elif 'fx_sim' in dict_sig:
@@ -253,12 +253,12 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
                 qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
-            # somewhere else, update UI and set run button to "changed" in wdg_dict2ui()
+            # somewhere else, update UI and set run button to "changed" in dict2ui()
 
             # --------------- fx specs_changed ------------
             elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
                 # update wordlengths in UI and set RUN button to 'changed':
-                self.wdg_dict2ui()
+                self.dict2ui()
                 self.fx_specs_changed = False
             elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                 self.fx_specs_changed = True
@@ -612,7 +612,7 @@ class Input_Fixpoint_Specs(QWidget):
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
             self.fx_filt_ui.setVisible(True)
-            self.wdg_dict2ui()  # initialize the fixpoint subwidgets from the fxqc_dict
+            self.dict2ui()  # initialize the fixpoint subwidgets from the fxqc_dict
 
             # ---- connect signals to fx_filt_ui ----
             if hasattr(self.fx_filt_ui, "sig_rx"):
@@ -649,7 +649,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
-    def wdg_dict2ui(self):
+# ------------------------------------------------------------------------------
+    def dict2ui(self):
         """
         Trigger an update of the input, output and fixpoint widgets UI when view
         (i.e. fixpoint coefficient format) or data have been changed outside this
@@ -657,6 +658,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         Set the RUN button to "changed".
         """
+        qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
         self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_wq_output.dict2ui((fb.fil[0]['fxqc']['QO']))
 
