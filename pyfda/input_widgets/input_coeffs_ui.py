@@ -114,16 +114,6 @@ class Input_Coeffs_UI(QWidget):
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
                           self.cmb_fx_base_default)
 
-        model = self.cmb_fx_base.model()
-        # create header "Fixpoint:" between separators
-        item = QtGui.QStandardItem('Fixpoint:')
-        item.setData('parent', Qt.AccessibleDescriptionRole)
-        item.setData(0, role=QtGui.QFont.Bold)
-        item.setFlags(item.flags() & Qt.ItemIsEnabled)  # | Qt.ItemIsSelectable))
-        model.insertRow(1, item)
-        self.cmb_fx_base.insertSeparator(1)
-        self.cmb_fx_base.insertSeparator(3)
-
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0, 16)
         self.spnDigits.setValue(params['FMT_ba'])
