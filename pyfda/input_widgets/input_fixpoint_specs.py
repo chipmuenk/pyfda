@@ -441,6 +441,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFx.clicked.connect(self._start_fx_sim)
+        self.cmb_qfrmt.currentIndexChanged.connect(self.ui2dict)
+
         # ----------------------------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------------------------
@@ -675,6 +677,17 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
+    def ui2dict(self):
+        """
+        Trigger an update of the input, output and fixpoint widgets UI when view
+        (i.e. fixpoint coefficient format) or data have been changed outside this
+        class.
+
+        Set the RUN button to "changed".
+        """
+        fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        self.emit({'fx_sim': 'specs_changed'})
+
 # ------------------------------------------------------------------------------
     def dict2ui(self):
         """
