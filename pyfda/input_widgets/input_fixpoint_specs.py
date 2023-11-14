@@ -22,8 +22,9 @@ import numpy as np
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 import pyfda.libs.pyfda_dirs as dirs
-from pyfda.libs.pyfda_lib import qstr, pprint_log, first_item
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.libs.pyfda_lib import pprint_log, first_item
+from pyfda.libs.pyfda_qt_lib import (
+    qget_cmb_box, qstyle_widget, qcmb_box_populate, qset_cmb_box)
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
 
@@ -73,6 +74,18 @@ class Input_Fixpoint_Specs(QWidget):
         self.default_fx_img = os.path.join(self.fx_path, "default_fx_img.png")
         if not os.path.isfile(self.default_fx_img):
             logger.error("Image {0:s} not found!".format(self.default_fx_img))
+
+        self.cmb_qfrmt_items = [
+            "<span>Quantization format for coefficients (affects only "
+            "the display, not the stored values).</span>",
+            ('float', "Float", "<span>Full precision floating point format</span>"),
+            ('qint', "Integer", "<span>Integer format with <i>WI</i> + 1 bits "
+             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 1)</span>"),
+            ('qfrac', "Fractional",
+             "<span>General fractional format with <i>WI</i> + <i>WF</i> + 1 bits "
+             "(range -2<sup>WI</sup> ... 2<sup>WI</sup> - 2<sup>WF</sup>).</span>")
+            ]
+        self.cmb_qfrmt_default = "float"
 
         self._construct_UI()
         inst_wdg_list = self._update_filter_cmb()
@@ -365,21 +378,34 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
 #       Simulation and export Buttons
 # ------------------------------------------------------------------------------
+        # choose float / fixpoint mode
+        self.cmb_qfrmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_qfrmt, self.cmb_qfrmt_items,
+                          self.cmb_qfrmt_default)
+        self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        # lay_v_qfrmt = QVBoxLayout()
+        # lay_v_qfrmt.addWidget(self.cmb_qfrmt)
+        # frm_qfrmt = QFrame(self)
+        # frm_qfrmt.setLayout(lay_v_qfrmt)
+        # frm_qfrmt.setContentsMargins(*params['wdg_margins'])
+        self.butSimFx = QPushButton(self)
+        self.butSimFx.setToolTip("Start fixpoint simulation.")
+        self.butSimFx.setText("Sim. FX")
+
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip(
             "Create Verilog or VHDL netlist for fixpoint filter.")
         self.butExportHDL.setText("Create HDL")
 
-        self.butSimFx = QPushButton(self)
-        self.butSimFx.setToolTip("Start fixpoint simulation.")
-        self.butSimFx.setText("Sim. FX")
+        # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
+        layH_fx_btns = QHBoxLayout()
+        layH_fx_btns.addWidget(self.cmb_qfrmt)
+        layH_fx_btns.addWidget(self.butSimFx)
+        layH_fx_btns.addWidget(self.butExportHDL)
 
-        self.layHHdlBtns = QHBoxLayout()
-        self.layHHdlBtns.addWidget(self.butSimFx)
-        self.layHHdlBtns.addWidget(self.butExportHDL)
-        # This frame encompasses the HDL buttons sim and convert
         frmHdlBtns = QFrame(self)
-        frmHdlBtns.setLayout(self.layHHdlBtns)
+        frmHdlBtns.setLayout(layH_fx_btns)
         frmHdlBtns.setContentsMargins(*params['wdg_margins'])
 
 # -------------------------------------------------------------------
