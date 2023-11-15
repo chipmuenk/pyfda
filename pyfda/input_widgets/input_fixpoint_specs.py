@@ -679,13 +679,13 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Trigger an update of the input, output and fixpoint widgets UI when view
-        (i.e. fixpoint coefficient format) or data have been changed outside this
-        class.
+        Triggered by a change of fixpoint format, call `dict2ui()` to propagate this to
+        input, output and dyn. filter widget and set the simFX button to "changed".
 
-        Set the RUN button to "changed".
+        Emit {'fx_sim': 'specs_changed'}.
         """
         fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
