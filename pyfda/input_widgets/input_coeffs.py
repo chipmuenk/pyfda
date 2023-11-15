@@ -319,7 +319,7 @@ class Input_Coeffs(QWidget):
             if self.fx_specs_changed or\
                     ('fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed'):
                 # global event, update widget dicts and table
-                self.qdict2ui()
+                self.dict2ui()
                 self.fx_specs_changed = False
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view
@@ -648,7 +648,7 @@ class Input_Coeffs(QWidget):
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
-        self.qdict2ui()
+        self.dict2ui()
 
         qstyle_widget(self.ui.butSave, 'normal')
 
@@ -776,7 +776,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.butSave, 'changed')
 
     # --------------------------------------------------------------------------
-    def qdict2ui(self):
+    def dict2ui(self):
         """
         - set the UI from the quantization dict
         - Update the fixpoint quant. object
@@ -821,7 +821,7 @@ class Input_Coeffs(QWidget):
         fb.fil[0]['qfrmt'] = qget_cmb_box(self.ui.cmb_q_frmt)
 
         # update quant. widgets and table with the new `qfrmt` settings
-        self.qdict2ui()
+        self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
@@ -837,7 +837,7 @@ class Input_Coeffs(QWidget):
         fb.fil[0]['fx_base'] = qget_cmb_box(self.ui.cmb_fx_base)
 
         # update quant. widgets and table with the new `fx_base` settings
-        self.qdict2ui()
+        self.dict2ui()
 
 # ------------------------------------------------------------------------------
     def _save_dict(self):
