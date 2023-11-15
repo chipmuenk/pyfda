@@ -778,7 +778,7 @@ class Input_Coeffs(QWidget):
     # --------------------------------------------------------------------------
     def dict2ui(self):
         """
-        - set the UI from the quantization dict
+        - update the UI from the dictionary
         - Update the fixpoint quant. object
         - Update the quantized coefficient view and the overflow counter
         - Refresh the table
@@ -790,6 +790,9 @@ class Input_Coeffs(QWidget):
         - `self.fx_base2dict()`
 
         """
+        # update ui
+        qset_cmb_box(self.ui.cmb_q_frmt, fb.fil[0]['qfrmt'], data=True)
+
         # update quantizer objects and widgets
         self.ui.wdg_wq_coeffs_a.dict2ui()
         self.ui.wdg_wq_coeffs_b.dict2ui()
