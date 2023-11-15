@@ -293,7 +293,7 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("process_sig_rx(): vis={0}\n{1}"\
+        logger.warning("process_sig_rx(): vis={0}\n{1}"\
                      .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
