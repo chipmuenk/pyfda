@@ -46,7 +46,6 @@ class FX_UI_WQ(QWidget):
     - `WI`      : number of integer bits
     - `WF`      : number of fractional bits
     - `w_a_m`   : automatic or manual update of word format
-    - `scale`   : scaling factor between real world value and integer representation
 
     These quantization settings are also stored in the instance quantizer object
     `self.QObj`.

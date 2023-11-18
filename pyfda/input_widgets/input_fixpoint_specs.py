@@ -464,15 +464,16 @@ class Input_Fixpoint_Specs(QWidget):
     def _update_filter_cmb(self) -> str:
         """
         (Re-)Read list of available fixpoint filters for a given filter design
-        every time a new filter design is selected.
+        every time a new filter has been designed or loaded.
 
         Then try to import the fixpoint designs in the list and populate the
-        fixpoint implementation combo box `self.cmb_fx_wdg` when successfull.
+        fixpoint implementation combo box `self.cmb_fx_wdg` with successfull
+        imports.
 
         Returns
         -------
         inst_wdg_str: str
-          string with all fixpoint widgets that could be instantiated successfully
+          string with all fixpoint widgets that have been instantiated successfully.
         """
         inst_wdg_str = ""  # full names of successfully instantiated widgets for logging
         # remember last fx widget setting:
@@ -493,12 +494,12 @@ class Input_Fixpoint_Specs(QWidget):
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(class_name, e))
                     self.embed_fixp_img(self.no_fx_filter_img)
-                    continue  # with next `class_name` of for loop
+                    continue  # with next `class_name` in for loop
                 except KeyError as e:
                     logger.warning("No fixpoint filter for filter type {0} available."
                                    .format(e))
                     self.embed_fixp_img(self.no_fx_filter_img)
-                    continue  # with next `class_name` of for loop
+                    continue  # with next `class_name` in for loop
 
             # restore last fx widget if possible
             idx = self.cmb_fx_wdg.findText(last_fx_wdg)
@@ -699,7 +700,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
         qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
         self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_wq_output.dict2ui((fb.fil[0]['fxqc']['QO']))
+        self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+        try:
+            self.fx_filt_ui.dict2ui()
+        except AttributeError as e:
+            logger.error(f"Error using FX filter widget's 'dict2ui()' method:\n{e}")
 
         qstyle_widget(self.butSimFx, "changed")
 
@@ -762,7 +767,6 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             # initialize fixpoint filter instance with fixpoint quantizer
-            # self.fx_filt_ui.init_filter()
             self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
 
             return 0
@@ -785,50 +789,29 @@ class Input_Fixpoint_Specs(QWidget):
         None
         """
         try:
-            # logger.info(
-            #     'Simulate fixpoint frame with "{0}" stimulus:\n\t{1}'.format(
-            #         dict_sig['class'],
-            #         pprint_log(dict_sig['fx_stimulus'], tab=" "),
-            #         ))
-
             # Run fixpoint simulation and store the results as integer values:
             fb.fx_results = self.fx_filt_ui.fxfilter(dict_sig['fx_stimulus'])
 
             if len(fb.fx_results) == 0:
                 logger.error("Fixpoint simulation returned empty results!")
-            # else:
-            #     # logger.debug("fx_results: {0}"\
-            #     #            .format(pprint_log(fb.fx_results, tab= " ")))
-            #     logger.info(
-            #         f'Fixpoint simulation successful for dict\n{pprint_log(dict_sig)}'
-            #         f'\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])}'
-            #         f' of type "{dict_sig["fx_stimulus"].dtype}"'
-            #         f'\n\tResponse: Shape {np.shape(fb.fx_results)}'
-            #         f' of type "{type(fb.fx_results).__name__} "'
-            #         f' ("{type(fb.fx_results[0]).__name__}")'
-            #     )
 
         except ValueError as e:
             logger.error("Simulator error {0}".format(e))
             fb.fx_results = None
 
         except AssertionError as e:
-            logger.error('Fixpoint simulation failed for dict\n{0}'
-                         '\twith msg. "{1}"\n\tStimuli: Shape {2} of type "{3}"'
-                         '\n\tResponse: Shape {4} of type "{5}"'.format(
-                            pprint_log(dict_sig), e,
-                            np.shape(dict_sig['fx_stimulus']),
-                            dict_sig['fx_stimulus'].dtype,
-                            np.shape(fb.fx_results),
-                            type(fb.fx_results)
-                                ))
+            logger.error(
+                f'Fixpoint simulation failed for dict\n{pprint_log(dict_sig)}'
+                f'\twith msg. "{e}"\n\tStimuli: Shape {np.shape(dict_sig["fx_stimulus"])} '
+                f'of type {dict_sig["fx_stimulus"].dtype}'
+                f'\n\tResponse: Shape {np.shape(fb.fx_results)} of type '
+                f'"{type(fb.fx_results)}"')
             fb.fx_results = None
 
         if fb.fx_results is None:
             qstyle_widget(self.butSimFx, "error")
         else:
             pass  # everything ok, return
-            # logger.debug("Sending fixpoint results")
         return
 
 
