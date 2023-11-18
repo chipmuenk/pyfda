@@ -280,9 +280,19 @@ class IIR_DF1_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        self.wdg_wq_coeffs_b.dict2ui()  # update coefficient quantization
+        fxq_dict = fb.fil[0]['fxqc']
+        logger.warning(fxq_dict)
+        if 'QACC' not in fxq_dict:
+            fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
+            logger.warning("'QACC' key missing in filter dict")
+
+        if 'QCB' not in fxq_dict:
+            fxq_dict.update({'QCB': {}})  # no coefficient settings in dict yet
+            logger.warning("'QCB' key missing in filter dict")
+
+        self.wdg_wq_coeffs_b.dict2ui(fxq_dict['QCB'])  # update coefficient quantization
         self.wdg_wq_coeffs_a.dict2ui()  # settings
-        self.wdg_wq_accu.dict2ui()
+        self.wdg_wq_accu.dict2ui(fxq_dict['QACC']) # and the accu as well
 
     # --------------------------------------------------------------------------
     def update_ovfl_cnt_all(self):
