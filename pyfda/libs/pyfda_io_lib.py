@@ -1563,10 +1563,9 @@ def load_filter(self) -> int:
 
                 logger.debug(f"Entries in {file_name}:\n{a.files}")
                 for key in sorted(a):
-                    logger.debug(
-                        f"key: {key}|{type(key).__name__}|"
-                        f"{type(a[key]).__name__}|{a[key]}")
-
+                    # logger.warning(
+                    #     f"key: {key}|{type(key).__name__}|"
+                    #     f"{type(a[key]).__name__}|{a[key]}")
                     if np.ndim(a[key]) == 0:
                         # scalar objects may be extracted with the item() method
                         fb.fil[0][key] = a[key].item()
