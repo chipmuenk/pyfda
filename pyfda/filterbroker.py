@@ -269,15 +269,16 @@ fil_ref = {
     #  Keys:
     #   'name': name of the fixpoint widget (for easier debugging)
     #   'WI': integer bits, 'WF': fractional bits,
+    #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
     #   'N_over': number of overflows during last quantization process
 
     'fxqc':{
         # Input quantization
-        'QI': {'name': 'QI', 'WI': 0, 'WF': 15,
+        'QI': {'name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
         # Output quantization
-        'QO': {'name': 'QO', 'WI': 0, 'WF': 15,
+        'QO': {'name': 'QO', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'b' coefficient quantization
         'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
