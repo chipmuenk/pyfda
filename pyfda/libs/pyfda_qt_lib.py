@@ -126,7 +126,7 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> N
 
     Returns
     -------
-    None
+    Index of `item_init`. If index == -1, `item_init` was not in `items_list`
     """
     cmb_box.clear()
     if type(items_list[0]) is str:  # combo box tool tipp (optional)
@@ -139,7 +139,9 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> N
             cmb_box.addItem(cmb_box.tr(items_list[i][1]), items_list[i][0])
         if len(items_list[i]) == 3:  # add item tool tip (optional)
             cmb_box.setItemData(i-1, cmb_box.tr(items_list[i][2]), Qt.ToolTipRole)
-    qset_cmb_box(cmb_box, item_init, data=True)
+    ret = qset_cmb_box(cmb_box, item_init, data=True)
+
+    return ret
 
     """ icon = QIcon('logo.png')
     # adding icon to the given index
