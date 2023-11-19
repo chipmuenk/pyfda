@@ -414,11 +414,11 @@ def iter2ndarray(iterable, dtype=complex) -> ndarray:
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
     """
-    Add the key:value pairs of `default_dict` to dictionary `d` for all missing
-    keys
+    Add the key:value pairs of `default_dict` to dictionary `d` in-place for
+    all missing keys.
     """
-    if d is None or d == {}:
-        d = default_dict
+    if d == {}:
+        d.update(default_dict)
     else:
         for k, v in default_dict.items():
             if k not in d:
