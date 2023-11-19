@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 # --------------------------------------------------------------------------
-def merge_dicts(d1, d2, path=None, mode='keep1'):
+def merge_dicts_hierarchically(d1, d2, path=None, mode='keep1'):
     """
     Merge the hierarchical dictionaries ``d1`` and ``d2``.  The dict ``d1`` is
     modified in place and returned
@@ -63,13 +63,13 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 
     Example
     -------
-    >>> merge_dicts(fil_tree, fil_tree_add, mode='add1')
+    >>> merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
     Notes
     -----
     If you don't want to modify ``d1`` in place, call the function using:
 
-    >>> new_dict = merge_dicts(dict(d1), d2)
+    >>> new_dict = merge_dicts_hierarchically(dict(d1), d2)
 
     If you need to merge more than two dicts use:
 
@@ -90,7 +90,7 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
         if key in d1:
             if isinstance(d1[key], dict) and isinstance(d2[key], dict):
                 # both entries are dicts, recurse one level deeper:
-                merge_dicts(d1[key], d2[key], path=path + str(key), mode=mode)
+                merge_dicts_hierarchically(d1[key], d2[key], path=path + str(key), mode=mode)
 # TODO:            elif <either d1[key] OR d2[key] is not a dict> -> exception
             elif d1[key] == d2[key] or mode == 'keep1':
                 pass  # keep item in dict1, discard item with same key in dict1
@@ -185,7 +185,7 @@ class Tree_Builder(object):
             # merge additional rt_dict (optional) into filter tree
             if hasattr(ff.fil_inst, 'rt_dict_add'):
                 fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
-                merge_dicts(fil_tree, fil_tree_add, mode='add1')
+                merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
         fb.fil_tree = freeze_hierarchical(fil_tree)
@@ -703,7 +703,7 @@ class Tree_Builder(object):
             if 'COM' in rt_dict:      # Now handle common info
                 for fo in rt_dict[rt]:  # iterate over 'min' / 'max'
                     if fo in rt_dict['COM']:  # and add common info first
-                        merge_dicts(fil_tree[rt][ft][fc][fo],
+                        merge_dicts_hierarchically(fil_tree[rt][ft][fc][fo],
                                     rt_dict['COM'][fo], mode='add2')
 
         return fil_tree
