@@ -386,9 +386,7 @@ def redo():
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
 
-d1 = {'as': 1, 'a': {'b': {'cs':10, 'qqq': {'qwe':1}}, 'd': {'csd':30}}}
-d2 = {'as': 3, 'a': {'b': {'cs':30, 'qqq': 123},       'd': {'csd':20}},
-        'newa': {'q': {'cs':50}}}
+
 def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> str:
 
     def compare_dictionaries(
@@ -443,7 +441,7 @@ def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> str:
         [i.replace("Missing in d1:", "\t") for i in err_list if "Missing in d1:" in i])
     logger.warning(f"d1: {len(err_missing)}, d2: {len(err_unsupported)}")
     if err_missing != "":
-        err_str = f"The following key(s) have not been found in '{new_dict_name}', "\
+        err_str = f"The following key(s) have not been found in {new_dict_name},\n\t"\
         "they are copied with their values from the reference dict:\n" + err_missing
     if err_unsupported != "":
         err_str += "\nThe following key(s) are not part of the reference dict "\

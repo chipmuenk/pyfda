@@ -1578,7 +1578,7 @@ def load_filter(self) -> int:
                 logger.error(f'Unknown file type "{file_type}"')
                 err = True
             if not err:
-                ret = fb.sanitize_imported_dict(fb.fil[0], 'fb.fil[0]')
+                ret = fb.sanitize_imported_dict(fb.fil[0], 'the loaded dict')
                 if ret != "":
                     logger.warning(ret)
 

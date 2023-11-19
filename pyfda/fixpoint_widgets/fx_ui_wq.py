@@ -394,7 +394,7 @@ class FX_UI_WQ(QWidget):
         self.update_WI_WF()
 
         if self.sender():
-            logger.error(f"sender = {self.sender().objectName()}")
+            # logger.error(f"sender = {self.sender().objectName()}")
 #             if self.sender().objectName() == 'cmbW':
 #                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
             dict_sig = {'wdg_name': self.wdg_name,

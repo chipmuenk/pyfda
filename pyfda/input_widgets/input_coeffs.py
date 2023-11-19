@@ -293,8 +293,8 @@ class Input_Coeffs(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.warning("process_sig_rx(): vis={0}\n{1}"\
-                     .format(self.isVisible(), pprint_log(dict_sig)))
+        # logger.warning("process_sig_rx(): vis={0}\n{1}"\
+        #              .format(self.isVisible(), pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')

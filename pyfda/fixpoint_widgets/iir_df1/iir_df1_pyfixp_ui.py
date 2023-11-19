@@ -275,7 +275,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
         fxq_dict = fb.fil[0]['fxqc']
-        logger.warning(fxq_dict)
+        # logger.warning(fxq_dict)
         if 'QACC' not in fxq_dict:
             fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
             logger.warning("'QACC' key missing in filter dict")

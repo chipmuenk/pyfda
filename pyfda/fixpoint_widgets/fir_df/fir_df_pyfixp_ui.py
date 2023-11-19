@@ -129,7 +129,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         the referenced dicts `fb.fil[0]['fxqc']['QCB']` and `...['QACC']` have already
         been updated by the corresponding subwidgets `FX_UI_WQ`
         """
-        logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
+        # logger.warning("sig_rx:\n{0}".format(pprint_log(dict_sig)))
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
