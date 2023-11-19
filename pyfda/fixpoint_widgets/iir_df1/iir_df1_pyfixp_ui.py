@@ -55,15 +55,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
              "and input word formats.</span>")
             ]
 
-        self.cmb_wq_accu_init = 'm'
-
         self.cmb_wq_coeffs_a_items = [
             "<span>Number of integer bits</span>",
             ("m", "M", "<span><b>Manual</b> entry</span>"),
             ("a", "A",
              "<span><b>Automatic</b> calculation from largest coefficient.</span>")
             ]
-        self.cmb_wq_coeffs_a_init = 'a'
 
         self.cmb_wq_coeffs_b_items = [
             "<span>Number of integer bits</span>",
@@ -71,7 +68,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
             ("a", "A",
              "<span><b>Automatic</b> calculation from largest coefficient.</span>")
             ]
-        self.cmb_wq_coeffs_b_init = 'a'
 
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
@@ -92,8 +88,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_b_items,
-            cmb_w_init=self.cmb_wq_coeffs_b_init)
+            MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_b_items)
         layV_wq_coeffs_b = QVBoxLayout()
         layV_wq_coeffs_b.addWidget(self.wdg_wq_coeffs_b)
 
@@ -104,8 +99,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items,
-            cmb_w_init=self.cmb_wq_coeffs_a_init)
+            MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items)
         layV_wq_coeffs_a = QVBoxLayout()
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
         self.update_coeffs_settings()
@@ -115,12 +109,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc']['QACC'] = {}  # initialize dict settings
         set_dict_defaults(
             fb.fil[0]['fxqc']['QACC'],
-            {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor'})
+            {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
+             'N_over': 0, 'wdg_name': 'unknown'})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
-            cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
-            cmb_w_init=self.cmb_wq_accu_init)
+            cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items)
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
@@ -150,7 +144,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         - For locally generated signals (key = 'ui_local_changed'), emit
           `{'fx_sim': 'specs_changed'}` with local id.
         - For external changes, i.e. `{'fx_sim': 'specs_changed'}` or
-          `{'data_changed': xxx}` update the UI via `self.dict_ui`.
+          `{'data_changed': xxx}` update the UI via `self.dict2ui`.
 
         Ignore all other signals
 

@@ -417,6 +417,11 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
     Add the key:value pairs of `default_dict` to dictionary `d` in-place for
     all missing keys.
     """
+    # Create a list of keys to avoid "dictionary size changed" runtime error
+    for k in list(d.keys()):
+        if k not in default_dict:
+            d.pop(k)
+            logger.warning(f"Deleted key '{k}' (not part of default dict).")
     if d == {}:
         d.update(default_dict)
     else:

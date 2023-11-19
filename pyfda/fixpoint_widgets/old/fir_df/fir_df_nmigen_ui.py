@@ -63,7 +63,8 @@ class FIR_DF_nmigen_UI(QWidget):
         if 'QA' not in fb.fil[0]['fxqc']:
             fb.fil[0]['fxqc']['QA'] = {}
         set_dict_defaults(fb.fil[0]['fxqc']['QA'],
-                          {'WI': 0, 'WF': 30, 'W': 32, 'ovfl': 'wrap', 'quant': 'floor'})
+                          {'WI': 0, 'WF': 30, 'ovfl': 'wrap', 'quant': 'floor',
+                           'w_a_m': 'a', 'N_over': 0, 'wdg_name': 'unknown'})
 
         self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff',
                                  label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',

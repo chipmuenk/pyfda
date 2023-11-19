@@ -267,7 +267,7 @@ fil_ref = {
     # Settings for fixpoint widgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
     #  Keys:
-    #   'name': name of the fixpoint widget (for easier debugging)
+    #   'wdg_name': name of the fixpoint widget (for easier debugging)
     #   'WI': integer bits, 'WF': fractional bits,
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
@@ -275,19 +275,19 @@ fil_ref = {
 
     'fxqc':{
         # Input quantization
-        'QI': {'name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
+        'QI': {'wdg_name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
         # Output quantization
-        'QO': {'name': 'QO', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
+        'QO': {'wdg_name': 'QO', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'b' coefficient quantization
-        'QCB': {'name': 'QCB', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
+        'QCB': {'wdg_name': 'QCB', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'a' coefficient quantization
-        'QCA': {'name': 'QCA', 'WI': 2, 'WF': 13, 'w_a_m': 'a',
+        'QCA': {'wdg_name': 'QCA', 'WI': 2, 'WF': 13, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # accumulator quantization
-        'QACC': {'name': 'QACC', 'WI': 0, 'WF': 31, 'w_a_m': 'a',
+        'QACC': {'wdg_name': 'QACC', 'WI': 0, 'WF': 31, 'w_a_m': 'a',
                  'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0}
         },
         # 'b': [32768, 32768, 32768],
