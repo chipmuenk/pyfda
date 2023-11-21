@@ -902,6 +902,8 @@ class Plot_Impz(QWidget):
                     self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
                     self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
                         + fb.fil[0]['fxqc']['QO']['WF'] + 1)
+                    self.fx_min = - (1 << (fb.fil[0]['fxqc']['QO']['WI']
+                                     + fb.fil[0]['fxqc']['QO']['WF']))
                     self.fx_max = -self.fx_min - 1
                 elif fb.fil[0]['qfrmt'] == 'qfrac':
                     # display values scaled as "real world (float) values"
