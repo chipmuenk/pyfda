@@ -888,24 +888,49 @@ class Plot_Impz(QWidget):
             logger.error("Response should have been calculated by now!")
             return
 
-        self.scale_i = self.scale_o = 1
+        self.scale_i = self.scale_iq = self.scale_o = 1
         self.fx_min = -1.
         self.fx_max = 1.
         if fb.fil[0]['fx_sim']:
             # fixpoint simulation enabled -> scale stimulus and response
             try:
-                if self.ui.but_fx_scale.isChecked():
+                if fb.fil[0]['qfrmt'] == 'qint':
                     # display stimulus and response as integer values:
                     # - multiply stimulus and response by 2 ** WF
                     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.scale_iq = 1
                     self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
                     self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
                         + fb.fil[0]['fxqc']['QO']['WF'] + 1)
                     self.fx_max = -self.fx_min - 1
-                else:
+                elif fb.fil[0]['qfrmt'] == 'qfrac':
                     # display values scaled as "real world (float) values"
+                    self.scale_i = 1
+                    self.scale_iq = 1
+                    self.scale_o = 1
+                    # self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
+                    #    + fb.fil[0]['fxqc']['QO']['WF'] + 1)
+                    # self.fx_max = -self.fx_min - 1
                     self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
                     self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
+                logger.warning(f"{self.scale_i} - {self.scale_o}")
+
+                # if self.ui.but_fx_scale.isChecked():
+                #     # display stimulus and response as integer values:
+                #     # - multiply stimulus and response by 2 ** WF
+                #     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                #     self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
+                #     self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
+                #         + fb.fil[0]['fxqc']['QO']['WF'] + 1)
+                #     self.fx_max = -self.fx_min - 1
+                #     if fb.fil[0]['qfrmt'] == 'qfrac':
+                #         self.scale_iq = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                #     elif fb.fil[0]['qfrmt'] == 'qint':
+                #         self.scale_iq = 1
+                # else:
+                #     # display values scaled as "real world (float) values"
+                #     self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
+                #     self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
@@ -1149,7 +1174,7 @@ class Plot_Impz(QWidget):
 
         # fixpoint simulation enabled -> scale stimulus and response
         if fb.fil[0]['fx_sim'] and hasattr(self, 'x_q'):
-            x_q = self.x_q[self.ui.N_start:N_end] * self.scale_i
+            x_q = self.x_q[self.ui.N_start:N_end] * self.scale_iq
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
 
@@ -1622,9 +1647,9 @@ class Plot_Impz(QWidget):
             if plt_stimulus_q:
                 Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X_q = calc_ssb_spectrum(self.X_q) * self.scale_i * scale_impz
+                    X_q = calc_ssb_spectrum(self.X_q) * self.scale_iq * scale_impz
                 else:
-                    X_q = self.X_q * self.scale_i * scale_impz
+                    X_q = self.X_q * self.scale_iq * scale_impz
 
             if plt_response:
                 Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * P_scale
