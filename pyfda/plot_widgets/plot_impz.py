@@ -910,29 +910,9 @@ class Plot_Impz(QWidget):
                     self.scale_i = 1
                     self.scale_iq = 1
                     self.scale_o = 1
-                    # self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
-                    #    + fb.fil[0]['fxqc']['QO']['WF'] + 1)
-                    # self.fx_max = -self.fx_min - 1
                     self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
                     self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
                 logger.warning(f"{self.scale_i} - {self.scale_o}")
-
-                # if self.ui.but_fx_scale.isChecked():
-                #     # display stimulus and response as integer values:
-                #     # - multiply stimulus and response by 2 ** WF
-                #     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
-                #     self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
-                #     self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
-                #         + fb.fil[0]['fxqc']['QO']['WF'] + 1)
-                #     self.fx_max = -self.fx_min - 1
-                #     if fb.fil[0]['qfrmt'] == 'qfrac':
-                #         self.scale_iq = 1 << fb.fil[0]['fxqc']['QI']['WF']
-                #     elif fb.fil[0]['qfrmt'] == 'qint':
-                #         self.scale_iq = 1
-                # else:
-                #     # display values scaled as "real world (float) values"
-                #     self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
-                #     self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
