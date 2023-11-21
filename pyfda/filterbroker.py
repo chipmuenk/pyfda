@@ -275,10 +275,10 @@ fil_ref = {
 
     'fxqc':{
         # Input quantization
-        'QI': {'wdg_name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
+        'QI': {'wdg_name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'm',
                'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
         # Output quantization
-        'QO': {'wdg_name': 'QO', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
+        'QO': {'wdg_name': 'QO', 'WI': 0, 'WF': 15, 'w_a_m': 'm',
                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # 'b' coefficient quantization
         'QCB': {'wdg_name': 'QCB', 'WI': 0, 'WF': 15, 'w_a_m': 'a',
