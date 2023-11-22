@@ -219,7 +219,6 @@ class Plot_Impz(QWidget):
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.toggle_fx_setting)
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
-        self.ui.but_fx_scale.clicked.connect(self.draw)
         self.stim_wdg.ui.but_file_io.clicked.connect(self.set_N_to_file_len)
         # --- time domain plotting --------------------------------------------
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw)
@@ -234,7 +233,8 @@ class Plot_Impz(QWidget):
         self.ui.led_time_ovlp_spgr.editingFinished.connect(self._spgr_ui2params)
         self.ui.cmb_mode_spgr_time.currentIndexChanged.connect(self.draw)
         self.ui.chk_byfs_spgr_time.clicked.connect(self.draw)
-        self.ui.but_fx_range.clicked.connect(self.draw)
+        self.ui.but_fx_range_x.clicked.connect(self.draw)
+        self.ui.but_fx_range_y.clicked.connect(self.draw)
         self.ui.chk_win_time.clicked.connect(self.draw)
         # --- frequency domain plotting ---------------------------------------
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw)
@@ -801,8 +801,9 @@ class Plot_Impz(QWidget):
         self.ui.lbl_plt_freq_stmq.setVisible(fb.fil[0]['fx_sim'])  # label freq. domain
         self.ui.cmb_plt_time_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box time domain
         self.ui.lbl_plt_time_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box time domain
-        self.ui.but_fx_scale.setVisible(fb.fil[0]['fx_sim'])  # fx scale int
-        self.ui.but_fx_range.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
+        self.ui.lbl_fx_range.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
+        self.ui.but_fx_range_x.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
+        self.ui.but_fx_range_y.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
 
         # add / delete fixpoint entry to / from spectrogram combo box and set
         # `fx_str = "fixpoint"`` or `""``
@@ -890,30 +891,34 @@ class Plot_Impz(QWidget):
             return
 
         self.scale_i = self.scale_iq = self.scale_o = 1
-        self.fx_min = -1.
-        self.fx_max = 1.
+        self.fx_min_x = self.fx_min_y = -1.
+        self.fx_max_x = self.fx_max_y = 1.
         if fb.fil[0]['fx_sim']:
             # fixpoint simulation enabled -> scale stimulus and response
             try:
                 if fb.fil[0]['qfrmt'] == 'qint':
-                    # display stimulus and response as integer values:
-                    # - multiply stimulus and response by 2 ** WF
+                    # display stimulus and response as integer values
+                    # in the range +/- 2 ** (WI + WF)
                     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
                     self.scale_iq = 1
-                    self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
-                    self.fx_min = - (1 << fb.fil[0]['fxqc']['QO']['WI']\
-                        + fb.fil[0]['fxqc']['QO']['WF'] + 1)
-                    self.fx_min = - (1 << (fb.fil[0]['fxqc']['QO']['WI']
+                    self.scale_o = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.fx_min_x = - (1 << (fb.fil[0]['fxqc']['QI']['WI']
+                                     + fb.fil[0]['fxqc']['QI']['WF']))
+                    self.fx_max_x = -self.fx_min_x - 1
+                    self.fx_min_y = - (1 << (fb.fil[0]['fxqc']['QO']['WI']
                                      + fb.fil[0]['fxqc']['QO']['WF']))
-                    self.fx_max = -self.fx_min - 1
+                    self.fx_max_y = -self.fx_min_y - 1
                 elif fb.fil[0]['qfrmt'] == 'qfrac':
                     # display values scaled as "real world (float) values"
                     self.scale_i = 1
                     self.scale_iq = 1
                     self.scale_o = 1
-                    self.fx_min = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
-                    self.fx_max = -self.fx_min - 1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
-                logger.warning(f"{self.scale_i} - {self.scale_o}")
+                    self.fx_min_x = -(1 << fb.fil[0]['fxqc']['QI']['WI'])
+                    self.fx_max_x = -self.fx_min_x\
+                        - 1. / (1 << fb.fil[0]['fxqc']['QI']['WF'])
+                    self.fx_min_y = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
+                    self.fx_max_y = -self.fx_min_y -\
+                        1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
@@ -1213,21 +1218,26 @@ class Plot_Impz(QWidget):
             else:
                 H_str = '$|$' + H_str + '$|$ in dBV'
 
-            fx_min = 20*np.log10(abs(self.fx_min))
-            fx_max = fx_min
+            fx_min_x = fx_max_x = 20*np.log10(abs(self.fx_min_x))
+            fx_min_y = fx_max_y = 20*np.log10(abs(self.fx_min_y))
         else:
             bottom_t = 0
-            fx_max = self.fx_max
-            fx_min = self.fx_min
+            fx_max_x = self.fx_max_x
+            fx_min_x = self.fx_min_x
+            fx_max_y = self.fx_max_y
+            fx_min_y = self.fx_min_y
             if self.cmplx:
                 H_i_str = r'$\Im\{$' + H_str + r'$\}$ in V'
                 H_str = r'$\Re\{$' + H_str + r'$\}$ in V'
             else:
                 H_str = H_str + ' in V'
 
-        if self.ui.but_fx_range.isChecked() and fb.fil[0]['fx_sim']:
-            self.ax_r.axhline(fx_max, 0, 1, color='k', linestyle='--')
-            self.ax_r.axhline(fx_min, 0, 1, color='k', linestyle='--')
+        if self.ui.but_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
+            self.ax_r.axhline(fx_max_x, 0, 1, color='k', linestyle='--')
+            self.ax_r.axhline(fx_min_x, 0, 1, color='k', linestyle='--')
+        if self.ui.but_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
+            self.ax_r.axhline(fx_max_y, 0, 1, color='k', linestyle='-.')
+            self.ax_r.axhline(fx_min_y, 0, 1, color='k', linestyle='-.')
 
         h_r = []  # plot handles (real part)
         h_i = []  # plot handles (imag. part)
