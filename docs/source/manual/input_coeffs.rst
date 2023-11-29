@@ -17,9 +17,26 @@ every time you design a new filter or update the poles / zeros.
 In the top row, the display of the coefficients can be disabled as a coefficient
 update can be time consuming for high order filters (:math:`N > 100`).
 
+Quantization format
+-------------------
+
+By default, coefficients are displayed in float quantization format, the format returned
+by the filter design algorithm, with a selectable number of decimal places. Internally,
+full precision is always used.
+
+However, many hardware platforms with limited computing resources like uCs can only
+perform fixpoint arithmetics. Here, scaling and wordlength have a strong influence on
+the obtainable accuracy.
+
+It is important to understand that the quantization format only influences the *display*
+of the coefficients, the frequency response etc. is only updated when the quantize
+icon (the staircase) is clicked. Only when you do a *fixpoint simulation*
+or generate Verilog code from the fixpoint tab, the selected word format is
+used for the coefficients.
+
 Fixpoint
 ---------
-When the format is not float, the fixpoint options are displayed as in
+When the format is set to fractional or integer, the fixpoint options are displayed as in
 :numref:`fig_input_coeffs_fixpoint`. Here, the format `Binary` has been set.
 
 .. _fig_input_coeffs_fixpoint:
@@ -29,13 +46,10 @@ When the format is not float, the fixpoint options are displayed as in
    :align: center
    :width: 50%
 
-   Screenshot of the coefficients tab for fixpoint formats
+   Screenshot of the coefficients tab for fixpoint formats (binary display)
 
 Fixpoint Formats
 ~~~~~~~~~~~~~~~~
-Coefficients can be displayed in float format (the format returned by the
-filter design algorithm) with the maximum precision. This is also called
-"Real World Value" (RWV).
 
 Any other format (Binary,
 Hex, Decimal, CSD) is a fixpoint format with a fixed number of binary places
@@ -43,7 +57,8 @@ which activates further display options. These formats (except for CSD)
 are based on the integer value i.e. by simply interpreting the bits as an
 integer value ``INT`` with the MSB as the sign bit.
 
-The scale between floating and fixpoint format is determined by partitioning
+The scale between floating ("Real World Value", RWV) and fixpoint format 
+is determined by partitioning
 the word length ``W`` into integer and fractional places ``WI`` and ``WF``
 with total word length ``W = WI + WF + 1`` where the "``+ 1``" accounts for
 the sign bit.
@@ -64,14 +79,8 @@ In any case, scaling is determined by the number of fractional bits,
 
 .. math::
 
-    F = \frac{f}{f_S}  \textrm{ or }\Omega = \frac{2\pi f}{f_S} = 2\pi F
+    c^2 = a^2 + b^2
 
-It is important to understand that these settings only influence the *display*
-of the coefficients, the frequency response etc. is only updated when the quantize
-icon (the staircase) is clicked AND afterwards the changed coefficients are
-saved to the dict (downwards arrow). However, when you do a fixpoint simulation
-or generate Verilog code from the fixpoint tab, the selected word format is
-used for the coefficients.
 
 In addition to setting the position of the binary point you can select the
 behaviour for:
@@ -85,46 +94,11 @@ behaviour for:
         the fixpoint format, either two's complement overflow occurs (``wrap``)
         or the value is clipped to the maximum resp. minimum ("saturation", ``sat``)
 
-The following shows an example of a coefficient in Q2.4 and Q0.3 format
-using wrap-around and truncation. It's easy to see that for simple wrap-around
-logic, the sign of the result may change.
-
-::
-
-  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-  0 |  1  |  0  .  1  |  0  |  1  |  1   =  43 (INT) or 43/16 = 2 + 11/16 (RWV)
-
-          |  S  . WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
-             0  .  1  |  0  |  1         =  5 (INT) or 5/8 (RWV)
 
 
-Summation:
 
-Before adding two fixpoint numbers with a different number of integer and/or
-fractional bits, integer and fractional word lenghts need to equalized:
 
-- the fractional parts are padded with zeros
-- the integer parts need to be sign extended, i.e. with zeros for positive
-  numbers and with ones for negative numbers
-- adding numbers can require additional integer places due to word growth
-
-For this reason, the position of the binary point needs to be
-
-::
-
-  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-  0 |  1  |  0  .  1  |  0  |  1  |  1   =  43 (INT) or 43/16 = 2 + 11/16 (RWV)
-
-                +
-
-  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-  0 |  0  |  0  .  1  |  0  |  1  |  0   =  10 (INT) or 10/16 (RWV)
-
-  ===================================================================
-
-  S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-  0 |  1  |  1  *  0  |  1  |  0  |  1   =  53 (INT) or 53/16 = 3 + 5/16 (RWV)
-
+More info on fixpoint arithmetics can be found under :ref:`man_fixpoint_specs`.
 
 Development
 -----------

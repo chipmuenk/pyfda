@@ -1,3 +1,5 @@
+.. _man_fixpoint_specs:
+
 Fixpoint Specs
 ===============
 
@@ -40,7 +42,7 @@ limit cycles in recursive filters.
    :width: 40%
    :align: center
    
-   Fixpoint parameter entry widget
+   Fixpoint parameter entry widget (overflow = wrap)
 
 Typical simulation results are shown in :numref:`fig_pyfda_screenshot_hn_fix_t`
 (time domain) and :numref:`fig_pyfda_screenshot_hn_fix_f` (frequency domain).
@@ -66,6 +68,47 @@ simulation and calculating the Fourier response afterwards:
    :align: center
 
    Fixpoint simulation results (frequency domain)
+
+The following shows an example of a coefficient in Q2.4 and Q0.3 format
+using wrap-around and truncation. It's easy to see that for simple wrap-around
+logic, the sign of the result may change.
+
+::
+
+  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+  0 |  1  |  0  .  1  |  0  |  1  |  1   =  43 (INT) or 43/16 = 2 + 11/16 (RWV)
+                .
+          |  S  . WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
+             0  .  1  |  0  |  1         =  5 (INT) or 5/8 (RWV)
+
+
+Summation
+----------
+
+Before adding two fixpoint numbers with a different number of integer and/or
+fractional bits, integer and fractional word lenghts need to equalized:
+
+- the fractional parts are padded with zeros
+- the integer parts need to be sign extended, i.e. with zeros for positive
+  numbers and with ones for negative numbers
+- adding numbers can require additional integer places due to word growth
+
+For this reason, the position of the binary point needs to be
+
+::
+
+  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+  0 |  1  |  0  .  1  |  0  |  1  |  1   =  43 (INT) or 43/16 = 2 + 11/16 (RWV)
+
+                +
+
+  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+  0 |  0  |  0  .  1  |  0  |  1  |  0   =  10 (INT) or 10/16 (RWV)
+
+  ===================================================================
+
+  S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+  0 |  1  |  1  *  0  |  1  |  0  |  1   =  53 (INT) or 53/16 = 3 + 5/16 (RWV)
 
 Configuration
 -------------
