@@ -39,7 +39,7 @@ limit cycles in recursive filters.
 
 .. figure:: ../img/manual/pyfda_input_fixpoint.png
    :alt: Fixpoint parameter entry widget
-   :width: 40%
+   :width: 60%
    :align: center
    
    Fixpoint parameter entry widget (overflow = wrap)
