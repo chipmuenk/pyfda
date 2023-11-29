@@ -549,6 +549,17 @@ class Fixed(object):
         Saturation / two's complement wrapping happens outside the range +/- MSB,
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
+        * Fractional number format WI.WF ('qfrmt':'qfrac'): *
+          - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
+          - Quantize
+          - Scale back by multiplying with `self.LSB` to restore fractional point
+          - Find pos. and neg. overflows and replace them by wrapped or saturated
+            values
+
+        * Integer number format WI + WF ('qfrmt':'qint'): *
+          -
+
+
         Parameters
         ----------
         y: scalar or array-like object
@@ -602,7 +613,7 @@ class Fixed(object):
         scaling = scaling.lower()
         # use values from dict for initialization
         if fb.fil[0]['qfrmt'] == 'qint':
-            self.scale = 2. ** self.q_dict['WF']
+            self.scale = 1 # 2. ** self.q_dict['WF']
         else:
             self.scale = 1
 

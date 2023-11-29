@@ -88,7 +88,13 @@ class IIR_DF1_pyfixp(object):
         """
         self.p = p  # update parameter dictionary with coefficients etc.
 
-        q_mul = p['QACC'].copy()
+        q_mul = p['QACC'].copy()  # quantizer dict for partial products
+        DW = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
+        # word format for sum of partial products b_i * x_i
+        q_mul.update(
+            {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
+             'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
+        WP = q_mul['WI'] + q_mul['WF'] + 1
 
         # update the quantizers
         self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.
@@ -201,11 +207,19 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = np.concatenate((self.zi_b, x))
 
+        logger.warning(f"a_q = \n{self.a_q}\n")
+
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
-            xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            if fb.fil[0]['fxqc']['qfrmt'] == 'qint':
+                xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            else:
+                xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            # logger.warning(f"xb_q = \n{xb_q}\n")
             # append a zero to xa_q to equalize length of xb_q and xa_q
             xa_q = np.append(self.Q_mul.fixp(self.zi_a * self.a_q[1:]), 0)
+            logger.warning(f"zi_a = \n{self.zi_a}")
+            logger.warning(f"xa_q = \n{xa_q}")
 
             # accumulate partial products x_bq and x_aq and quantize them (Q_acc)
             # quantize individual accumulation steps - needed?!
