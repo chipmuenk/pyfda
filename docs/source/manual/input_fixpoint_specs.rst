@@ -1,10 +1,11 @@
 .. _man_fixpoint_specs:
 
+###############
 Fixpoint Specs
-===============
+###############
 
 Overview
---------
+********
 
 The **Fixpoint** tab (:numref:`fig_input_fixpoint`) provides options for 
 generating and simulating discrete-time filters that 
@@ -83,7 +84,7 @@ logic, the sign of the result may change.
 
 
 Summation
-----------
+~~~~~~~~~
 
 Before adding two fixpoint numbers with a different number of integer and/or
 fractional bits, integer and fractional word lenghts need to equalized:
