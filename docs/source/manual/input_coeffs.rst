@@ -98,7 +98,7 @@ behaviour for:
 
 
 
-More info on fixpoint arithmetics can be found under :ref:`man_fixpoint_specs`.
+More info on fixpoint arithmetics can be found under :ref:`man_fixpoint_arithmetics`.
 
 Development
 -----------
