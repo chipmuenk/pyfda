@@ -550,15 +550,23 @@ class Fixed(object):
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
         * Fractional number format WI.WF ('qfrmt':'qfrac'): *
-          - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
-          - Quantize
-          - Scale back by multiplying with `self.LSB` to restore fractional point
-          - Find pos. and neg. overflows and replace them by wrapped or saturated
-            values
+        `LSB =  2 ** -WF, scale = 1`
 
-        * Integer number format WI + WF ('qfrmt':'qint'): *
-          -
+        - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
 
+        - Quantize
+
+        - Scale back by multiplying with `self.LSB` to restore fractional point
+
+        - Find pos. and neg. overflows and replace them by wrapped or saturated
+          values
+
+        * Integer number format W = 1 + WI + WF ('qfrmt':'qint'): *
+        `LSB = 1, scale = 2 ** WF`
+
+        - Multiply float input by `scale = 2 ** WF` to obtain integer scale
+
+        - Quantize and treat overflows in integer scale
 
         Parameters
         ----------
@@ -667,7 +675,6 @@ class Fixed(object):
                         logger.error(f"'{y}' cannot be converted to a number.")
                         y = 0.0
             over_pos = over_neg = yq = 0
-            # ovr_flag = 0
             self.N += 1
 
         # convert pseudo-complex (imag = 0) and complex values to real
@@ -677,7 +684,7 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        y_in = y  # y before scaling / quantizing
+        y_in = y  # store y before scaling / quantizing
         # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
@@ -731,7 +738,7 @@ class Fixed(object):
 
         yq /= 2. ** self.q_dict['WF']
 
-        # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
+        logger.warning(f"scaling={scaling} y_in={y_in} | y={y} | yq={yq}")
 
         # ======================================================================
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
@@ -769,11 +776,10 @@ class Fixed(object):
 
         # ======================================================================
         # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
-        #       to obtain correct scaling for floats
+        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv':
         #       - frmt2float() always returns float
         #       - input_coeffs when quantizing the coefficients
-        #       float2frmt passes on the scaling argument
+        #       - float2frmt passes on the scaling argument
         # ======================================================================
 
         if scaling in {'div', 'multdiv'}:
