@@ -211,7 +211,7 @@ class IIR_DF1_pyfixp(object):
 
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
-            if fb.fil[0]['fxqc']['qfrmt'] == 'qint':
+            if fb.fil[0]['qfrmt'] == 'qint':
                 xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
             else:
                 xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
