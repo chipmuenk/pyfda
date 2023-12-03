@@ -688,13 +688,14 @@ class Fixed(object):
 
         # ======================================================================
         # (3) : QUANTIZATION
-        #       Divide by LSB to obtain an intermediate format where the
+        #       Multiply by 2**WF to obtain an intermediate format where the
         #       quantization step size = 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
-        #       Finally, multiply by LSB to restore original scale.
+        #       Finally, divide by 2**WF to restore original scale.
         # ======================================================================
-        y = y / self.LSB
+
+        y *= 2. ** self.q_dict['WF']
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -727,7 +728,9 @@ class Fixed(object):
         else:
             raise Exception(
                 f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
-        yq = yq * self.LSB
+
+        yq /= 2. ** self.q_dict['WF']
+
         # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         # ======================================================================
