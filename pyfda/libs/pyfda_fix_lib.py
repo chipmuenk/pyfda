@@ -613,7 +613,7 @@ class Fixed(object):
         scaling = scaling.lower()
         # use values from dict for initialization
         if fb.fil[0]['qfrmt'] == 'qint':
-            self.scale = 1 # 2. ** self.q_dict['WF']
+            self.scale = 2. ** self.q_dict['WF']
         else:
             self.scale = 1
 
