@@ -1056,17 +1056,17 @@ class Fixed(object):
             y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1)
 
             if fb.fil[0]['qfrmt'] == 'qint':
-                W = self.q_dict['WI'] + self.q_dict['WF'] + 1
+                WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
             else:
-                W = self.q_dict['WI']
+                WI = self.q_dict['WI']
             if fb.fil[0]['fx_base'] == 'hex':
-                y_str = bin2hex_vec(y_bin_str, W)
+                y_str = bin2hex_vec(y_bin_str, WI)
             else:  # 'bin'
                 # insert radix point if required
                 if fb.fil[0]['qfrmt'] == 'qint':
                     y_str = y_bin_str
                 else:
-                    y_str = insert_binary_point(y_bin_str, W)
+                    y_str = insert_binary_point(y_bin_str, WI)
         else:
             raise Exception(f"""Unknown number format "{fb.fil[0]['fx_base']}"!""")
 
