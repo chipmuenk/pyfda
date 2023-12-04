@@ -213,8 +213,10 @@ class FX_UI_WQ(QWidget):
         self.ledWI.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
         self.ledWI.setObjectName("WI")
 
-        self.lbl_sep = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
-        self.lbl_sep.setVisible(ui_dict['fractional'])
+        self.lbl_sep1 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
+        self.lbl_sep1.setVisible(ui_dict['fractional'])
+        self.lbl_sep2 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
+        self.lbl_sep2.setVisible(False)
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(ui_dict['tip_WF'])
@@ -240,8 +242,9 @@ class FX_UI_WQ(QWidget):
 
         layH_W = QHBoxLayout()
         layH_W.addWidget(self.ledWI)
-        layH_W.addWidget(self.lbl_sep)
+        layH_W.addWidget(self.lbl_sep1)
         layH_W.addWidget(self.ledWF)
+        layH_W.addWidget(self.lbl_sep2)
         layH_W.setContentsMargins(0, 0, 0, 0)
 
         layG = QGridLayout()
@@ -473,15 +476,15 @@ class FX_UI_WQ(QWidget):
         self.ledWF.setVisible(qfrmt != 'float')
 
         if qfrmt == 'qint':
-            self.lbl_sep.setText(to_html(">", frmt='b'))
-            self.ledWF.setToolTip("Integer scaling")
+            self.lbl_sep1.setText(to_html("(", frmt='b'))
+            self.ledWF.setToolTip("Fractional position")
             self.ledWI.setText(str(self.q_dict['WI'] + self.q_dict['WF'] + 1))
             self.ledWI.setToolTip("Total number of bits")
 
             LSB = 1.
             MSB = 2. ** (self.q_dict['WI'] + self.q_dict['WF'] - 1)
         elif qfrmt == "qfrac":
-            self.lbl_sep.setText(to_html(".", frmt='b'))
+            self.lbl_sep1.setText(to_html(".", frmt='b'))
             self.ledWF.setToolTip("Number of fractional bits")
             self.ledWI.setText(str(self.q_dict['WI']))
             self.ledWI.setToolTip("Number of integer bits")
@@ -489,7 +492,7 @@ class FX_UI_WQ(QWidget):
             LSB = 2 ** -self.q_dict['WF']
             MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
         elif qfrmt == 'float':
-            self.lbl_sep.setText(to_html("---", frmt='b'))
+            self.lbl_sep1.setText(to_html("---", frmt='b'))
         else:
             logger.error(f"Unknown quantization format '{qfrmt}'!")
 
