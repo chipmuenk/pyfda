@@ -5,7 +5,7 @@ Fixpoint Specs
 ###############
 
 Overview
-********
+---------
 
 The **Fixpoint** tab (:numref:`fig_input_fixpoint`) provides options for 
 generating and simulating discrete-time filters that 
@@ -40,7 +40,7 @@ limit cycles in recursive filters.
 
 .. figure:: ../img/manual/pyfda_input_fixpoint.png
    :alt: Fixpoint parameter entry widget
-   :width: 60%
+   :width: 80%
    :align: center
    
    Fixpoint parameter entry widget (overflow = wrap)
@@ -84,7 +84,7 @@ logic, the sign of the result may change.
 
 
 Summation
-~~~~~~~~~
+*********
 
 Before adding two fixpoint numbers with a different number of integer and/or
 fractional bits, integer and fractional word lenghts need to equalized:
@@ -108,8 +108,11 @@ For this reason, the position of the binary point needs to be
 
   ===================================================================
 
-  S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-  0 |  1  |  1  *  0  |  1  |  0  |  1   =  53 (INT) or 53/16 = 3 + 5/16 (RWV)
+  S | WI1 | WI0 . WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+  0 |  1  |  1  .  0  |  1  |  0  |  1   =  53 (INT) or 53/16 = 3 + 5/16 (RWV)
+
+More info on fixpoint numbers and arithmetics can be found under
+:ref:`man_fixpoint_arithmetics`.
 
 Configuration
 -------------
