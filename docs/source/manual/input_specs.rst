@@ -104,7 +104,7 @@ process and the signal cannot be reconstructed without errors (forth image in :n
 
 .. _fig_aliasing:
 
-.. figure:: ../img/manual/SMP_aliasing.png
+.. figure:: ../img/manual/aliasing.png
    :alt: Sampling and aliasing with 4 different sinusoids
    :align: center
 

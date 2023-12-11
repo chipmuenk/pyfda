@@ -8,7 +8,27 @@ Overview
 ---------
 
 In contrast to floating point numbers, **fixpoint** numbers have a fixed scaling, 
-requiring more care to avoid over- or underflows. 
+requiring more care to avoid over- or underflows. The same binary word can
+represent an integer or a fractional number, signed or unsigned. The binary point
+and whether the MSB represents the sign bit or not, is in the designers head ...
+
+.. _fig_twos_complement_int:
+
+.. figure:: ../img/manual/twos_complement_int.png
+   :alt: Integer number in twos-complement format
+   :width: 60%
+   :align: center
+
+   Signed integer number in twos-complement format
+
+.. _fig_twos_complement_frac:
+
+.. figure:: ../img/manual/twos_complement_frac.png
+   :alt: Fractional number in twos-complement format
+   :width: 60%
+   :align: center
+
+   Signed fractional number in twos-complement format
 
 The fixpoint format of input word :math:`Q_X` and output word
 :math:`Q_Y` can be adjusted for all fixpoint filters, pressing the "lock" button
@@ -38,8 +58,61 @@ with changes in the sign.
    
    Fixpoint filter response with overflows
 
-Truncation and wrap-around
+Overflow behaviour
+*******************
+
+When adding two numbers or when reducing the number of integer bits, the number may
+not fit in the numeric range.
+
+Discarding one or more leading bits to obtain the desired wordlength is easy but may produce
+wrap-arounds. The resulting sign changes can introduce instability and limit-cycle
+oscillations to the system.
+
+Saturation is much more benign but requires a little more effort: When summing two numbers,
+both need to be sign extended by one bit to enable overflow detection. As shown in
+:numref:`fig_fixpoint_overflow`, when the two leading bits (sign and carry) are `01`
+or `10`, the result exceeds the numeric range and needs to be replaced by the maximum 
+resp. minimum representable value. When reducing the number of integer bits, similar
+checks need to be performed to test for overflows.
+
+
+.. _fig_fixpoint_overflow:
+
+.. figure:: ../img/manual/fixpoint_overflow.png
+   :alt: Overflow behaviour for wrap-around and saturation
+   :width: 60%
+   :align: center
+
+   Overflow behaviour with wrap-around or saturation
+
+Sign extension
+***************
+
+When increasing the number of integer bits, numbers need to be sign extended,
+i.e. the new leading bits need to be filled with the sign bit. Extending the
+number of fractional bits just requires zero padding.
+
+.. _fig_sign_extension_int:
+
+.. figure:: ../img/manual/sign_extension.png
+   :alt: Sign extension of integer and fractional numbers
+   :width: 40%
+   :align: center
+
+   Sign extension of integer and fractional numbers
+
+
+Truncation and rounding
 **************************
+
+.. _fig_requant_reduce_fractional:
+
+.. figure:: ../img/manual/requant_reduce_fractional.png
+   :alt: Requantizing fixpoint number
+   :width: 80%
+   :align: center
+
+   Reducing fractional word length using truncation, rounding and round-towards-zero
 
 The following shows an example of a positive number in Q2.4 that is converted to Q1.3
 format using truncation. It's easy to see that for simple wrap-around

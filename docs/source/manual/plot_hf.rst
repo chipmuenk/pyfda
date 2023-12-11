@@ -11,7 +11,7 @@ magnitude frequency response.
    :align: center
    :width: 70%
 
-   Screenshot of the |H(f)| tab
+   Screenshot of the `|H(f)|` tab
 
 You can plot magnitude, real or imaginary part in V (linear), W (squared) or dB
 (log. scale).

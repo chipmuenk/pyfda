@@ -62,6 +62,7 @@ Uninstall:
 If you have cloned `pyfda` to your local drive you can install the local copy (i.e. create local config files and the `pyfdax` starter script) via
 
     > pip install -e <YOUR_PATH_TO_PYFDA_setup.py>
+
 -->
 
 #### Starting pyfda
@@ -70,14 +71,15 @@ A pip installation creates a start script `pyfdax` in `<python>/Scripts` which s
     > pyfdax
 
 The following libraries are required and installed automatically by pip when missing.
-* [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
-* [**numpy**](https://numpy.org/)
-* [**numexpr**](https://github.com/pydata/numexpr)
-* [**scipy**](https://scipy.org/): **1.2.0** or higher
-* [**matplotlib**](https://matplotlib.org/): **3.1** or higher
-* [**Markdown**](https://github.com/Python-Markdown/markdown)
+- [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
+- [**numpy**](https://numpy.org/)
+- [**numexpr**](https://github.com/pydata/numexpr)
+- [**scipy**](https://scipy.org/): **1.2.0** or higher
+- [**matplotlib**](https://matplotlib.org/): **3.1** or higher
+- [**Markdown**](https://github.com/Python-Markdown/markdown)
   
 **Optional libraries:**
+
 * [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
 * [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
