@@ -738,7 +738,7 @@ class Fixed(object):
 
         yq /= 2. ** self.q_dict['WF']
 
-        logger.warning(f"scaling={scaling} y_in={y_in} | y={y} | yq={yq}")
+        # logger.warning(f"scaling={scaling} y_in={y_in} | y={y} | yq={yq}")
 
         # ======================================================================
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
