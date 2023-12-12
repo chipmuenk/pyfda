@@ -11,7 +11,10 @@ User Manual
    Screenshot of pyfda
 
 :numref:`fig_pyfda_screenshot` shows the main pyfda screen with three subwindows 
-that can be resized with the handles (red dots):
+that can be resized with the handles (red dots).
+
+The tabs on the left-hand side access widgets to enter and view various
+specification and parameters for the filter / system to be designed resp. analyzed.
 
    .. toctree::
       :maxdepth: 1
@@ -23,8 +26,7 @@ that can be resized with the handles (red dots):
       input_info
       input_fixpoint_specs
 
-   The tabs on the left-hand side access widgets to enter and view various
-   specification and parameters for the filter / system to be designed resp. analyzed.
+   The subwidgets on the right-hand side allow for graphical analyses of the system.
 
    .. toctree::
       :maxdepth: 1
@@ -37,7 +39,14 @@ that can be resized with the handles (red dots):
       plot_impz
       plot_3d
 
-   The subwidgets on the right-hand side allow for graphical analyses of the system.
+Some documentation treats general filter design and fixpoint arithmetics stuff.
+
+   .. toctree::
+      :maxdepth: 1
+      :caption: General Documentation
+
+      fixpoint_arithmetics
+
 
 Logger Subwindow
 ----------------

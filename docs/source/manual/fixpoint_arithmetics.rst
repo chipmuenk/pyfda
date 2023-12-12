@@ -16,7 +16,7 @@ and whether the MSB represents the sign bit or not, is in the designers head ...
 
 .. figure:: ../img/manual/twos_complement_int.png
    :alt: Integer number in twos-complement format
-   :width: 60%
+   :width: 50%
    :align: center
 
    Signed integer number in twos-complement format
