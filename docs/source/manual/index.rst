@@ -18,7 +18,7 @@ specification and parameters for the filter / system to be designed resp. analyz
 
    .. toctree::
       :maxdepth: 1
-      :caption: Subwindow for Input Widgets
+      :caption: **Subwindow for Input Widgets**
 
       input_specs
       input_coeffs
@@ -26,11 +26,11 @@ specification and parameters for the filter / system to be designed resp. analyz
       input_info
       input_fixpoint_specs
 
-   The subwidgets on the right-hand side allow for graphical analyses of the system.
+The subwidgets on the right-hand side allow for graphical analyses of the system.
 
    .. toctree::
       :maxdepth: 1
-      :caption: Subwindow for Plotting Widgets
+      :caption: **Subwindow for Plotting Widgets**
 
       plot_hf
       plot_phi
@@ -43,7 +43,7 @@ Some documentation treats general filter design and fixpoint arithmetics stuff.
 
    .. toctree::
       :maxdepth: 1
-      :caption: General Documentation
+      :caption: **General Documentation**
 
       fixpoint_arithmetics
 

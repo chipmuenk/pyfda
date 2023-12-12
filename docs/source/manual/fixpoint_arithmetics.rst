@@ -7,10 +7,12 @@ Fixpoint Arithmetics
 Overview
 ---------
 
-In contrast to floating point numbers, **fixpoint** numbers have a fixed scaling, 
+In contrast to floating point numbers, **fixpoint** numbers have a fixed scaling,
 requiring more care to avoid over- or underflows. The same binary word can
-represent an integer or a fractional number, signed or unsigned. The binary point
-and whether the MSB represents the sign bit or not, is in the designers head ...
+represent an integer (:numref:`fig_twos_complement_int`) or a fractional
+(:numref:`fig_twos_complement_frac`) number, signed or unsigned. The position of the
+binary point and whether the MSB represents the sign bit or not, it is all in the
+designer's head ...
 
 .. _fig_twos_complement_int:
 
@@ -46,7 +48,7 @@ limit cycles in recursive filters.
 
 Typical simulation results are shown in :numref:`fig_pyfda_screenshot_yn_overflows`,
 where first the input signal exceeds the numeric range and then the output signal.
-The overflow behaviour is set to 'wrap', resulting in twos-complement wrap around 
+The overflow behaviour is set to 'wrap', resulting in twos-complement wrap around
 with changes in the sign.
 
 .. _fig_pyfda_screenshot_yn_overflows:
@@ -55,23 +57,41 @@ with changes in the sign.
    :alt: Screenshot of fixpoint simulation results (time domain)
    :width: 80%
    :align: center
-   
+
    Fixpoint filter response with overflows
+
+Sign extension
+***************
+
+When increasing the number of integer bits, numbers need to be sign extended,
+i.e. the new leading bits need to be filled with the sign bit
+(:numref:`fig_sign_extension`). Extending the
+number of fractional bits just requires zero padding.
+
+.. _fig_sign_extension:
+
+.. figure:: ../img/manual/sign_extension.png
+   :alt: Sign extension of integer and fractional numbers
+   :width: 40%
+   :align: center
+
+   Sign extension of integer and fractional numbers
 
 Overflow behaviour
 *******************
 
-When adding two numbers or when reducing the number of integer bits, the number may
+After summation or when reducing the number of integer bits, the result may
 not fit in the numeric range.
 
 Discarding one or more leading bits to obtain the desired wordlength is easy but may produce
 wrap-arounds. The resulting sign changes can introduce instability and limit-cycle
-oscillations to the system.
+oscillations to the system (:numref:`fig_fixpoint_overflow`, left-hand side).
 
-Saturation is much more benign but requires a little more effort: When summing two numbers,
+Saturation (:numref:`fig_fixpoint_overflow`, right-hand side) is much more benign
+but requires a little more effort: Before adding two numbers,
 both need to be sign extended by one bit to enable overflow detection. As shown in
 :numref:`fig_fixpoint_overflow`, when the two leading bits (sign and carry) are `01`
-or `10`, the result exceeds the numeric range and needs to be replaced by the maximum 
+or `10`, the result exceeds the numeric range and needs to be replaced by the maximum
 resp. minimum representable value. When reducing the number of integer bits, similar
 checks need to be performed to test for overflows.
 
@@ -84,22 +104,6 @@ checks need to be performed to test for overflows.
    :align: center
 
    Overflow behaviour with wrap-around or saturation
-
-Sign extension
-***************
-
-When increasing the number of integer bits, numbers need to be sign extended,
-i.e. the new leading bits need to be filled with the sign bit. Extending the
-number of fractional bits just requires zero padding.
-
-.. _fig_sign_extension_int:
-
-.. figure:: ../img/manual/sign_extension.png
-   :alt: Sign extension of integer and fractional numbers
-   :width: 40%
-   :align: center
-
-   Sign extension of integer and fractional numbers
 
 
 Truncation and rounding
