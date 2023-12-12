@@ -690,7 +690,11 @@ class Fixed(object):
         if np.iscomplexobj(y):
             logger.warning("Casting complex values to real before quantization!")
             # quantizing complex objects is not supported yet
-            y = y.real
+            # y = y.real
+            yq = self.fixp(y.real, scaling=scaling) + 1j * self.fixp(y.imag, scaling=scaling)
+            logger.warning(yq)
+            return yq
+
 
         y_in = y  # store y before scaling / quantizing
         # ======================================================================
