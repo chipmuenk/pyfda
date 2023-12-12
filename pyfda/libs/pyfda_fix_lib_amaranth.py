@@ -95,12 +95,12 @@ if cmp_version("nmigen", "0.3") >= 0:
 
         """
         WI_I = QI['WI']         # number of integer bits (input signal)
-        WI_F = QI['WF']         # number of integer bits (output signal)
+        WI_F = QI['WF']         # number of fractional bits (input signal)
         WI   = WI_I + WI_F + 1  # total word length (input signal)
 
-        WO_I = QO['WI']         # number of integer bits (input signal)
-        WO_F = QO['WF']         # number of integer bits (output signal)
-        WO   = WO_I + WO_F + 1  # total word length (input signal)
+        WO_I = QO['WI']         # number of integer bits (output signal)
+        WO_F = QO['WF']         # number of fractional bits (output signal)
+        WO   = WO_I + WO_F + 1  # total word length (output signal)
 
         dWF = WI_F - WO_F       # difference of fractional lengths
         dWI = WI_I - WO_I       # difference of integer lengths
