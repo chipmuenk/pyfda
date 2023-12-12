@@ -648,9 +648,10 @@ class Fixed(object):
                         self.N += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError):
-                        y = np.asarray(list(map(lambda y_scalar:
+                        yq = np.asarray(list(map(lambda y_scalar:
                                             self.fixp(y_scalar, scaling=scaling), y)))
                         self.N += y.size
+                        return yq
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
