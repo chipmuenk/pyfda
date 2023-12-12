@@ -543,8 +543,15 @@ class Fixed(object):
 # ------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
         """
-        Return fixed-point integer or fractional representation `yq` for `y`
-        (scalar or array-like) with the same shape as `y`.
+        Return a quantized copy `yq` for `y` (scalar or array-like) with the same
+        shape as `y`. The returned data is always in float format, use float2frmt()
+        to obtain different number formats.
+
+        This is used a.o. by the following methods / classes:
+
+        - frmt2float(): always returns a float with RWV
+        - float2frmt(): starts with RWV, passes on the scaling argument
+        - input_coeffs: uses both methods above when quantizing coefficients
 
         Saturation / two's complement wrapping happens outside the range +/- MSB,
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
@@ -778,10 +785,7 @@ class Fixed(object):
 
         # ======================================================================
         # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv':
-        #       - frmt2float() always returns float
-        #       - input_coeffs when quantizing the coefficients
-        #       - float2frmt() passes on the scaling argument
+        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         # ======================================================================
 
         if scaling in {'div', 'multdiv'}:
