@@ -1068,8 +1068,7 @@ class Fixed(object):
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
                 logger.warning(e)
-                y_dec = y_float = None
-
+                return 0.0
         # ----
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
@@ -1082,6 +1081,7 @@ class Fixed(object):
         # ----
         else:
             logger.error(f'Unknown output format "{frmt}"!')
+            return 0.0
 
         if y_float is not None:
             return y_float
