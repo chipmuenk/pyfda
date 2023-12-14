@@ -477,7 +477,8 @@ class Fixed(object):
                 'dec': r'[^0-9Ee|.|,|\-]',
                 'hex': r'[^0-9A-Fa-f|.|,|\-]'
                         }
-        # provide frmt2float function for arrays, swallow the `self` argument
+        # --------------------------------------------------------------------------
+        # vectorize frmt2float function for arrays, swallow the `self` argument
         self.frmt2float_vec = np.vectorize(self.frmt2float_scalar, excluded='self')
 
     def verify_q_dict_keys(self, q_dict: dict) -> None:
@@ -670,7 +671,7 @@ class Fixed(object):
             if y is None or str(y) == "":
                 y = 0
             # If y is not a number, remove whitespace and try to convert to
-            # to float and or to complex format:
+            # float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
                 y = str(y)
                 y = y.replace(' ', '')  # remove all whitespace

@@ -208,10 +208,13 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index) -> None:
         """
         When editing has finished, read the updated data from the editor (= QTableWidget),
-        convert it back to floating point format and store it in `self.ba` as float via
-        `float2frmt()`. Next, convert it back to fixpoint format via `frmt2float()`  and
-        store it in `self.ba_q`. Finally, refresh the table item to
-        display it in the selected format via `_refresh_table_item()`.
+        and store it in `self.ba` as float / complex for `fb.fil[0]['qfrmt'] == 'float'`.
+
+        For all other formats, convert data back to floating point format via
+        `frmt2float()` and store it in `self.ba` as float / complex. Next, use
+        `float2frmt()` to quantize data and and store it in `parent.ba_q`.
+        Finally, refresh the table item to display it in the selected format via
+        `_refresh_table_item()`.
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
@@ -229,13 +232,13 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw data without fixpoint formatting
-            data_q = data  # TODO: complex data
+            data_q = data
         else:   # fixpoint format, transform to float
             data = self.QObj[index.column()].frmt2float(str(editor.text()))
             data_q = self.QObj[index.column()].float2frmt(data)
 
         # model.setData(index, data)                          # store in QTableWidget
-        # if data is complex, convert whole ba (list of arrays) to complex type
+        # if data is complex, whole ba (list of arrays) needs to be of complex type
         if isinstance(data, complex):
             self.parent.ba[index.column()] = self.parent.ba[index.column()].astype(complex)
             self.parent.ba_q[index.column()] = self.parent.ba_q[index.column()].astype(complex)
