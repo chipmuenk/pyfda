@@ -673,6 +673,7 @@ class Fixed(object):
             # If y is not a number, remove whitespace and try to convert to
             # float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
+                logger.error(f"Quantize string {y}")
                 y = str(y)
                 y = y.replace(' ', '')  # remove all whitespace
                 try:
@@ -689,11 +690,11 @@ class Fixed(object):
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
-            logger.warning("Casting complex values to real before quantization!")
+            logger.warning(f"Trying to quantize complex value(s)\n{y}")
             # quantizing complex objects is not supported yet
             # y = y.real
             yq = self.fixp(y.real, scaling=scaling) + 1j * self.fixp(y.imag, scaling=scaling)
-            logger.warning(yq)
+            logger.warning(f"yq = {yq}")
             return yq
 
 
@@ -1005,7 +1006,12 @@ class Fixed(object):
                     f"String split into {len(y1)} parts - that's too many!")
                 return 0.0, 0.0
         # -----------------------------------------
+
         frmt = fb.fil[0]['fx_base']
+        if 'j' in str(y):
+            y_re, y_im = split_complex_str(y)
+            return self.frmt2float(y_re) +\
+                  self.frmt2float(y_im) * 1j
         val_str = re.sub(self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0')
         if len(val_str) > 0:
             val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
