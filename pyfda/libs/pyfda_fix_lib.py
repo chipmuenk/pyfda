@@ -981,6 +981,30 @@ class Fixed(object):
         error handling of individual routines,
         remove illegal characters and trailing zeros
         """
+        def split_complex_str(y: str) -> tuple:
+            # only keep allowed characters incl. 'j' and '+'
+            y = re.sub(self.FRMT_REGEX[frmt].replace(']', '|j\+]'),
+                       r'', str(y)).lstrip('0')
+            logger.error(f"y cleaned but unsplit: {y}")
+
+            # (?!^) : any position other than start of string
+            # (...) split without deleting the delimiter
+            # (?= ...) Matches if ... matches next, but doesn’t consume any
+            #          of the string (lookahead assertion).
+            # [+-][\d]: +[0 ... 9] or -[0 ... 9]
+            y1 = re.split(r"(?!^)(?=[+-][\da-fA-F])", y)
+
+            logger.error(f"split: {y1}")
+
+            if len(y1) == 2:
+                return y1[-2], y1[-1].replace('j','')
+            elif len(y1) == 1: # purely imaginary
+                return 0, y1[0].replace('j', '')
+            else:
+                logger.error(
+                    f"String split into {len(y1)} parts - that's too many!")
+                return 0.0, 0.0
+        # -----------------------------------------
         frmt = fb.fil[0]['fx_base']
         val_str = re.sub(self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0')
         if len(val_str) > 0:
