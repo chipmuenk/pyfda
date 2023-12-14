@@ -464,6 +464,8 @@ class Input_Coeffs(QWidget):
                 self.QObj[0].ovr_flag,
                 self.QObj[1].ovr_flag
                         ]
+        # convert self.ba_q to list of arrays for easier handling
+        self.ba_q = [np.asarray(self.ba_q[i]) for i in range(4)]
         self.ui.wdg_wq_coeffs_b.update_ovfl_cnt()
         self.ui.wdg_wq_coeffs_a.update_ovfl_cnt()
 
