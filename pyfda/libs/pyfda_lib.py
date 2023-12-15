@@ -658,7 +658,8 @@ def safe_numexpr_eval(expr: str, fallback=None,
 
 
 # ------------------------------------------------------------------------------
-def safe_eval(expr, alt_expr=0, return_type: str = "float", sign: str = None) -> str:
+def safe_eval(expr, alt_expr=0, return_type: str = "float", sign: str = None
+              )-> complex|float|int:
     """
     Try ... except wrapper around numexpr to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`.
