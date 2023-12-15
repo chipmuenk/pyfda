@@ -18,6 +18,7 @@ import copy
 import pyfda.filterbroker as fb
 import numpy as np
 from numpy.lib.function_base import iterable
+from pyfda.libs.pyfda_lib import is_numeric
 try:
     import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
@@ -1120,8 +1121,11 @@ class Fixed(object):
             return 0.0
 
     # --------------------------------------------------------------------------
-    def float2frmt(self, y):
+    def float2frmt(self, y) -> str:
         """
+        Convert an array or single value of float / complex / string to a quantized
+        representation in one of the formats float / int / bin / hex / csd.
+
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
         with numeric format `self.frmt` and a total wordlength of
@@ -1134,8 +1138,7 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like
-            y has to be an integer or float decimal number either numeric or in
-            string format.
+            y has to be an integer, float or complex decimal number
 
         Returns
         -------
@@ -1159,7 +1162,9 @@ class Fixed(object):
 
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         # ======================================================================
-
+        if not is_numeric(y):
+            logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
+            return 0.0
         if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
         elif fb.fil[0]['qfrmt'] == 'float32':

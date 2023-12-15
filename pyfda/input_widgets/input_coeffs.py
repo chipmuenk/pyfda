@@ -192,16 +192,16 @@ class ItemDelegate(QStyledItemDelegate):
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
         """
-        data_str = str(safe_eval(self.parent.ba[index.column()][index.row()],
-                                 return_type="auto"))
+        data = safe_eval(self.parent.ba[index.column()][index.row()],
+                         return_type="auto")
         if fb.fil[0]['qfrmt'] == 'float':
             # floating point format: pass data with full resolution
-            editor.setText(data_str)
+            editor.setText(str(data))
         else:
             # fixpoint format with base:
             # pass requantized data with required number of decimal places
             editor.setText(
-                "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data_str),
+                "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data),
                                   self.QObj[index.column()].places))
 
     # -------------------------------------------------------------------------
