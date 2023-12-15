@@ -336,6 +336,28 @@ def qstr(text):
 # General functions ###########################################################
 ###############################################################################
 
+def is_numeric(a) -> bool:
+    """
+    Return True when a or a.dtype is of a numeric type (complex, float, int, ...)
+
+    Parameters
+    ----------
+    a : array-like or scalar
+
+    Returns
+    -------
+    is_num : bool
+        True when dtype of a is a numeric subtype
+    """
+    if isinstance(a, np.ndarray):
+        is_num = np.issubdtype(a.dtype, np.number)
+    else:
+        is_num = np.issubdtype(type(a), np.number)
+        logger.error(f"{a} of type {type(a)} is num: {is_num}")
+
+    return is_num
+
+
 def np_type(a):
     """
     Return the python type of `a`, either of the parameter itself or (if it's a
