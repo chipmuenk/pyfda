@@ -1168,6 +1168,22 @@ class Fixed(object):
         if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
 
+        logger.error(f"float2frmt:\n{y}\n{type(y)}")
+        if np.iscomplexobj(y):
+            y_re = self.float2frmt(y.real)
+            y_im = self.float2frmt(y.imag)
+            if is_numeric(y_re) and is_numeric(y_im):
+                return y_re + y_im * 1j
+            else:
+                y_j = np.empty_like(y_im, dtype=str)
+                y_j.fill("j")
+                ystr = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im, y_j))
+                # ystr = str(y_re) + str(y_im) + y_j
+                logger.warning(f"ystr={ystr}")
+                return ystr
+        # use np.array2string(x, formatter={'int':lambda x: hex(x)}) ?
+        logger.error(f"float2frmt (not cmplx):\n{y}\n{type(y)}")
+
         # return a quantized & saturated / wrapped fixpoint (type float) for y
         y_fix = self.fixp(y, scaling='mult')
 
