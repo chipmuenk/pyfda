@@ -1167,10 +1167,6 @@ class Fixed(object):
             return 0.0
         if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
-        elif fb.fil[0]['qfrmt'] == 'float32':
-            return np.float32(y)
-        elif fb.fil[0]['qfrmt'] == 'float16':
-            return np.float16(y)
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y
         y_fix = self.fixp(y, scaling='mult')
