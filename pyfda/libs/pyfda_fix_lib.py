@@ -992,8 +992,8 @@ class Fixed(object):
             # (...) split without deleting the delimiter
             # (?= ...) Matches if ... matches next, but doesn’t consume any
             #          of the string (lookahead assertion).
-            # [+-][\d]: +[0 ... 9] or -[0 ... 9]
-            y1 = re.split(r"(?!^)(?=[+-][\da-fA-F])", y)
+            # [+-][\d]: +/-[0 ... 9 or A ... F or .]
+            y1 = re.split(r"(?!^)(?=[+-][\.\da-fA-F])", y)
 
             logger.error(f"split: {y1}")
 
