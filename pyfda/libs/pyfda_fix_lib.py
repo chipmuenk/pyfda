@@ -1169,7 +1169,7 @@ class Fixed(object):
             return y
 
         logger.error(f"float2frmt:\n{y}\n{type(y)}")
-        if np.iscomplexobj(y):
+        if np.iscomplexobj(y):  # convert complex arguments recursively
             y_re = self.float2frmt(y.real)
             y_im = self.float2frmt(y.imag)
             if fb.fil[0]['fx_base'] == 'csd':
@@ -1178,12 +1178,10 @@ class Fixed(object):
                     "\n\tPlease create an issue if you need this feature.")
                 # CSD coefficients differ in length and require an array with dtype 'object'
                 # which does not support arithmetic or string operations.
-                y_str = y_re
-                logger.warning(y_str)
-                return y_str
-            if is_numeric(y_re) and is_numeric(y_im):
+                return y_re
+            elif is_numeric(y_re) and is_numeric(y_im):  # return in numeric format
                 return y_re + y_im * 1j
-            elif not (is_numeric(y_re) or is_numeric(y_im)):
+            elif not (is_numeric(y_re) or is_numeric(y_im)):  # return string (array)
                 logger.error(f"real part {y_re}\n{type(y_re)}\nimag. part {y_im}\n{type(y_im)}.")
                 y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
                 logger.warning(f"ystr={y_str}")
