@@ -1183,13 +1183,14 @@ class Fixed(object):
                 return y_str
             if is_numeric(y_re) and is_numeric(y_im):
                 return y_re + y_im * 1j
+            elif not (is_numeric(y_re) or is_numeric(y_im)):
+                logger.error(f"real part {y_re}\n{type(y_re)}\nimag. part {y_im}\n{type(y_im)}.")
+                y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
+                logger.warning(f"ystr={y_str}")
+                return y_str
             else:
-                y_j = np.empty_like(y_im, dtype=str)
-                y_j.fill("j")
-                ystr = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im, y_j))
-                # ystr = str(y_re) + str(y_im) + y_j
-                logger.warning(f"ystr={ystr}")
-                return ystr
+                logger.error(f"Cannot combine real part ({y_re.dtype}) and imag. part ({y_im.dtype}).")
+                return "0"
         # use np.array2string(x, formatter={'int':lambda x: hex(x)}) ?
         logger.error(f"float2frmt (not cmplx):\n{y}\n{type(y)}")
 
