@@ -1172,6 +1172,15 @@ class Fixed(object):
         if np.iscomplexobj(y):
             y_re = self.float2frmt(y.real)
             y_im = self.float2frmt(y.imag)
+            if fb.fil[0]['fx_base'] == 'csd':
+                logger.error(
+                    "Complex CSD coefficients are not supported yet, casting  to real. "
+                    "\n\tPlease create an issue if you need this feature.")
+                # CSD coefficients differ in length and require an array with dtype 'object'
+                # which does not support arithmetic or string operations.
+                y_str = y_re
+                logger.warning(y_str)
+                return y_str
             if is_numeric(y_re) and is_numeric(y_im):
                 return y_re + y_im * 1j
             else:
