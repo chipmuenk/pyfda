@@ -231,18 +231,20 @@ class ItemDelegate(QStyledItemDelegate):
         if fb.fil[0]['qfrmt'] == 'float':
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
-                return_type='auto')  # raw data without fixpoint formatting
+                return_type='auto')  # raw float data without fixpoint formatting
             data_q = data
-        else:   # fixpoint format, transform to float
+        else:
+            # fixpoint format: read editor string and transform to float (`data`)
+            # convert `data` to fixpoint format as `data_q`
             data = self.QObj[index.column()].frmt2float(str(editor.text()))
             data_q = self.QObj[index.column()].float2frmt(data)
 
-        # model.setData(index, data)                          # store in QTableWidget
-        # if data is complex, whole ba (list of arrays) needs to be of complex type
         if isinstance(data, complex):
+            # if data is complex, convert whole column (b or a array) to complex
             self.parent.ba[index.column()] = self.parent.ba[index.column()].astype(complex)
+        if isinstance(data_q, complex):
+            # if data_q is complex, convert whole column (b or a array) to complex
             self.parent.ba_q[index.column()] = self.parent.ba_q[index.column()].astype(complex)
-
         # store new data in self.ba and ba_q
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
