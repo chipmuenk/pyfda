@@ -1000,13 +1000,20 @@ class Fixed(object):
             logger.error(f"split: {y1}")
 
             if len(y1) == 2:
-                return y1[-2], y1[-1].replace('j','')
-            elif len(y1) == 1: # purely imaginary
-                return 0, y1[0].replace('j', '')
+                if not 'j' in y1[0] and 'j' in y1[1]:  # re + im
+                    return y1[0], y1[1].replace('j','')
+                elif 'j' in y1[0] and not 'j' in y1[1]:  # im + re
+                    return y1[1], y1[0].replace('j','')
+                else:  # both parts are imaginary, combine them
+                    y_im = self.frmt2float(y1[0].replace('j',''))\
+                        + self.frmt2float(y1[1].replace('j',''))
+                    return "0", self.float2frmt(y_im)
+            elif len(y1) == 1: # purely imaginary, return 0 for re part
+                return "0", y1[0].replace('j', '')
             else:
                 logger.error(
                     f"String split into {len(y1)} parts - that's too many!")
-                return 0.0, 0.0
+                return "0", "0"
         # -----------------------------------------
 
         frmt = fb.fil[0]['fx_base']
