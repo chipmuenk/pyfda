@@ -984,9 +984,10 @@ class Fixed(object):
         remove illegal characters and trailing zeros
         """
         def split_complex_str(y: str) -> tuple:
-            # only keep allowed characters incl. 'j' and '+'
+            # only keep allowed characters incl. 'j' and '+',
+            # remove leading zero(s) and convert to lower case
             y = re.sub(self.FRMT_REGEX[frmt].replace(']', '|j\+]'),
-                       r'', str(y)).lstrip('0')
+                       r'', str(y)).lstrip('0').lower()
             logger.error(f"y cleaned but unsplit: {y}")
 
             # (?!^) : any position other than start of string
