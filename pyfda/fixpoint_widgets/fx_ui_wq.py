@@ -215,7 +215,7 @@ class FX_UI_WQ(QWidget):
 
         self.lbl_sep1 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
         self.lbl_sep1.setVisible(ui_dict['fractional'])
-        self.lbl_sep2 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
+        self.lbl_sep2 = QLabel(to_html(')', frmt='b'), self)
         self.lbl_sep2.setVisible(False)
 
         self.ledWF = QLineEdit(self)
@@ -477,9 +477,10 @@ class FX_UI_WQ(QWidget):
 
         if qfrmt == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
-            self.ledWF.setToolTip("Fractional position")
+            self.ledWF.setToolTip("Scale factor 2<sup>WF</sup>")
             self.ledWI.setText(str(self.q_dict['WI'] + self.q_dict['WF'] + 1))
             self.ledWI.setToolTip("Total number of bits")
+            self.lbl_sep2.setVisible(True)
 
             LSB = 1.
             MSB = 2. ** (self.q_dict['WI'] + self.q_dict['WF'] - 1)
@@ -488,11 +489,13 @@ class FX_UI_WQ(QWidget):
             self.ledWF.setToolTip("Number of fractional bits")
             self.ledWI.setText(str(self.q_dict['WI']))
             self.ledWI.setToolTip("Number of integer bits")
+            self.lbl_sep2.setVisible(False)
 
             LSB = 2 ** -self.q_dict['WF']
             MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
         elif qfrmt == 'float':
             self.lbl_sep1.setText(to_html("---", frmt='b'))
+            self.lbl_sep2.setVisible(False)
         else:
             logger.error(f"Unknown quantization format '{qfrmt}'!")
 
