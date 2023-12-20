@@ -353,8 +353,6 @@ def is_numeric(a) -> bool:
         is_num = np.issubdtype(a.dtype, np.number)
     else:
         is_num = np.issubdtype(type(a), np.number)
-        logger.error(f"{a} of type {type(a)} is num: {is_num}")
-
     return is_num
 
 

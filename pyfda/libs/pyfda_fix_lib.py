@@ -988,7 +988,6 @@ class Fixed(object):
             # remove leading zero(s) and convert to lower case
             y = re.sub(self.FRMT_REGEX[frmt].replace(']', '|j\+]'),
                        r'', str(y)).lstrip('0').lower()
-            logger.error(f"y cleaned but unsplit: {y}")
 
             # (?!^) : any position other than start of string
             # (...) split without deleting the delimiter
@@ -997,7 +996,6 @@ class Fixed(object):
             # [+-][\d]: +/-[0 ... 9 or A ... F or .]
             y1 = re.split(r"(?!^)(?=[+-][\.\da-fA-F])", y)
 
-            logger.error(f"split: {y1}")
 
             if len(y1) == 2:
                 if not 'j' in y1[0] and 'j' in y1[1]:  # re + im
@@ -1176,7 +1174,6 @@ class Fixed(object):
         if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
             return y
 
-        logger.error(f"float2frmt:\n{y}\n{type(y)}")
         if np.iscomplexobj(y):  # convert complex arguments recursively
             y_re = self.float2frmt(y.real)
             y_im = self.float2frmt(y.imag)
@@ -1190,15 +1187,12 @@ class Fixed(object):
             elif is_numeric(y_re) and is_numeric(y_im):  # return in numeric format
                 return y_re + y_im * 1j
             elif not (is_numeric(y_re) or is_numeric(y_im)):  # return string (array)
-                logger.error(f"real part {y_re}\n{type(y_re)}\nimag. part {y_im}\n{type(y_im)}.")
                 y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
                 logger.warning(f"ystr={y_str}")
                 return y_str
             else:
                 logger.error(f"Cannot combine real part ({y_re.dtype}) and imag. part ({y_im.dtype}).")
                 return "0"
-        # use np.array2string(x, formatter={'int':lambda x: hex(x)}) ?
-        logger.error(f"float2frmt (not cmplx):\n{y}\n{type(y)}")
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y
         y_fix = self.fixp(y, scaling='mult')
