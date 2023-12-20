@@ -1012,7 +1012,6 @@ class Fixed(object):
             # [+-][\d]: +/-[0 ... 9 or A ... F or .]
             y1 = re.split(r"(?!^)(?=[+-][\.\da-fA-F])", y)
 
-
             if len(y1) == 2:
                 if not 'j' in y1[0] and 'j' in y1[1]:  # re + im
                     return y1[0], y1[1].replace('j','')
@@ -1203,6 +1202,9 @@ class Fixed(object):
             elif is_numeric(y_re) and is_numeric(y_im):  # return in numeric format
                 return y_re + y_im * 1j
             elif not (is_numeric(y_re) or is_numeric(y_im)):  # return string (array)
+                # logger.error(
+                #     f"real part:\n{y_re}\n{type(y_re)} ({y_re.dtype})\n"
+                #     f"imag. part\n{y_im}\n{type(y_im)} ({y_im.dtype}).")
                 y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
                 logger.warning(f"ystr={y_str}")
                 return y_str
