@@ -984,6 +984,22 @@ class Fixed(object):
         remove illegal characters and trailing zeros
         """
         def split_complex_str(y: str) -> tuple:
+            """
+            Parameters
+            ----------
+            y: str
+                A string containing a 'j', indicating a complex number
+                representation. Format can be decimal, binary or hex.
+                csd is not supported.
+
+            Returns
+            --------
+            tuple of str: (y_re, y_im)
+
+            Split string `y` into two parts at the + or - sign, separating
+            real and imaginary part. The sign at the beginning of the string
+            is ignored. Real and imaginary part are returned as a tuple.
+            """
             # only keep allowed characters incl. 'j' and '+',
             # remove leading zero(s) and convert to lower case
             y = re.sub(self.FRMT_REGEX[frmt].replace(']', '|j\+]'),
