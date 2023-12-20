@@ -1234,7 +1234,8 @@ class Fixed(object):
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
             # convert to (array of) string with 2's complement binary
-            y_bin_str = binary_repr_vec(y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1)
+            y_bin_str = binary_repr_vec(
+                y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1).astype('U')
 
             if fb.fil[0]['qfrmt'] == 'qint':
                 WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
