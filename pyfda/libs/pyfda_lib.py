@@ -1475,7 +1475,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
             logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         elif isinstance(arg, np.ndarray) and np.ndim(arg) == 2:
             frmt = "nd2" #  two-dimensional numpy array
-            logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
+            # logger.info(f"Format (zpk) is '{frmt}', shape = {np.shape(arg)}")
         # elif any(isinstance(el, list) for el in arg):
         #     frmt = "lol"  # list or ndarray or tuple of lists
         elif any(isinstance(el, np.ndarray) for el in arg):

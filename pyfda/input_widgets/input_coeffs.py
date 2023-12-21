@@ -31,8 +31,6 @@ from .input_coeffs_ui import Input_Coeffs_UI
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
-#       h[n] detects complex data (although it isn't)
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
 #       the filter?
 # TODO: This ItemDelegate method displayText is called again and again when an
@@ -248,6 +246,7 @@ class ItemDelegate(QStyledItemDelegate):
         # store new data in self.ba and ba_q
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
+        # logger.error(f"data_q: {data_q}")
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
 

@@ -674,7 +674,7 @@ class Fixed(object):
             # If y is not a number, remove whitespace and try to convert to
             # float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
-                logger.error(f"Quantize string {y}")
+                # logger.error(f"Quantize string {y}")
                 y = str(y)
                 y = y.replace(' ', '')  # remove all whitespace
                 try:
@@ -1206,7 +1206,7 @@ class Fixed(object):
                 #     f"real part:\n{y_re}\n{type(y_re)} ({y_re.dtype})\n"
                 #     f"imag. part\n{y_im}\n{type(y_im)} ({y_im.dtype}).")
                 y_str = np.char.add(np.char.add(y_re, '+'), np.char.add(y_im,'j'))
-                logger.warning(f"ystr={y_str}")
+                # logger.warning(f"ystr={y_str}")
                 return y_str
             else:
                 logger.error(f"Cannot combine real part ({y_re.dtype}) and imag. part ({y_im.dtype}).")

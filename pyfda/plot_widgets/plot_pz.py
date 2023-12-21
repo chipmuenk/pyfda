@@ -6,6 +6,9 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
+# TODO: Make P/Z draggable -> Bercher, Journey in Signal Processing with Jupyter, 2018.
+# TODO: Highlight P/Z selected in P/Z editor
+
 """
 Widget for plotting poles and zeros
 """
