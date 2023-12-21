@@ -1180,8 +1180,17 @@ class Fixed(object):
         """
         insert_binary_point = np.vectorize(lambda bin_str, pos: (
                                     bin_str[:pos+1] + "." + bin_str[pos+1:]))
-
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
+
+        def binary_repr(y_int, W):
+            if type(y_int) in {np.ndarray, list, tuple}:
+                return binary_repr_vec(y_int, W).astype('U')
+            elif isinstance(y_int, (int, np.integer)):
+                return np.binary_repr(y_int, W)
+            else:
+                logger.error(f"Unsupported data type '{type(y_int)}'!")
+                return "0"
+
         # ======================================================================
         if not is_numeric(y):
             logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
@@ -1235,9 +1244,9 @@ class Fixed(object):
         elif fb.fil[0]['fx_base'] in {'bin', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
+            W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             # convert to (array of) string with 2's complement binary
-            y_bin_str = binary_repr_vec(
-                y_fix_int, self.q_dict['WI'] + self.q_dict['WF'] + 1).astype('U')
+            y_bin_str = binary_repr(y_fix_int, W)
 
             if fb.fil[0]['qfrmt'] == 'qint':
                 WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
