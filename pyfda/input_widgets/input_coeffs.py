@@ -248,7 +248,9 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent.ba_q[index.column()][index.row()] = data_q
         # logger.error(f"data_q: {data_q}")
         qstyle_widget(self.parent.ui.butSave, 'changed')
-        self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
+        # this is needed to adapt text width to e.g. complex number representation
+        self.parent.refresh_table()
+        # self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
 
 ###############################################################################
 
