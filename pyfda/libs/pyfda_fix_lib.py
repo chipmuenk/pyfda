@@ -819,7 +819,7 @@ class Fixed(object):
         self.N = 0
 
     # --------------------------------------------------------------------------
-    def requant(self, x, QI, QO):
+    def requant(self, x_i, QI, QO):
 
         """
         Change word length of input signal `sig_i` to the wordlength of the output
@@ -828,7 +828,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        x: input data, scalar or array-like
+        x_i: input data, scalar or array-like
             Signal to be requantized
 
         QI: dict
@@ -893,22 +893,31 @@ class Fixed(object):
           bits with the sign bit.
 
         """
+        QO_obj = Fixed(QO)      # Fixpoint object for output quantizer
+
         WI_I = QI['WI']         # number of integer bits (input signal)
         WI_F = QI['WF']         # number of fractional bits (input signal)
-        WI   = WI_I + WI_F + 1  # total word length (input signal)
+        # WI   = WI_I + WI_F + 1  # total word length (input signal)
 
-        WO_I = QO['WI']         # number of integer bits (output signal)
-        WO_F = QO['WF']         # number of fractional bits (output signal)
-        WO   = WO_I + WO_F + 1  # total word length (output signal)
+        # WO_I = QO['WI']         # number of integer bits (output signal)
+        # WO_F = QO['WF']         # number of fractional bits (output signal)
+        # WO   = WO_I + WO_F + 1  # total word length (output signal)
 
-        dWF = WI_F - WO_F       # difference of fractional lengths
-        dWI = WI_I - WO_I       # difference of integer lengths
+        # dWF = WI_F - WO_F       # difference of fractional lengths
+        # dWI = WI_I - WO_I       # difference of integer lengths
 
-        # max. resp. min, output values
-        MIN_o = - 1 << (WO - 1)
-        MAX_o = -MIN_o - 1
+        # # max. resp. min, output values
+        # MIN_o = - 1 << (WO - 1)
+        # MAX_o = -MIN_o - 1
 
+        if fb.fil[0]['qfrmt'] == 'qint':
+            rwv_i = x_i / (1 << WI_F)
+        else:
+            rwv_i = x_i
 
+        rwv_o = QO_obj.fixp(rwv_i)
+
+        return rwv_o
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y):
