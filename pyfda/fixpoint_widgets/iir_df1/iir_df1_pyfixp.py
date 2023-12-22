@@ -47,9 +47,10 @@ class IIR_DF1_pyfixp(object):
 
         logger.info("Instantiating filter")
         # create various quantizers and initialize / reset them
-        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
-        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
+        self.Q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.Q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
@@ -88,25 +89,42 @@ class IIR_DF1_pyfixp(object):
         """
         self.p = p  # update parameter dictionary with coefficients etc.
 
-        q_mul = p['QACC'].copy()  # quantizer dict for partial products
-        DW = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        q_mul.update(
-            {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-             'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        WP = q_mul['WI'] + q_mul['WF'] + 1
-
         # update the quantizers
-        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.
-        self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs
-        self.Q_mul.set_qdict(q_mul)  # partial products
+        self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
+        self.Q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
+        # self.Q_mul_a.set_qdict(q_mul_a)  # partial products coeffs (x a)
+        # self.Q_mul_b.set_qdict(q_mul_b)  # partial products coeffs (x b)
         self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
+
+        # q_mul_a = p['QACC'].copy()  # quantizer dict for partial products (a)
+        DW_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
+        # word format for sum of partial products a_i * y_i
+        self.Q_mul_a.set_qdict(
+            {'WI': self.p['QO']['WI'] + self.p['QCA']['WI'] + DW_a,
+             'WF': self.p['QO']['WF'] + self.p['QCA']['WF']})
+
+        # q_mul_b = p['QACC'].copy()  # quantizer dict for partial products
+        DW_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
+        # word format for sum of partial products b_i * x_i
+        self.Q_mul_b.set_qdict(
+            {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW_b,
+             'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
+        # WP_b = q_mul_b['WI'] + q_mul_b['WF'] + 1
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
         self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
         self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+
+        if np.iscomplexobj(self.a_q):
+            self.a_q = self.a_q.real
+            logger.warning(
+                "Complex fixpoint coefficients a_q are not supported, casting to real.")
+        if np.iscomplexobj(self.b_q):
+            self.b_q = self.b_q.real
+            logger.warning(
+                "Complex fixpoint coefficients b_q are not supported, casting to real.")
 
         self.L = max(len(self.b_q), len(self.a_q))  # filter length = number of taps
 
@@ -135,7 +153,8 @@ class IIR_DF1_pyfixp(object):
         Reset registers and overflow counters of quantizers
         (except for coefficient quant.)
         """
-        self.Q_mul.resetN()
+        self.Q_mul_a.resetN()
+        self.Q_mul_b.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
@@ -212,12 +231,12 @@ class IIR_DF1_pyfixp(object):
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
             if fb.fil[0]['qfrmt'] == 'qint':
-                xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+                xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
             else:
-                xb_q = self.Q_mul.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+                xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
             # logger.warning(f"xb_q = \n{xb_q}\n")
             # append a zero to xa_q to equalize length of xb_q and xa_q
-            xa_q = np.append(self.Q_mul.fixp(self.zi_a * self.a_q[1:]), 0)
+            xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
             logger.warning(f"zi_a = \n{self.zi_a}")
             logger.warning(f"xa_q = \n{xa_q}")
 
@@ -227,6 +246,7 @@ class IIR_DF1_pyfixp(object):
             # for i in range(len(self.b_q)):
             #     y_q[k] += self.Q_acc.fixp(xb_q[i] - xa_q[i])
 
+            # todo: complex?=
             y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 
@@ -239,11 +259,13 @@ class IIR_DF1_pyfixp(object):
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
-        if self.Q_acc.N_over > 0 or self.Q_mul.N_over > 0:
+        if self.Q_acc.N_over > 0 or self.Q_mul_a.N_over > 0 or self.Q_mul_b.N_over > 0:
             logger.warning(f"Overflows: N_Acc = {self.Q_acc.N_over}, "
-                           f"N_Mul = {self.Q_mul.N_over}")
-        self.Q_acc.N_over += self.Q_mul.N_over
-        self.Q_mul.resetN()
+                           f"N_Mul_a = {self.Q_mul_a.N_over}, "
+                           f"N_Mul_b = {self.Q_mul_b.N_over}.")
+        self.Q_acc.N_over += self.Q_mul_a.N_over + self.Q_mul_b.N_over
+        self.Q_mul_a.resetN()
+        self.Q_mul_b.resetN()
 
         return self.Q_O.fixp(y_q[:len(x)]), self.zi_b, self.zi_a
 
