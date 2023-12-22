@@ -477,7 +477,7 @@ class FX_UI_WQ(QWidget):
 
         if qfrmt == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
-            self.ledWF.setToolTip("Scale factor 2<sup>WF</sup>")
+            self.ledWF.setToolTip("Scale factor 2<sup>-WF</sup>")
             self.ledWI.setText(str(self.q_dict['WI'] + self.q_dict['WF'] + 1))
             self.ledWI.setToolTip("Total number of bits")
             self.lbl_sep2.setVisible(True)
