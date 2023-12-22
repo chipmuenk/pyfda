@@ -1271,7 +1271,7 @@ class Fixed(object):
 ########################################
 
 # --------------------------------------------------------------------------
-def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
+def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance QObj.
@@ -1290,8 +1290,8 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
 
     Returns
     -------
-    A list of integer coeffcients, quantized and scaled with the settings
-    of the quantization object dict
+    A numpy array of integer coeffcients, quantized and scaled with the
+    settings of the quantization object dict.
 
     """
     logger.debug("quant_coeffs")
@@ -1309,10 +1309,12 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> list:
 #        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
         # quantize coefficients except for first
-        coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
+        # coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
+        coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:])))
     else:
         # quantize all coefficients
-        coeff_q = list(QObj.fixp(coeffs))
+        # coeff_q = list(QObj.fixp(coeffs))
+        coeff_q = QObj.fixp(coeffs)
 
     # self.update_ovfl_cnt()  # update display of overflow counter and MSB / LSB
 
