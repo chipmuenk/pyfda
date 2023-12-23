@@ -819,7 +819,7 @@ class Fixed(object):
         self.N = 0
 
     # --------------------------------------------------------------------------
-    def requant(self, x_i, QI, QO):
+    def requant(self, x_i, QI):
 
         """
         Change word length of input signal `sig_i` to the wordlength of the output
@@ -829,7 +829,7 @@ class Fixed(object):
         Parameters
         ----------
         x_i: input data, scalar or array-like
-            Signal to be requantized
+            Signal to be requantized with quant. dict QI
 
         QI: dict
             Quantization dict for input word, only the keys 'WI' and 'WF' for integer
@@ -893,10 +893,10 @@ class Fixed(object):
           bits with the sign bit.
 
         """
-        QO_obj = Fixed(QO)      # Fixpoint object for output quantizer
+        # QO_obj = Fixed(QO)      # Fixpoint object for output quantizer
 
-        WI_I = QI['WI']         # number of integer bits (input signal)
-        WI_F = QI['WF']         # number of fractional bits (input signal)
+        WI_I = QI.q_dict['WI']         # number of integer bits (input signal)
+        WI_F = QI.q_dict['WF']         # number of fractional bits (input signal)
         # WI   = WI_I + WI_F + 1  # total word length (input signal)
 
         # WO_I = QO['WI']         # number of integer bits (output signal)
@@ -915,7 +915,7 @@ class Fixed(object):
         else:
             rwv_i = x_i
 
-        rwv_o = QO_obj.fixp(rwv_i)
+        rwv_o = self.fixp(rwv_i)
 
         return rwv_o
 
