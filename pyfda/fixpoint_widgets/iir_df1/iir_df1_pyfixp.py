@@ -226,7 +226,7 @@ class IIR_DF1_pyfixp(object):
 
         self.zi_b = np.concatenate((self.zi_b, x))
 
-        logger.warning(f"a_q = \n{self.a_q}\n")
+        logger.warning(f"a_q = \n{self.a_q}\nb_q = \n{self.b_q}\nx= {x}\n")
 
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
@@ -237,8 +237,9 @@ class IIR_DF1_pyfixp(object):
             # logger.warning(f"xb_q = \n{xb_q}\n")
             # append a zero to xa_q to equalize length of xb_q and xa_q
             xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
-            logger.warning(f"zi_a = \n{self.zi_a}")
-            logger.warning(f"xa_q = \n{xa_q}")
+            if k == 5:
+                logger.warning(f"zi_a = \n{self.zi_a}")
+                logger.warning(f"xa_q = \n{xa_q}")
 
             # accumulate partial products x_bq and x_aq and quantize them (Q_acc)
             # quantize individual accumulation steps - needed?!
