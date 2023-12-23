@@ -49,8 +49,9 @@ class IIR_DF1_pyfixp(object):
         # create various quantizers and initialize / reset them
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
-        self.Q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products
-        self.Q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products
+        self.Q_mul_a = fx.Fixed(self.p['QACC'].copy())  # partial products a y
+        self.Q_mul_b = fx.Fixed(self.p['QACC'].copy())  # partial products b x
+        self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
@@ -112,6 +113,11 @@ class IIR_DF1_pyfixp(object):
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
         # WP_b = q_mul_b['WI'] + q_mul_b['WF'] + 1
 
+        self.Q_mul.set_qdict(
+            {'WI': max(self.Q_mul_a.q_dict['WI'], self.Q_mul_b.q_dict['WI']),
+             'WF': max(self.Q_mul_a.q_dict['WF'], self.Q_mul_b.q_dict['WF'])}
+        )
+
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
         self.a_q = quant_coeffs(fb.fil[0]['ba'][1], self.Q_a, recursive=True)
@@ -155,6 +161,7 @@ class IIR_DF1_pyfixp(object):
         """
         self.Q_mul_a.resetN()
         self.Q_mul_b.resetN()
+        self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
@@ -230,13 +237,12 @@ class IIR_DF1_pyfixp(object):
 
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
-            if fb.fil[0]['qfrmt'] == 'qint':
-                xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
-            else:
-                xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            # xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
+            xb_q = self.zi_b[k:k + len(self.b_q)] * self.b_q
             # logger.warning(f"xb_q = \n{xb_q}\n")
             # append a zero to xa_q to equalize length of xb_q and xa_q
-            xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
+            # xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
+            xa_q = np.append(self.zi_a * self.a_q[1:], 0)
             if k == 5:
                 logger.warning(f"zi_a = \n{self.zi_a}")
                 logger.warning(f"xa_q = \n{xa_q}")
@@ -247,12 +253,15 @@ class IIR_DF1_pyfixp(object):
             # for i in range(len(self.b_q)):
             #     y_q[k] += self.Q_acc.fixp(xb_q[i] - xa_q[i])
 
-            # todo: complex?=
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
+            # todo: complex?
+            # y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
+            y_q[k] = self.Q_O.requant(
+                self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b) - 
+                self.Q_acc.requant(np.sum(xa_q), self.Q_mul_a), self.Q_acc)
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 
             # and insert last output value quantized to output format
-            self.zi_a[0] = self.Q_O.fixp(y_q[k])
+            self.zi_a[0] = y_q[k]
 
             # logger.warning(f"zi_a = {self.zi_a}\n"
             #                f"zi_b = {self.zi_b}")
