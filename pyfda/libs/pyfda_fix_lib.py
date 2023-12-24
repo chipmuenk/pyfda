@@ -692,16 +692,13 @@ class Fixed(object):
             over_pos = over_neg = yq = 0
             self.N += 1
 
-        # convert pseudo-complex (imag = 0) and complex values to real
+        # convert pseudo-complex (imag = 0) to real
         y = np.real_if_close(y)
+        # quantize complex values separately and recursively
         if np.iscomplexobj(y):
-            logger.warning(f"Trying to quantize complex value(s)\n{y}")
-            # quantizing complex objects is not supported yet
-            # y = y.real
             yq = self.fixp(y.real, scaling=scaling) + 1j * self.fixp(y.imag, scaling=scaling)
-            logger.warning(f"yq = {yq}")
+            # logger.warning(f"yq = {yq}")
             return yq
-
 
         y_in = y  # store y before scaling / quantizing
         # ======================================================================
