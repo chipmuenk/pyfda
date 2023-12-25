@@ -1038,16 +1038,37 @@ class Fixed(object):
                     f"String split into {len(y1)} parts - that's too many!")
                 return "0", "0"
         # -----------------------------------------
-
-        frmt = fb.fil[0]['fx_base']
+        # ======================================================================
+        # (1) : COMPLEX NUMBERS
+        #       Split strings containing 'j' into real and imaginary part,
+        #       calling `frmt2float` recursively
+        # ======================================================================
         if 'j' in str(y):
             y_re, y_im = split_complex_str(y)
             return self.frmt2float(y_re) +\
                   self.frmt2float(y_im) * 1j
-        val_str = re.sub(self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0')
+
+        # ======================================================================
+        # (2) : CLEAN UP INPUT STRING
+        #       - remove illegal characters (depending on selected number format
+        #         defined in FRMT_REGEX(frmt)) from input string
+        #       - remove all leading '0' to sanitize cases like '0001' or '00.23'
+        #       - replace ',' by '.' for German style numbers
+        # ======================================================================
+        frmt = fb.fil[0]['fx_base']
+        val_str = re.sub(
+            self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0').replace(',', '.')
+
+        # ======================================================================
+        # (3) : FRACTIONAL PLACES
+        #       - prepend '0' if string starts with '.' and store as `val_str`
+        #       - store number of fractional places in `frc_places` (all number
+        #         formats)
+        #       - store fractional part as `frc_str` and whole string without '.'
+        #         as `raw_str`
+        # ======================================================================
         if len(val_str) > 0:
-            val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
-            if val_str[0] == '.':  # prepend '0' when the number starts with '.'
+            if val_str[0] == '.':
                 val_str = '0' + val_str
 
             # count number of fractional places in string
@@ -1064,10 +1085,13 @@ class Fixed(object):
         else:
             return 0.0
 
-        # (1) calculate the decimal value of the input string using np.float64()
-        #     which takes the number of decimal places into account.
-        # (2) quantize and saturate
-        # (3) divide by scale
+        # ======================================================================
+        # (4a): CONVERSION (DEC)
+        #       - calculate the decimal value of `val_str` using np.float64()
+        #           which takes the number of decimal places into account.
+        #       - quantize and saturate
+        #       - divide by scale
+        # ======================================================================
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
@@ -1075,19 +1099,25 @@ class Fixed(object):
             except Exception as e:
                 logger.warning(e)
 
+        # ======================================================================
+        # (4b): CONVERSION (BIN, HEX)
+        #       - Use `raw_string` without radix point for calculation
+        #       - Check for a negative sign and remove it, use this information only
+        #         in the end
+        #       - Calculate decimal value of `raw_str` without '-' using
+        #        `int(raw_str, base)`
+        #       - divide by `base ** frc_places` for correct scaling
+        # - Strip MSBs outside fixpoint range
+        # - Transform numbers in negative 2's complement to negative floats.
+        # - Calculate the fixpoint representation for correct saturation /
+        #   quantization
+        # ======================================================================
         elif frmt in {'hex', 'bin'}:
-            # - Glue integer and fractional part to a string without radix point
-            # - Check for a negative sign, use this information only in the end
-            # - Divide by <base> ** <number of fractional places> for correct scaling
-            # - Strip MSBs outside fixpoint range
-            # - Transform numbers in negative 2's complement to negative floats.
-            # - Calculate the fixpoint representation for correct saturation /
-            #   quantization
+            neg_sign = False
             if fb.fil[0]['qfrmt'] == 'qint':
                 W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             else:
                 W = self.q_dict['WI'] + 1
-            neg_sign = False
             try:
                 if raw_str[0] == '-':
                     neg_sign = True
@@ -1117,12 +1147,12 @@ class Fixed(object):
 
                     if y_dec == 0:  # avoid log2(0) error in code below
                         return 0
-
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
+
                 # now, y_dec is in the correct range:
                 if int_bits <= W - 1:  # positive number
                     pass
-                elif int_bits == W:
+                else: # int_bits == W, int_bits > W has been treated above
                     # negative, calculate 2's complement
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:

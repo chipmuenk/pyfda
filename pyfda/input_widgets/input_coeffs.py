@@ -475,6 +475,7 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def quant_coeffs_save(self):
         """
+        Triggered by pushing "Quantize button":
         - Store selected / all quantized coefficients in `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
         - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
@@ -483,7 +484,6 @@ class Input_Coeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
-
         if not idx:  # nothing selected, quantize all elements
             self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
             self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
