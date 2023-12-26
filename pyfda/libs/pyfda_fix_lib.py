@@ -786,6 +786,8 @@ class Fixed(object):
         # multiply by 2 ** WF instead of dividing by 2 ** -WF:
         y *= 2. ** self.q_dict['WF']
 
+        logger.error(f"y={y}")
+
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
         elif self.q_dict['quant'] == 'round':
@@ -1054,12 +1056,9 @@ class Fixed(object):
         to float.
 
         - format is taken from the global `fb.fil[0]['fx_base']`
-
         - maximum wordlength is determined from the local quantization dict keys
           `self.q_dict['WI']` and `self.q_dict['WF']`
-
         - negative numbers can be represented by a '-' sign or in two's complement
-
         - represented numbers may be fractional and / or complex.
 
         Parameters
