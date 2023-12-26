@@ -1048,16 +1048,35 @@ class Fixed(object):
             return self.frmt2float_vec(y)
 
     # --------------------------------------------------------------------------
-    def frmt2float_scalar(self, y) -> float:
+    def frmt2float_scalar(self, y: str) -> float:
         """
-        Convert the formats 'dec', 'bin', 'oct', 'hex', 'csd' to float
+        Convert a string in 'dec', 'bin', 'oct', 'hex', 'csd' numeric format
+        to float.
 
-        Find the number of places before the first radix point (if there is one)
-        and join integer and fractional parts
-        when returned string is empty, skip general conversions and rely on
-        error handling of individual routines,
-        remove illegal characters and trailing zeros
+        - format is taken from the global `fb.fil[0]['fx_base']`
+
+        - maximum wordlength is determined from the local quantization dict keys
+          `self.q_dict['WI']` and `self.q_dict['WF']`
+
+        - negative numbers can be represented by a '-' sign or in two's complement
+
+        - represented numbers may be fractional and / or complex.
+
+        Parameters
+        ----------
+        y: str
+            A string formatted as a decimal, binary, octal, hex or csd
+            number representation. The number string may contain a '.'
+            or ',' to represent fractal numbers. When the string contains a 'j'm
+            it is tried to split the string into real and imaginary part.
+
+        Returns
+        --------
+        float or complex
+            The float / complex representation of the string
+
         """
+        # -----------------------------------------------------
         def split_complex_str(y: str) -> tuple:
             """
             Parameters
@@ -1151,9 +1170,8 @@ class Fixed(object):
 
         # ======================================================================
         # (4a): CONVERSION (DEC)
-        #       - calculate the decimal value of `val_str` using np.float64()
-        #           which takes the number of decimal places into account.
-        #       - quantize and saturate
+        #       - calculate the decimal value of `val_str` directly using `fixp()`
+        #         which quantizes and calculates overflows
         #       - divide by scale
         # ======================================================================
         if frmt == 'dec':
@@ -1171,10 +1189,13 @@ class Fixed(object):
         #       - Calculate decimal value of `raw_str` without '-' using
         #        `int(raw_str, base)`
         #       - divide by `base ** frc_places` for correct scaling
-        # - Strip MSBs outside fixpoint range
-        # - Transform numbers in negative 2's complement to negative floats.
-        # - Calculate the fixpoint representation for correct saturation /
-        #   quantization
+        #       - calculate number of bits required for binary representation. If this
+        #         number exceeds word length, convert to binary string, strip
+        #         leading bits and convert back to float.
+        #       - transform numbers in negative 2's complement to negative floats.
+        #       - calculate the fixpoint representation using `fixp()` for correct
+        #            saturation / quantization
+        # TODO: Shouldn't `fixp()` be enough for handling number of bits etc?
         # ======================================================================
         elif frmt in {'hex', 'bin', 'oct'}:
             neg_sign = False
@@ -1219,8 +1240,8 @@ class Fixed(object):
                 # now, y_dec is in the correct range:
                 if int_bits <= W - 1:  # positive number
                     pass
-                else: # int_bits == W, int_bits > W has been treated above
-                    # negative, calculate 2's complement
+                else: # int_bits == W -> negative, calculate 2's complement
+                    # int_bits > W has been treated above
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
                 if neg_sign:
@@ -1229,15 +1250,18 @@ class Fixed(object):
             except Exception as e:
                 logger.warning(e)
                 return 0.0
-        # ----
-        elif frmt == 'csd':
-            # - Glue integer and fractional part to a string without radix point
-            # - Divide by 2 ** <number of fractional places> for correct scaling
-            # - Calculate fixpoint representation for saturation / overflow effects
+        # ======================================================================
+        # (4c): CONVERSION (CSD)
+        #       - use `raw_string` without radix point for calculation
+        #       - divide by 2 ** <number of fractional places> for correct scaling
+        #       - calculate the fixpoint representation using `fixp()` for correct
+        #            saturation / quantization
+        # ======================================================================
 
+        elif frmt == 'csd':
             y_dec = csd2dec_vec(raw_str)  # csd -> integer
             if y_dec is not None:
-                y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
+                y_float = self.fixp(y_dec / 2 ** frc_places, scaling='div')
         # ----
         else:
             logger.error(f'Unknown output format "{frmt}"!')
