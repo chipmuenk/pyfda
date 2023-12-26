@@ -1122,13 +1122,14 @@ class Fixed(object):
                     f"String split into {len(y1)} parts - that's too many!")
                 return "0", "0"
         # -----------------------------------------
+        y = str(y)
         frmt = fb.fil[0]['fx_base']
         # ======================================================================
         # (1) : COMPLEX NUMBERS
         #       Split strings containing 'j' into real and imaginary part,
         #       calling `frmt2float` recursively
         # ======================================================================
-        if 'j' in str(y):
+        if 'j' in y:
             y_re, y_im = split_complex_str(y)
             return self.frmt2float(y_re) +\
                   self.frmt2float(y_im) * 1j
@@ -1141,7 +1142,7 @@ class Fixed(object):
         #       - replace ',' by '.' for German style numbers
         # ======================================================================
         val_str = re.sub(
-            self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0').replace(',', '.')
+            self.FRMT_REGEX[frmt], r'', y).lstrip('0').replace(',', '.')
 
         # ======================================================================
         # (3) : FRACTIONAL PLACES
