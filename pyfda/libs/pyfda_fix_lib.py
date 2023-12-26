@@ -1128,7 +1128,7 @@ class Fixed(object):
                 else:
                     base = 2
 
-                y_dec = abs(int(raw_str, base) / base**frc_places)
+                y_dec = int(raw_str, base) / base**frc_places
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
