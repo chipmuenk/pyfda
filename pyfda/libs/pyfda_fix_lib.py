@@ -106,6 +106,67 @@ def bin2hex(bin_str: str, WI=0) -> str:
 bin2hex_vec = np.vectorize(bin2hex)  # safer than frompyfunction()
 
 
+# ---------------------------------------------------------------------
+def bin2oct(bin_str: str, WI=0) -> str:
+    """
+    Convert number `bin_str` in binary format to octal formatted string.
+    `bin_str` is prepended / appended with zeros until the number of bits before
+    and after the radix point (position given by `WI`) is a multiple of 3.
+    """
+
+    wmap = {
+        '000': '0',
+        '001': '1',
+        '010': '2',
+        '011': '3',
+        '100': '4',
+        '101': '5',
+        '110': '6',
+        '111': '7',
+        }
+
+    oct_str = ""
+
+    # --- integer part ----------------------------
+    if WI > 0:
+        # slice string with integer bits and prepend with zeros to obtain a
+        # multiple of 3 length:
+        bin_i_str = bin_str[:WI+1]
+        while (len(bin_i_str) % 3 != 0):
+            bin_i_str = "0" + bin_i_str
+
+        i = 0
+        while (i < len(bin_i_str)):  # map chunks of 3 binary bits to one oct digit
+            oct_str = oct_str + wmap[bin_i_str[i:i + 3]]
+            i = i + 3
+    else:
+        oct_str = bin_str[0]  # copy MSB as sign bit
+
+    # --- fractional part -------------------------
+    WF = len(bin_str) - WI - 1
+    # slice string with fractional bits and append with zeros to obtain a
+    # multiple of 3 length:
+    if WF > 0:
+        oct_str = oct_str + '.'
+        bin_f_str = bin_str[WI+1:]
+
+        while (len(bin_f_str) % 4 != 0):
+            bin_f_str = bin_f_str + "0"
+
+        # map chunks of 3 binary bits to one octal digit
+        i = 0
+        while (i < len(bin_f_str)):
+            oct_str = oct_str + wmap[bin_f_str[i:i + 3]]
+            i = i + 3
+
+    # oct_str = oct_str.lstrip("0") # remove leading zeros
+    oct_str = "0" if len(oct_str) == 0 else oct_str
+    return oct_str
+
+
+bin2oct_vec = np.vectorize(bin2oct)  # safer than frompyfunction()
+
+
 # ------------------------------------------------------------------------------
 def dec2hex(val, nbits, WF=0):
     """
@@ -334,6 +395,7 @@ class Fixed(object):
 
       - 'dec'  : decimal integer, scaled by :math:`2^{WF}` (default)
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
+      - 'oct'  : octal string, scaled by :math:`2^{WF}` (not fully implemented yet)
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
 
@@ -419,7 +481,8 @@ class Fixed(object):
       - 'dec'   : decimal (base = 10)
       - 'bin'   : binary (base = 2)
       - 'hex'   : hexadecimal (base = 16)
-      - 'csd'   : canonically signed digit (base = 2?)
+      - 'oct'   : octal (base = 8)
+      - 'csd'   : canonically signed digit (base = "3")
 
     Example
     -------
@@ -472,10 +535,11 @@ class Fixed(object):
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
         self.FRMT_REGEX = {
-                'bin': r'[^0|1|.|,|\-]',
-                'csd': r'[^0|\+|\-|.|,]',
                 'dec': r'[^0-9Ee|.|,|\-]',
-                'hex': r'[^0-9A-Fa-f|.|,|\-]'
+                'bin': r'[^0|1|.|,|\-]',
+                'oct': r'[^0-7|.|,|\-]',
+                'hex': r'[^0-9A-Fa-f|.|,|\-]',
+                'csd': r'[^0|\+|\-|.|,]'
                         }
         # --------------------------------------------------------------------------
         # vectorize frmt2float function for arrays, swallow the `self` argument
@@ -535,6 +599,8 @@ class Fixed(object):
             self.places = int(np.ceil(W / 1.5)) + 1
         elif fb.fil[0]['fx_base'] == 'hex':
             self.places = int(np.ceil(W / 4.)) + 1
+        elif fb.fil[0]['fx_base'] == 'oct':
+            self.places = int(np.ceil(W / 3.)) + 1
         elif fb.fil[0]['qfrmt'] == 'float':
             self.places = 4
         else:
@@ -634,6 +700,8 @@ class Fixed(object):
             self.scale = 1
 
         scaling = scaling.lower()
+        if scaling != 'mult':
+            logger.error(f"scaling = '{scaling}'")
 
         if np.shape(y):
             # Input is an array:
@@ -938,7 +1006,7 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or string or array of scalars or strings in number format float or
-            `fb.fil[0]['fx_base']` ('dec', 'hex', 'bin' or 'csd')
+            `fb.fil[0]['fx_base']` ('dec', 'hex', 'oct', 'bin' or 'csd')
 
         Returns
         -------
@@ -982,7 +1050,7 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def frmt2float_scalar(self, y) -> float:
         """
-        Convert the formats 'dec', 'bin', 'hex', 'csd' to float
+        Convert the formats 'dec', 'bin', 'oct', 'hex', 'csd' to float
 
         Find the number of places before the first radix point (if there is one)
         and join integer and fractional parts
@@ -1077,7 +1145,6 @@ class Fixed(object):
                 frc_places = 0
 
             raw_str = val_str.replace('.', '')  # join integer and fractional part
-
             # logger.debug(f"y={y}, val_str={val_str}, raw_str={raw_str}")
         else:
             return 0.0
@@ -1097,7 +1164,7 @@ class Fixed(object):
                 logger.warning(e)
 
         # ======================================================================
-        # (4b): CONVERSION (BIN, HEX)
+        # (4b): CONVERSION (BIN, HEX, OCT)
         #       - Use `raw_string` without radix point for calculation
         #       - Check for a negative sign and remove it, use this information only
         #         in the end
@@ -1109,7 +1176,7 @@ class Fixed(object):
         # - Calculate the fixpoint representation for correct saturation /
         #   quantization
         # ======================================================================
-        elif frmt in {'hex', 'bin'}:
+        elif frmt in {'hex', 'bin', 'oct'}:
             neg_sign = False
             if fb.fil[0]['qfrmt'] == 'qint':
                 W = self.q_dict['WI'] + self.q_dict['WF'] + 1
@@ -1122,20 +1189,23 @@ class Fixed(object):
 
                 if frmt == 'hex':
                     base = 16
-                else:
+                elif frmt == 'oct':
+                    base = 8
+                else:  # 'bin'
                     base = 2
 
                 y_dec = int(raw_str, base) / base ** frc_places
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
-
                 int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
+
                 # When number is outside fixpoint range, discard MSBs:
                 if int_bits > W:
-                    # convert hex numbers to binary string for discarding bits bit-wise
-                    if frmt == 'hex':
-                        raw_str = np.binary_repr(int(raw_str, 16))
+                    # convert non-binary numbers to binary string for
+                    # discarding bits bit-wise
+                    if frmt != 'bin':
+                        raw_str = np.binary_repr(int(raw_str, base))
                     # discard the upper bits outside the valid range
                     raw_str = raw_str[int_bits - W:]
 
@@ -1278,7 +1348,7 @@ class Fixed(object):
                 # fractional case, convert with WF fractional bits
                 y_str = dec2csd_vec(y_fix, self.q_dict['WF'])
 
-        elif fb.fil[0]['fx_base'] in {'bin', 'hex'}:
+        elif fb.fil[0]['fx_base'] in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
             W = self.q_dict['WI'] + self.q_dict['WF'] + 1
@@ -1291,6 +1361,8 @@ class Fixed(object):
                 WI = self.q_dict['WI']
             if fb.fil[0]['fx_base'] == 'hex':
                 y_str = bin2hex_vec(y_bin_str, WI)
+            elif fb.fil[0]['fx_base'] == 'oct':
+                y_str = bin2oct_vec(y_bin_str, WI)
             else:  # 'bin'
                 # insert radix point if required
                 if fb.fil[0]['qfrmt'] == 'qint':
