@@ -1122,6 +1122,7 @@ class Fixed(object):
                     f"String split into {len(y1)} parts - that's too many!")
                 return "0", "0"
         # -----------------------------------------
+        frmt = fb.fil[0]['fx_base']
         # ======================================================================
         # (1) : COMPLEX NUMBERS
         #       Split strings containing 'j' into real and imaginary part,
@@ -1139,7 +1140,6 @@ class Fixed(object):
         #       - remove all leading '0' to sanitize cases like '0001' or '00.23'
         #       - replace ',' by '.' for German style numbers
         # ======================================================================
-        frmt = fb.fil[0]['fx_base']
         val_str = re.sub(
             self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0').replace(',', '.')
 
