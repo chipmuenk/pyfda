@@ -644,7 +644,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like object
+        y: scalar or array-like object of float
             input value (floating point format) to be quantized
 
         scaling: String
@@ -1131,8 +1131,7 @@ class Fixed(object):
         # ======================================================================
         if 'j' in y:
             y_re, y_im = split_complex_str(y)
-            return self.frmt2float(y_re) +\
-                  self.frmt2float(y_im) * 1j
+            return self.frmt2float(y_re) + self.frmt2float(y_im) * 1j
 
         # ======================================================================
         # (2) : CLEAN UP INPUT STRING
