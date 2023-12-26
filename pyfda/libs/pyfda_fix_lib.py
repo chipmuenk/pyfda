@@ -888,27 +888,21 @@ class Fixed(object):
 
     # --------------------------------------------------------------------------
     def requant(self, x_i, QI):
-
         """
-        Change word length of input signal `sig_i` to the wordlength of the output
-        signal, using the quantization and saturation methods specified by
-        ``QO['quant']`` and ``QO['ovfl']``.
+        Change word length of input signal `sig_i` to the wordlength of `self.q_dict`
+        using the quantization and saturation methods specified by
+        `self.q_dict['quant']` and `self.q_dict['ovfl']`.
 
         Parameters
         ----------
-        x_i: input data, scalar or array-like
-            Signal to be requantized with quant. dict QI
+        x_i: int, float or complex scalar or array-like
+            Signal to be requantized from quant. dict QI
 
         QI: dict
             Quantization dict for input word, only the keys 'WI' and 'WF' for integer
-            and fractional wordlength are evaluated. QI['WI'] = 2 and QI['WF'] = 13
-            e.g. define Q-Format '2.13'  with 2 integer, 13 fractional bits and 1 implied
-            sign bit = 16 bits total.
-
-        QO: dict
-            Quantization dict for output word format; the keys 'WI' and 'WF' for
-            integer and fractional wordlength are evaluated as well as the keys 'quant'
-            and 'ovfl' describing requantization and overflow behaviour.
+            and fractional wordlength are evaluated.
+            `QI.q_dict['WI'] = 2` and `QI.q_dict['WF'] = 13` e.g. define Q-Format '2.13'
+            with 2 integer, 13 fractional bits and 1 implied sign bit = 16 bits total.
 
         Returns
         -------
@@ -1060,6 +1054,7 @@ class Fixed(object):
           `self.q_dict['WI']` and `self.q_dict['WF']`
         - negative numbers can be represented by a '-' sign or in two's complement
         - represented numbers may be fractional and / or complex.
+        - the result is divided by 2**WF for `'qfrmt' == 'qint'` via `fixp()`
 
         Parameters
         ----------
