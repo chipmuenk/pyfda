@@ -1180,6 +1180,7 @@ class Fixed(object):
                 y_dec = y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warning(e)
+                return 0.0
 
         # ======================================================================
         # (4b): CONVERSION (BIN, HEX, OCT)
@@ -1234,7 +1235,7 @@ class Fixed(object):
                     y_dec = int(raw_str, 2) / base ** frc_places
 
                     if y_dec == 0:  # avoid log2(0) error in code below
-                        return 0
+                        return 0.0
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
 
                 # now, y_dec is in the correct range:
