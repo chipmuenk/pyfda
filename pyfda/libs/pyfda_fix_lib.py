@@ -150,7 +150,7 @@ def bin2oct(bin_str: str, WI=0) -> str:
         oct_str = oct_str + '.'
         bin_f_str = bin_str[WI+1:]
 
-        while (len(bin_f_str) % 4 != 0):
+        while (len(bin_f_str) % 3 != 0):
             bin_f_str = bin_f_str + "0"
 
         # map chunks of 3 binary bits to one octal digit
