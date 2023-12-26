@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
-# TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.6
 
@@ -42,7 +41,7 @@ def qstr(text):
     return str(text)
 
 
-def bin2hex(bin_str, WI=0):
+def bin2hex(bin_str: str, WI=0) -> str:
     """
     Convert number `bin_str` in binary format to hex formatted string.
     `bin_str` is prepended / appended with zeros until the number of bits before
@@ -606,7 +605,7 @@ class Fixed(object):
         >>> myQa.resetN()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
 
-        >>> aq = myQa.fixed(a) # quantize input signal
+        >>> aq = myQa.fixp(a) # quantize input signal
         >>> plt.plot(a, aq) # plot quantized vs. original signal
         >>> print(myQa.q_dict('N_over'), "overflows!") # print number of overflows
 
@@ -616,7 +615,7 @@ class Fixed(object):
         >>> # MSB = 2**7, LSB = 2**(-2):
         >>> q_obj_b = {'WI':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
-        >>> bq = myQb.fixed(b)
+        >>> bq = myQb.fixp(b)
         >>> bq = bq.astype(btype) # restore original variable type
         """
 
@@ -1126,7 +1125,7 @@ class Fixed(object):
                 else:
                     base = 2
 
-                y_dec = int(raw_str, base) / base**frc_places
+                y_dec = int(raw_str, base) / base ** frc_places
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
@@ -1141,7 +1140,7 @@ class Fixed(object):
                     raw_str = raw_str[int_bits - W:]
 
                     # recalculate y_dec for truncated string
-                    y_dec = int(raw_str, 2) / base**frc_places
+                    y_dec = int(raw_str, 2) / base ** frc_places
 
                     if y_dec == 0:  # avoid log2(0) error in code below
                         return 0
