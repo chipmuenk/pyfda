@@ -589,8 +589,6 @@ class Fixed(object):
                 `y` is multiplied by `self.scale` *before* quantizing / saturating
             **'div'**: int in, float out:
                 `y` is divided by `self.scale` *after* quantizing / saturating.
-            **'multdiv'**: float in, float out (default):
-                both of the above
 
             For all other settings, `y` is transformed unscaled.
 
@@ -704,9 +702,9 @@ class Fixed(object):
         # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
-        #       when `scaling=='mult'`or 'multdiv'
+        #       when `scaling=='mult'``
         # ======================================================================
-        if scaling in {'mult', 'multdiv'}:
+        if scaling == 'mult':
             y = y * self.scale
 
         # ======================================================================
@@ -793,10 +791,10 @@ class Fixed(object):
 
         # ======================================================================
         # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
+        #       Divide result by `scale` factor when `scaling=='div'`
         # ======================================================================
 
-        if scaling in {'div', 'multdiv'}:
+        if scaling == 'div':
             yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
