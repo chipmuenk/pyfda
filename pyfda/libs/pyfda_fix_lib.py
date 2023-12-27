@@ -388,22 +388,23 @@ class Fixed(object):
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
 
-    Additionally, the following keys define the base / display format for the
-    fixpoint number:
+    Additionally, the following keys from global dict `fb.fil[0]` define the
+    number base and quantization/overflow behaviour for fixpoint numbers:
 
-    * **'fx_base'** : Display format for fixpoint data, optional; default = 'dec'
+    * **`'fx_base'`** : Display format for fixpoint number base; default = 'dec'
 
-      - 'dec'  : decimal integer, scaled by :math:`2^{WF}` (default)
-      - 'bin'  : binary string, scaled by :math:`2^{WF}`
-      - 'oct'  : octal string, scaled by :math:`2^{WF}` (not fully implemented yet)
-      - 'hex'  : hex string, scaled by :math:`2^{WF}`
-      - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
+      - 'dec'   : decimal (base = 10)
+      - 'bin'   : binary (base = 2)
+      - 'hex'   : hexadecimal (base = 16)
+      - 'oct'   : octal (base = 8)
+      - 'csd'   : canonically signed digit (base = "3")
 
-    * **quant** : str
-        Quantization behaviour ('floor', 'round', ...)
+    **`'qfrmt'`** : Quantization / overflow behaviour, default = 'float'
 
-    * **'ovfl'**  : str
-        Overflow behaviour ('wrap', 'sat', ...)
+      - 'float'  : floating point (unquantized)
+      - 'qint'   : fixpoint integer format
+      - 'qfrac'  : fractional fixpoint format
+
 
     * **N_over** : integer
         total number of overflows
@@ -418,7 +419,7 @@ class Fixed(object):
     LSB : float
         value of LSB (smallest quantization step), `self.LSB = 2 ** -q_dict['WF']`
 
-            MSB : float
+    MSB : float
         value of most significant bit (MSB),  `self.MSB = 2 ** (q_dict['WI'] - 1)`
 
     MIN : float
@@ -452,37 +453,7 @@ class Fixed(object):
         For binary formats, this is the same as the wordlength. Calculated
         from the numeric base 'fx_base' and the total word length WI + WF + 1.
 
-
-    scale : *** obsolete, no longer used ! ***
-            float or a keyword, the factor between the fixpoint integer
-            representation (FXP) and its "real world" floating point value (RWV).
-            If ``scale`` is a float, this value is used, RWV = FXP / scale.
-            By default, scale = 1 << WI.
-
-            Examples:
-                WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
-                WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
-
-    Q : str
-        Quantization format as string, e.g. '0.15'
-
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
-
-    Also used are the global dict entries
-
-    **`fb.fil[0]['qfrmt']`** : Quantization format, default = 'float'
-
-      - 'float'  : floating point (unquantized)
-      - 'qint'   : integer
-      - 'qfrac'  : general fixpoint format
-
-    **`fb.fil[0]['fx_base']`** : fixpoint number base, default = 'dec'
-
-      - 'dec'   : decimal (base = 10)
-      - 'bin'   : binary (base = 2)
-      - 'hex'   : hexadecimal (base = 16)
-      - 'oct'   : octal (base = 8)
-      - 'csd'   : canonically signed digit (base = "3")
 
     Example
     -------
@@ -624,22 +595,18 @@ class Fixed(object):
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
         * Fractional number format WI.WF ('qfrmt':'qfrac'): *
-        `LSB =  2 ** -WF, scale = 1`
+        `LSB =  2 ** -WF`
 
         - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
-
         - Quantize
-
         - Scale back by multiplying with `self.LSB` to restore fractional point
-
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
         * Integer number format W = 1 + WI + WF ('qfrmt':'qint'): *
-        `LSB = 1, scale = 2 ** WF`
+        `LSB = 1`
 
-        - Multiply float input by `scale = 2 ** WF` to obtain integer scale
-
+        - Multiply float input by `2 ** WF` to obtain integer scale
         - Quantize and treat overflows in integer scale
 
         Parameters
@@ -889,7 +856,7 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def requant(self, x_i, QI):
         """
-        Change word length of input signal `sig_i` to the wordlength of `self.q_dict`
+        Change word length of input signal `x_i` to the wordlength of `self.q_dict`
         using the quantization and saturation methods specified by
         `self.q_dict['quant']` and `self.q_dict['ovfl']`.
 
@@ -1433,15 +1400,11 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     # quantize floating point coefficients with the selected scale (WI.WF),
     # next convert array float  -> array of fixp
     #                           -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
-#    if fb.fil[0]['qfrmt'] == 'qint':
-#        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
         # quantize coefficients except for first
-        # coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
         coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:])))
     else:
         # quantize all coefficients
-        # coeff_q = list(QObj.fixp(coeffs))
         coeff_q = QObj.fixp(coeffs)
 
     # self.update_ovfl_cnt()  # update display of overflow counter and MSB / LSB
