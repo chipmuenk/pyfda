@@ -467,7 +467,6 @@ class Fixed(object):
     >>> q_dsp = {'WI':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
-
     """
 
     def __init__(self, q_dict):
@@ -617,9 +616,9 @@ class Fixed(object):
             Determine the scaling before and after quantizing / saturation
 
             *'mult'* float in, int out:
-                `y` is multiplied by `self.scale` *before* quantizing / saturating
+                `y` is multiplied by `scale` *before* quantizing / saturating
             **'div'**: int in, float out:
-                `y` is divided by `self.scale` *after* quantizing / saturating.
+                `y` is divided by `scale` *after* quantizing / saturating.
 
             For all other settings, `y` is transformed unscaled.
 
@@ -661,9 +660,9 @@ class Fixed(object):
             logger.warning("fixp() shouldn't be called for float setting!")
             return y
         elif fb.fil[0]['qfrmt'] == 'qint':
-            self.scale = 2. ** self.q_dict['WF']
+            scale = 2. ** self.q_dict['WF']
         else:
-            self.scale = 1
+            scale = 1
 
         scaling = scaling.lower()
         if scaling != 'mult':
@@ -738,7 +737,7 @@ class Fixed(object):
         #       when `scaling=='mult'``
         # ======================================================================
         if scaling == 'mult':
-            y = y * self.scale
+            y = y * scale
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -830,7 +829,7 @@ class Fixed(object):
         # ======================================================================
 
         if scaling == 'div':
-            yq = yq / self.scale
+            yq = yq / scale
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
