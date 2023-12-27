@@ -388,6 +388,9 @@ class Fixed(object):
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
 
+    * **N_over** : integer
+        total number of overflows (should be considered as read-only)
+
     Additionally, the following keys from global dict `fb.fil[0]` define the
     number base and quantization/overflow behaviour for fixpoint numbers:
 
@@ -404,10 +407,6 @@ class Fixed(object):
       - 'float'  : floating point (unquantized)
       - 'qint'   : fixpoint integer format
       - 'qfrac'  : fractional fixpoint format
-
-
-    * **N_over** : integer
-        total number of overflows
 
     Attributes
     ----------
