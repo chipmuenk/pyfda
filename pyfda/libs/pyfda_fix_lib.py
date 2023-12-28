@@ -577,7 +577,7 @@ class Fixed(object):
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
 
 # ------------------------------------------------------------------------------
-    def fixp(self, y, scaling='mult'):
+    def fixp(self, y, scaling=''):
         """
         Return a quantized copy `yq` for `y` (scalar or array-like) with the same
         shape as `y`. The returned data is always in float format, use float2frmt()
@@ -615,7 +615,7 @@ class Fixed(object):
         scaling: String
             Determine the scaling before and after quantizing / saturation
 
-            *'mult'* float in, int out:
+            *''* float in, int out (default):
                 `y` is multiplied by `scale` *before* quantizing / saturating
             **'div'**: int in, float out:
                 `y` is divided by `scale` *after* quantizing / saturating.
@@ -665,7 +665,7 @@ class Fixed(object):
             scale = 1
 
         scaling = scaling.lower()
-        if scaling != 'mult':
+        if scaling != '':
             logger.error(f"scaling = '{scaling}'")
 
         if np.shape(y):
@@ -734,9 +734,9 @@ class Fixed(object):
         # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
-        #       when `scaling=='mult'``
+        #       when `scaling==''``
         # ======================================================================
-        if scaling == 'mult':
+        if scaling == '':
             y = y * scale
 
         # ======================================================================
@@ -1228,7 +1228,10 @@ class Fixed(object):
             return 0.0
 
         if y_float is not None:
-            return y_float
+            if fb.fil[0]['qfrmt'] == 'qint':
+                return y_float # / 2. ** self.q_dict['WF']
+            else:
+                return y_float
         else:
             return 0.0
 
@@ -1313,7 +1316,7 @@ class Fixed(object):
                 return "0"
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y
-        y_fix = self.fixp(y, scaling='mult')
+        y_fix = self.fixp(y)
 
         if fb.fil[0]['fx_base'] == 'dec':
             if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
