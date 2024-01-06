@@ -661,10 +661,6 @@ class Fixed(object):
         if fb.fil[0]['qfrmt'] == 'float':
             logger.warning("fixp() shouldn't be called for float setting!")
             return y
-        elif fb.fil[0]['qfrmt'] == 'qint':
-            scale = 2. ** self.q_dict['WF']
-        else:
-            scale = 1
 
         if scaling != '':
             logger.error(f"scaling = '{scaling}'")
@@ -736,6 +732,10 @@ class Fixed(object):
         #       Multiply by `scale` factor before requantization and saturation
         #       when `scaling==''``
         # ======================================================================
+        if fb.fil[0]['qfrmt'] == 'qint':
+            scale = 2. ** self.q_dict['WF']
+        else:
+            scale = 1
         if scaling == '':
             y = y * scale
 
