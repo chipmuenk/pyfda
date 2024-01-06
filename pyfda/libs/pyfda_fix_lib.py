@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
-# TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.6
 
@@ -42,7 +41,7 @@ def qstr(text):
     return str(text)
 
 
-def bin2hex(bin_str, WI=0):
+def bin2hex(bin_str: str, WI=0) -> str:
     """
     Convert number `bin_str` in binary format to hex formatted string.
     `bin_str` is prepended / appended with zeros until the number of bits before
@@ -105,6 +104,67 @@ def bin2hex(bin_str, WI=0):
 
 
 bin2hex_vec = np.vectorize(bin2hex)  # safer than frompyfunction()
+
+
+# ---------------------------------------------------------------------
+def bin2oct(bin_str: str, WI=0) -> str:
+    """
+    Convert number `bin_str` in binary format to octal formatted string.
+    `bin_str` is prepended / appended with zeros until the number of bits before
+    and after the radix point (position given by `WI`) is a multiple of 3.
+    """
+
+    wmap = {
+        '000': '0',
+        '001': '1',
+        '010': '2',
+        '011': '3',
+        '100': '4',
+        '101': '5',
+        '110': '6',
+        '111': '7',
+        }
+
+    oct_str = ""
+
+    # --- integer part ----------------------------
+    if WI > 0:
+        # slice string with integer bits and prepend with zeros to obtain a
+        # multiple of 3 length:
+        bin_i_str = bin_str[:WI+1]
+        while (len(bin_i_str) % 3 != 0):
+            bin_i_str = "0" + bin_i_str
+
+        i = 0
+        while (i < len(bin_i_str)):  # map chunks of 3 binary bits to one oct digit
+            oct_str = oct_str + wmap[bin_i_str[i:i + 3]]
+            i = i + 3
+    else:
+        oct_str = bin_str[0]  # copy MSB as sign bit
+
+    # --- fractional part -------------------------
+    WF = len(bin_str) - WI - 1
+    # slice string with fractional bits and append with zeros to obtain a
+    # multiple of 3 length:
+    if WF > 0:
+        oct_str = oct_str + '.'
+        bin_f_str = bin_str[WI+1:]
+
+        while (len(bin_f_str) % 3 != 0):
+            bin_f_str = bin_f_str + "0"
+
+        # map chunks of 3 binary bits to one octal digit
+        i = 0
+        while (i < len(bin_f_str)):
+            oct_str = oct_str + wmap[bin_f_str[i:i + 3]]
+            i = i + 3
+
+    # oct_str = oct_str.lstrip("0") # remove leading zeros
+    oct_str = "0" if len(oct_str) == 0 else oct_str
+    return oct_str
+
+
+bin2oct_vec = np.vectorize(bin2oct)  # safer than frompyfunction()
 
 
 # ------------------------------------------------------------------------------
@@ -328,24 +388,25 @@ class Fixed(object):
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
 
-    Additionally, the following keys define the base / display format for the
-    fixpoint number:
-
-    * **'fx_base'** : Display format for fixpoint data, optional; default = 'dec'
-
-      - 'dec'  : decimal integer, scaled by :math:`2^{WF}` (default)
-      - 'bin'  : binary string, scaled by :math:`2^{WF}`
-      - 'hex'  : hex string, scaled by :math:`2^{WF}`
-      - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
-
-    * **quant** : str
-        Quantization behaviour ('floor', 'round', ...)
-
-    * **'ovfl'**  : str
-        Overflow behaviour ('wrap', 'sat', ...)
-
     * **N_over** : integer
-        total number of overflows
+        total number of overflows (should be considered as read-only)
+
+    Additionally, the following keys from global dict `fb.fil[0]` define the
+    number base and quantization/overflow behaviour for fixpoint numbers:
+
+    * **`'fx_base'`** : Display format for fixpoint number base; default = 'dec'
+
+      - 'dec'   : decimal (base = 10)
+      - 'bin'   : binary (base = 2)
+      - 'hex'   : hexadecimal (base = 16)
+      - 'oct'   : octal (base = 8)
+      - 'csd'   : canonically signed digit (base = "3")
+
+    **`'qfrmt'`** : Quantization / overflow behaviour, default = 'float'
+
+      - 'float'  : floating point (unquantized)
+      - 'qint'   : fixpoint integer format
+      - 'qfrac'  : fractional fixpoint format
 
     Attributes
     ----------
@@ -357,7 +418,7 @@ class Fixed(object):
     LSB : float
         value of LSB (smallest quantization step), `self.LSB = 2 ** -q_dict['WF']`
 
-            MSB : float
+    MSB : float
         value of most significant bit (MSB),  `self.MSB = 2 ** (q_dict['WI'] - 1)`
 
     MIN : float
@@ -391,36 +452,7 @@ class Fixed(object):
         For binary formats, this is the same as the wordlength. Calculated
         from the numeric base 'fx_base' and the total word length WI + WF + 1.
 
-
-    scale : *** obsolete, no longer used ! ***
-            float or a keyword, the factor between the fixpoint integer
-            representation (FXP) and its "real world" floating point value (RWV).
-            If ``scale`` is a float, this value is used, RWV = FXP / scale.
-            By default, scale = 1 << WI.
-
-            Examples:
-                WI.WF = 3.0, FXP = "b0110." = 6,   scale = 8 -> RWV = 6 / 8   = 0.75
-                WI.WF = 1.2, FXP = "b01.10" = 1.5, scale = 2 -> RWV = 1.5 / 2 = 0.75
-
-    Q : str
-        Quantization format as string, e.g. '0.15'
-
     Overflow flags and counters are set in `self.fixp()` and reset in `self.reset_N()`
-
-    Also used are the global dict entries
-
-    **`fb.fil[0]['qfrmt']`** : Quantization format, default = 'float'
-
-      - 'float'  : floating point (unquantized)
-      - 'qint'   : integer
-      - 'qfrac'  : general fixpoint format
-
-    **`fb.fil[0]['fx_base']`** : fixpoint number base, default = 'dec'
-
-      - 'dec'   : decimal (base = 10)
-      - 'bin'   : binary (base = 2)
-      - 'hex'   : hexadecimal (base = 16)
-      - 'csd'   : canonically signed digit (base = 2?)
 
     Example
     -------
@@ -435,7 +467,6 @@ class Fixed(object):
     >>> q_dsp = {'WI':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
-
     """
 
     def __init__(self, q_dict):
@@ -473,10 +504,11 @@ class Fixed(object):
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
         self.FRMT_REGEX = {
-                'bin': r'[^0|1|.|,|\-]',
-                'csd': r'[^0|\+|\-|.|,]',
                 'dec': r'[^0-9Ee|.|,|\-]',
-                'hex': r'[^0-9A-Fa-f|.|,|\-]'
+                'bin': r'[^0|1|.|,|\-]',
+                'oct': r'[^0-7|.|,|\-]',
+                'hex': r'[^0-9A-Fa-f|.|,|\-]',
+                'csd': r'[^0|\+|\-|.|,]'
                         }
         # --------------------------------------------------------------------------
         # vectorize frmt2float function for arrays, swallow the `self` argument
@@ -536,6 +568,8 @@ class Fixed(object):
             self.places = int(np.ceil(W / 1.5)) + 1
         elif fb.fil[0]['fx_base'] == 'hex':
             self.places = int(np.ceil(W / 4.)) + 1
+        elif fb.fil[0]['fx_base'] == 'oct':
+            self.places = int(np.ceil(W / 3.)) + 1
         elif fb.fil[0]['qfrmt'] == 'float':
             self.places = 4
         else:
@@ -543,7 +577,7 @@ class Fixed(object):
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
 
 # ------------------------------------------------------------------------------
-    def fixp(self, y, scaling='mult'):
+    def fixp(self, y, scaling=''):
         """
         Return a quantized copy `yq` for `y` (scalar or array-like) with the same
         shape as `y`. The returned data is always in float format, use float2frmt()
@@ -559,38 +593,32 @@ class Fixed(object):
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
         * Fractional number format WI.WF ('qfrmt':'qfrac'): *
-        `LSB =  2 ** -WF, scale = 1`
+        `LSB =  2 ** -WF`
 
         - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
-
         - Quantize
-
         - Scale back by multiplying with `self.LSB` to restore fractional point
-
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
         * Integer number format W = 1 + WI + WF ('qfrmt':'qint'): *
-        `LSB = 1, scale = 2 ** WF`
+        `LSB = 1`
 
-        - Multiply float input by `scale = 2 ** WF` to obtain integer scale
-
+        - Multiply float input by `2 ** WF` to obtain integer scale
         - Quantize and treat overflows in integer scale
 
         Parameters
         ----------
-        y: scalar or array-like object
+        y: scalar or array-like object of float
             input value (floating point format) to be quantized
 
         scaling: String
             Determine the scaling before and after quantizing / saturation
 
-            *'mult'* float in, int out:
-                `y` is multiplied by `self.scale` *before* quantizing / saturating
+            *''* float in, int out (default):
+                `y` is multiplied by `scale` *before* quantizing / saturating
             **'div'**: int in, float out:
-                `y` is divided by `self.scale` *after* quantizing / saturating.
-            **'multdiv'**: float in, float out (default):
-                both of the above
+                `y` is divided by `scale` *after* quantizing / saturating.
 
             For all other settings, `y` is transformed unscaled.
 
@@ -608,7 +636,7 @@ class Fixed(object):
         >>> myQa.resetN()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
 
-        >>> aq = myQa.fixed(a) # quantize input signal
+        >>> aq = myQa.fixp(a) # quantize input signal
         >>> plt.plot(a, aq) # plot quantized vs. original signal
         >>> print(myQa.q_dict('N_over'), "overflows!") # print number of overflows
 
@@ -618,7 +646,7 @@ class Fixed(object):
         >>> # MSB = 2**7, LSB = 2**(-2):
         >>> q_obj_b = {'WI':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
-        >>> bq = myQb.fixed(b)
+        >>> bq = myQb.fixp(b)
         >>> bq = bq.astype(btype) # restore original variable type
         """
 
@@ -632,11 +660,13 @@ class Fixed(object):
             logger.warning("fixp() shouldn't be called for float setting!")
             return y
         elif fb.fil[0]['qfrmt'] == 'qint':
-            self.scale = 2. ** self.q_dict['WF']
+            scale = 2. ** self.q_dict['WF']
         else:
-            self.scale = 1
+            scale = 1
 
         scaling = scaling.lower()
+        if scaling != '':
+            logger.error(f"scaling = '{scaling}'")
 
         if np.shape(y):
             # Input is an array:
@@ -704,10 +734,10 @@ class Fixed(object):
         # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
-        #       when `scaling=='mult'`or 'multdiv'
+        #       when `scaling==''``
         # ======================================================================
-        if scaling in {'mult', 'multdiv'}:
-            y = y * self.scale
+        if scaling == '':
+            y = y * scale
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -720,6 +750,8 @@ class Fixed(object):
 
         # multiply by 2 ** WF instead of dividing by 2 ** -WF:
         y *= 2. ** self.q_dict['WF']
+
+        logger.error(f"y={y}")
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -793,11 +825,11 @@ class Fixed(object):
 
         # ======================================================================
         # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
+        #       Divide result by `scale` factor when `scaling=='div'`
         # ======================================================================
 
-        if scaling in {'div', 'multdiv'}:
-            yq = yq / self.scale
+        if scaling == 'div':
+            yq = yq / scale
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
@@ -821,27 +853,21 @@ class Fixed(object):
 
     # --------------------------------------------------------------------------
     def requant(self, x_i, QI):
-
         """
-        Change word length of input signal `sig_i` to the wordlength of the output
-        signal, using the quantization and saturation methods specified by
-        ``QO['quant']`` and ``QO['ovfl']``.
+        Change word length of input signal `x_i` to the wordlength of `self.q_dict`
+        using the quantization and saturation methods specified by
+        `self.q_dict['quant']` and `self.q_dict['ovfl']`.
 
         Parameters
         ----------
-        x_i: input data, scalar or array-like
-            Signal to be requantized with quant. dict QI
+        x_i: int, float or complex scalar or array-like
+            Signal to be requantized from quant. dict QI
 
         QI: dict
             Quantization dict for input word, only the keys 'WI' and 'WF' for integer
-            and fractional wordlength are evaluated. QI['WI'] = 2 and QI['WF'] = 13
-            e.g. define Q-Format '2.13'  with 2 integer, 13 fractional bits and 1 implied
-            sign bit = 16 bits total.
-
-        QO: dict
-            Quantization dict for output word format; the keys 'WI' and 'WF' for
-            integer and fractional wordlength are evaluated as well as the keys 'quant'
-            and 'ovfl' describing requantization and overflow behaviour.
+            and fractional wordlength are evaluated.
+            `QI.q_dict['WI'] = 2` and `QI.q_dict['WF'] = 13` e.g. define Q-Format '2.13'
+            with 2 integer, 13 fractional bits and 1 implied sign bit = 16 bits total.
 
         Returns
         -------
@@ -941,7 +967,7 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or string or array of scalars or strings in number format float or
-            `fb.fil[0]['fx_base']` ('dec', 'hex', 'bin' or 'csd')
+            `fb.fil[0]['fx_base']` ('dec', 'hex', 'oct', 'bin' or 'csd')
 
         Returns
         -------
@@ -983,16 +1009,33 @@ class Fixed(object):
             return self.frmt2float_vec(y)
 
     # --------------------------------------------------------------------------
-    def frmt2float_scalar(self, y) -> float:
+    def frmt2float_scalar(self, y: str) -> float:
         """
-        Convert the formats 'dec', 'bin', 'hex', 'csd' to float
+        Convert a string in 'dec', 'bin', 'oct', 'hex', 'csd' numeric format
+        to float.
 
-        Find the number of places before the first radix point (if there is one)
-        and join integer and fractional parts
-        when returned string is empty, skip general conversions and rely on
-        error handling of individual routines,
-        remove illegal characters and trailing zeros
+        - format is taken from the global `fb.fil[0]['fx_base']`
+        - maximum wordlength is determined from the local quantization dict keys
+          `self.q_dict['WI']` and `self.q_dict['WF']`
+        - negative numbers can be represented by a '-' sign or in two's complement
+        - represented numbers may be fractional and / or complex.
+        - the result is divided by 2**WF for `'qfrmt' == 'qint'` via `fixp()`
+
+        Parameters
+        ----------
+        y: str
+            A string formatted as a decimal, binary, octal, hex or csd
+            number representation. The number string may contain a '.'
+            or ',' to represent fractal numbers. When the string contains a 'j'm
+            it is tried to split the string into real and imaginary part.
+
+        Returns
+        --------
+        float or complex
+            The float / complex representation of the string
+
         """
+        # -----------------------------------------------------
         def split_complex_str(y: str) -> tuple:
             """
             Parameters
@@ -1038,16 +1081,37 @@ class Fixed(object):
                     f"String split into {len(y1)} parts - that's too many!")
                 return "0", "0"
         # -----------------------------------------
-
+        y = str(y)
         frmt = fb.fil[0]['fx_base']
-        if 'j' in str(y):
+        # ======================================================================
+        # (1) : COMPLEX NUMBERS
+        #       Split strings containing 'j' into real and imaginary part,
+        #       calling `frmt2float` recursively
+        # ======================================================================
+        if 'j' in y:
             y_re, y_im = split_complex_str(y)
-            return self.frmt2float(y_re) +\
-                  self.frmt2float(y_im) * 1j
-        val_str = re.sub(self.FRMT_REGEX[frmt], r'', str(y)).lstrip('0')
+            return self.frmt2float(y_re) + self.frmt2float(y_im) * 1j
+
+        # ======================================================================
+        # (2) : CLEAN UP INPUT STRING
+        #       - remove illegal characters (depending on selected number format
+        #         defined in FRMT_REGEX(frmt)) from input string
+        #       - remove all leading '0' to sanitize cases like '0001' or '00.23'
+        #       - replace ',' by '.' for German style numbers
+        # ======================================================================
+        val_str = re.sub(
+            self.FRMT_REGEX[frmt], r'', y).lstrip('0').replace(',', '.')
+
+        # ======================================================================
+        # (3) : FRACTIONAL PLACES
+        #       - prepend '0' if string starts with '.' and store as `val_str`
+        #       - store number of fractional places in `frc_places` (all number
+        #         formats)
+        #       - store fractional part as `frc_str` and whole string without '.'
+        #         as `raw_str`
+        # ======================================================================
         if len(val_str) > 0:
-            val_str = val_str.replace(',', '.')  # ',' -> '.' for German-style numbers
-            if val_str[0] == '.':  # prepend '0' when the number starts with '.'
+            if val_str[0] == '.':
                 val_str = '0' + val_str
 
             # count number of fractional places in string
@@ -1059,35 +1123,46 @@ class Fixed(object):
                 frc_places = 0
 
             raw_str = val_str.replace('.', '')  # join integer and fractional part
-
             # logger.debug(f"y={y}, val_str={val_str}, raw_str={raw_str}")
         else:
             return 0.0
 
-        # (1) calculate the decimal value of the input string using np.float64()
-        #     which takes the number of decimal places into account.
-        # (2) quantize and saturate
-        # (3) divide by scale
+        # ======================================================================
+        # (4a): CONVERSION (DEC)
+        #       - calculate the decimal value of `val_str` directly using `fixp()`
+        #         which quantizes and calculates overflows
+        #       - divide by scale
+        # ======================================================================
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
                 y_dec = y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warning(e)
+                return 0.0
 
-        elif frmt in {'hex', 'bin'}:
-            # - Glue integer and fractional part to a string without radix point
-            # - Check for a negative sign, use this information only in the end
-            # - Divide by <base> ** <number of fractional places> for correct scaling
-            # - Strip MSBs outside fixpoint range
-            # - Transform numbers in negative 2's complement to negative floats.
-            # - Calculate the fixpoint representation for correct saturation /
-            #   quantization
+        # ======================================================================
+        # (4b): CONVERSION (BIN, HEX, OCT)
+        #       - Use `raw_string` without radix point for calculation
+        #       - Check for a negative sign and remove it, use this information only
+        #         in the end
+        #       - Calculate decimal value of `raw_str` without '-' using
+        #        `int(raw_str, base)`
+        #       - divide by `base ** frc_places` for correct scaling
+        #       - calculate number of bits required for binary representation. If this
+        #         number exceeds word length, convert to binary string, strip
+        #         leading bits and convert back to float.
+        #       - transform numbers in negative 2's complement to negative floats.
+        #       - calculate the fixpoint representation using `fixp()` for correct
+        #            saturation / quantization
+        # TODO: Shouldn't `fixp()` be enough for handling number of bits etc?
+        # ======================================================================
+        elif frmt in {'hex', 'bin', 'oct'}:
+            neg_sign = False
             if fb.fil[0]['qfrmt'] == 'qint':
                 W = self.q_dict['WI'] + self.q_dict['WF'] + 1
             else:
                 W = self.q_dict['WI'] + 1
-            neg_sign = False
             try:
                 if raw_str[0] == '-':
                     neg_sign = True
@@ -1095,35 +1170,38 @@ class Fixed(object):
 
                 if frmt == 'hex':
                     base = 16
-                else:
+                elif frmt == 'oct':
+                    base = 8
+                else:  # 'bin'
                     base = 2
 
-                y_dec = abs(int(raw_str, base) / base**frc_places)
+                y_dec = int(raw_str, base) / base ** frc_places
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
-
                 int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
+
                 # When number is outside fixpoint range, discard MSBs:
                 if int_bits > W:
-                    # convert hex numbers to binary string for discarding bits bit-wise
-                    if frmt == 'hex':
-                        raw_str = np.binary_repr(int(raw_str, 16))
+                    # convert non-binary numbers to binary string for
+                    # discarding bits bit-wise
+                    if frmt != 'bin':
+                        raw_str = np.binary_repr(int(raw_str, base))
                     # discard the upper bits outside the valid range
                     raw_str = raw_str[int_bits - W:]
 
                     # recalculate y_dec for truncated string
-                    y_dec = int(raw_str, 2) / base**frc_places
+                    y_dec = int(raw_str, 2) / base ** frc_places
 
                     if y_dec == 0:  # avoid log2(0) error in code below
-                        return 0
-
+                        return 0.0
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
+
                 # now, y_dec is in the correct range:
                 if int_bits <= W - 1:  # positive number
                     pass
-                elif int_bits == W:
-                    # negative, calculate 2's complement
+                else: # int_bits == W -> negative, calculate 2's complement
+                    # int_bits > W has been treated above
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
                 if neg_sign:
@@ -1132,22 +1210,28 @@ class Fixed(object):
             except Exception as e:
                 logger.warning(e)
                 return 0.0
-        # ----
-        elif frmt == 'csd':
-            # - Glue integer and fractional part to a string without radix point
-            # - Divide by 2 ** <number of fractional places> for correct scaling
-            # - Calculate fixpoint representation for saturation / overflow effects
+        # ======================================================================
+        # (4c): CONVERSION (CSD)
+        #       - use `raw_string` without radix point for calculation
+        #       - divide by 2 ** <number of fractional places> for correct scaling
+        #       - calculate the fixpoint representation using `fixp()` for correct
+        #            saturation / quantization
+        # ======================================================================
 
+        elif frmt == 'csd':
             y_dec = csd2dec_vec(raw_str)  # csd -> integer
             if y_dec is not None:
-                y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
+                y_float = self.fixp(y_dec / 2 ** frc_places, scaling='div')
         # ----
         else:
             logger.error(f'Unknown output format "{frmt}"!')
             return 0.0
 
         if y_float is not None:
-            return y_float
+            if fb.fil[0]['qfrmt'] == 'qint':
+                return y_float # / 2. ** self.q_dict['WF']
+            else:
+                return y_float
         else:
             return 0.0
 
@@ -1232,7 +1316,7 @@ class Fixed(object):
                 return "0"
 
         # return a quantized & saturated / wrapped fixpoint (type float) for y
-        y_fix = self.fixp(y, scaling='mult')
+        y_fix = self.fixp(y)
 
         if fb.fil[0]['fx_base'] == 'dec':
             if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
@@ -1251,7 +1335,7 @@ class Fixed(object):
                 # fractional case, convert with WF fractional bits
                 y_str = dec2csd_vec(y_fix, self.q_dict['WF'])
 
-        elif fb.fil[0]['fx_base'] in {'bin', 'hex'}:
+        elif fb.fil[0]['fx_base'] in {'bin', 'oct', 'hex'}:
             # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
             y_fix_int = np.int64(np.round(y_fix / self.LSB))
             W = self.q_dict['WI'] + self.q_dict['WF'] + 1
@@ -1264,6 +1348,8 @@ class Fixed(object):
                 WI = self.q_dict['WI']
             if fb.fil[0]['fx_base'] == 'hex':
                 y_str = bin2hex_vec(y_bin_str, WI)
+            elif fb.fil[0]['fx_base'] == 'oct':
+                y_str = bin2oct_vec(y_bin_str, WI)
             else:  # 'bin'
                 # insert radix point if required
                 if fb.fil[0]['qfrmt'] == 'qint':
@@ -1315,8 +1401,6 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     # quantize floating point coefficients with the selected scale (WI.WF),
     # next convert array float  -> array of fixp
     #                           -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
-#    if fb.fil[0]['qfrmt'] == 'qint':
-#        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
         # recursive coefficients: quantize coefficients except for first (= 1)
         coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:])))

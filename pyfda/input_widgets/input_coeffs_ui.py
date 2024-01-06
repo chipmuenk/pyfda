@@ -56,10 +56,11 @@ class Input_Coeffs_UI(QWidget):
             "<span>Select the coefficient fixpoint display format.</span>",
             # ("float", "Float", "<span>Coefficients with full precision in floating "
             # "point format</span>"),
-            ("dec", "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
-            ("hex", "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
-            ("bin", "Bin", "<span>Fixpoint coefficients in binary format</span>"),
-            ("csd", "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
+            ('dec', "Dec", "<span>Fixpoint coefficients in decimal format</span>"),
+            ('hex', "Hex", "<span>Fixpoint coefficients in hexadecimal format</span>"),
+            ('bin', "Bin", "<span>Fixpoint coefficients in binary format</span>"),
+            ('oct', "Oct", "<span>Fixpoint coefficients in octal format</span>"),
+            ('csd', "CSD", "<span>Fixpoint coefficients in Canonically Signed Digit "
              "(ternary logic) format</span>")
             ]
         self.cmb_fx_base_default = "dec"

@@ -262,7 +262,7 @@ fil_ref = {
     'sos': [],
     # global quantization format {'float', 'qint', 'qfrac'}
     'qfrmt': 'float',
-    # number format for fixpoint display {'dec', 'hex', 'bin', 'csd'}
+    # number format for fixpoint display {'dec', 'hex', 'bin', 'oct', 'csd'}
     'fx_base': 'dec',
     # Settings for fixpoint widgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
