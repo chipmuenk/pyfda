@@ -546,6 +546,7 @@ class Fixed(object):
 
         # Calculate min., max., LSB and MSB from word lengths
         if fb.fil[0]['qfrmt'] == 'qint':
+            # LSB = 1, MSB = 2 ** (W - 1)
             self.LSB = 1
             self.MSB = 2 ** (self.q_dict['WI'] + self.q_dict['WF']- 1)
         else:
@@ -826,6 +827,7 @@ class Fixed(object):
         # ======================================================================
         # (5) : OUTPUT SCALING
         #       Divide result by `scale` factor when `scaling=='div'` to obtain
+        #       quantized fractional number
         # ======================================================================
 
         if scaling == 'div':
