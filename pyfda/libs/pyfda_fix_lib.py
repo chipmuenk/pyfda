@@ -1306,7 +1306,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     """
     logger.debug("quant_coeffs")
     # always use decimal display format for coefficient quantization
-    disp_frmt_tmp = fb.fil[0]['fx_base']
+    disp_frmt_tmp = fb.fil[0]['fx_base']  # store fx format
     fb.fil[0]['fx_base'] = 'dec'
     QObj.resetN()  # reset all overflow counters
 
@@ -1318,12 +1318,10 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
 #    if fb.fil[0]['qfrmt'] == 'qint':
 #        QObj.q_dict['scale'] = 1 << QObj.q_dict['WF']
     if recursive:
-        # quantize coefficients except for first
-        # coeff_q = [1] + list(QObj.fixp(coeffs[1:]))
+        # recursive coefficients: quantize coefficients except for first (= 1)
         coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:])))
     else:
         # quantize all coefficients
-        # coeff_q = list(QObj.fixp(coeffs))
         coeff_q = QObj.fixp(coeffs)
 
     # self.update_ovfl_cnt()  # update display of overflow counter and MSB / LSB
