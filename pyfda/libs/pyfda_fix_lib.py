@@ -615,7 +615,8 @@ class Fixed(object):
         scaling: String
             Determine the scaling before and after quantizing / saturation
 
-            *''* float in, int out (default):
+            *''* (default): float in, quantized fractional (qfrmt = 'qfrac') or
+                int (qfrmt = 'qint') out
                 `y` is multiplied by `scale` *before* quantizing / saturating
             **'div'**: int in, float out:
                 `y` is divided by `scale` *after* quantizing / saturating.
@@ -676,7 +677,6 @@ class Fixed(object):
             y = np.asarray(y)  # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype=bool)
-            # ovr_flag = np.zeros(y.shape, dtype=int)
 
             if np.issubdtype(y.dtype, np.number):  # numpy number type
                 self.N += y.size
@@ -741,7 +741,7 @@ class Fixed(object):
 
         # ======================================================================
         # (3) : QUANTIZATION
-        #       Divide by LSB = 2**-WF to obtain an intermediate format with
+        #       Multiply by 2**WF = 1/LSB to obtain an intermediate format with
         #       quantization step size = 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
@@ -825,7 +825,7 @@ class Fixed(object):
 
         # ======================================================================
         # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'`
+        #       Divide result by `scale` factor when `scaling=='div'` to obtain
         # ======================================================================
 
         if scaling == 'div':
