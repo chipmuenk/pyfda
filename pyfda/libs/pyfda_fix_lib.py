@@ -666,7 +666,6 @@ class Fixed(object):
         else:
             scale = 1
 
-        scaling = scaling.lower()
         if scaling != '':
             logger.error(f"scaling = '{scaling}'")
 
