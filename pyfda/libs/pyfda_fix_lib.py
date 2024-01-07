@@ -673,6 +673,7 @@ class Fixed(object):
             y = np.asarray(y)  # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype=bool)
+            self.ovr_flag = np.zeros(y.shape, dtype=int)
 
             if np.issubdtype(y.dtype, np.number):
                 # numpy number type (usual case), proceed with test for complex value
@@ -797,7 +798,6 @@ class Fixed(object):
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
             self.N_over_neg = self.N_over_pos = self.N_over = 0
-            self.ovr_flag = np.zeros_like(yq)
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < self.MIN)
