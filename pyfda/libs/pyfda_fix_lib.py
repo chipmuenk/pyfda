@@ -795,13 +795,22 @@ class Fixed(object):
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
         #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
         # ====================================================================
+
+        # MSB = 1 << (self.q_dict['WI'] + self.q_dict['WF'])  # (2 ** (W - 1))
+        LSB = 2 ** -self.q_dict['WF']
+        MSB = self.MSB
+        MAX = 2 * MSB - LSB  # (2 ** W) - 1
+        MIN = - 2 * MSB
+
+        logger.error(f"MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
+
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
             self.N_over_neg = self.N_over_pos = self.N_over = 0
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < self.MIN)
-            over_pos = (yq > self.MAX)
+            over_neg = (yq < MIN)
+            over_pos = (yq > MAX)
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
@@ -811,13 +820,13 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
-                yq = np.where(over_pos, self.MAX, yq)  # (cond, true, false)
-                yq = np.where(over_neg, self.MIN, yq)
+                yq = np.where(over_pos, MAX, yq)  # (cond, true, false)
+                yq = np.where(over_neg, MIN, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.q_dict['ovfl'] == 'wrap':
                 yq = np.where(
-                    over_pos | over_neg, yq - 4. * self.MSB * np.fix(
-                        (np.sign(yq) * 2 * self.MSB + yq) / (4 * self.MSB)), yq)
+                    over_pos | over_neg, yq - 4. * MSB * np.fix(
+                        (np.sign(yq) * 2 * MSB + yq) / (4 * MSB)), yq)
             else:
                 raise Exception(
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
