@@ -674,7 +674,8 @@ class Fixed(object):
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype=bool)
 
-            if np.issubdtype(y.dtype, np.number):  # numpy number type
+            if np.issubdtype(y.dtype, np.number):
+                # numpy number type (usual case), proceed with test for complex value
                 self.N += y.size
             elif y.dtype.kind in {'U', 'S'}:  # string or unicode
                 try:
@@ -692,8 +693,8 @@ class Fixed(object):
                         self.N += y.size
                         return yq
             else:
-                logger.error("Argument '{0}' is of type '{1}',\n"
-                             "cannot convert to float.".format(y, y.dtype))
+                logger.error(f"Argument '{y}' is of type '{y.dtype}',\n"
+                             "cannot convert to float or complex.")
                 y = np.zeros(y.shape)
         else:
             # Input is a scalar
@@ -722,11 +723,11 @@ class Fixed(object):
         y = np.real_if_close(y)
         # quantize complex values separately and recursively
         if np.iscomplexobj(y):
-            yq = self.fixp(y.real, scaling=scaling) + 1j * self.fixp(y.imag, scaling=scaling)
+            yq = self.fixp(y.real, scaling=scaling) +\
+                 self.fixp(y.imag, scaling=scaling) * 1j
             # logger.warning(f"yq = {yq}")
             return yq
 
-        y_in = y  # store y before scaling / quantizing
         # ======================================================================
         # (2) : INPUT SCALING
         #       Multiply by `scale` factor before requantization and saturation
@@ -742,7 +743,7 @@ class Fixed(object):
         # ======================================================================
         # (3) : QUANTIZATION
         #       Multiply by 2**WF = 1/LSB to obtain an intermediate format with
-        #       quantization step size = 1.
+        #       quantization step size of 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
         #       Finally, multiply by LSB to restore original scale.
