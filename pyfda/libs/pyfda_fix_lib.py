@@ -481,7 +481,7 @@ class Fixed(object):
             'N_over': 0}
         # these attributes are calculated and should be regarded as read-only
         self.LSB = 2. ** -self.q_dict_default['WF']
-        self.MSB = 2. ** (self.q_dict_default['WF'] - 1)
+        self.MSB = 2. ** (self.q_dict_default['WI'] - 1)
         self.MAX = 2 * self.MSB - self.LSB
         self.MIN = -2 * self.MSB
 
