@@ -492,7 +492,7 @@ class FX_UI_WQ(QWidget):
             self.lbl_sep2.setVisible(False)
 
             LSB = 2 ** -self.q_dict['WF']
-            MSB = 2. ** (self.q_dict['WI'] - 1) - LSB
+            MSB = 2. ** (self.q_dict['WI'] - 1)
         elif qfrmt == 'float':
             self.lbl_sep1.setText(to_html("---", frmt='b'))
             self.lbl_sep2.setVisible(False)
