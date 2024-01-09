@@ -992,8 +992,8 @@ class Fixed(object):
         - Calculate decimal, fractional representation `y_dec` of string,
           using the base and the number of fractional places
         - Calculate two's complement for `W` bits (only for negative bin and hex numbers)
-        - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`,
-          dividing the result by `scale`.
+        - Calculate fixpoint float representation `y_float = fixp(y_dec, out_frmt='qfrmt')`,
+          dividing the result by `2**WF`.
 
         Parameters
         ----------
@@ -1050,7 +1050,7 @@ class Fixed(object):
           `self.q_dict['WI']` and `self.q_dict['WF']`
         - negative numbers can be represented by a '-' sign or in two's complement
         - represented numbers may be fractional and / or complex.
-        - the result is divided by 2**WF for `'qfrmt' == 'qint'` via `fixp()`
+        - the result is divided by 2**WF for `fb.fil[0]['qfrmt'] == 'qint'` in `fixp()`
 
         Parameters
         ----------
