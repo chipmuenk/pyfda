@@ -810,14 +810,14 @@ class Fixed(object):
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
         #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
         # ====================================================================
-
-        # MSB = 1 << (self.q_dict['WI'] + self.q_dict['WF'])  # (2 ** (W - 1))
-        LSB = 2 ** -self.q_dict['WF']
-        MSB = self.MSB
-        MAX = 2 * MSB - LSB  # (2 ** W) - 1
+        # LSB = 2 ** -self.q_dict['WF']
+        # MSB = self.MSB
+        LSB = 1
+        MSB = 1 << (self.q_dict['WI'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
+        MAX = 2 * MSB - LSB  # 2 ** (W - 1) - 1
         MIN = - 2 * MSB
 
-        logger.error(f"MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
+        logger.error(f"fixp: MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
 
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
