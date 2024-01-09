@@ -578,7 +578,7 @@ class Fixed(object):
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
 
 # ------------------------------------------------------------------------------
-    def fixp(self, y, scaling=''):
+    def fixp(self, y, scaling='', in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
         """
         Return a quantized copy `yq` for `y` (scalar or array-like) with the same
         shape as `y`. The returned data is always in float format, use float2frmt()
@@ -658,6 +658,11 @@ class Fixed(object):
         #       arrays and initialize flags
         # ======================================================================
         # use values from dict for initialization
+        if not in_frmt in {'qfrac', 'qint', 'float'}:
+            logger.error(f"Unknown input format {in_frmt}")
+        if not out_frmt in {'qfrac', 'qint', 'float'}:
+            logger.error(f"Unknown output format {out_frmt}")
+
         if fb.fil[0]['qfrmt'] == 'float':
             logger.warning("fixp() shouldn't be called for float setting!")
             return y
@@ -734,12 +739,19 @@ class Fixed(object):
         #       Multiply by `scale` factor before requantization and saturation
         #       when `scaling==''``
         # ======================================================================
-        if fb.fil[0]['qfrmt'] == 'qint':
-            scale = 2. ** self.q_dict['WF']
-        else:
-            scale = 1
-        if scaling == '':
-            y = y * scale
+        # if fb.fil[0]['qfrmt'] == 'qint':
+        #     scale = 2. ** self.q_dict['WF']
+        # else:
+        #     scale = 1
+
+        logger.error(f"scaling = '{scaling}', qfrmt = {fb.fil[0]['qfrmt']}, y.dtype = {y.dtype}")
+        logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
+
+        # if scaling == '' and  fb.fil[0]['qfrmt'] == 'qint':
+        #   y = y * (2. ** self.q_dict['WF'])
+        # if scaling != 'div':
+        #   y = y * scale
+        # logger.error(f"y2={y}")
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -751,7 +763,9 @@ class Fixed(object):
         # ======================================================================
 
         # multiply by 2 ** WF instead of dividing by 2 ** -WF:
-        y *= 2. ** self.q_dict['WF']
+        # y *= 2. ** self.q_dict['WF']
+        if in_frmt != 'qint':
+            y = y * (2. ** self.q_dict['WF'])
 
         logger.error(f"y={y}")
 
@@ -786,8 +800,9 @@ class Fixed(object):
         else:
             raise Exception(
                 f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
-
-        yq /= 2. ** self.q_dict['WF']
+        logger.error(f"fixp: y_q = {yq}")
+        # yq /= 2. ** self.q_dict['WF']
+        # logger.error(f"y_quant_scale={yq}")
 
         # logger.warning(f"scaling={scaling} y_in={y_in} | y={y} | yq={yq}")
 
@@ -839,8 +854,13 @@ class Fixed(object):
         #       quantized fractional number
         # ======================================================================
 
-        if scaling == 'div':
-            yq = yq / scale
+#        if fb.fil[0]['qfrmt'] == 'qfrac':
+        if out_frmt == 'qfrac':
+            yq = yq / (2. ** self.q_dict['WF'])
+        # if scaling == 'div' and fb.fil[0]['qfrmt'] == 'qint':
+        #    yq = yq / (2. ** self.q_dict['WF'])
+
+        logger.error(f"fixp: y_over_scale = {yq}")
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
@@ -1147,7 +1167,7 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_dec = y_float = self.fixp(val_str, scaling='div')
+                y_dec = y_float = self.fixp(val_str, in_frmt=fb.fil[0]['qfrmt'])
             except Exception as e:
                 logger.warning(e)
                 return 0.0
@@ -1217,10 +1237,11 @@ class Fixed(object):
                 # quantize / saturate / wrap & scale the integer value:
                 if neg_sign:
                     y_dec = -y_dec
-                y_float = self.fixp(y_dec, scaling='div')
+                y_float = self.fixp(y_dec, out_frmt='qfrac')
             except Exception as e:
                 logger.warning(e)
                 return 0.0
+
         # ======================================================================
         # (4c): CONVERSION (CSD)
         #       - use `raw_string` without radix point for calculation
@@ -1228,21 +1249,21 @@ class Fixed(object):
         #       - calculate the fixpoint representation using `fixp()` for correct
         #            saturation / quantization
         # ======================================================================
-
         elif frmt == 'csd':
             y_dec = csd2dec_vec(raw_str)  # csd -> integer
             if y_dec is not None:
-                y_float = self.fixp(y_dec / 2 ** frc_places, scaling='div')
+                y_float = self.fixp(y_dec / 2 ** frc_places, out_frmt='qfrac')
         # ----
         else:
             logger.error(f'Unknown output format "{frmt}"!')
             return 0.0
 
         if y_float is not None:
-            if fb.fil[0]['qfrmt'] == 'qint':
-                return y_float # / 2. ** self.q_dict['WF']
-            else:
-                return y_float
+            return y_float
+            # if fb.fil[0]['qfrmt'] == 'qint':
+            #     return y_float / 2. ** self.q_dict['WF']
+            # else:
+            #     return y_float
         else:
             return 0.0
 
@@ -1326,8 +1347,8 @@ class Fixed(object):
                 logger.error(f"Cannot combine real part ({y_re.dtype}) and imag. part ({y_im.dtype}).")
                 return "0"
 
-        # return a quantized & saturated / wrapped fixpoint (type float) for y
-        y_fix = self.fixp(y)
+        # return a quantized & saturated / wrapped fixpoint (type float) for y (int or frac format)
+        y_fix = self.fixp(y, out_frmt=fb.fil[0]['qfrmt'])
 
         if fb.fil[0]['fx_base'] == 'dec':
             if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
