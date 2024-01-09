@@ -670,6 +670,7 @@ class Fixed(object):
         if scaling != '':
             logger.error(f"scaling = '{scaling}'")
 
+        logger.error(f"fixp: y = {y}")
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
@@ -693,7 +694,7 @@ class Fixed(object):
                         y = y.astype(complex)  # try to convert to complex
                         self.N += y.size * 2
                     # try converting elements recursively:
-                    except (TypeError, ValueError):
+                    except (TypeError, ValueError) as e:
                         yq = np.asarray(list(map(lambda y_scalar:
                                             self.fixp(y_scalar, scaling=scaling), y)))
                         self.N += y.size
@@ -729,6 +730,7 @@ class Fixed(object):
         y = np.real_if_close(y)
         # quantize complex values separately and recursively
         if np.iscomplexobj(y):
+            # TODO:
             yq = self.fixp(y.real, scaling=scaling) +\
                  self.fixp(y.imag, scaling=scaling) * 1j
             # logger.warning(f"yq = {yq}")
@@ -767,7 +769,7 @@ class Fixed(object):
         if in_frmt != 'qint':
             y = y * (2. ** self.q_dict['WF'])
 
-        logger.error(f"y={y}")
+        logger.error(f"fixp: y3={y}")
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -847,6 +849,7 @@ class Fixed(object):
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
 
         self.q_dict.update({'N_over': self.N_over})
+        logger.error(f"fixp: y_over = {yq}")
 
         # ======================================================================
         # (5) : OUTPUT SCALING
@@ -1020,7 +1023,7 @@ class Fixed(object):
 
         y_float = None
 
-        if 'float' in fb.fil[0]['qfrmt']:
+        if fb.fil[0]['qfrmt'] == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -1318,6 +1321,7 @@ class Fixed(object):
                 return "0"
 
         # ======================================================================
+        logger.warning(f"float2frmt: y = {y}")
         if not is_numeric(y):
             logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
             return 0.0
@@ -1352,6 +1356,7 @@ class Fixed(object):
 
         if fb.fil[0]['fx_base'] == 'dec':
             if self.q_dict['WF'] == 0 or fb.fil[0]['qfrmt'] == 'qint':
+                # TODO: need to convert to str?
                 y_str = np.int64(y_fix)  # get rid of trailing zero
                 # y_str = np.char.mod('%d', y_fix)
                 # elementwise conversion from integer (%d) to string
@@ -1376,6 +1381,7 @@ class Fixed(object):
 
             if fb.fil[0]['qfrmt'] == 'qint':
                 WI = self.q_dict['WI'] + self.q_dict['WF'] + 1
+                # TODO: Is the "+ 1" correct?
             else:
                 WI = self.q_dict['WI']
             if fb.fil[0]['fx_base'] == 'hex':
@@ -1394,6 +1400,7 @@ class Fixed(object):
         if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
             y_str = y_str.item()  # convert singleton array to scalar
 
+        logger.warning(f"float2frmt: y_str = {y_str}")
         return y_str
 
 ########################################
