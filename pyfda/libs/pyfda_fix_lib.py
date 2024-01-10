@@ -628,7 +628,7 @@ class Fixed(object):
 
         Returns
         -------
-        float scalar or ndarray
+        yq: float scalar or ndarray
             with the same shape as `y`, in the range
             `-2 * self.MSB` ... `2 * self.MSB - self.LSB`
 
@@ -659,14 +659,13 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
-        # use values from dict for initialization
-        if not in_frmt in {'qfrac', 'qint', 'float'}:
+        if not in_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown input format {in_frmt}")
-        if not out_frmt in {'qfrac', 'qint', 'float'}:
+        if not out_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown output format {out_frmt}")
 
         if fb.fil[0]['qfrmt'] == 'float':
-            logger.warning("fixp() shouldn't be called for float setting!")
+            logger.warning("fixp() shouldn't be called for float number format!")
             return y
 
         logger.error(f"fixp: y = {y}")
@@ -694,8 +693,10 @@ class Fixed(object):
                         self.N += y.size * 2
                     # try converting elements recursively:
                     except (TypeError, ValueError) as e:
-                        yq = np.asarray(list(map(lambda y_scalar:
-                                            self.fixp(y_scalar, scaling=scaling), y)))
+                        yq = np.asarray(
+                            list(map(lambda y_scalar:\
+                                     self.fixp(y_scalar, in_frmt=in_frmt, out_frmt=out_frmt),
+                                     y)))
                         self.N += y.size
                         return yq
             else:
@@ -738,16 +739,12 @@ class Fixed(object):
         logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
 
         # ======================================================================
-        # (3) : QUANTIZATION
-        #       Multiply by 2**WF = 1/LSB to obtain an intermediate format with
-        #       quantization step size of 1.
+        # (2) : QUANTIZATION
+        #       For `in_frmt=='qfrac'`, multiply by 2**WF = 1/LSB to obtain an
+        #       intermediate format with quantization step size of 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
-        #       Finally, multiply by LSB to restore original scale.
         # ======================================================================
-
-        # multiply by 2 ** WF instead of dividing by 2 ** -WF:
-        # y *= 2. ** self.q_dict['WF']
         if in_frmt != 'qint':
             y = y * (2. ** self.q_dict['WF'])
 
@@ -784,24 +781,20 @@ class Fixed(object):
         else:
             raise Exception(
                 f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
-        logger.error(f"fixp: y_q = {yq}")
-        # yq /= 2. ** self.q_dict['WF']
-        # logger.error(f"y_quant_scale={yq}")
 
         # logger.error(f"fixp: y_q = {yq}")
 
-        # ======================================================================
-        # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
-        #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
-        # ====================================================================
-        # LSB = 2 ** -self.q_dict['WF']
-        # MSB = self.MSB
+        # ========================================================================
+        # (3) : OVERFLOW / SATURATION
+        #       Handle Overflow / saturation w.r.t. to the MSB = 2 ** (W - 2),
+        #       returning a result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
+        # ========================================================================
         LSB = 1
         MSB = 1 << (self.q_dict['WI'] + self.q_dict['WF'] - 1)  # 2 ** (W - 2)
         MAX = 2 * MSB - LSB  # 2 ** (W - 1) - 1
         MIN = - 2 * MSB
 
-        logger.error(f"fixp: MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
+        # logger.error(f"fixp: MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
 
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
@@ -831,7 +824,7 @@ class Fixed(object):
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
 
         self.q_dict.update({'N_over': self.N_over})
-        logger.error(f"fixp: y_over = {yq}")
+        # logger.error(f"fixp: y_over = {yq}")
 
         # ======================================================================
         # (4) : OUTPUT SCALING
