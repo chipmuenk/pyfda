@@ -578,7 +578,7 @@ class Fixed(object):
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
 
 # ------------------------------------------------------------------------------
-    def fixp(self, y, scaling='', in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
+    def fixp(self, y, in_frmt: str = 'qfrac', out_frmt: str = 'qfrac'):
         """
         Return a quantized copy `yq` for `y` (scalar or array-like) with the same
         shape as `y`. The returned data is always in float format, use float2frmt()
@@ -613,14 +613,16 @@ class Fixed(object):
         y: scalar or array-like object of float
             input value (floating point format) to be quantized
 
-        scaling: String
-            Determine the scaling before and after quantizing / saturation
+        in_frmt: str
+            Determine the scaling before quantizing / saturation
 
-            *''* (default): float in, quantized fractional (qfrmt = 'qfrac') or
-                int (qfrmt = 'qint') out
-                `y` is multiplied by `scale` *before* quantizing / saturating
-            **'div'**: int in, float out:
-                `y` is divided by `scale` *after* quantizing / saturating.
+            *'qfrac'* (default): fractional float input
+                `y` is multiplied by `2 ** WF` *before* quantizing / saturating
+
+        out_frmt: str
+            Determine the scaling after quantizing / saturation
+            **'qfrac'** (default): fractional fixpoint output format
+                `y` is divided by `2 ** WF` *after* quantizing / saturating.
 
             For all other settings, `y` is transformed unscaled.
 
@@ -666,9 +668,6 @@ class Fixed(object):
         if fb.fil[0]['qfrmt'] == 'float':
             logger.warning("fixp() shouldn't be called for float setting!")
             return y
-
-        if scaling != '':
-            logger.error(f"scaling = '{scaling}'")
 
         logger.error(f"fixp: y = {y}")
         if np.shape(y):
@@ -730,30 +729,13 @@ class Fixed(object):
         y = np.real_if_close(y)
         # quantize complex values separately and recursively
         if np.iscomplexobj(y):
-            # TODO:
-            yq = self.fixp(y.real, scaling=scaling) +\
-                 self.fixp(y.imag, scaling=scaling) * 1j
-            # logger.warning(f"yq = {yq}")
+            yq = self.fixp(y.real, in_frmt=in_frmt, out_frmt=out_frmt) +\
+                 self.fixp(y.imag, in_frmt=in_frmt, out_frmt=out_frmt) * 1j
             return yq
 
         # ======================================================================
-        # (2) : INPUT SCALING
-        #       Multiply by `scale` factor before requantization and saturation
-        #       when `scaling==''``
-        # ======================================================================
-        # if fb.fil[0]['qfrmt'] == 'qint':
-        #     scale = 2. ** self.q_dict['WF']
-        # else:
-        #     scale = 1
-
-        logger.error(f"scaling = '{scaling}', qfrmt = {fb.fil[0]['qfrmt']}, y.dtype = {y.dtype}")
+        # logger.error(f"qfrmt = {fb.fil[0]['qfrmt']}, y.dtype = {y.dtype}")
         logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
-
-        # if scaling == '' and  fb.fil[0]['qfrmt'] == 'qint':
-        #   y = y * (2. ** self.q_dict['WF'])
-        # if scaling != 'div':
-        #   y = y * scale
-        # logger.error(f"y2={y}")
 
         # ======================================================================
         # (3) : QUANTIZATION
@@ -806,7 +788,7 @@ class Fixed(object):
         # yq /= 2. ** self.q_dict['WF']
         # logger.error(f"y_quant_scale={yq}")
 
-        # logger.warning(f"scaling={scaling} y_in={y_in} | y={y} | yq={yq}")
+        # logger.error(f"fixp: y_q = {yq}")
 
         # ======================================================================
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
@@ -852,16 +834,12 @@ class Fixed(object):
         logger.error(f"fixp: y_over = {yq}")
 
         # ======================================================================
-        # (5) : OUTPUT SCALING
-        #       Divide result by `scale` factor when `scaling=='div'` to obtain
+        # (4) : OUTPUT SCALING
+        #       Divide result by `2 ** WF` factor for `out_frmt=='qint'` to obtain
         #       quantized fractional number
         # ======================================================================
-
-#        if fb.fil[0]['qfrmt'] == 'qfrac':
         if out_frmt == 'qfrac':
             yq = yq / (2. ** self.q_dict['WF'])
-        # if scaling == 'div' and fb.fil[0]['qfrmt'] == 'qint':
-        #    yq = yq / (2. ** self.q_dict['WF'])
 
         logger.error(f"fixp: y_over_scale = {yq}")
 
