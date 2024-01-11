@@ -674,7 +674,7 @@ class Plot_Impz(QWidget):
                 # --------------------------------------------------------------
                 try:
                     self.y[frame] = np.asarray(self.fxfilter(self.x_q[frame]))
-                    logger.warning(f"y_frame = \n{self.y[frame]}")
+                    logger.warning(f"y_frame = \n{pprint_log(self.y[frame])}")
 
                 except ValueError as e:
                     if self.fxfilter(self.x_q[frame]) is None:
@@ -772,11 +772,14 @@ class Plot_Impz(QWidget):
         Select between fixpoint and floating point simulation and update FX UI
         settings.
 
+        When the global number format `fb.fil[0]['qfrmt'] == 'float'`, always turn
+        off fixpoint simulation (combobox and global parameter `fb.fil[0]['fx_sim']`).
+
         Parameter `fx` can be:
 
         - str "fixpoint", "float" or `None` when called directly. "fixpoint"
           or "float" updates the combobox setting correspondingly. `None`
-          only upcates the UI.
+          only updates the UI.
 
         - int 0 or 1 when triggered by changing the index of combobox
           `self.ui.cmb_sim_select` (signal-slot-connection)

@@ -18,7 +18,7 @@ import copy
 import pyfda.filterbroker as fb
 import numpy as np
 from numpy.lib.function_base import iterable
-from pyfda.libs.pyfda_lib import is_numeric
+from pyfda.libs.pyfda_lib import is_numeric, pprint_log
 try:
     import deltasigma as ds
     from deltasigma import simulateDSM, synthesizeNTF
@@ -668,7 +668,7 @@ class Fixed(object):
             logger.warning("fixp() shouldn't be called for float number format!")
             return y
 
-        logger.error(f"fixp: y = {y}")
+        logger.error(f"fixp: y = {pprint_log(y)}")
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
@@ -735,7 +735,6 @@ class Fixed(object):
             return yq
 
         # ======================================================================
-        # logger.error(f"qfrmt = {fb.fil[0]['qfrmt']}, y.dtype = {y.dtype}")
         logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
 
         # ======================================================================
@@ -745,10 +744,10 @@ class Fixed(object):
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
         # ======================================================================
-        if in_frmt != 'qint':
+        if in_frmt == 'qfrac':
             y = y * (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp: y3={y}")
+        logger.error(f"fixp: y3={pprint_log(y)}")
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -794,8 +793,6 @@ class Fixed(object):
         MAX = 2 * MSB - LSB  # 2 ** (W - 1) - 1
         MIN = - 2 * MSB
 
-        # logger.error(f"fixp: MSB = {MSB}, MAX = {MAX}, MIN = {MIN}")
-
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
             self.N_over_neg = self.N_over_pos = self.N_over = 0
@@ -824,7 +821,6 @@ class Fixed(object):
                     f"""Unknown overflow type "{self.q_dict['ovfl']:s}"!""")
 
         self.q_dict.update({'N_over': self.N_over})
-        # logger.error(f"fixp: y_over = {yq}")
 
         # ======================================================================
         # (4) : OUTPUT SCALING
@@ -834,7 +830,7 @@ class Fixed(object):
         if out_frmt == 'qfrac':
             yq = yq / (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp: y_over_scale = {yq}")
+        logger.error(f"fixp: y_over_scale = {pprint_log(yq)}")
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
