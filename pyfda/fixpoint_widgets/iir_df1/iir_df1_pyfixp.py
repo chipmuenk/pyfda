@@ -255,9 +255,8 @@ class IIR_DF1_pyfixp(object):
 
             # todo: complex?
             # y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
-            y_q[k] = self.Q_O.requant(
-                self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b) - 
-                self.Q_acc.requant(np.sum(xa_q), self.Q_mul_a), self.Q_acc)
+            y_q[k] = self.Q_O.fixp(
+                self.Q_acc.fixp(np.sum(xb_q)) - self.Q_acc.fixp(np.sum(xa_q)))
             self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 
             # and insert last output value quantized to output format
