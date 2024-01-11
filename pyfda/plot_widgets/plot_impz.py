@@ -761,8 +761,7 @@ class Plot_Impz(QWidget):
 # =============================================================================
     def toggle_fx_setting(self):
         """ Triggered by changing `self.ui.cmb_sim_select` """
-
-        fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == "fixpoint")
+        fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
         self.update_fx_ui_settings()
         self.impz_init()
 
@@ -790,7 +789,10 @@ class Plot_Impz(QWidget):
         If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
         is set to True and the run button is set to "changed".
         """
-        if fx in {"float", "fixpoint"}:
+        if fb.fil[0]['qfrmt'] == 'float':
+            qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
+            fb.fil[0]['fx_sim'] = False
+        elif fx in {"float", "fixpoint"}:
             # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `fx`
             qset_cmb_box(self.ui.cmb_sim_select, fx, data=True)
             fb.fil[0]['fx_sim'] = (fx == "fixpoint")
