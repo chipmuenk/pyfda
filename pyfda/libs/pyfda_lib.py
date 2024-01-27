@@ -515,12 +515,14 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             return ""
 
     if type(d) in {list, np.ndarray, tuple}:
-        if np.ndim(d) == 1:
-            s += (f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
-                  f'shape =  ({len(d)},)' + cr + tab)
-            s += str(d[: min(N-1, len(d))])
+        if np.ndim(d) == 0: # iterable with a single element
+            s = str(d) + f' of type: {type(d).__name__}'
+        elif np.ndim(d) == 1:
+            s = cr + tab + str(d[: min(N-1, len(d))])
             if len(d) > N-1:
                 s += ' ...'
+            s += (cr + tab + f'Type: {type(d).__name__} of {type(d[0]).__name__}, '
+                  f'with shape = ({len(d)},)')
         elif np.ndim(d) == 2:
             rows, cols = np.shape(d)
             s += (f'Type: {type(d).__name__} of {type(d[0][0]).__name__}, '
@@ -548,9 +550,9 @@ def pprint_log(d, N: int = 10, tab: str = "\t", debug: bool = False) -> str:
             if len(d) > N-1:
                 s += ' ...'
         elif np.isscalar(d):
-            s += (f'Type: {type(d).__name__}' + cr + tab + str(d))
+            s = str(d) + f' of type: {type(d).__name__}'
         else:
-            s += (f'Type: {type(d).__name__}')
+            s += 'Type: {type(d).__name__}'
     return s
 
 
