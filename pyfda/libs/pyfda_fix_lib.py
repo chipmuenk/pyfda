@@ -659,14 +659,14 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
+        if fb.fil[0]['qfrmt'] == 'float':
+            logger.warning("fixp() shouldn't be called for float number format!")
+            return y
+
         if not in_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown input format {in_frmt}")
         if not out_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown output format {out_frmt}")
-
-        if fb.fil[0]['qfrmt'] == 'float':
-            logger.warning("fixp() shouldn't be called for float number format!")
-            return y
 
         logger.error(f"fixp: y = {pprint_log(y)}")
         if np.shape(y):
