@@ -1376,7 +1376,8 @@ class Fixed(object):
 def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
-    using the quantization settings of `Fixed()` instance QObj.
+    using the quantization settings of `Fixed()` instance QObj and global setting
+    `fb.fil[0]['qfrmt']` (either 'float', 'qfrac' or 'qint').
 
     Parameters
     ----------
