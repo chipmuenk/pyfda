@@ -188,11 +188,11 @@ class IIR_DF1_pyfixp(object):
 
         zi_b : array-like
              initial conditions for transversal registers; when `zi_b == None`,
-             the register contents from the last run are used.
+             register contents from last run are used.
 
         zi_a : array-like
              initial conditions for recursive registers; when `zi_a == None`,
-             the register contents from the last run are used.
+             register contents from last run are used.
 
         Returns
         -------
