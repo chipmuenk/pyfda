@@ -668,7 +668,7 @@ class Fixed(object):
         if not out_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown output format {out_frmt}")
 
-        logger.error(f"fixp: y = {pprint_log(y)}")
+        logger.error(f"fixp in: y = {pprint_log(y, N=4)}")
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
@@ -747,7 +747,7 @@ class Fixed(object):
         if in_frmt == 'qfrac':
             y = y * (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp: y3={pprint_log(y)}")
+        logger.error(f"fixp (in:scaled): y3={pprint_log(y, N=4)}")
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -830,7 +830,7 @@ class Fixed(object):
         if out_frmt == 'qfrac':
             yq = yq / (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp: y_over_scale = {pprint_log(yq)}")
+        logger.error(f"fixp: (out:scaled) = {pprint_log(yq, N=4)}")
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar
