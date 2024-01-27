@@ -668,7 +668,9 @@ class Plot_Impz(QWidget):
             # ---- calculate fixpoint or floating point response for current frame
             # ------------------------------------------------------------------
             if fb.fil[0]['fx_sim']:  # fixpoint filter
-                self.x_q[frame] = self.q_i.fixp(self.x[frame].real)  # quantize stimulus
+                # Quantize stimulus:
+                self.x_q[frame] = self.q_i.fixp(self.x[frame].real,
+                                                out_frmt=fb.fil[0]['qfrmt'])
                 # --------------------------------------------------------------
                 # ---- Get fixpoint response for current frame -----------------
                 # --------------------------------------------------------------
