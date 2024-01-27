@@ -747,7 +747,7 @@ class Fixed(object):
         if in_frmt == 'qfrac':
             y = y * (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp (in:scaled): y3={pprint_log(y, N=4)}")
+        # logger.error(f"fixp (in:scaled): {pprint_log(y, N=4)}")
 
         if self.q_dict['quant'] == 'floor':
             yq = np.floor(y)  # largest integer i, such that i <= x (= binary truncation)
@@ -780,8 +780,6 @@ class Fixed(object):
         else:
             raise Exception(
                 f'''Unknown Requantization type "{self.q_dict['quant']:s}"!''')
-
-        # logger.error(f"fixp: y_q = {yq}")
 
         # ========================================================================
         # (3) : OVERFLOW / SATURATION
@@ -1288,7 +1286,7 @@ class Fixed(object):
                 return "0"
 
         # ======================================================================
-        logger.warning(f"float2frmt: y = {y}")
+        # logger.warning(f"float2frmt: y = {y}")
         if not is_numeric(y):
             logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
             return 0.0
@@ -1367,7 +1365,7 @@ class Fixed(object):
         if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
             y_str = y_str.item()  # convert singleton array to scalar
 
-        logger.warning(f"float2frmt: y_str = {y_str}")
+        # logger.warning(f"float2frmt: y_str = {y_str}")
         return y_str
 
 ########################################
