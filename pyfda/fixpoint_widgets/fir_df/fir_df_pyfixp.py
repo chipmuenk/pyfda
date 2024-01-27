@@ -127,6 +127,7 @@ class FIR_DF_pyfixp(object):
         ----------
         x : array of float or float or None
             input value(s) scaled and quantized according to the setting of `p['QI']`
+            and fb.fil[0]['qfrmt']
             - When x is a scalar, calculate impulse response with the
                 amplitude defined by the scalar.
             - When `x == None`, calculate impulse response with amplitude = 1.
@@ -165,9 +166,12 @@ class FIR_DF_pyfixp(object):
 
         for k in range(len(x)):
             # partial products xb_q at time k, quantized with Q_mul:
-            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q)
+            xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q,
+                                   in_frmt=fb.fil[0]['qfrmt'],
+                                   out_frmt=fb.fil[0]['qfrmt'])
             # accumulate x_bq to get accu[k]
-            y_q[k] = self.Q_acc.fixp(np.sum(xb_q))
+            y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb.fil[0]['qfrmt'],
+                                     out_frmt=fb.fil[0]['qfrmt'])
 
         self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
