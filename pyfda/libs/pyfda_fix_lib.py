@@ -853,17 +853,24 @@ class Fixed(object):
     # --------------------------------------------------------------------------
     def requant(self, x_i, QI):
         """
-        Change word length of input signal `x_i` to the wordlength of `self.q_dict`
-        using the quantization and saturation methods specified by
-        `self.q_dict['quant']` and `self.q_dict['ovfl']`.
+        Change word length of input signal `x_i` with fractional and integer widths
+        defined by 'QI' to the word format defined by `self.q_dict` using the
+        quantization and saturaion methods specified by `self.q_dict['quant']` and
+        `self.q_dict['ovfl']`.
+
+        **Input and output word are aligned at their binary points.**
 
         Parameters
         ----------
-        x_i: int, float or complex scalar or array-like
-            Signal to be requantized from quant. dict QI
+        self: Fixed() object
+            `self.qdict()` is the quantizer dict that specifies the output word format
+            and the requantizing / saturation methods to be used.
 
-        QI: dict
-            Quantization dict for input word, only the keys 'WI' and 'WF' for integer
+        x_i: int, float or complex scalar or array-like
+            signal to be requantized with quantization format defined in quantizer QI
+
+        QI: quantizer
+            Quantizer for input word, only the keys 'WI' and 'WF' for integer
             and fractional wordlength are evaluated.
             `QI.q_dict['WI'] = 2` and `QI.q_dict['WF'] = 13` e.g. define Q-Format '2.13'
             with 2 integer, 13 fractional bits and 1 implied sign bit = 16 bits total.
@@ -871,13 +878,11 @@ class Fixed(object):
         Returns
         -------
 
-        y: output data with same shape as input data
-            Requantized signal
+        y: requantized output data with same shape as input data, quantized as specified
+            in `self.qdict`.
 
         Documentation
         -------------
-
-        **Input and output word are aligned at their binary points.**
 
         The following shows an example of rescaling an input word from Q2.4 to Q0.3
         using wrap-around and truncation. It's easy to see that for simple wrap-around
@@ -892,12 +897,15 @@ class Fixed(object):
                    0  *  1  |  0  |  1         =  7 (dec) or 7/8 (float)
 
 
-        The float or "real (world) value" is calculated by multiplying the integer
-        value by 2 ** (-WF).
+        When the input is integer format, the fractional value is calculated as an
+        intermediate representation by multiplying the integer value by 2 ** (-WF).
+        Integer and fractional part are truncated / extended to the output
+        quantization specifications.
 
-        For requantizing two numbers to the same WI and WF, imagine both binary numbers
-        to be right-aligned. Changes in the number of integer bits `dWI` and fractional
-        bits `dWF` are handled separately.
+        Changes in the number of integer bits `dWI` and fractional bits `dWF` are
+        handled separately.
+
+        When operating on bit level in hardware, the following operations are used:
 
         Fractional Bits
         ---------------
@@ -917,33 +925,19 @@ class Fixed(object):
 
         - The number of fractional bits is SIGN-EXTENDED by filling up the left-most
           bits with the sign bit.
-
         """
-        # QO_obj = Fixed(QO)      # Fixpoint object for output quantizer
 
-        WI_I = QI.q_dict['WI']         # number of integer bits (input signal)
-        WI_F = QI.q_dict['WF']         # number of fractional bits (input signal)
-        # WI   = WI_I + WI_F + 1  # total word length (input signal)
+        WI_F = QI.q_dict['WF']  # number of fractional bits of input signal
 
-        # WO_I = QO['WI']         # number of integer bits (output signal)
-        # WO_F = QO['WF']         # number of fractional bits (output signal)
-        # WO   = WO_I + WO_F + 1  # total word length (output signal)
-
-        # dWF = WI_F - WO_F       # difference of fractional lengths
-        # dWI = WI_I - WO_I       # difference of integer lengths
-
-        # # max. resp. min, output values
-        # MIN_o = - 1 << (WO - 1)
-        # MAX_o = -MIN_o - 1
-
+        # Convert input signal to fractional format if needed for aligning at fractional point
         if fb.fil[0]['qfrmt'] == 'qint':
-            rwv_i = x_i / (1 << WI_F)
+            x_i_frac = x_i / (1 << WI_F)
         else:
-            rwv_i = x_i
+            x_i_frac = x_i
 
-        rwv_o = self.fixp(rwv_i)
-
-        return rwv_o
+        # Quantize and saturate / overflow based on fractional output format and return
+        # either fractional or integer format, depending on `fb.fil[0]['qfrmt']`.
+        return self.fixp(x_i_frac, out_frmt=fb.fil[0]['qfrmt'])
 
     # --------------------------------------------------------------------------
     def frmt2float(self, y):
