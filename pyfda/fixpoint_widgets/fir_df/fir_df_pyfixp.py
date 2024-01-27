@@ -183,7 +183,7 @@ class FIR_DF_pyfixp(object):
         self.Q_acc.q_dict['N_over'] = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
         self.Q_mul.resetN()
 
-        return self.Q_O.fixp(y_q[:len(x)]), self.zi
+        return self.Q_O.requant(y_q[:len(x)], self.Q_acc), self.zi
 
 
 # ------------------------------------------------------------------------------
