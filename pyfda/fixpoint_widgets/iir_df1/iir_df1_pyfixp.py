@@ -200,6 +200,8 @@ class IIR_DF1_pyfixp(object):
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` or `a`(impulse response).
         """
+        qfrmt = fb.fil[0]['qfrmt']
+
         if zi_b is not None:
             if len(zi_b) == self.L - 1:   # use zi_b as it is
                 self.zi_b = zi_b
@@ -237,12 +239,15 @@ class IIR_DF1_pyfixp(object):
 
         for k in range(len(x)):
             # partial products xa_q and xb_q at time k, quantized with Q_mul:
-            # xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q)
-            xb_q = self.zi_b[k:k + len(self.b_q)] * self.b_q
+            xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q,
+                                     in_frmt=qfrmt, out_frmt=qfrmt)
+            # xb_q = self.zi_b[k:k + len(self.b_q)] * self.b_q
             # logger.warning(f"xb_q = \n{xb_q}\n")
             # append a zero to xa_q to equalize length of xb_q and xa_q
             # xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
-            xa_q = np.append(self.zi_a * self.a_q[1:], 0)
+            xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
+                                               in_frmt=qfrmt, out_frmt=qfrmt),
+                                               0)
             if k == 5:
                 logger.warning(f"zi_a = \n{self.zi_a}")
                 logger.warning(f"xa_q = \n{xa_q}")
@@ -255,11 +260,14 @@ class IIR_DF1_pyfixp(object):
 
             # todo: complex?
             # y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
-            y_q[k] = self.Q_O.fixp(
-                self.Q_acc.fixp(np.sum(xb_q)) - self.Q_acc.fixp(np.sum(xa_q)))
-            self.zi_a[1:] = self.zi_a[:-1]  # shift right by one
 
-            # and insert last output value quantized to output format
+            # Shift right and insert last accumulator value quantized to output format
+            self.zi_a[1:] = self.zi_a[:-1]
+            y_q[k] = self.Q_O.requant(
+                (self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b)
+                - self.Q_acc.requant(np.sum(xa_q), self.Q_mul_a)),
+                                self.Q_acc)
+            #
             self.zi_a[0] = y_q[k]
 
             # logger.warning(f"zi_a = {self.zi_a}\n"
@@ -276,7 +284,7 @@ class IIR_DF1_pyfixp(object):
         self.Q_mul_a.resetN()
         self.Q_mul_b.resetN()
 
-        return self.Q_O.fixp(y_q[:len(x)]), self.zi_b, self.zi_a
+        return y_q[:len(x)], self.zi_b, self.zi_a
 
 
 # ------------------------------------------------------------------------------
