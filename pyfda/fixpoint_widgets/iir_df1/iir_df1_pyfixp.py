@@ -178,6 +178,19 @@ class IIR_DF1_pyfixp(object):
 
         Registers can be initialized by passing `zi_a` and `zi_b`.
 
+        Calculate response by:
+        - append new stimuli `x` to transversal register state `self.zi_b`
+
+        - slide a window with length `len(b)` over `self.zi_b`, starting at position `k`
+          and multiply it with the coefficients `b`, yielding the partial products x*b
+          TODO: Doing this for the last len(x) terms should be enough
+        - do the same `self.zi_a` and coefficients `a`, yielding partial products y*a
+        - quantize the partial products x*b and y*a, yielding xb_q and x_aq
+        - accumulate the quantized partial products and quantize result as `y_q[k]`
+        - insert last output `y_q[k]` into the recursive register `self.zi_a`
+
+          TODO: complex inputs?
+
         Parameters
         ----------
         x : array of float or float or None
@@ -199,9 +212,18 @@ class IIR_DF1_pyfixp(object):
         yq : ndarray
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` or `a`(impulse response).
+
+        zi_b : ndarray
+            The content of the L-1 transversal state registers with the
+            last L-1 input values
+
+        zi_a : ndarray
+            The content of the L-1 recursive state registers with the
+            last L-1 output values
         """
         qfrmt = fb.fil[0]['qfrmt']
 
+        # if initial conditions `zi_a` or `zi_b` have been given, use them:
         if zi_b is not None:
             if len(zi_b) == self.L - 1:   # use zi_b as it is
                 self.zi_b = zi_b
@@ -224,27 +246,17 @@ class IIR_DF1_pyfixp(object):
         y_q = xb_q = np.zeros(len(x))
         xa_q = np.zeros(self.L - 1)
 
-        # Calculate response by:
-        # - feed last output `y_q[k]`` into the recursive register `self.zi_a`
-        # - append new stimuli `x` to transversal register state `self.zi_b`
-        # - slide a window with length `len(b)` over `self.zi`, starting at position `k`
-        #   and multiply it with the coefficients `b`, yielding the partial products x*b
-        #   TODO: Doing this for the last len(x) terms should be enough
-        # - quantize the partial products x*b and x*a, yielding xb_q and x_aq
-        # - accumulate the quantized partial products and quantize result, yielding y_q[k]
-
         self.zi_b = np.concatenate((self.zi_b, x))
 
-        logger.warning(f"a_q = \n{self.a_q}\nb_q = \n{self.b_q}\nx= {x}\n")
+        # logger.warning(f"a_q = \n{self.a_q}\nb_q = \n{self.b_q}\nx= {x}\n")
 
         for k in range(len(x)):
-            # partial products xa_q and xb_q at time k, quantized with Q_mul:
+            # calculate partial products xb_q and ya_q at time k and quantize them
+            # with Q_mul_b resp. Q_mul_a:
             xb_q = self.Q_mul_b.fixp(self.zi_b[k:k + len(self.b_q)] * self.b_q,
                                      in_frmt=qfrmt, out_frmt=qfrmt)
-            # xb_q = self.zi_b[k:k + len(self.b_q)] * self.b_q
-            # logger.warning(f"xb_q = \n{xb_q}\n")
-            # append a zero to xa_q to equalize length of xb_q and xa_q
-            # xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:]), 0)
+
+            # append a zero to ya_q to equalize length of xb_q and ya_q
             xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
                                                in_frmt=qfrmt, out_frmt=qfrmt),
                                                0)
@@ -252,26 +264,18 @@ class IIR_DF1_pyfixp(object):
                 logger.warning(f"zi_a = \n{self.zi_a}")
                 logger.warning(f"xa_q = \n{xa_q}")
 
-            # accumulate partial products x_bq and x_aq and quantize them (Q_acc)
-            # quantize individual accumulation steps - needed?!
-            # y_q[k] = 0.0
-            # for i in range(len(self.b_q)):
-            #     y_q[k] += self.Q_acc.fixp(xb_q[i] - xa_q[i])
-
-            # todo: complex?
-            # y_q[k] = self.Q_acc.fixp(np.sum(xb_q) - np.sum(xa_q))
-
-            # Shift right and insert last accumulator value quantized to output format
+            # - shift right recursive state (output) register
+            # - accumulate partial products `xb_q` and `ya_q`, requantize the results
+            #   to accumulator word formats `Q_acc` and calculate the difference
+            # - requantize the result to output word format `Q_O`
+            # - insert last accumulator value quantized to output format into recursive
+            #   (output) state register
             self.zi_a[1:] = self.zi_a[:-1]
             y_q[k] = self.Q_O.requant(
                 (self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b)
                 - self.Q_acc.requant(np.sum(xa_q), self.Q_mul_a)),
                                 self.Q_acc)
-            #
             self.zi_a[0] = y_q[k]
-
-            # logger.warning(f"zi_a = {self.zi_a}\n"
-            #                f"zi_b = {self.zi_b}")
 
         self.zi_b = self.zi_b[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
