@@ -908,7 +908,8 @@ class Plot_Impz(QWidget):
                     # in the range +/- 2 ** (WI + WF)
                     self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
                     self.scale_iq = 1
-                    self.scale_o = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
+
                     self.fx_min_x = - (1 << (fb.fil[0]['fxqc']['QI']['WI']
                                      + fb.fil[0]['fxqc']['QI']['WF']))
                     self.fx_max_x = -self.fx_min_x - 1
@@ -917,9 +918,7 @@ class Plot_Impz(QWidget):
                     self.fx_max_y = -self.fx_min_y - 1
                 elif fb.fil[0]['qfrmt'] == 'qfrac':
                     # display values scaled as "real world (float) values"
-                    self.scale_i = 1
-                    self.scale_iq = 1
-                    self.scale_o = 1
+                    self.scale_i = self.scale_iq = self.scale_o = 1
                     self.fx_min_x = -(1 << fb.fil[0]['fxqc']['QI']['WI'])
                     self.fx_max_x = -self.fx_min_x\
                         - 1. / (1 << fb.fil[0]['fxqc']['QI']['WF'])
@@ -1167,13 +1166,11 @@ class Plot_Impz(QWidget):
         else:
             fmt_mkr_resp = {'marker': ''}
 
-        # fixpoint simulation enabled -> scale stimulus and response
+        # fixpoint simulation enabled -> assign frame to x_q
         if fb.fil[0]['fx_sim'] and hasattr(self, 'x_q'):
-            x_q = self.x_q[self.ui.N_start:N_end] * self.scale_iq
+            x_q = self.x_q[self.ui.N_start:N_end]
             if self.ui.but_log_time.isChecked():
                 x_q = np.maximum(20 * np.log10(abs(x_q)), self.ui.bottom_t)
-
-            # logger.warning("self.scale I:{0} O:{1}".format(self.scale_i, self.scale_o))
         else:
             x_q = None
 
@@ -1188,8 +1185,8 @@ class Plot_Impz(QWidget):
             self.t_interp = np.linspace(self.n[0], self.n[-1] + 1, len(self.n) * I, endpoint=False) * fb.fil[0]['T_S']
 
         t = self.t[N_start:N_end]
-        x = self.x[N_start:N_end] * self.scale_i
-        y = self.y[N_start:N_end] * self.scale_o
+        x = self.x[N_start:N_end] * self.scale_i  # obtain same scaling for x as for quantized signals
+        y = self.y[N_start:N_end]
         win = self.ui.qfft_win_select.get_window(self.ui.N)
         if self.cmplx:
             x_r = x.real
@@ -1640,23 +1637,23 @@ class Plot_Impz(QWidget):
                 # scale display of frequency response
                 Px = np.sum(np.square(np.abs(self.X))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X = calc_ssb_spectrum(self.X) * self.scale_i * scale_impz
+                    X = calc_ssb_spectrum(self.X) / self.scale_i * scale_impz
                 else:
-                    X = self.X * self.scale_i * scale_impz
+                    X = self.X / self.scale_i * scale_impz
 
             if plt_stimulus_q:
                 Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X_q = calc_ssb_spectrum(self.X_q) * self.scale_iq * scale_impz
+                    X_q = calc_ssb_spectrum(self.X_q) / self.scale_iq * scale_impz
                 else:
-                    X_q = self.X_q * self.scale_iq * scale_impz
+                    X_q = self.X_q / self.scale_iq * scale_impz
 
             if plt_response:
                 Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    Y = calc_ssb_spectrum(self.Y) * self.scale_o * scale_impz
+                    Y = calc_ssb_spectrum(self.Y) / self.scale_o * scale_impz
                 else:
-                    Y = self.Y * self.scale_o * scale_impz
+                    Y = self.Y / self.scale_o * scale_impz
 
             # ----------------------------------------------------------------
             # Scale and shift frequency range
