@@ -244,7 +244,7 @@ class IIR_DF1_pyfixp(object):
 
         # initialize quantized partial products and output arrays
         y_q = xb_q = np.zeros(len(x))
-        xa_q = np.zeros(self.L - 1)
+        ya_q = np.zeros(self.L - 1)
 
         self.zi_b = np.concatenate((self.zi_b, x))
 
@@ -257,12 +257,12 @@ class IIR_DF1_pyfixp(object):
                                      in_frmt=qfrmt, out_frmt=qfrmt)
 
             # append a zero to ya_q to equalize length of xb_q and ya_q
-            xa_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
+            ya_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
                                                in_frmt=qfrmt, out_frmt=qfrmt),
                                                0)
             if k == 5:
                 logger.warning(f"zi_a = \n{self.zi_a}")
-                logger.warning(f"xa_q = \n{xa_q}")
+                logger.warning(f"ya_q = \n{ya_q}")
 
             # - shift right recursive state (output) register
             # - accumulate partial products `xb_q` and `ya_q`, requantize the results
@@ -273,7 +273,7 @@ class IIR_DF1_pyfixp(object):
             self.zi_a[1:] = self.zi_a[:-1]
             y_q[k] = self.Q_O.requant(
                 (self.Q_acc.requant(np.sum(xb_q), self.Q_mul_b)
-                - self.Q_acc.requant(np.sum(xa_q), self.Q_mul_a)),
+                - self.Q_acc.requant(np.sum(ya_q), self.Q_mul_a)),
                                 self.Q_acc)
             self.zi_a[0] = y_q[k]
 
