@@ -658,7 +658,7 @@ class Plot_Impz(QWidget):
             frame = slice(self.N_first, self.N_first + L_frame)
 
             # ------------------------------------------------------------------
-            # ---- calculate stimuli for current frame -------------------------
+            # ---- calculate stimuli for current frame inplace -----------------
             # ------------------------------------------------------------------
             # self.x[frame] = self.stim_wdg.calc_stimulus_frame(
             self.stim_wdg.calc_stimulus_frame(
@@ -676,7 +676,7 @@ class Plot_Impz(QWidget):
                 # --------------------------------------------------------------
                 try:
                     self.y[frame] = np.asarray(self.fxfilter(self.x_q[frame]))
-                    logger.warning(f"y_frame = \n{pprint_log(self.y[frame])}")
+                    logger.warning(f"y_frame = {pprint_log(self.y[frame])}")
 
                 except ValueError as e:
                     if self.fxfilter(self.x_q[frame]) is None:
