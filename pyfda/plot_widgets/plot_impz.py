@@ -1634,12 +1634,13 @@ class Plot_Impz(QWidget):
             # scale with window NENBW for correct power calculation
             P_scale = scale_impz / nenbw
             if plt_stimulus:
-                # scale display of frequency response
+                # scale display of stimulus: `self.x` is unscaled, hence X needs
+                # to be multiplied by self.scale_i
                 Px = np.sum(np.square(np.abs(self.X))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X = calc_ssb_spectrum(self.X) / self.scale_i * scale_impz
+                    X = calc_ssb_spectrum(self.X) * scale_impz
                 else:
-                    X = self.X / self.scale_i * scale_impz
+                    X = self.X * scale_impz
 
             if plt_stimulus_q:
                 Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
