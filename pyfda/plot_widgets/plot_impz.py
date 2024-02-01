@@ -23,7 +23,7 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex)
+    safe_eval, pprint_log, calc_ssb_spectrum, calc_Hcomplex, first_item)
 from pyfda.libs.pyfda_qt_lib import (
     qget_cmb_box, qset_cmb_box, qstyle_widget, qcmb_box_add_item, qcmb_box_del_item)
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -322,7 +322,7 @@ class Plot_Impz(QWidget):
         # logger.warning(
         #     f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
         #     f"{pprint_log(dict_sig)}\n")
-        # logger.debug(f'SIG_RX: "{first_item(dict_sig)}"')
+        logger.warning(f'SIG_RX: "{first_item(dict_sig)}"')
 
         if dict_sig['id'] == id(self):
             # logger.debug(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -330,27 +330,27 @@ class Plot_Impz(QWidget):
 
         if 'fx_sim' in dict_sig:
             # --------------- START (ext. widget) ------------
-            if dict_sig['fx_sim'] == 'start_fx_sim':
-                """
-                Fixpoint simulation started from external widget, e.g.
-                from 'input_fixpoint_specs' by pressing the "Sim FX" button
-                - Reset error flag and set 'needs_calc' flags
-                - Set fixpoint mode
-                - Update run button to "changed"
-                - Force-start simulation with `self.impz_init(True)`
-                """
+            # if dict_sig['fx_sim'] == 'start_fx_sim':
+            #     """
+            #     Fixpoint simulation started from external widget, e.g.
+            #     from 'input_fixpoint_specs' by pressing the "Sim FX" button
+            #     - Reset error flag and set 'needs_calc' flags
+            #     - Set fixpoint mode
+            #     - Update run button to "changed"
+            #     - Force-start simulation with `self.impz_init(True)`
+            #     """
 
-                self.needs_calc = True      # force recalculation
-                self.needs_calc_fx = True   # force fx recalculation
-                self.error = False          # reset error flag
+            #     self.needs_calc = True      # force recalculation
+            #     self.needs_calc_fx = True   # force fx recalculation
+            #     self.error = False          # reset error flag
 
-                self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
-                qstyle_widget(self.ui.but_run, "changed")
-                self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                self.impz_init(True)
-                return
+            #     self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
+            #     qstyle_widget(self.ui.but_run, "changed")
+            #     self.ui.but_run.setIcon(QIcon(":/play.svg"))
+            #     self.impz_init(True)
+            #     return
             # --------------- specs changed ------------
-            elif dict_sig['fx_sim'] == 'specs_changed':
+            if dict_sig['fx_sim'] == 'specs_changed':
                 """
                 Fixpoint widget specs have been updated.
                 - set `self.needs_calc_fx = True`.
