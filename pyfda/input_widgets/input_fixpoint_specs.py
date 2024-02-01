@@ -228,13 +228,13 @@ class Input_Fixpoint_Specs(QWidget):
                 # via signal-slot connection
                 if not self.fx_wdg_found:
                     logger.error("No fixpoint widget found!")
-                    qstyle_widget(self.butSimFx, "error")
+                    # qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                     return
                 # initialize fixpoint filter and check for error during initialization
                 err = self.fx_filt_init()
                 if err != 0:  # returned an error
-                    qstyle_widget(self.butSimFx, "error")
+                    # qstyle_widget(self.butSimFx, "error")
                     self.emit({'fx_sim': 'error'})
                 else:
                     # Reset overflow counter for input and output quantization,
@@ -264,7 +264,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.fx_filt_ui.update_ovfl_cnt_all()
                 else:
                     logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
-                qstyle_widget(self.butSimFx, "normal")
+                # qstyle_widget(self.butSimFx, "normal")
             # fixpoint specifications / quantization settings have been changed
             # somewhere else, update UI and set run button to "changed" in dict2ui()
 
@@ -389,9 +389,9 @@ class Input_Fixpoint_Specs(QWidget):
         # frm_qfrmt = QFrame(self)
         # frm_qfrmt.setLayout(lay_v_qfrmt)
         # frm_qfrmt.setContentsMargins(*params['wdg_margins'])
-        self.butSimFx = QPushButton(self)
-        self.butSimFx.setToolTip("Start fixpoint simulation.")
-        self.butSimFx.setText("Sim. FX")
+        # self.butSimFx = QPushButton(self)
+        # self.butSimFx.setToolTip("Start fixpoint simulation.")
+        # self.butSimFx.setText("Sim. FX")
 
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip(
@@ -401,7 +401,7 @@ class Input_Fixpoint_Specs(QWidget):
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
         layH_fx_btns = QHBoxLayout()
         layH_fx_btns.addWidget(self.cmb_qfrmt)
-        layH_fx_btns.addWidget(self.butSimFx)
+        # layH_fx_btns.addWidget(self.butSimFx)
         layH_fx_btns.addWidget(self.butExportHDL)
 
         frmHdlBtns = QFrame(self)
@@ -440,7 +440,7 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFx.clicked.connect(self._start_fx_sim)
+        # self.butSimFx.clicked.connect(self._start_fx_sim)
         self.cmb_qfrmt.currentIndexChanged.connect(self.ui2dict)
 
         # ----------------------------------------------------------------------
@@ -452,13 +452,13 @@ class Input_Fixpoint_Specs(QWidget):
         # self.sig_resize.connect(self.resize_img)
 
 # ------------------------------------------------------------------------------
-    def _start_fx_sim(self) -> None:
-        """
-        Start fixpoint simulation by setting the global fixpoint flag
-        `fb.fil[0]['fx_sim'] = True` and emitting `{'fx_sim': 'start_fx_sim'}`.
-        """
-        fb.fil[0]['fx_sim'] = True
-        self.emit({'fx_sim': 'start_fx_sim'})
+    # def _start_fx_sim(self) -> None:
+    #     """
+    #     Start fixpoint simulation by setting the global fixpoint flag
+    #     `fb.fil[0]['fx_sim'] = True` and emitting `{'fx_sim': 'start_fx_sim'}`.
+    #     """
+    #     fb.fil[0]['fx_sim'] = True
+    #     self.emit({'fx_sim': 'start_fx_sim'})
 
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
@@ -612,7 +612,7 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n{0}".format(e))
 
             self.fx_wdg_found = False
-            self.butSimFx.setEnabled(False)
+            # self.butSimFx.setEnabled(False)
             self.butExportHDL.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
@@ -674,7 +674,7 @@ class Input_Fixpoint_Specs(QWidget):
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
-            self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
+            # self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
@@ -707,7 +707,7 @@ class Input_Fixpoint_Specs(QWidget):
         except AttributeError as e:
             logger.error(f"Error using FX filter widget's 'dict2ui()' method:\n{e}")
 
-        qstyle_widget(self.butSimFx, "changed")
+        # qstyle_widget(self.butSimFx, "changed")
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
@@ -809,10 +809,10 @@ class Input_Fixpoint_Specs(QWidget):
                 f'"{type(fb.fx_results)}"')
             fb.fx_results = None
 
-        if fb.fx_results is None:
-            qstyle_widget(self.butSimFx, "error")
-        else:
-            pass  # everything ok, return
+    #    if fb.fx_results is None:
+    #        qstyle_widget(self.butSimFx, "error")
+    #    else:
+    #        pass  # everything ok, return
         return
 
 
