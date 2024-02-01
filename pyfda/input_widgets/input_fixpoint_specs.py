@@ -686,6 +686,7 @@ class Input_Fixpoint_Specs(QWidget):
         Emit {'fx_sim': 'specs_changed'}.
         """
         fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        fb.fil[0]['fx_sim'] = fb.fil[0]['qfrmt'] != 'float'
         self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 

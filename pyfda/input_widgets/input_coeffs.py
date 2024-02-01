@@ -819,8 +819,10 @@ class Input_Coeffs(QWidget):
         `{'fx_sim': 'specs_changed'}`.
         """
         fb.fil[0]['qfrmt'] = qget_cmb_box(self.ui.cmb_q_frmt)
+        fb.fil[0]['fx_sim'] = fb.fil[0]['qfrmt'] != 'float'
 
-        # update quant. widgets and table with the new `qfrmt` settings
+        # update quant. widgets and table with the new `qfrmt` settings and propagate
+        # change in fixpoint settings to other widgets
         self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 

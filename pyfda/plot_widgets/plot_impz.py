@@ -773,7 +773,7 @@ class Plot_Impz(QWidget):
         Select between fixpoint and floating point simulation and update FX UI
         settings.
 
-        When the global number format `fb.fil[0]['qfrmt'] == 'float'`, always turn
+        When the global number format `fb.fil[0]['fx_sim'] == False`, always turn
         off fixpoint simulation (combobox and global parameter `fb.fil[0]['fx_sim']`).
 
         Parameter `fx` can be:
@@ -791,10 +791,7 @@ class Plot_Impz(QWidget):
         If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
         is set to True and the run button is set to "changed".
         """
-        if fb.fil[0]['qfrmt'] == 'float':
-            qset_cmb_box(self.ui.cmb_sim_select, 'float', data=True)
-            fb.fil[0]['fx_sim'] = False
-        elif fx in {"float", "fixpoint"}:
+        if fx in {"float", "fixpoint"}:
             # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `fx`
             qset_cmb_box(self.ui.cmb_sim_select, fx, data=True)
             fb.fil[0]['fx_sim'] = (fx == "fixpoint")
