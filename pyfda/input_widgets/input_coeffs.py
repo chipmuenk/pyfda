@@ -151,7 +151,7 @@ class ItemDelegate(QStyledItemDelegate):
          positive / negative overflows, else it is 0.
         """
 
-        if fb.fil[0]['qfrmt'] == 'float':
+        if not fb.fil[0]['fx_sim']:
             data = safe_eval(text, return_type='auto')  # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
@@ -192,21 +192,22 @@ class ItemDelegate(QStyledItemDelegate):
         """
         data = safe_eval(self.parent.ba[index.column()][index.row()],
                          return_type="auto")
-        if fb.fil[0]['qfrmt'] == 'float':
-            # floating point format: pass data with full resolution
-            editor.setText(str(data))
-        else:
+
+        if fb.fil[0]['fx_sim']:
             # fixpoint format with base:
             # pass requantized data with required number of decimal places
             editor.setText(
                 "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data),
                                   self.QObj[index.column()].places))
+        else:
+            # floating point format: pass data with full resolution
+            editor.setText(str(data))
 
     # -------------------------------------------------------------------------
     def setModelData(self, editor, model, index) -> None:
         """
         When editing has finished, read the updated data from the editor (= QTableWidget),
-        and store it in `self.ba` as float / complex for `fb.fil[0]['qfrmt'] == 'float'`.
+        and store it in `self.ba` as float / complex for `fb.fil[0]['fx_sim'] == False`.
 
         For all other formats, convert data back to floating point format via
         `frmt2float()` and store it in `self.ba` as float / complex. Next, use
@@ -226,7 +227,7 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if fb.fil[0]['qfrmt'] == 'float':
+        if not fb.fil[0]['fx_sim']:
             data = safe_eval(
                 str(editor.text()), self.parent.ba[index.column()][index.row()],
                 return_type='auto')  # raw float data without fixpoint formatting
@@ -395,7 +396,7 @@ class Input_Coeffs(QWidget):
 
         # store new settings and refresh table
         self.ui.cmb_fx_base.currentIndexChanged.connect(self.fx_base2dict)
-        self.ui.cmb_q_frmt.currentIndexChanged.connect(self.qfrmt2dict)
+        self.ui.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2dict)
 
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
@@ -442,7 +443,7 @@ class Input_Coeffs(QWidget):
         # logger.error(f"a: {a[1].dtype}")
 
         # Float format: Set ba_q = ba, overflows are all = 0
-        if fb.fil[0]['qfrmt'] == 'float':
+        if not fb.fil[0]['fx_sim']:
             self.ba_q = [self.ba[0],
                          self.ba[1],
                          np.zeros(len_b),
@@ -590,7 +591,7 @@ class Input_Coeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         # When format is 'float', disable all fixpoint options and widgets:
-        is_float = (qget_cmb_box(self.ui.cmb_q_frmt) == 'float')
+        is_float = (qget_cmb_box(self.ui.cmb_qfrmt) == 'float')
         self.ui.spnDigits.setVisible(is_float)  # select number of float digits
         self.ui.lblDigits.setVisible(is_float)
         self.ui.cmb_fx_base.setVisible(not is_float)  # hide fx base combobosx
@@ -799,7 +800,10 @@ class Input_Coeffs(QWidget):
 
         """
         # update ui
-        qset_cmb_box(self.ui.cmb_q_frmt, fb.fil[0]['qfrmt'], data=True)
+        if not fb.fil[0]['fx_sim']:  # float mode
+            qset_cmb_box(self.ui.cmb_qfrmt, 'float', data=True)
+        else:  # fixpoint mode
+            qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
 
         # update quantizer objects and widgets
         self.ui.wdg_wq_coeffs_a.dict2ui()
@@ -812,14 +816,17 @@ class Input_Coeffs(QWidget):
 # ------------------------------------------------------------------------------
     def qfrmt2dict(self):
         """
-        Read out the UI settings of  `self.ui.cmb_q_frmt` (triggering this method)
-        and store it under the 'qfrmt' key.
+        Read out the UI settings of  `self.ui.cmb_qfrmt` (triggering this method)
+        and store it under the 'qfrmt' key if it is a fixpoint format. Set the
+        `fb.fil[0]['fx_sim']` flag accordingly.
 
         Refresh the table and update quantization widgets, finally emit a signal
         `{'fx_sim': 'specs_changed'}`.
         """
-        fb.fil[0]['qfrmt'] = qget_cmb_box(self.ui.cmb_q_frmt)
-        fb.fil[0]['fx_sim'] = fb.fil[0]['qfrmt'] != 'float'
+        qfrmt = qget_cmb_box(self.ui.cmb_qfrmt)
+        fb.fil[0]['fx_sim'] = (qfrmt != 'float')
+        if qfrmt != 'float':
+            fb.fil[0]['qfrmt'] = qfrmt
 
         # update quant. widgets and table with the new `qfrmt` settings and propagate
         # change in fixpoint settings to other widgets

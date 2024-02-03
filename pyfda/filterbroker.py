@@ -260,8 +260,8 @@ fil_ref = {
             [0.3, 0]],
     #
     'sos': [],
-    # global quantization format {'float', 'qint', 'qfrac'}
-    'qfrmt': 'float',
+    # global quantization format {'qint', 'qfrac'}
+    'qfrmt': 'qfrac',
     # number format for fixpoint display {'dec', 'hex', 'bin', 'oct', 'csd'}
     'fx_base': 'dec',
     # Settings for fixpoint widgets:

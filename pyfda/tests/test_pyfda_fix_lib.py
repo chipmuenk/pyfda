@@ -117,7 +117,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        fb.fil[0]['qfrmt'] = 'float'
+        fb.fil[0]['fx_sim'] = False
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
 
@@ -358,7 +358,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Test conversion from float format to float
         """
         # return floats as float, no quantization options are regarded here
-        fb.fil[0].update({'qfrmt': 'float', 'fx_base': 'dec'})  # set to fractional format
+        fb.fil[0].update({'fx_sim': False, 'fx_base': 'dec'})  # set to fractional format
         q_dict = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round'}
         self.myQ.set_qdict(q_dict)
         # scalar format

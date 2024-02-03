@@ -1465,16 +1465,16 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
-    if fb.fil[0]['qfrmt'] == 'float' or fb.fil[0]['qfrmt'] == 'qint'\
-        or fb.fil[0]['qfrmt'] == 'qint'and qc.q_dict['WF'] == 0:
+    if not fb.fil[0]['fx_sim'] or fb.fil[0]['qfrmt'] == 'qint'\
+        or fb.fil[0]['qfrmt'] == 'qfrac' and qc.q_dict['WF'] == 0:
             pass
     else:
-        logger.error("Fractional numbers are only supported f9r floats!")
+        logger.error("Fractional numbers are only supported for floats!")
         return True
 
     WO = fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QO']['WF'] + 1
 
-    if fb.fil[0]['fx_base'] == 'dec' or 'float' in fb.fil[0]['qfrmt']:
+    if fb.fil[0]['fx_base'] == 'dec' or not fb.fil[0]['fx_sim']:
         pre = ""
         post = ""
     elif fb.fil[0]['fx_base'] == 'hex':
@@ -1497,12 +1497,12 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         "VHDL FIR filter coefficient package file").replace("\n", "\n-- ")
 
     exp_str += "\nlibrary IEEE;\n"
-    if fb.fil[0]['qfrmt'] == 'float':
+    if not fb.fil[0]['fx_sim']:
         exp_str += "use IEEE.math_real.all;\n"
     exp_str += "USE IEEE.std_logic_1164.all;\n\n"
     exp_str += "package coeff_package is\n"
     exp_str += "constant n_taps: integer := {0:d};\n".format(len(bq)-1)
-    if fb.fil[0]['qfrmt'] == 'float':
+    if not fb.fil[0]['fx_sim']:
         exp_str += "type coeff_type is array(0 to n_taps) of real;\n"
     else:
         exp_str += "type coeff_type is array(0 to n_taps) of integer "

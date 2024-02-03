@@ -444,10 +444,8 @@ class FX_UI_WQ(QWidget):
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
             self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
-        qfrmt = fb.fil[0]['qfrmt']
-
-        if qfrmt not in {'float', 'qfrac', 'qint'}:
-            logger.error(f"Unknown quantization format '{qfrmt}'")
+        if fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
+            logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'")
 
         WI = safe_eval(
             q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
@@ -470,12 +468,14 @@ class FX_UI_WQ(QWidget):
         Update visibility / writability of integer and fractional part of the
         quantization format. depending on 'qfrmt' and 'w_a_m' settings
         """
-        qfrmt = fb.fil[0]['qfrmt']
         ## logger.error(f"{self.q_dict['wdg_name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
-        self.ledWI.setVisible(qfrmt != 'float')
-        self.ledWF.setVisible(qfrmt != 'float')
+        self.ledWI.setVisible(fb.fil[0]['fx_sim'])
+        self.ledWF.setVisible(fb.fil[0]['fx_sim'])
 
-        if qfrmt == 'qint':
+        if not fb.fil[0]['fx_sim']:
+            self.lbl_sep1.setText(to_html("---", frmt='b'))
+            self.lbl_sep2.setVisible(False)
+        elif fb.fil[0]['qfrmt'] == 'qint':
             self.lbl_sep1.setText(to_html("(", frmt='b'))
             self.ledWF.setToolTip("Scale factor 2<sup>-WF</sup>")
             self.ledWI.setText(str(self.q_dict['WI'] + self.q_dict['WF'] + 1))
@@ -484,7 +484,7 @@ class FX_UI_WQ(QWidget):
 
             LSB = 1.
             MSB = 2. ** (self.q_dict['WI'] + self.q_dict['WF'] - 1)
-        elif qfrmt == "qfrac":
+        elif fb.fil[0]['qfrmt'] == "qfrac":
             self.lbl_sep1.setText(to_html(".", frmt='b'))
             self.ledWF.setToolTip("Number of fractional bits")
             self.ledWI.setText(str(self.q_dict['WI']))
@@ -493,16 +493,13 @@ class FX_UI_WQ(QWidget):
 
             LSB = 2 ** -self.q_dict['WF']
             MSB = 2. ** (self.q_dict['WI'] - 1)
-        elif qfrmt == 'float':
-            self.lbl_sep1.setText(to_html("---", frmt='b'))
-            self.lbl_sep2.setVisible(False)
         else:
-            logger.error(f"Unknown quantization format '{qfrmt}'!")
+            logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'!")
 
         self.ledWF.setText(str(self.q_dict['WF']))
 
 
-        if self.MSB_LSB_vis == 'off' or fb.fil[0]['qfrmt'] == 'float':
+        if self.MSB_LSB_vis == 'off' or not fb.fil[0]['fx_sim']:
             # Don't show any data
             self.lbl_MSB.setVisible(False)
             self.lbl_LSB.setVisible(False)

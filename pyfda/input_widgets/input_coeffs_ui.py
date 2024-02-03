@@ -106,10 +106,10 @@ class Input_Coeffs_UI(QWidget):
         # UI Elements for controlling the display
         # ---------------------------------------------
 
-        self.cmb_q_frmt = QComboBox(self)
-        qcmb_box_populate(self.cmb_q_frmt, self.cmb_q_frmt_items,
+        self.cmb_qfrmt = QComboBox(self)
+        qcmb_box_populate(self.cmb_qfrmt, self.cmb_q_frmt_items,
                           self.cmb_q_frmt_default)
-        self.cmb_q_frmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.cmb_fx_base = QComboBox(self)
         qcmb_box_populate(self.cmb_fx_base, self.cmb_fx_base_items,
@@ -141,7 +141,7 @@ class Input_Coeffs_UI(QWidget):
         self.but_format.setCheckable(True)
 
         # layH_q_frmt = QHBoxLayout()
-        # layH_q_frmt.addWidget(self.cmb_q_frmt)
+        # layH_q_frmt.addWidget(self.cmb_qfrmt)
         # layH_q_frmt.addWidget(self.but_quant)
         # layH_q_frmt.setContentsMargins(5, 0, 0, 0)  # 5 pixels extra left space
         # self.frm_q_frmt = QFrame(self)
@@ -150,7 +150,7 @@ class Input_Coeffs_UI(QWidget):
         layH_display = QHBoxLayout()
         layH_display.setContentsMargins(*params['wdg_margins'])
         layH_display.setAlignment(Qt.AlignLeft)
-        layH_display.addWidget(self.cmb_q_frmt)
+        layH_display.addWidget(self.cmb_qfrmt)
         layH_display.addWidget(self.spnDigits)
         layH_display.addWidget(self.lblDigits)
         layH_display.addWidget(self.cmb_fx_base)

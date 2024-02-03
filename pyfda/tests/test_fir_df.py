@@ -123,7 +123,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # frmt float
-        fb.fil[0]['qfrmt'] = 'float'
+        fb.fil[0]['fx_sim'] = False
         yq_list = list(self.myQ.fixp(y_string))
         self.assertEqual(yq_list, yq_list_goal)
 

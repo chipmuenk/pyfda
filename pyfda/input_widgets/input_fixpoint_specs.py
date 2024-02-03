@@ -685,8 +685,11 @@ class Input_Fixpoint_Specs(QWidget):
 
         Emit {'fx_sim': 'specs_changed'}.
         """
-        fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
-        fb.fil[0]['fx_sim'] = fb.fil[0]['qfrmt'] != 'float'
+        qfrmt = qget_cmb_box(self.cmb_qfrmt)
+        fb.fil[0]['fx_sim'] = (qfrmt != 'float')
+        if qfrmt != 'float':
+            fb.fil[0]['qfrmt'] = qfrmt
+
         self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
 
@@ -699,7 +702,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         Set the RUN button to "changed".
         """
-        qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
+        if not fb.fil[0]['fx_sim']:  # float mode
+            qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
+        else:  # fixpoint mode
+            qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
         self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
         self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
         try:

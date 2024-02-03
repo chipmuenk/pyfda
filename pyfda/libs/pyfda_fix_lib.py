@@ -394,6 +394,8 @@ class Fixed(object):
     Additionally, the following keys from global dict `fb.fil[0]` define the
     number base and quantization/overflow behaviour for fixpoint numbers:
 
+    * **`'fx_sim'`** : Flag for fixpoint mode, default = False (floating point)
+
     * **`'fx_base'`** : Display format for fixpoint number base; default = 'dec'
 
       - 'dec'   : decimal (base = 10)
@@ -402,9 +404,8 @@ class Fixed(object):
       - 'oct'   : octal (base = 8)
       - 'csd'   : canonically signed digit (base = "3")
 
-    **`'qfrmt'`** : Quantization / overflow behaviour, default = 'float'
+    * **`'qfrmt'`** : Quantization / overflow behaviour, default = 'qfrac'
 
-      - 'float'  : floating point (unquantized)
       - 'qint'   : fixpoint integer format
       - 'qfrac'  : fractional fixpoint format
 
@@ -560,7 +561,9 @@ class Fixed(object):
         # number of bits:
         W = self.q_dict['WI'] + self.q_dict['WF'] + 1
         #
-        if fb.fil[0]['fx_base'] == 'dec':
+        if not fb.fil[0]['fx_sim']:  # float format
+            self.places = 4
+        elif fb.fil[0]['fx_base'] == 'dec':
             self.places = int(
                 np.ceil(np.log10(W) * np.log10(2.))) + 1
         elif fb.fil[0]['fx_base'] == 'bin':
@@ -571,8 +574,6 @@ class Fixed(object):
             self.places = int(np.ceil(W / 4.)) + 1
         elif fb.fil[0]['fx_base'] == 'oct':
             self.places = int(np.ceil(W / 3.)) + 1
-        elif fb.fil[0]['qfrmt'] == 'float':
-            self.places = 4
         else:
             raise Exception(
                 u'Unknown number format "{0:s}"!'.format(fb.fil[0]['fx_base']))
@@ -659,8 +660,9 @@ class Fixed(object):
         #       Convert input argument into proper floating point scalars /
         #       arrays and initialize flags
         # ======================================================================
-        if fb.fil[0]['qfrmt'] == 'float':
-            logger.warning("fixp() shouldn't be called for float number format!")
+        if not fb.fil[0]['fx_sim']:
+            logger.warning(
+                "fixp() should only be called for fixpoint number format - returning floats!")
             return y
 
         if not in_frmt in {'qfrac', 'qint'}:
@@ -982,7 +984,7 @@ class Fixed(object):
 
         y_float = None
 
-        if fb.fil[0]['qfrmt'] == 'float':
+        if not fb.fil[0]['fx_sim']:
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
                 y_float = np.float64(y)
@@ -1222,10 +1224,6 @@ class Fixed(object):
 
         if y_float is not None:
             return y_float
-            # if fb.fil[0]['qfrmt'] == 'qint':
-            #     return y_float / 2. ** self.q_dict['WF']
-            # else:
-            #     return y_float
         else:
             return 0.0
 
@@ -1284,7 +1282,7 @@ class Fixed(object):
         if not is_numeric(y):
             logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
             return 0.0
-        if fb.fil[0]['qfrmt'] == 'float':  # return float input value unchanged (no string)
+        if not fb.fil[0]['fx_sim']:  # return float input value unchanged (no string)
             return y
 
         if np.iscomplexobj(y):  # convert complex arguments recursively
@@ -1369,7 +1367,8 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance QObj and global setting
-    `fb.fil[0]['qfrmt']` (either 'float', 'qfrac' or 'qint').
+    `fb.fil[0]['qfrmt']` ('qfrac' or 'qint') and `fb.fil[0]['fx_sim']` (`True` or
+    `False`)
 
     Parameters
     ----------
@@ -1389,18 +1388,19 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     settings of the quantization object dict.
 
     """
-    logger.debug("quant_coeffs")
+    disp_frmt_tmp = fb.fil[0]['fx_base']  # temporarily store fx display format and
     # always use decimal display format for coefficient quantization
-    disp_frmt_tmp = fb.fil[0]['fx_base']  # store fx format
     fb.fil[0]['fx_base'] = 'dec'
     out_frmt=fb.fil[0]['qfrmt']
     QObj.resetN()  # reset all overflow counters
 
     if coeffs is None:
         logger.error("Coeffs empty!")
+        return None
+
     # quantize floating point coefficients with the selected scale (WI.WF),
-    # next convert array float  -> array of fixp
-    #                           -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
+    # next, convert array float  -> array of fixp
+    #                            -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
     if recursive:
         # recursive coefficients: quantize coefficients except for first (= 1)
         coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:], out_frmt=out_frmt)))
