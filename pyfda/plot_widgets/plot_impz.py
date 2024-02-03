@@ -69,7 +69,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw = [True] * 2  # flag which plot needs to be redrawn
         self.error = False
         fb.fil[0]['fx_sim'] = False  # disable fixpoint mode initially
-        self.fx_sim_old = fb.fil[0]['fx_sim']
+        self.fx_mode_old = fb.fil[0]['fx_sim']
         self.tool_tip = "Impulse / transient response and their spectra"
         self.tab_label = "y[n]"
         self.active_tab = 0  # index for active tab
@@ -95,7 +95,7 @@ class Plot_Impz(QWidget):
         # self.update_fx_ui_settings(qget_cmb_box(self.ui.cmb_sim_select, data=False))
         self.update_fx_ui_settings()
         # store current state of `fb.fil[0]['fx_sim']``
-        # self.fx_sim_old = fb.fil[0]['fx_sim']
+        # self.fx_mode_old = fb.fil[0]['fx_sim']
 
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
@@ -800,32 +800,33 @@ class Plot_Impz(QWidget):
         else:
             qset_cmb_box(self.ui.cmb_sim_select, "float", data=True)
 
-        # plot styles for quantized stimulus signal
-        self.ui.cmb_plt_freq_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box freq. domain
-        self.ui.lbl_plt_freq_stmq.setVisible(fb.fil[0]['fx_sim'])  # label freq. domain
-        self.ui.cmb_plt_time_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box time domain
-        self.ui.lbl_plt_time_stmq.setVisible(fb.fil[0]['fx_sim'])  # cmb box time domain
-        self.ui.lbl_fx_range.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
-        self.ui.but_fx_range_x.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
-        self.ui.but_fx_range_y.setVisible(fb.fil[0]['fx_sim'])  # display fx range limits
+        fx_mode = fb.fil[0]['fx_sim']
+        # enable plot widgets for quantized stimulus signal
+        self.ui.cmb_plt_freq_stmq.setVisible(fx_mode)  # cmb box freq. domain
+        self.ui.lbl_plt_freq_stmq.setVisible(fx_mode)  # label freq. domain
+        self.ui.cmb_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
+        self.ui.lbl_plt_time_stmq.setVisible(fx_mode)  # cmb box time domain
+        self.ui.lbl_fx_range.setVisible(fx_mode)  # display fx range limits
+        self.ui.but_fx_range_x.setVisible(fx_mode)  # display fx range limits
+        self.ui.but_fx_range_y.setVisible(fx_mode)  # display fx range limits
 
         # add / delete fixpoint entry to / from spectrogram combo box and set
         # `fx_str = "fixpoint"`` or `""``
-        if fb.fil[0]['fx_sim']:
+        if fx_mode:
             qcmb_box_add_item(self.ui.cmb_plt_time_spgr, ["xqn", "x_q[n]", ""])
             self.fx_str = "fixpoint "
         else:
             qcmb_box_del_item(self.ui.cmb_plt_time_spgr, "x_q[n]")
             self.fx_str = ""
 
-        if fb.fil[0]['fx_sim'] != self.fx_sim_old:
+        if fx_mode != self.fx_mode_old:
             self.ui.but_run.setIcon(QIcon(":/play.svg"))
             qstyle_widget(self.ui.but_run, "changed")
             # force recalculation of stimulus and response when switching
             # between float and fixpoint
             self.needs_calc = True
 
-        self.fx_sim_old = fb.fil[0]['fx_sim']
+        self.fx_mode_old = fb.fil[0]['fx_sim']
 
     # ------------------------------------------------------------------------
     def calc_fft(self):
