@@ -97,30 +97,22 @@ class IIR_DF1_pyfixp(object):
         # update the quantizers
         self.Q_a.set_qdict(self.p['QCA'])  # recursive coeffs (a)
         self.Q_b.set_qdict(self.p['QCB'])  # transversal b coeffs (b)
-        # self.Q_mul_a.set_qdict(q_mul_a)  # partial products coeffs (x a)
-        # self.Q_mul_b.set_qdict(q_mul_b)  # partial products coeffs (x b)
         self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
         self.Q_O.set_qdict(self.p['QO'])  # output
 
-        # q_mul_a = p['QACC'].copy()  # quantizer dict for partial products (a)
+        # Quantizer dict for partial products yq * aq
         DW_a = int(np.ceil(np.log2(len(self.p['QCA']))))  # word growth
         # word format for sum of partial products a_i * y_i
         self.Q_mul_a.set_qdict(
             {'WI': self.p['QO']['WI'] + self.p['QCA']['WI'] + DW_a,
              'WF': self.p['QO']['WF'] + self.p['QCA']['WF']})
 
-        # q_mul_b = p['QACC'].copy()  # quantizer dict for partial products
+        # Quantizer dict for partial products xq * bq
         DW_b = int(np.ceil(np.log2(len(self.p['QCB']))))  # word growth
         # word format for sum of partial products b_i * x_i
         self.Q_mul_b.set_qdict(
             {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW_b,
              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        # WP_b = q_mul_b['WI'] + q_mul_b['WF'] + 1
-
-        self.Q_mul.set_qdict(
-            {'WI': max(self.Q_mul_a.q_dict['WI'], self.Q_mul_b.q_dict['WI']),
-             'WF': max(self.Q_mul_a.q_dict['WF'], self.Q_mul_b.q_dict['WF'])}
-        )
 
         # Quantize coefficients and store them in local attributes
         # This also resets the overflow counters.
@@ -165,7 +157,6 @@ class IIR_DF1_pyfixp(object):
         """
         self.Q_mul_a.resetN()
         self.Q_mul_b.resetN()
-        self.Q_mul.resetN()
         self.Q_acc.resetN()
         self.Q_O.resetN()
         self.N_over_filt = 0
