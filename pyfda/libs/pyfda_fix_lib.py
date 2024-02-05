@@ -670,7 +670,8 @@ class Fixed(object):
         if not out_frmt in {'qfrac', 'qint'}:
             logger.error(f"Unknown output format {out_frmt}")
 
-        logger.error(f"fixp in: y = {pprint_log(y, N=4)}")
+        # logger.error(f"fixp in: y = {pprint_log(y, N=4)}")
+
         if np.shape(y):
             # Input is an array:
             #   Create empty arrays for result and overflows with same shape as y
@@ -737,7 +738,7 @@ class Fixed(object):
             return yq
 
         # ======================================================================
-        logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
+        # logger.error(f"fixp: in_frmt = '{in_frmt}', out_frmt = '{out_frmt}'")
 
         # ======================================================================
         # (2) : QUANTIZATION
@@ -830,7 +831,7 @@ class Fixed(object):
         if out_frmt == 'qfrac':
             yq = yq / (2. ** self.q_dict['WF'])
 
-        logger.error(f"fixp: (out:scaled) = {pprint_log(yq, N=4)}")
+        # logger.error(f"fixp: (out:scaled) = {pprint_log(yq, N=4)}")
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item()  # convert singleton array to scalar

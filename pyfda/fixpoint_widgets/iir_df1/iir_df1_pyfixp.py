@@ -260,9 +260,6 @@ class IIR_DF1_pyfixp(object):
             ya_q = np.append(self.Q_mul_a.fixp(self.zi_a * self.a_q[1:],
                                                in_frmt=qfrmt, out_frmt=qfrmt),
                                                0)
-            if k == 5:
-                logger.warning(f"zi_a = \n{self.zi_a}")
-                logger.warning(f"ya_q = \n{ya_q}")
 
             # - shift right recursive state (output) register
             # - accumulate partial products `xb_q` and `ya_q`, requantize the results

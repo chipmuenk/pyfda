@@ -676,7 +676,7 @@ class Plot_Impz(QWidget):
                 # --------------------------------------------------------------
                 try:
                     self.y[frame] = np.asarray(self.fxfilter(self.x_q[frame]))
-                    logger.warning(f"y_frame = {pprint_log(self.y[frame])}")
+                    # logger.warning(f"y_frame = {pprint_log(self.y[frame])}")
 
                 except ValueError as e:
                     if self.fxfilter(self.x_q[frame]) is None:
