@@ -88,6 +88,10 @@ class IIR_DF1_pyfixp(object):
         -------
         None.
         """
+        # Do not initialize filter unless fixpoint mode is active
+        if not fb.fil[0]['fx_sim']:
+            return
+
         self.p = p  # update parameter dictionary with coefficients etc.
 
         # update the quantizers

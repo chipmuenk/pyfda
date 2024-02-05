@@ -77,6 +77,10 @@ class FIR_DF_pyfixp(object):
         -------
         None.
         """
+        # Do not initialize filter unless fixpoint mode is active
+        if not fb.fil[0]['fx_sim']:
+            return
+
         self.p = p  # parameter dictionary with coefficients etc.
 
         q_mul = p['QACC'].copy()
