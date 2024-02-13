@@ -1550,6 +1550,10 @@ def export_coe_cmsis(f: TextIO) -> None:
     Get coefficients in SOS format and delete 4th column containing the
     '1.0' of the recursive parts.
 
+    See https://www.keil.com/pack/doc/CMSIS/DSP/html/group__BiquadCascadeDF1.html
+    https://dsp.stackexchange.com/questions/79021/iir-design-scipy-cmsis-dsp-coefficient-format
+    https://github.com/docPhil99/DSP/blob/master/MatlabSOS2CMSIS.m
+
     # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
     """
     sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
