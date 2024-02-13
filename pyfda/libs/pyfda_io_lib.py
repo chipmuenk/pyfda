@@ -1162,7 +1162,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
 
     data: str
         formatted as CSV data, i.e. rows of elements separated by 'delimiter',
-        terminated by 'lineterminator'
+        terminated by 'lineterminator'. Some data formats
 
     fkey: str
         Key for accessing data in ``*.npz`` or Matlab workspace (``*.mat``) file.
@@ -1182,6 +1182,9 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # add file types for FIR filter coefficients
     if fb.fil[0]['ft'] == 'FIR':
         file_types += ('coe', 'vhd', 'txt')
+    else:
+        file_types += ('cmsis',)
+
     # Add file types when Excel modules are available:
     if xlwt is not None:
         file_types += ('xls',)
@@ -1199,7 +1202,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
         if file_type == 'csv':
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
-        elif file_type in {'coe', 'txt', 'vhd'}:  # text / string format
+        elif file_type in {'coe', 'txt', 'vhd', 'cmsis'}:  # text / string formats
             with open(file_name, 'w', encoding="utf8") as f:
                 if file_type == 'coe':
                     err = export_coe_xilinx(f)
@@ -1207,6 +1210,8 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_microsemi(f)
                 elif file_type == '.vhd':
                     err = export_coe_vhdl_package(f)
+                elif file_type == 'cmsis':
+                    err = export_coe_cmsis(f)
                 else:
                     logger.error(f'Unknown file extension "{file_type}')
                     return None
@@ -1537,6 +1542,33 @@ def export_coe_TI(f: TextIO) -> None:
     ** not implemented yet **
     """
     pass
+
+
+# ------------------------------------------------------------------------------
+def export_coe_cmsis(f: TextIO) -> None:
+    """
+    Get coefficients in SOS format and delete 4th column containing the
+    '1.0' of the recursive parts.
+
+    # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
+    """
+    sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+
+    delim = params['CSV']['delimiter'].lower()
+    if delim == 'auto':  # 'auto' doesn't make sense when exporting
+        delim = ","
+    cr = params['CSV']['lineterminator']
+
+    text = ""
+    for r in range(np.shape(sos_coeffs)[0]):  # number of rows
+        for c in range(5):  # always has 5 columns
+            text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
+        text = text.rstrip(delim) + cr
+    text = text.rstrip(cr)  # delete last CR
+
+    f.write(text)
+
+    return False
 
 
 # ==============================================================================
