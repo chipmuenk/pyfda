@@ -1208,7 +1208,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_xilinx(f)
                 elif file_type == 'txt':
                     err = export_coe_microsemi(f)
-                elif file_type == '.vhd':
+                elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
                 elif file_type == 'cmsis':
                     err = export_coe_cmsis(f)
