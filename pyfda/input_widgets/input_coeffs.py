@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, export_fil_data
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -675,7 +675,7 @@ class Input_Coeffs(QWidget):
             else:
                 # pass csv formatted text, key for accessing data in ``*.npz`` file or
                 # Matlab workspace (``*.mat``) and a title for the file export dialog
-                save_data_csv(self, text, 'ba', title="Export Filter Coefficients")
+                export_fil_data(self, text, 'ba', title="Export Filter Coefficients")
 
         elif fb.fil[0]['ft'] != 'IIR':
             logger.warning("CMSIS SOS export is only possible for IIR filters!")
@@ -700,7 +700,7 @@ class Input_Coeffs(QWidget):
             if params['CSV']['clipboard']:
                 fb.clipboard.setText(text)
             else:
-                save_data_csv(self, text, title="Export in CMSIS DSP SOS format",
+                export_fil_data(self, text, title="Export in CMSIS DSP SOS format",
                                 file_types=('csv',))
 
     # --------------------------------------------------------------------------

@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, save_data_csv
+from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, export_fil_data
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
@@ -816,7 +816,7 @@ class Input_PZ(QWidget):
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
             # Matlab workspace (``*.mat``) and a title for the file export dialog
-            save_data_csv(self, text, 'zpk', title="Export Poles / Zeros")
+            export_fil_data(self, text, 'zpk', title="Export Poles / Zeros")
     # --------------------------------------------------------------------------
     def _import(self):
         """

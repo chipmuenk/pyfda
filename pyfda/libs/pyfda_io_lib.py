@@ -311,7 +311,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
     -------
 
     None
-        Nothing, text is exported to clipboard or to file via ``save_data_csv``
+        Nothing, text is exported to clipboard or to file via ``export_fil_data``
     """
 
     text = ""
@@ -1150,10 +1150,11 @@ def write_wav_frame(parent, file_name, data: np.array, f_S = 1,
 
 
 # ------------------------------------------------------------------------------
-def save_data_csv(parent: object, data: str, fkey: str = "", title: str = "Export",
+def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Export",
                 file_types: Tuple[str, ...] = ('csv', 'mat', 'npy', 'npz')):
     """
-    Export coefficients or pole/zero data in various formats
+    Export filter coefficients or pole/zero data in various formats, file name and type
+    are selected via the ui.
 
     Parameters
     ----------
