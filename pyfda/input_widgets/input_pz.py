@@ -255,7 +255,7 @@ class Input_PZ(QWidget):
         self.ui.butAddCells.clicked.connect(self._add_rows)
         self.ui.butClear.clicked.connect(self._clear_table)
 
-        self.ui.butFromTable.clicked.connect(self._export)
+        self.ui.butFromTable.clicked.connect(self.export_table)
         self.ui.butToTable.clicked.connect(self._import)
 
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
@@ -804,7 +804,7 @@ class Input_PZ(QWidget):
             return x + 1j * y
 
     # --------------------------------------------------------------------------
-    def _export(self):
+    def export_table(self):
         """
         Export data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file using a selected format

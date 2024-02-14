@@ -381,7 +381,7 @@ class Input_Coeffs(QWidget):
         # wdg.editingFinished() is only emitted for user changes
         self.ui.spnDigits.editingFinished.connect(self.refresh_table)
 
-        self.ui.butFromTable.clicked.connect(self._export)
+        self.ui.butFromTable.clicked.connect(self.export_table)
         self.ui.butToTable.clicked.connect(self._import)
 
         self.ui.cmbFilterType.currentIndexChanged.connect(self._filter_type)
@@ -662,7 +662,7 @@ class Input_Coeffs(QWidget):
         qstyle_widget(self.ui.butSave, 'normal')
 
     # --------------------------------------------------------------------------
-    def _export(self):
+    def export_table(self):
         """
         Export data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
