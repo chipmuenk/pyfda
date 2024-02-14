@@ -766,7 +766,7 @@ class Plot_Tran_Stim_UI(QWidget):
         """
 
         f_corr = 1
-        if fb.fil[0]['freq_locked'] and fb.fil[0]['freq_specs_unit'] != 'k':
+        if fb.fil[0]['freq_locked']:
             f_corr = fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
             self.f1 *= f_corr
             self.f2 *= f_corr
@@ -810,7 +810,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # emit a signal if normalized frequencies have changed due to an update
         # of f_S
-        if fb.fil[0]['freq_locked'] and fb.fil[0]['freq_specs_unit'] != 'k':
+        if fb.fil[0]['freq_locked']:
             self.emit({'ui_local_changed': 'f1_f2'})
 
     # -------------------------------------------------------------
