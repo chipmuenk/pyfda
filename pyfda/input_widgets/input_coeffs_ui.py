@@ -18,7 +18,7 @@ from pyfda.libs.pyfda_lib import to_html
 from pyfda.libs.pyfda_qt_lib import (
     qset_cmb_box, qstyle_widget, qcmb_box_populate, QHLine, PushButton)
 from pyfda.libs.csv_option_box import CSV_option_box
-# from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_lib import first_item
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.fixpoint_widgets.fx_ui_wq import FX_UI_WQ
 from pyfda.pyfda_rc import params
@@ -72,14 +72,20 @@ class Input_Coeffs_UI(QWidget):
         """
         Process signals coming from the CSV pop-up window
         """
-        # logger.debug("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
-
-        if 'closeEvent' in dict_sig:
+        # logger.warning("PROCESS_SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        if dict_sig['id'] == id(self):
+            # this should not happen as the rx slot is not connected globally
+            logger.warning(
+                f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            return
+        elif 'closeEvent' in dict_sig:
             self._close_csv_win()
+            # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})
-        elif 'ui_global_changed' in dict_sig:
+        elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
             self._set_load_save_icons()  # update icons file <-> clipboard
-            # set state of CSV options button according to state of CSV popup handle
+            # signal change of CSV options to other widgets with current id
+            self.emit({'ui_global_changed': 'csv'})
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):

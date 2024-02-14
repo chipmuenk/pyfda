@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
 
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
 from pyfda.libs.csv_option_box import CSV_option_box
-from pyfda.libs.pyfda_lib import to_html
+from pyfda.libs.pyfda_lib import to_html, first_item
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.pyfda_rc import params
 
@@ -69,13 +69,20 @@ class Input_PZ_UI(QWidget):
         Process signals coming from the CSV pop-up window
         """
         # logger.debug("PROCESS_SIG_RX\n{0}".format(pprint_log(dict_sig)))
-
-        if 'closeEvent' in dict_sig:
+        if dict_sig['id'] == id(self):
+            logger.warning(
+                # this should not happen as the rx slot is not connected globally
+                f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            return
+        elif 'closeEvent' in dict_sig:
             self._close_csv_win()
+            # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})
         elif 'ui_global_changed' in dict_sig:
             self._set_load_save_icons()  # update icons file <-> clipboard
-            # set state of CSV options button according to state of CSV popup handle
+            # signal change of CSV options to other widgets with current id
+            self.emit({'ui_global_changed': 'csv'})
+
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
