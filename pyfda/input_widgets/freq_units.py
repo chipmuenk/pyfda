@@ -83,7 +83,8 @@ class FreqUnits(QWidget):
             ]
         self.cmb_f_range_init = "half"
 
-        # t_units and f_scale have the same index as the f_unit_items
+        # t_units and f_scale have the same index as the f_unit_items, i.e.
+        # 'f_S', 'f_Ny', 'k', 'mHz', 'Hz', 'kHz', 'MHz', 'GHz'
         self.t_units = ['T_S', 'T_S', '', 'ks', 's', 'ms', r'$\mu$s', 'ns']
         self.f_scale = [1, 1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
 
@@ -296,6 +297,10 @@ class FreqUnits(QWidget):
                 fb.fil[0]['f_max'] = params['N_FFT']
                 f_label = r"$k \; \rightarrow$"
                 t_label = r"$n\; \rightarrow$"
+
+            # Don't use locked frequency scaling with normalized frequencies
+            fb.fil[0]['freq_locked'] = False
+            self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         else:  # Hz, kHz, ...
             # Restore sampling frequency when user selected an absolute sampling frequency,
