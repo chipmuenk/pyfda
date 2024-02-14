@@ -660,6 +660,7 @@ class Input_Coeffs(QWidget):
         self.dict2ui()
 
         qstyle_widget(self.ui.butSave, 'normal')
+ 
 
     # --------------------------------------------------------------------------
     def export_table(self):
@@ -667,41 +668,41 @@ class Input_Coeffs(QWidget):
         Export data from coefficient table `self.tblCoeff` to clipboard / file in
         CSV format.
         """
-        if not params['CSV']['cmsis']:
-            text = qtable2csv(
-                self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
-            if params['CSV']['clipboard']:  # clipboard is selected as export target
-                fb.clipboard.setText(text)
-            else:
-                # pass csv formatted text, key for accessing data in ``*.npz`` file or
-                # Matlab workspace (``*.mat``) and a title for the file export dialog
-                export_fil_data(self, text, 'ba', title="Export Filter Coefficients")
-
-        elif fb.fil[0]['ft'] != 'IIR':
-            logger.warning("CMSIS SOS export is only possible for IIR filters!")
+        text = qtable2csv(
+            self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
+        if params['CSV']['destination'] == 'clipboard':
+            # clipboard is selected as export target
+            fb.clipboard.setText(text)
         else:
-            # Get coefficients in SOS format and delete 4th column containing the
-            # '1.0' of the recursive parts:
-            sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
-            # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
+            # pass csv formatted text, key for accessing data in ``*.npz`` file or
+            # Matlab workspace (``*.mat``) and a title for the file export dialog
+            export_fil_data(self, text, 'ba', title="Export Filter Coefficients")
 
-            delim = params['CSV']['delimiter'].lower()
-            if delim == 'auto':  # 'auto' doesn't make sense when exporting
-                delim = ","
-            cr = params['CSV']['lineterminator']
+        # elif fb.fil[0]['ft'] != 'IIR':
+        #     logger.warning("CMSIS SOS export is only possible for IIR filters!")
+        # else:
+        #     # Get coefficients in SOS format and delete 4th column containing the
+        #     # '1.0' of the recursive parts:
+        #     sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+        #     # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
 
-            text = ""
-            for r in range(np.shape(sos_coeffs)[0]):  # number of rows
-                for c in range(5):  # always has 5 columns
-                    text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
-                text = text.rstrip(delim) + cr
-            text = text.rstrip(cr)  # delete last CR
+        #     delim = params['CSV']['delimiter'].lower()
+        #     if delim == 'auto':  # 'auto' doesn't make sense when exporting
+        #         delim = ","
+        #     cr = params['CSV']['lineterminator']
 
-            if params['CSV']['clipboard']:
-                fb.clipboard.setText(text)
-            else:
-                export_fil_data(self, text, title="Export in CMSIS DSP SOS format",
-                                file_types=('csv',))
+        #     text = ""
+        #     for r in range(np.shape(sos_coeffs)[0]):  # number of rows
+        #         for c in range(5):  # always has 5 columns
+        #             text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
+        #         text = text.rstrip(delim) + cr
+        #     text = text.rstrip(cr)  # delete last CR
+
+        #     if params['CSV']['clipboard']:
+        #         fb.clipboard.setText(text)
+        #     else:
+        #         export_fil_data(self, text, title="Export in CMSIS DSP SOS format",
+        #                         file_types=('csv',))
 
     # --------------------------------------------------------------------------
     def _import(self) -> None:

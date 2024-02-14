@@ -13,6 +13,7 @@ Library with classes and functions for file and text IO
 
 from .pyfda_qt_lib import (qget_cmb_box, qset_cmb_box, qcmb_box_populate,
                            qwindow_stay_on_top)
+from .pyfda_lib import to_html
 from pyfda.pyfda_rc import params
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QCheckBox, QVBoxLayout, QGridLayout, pyqtSignal)
@@ -31,10 +32,11 @@ class CSV_option_box(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent, has_cmsis=True):
+    def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
 
-        self.has_cmsis = has_cmsis
+        # self.has_cmsis = has_cmsis
+        self.cmb_destination_default = "file"
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
         self.cmb_orientation_default = "auto"
@@ -57,10 +59,18 @@ class CSV_option_box(QDialog):
     def _construct_UI(self):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
+        lbl_destination = QLabel(to_html("Import / export:", frmt='b'))
+        cmb_destination_items = ["<span>Select destination for import / export of data."
+                                 "</span>",
+                                 ("file", "File", "From / to file,"),
+                                 ("clipboard", "Clipboard", "From / to clipboard")]
+        self.cmb_destination = QComboBox(self)
+        qcmb_box_populate(self.cmb_destination, cmb_destination_items,
+                          self.cmb_destination_default)
 
-        lbl_delimiter = QLabel("CSV delimiter", self)
-        cmb_delimiter_items = ["<span>Select delimiter between data fields for im- and export."
-                       "</span>",
+        lbl_delimiter = QLabel(to_html("CSV delimiter", frmt='b'), self)
+        cmb_delimiter_items = ["<span>Select delimiter between data fields for "
+                               "im- and export.</span>",
             ("auto", "Auto / ','", "<span>Detect the delimiter automatically for import, "
              "use ',' for exporting data.</span>"),
             (',', '< , >', "<span>Use ',' as delimiter between data fields.</span>"),
@@ -75,8 +85,7 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_delimiter, cmb_delimiter_items,
                           self.cmb_delimiter_default)
 
-
-        lbl_terminator = QLabel("Line terminator", self)
+        lbl_terminator = QLabel(to_html("Line terminator", frmt='b'), self)
         cmb_terminator_items = [
             "<span>Terminator at the end of a data row, depending on the operating "
             "system. 'None' can be used for a single row of data with added line breaks.</span>",
@@ -97,9 +106,9 @@ class CSV_option_box(QDialog):
         butClose = QPushButton(self)
         butClose.setText("Close")
 
-        lbl_orientation = QLabel("Table mode", self)
+        lbl_orientation = QLabel(to_html("Table orientation", frmt='b'), self)
         cmb_orientation_items = [
-            "<span>Select row / column mode of table.</span>",
+            "<span>Select row / column orientation of table.</span>",
             ('auto', 'Auto/Cols.', "<span>Detect table orientation automatically "
              "during import; use column format for exporting data.</span>"),
             ('cols', 'Columns', "<span>Import / export data in columns.</span>"),
@@ -109,7 +118,7 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_orientation, cmb_orientation_items,
                           self.cmb_orientation_default)
 
-        lbl_header = QLabel("Use header", self)
+        lbl_header = QLabel(to_html("Use header", frmt='b'), self)
         cmb_header_items = [
             "<span>Interpret first row resp. column as header.</span>",
             ('auto', 'Auto/Off', "<span>Detect header automatically during import; "
@@ -121,22 +130,18 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_header, cmb_header_items,
                           self.cmb_header_default)
 
-        lbl_cmsis = QLabel("CMSIS SOS format", self)
-        lbl_cmsis.setVisible(self.has_cmsis)
-        self.chk_cmsis = QCheckBox()
-        self.chk_cmsis.setChecked(False)
-        self.chk_cmsis.setToolTip(
-            "<span>Use CMSIS DSP second-order sections format "
-            "(only for IIR coefficients).</span>")
-        self.chk_cmsis.setVisible(self.has_cmsis)
-
-        self.radClipboard = QRadioButton("Clipboard", self)
-        self.radClipboard.setChecked(False)
-        self.radFile = QRadioButton("File", self)
-        # setting is read later on from params['CSV']['clipboard']
-        self.radFile.setChecked(True)
+        # lbl_cmsis = QLabel("CMSIS SOS format", self)
+        # lbl_cmsis.setVisible(self.has_cmsis)
+        # self.chk_cmsis = QCheckBox()
+        # self.chk_cmsis.setChecked(False)
+        # self.chk_cmsis.setToolTip(
+        #     "<span>Use CMSIS DSP second-order sections format "
+        #     "(only for IIR coefficients).</span>")
+        # self.chk_cmsis.setVisible(self.has_cmsis)
 
         lay_grid = QGridLayout()
+        lay_grid.addWidget(lbl_destination, 0, 1)
+        lay_grid.addWidget(self.cmb_destination, 0, 2)
         lay_grid.addWidget(lbl_delimiter, 1, 1)
         lay_grid.addWidget(self.cmb_delimiter, 1, 2)
         lay_grid.addWidget(lbl_terminator, 2, 1)
@@ -145,10 +150,8 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.cmb_orientation, 3, 2)
         lay_grid.addWidget(lbl_header, 4, 1)
         lay_grid.addWidget(self.cmb_header, 4, 2)
-        lay_grid.addWidget(lbl_cmsis, 5, 1)
-        lay_grid.addWidget(self.chk_cmsis, 5, 2)
-        lay_grid.addWidget(self.radClipboard, 6, 1)
-        lay_grid.addWidget(self.radFile, 6, 2)
+        # lay_grid.addWidget(lbl_cmsis, 5, 1)
+        # lay_grid.addWidget(self.chk_cmsis, 5, 2)
 
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
@@ -161,13 +164,12 @@ class CSV_option_box(QDialog):
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
+        self.cmb_destination.currentIndexChanged.connect(self.store_settings)
         self.cmb_orientation.currentIndexChanged.connect(self.store_settings)
         self.cmb_delimiter.currentIndexChanged.connect(self.store_settings)
         self.cmb_terminator.currentIndexChanged.connect(self.store_settings)
         self.cmb_header.currentIndexChanged.connect(self.store_settings)
-        self.chk_cmsis.clicked.connect(self.store_settings)
-        self.radClipboard.clicked.connect(self.store_settings)
-        self.radFile.clicked.connect(self.store_settings)
+        # self.chk_cmsis.clicked.connect(self.store_settings)
 
     def store_settings(self):
         """
@@ -180,9 +182,8 @@ class CSV_option_box(QDialog):
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmb_terminator,
                                                            data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmb_header, data=True)
-            params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
-            params['CSV']['clipboard'] = self.radClipboard.isChecked()
-
+            # params['CSV']['cmsis'] = self.chk_cmsis.isChecked()
+            params['CSV']['destination'] = qget_cmb_box(self.cmb_destination, data=True)
             self.emit({'ui_global_changed': 'csv'})
 
         except KeyError as e:
@@ -198,10 +199,8 @@ class CSV_option_box(QDialog):
             qset_cmb_box(self.cmb_terminator, params['CSV']['lineterminator'],
                          data=True)
             qset_cmb_box(self.cmb_header, params['CSV']['header'], data=True)
-            self.chk_cmsis.setChecked(params['CSV']['cmsis'])
-
-            self.radClipboard.setChecked(params['CSV']['clipboard'])
-            self.radFile.setChecked(not params['CSV']['clipboard'])
+            # self.chk_cmsis.setChecked(params['CSV']['cmsis'])
+            qset_cmb_box(self.cmb_destination, params['CSV']['destination'], data=True)
 
         except KeyError as e:
             logger.error(f"Unknown key {e}")

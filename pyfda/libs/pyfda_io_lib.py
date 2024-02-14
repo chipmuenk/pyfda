@@ -305,7 +305,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
             When ``header='on'``, write the first row with 'b, a'.
 
     :'clipboard': bool (default: True),
-            when ``clipboard = True``, copy data to clipboard, else use a file.
+            when ``clipboard == True``, copy data to clipboard, else use a file.
 
     Returns
     -------
@@ -490,7 +490,7 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
     Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
 
     """
-    if params['CSV']['clipboard']:  # data from clipboard
+    if params['CSV']['destination'] == 'clipboard':  # data from clipboard
         text = fb.clipboard.text()
         logger.debug(
             f"Importing data from clipboard:\n{np.shape(text)}\n{text}")

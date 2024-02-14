@@ -304,7 +304,7 @@ class Input_PZ_UI(QWidget):
         Set icons / tooltipps for loading and saving data to / from file or
         clipboard depending on selected options.
         """
-        if params['CSV']['clipboard']:
+        if params['CSV']['destination'] == 'clipboard':
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
                 "<span>Copy table to clipboard in float format with full precision "

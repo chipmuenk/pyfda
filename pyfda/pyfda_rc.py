@@ -50,8 +50,8 @@ params = {
             'lineterminator': CRLF,  # OS-dependent line break from pyfda_lib
             'orientation': 'auto',  # 'auto', 'vert', 'horiz'# table orientation
             'header': 'auto',  # 'auto', 'on', 'off'
-            'cmsis' : False,  # True, False
-            'clipboard': False  # source/target is QClipboard or file
+            # 'cmsis' : False,  # True, False
+            'destination': False  # source/target is 'clipboard' or 'file'
             },
     'screen': { # screen properties, filled with values in pyfdax.py
         'ref_dpi': None, 'scaling': None, # dpi for scaling = 1 and scaling factor

@@ -811,7 +811,8 @@ class Input_PZ(QWidget):
         """
         text = qtable2csv(
             self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
-        if params['CSV']['clipboard']:  # clipboard is selected as export target
+        if params['CSV']['destination'] == 'clipboard':
+            # clipboard is selected as export target
             fb.clipboard.setText(text)
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
