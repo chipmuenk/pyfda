@@ -256,7 +256,8 @@ class Plot_Tran_Stim(QWidget):
         N_last = N_first + N_frame  # calculate last element index
         frm_slc = slice(N_first, N_last)  # current slice
         n = np.arange(N_first, N_last)  #  create frame index vector
-        t = n / fb.fil[0]['f_S']  # create time vector
+        logger.error(f"T_S = {fb.fil[0]['T_S']}")
+        t = n * fb.fil[0]['T_S']  # create time vector
         noi = 0  # fallback when no noise is selected
         # ====================================================================
 

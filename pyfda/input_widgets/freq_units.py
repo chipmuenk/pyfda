@@ -121,6 +121,7 @@ class FreqUnits(QWidget):
         self.lblUnits.setFont(bfont)
 
         self.f_s_old = fb.fil[0]['f_S']  # store current sampling frequency
+        self.T_s_old = fb.fil[0]['T_S']  # store current sampling period
 
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
@@ -278,34 +279,31 @@ class FreqUnits(QWidget):
 
         if is_normalized_freq:
             # store current sampling frequency to restore it when returning to
-            # unnormalized frequencies
+            # absolute (not normalized) frequencies
             if f_unit == "f_S":  # normalized to f_S
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 1.
-                fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
-                t_label = r"$n = t\, /\, T_S \; \rightarrow$"
             elif f_unit == "f_Ny":  # normalized to f_nyq = f_S / 2
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = 2.
-                fb.fil[0]['T_S'] = 1.
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
-                t_label = r"$n = t\, /\, T_S \; \rightarrow$"
             else: # frequency index k,
                 logger.error("Unit k is no longer supported!")
-                # fb.fil[0]['f_S'] = 1.
-                # fb.fil[0]['T_S'] = 1.
-                # fb.fil[0]['f_max'] = params['N_FFT']
-                # f_label = r"$k \; \rightarrow$"
-                # t_label = r"$n\; \rightarrow$"
 
-            # Don't use locked frequency scaling with normalized frequencies
+            # always use T_S = 1 for normalized frequencies
+            fb.fil[0]['T_S'] = 1.
+            t_label = r"$n = t\, /\, T_S \; \rightarrow$"
+
+            # Don't lock frequency scaling with normalized frequencies
             fb.fil[0]['freq_locked'] = False
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
         else:  # Hz, kHz, ...
-            # Restore sampling frequency when user selected an absolute sampling frequency,
-            # returning from f_S / f_Ny
+            # Restore sampling frequency when selecting absolute instead of
+            # normalized frequencies
+
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}:  # previous setting normalized?
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.f_s_old  # yes, restore prev. f_S
+                fb.fil[0]['T_S'] = self.T_s_old  # yes, restore prev. T_S
 
             # --- try to pick the most suitable unit for f_S --------------
             f_S = fb.fil[0]['f_S'] * f_s_scale
@@ -321,29 +319,25 @@ class FreqUnits(QWidget):
                 f_unit = "mHz"
 
             new_idx = qset_cmb_box(self.cmb_f_units, f_unit, caseSensitive=True)
-            if new_idx != idx:  # sampling frequency needs to be scaled
+            if new_idx != idx:
+                # sampling frequency unit has been changed, f_S and T_S need to be scaled
                 idx = new_idx
                 f_s_scale = self.f_scale[idx]
                 fb.fil[0]['f_S'] = f_S / f_s_scale
+                fb.fil[0]['T_S'] = f_s_scale / f_S
                 emit = True
             # -------------------------------------------------------------
             self.f_s_old = fb.fil[0]['f_S']
+            self.T_s_old = fb.fil[0]['T_S']
             self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-        # if f_unit == "k":
-        #     plt_f_unit = "f_S"
-        # else:
-        plt_f_unit = f_unit
-
-        fb.fil[0]['T_S'] = 1./fb.fil[0]['f_S']
-
         fb.fil[0].update({'f_s_scale': f_s_scale})  # scale factor for f_S (Hz, kHz, ...)
         fb.fil[0].update({'freq_specs_unit': f_unit})  # frequency unit
         # time and frequency unit as string e.g. for plot axis labeling
-        fb.fil[0].update({"plt_fUnit": plt_f_unit})
+        fb.fil[0].update({"plt_fUnit": f_unit})
         fb.fil[0].update({"plt_tUnit": self.t_units[idx]})
         # complete plot axis labels including unit and arrow
         fb.fil[0].update({"plt_fLabel": f_label})
