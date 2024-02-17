@@ -30,7 +30,7 @@ class FreqUnits(QWidget):
 
     The following key-value pairs of the `fb.fil[0]` dict are modified:
 
-        - `'freq_specs_unit'` : The unit ('k', 'f_S', 'f_Ny', 'Hz' etc.) as a string
+        - `'freq_specs_unit'` : The unit ('f_S', 'f_Ny', 'Hz' etc.) as a string
         - `'freqSpecsRange'` : A list with two entries for minimum and maximum frequency
                                values for labelling the frequency axis
         - `'f_S'` : The sampling frequency for referring frequency values to as a float
@@ -59,14 +59,12 @@ class FreqUnits(QWidget):
         self.cmb_f_unit_items = [
             "<span>Select whether frequencies are specified w.r.t. the sampling "
             "frequency " + to_html("f_S", frmt = 'i') + ", to the Nyquist frequency "
-            + to_html("f_Ny = f_S", frmt='i') + "/2 or as absolute values."
-            "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
-            " but plots graphs over the frequency index <i>k</i>.</span>",
+            + to_html("f_Ny = f_S", frmt='i') + "/2 or as absolute values.",
             ("fs", "f_S", "Relative to sampling frequency, "
              + to_html("F = f / f_S", frmt='i')),
             ("fny", "f_Ny", "Relative to Nyquist frequency, "
-             + to_html("F = f / f_Ny", frmt='i')),
-            ("k", "k", "Frequency index " + to_html("k = 0 ... N_FFT - 1", frmt='i')),
+             + to_html("F = f / f_Ny = 2f / f_S", frmt='i')),
+            # ("k", "k", "Frequency index " + to_html("k = 0 ... N_FFT - 1", frmt='i')),
             ("mhz", "mHz", "Absolute sampling frequency in mHz"),
             ("hz", "Hz", "Absolute sampling frequency in Hz"),
             ("khz", "kHz", "Absolute sampling frequency in kHz"),
@@ -84,9 +82,9 @@ class FreqUnits(QWidget):
         self.cmb_f_range_init = "half"
 
         # t_units and f_scale have the same index as the f_unit_items, i.e.
-        # 'f_S', 'f_Ny', 'k', 'mHz', 'Hz', 'kHz', 'MHz', 'GHz'
-        self.t_units = ['T_S', 'T_S', '', 'ks', 's', 'ms', r'$\mu$s', 'ns']
-        self.f_scale = [1, 1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
+        # 'f_S', 'f_Ny', 'mHz', 'Hz', 'kHz', 'MHz', 'GHz'
+        self.t_units = ['T_S', 'T_S', 'ks', 's', 'ms', r'$\mu$s', 'ns']
+        self.f_scale = [1, 1, 1e-3, 1, 1e3, 1e6, 1e9]
 
         self._construct_UI()
 
@@ -272,7 +270,7 @@ class FreqUnits(QWidget):
         idx = self.cmb_f_units.currentIndex()  # its index
         f_s_scale = self.f_scale[idx]  # and its scaling factor
 
-        is_normalized_freq = f_unit in {"f_S", "f_Ny", "k"}
+        is_normalized_freq = f_unit in {"f_S", "f_Ny"}
 
         self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
         self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
@@ -292,11 +290,12 @@ class FreqUnits(QWidget):
                 f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
                 t_label = r"$n = t\, /\, T_S \; \rightarrow$"
             else: # frequency index k,
-                fb.fil[0]['f_S'] = 1.
-                fb.fil[0]['T_S'] = 1.
-                fb.fil[0]['f_max'] = params['N_FFT']
-                f_label = r"$k \; \rightarrow$"
-                t_label = r"$n\; \rightarrow$"
+                logger.error("Unit k is no longer supported!")
+                # fb.fil[0]['f_S'] = 1.
+                # fb.fil[0]['T_S'] = 1.
+                # fb.fil[0]['f_max'] = params['N_FFT']
+                # f_label = r"$k \; \rightarrow$"
+                # t_label = r"$n\; \rightarrow$"
 
             # Don't use locked frequency scaling with normalized frequencies
             fb.fil[0]['freq_locked'] = False
@@ -304,8 +303,8 @@ class FreqUnits(QWidget):
 
         else:  # Hz, kHz, ...
             # Restore sampling frequency when user selected an absolute sampling frequency,
-            # returning from f_S / f_Ny / k
-            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}:  # previous setting normalized?
+            # returning from f_S / f_Ny
+            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}:  # previous setting normalized?
                 fb.fil[0]['f_S'] = fb.fil[0]['f_max'] = self.f_s_old  # yes, restore prev. f_S
 
             # --- try to pick the most suitable unit for f_S --------------
@@ -334,10 +333,10 @@ class FreqUnits(QWidget):
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-        if f_unit == "k":
-            plt_f_unit = "f_S"
-        else:
-            plt_f_unit = f_unit
+        # if f_unit == "k":
+        #     plt_f_unit = "f_S"
+        # else:
+        plt_f_unit = f_unit
 
         fb.fil[0]['T_S'] = 1./fb.fil[0]['f_S']
 

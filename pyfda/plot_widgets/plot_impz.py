@@ -1613,6 +1613,10 @@ class Plot_Impz(QWidget):
             F_range = fb.fil[0]['freqSpecsRange']
 
             if fb.fil[0]['freq_specs_unit'] == 'k':
+                """
+                "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
+                " but plots graphs over the frequency index <i>k</i>.</span>",
+                """
                 # By default, k = params['N_FFT'] which is used for the calculation
                 # of the non-transient tabs and for F_id / H_id here.
                 # Here, the frequency axes must be scaled to fit the number of
