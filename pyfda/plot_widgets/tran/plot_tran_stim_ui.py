@@ -748,6 +748,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
     # -------------------------------------------------------------
     def normalize_freqs(self):
+        # TODO: move this to plot_tran_stim and update N_FFT
         """
         Update normalized frequencies and periods if required.
 

@@ -248,22 +248,27 @@ class FreqUnits(QWidget):
         update_UI is called
         - during init
         - when the unit combobox is changed
-        - when the signal {'view_changed': 'f_S'} has been received. In this case,
-          the UI is updated from the fb.fil[0] dictionary and no signal is emitted.
+        - when a signal {'view_changed': 'f_S'} or {'data_changed': ...} has been
+          received. In this case, the UI is updated from the fb.fil[0] dictionary
+          and no signal is emitted (`emit==False`).
 
         Set various scale factors and labels depending on the setting of the unit
         combobox.
 
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
-        if not emit:  # triggered from outside
+        if not emit:  # triggered by function call, not by a change of UI
+            logger.error("called 'freq_units.update_UI' with emit == False")
+            # Load f_S display from dict
             self.led_f_s.setText(str(fb.fil[0]['f_S']))
+            # Load freq. unit setting from dict
             idx = qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'],
                                caseSensitive=True)
             if idx == -1:
                 logger.warning(
                     f"Unknown frequency unit {fb.fil[0]['freq_specs_unit']}, "
                     "using 'f_S'.")
+            # Load Frequency range type (0 ... f_S/2 etc.) from dict
             qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'],
                          data=True, fireSignals=True)
 
@@ -363,7 +368,11 @@ class FreqUnits(QWidget):
         - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
           current value with full precision (only if `spec_edited`== True) and
           display the stored value in selected format. Emit 'view_changed':'f_S'
-        """
+        - When f_S has been changed, update `fb.fil[0]['f_S']`,
+          emit `{'view_changed': 'f_S'}` to update other widgets and only *then*
+          update {'f_S_prev': fb.fil[0]['f_S']} to allow correction of normalized
+          frequency with the old value of f_S.
+                  """
         def _store_entry():
             """
             Update filter dictionary, set line edit entry with reduced precision
@@ -433,20 +442,13 @@ class FreqUnits(QWidget):
         Block signals during update of combobox / lineedit widgets
         This is called from `input_specs.load_dict()`
         """
-        # self.led_f_s.setText(params['FMT'].format(fb.fil[0]['f_S']))
-
-        # qset_cmb_box(self.cmb_f_units, fb.fil[0]['freq_specs_unit'])
-        # is_normalized_freq = fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny", "k"}
-        # self.led_f_s.setVisible(not is_normalized_freq)  # only vis. when
-        # self.lbl_f_s.setVisible(not is_normalized_freq)  # not normalized
-        # self.butLock.setVisible(not is_normalized_freq)
-
-        # qset_cmb_box(self.cmb_f_range, fb.fil[0]['freqSpecsRangeType'])
-
-        # self.butSort.blockSignals(True)
-        # self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
-        # self.butSort.blockSignals(False)
+        logger.error("freq_units: load dict ")
         self.update_UI(emit=False)
+        # This updates the following widgets:
+        # - `self.led_f_s` from `fb.fil[0]['f_S']`
+        # - `self.cmb_f_units` with `fb.fil[0]['freq_specs_unit']`
+        # - `self.cmb_f_range` from `fb.fil[0]['freqSpecsRangeType']``
+        # The other widgets are updated automatically.
 
 # -------------------------------------------------------------
     def _store_sort_flag(self):
