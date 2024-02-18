@@ -379,14 +379,15 @@ class FreqUnits(QWidget):
             again.
             """
             if self.spec_edited:
-                fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
-                fb.fil[0].update({'f_S': safe_eval(source.text(), fb.fil[0]['f_S'],
-                                                   sign='pos')})
-                fb.fil[0].update({'T_S': 1./fb.fil[0]['f_S']})
-                fb.fil[0].update({'f_max': fb.fil[0]['f_S']})
+                f_S_tmp = safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')
+                fb.fil[0].update({'f_S': f_S_tmp})
+                fb.fil[0].update({'T_S': 1./f_S_tmp})
+                fb.fil[0].update({'f_max': f_S_tmp})
 
                 self._freq_range(emit=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
+                fb.fil[0].update({'f_S_prev': f_S_tmp})
+
                 self.spec_edited = False  # reset flag, changed entry has been saved
         # ----------------------
         if source.objectName() == 'f_S':

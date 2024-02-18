@@ -444,19 +444,17 @@ class Plot_Impz(QWidget):
                     self.impz_init()
 
             elif 'view_changed' in dict_sig:
-                if 'f_S' in dict_sig['view_changed']:
-                    self.emit({'view_changed': 'f_S', 'id': id(self)})
                 self.draw()  # redraw a.o. changed axes scaling
 
         else:  # invisible
             if 'data_changed' in dict_sig:
                 self.needs_calc = True
-            elif 'view_changed' in dict_sig:
-                # update frequency related widgets (visible or not)
-                if dict_sig['view_changed'] == 'f_S':
-                    self.emit({'view_changed': 'f_S', 'id': id(self)})
-            elif 'ui_local_changed' in dict_sig:
+            elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
                 self.needs_redraw = [True] * 2
+                # update frequency related widgets (visible or not)
+            elif 'ui_local_changed' in dict_sig:
+                # self.needs_redraw = [True] * 2
+                self.needs_calc = True
 
     # ------------------------------------------------------------------------------
     def set_N_to_file_len(self):
