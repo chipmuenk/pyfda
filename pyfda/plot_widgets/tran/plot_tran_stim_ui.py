@@ -407,6 +407,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lbl_TWU2 = QLabel(to_html("T_S", frmt='i'), self)
         # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
+        self.txtFreq1_F = to_html("&nbsp;F_1", frmt='bi') + " ="
         self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
         self.lblFreq1 = QLabel(self.txtFreq1_f, self)
         self.led_f1 = QLineEdit(self)
@@ -416,6 +417,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.lblFreqUnit1 = QLabel(to_html("f_S", frmt='i'), self)
 
         self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
+        self.txtFreq2_F = to_html("&nbsp;F_2", frmt='bi') + " ="
         self.txtFreq2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
         self.lblFreq2 = QLabel(self.txtFreq2_f, self)
         self.led_f2 = QLineEdit(self)
@@ -645,13 +647,16 @@ class Plot_Tran_Stim_UI(QWidget):
         else:
             f_unit = fb.fil[0]['plt_fUnit']
             t_unit = fb.fil[0]['plt_tUnit'].replace(r"$\mu$", "&mu;")
-            self.lblFreq1.setText(self.txtFreq1_f)
-            self.lblFreq2.setText(self.txtFreq2_f)
-
-        if f_unit in {"f_S", "f_Ny"}:
-            unit_frmt = "i"  # italic
-        else:
-            unit_frmt = None  # don't print units like kHz in italic
+            if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
+                # Normalized frequency labels with capital F
+                self.lblFreq1.setText(self.txtFreq1_F)
+                self.lblFreq2.setText(self.txtFreq2_F)
+                unit_frmt = "i"  # print 'f_S' and 'f_Ny' in italic
+            else:
+                # absolute frequencies with lower case f
+                self.lblFreq1.setText(self.txtFreq1_f)
+                self.lblFreq2.setText(self.txtFreq2_f)
+                unit_frmt = None  # don't print units like kHz in italic
 
         self.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
