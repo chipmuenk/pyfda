@@ -386,7 +386,8 @@ class FreqUnits(QWidget):
 
                 self._freq_range(emit=False)  # update plotting range
                 self.emit({'view_changed': 'f_S'})
-                fb.fil[0].update({'f_S_prev': f_S_tmp})
+                logger.warning(f"Updating f_S: f_S = {fb.fil[0]['f_S']}, f_S_prev = {fb.fil[0]['f_S_prev']}")
+                fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
 
                 self.spec_edited = False  # reset flag, changed entry has been saved
         # ----------------------
@@ -405,7 +406,8 @@ class FreqUnits(QWidget):
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
                 source.setText(params['FMT'].format(fb.fil[0]['f_S']))  # reduced prec.
-        # Call base class method to continue normal event processing:
+
+            # Call base class method to continue normal event processing:
         return super(FreqUnits, self).eventFilter(source, event)
 
     # -------------------------------------------------------------

@@ -10,6 +10,7 @@
 Subwidget for entering frequency specifications
 """
 import sys
+import re
 from pyfda.libs.compat import (
     QtCore, Qt, QWidget, QLabel, QLineEdit, QFrame, QFont, QVBoxLayout, QHBoxLayout,
     QGridLayout, pyqtSignal, QEvent)
@@ -130,9 +131,9 @@ class FreqSpecs(QWidget):
         if isinstance(source, QLineEdit):  # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_dict()
                 # store current entry in case new value can't be evaluated:
                 self.data_prev = source.text()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -141,7 +142,6 @@ class FreqSpecs(QWidget):
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
                     self.load_dict()
-
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
@@ -229,6 +229,8 @@ class FreqSpecs(QWidget):
                 f_name = str(self.qlineedit[i].objectName()).split(":", 1)
                 f_label = f_name[0]
                 f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
+                logger.warning(f"Updating freq_specs: f_S = {fb.fil[0]['f_S']}, f_S_prev = {fb.fil[0]['f_S_prev']}\n"
+                               f"{f_label}: {f_value}")
 
                 fb.fil[0].update({f_label: f_value})
                 self.sort_dict_freqs()
@@ -294,6 +296,7 @@ class FreqSpecs(QWidget):
 # ------------------------------------------------------------------------
     def _show_entries(self, num_new_labels):
         """
+        Called by `update_UI()` when filter has changed
         - check whether subwidgets need to be shown or hidden
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the
           the required number of `num_new_labels`:
