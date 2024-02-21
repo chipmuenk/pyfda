@@ -132,7 +132,7 @@ class FreqSpecs(QWidget):
                 self.spec_edited = False
                 self.load_dict()
                 # store current entry in case new value can't be evaluated:
-                fb.data_old = source.text()
+                self.data_prev = source.text()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -158,7 +158,7 @@ class FreqSpecs(QWidget):
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(
-                event_source.text(), fb.data_old, sign='pos') / fb.fil[0]['f_S']
+                event_source.text(), self.data_prev, sign='pos') / fb.fil[0]['f_S']
             fb.fil[0].update({f_label: f_value})
             self.sort_dict_freqs()
             self.emit({'specs_changed': 'f_specs'})

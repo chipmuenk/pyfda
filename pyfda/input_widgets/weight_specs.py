@@ -115,7 +115,7 @@ class WeightSpecs(QWidget):
                 self.spec_edited = False
                 self.load_dict()
                 # store current entry in case new value can't be evaluated:
-                fb.data_old = source.text()
+                self.data_prev = source.text()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -194,7 +194,7 @@ class WeightSpecs(QWidget):
         """
         if self.spec_edited:
             w_label = str(widget.objectName())
-            w_value = safe_eval(widget.text(), fb.data_old, sign='pos')
+            w_value = safe_eval(widget.text(), self.data_prev, sign='pos')
             if w_value < 1:
                 w_value = 1
             if w_value > 1.e6:
