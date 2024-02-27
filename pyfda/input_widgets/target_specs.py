@@ -135,8 +135,6 @@ class TargetSpecs(QWidget):
         else:
             self.a_specs.hide()
 
-        # self.emit({'changed_specs':'target'})
-
 # ------------------------------------------------------------------------------
     def load_dict(self):
         """

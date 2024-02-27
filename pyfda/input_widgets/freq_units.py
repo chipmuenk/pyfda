@@ -239,8 +239,8 @@ class FreqUnits(QWidget):
     def update_UI(self, emit=True):
         """
         update_UI is called
-        - during init
-        - when the unit combobox is changed
+        - during init (direct call)
+        - when the unit combobox is changed (signal-slot)
         - when a signal {'view_changed': 'f_S'} or {'data_changed': ...} has been
           received. In this case, the UI is updated from the fb.fil[0] dictionary
           and no signal is emitted (`emit==False`).

@@ -171,7 +171,7 @@ class FreqSpecs(QWidget):
     # --------------------------------------------------------------------------
     def update_UI(self, new_labels=()):
         """
-        Called from filter_specs.update_UI() and target_specs.update_UI()
+        Called by `input_specs.update_UI()` and `target_specs.update_UI()`
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
@@ -221,7 +221,7 @@ class FreqSpecs(QWidget):
     # --------------------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies if required. This is called by via signal
+        Update normalized frequencies when absolute frequencies are locked. This is called by via signal
         ['view_changed': 'f_S']
         """
         if fb.fil[0]['freq_locked']:
@@ -356,7 +356,7 @@ class FreqSpecs(QWidget):
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
 
-        # Make sure normalized freqs are in the range ]0, 0.5[ and are different
+        # Flag normalized freqs when outside the range ]0, 0.5[ and verify that they differ
         # by at least MIN_FREQ_STEP
         for i in range(self.n_cur_labels):
             if f_specs[i] <= 0:

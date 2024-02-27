@@ -345,6 +345,10 @@ class Input_Specs(QWidget):
 
 # ------------------------------------------------------------------------------
     def _load_filter(self):
+        """
+        Load filter dict `fb.fil[0]` either from file or from memory and update the
+        widgets via `load_dict()`.
+        """
         sel = qget_cmb_box(self.cmb_filter_selection)
         if sel == "file":
             ret = load_filter(self)
