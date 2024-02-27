@@ -233,8 +233,8 @@ class FreqSpecs(QWidget):
                                f"{f_label}: {f_value}")
 
                 fb.fil[0].update({f_label: f_value})
-                self.sort_dict_freqs()
 
+            self.sort_dict_freqs() # mainly check for frequencies outside the Nyquist range
             self.emit({'specs_changed': 'f_specs'})
 
 # -------------------------------------------------------------
