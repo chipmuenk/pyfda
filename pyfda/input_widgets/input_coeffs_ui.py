@@ -226,7 +226,7 @@ class Input_Coeffs_UI(QWidget):
 
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
-        self.but_csv_options.setIconSize(q_icon_size)
+        # self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")

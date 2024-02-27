@@ -11,12 +11,12 @@ Subwidget for entering frequency units
 """
 import sys
 from pyfda.libs.compat import (
-    QtCore, QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QToolButton,
+    QtCore, QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QSizePolicy,
     QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
-from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate
+from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate, PushButton
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 import logging
@@ -131,10 +131,8 @@ class FreqUnits(QWidget):
         self.led_f_s.setObjectName("f_S")
         self.led_f_s.installEventFilter(self)  # filter events
 
-        self.butLock = QToolButton(self)
+        self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
         self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
-        self.butLock.setCheckable(True)
-        self.butLock.setChecked(False)
         self.butLock.setToolTip(
             "<span><b>Unlocked:</b> When f_S is changed, all frequency related "
             "widgets are updated, normalized frequencies stay the same.<br />"
@@ -160,14 +158,9 @@ class FreqUnits(QWidget):
         self.cmb_f_units.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_f_range.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butSort = QToolButton(self)
-        self.butSort.setText("Sort")
-        self.butSort.setIcon(QIcon(':/sort-ascending.svg'))
-        #self.butDelCells.setIconSize(q_icon_size)
-        self.butSort.setCheckable(True)
-        self.butSort.setChecked(True)
+        self.butSort = PushButton(self, icon=QIcon(':/sort-ascending.svg'), checked=True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
-        self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
+        self.butSort.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.layHUnits = QHBoxLayout()
         self.layHUnits.addWidget(self.cmb_f_units)
