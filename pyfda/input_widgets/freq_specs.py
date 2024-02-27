@@ -133,7 +133,7 @@ class FreqSpecs(QWidget):
                 self.spec_edited = False
                 # store current entry in case new value can't be evaluated:
                 self.data_prev = source.text()
-                self.load_dict()
+                self.update_f_display(source)
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True  # entry has been changed
                 key = event.key()
@@ -141,7 +141,7 @@ class FreqSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape:  # revert changes
                     self.spec_edited = False
-                    self.load_dict()
+                    self.update_f_display(source)
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
@@ -150,11 +150,13 @@ class FreqSpecs(QWidget):
     # --------------------------------------------------------------------------
     def _store_entry(self, event_source):
         """
-        _store_entry is triggered by `QEvent.focusOut` in the eventFilter:
-        When the textfield of `widget` has been edited (`self.spec_edited` =  True),
-        sort and store all entries in filter dict, then reload the text fields.
-        Finally, emit a SpecsChanged signal.
+        `_store_entry()` is triggered by `QEvent.focusOut` in the eventFilter:
+        When the `event_source` has been edited (`self.spec_edited ==  True`),
+        evaluate the text field, normalize it with f_S and store it in the filter
+        dict. Sort and store all entries in filter dict, then reload the text fields.
+        Finally, emit a 'specs_changed': 'f_specs' signal.
         """
+        logger.warning("freq_units: _store_entry")
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(
@@ -163,10 +165,7 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs()
             self.emit({'specs_changed': 'f_specs'})
             self.spec_edited = False  # reset flag
-
-        # nothing has changed, but display frequencies in rounded format anyway
-        else:
-            self.load_dict()
+        self.update_f_display(event_source)
 
     # --------------------------------------------------------------------------
     def update_UI(self, new_labels=()):
@@ -183,7 +182,6 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
-        self.update_f_unit()
         state = new_labels[0]
         new_labels = new_labels[1:]
         num_new_labels = len(new_labels)
@@ -237,11 +235,7 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs() # mainly check for frequencies outside the Nyquist range
             self.emit({'specs_changed': 'f_specs'})
 
-# -------------------------------------------------------------
-    def update_f_unit(self):
-        """
-        Set label for frequency unit according to selected unit.
-        """
+        # Always set label for frequency unit according to selected unit.
         unit = fb.fil[0]['plt_fUnit']
         if unit in {"f_S", "f_Ny"}:
             unit_frmt = 'bi'
@@ -250,8 +244,52 @@ class FreqSpecs(QWidget):
         self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
 
 # -------------------------------------------------------------
-    def load_dict(self):
+    # def update_f_unit_label(self):
+    #     """
+    #     Set label for frequency unit according to selected unit.
+    #     """
+    #     unit = fb.fil[0]['plt_fUnit']
+    #     if unit in {"f_S", "f_Ny"}:
+    #         unit_frmt = 'bi'
+    #     else:
+    #         unit_frmt = 'b'
+    #     self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
+
+# -------------------------------------------------------------
+    def update_f_display(self, source):
         """
+        Update frequency display when frequency or sampling frequency has been
+        updated. Depending on whether it has focus or not, the value is displayed
+        with full precision or rounded.
+
+        Triggered by
+        """
+        f_name = str(source.objectName()).split(':', 1)
+        f_label = f_name[0]
+        f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
+
+        if source.hasFocus():
+            # widget has focus, show full precision
+            logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
+                            f"{fb.fil[0][f_label]} (dict) FOK")
+            source.setText(str(f_value))
+        else:
+            # widget has no focus, round the display
+            logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
+                            f"{fb.fil[0][f_label]} (dict) NFOK")
+            source.setText(params['FMT'].format(f_value))
+        return
+
+# -------------------------------------------------------------
+    def load_dict(self, source=None):
+        """
+        Triggered by FocusIn, FocusOut and ESC-Key in LineEdit fields and by
+        `sort_dict_freqs():
+
+        `load_dict()` is called during init and when the frequency unit or the
+          sampling frequency have been changed via
+          `filter_specs.update_UI()` -> `self.update_UI()` -> `self.sort_dict_freqs()`
+
         - Reload textfields from filter dictionary
 
         - Transform the displayed frequency spec input fields according to the units
@@ -261,28 +299,12 @@ class FreqSpecs(QWidget):
 
         - Update the displayed frequency unit
 
-        `load_dict()` is called during init and when the frequency unit or the
-          sampling frequency have been changed.
-
         It should be called when `specs_changed` or `data_changed` is emitted
         at another place, indicating that a reload is required.
         """
-
-        # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_dict")
-        self.update_f_unit()
-
+        # update displayed freq spec values for (maybe) changed f_S
         for i in range(len(self.qlineedit)):
-            f_name = str(self.qlineedit[i].objectName()).split(":", 1)
-            f_label = f_name[0]
-            f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
-
-            if not self.qlineedit[i].hasFocus():
-                # widget has no focus, round the display
-                self.qlineedit[i].setText(params['FMT'].format(f_value))
-            else:
-                # widget has focus, show full precision
-                self.qlineedit[i].setText(str(f_value))
+            self.update_f_display(self.qlineedit[i])
 
             # Print label with "f" for absolute and with "F" for normalized frequencies
             lbl_text = self.qlabels[i].text()
