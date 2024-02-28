@@ -44,7 +44,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
             return
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
-    if self.sender() and self.sender().objectName():
+    if 'sender_name' not in dict_sig and\
+        self.sender() and self.sender().objectName():
         dict_sig.update({'sender_name': self.sender().objectName()})
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
