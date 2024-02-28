@@ -276,6 +276,20 @@ class FreqSpecs(QWidget):
             logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
                             f"{fb.fil[0][f_label]} (dict) NFOK")
             source.setText(params['FMT'].format(f_value))
+
+        # Check whether normalized freqs are inside the range ]0, 0.5[. If not, highlight
+        # widget.
+        if fb.fil[0][f_label] <= 0:
+            logger.warning(
+                f"Frequency {str(source.objectName())} has to be >= 0")
+            source.setProperty("state", 'failed')
+        elif fb.fil[0][f_label] >= 0.5:
+            logger.warning(
+                f"Frequency {str(source.objectName())} has to be < f_S /2.")
+            qstyle_widget(source, 'failed')
+        else:
+            qstyle_widget(source, 'normal')
+
         return
 
 # -------------------------------------------------------------
@@ -376,31 +390,33 @@ class FreqSpecs(QWidget):
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
 
-        # Flag normalized freqs when outside the range ]0, 0.5[ and verify that they differ
-        # by at least MIN_FREQ_STEP
+        # and write them back to the filter dict
         for i in range(self.n_cur_labels):
-            if f_specs[i] <= 0:
-                logger.warning(
-                    f"Frequency {str(self.qlineedit[i].objectName())} has to be >= 0")
-                self.qlineedit[i].setProperty("state", 'failed')
-            elif f_specs[i] >= 0.5:
-                logger.warning(
-                    f"Frequency {str(self.qlineedit[i].objectName())} has to be < f_S /2.")
-                qstyle_widget(self.qlineedit[i], 'failed')
-            else:
-                fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
-                qstyle_widget(self.qlineedit[i], 'normal')
+            fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
 
-        # check for (nearly) identical elements:
+        # Update QLineEdit fields from list
+        # Flag normalized freqs when outside the range ]0, 0.5[
+        # for i in range(self.n_cur_labels):
+        #     # fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
+        #     if f_specs[i] <= 0:
+        #         logger.warning(
+        #             f"Frequency {str(self.qlineedit[i].objectName())} has to be >= 0")
+        #         self.qlineedit[i].setProperty("state", 'failed')
+        #     elif f_specs[i] >= 0.5:
+        #         logger.warning(
+        #             f"Frequency {str(self.qlineedit[i].objectName())} has to be < f_S /2.")
+        #         qstyle_widget(self.qlineedit[i], 'failed')
+        #     else:
+        #         qstyle_widget(self.qlineedit[i], 'normal')
+
+        # verify that elements differ by at least MIN_FREQ_STEP by
+        # checking for (nearly) identical elements:
         _, mult = unique_roots(f_specs, tol=MIN_FREQ_STEP)
         ident = [x for x in mult if x > 1]
         if ident:
             logger.warning("Frequencies must differ by at least {0:.4g}"
                            .format(MIN_FREQ_STEP * fb.fil[0]['f_S']))
-
         self.load_dict()
-
-
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     """ Run widget standalone with `python -m pyfda.input_widgets.freq_specs` """
