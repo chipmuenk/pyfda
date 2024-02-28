@@ -160,7 +160,7 @@ class FreqSpecs(QWidget):
             f_value = safe_eval(
                 event_source.text(), self.data_prev, sign='pos') / fb.fil[0]['f_S']
             fb.fil[0].update({f_label: f_value})
-            self.sort_dict_freqs()
+            self.sort_dict_freqs()  # sort and update display
             self.emit({'specs_changed': 'f_specs'})
             self.spec_edited = False  # reset flag
         else:
