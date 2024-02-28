@@ -367,8 +367,8 @@ class FreqUnits(QWidget):
                   """
         def _store_entry():
             """
-            Update filter dictionary, set line edit entry with reduced precision
-            again.
+            Update filter dictionary with sampling frequency and related parameters
+            and emit `{'view_changed': 'f_S'}`.
             """
             if self.spec_edited:
                 f_S_tmp = safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')
@@ -453,7 +453,6 @@ class FreqUnits(QWidget):
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
         if self.butSort.isChecked():
             self.emit({'specs_changed': 'f_sort'})
-
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

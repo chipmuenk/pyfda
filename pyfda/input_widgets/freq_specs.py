@@ -243,18 +243,6 @@ class FreqSpecs(QWidget):
         self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
 
 # -------------------------------------------------------------
-    # def update_f_unit_label(self):
-    #     """
-    #     Set label for frequency unit according to selected unit.
-    #     """
-    #     unit = fb.fil[0]['plt_fUnit']
-    #     if unit in {"f_S", "f_Ny"}:
-    #         unit_frmt = 'bi'
-    #     else:
-    #         unit_frmt = 'b'
-    #     self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
-
-# -------------------------------------------------------------
     def update_f_display(self, source):
         """
         Update frequency display when frequency or sampling frequency has been
@@ -386,8 +374,11 @@ class FreqSpecs(QWidget):
         - the sort button has been clicked (from filter_specs.py)
         """
         logger.warning("freq_specs: sort_dict_freqs")
+        # create list with the normalized frequency values of visible
+        # QLineEdit widgets from the filter dict
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                    for i in range(self.n_cur_labels)]
+        # sort them if required
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
 

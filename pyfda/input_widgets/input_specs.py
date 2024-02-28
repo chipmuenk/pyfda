@@ -68,8 +68,8 @@ class Input_Specs(QWidget):
 
     def process_sig_rx_local(self, dict_sig=None):
         """
-        Flag signals coming in from local subwidgets with `propagate=True` before
-        proceeding with processing in `process_sig_rx`.
+        Signals coming in from local subwidgets need to be propagated, so set
+        `propagate=True` and proceed with processing in `process_sig_rx`.
         """
         self.process_sig_rx(dict_sig, propagate=True)
 
@@ -111,7 +111,7 @@ class Input_Specs(QWidget):
             self.load_dict()
 
         if propagate:
-            # local signals are propagated with the name of this widget,
+            # local signals are propagated with the class name of this widget,
             # global signals terminate here
             dict_sig.update({'class': self.__class__.__name__})
             self.emit(dict_sig)
