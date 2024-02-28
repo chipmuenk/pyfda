@@ -230,9 +230,11 @@ class FreqSpecs(QWidget):
                                f"{f_label}: {f_value}")
 
                 fb.fil[0].update({f_label: f_value})
-
-            self.sort_dict_freqs() # mainly check for frequencies outside the Nyquist range
             self.emit({'specs_changed': 'f_specs'})
+
+        # Always reload normalized frequencies from dict, check whether they are outside
+        # the Nyquist range and display them in the selected unit.
+        self.load_dict()
 
         # Always set label for frequency unit according to selected unit.
         unit = fb.fil[0]['plt_fUnit']
@@ -381,7 +383,6 @@ class FreqSpecs(QWidget):
         # sort them if required
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
-
         # and write them back to the filter dict
         for i in range(self.n_cur_labels):
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
