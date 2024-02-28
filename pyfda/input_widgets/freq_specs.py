@@ -56,8 +56,6 @@ class FreqSpecs(QWidget):
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
-        elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
-            self.sort_dict_freqs()
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.recalc_freqs()
 

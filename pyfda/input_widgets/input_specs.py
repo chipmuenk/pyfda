@@ -90,8 +90,10 @@ class Input_Specs(QWidget):
             return
 
         elif 'specs_changed' in dict_sig:
-            self.f_specs.sort_dict_freqs()
-            self.t_specs.f_specs.sort_dict_freqs()
+            if dict_sig['specs_changed'] == 'f_sort':
+                # sort and update the frequency widgets
+                self.f_specs.sort_dict_freqs()
+                self.t_specs.f_specs.sort_dict_freqs()
             self.color_design_button("changed")
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
