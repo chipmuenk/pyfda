@@ -163,7 +163,8 @@ class FreqSpecs(QWidget):
             self.sort_dict_freqs()
             self.emit({'specs_changed': 'f_specs'})
             self.spec_edited = False  # reset flag
-        self.update_f_display(event_source)
+        else:
+            self.update_f_display(event_source)  # just update / restore display
 
     # --------------------------------------------------------------------------
     def update_UI(self, new_labels=()):
