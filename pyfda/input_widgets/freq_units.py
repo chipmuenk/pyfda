@@ -377,8 +377,9 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'f_max': f_S_tmp})
 
                 self._freq_range(emit=False)  # update plotting range
-                self.emit({'view_changed': 'f_S'})
                 logger.warning(f"Updating f_S: f_S = {fb.fil[0]['f_S']}, f_S_prev = {fb.fil[0]['f_S_prev']}")
+                self.emit({'view_changed': 'f_S'})
+                # Now store current f_S as f_S_prev
                 fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
 
                 self.spec_edited = False  # reset flag, changed entry has been saved
