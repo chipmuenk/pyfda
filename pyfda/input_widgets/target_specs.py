@@ -141,9 +141,8 @@ class TargetSpecs(QWidget):
         Update entries from global dict fb.fil[0]
         parameters, using the "load_dict" methods of the classes
         """
-        self.a_specs.load_dict()  # magnitude specs with unit
-        self.f_specs.load_dict()  # weight specification
-
+        self.a_specs.load_dict()
+        self.f_specs.load_dict()
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

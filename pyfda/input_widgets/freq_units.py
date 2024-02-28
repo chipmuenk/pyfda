@@ -251,7 +251,6 @@ class FreqUnits(QWidget):
         Update the freqSpecsRange and finally, emit 'view_changed':'f_S' signal
         """
         if not emit:  # triggered by function call, not by a change of UI
-            logger.error("called 'freq_units.update_UI' with emit == False")
             # Load f_S display from dict
             self.led_f_s.setText(str(fb.fil[0]['f_S']))
             # Load freq. unit setting from dict
@@ -438,7 +437,6 @@ class FreqUnits(QWidget):
         Block signals during update of combobox / lineedit widgets
         This is called from `input_specs.load_dict()`
         """
-        logger.error("freq_units: load dict ")
         self.update_UI(emit=False)
         # This updates the following widgets:
         # - `self.led_f_s` from `fb.fil[0]['f_S']`

@@ -293,7 +293,7 @@ class FreqSpecs(QWidget):
         return
 
 # -------------------------------------------------------------
-    def load_dict(self, source=None):
+    def load_dict(self):
         """
         Triggered by FocusIn, FocusOut and ESC-Key in LineEdit fields and by
         `sort_dict_freqs():
@@ -384,7 +384,7 @@ class FreqSpecs(QWidget):
         - a frequency spec field has been edited
         - the sort button has been clicked (from filter_specs.py)
         """
-
+        logger.warning("freq_specs: sort_dict_freqs")
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                    for i in range(self.n_cur_labels)]
         if fb.fil[0]['freq_specs_sort']:
