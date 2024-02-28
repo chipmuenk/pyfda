@@ -88,9 +88,7 @@ class Input_Specs(QWidget):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{pprint_log(dict_sig)}")
             return
-        elif 'view_changed' in dict_sig:
-            self.f_specs.load_dict()
-            self.t_specs.load_dict()
+
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
