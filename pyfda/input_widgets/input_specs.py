@@ -73,7 +73,7 @@ class Input_Specs(QWidget):
         """
         self.process_sig_rx(dict_sig, propagate=True)
 
-    def process_sig_rx(self, dict_sig=None, propagate=False):
+    def process_sig_rx(self, dict_sig, propagate=False):
         """
         Process signals coming in via subwidgets and sig_rx
 
