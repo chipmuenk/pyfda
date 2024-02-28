@@ -52,7 +52,8 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        # logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        # logger.warning(
+        #     f"vis: {self.isVisible()} | {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -154,7 +155,6 @@ class FreqSpecs(QWidget):
         dict. Sort and store all entries in filter dict, then reload the text fields.
         Finally, emit a 'specs_changed': 'f_specs' signal.
         """
-        logger.warning("freq_units: _store_entry")
         if self.spec_edited:
             f_label = str(event_source.objectName())
             f_value = safe_eval(
@@ -190,8 +190,8 @@ class FreqSpecs(QWidget):
 #        W_lbl = max([self.qfm.width(l) for l in new_labels]) # max. label width in pixel
 
         # ---------------------------- logging -----------------------------
-        logger.debug("update_UI: {0}-{1}-{2}".format(
-                            fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]['fo']))
+        # logger.debug("update_UI: {0}-{1}-{2}".format(
+        #                     fb.fil[0]['rt'], fb.fil[0]['fc'], fb.fil[0]['fo']))
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
@@ -226,8 +226,8 @@ class FreqSpecs(QWidget):
                 f_name = str(self.qlineedit[i].objectName()).split(":", 1)
                 f_label = f_name[0]
                 f_value = fb.fil[0][f_label] * fb.fil[0]['f_S_prev'] / fb.fil[0]['f_S']
-                logger.warning(f"Updating freq_specs: f_S = {fb.fil[0]['f_S']}, f_S_prev = {fb.fil[0]['f_S_prev']}\n"
-                               f"{f_label}: {f_value}")
+                # logger.warning(f"Updating freq_specs: f_S = {fb.fil[0]['f_S']}, "
+                #                f"f_S_prev = {fb.fil[0]['f_S_prev']}\n{f_label}: {f_value}")
 
                 fb.fil[0].update({f_label: f_value})
             self.emit({'specs_changed': 'f_specs'})
@@ -259,13 +259,13 @@ class FreqSpecs(QWidget):
 
         if source.hasFocus():
             # widget has focus, show full precision
-            logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
-                            f"{fb.fil[0][f_label]} (dict) FOK")
+            # logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
+            #                 f"{fb.fil[0][f_label]} (dict) FOK")
             source.setText(str(f_value))
         else:
             # widget has no focus, round the display
-            logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
-                            f"{fb.fil[0][f_label]} (dict) NFOK")
+            # logger.warning(f"freq_specs: update_f_display {f_label}: {f_value} (disp) "
+            #                f"{fb.fil[0][f_label]} (dict) NFOK")
             source.setText(params['FMT'].format(f_value))
 
         # Check whether normalized freqs are inside the range ]0, 0.5[. If not, highlight
@@ -375,7 +375,6 @@ class FreqSpecs(QWidget):
         - a frequency spec field has been edited
         - the sort button has been clicked (from filter_specs.py)
         """
-        logger.warning("freq_specs: sort_dict_freqs")
         # create list with the normalized frequency values of visible
         # QLineEdit widgets from the filter dict
         f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
@@ -386,21 +385,6 @@ class FreqSpecs(QWidget):
         # and write them back to the filter dict
         for i in range(self.n_cur_labels):
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
-
-        # Update QLineEdit fields from list
-        # Flag normalized freqs when outside the range ]0, 0.5[
-        # for i in range(self.n_cur_labels):
-        #     # fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
-        #     if f_specs[i] <= 0:
-        #         logger.warning(
-        #             f"Frequency {str(self.qlineedit[i].objectName())} has to be >= 0")
-        #         self.qlineedit[i].setProperty("state", 'failed')
-        #     elif f_specs[i] >= 0.5:
-        #         logger.warning(
-        #             f"Frequency {str(self.qlineedit[i].objectName())} has to be < f_S /2.")
-        #         qstyle_widget(self.qlineedit[i], 'failed')
-        #     else:
-        #         qstyle_widget(self.qlineedit[i], 'normal')
 
         # verify that elements differ by at least MIN_FREQ_STEP by
         # checking for (nearly) identical elements:

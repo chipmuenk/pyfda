@@ -341,7 +341,6 @@ class FreqUnits(QWidget):
         fb.fil[0].update({"plt_tLabel": t_label})
 
         self._freq_range(emit=False)  # update f_lim setting without emitting signal
-        logger.warning("Update UI")
         if emit:  # UI was updated by user or a rescaling of f_S
             self.emit({'view_changed': 'f_S'})
 
@@ -371,14 +370,12 @@ class FreqUnits(QWidget):
             and emit `{'view_changed': 'f_S'}`.
             """
             if self.spec_edited:
-                logger.warning("_store_entry (edited)")
                 f_S_tmp = safe_eval(source.text(), fb.fil[0]['f_S'], sign='pos')
                 fb.fil[0].update({'f_S': f_S_tmp})
                 fb.fil[0].update({'T_S': 1./f_S_tmp})
                 fb.fil[0].update({'f_max': f_S_tmp})
 
                 self._freq_range(emit=False)  # update plotting range
-                logger.warning(f"Updating f_S: f_S = {fb.fil[0]['f_S']}, f_S_prev = {fb.fil[0]['f_S_prev']}")
                 self.emit({'view_changed': 'f_S'})
                 # Now store current f_S as f_S_prev
                 fb.fil[0].update({'f_S_prev': fb.fil[0]['f_S']})
