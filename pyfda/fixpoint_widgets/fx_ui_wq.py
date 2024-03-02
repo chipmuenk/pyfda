@@ -321,7 +321,7 @@ class FX_UI_WQ(QWidget):
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
 
-        dict_sig = {'wdg_name': self.wdg_name, 'ui_local_changed': 'butLock'}
+        dict_sig = {'sender_name': self.wdg_name, 'ui_local_changed': 'butLock'}
         self.emit(dict_sig)
 
     # --------------------------------------------------------------------------
@@ -400,7 +400,7 @@ class FX_UI_WQ(QWidget):
             # logger.error(f"sender = {self.sender().objectName()}")
 #             if self.sender().objectName() == 'cmbW':
 #                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
-            dict_sig = {'wdg_name': self.wdg_name,
+            dict_sig = {'sender_name': self.wdg_name,
                         'ui_local_changed': self.sender().objectName()}
             self.emit(dict_sig)
         else:
