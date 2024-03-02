@@ -19,7 +19,17 @@ from .pyfda_dirs import OS, OS_VER
 import logging
 logger = logging.getLogger(__name__)
 
-
+DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name',
+                 'view_changed',   # view on the data (e.g. f_S) has changed
+                 'specs_changed',  # filter specs (corner freqs. etc.) have changed
+                 'data_changed',   # actual filter data (coeffs. etc.) has changed
+                 'filt_changed',   # the filter type (e.g. elliptic) has changed
+                 'ui_local_changed',  # some parameter in the local ui has changed
+                 'ui_global_changed', # this relates to resize, tab change or CSV options
+                 'fx_sim',         # parameters relating to fixpoint simulation
+                 'fxfilter_func',  # handle to filter function
+                 'close_event'     # propagate close event to finish some task upstream
+                }
 # ------------------------------------------------------------------------------
 def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     """
@@ -33,7 +43,10 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
       to the dict.
 
     """
-
+    for k in dict_sig:
+        if k not in DICT_SIG_KEYS:
+            logger.warning(f"Unknown entry '{k}:{dict_sig[k]}' in 'dict_sig'!")
+            logger.warning(pprint_log(dict_sig))
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
     if 'class' not in dict_sig:
