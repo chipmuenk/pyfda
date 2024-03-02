@@ -120,8 +120,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         # ---- Process input and output quantizer settings ('ui_local_changed') --
         elif 'ui_local_changed' in dict_sig:
-            if 'wdg_name' not in dict_sig:
-                logger.warning(f"No key 'wdg_name' in dict_sig:\n{pprint_log(dict_sig)}")
+            if 'sender_name' not in dict_sig:
+                logger.warning(f"No key 'sender_name' in dict_sig:\n{pprint_log(dict_sig)}")
                 return
 
             elif dict_sig['ui_local_changed']\
@@ -131,7 +131,7 @@ class Input_Fixpoint_Specs(QWidget):
                     "for key 'ui_local_changed'")
                 return
 
-            elif dict_sig['wdg_name'] == 'wq_input':
+            elif dict_sig['sender_name'] == 'wq_input':
                 """
                 Input fixpoint format has been changed or butLock has been clicked.
                 When I/O lock is active, copy input fixpoint word format to output
@@ -146,7 +146,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
 
-            elif dict_sig['wdg_name'] == 'wq_output':
+            elif dict_sig['sender_name'] == 'wq_output':
                 """
                 Output fixpoint format has been changed. When I/O lock is active, copy
                 output fixpoint word format to input word format.
@@ -156,7 +156,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
             else:
                 logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
-                             .format(dict_sig['wdg_name'], pprint_log(dict_sig)))
+                             .format(dict_sig['sender_name'], pprint_log(dict_sig)))
                 return
 
             self.dict2ui()  # update wordlengths in UI and set RUN button to 'changed'

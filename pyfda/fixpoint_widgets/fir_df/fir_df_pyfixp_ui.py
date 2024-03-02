@@ -136,12 +136,12 @@ class FIR_DF_pyfixp_UI(QWidget):
 
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
-            if not dict_sig['wdg_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
-                logger.error(f"Unknown widget name '{dict_sig['wdg_name']}' "
+            if not dict_sig['sender_name'] in {'wq_coeffs', 'wq_accu'}:  # coeffs format
+                logger.error(f"Unknown widget name '{dict_sig['sender_name']}' "
                              f"in '{__name__}' !")
                 return
 
-            elif dict_sig['wdg_name'] == 'wq_accu':  # accu format updated
+            elif dict_sig['sender_name'] == 'wq_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
                 if cmbW in {'f', 'a'}\
                         or dict_sig['ui_local_changed'] in {'WF', 'WI'}:

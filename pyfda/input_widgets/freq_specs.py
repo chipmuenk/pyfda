@@ -52,8 +52,8 @@ class FreqSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        # logger.warning(
-        #     f"vis: {self.isVisible()} | {pprint_log(dict_sig)}")
+        logger.warning(
+            f"vis: {self.isVisible()} | {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
@@ -161,7 +161,7 @@ class FreqSpecs(QWidget):
                 event_source.text(), self.data_prev, sign='pos') / fb.fil[0]['f_S']
             fb.fil[0].update({f_label: f_value})
             self.sort_dict_freqs()  # sort and update display
-            self.emit({'specs_changed': 'f_specs'})
+            self.emit({'specs_changed': 'f_specs', 'sender_name': f_label})
             self.spec_edited = False  # reset flag
         else:
             self.update_f_display(event_source)  # just update / restore display
