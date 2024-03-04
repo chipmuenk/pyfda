@@ -113,10 +113,9 @@ class Plot_Hf(QWidget):
 
         self.lblIn = QLabel(to_html("Unit:", frmt="b"), self)
 
-        self.cmb_units_a = QComboBox(self)
+        self.cmb_units_a = QComboBox(self, objectName="cmbUnitsA")
         qcmb_box_populate(self.cmb_units_a, self.cmb_units_a_items,
                           self.cmb_units_a_default)
-        self.cmb_units_a.setObjectName("cmbUnitsA")
 
         self.lbl_log_bottom = QLabel(to_html("min =", 'bi'), self)
         self.led_log_bottom = QLineEdit(self)
@@ -134,9 +133,8 @@ class Plot_Hf(QWidget):
             "Attention: This makes no sense for a non-linear phase system!</span>")
 
         self.lblInset = QLabel(to_html("Inset", "bi"), self)
-        self.cmbInset = QComboBox(self)
+        self.cmbInset = QComboBox(self, objectName="cmbInset")
         self.cmbInset.addItems(['off', 'edit', 'fixed'])
-        self.cmbInset.setObjectName("cmbInset")
         self.cmbInset.setToolTip("Display/edit second inset plot")
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0  # store previous index for comparison
@@ -178,8 +176,7 @@ class Plot_Hf(QWidget):
         layHControls.addWidget(self.but_align)
         layHControls.addStretch(10)
 
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
+        self.frmControls = QFrame(self, objectName="frmControls")
         self.frmControls.setLayout(layHControls)
 
         # ----------------------------------------------------------------------

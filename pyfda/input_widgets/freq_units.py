@@ -126,9 +126,8 @@ class FreqUnits(QWidget):
         self.lbl_f_s = QLabel(self)
         self.lbl_f_s.setText(to_html("f_S =", frmt='bi'))
 
-        self.led_f_s = QLineEdit()
+        self.led_f_s = QLineEdit(objectName="f_S")
         self.led_f_s.setText(str(fb.fil[0]["f_S"]))
-        self.led_f_s.setObjectName("f_S")
         self.led_f_s.installEventFilter(self)  # filter events
 
         self.butLock = PushButton(self, icon=QIcon(':/lock-unlocked.svg'))
@@ -143,14 +142,12 @@ class FreqUnits(QWidget):
         layHF_S.addWidget(self.led_f_s)
         layHF_S.addWidget(self.butLock)
 
-        self.cmb_f_units = QComboBox(self)
-        self.cmb_f_units.setObjectName("cmb_f_units")
+        self.cmb_f_units = QComboBox(self, objectName="cmb_f_units")
         qcmb_box_populate(self.cmb_f_units, self.cmb_f_unit_items, self.cmb_f_unit_init)
 #        self.cmb_f_units.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
 #        self.cmb_f_units.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
-        self.cmb_f_range = QComboBox(self)
-        self.cmb_f_range.setObjectName("cmb_f_range")
+        self.cmb_f_range = QComboBox(self, objectName="cmb_f_range")
         qcmb_box_populate(self.cmb_f_range, self.cmb_f_range_items,
                           self.cmb_f_range_init)
 

@@ -109,8 +109,7 @@ class Tran_IO_UI(QWidget):
         # =====================================================================
         # Controls
         # =====================================================================
-        self.lbl_title_io_file = QLabel("File:")
-        self.lbl_title_io_file.setObjectName("large")
+        self.lbl_title_io_file = QLabel("File:", objectName="large")
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
@@ -149,16 +148,14 @@ class Tran_IO_UI(QWidget):
 
         # ----------- LOAD ------------------------------------------------------------
         line1 = QVLine(width=10)
-        self.but_select = PushButton("Select", checkable=False)
-        self.but_select.setObjectName("large")
+        self.but_select = PushButton("Select", checkable=False, objectName="large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_select.setToolTip(
             self.tr("<span>Select file, get its shape and size but don't load "
                     "it yet.</span>"))
 
-        self.but_load = QPushButton("Load:")
-        self.but_load.setObjectName("large")
+        self.but_load = QPushButton("Load:", objectName="large")
         self.but_load.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
         self.but_load.setToolTip(
@@ -217,8 +214,7 @@ class Tran_IO_UI(QWidget):
 
         # ----------- SAVE ------------------------------------------------------------
         line3 = QVLine(width=5)
-        self.but_save = QPushButton("Save:")
-        self.but_save.setObjectName("large")
+        self.but_save = QPushButton("Save:", objectName="large")
         self.but_save.setSizePolicy(QSizePolicy.Expanding,
                                       QSizePolicy.Expanding)
         self.but_save.setToolTip(
@@ -313,8 +309,7 @@ class Tran_IO_UI(QWidget):
         layH_io.addWidget(self.wdg_ctrl_io_file)
         layH_io.setContentsMargins(0, 0, 0, 0)
 
-        self.wdg_top = QWidget(self)
-        self.wdg_top.setObjectName("transparent")
+        self.wdg_top = QWidget(self, objectName="transparent")
         self.wdg_top.setLayout(layH_io)
         self.wdg_top.setContentsMargins(0, 0, 0, 0)
         self.wdg_top.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)

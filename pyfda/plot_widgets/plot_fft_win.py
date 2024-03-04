@@ -170,10 +170,10 @@ class Plot_FFT_win(QDialog):
             "<span>Number of window data points to display.</span>")
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
-        # widgets. This activates one of the pushbuttons.
-        self.but_log_t = QPushButton("dB", default=False, autoDefault=False)
+        # widgets. This would activate one of the pushbuttons if `default` wasn't False.
+        self.but_log_t = QPushButton("dB", default=False, autoDefault=False,
+                                     objectName="chk_log_time")
         self.but_log_t.setMaximumWidth(qtext_width(" dB "))
-        self.but_log_t.setObjectName("chk_log_time")
         self.but_log_t.setCheckable(True)
         self.but_log_t.setChecked(False)
         self.but_log_t.setToolTip("Display in dB")
@@ -204,9 +204,9 @@ class Plot_FFT_win(QDialog):
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This activates one of the pushbuttons.
-        self.but_log_f = QPushButton("dB", default=False, autoDefault=False)
+        self.but_log_f = QPushButton("dB", default=False, autoDefault=False,
+                                     objectName="chk_log_freq")
         self.but_log_f.setMaximumWidth(qtext_width(" dB "))
-        self.but_log_f.setObjectName("chk_log_freq")
         self.but_log_f.setToolTip("<span>Display in dB.</span>")
         self.but_log_f.setCheckable(True)
         self.but_log_f.setChecked(True)
@@ -230,8 +230,7 @@ class Plot_FFT_win(QDialog):
         layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.setContentsMargins(0, 0, 0, 0)
         layH_win_select.addStretch(1)
-        frmQFFT = QFrame(self)
-        frmQFFT.setObjectName("frmQFFT")
+        frmQFFT = QFrame(self, objectName="frmQFFT")
         frmQFFT.setLayout(layH_win_select)
 
         hline = QHLine()
@@ -259,8 +258,7 @@ class Plot_FFT_win(QDialog):
         layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
 
-        frmControls = QFrame(self)
-        frmControls.setObjectName("frmControls")
+        frmControls = QFrame(self, objectName="frmControls")
         frmControls.setLayout(layVControls)
 
         # ----------------------------------------------------------------------
@@ -307,8 +305,7 @@ class Plot_FFT_win(QDialog):
         layVInfo.addWidget(self.tbl_win_props)
         layVInfo.addWidget(self.txtInfoBox)
 
-        frmInfo = QFrame(self)
-        frmInfo.setObjectName("frmInfo")
+        frmInfo = QFrame(self, objectName="frmInfo")
         frmInfo.setLayout(layVInfo)
 
         # ----------------------------------------------------------------------

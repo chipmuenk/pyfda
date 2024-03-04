@@ -170,7 +170,6 @@ class PlotImpz_UI(QWidget):
             ("angle", "Angle", "Phase, wrapped to &pm; &pi;"),
             ("phase", "Phase", "Phase (unwrapped)")
         ]
-#        self.N
 
         self.cmb_freq_display_items = [
             "<span>Select how to display the spectrum.</span>",
@@ -188,9 +187,7 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        # self.but_auto_run = QPushButtonRT(text=to_html("Auto", frmt="b"), margin=0)
-        self.but_auto_run = QPushButton(" Auto", self)
-        self.but_auto_run.setObjectName("but_auto_run")
+        self.but_auto_run = QPushButton(" Auto", objectName="but_auto_run")
         self.but_auto_run.setToolTip("<span>Update response automatically when "
                                      "parameters have been changed.</span>")
         # self.but_auto_run.setMaximumWidth(qtext_width(text=" Auto "))
@@ -267,18 +264,12 @@ class PlotImpz_UI(QWidget):
         self.qfft_win_select = QFFTWinSelector(self.win_dict)
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
-        self.but_fx_range_x = QCheckBox("X", self)
-        self.but_fx_range_x.setObjectName("but_fx_range_x")
+        self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")
         self.but_fx_range_x.setToolTip(
              "<span>Display stimulus fixpoint range (---).</span>")
-        self.but_fx_range_y = QCheckBox("Y", self)
-        self.but_fx_range_y.setObjectName("but_fx_range_y")
+        self.but_fx_range_y = QCheckBox("Y", objectName="but_fx_range_y")
         self.but_fx_range_y.setToolTip(
              "<span>Display response fixpoint range (-.-).</span>")
-        # self.but_fx_range = PushButton(" FX:Range")
-        # self.but_fx_range.setObjectName("but_fx_limits")
-        # self.but_fx_range.setToolTip(
-        #     "<span>Display limits of fixpoint range.</span>")
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.but_auto_run)
@@ -313,16 +304,7 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lbl_title_plot_time = QLabel("Plots:")
-        self.lbl_title_plot_time.setObjectName("large")
-
-        # setting up background color and border
-        # self.lbl_title_plot_time.setStyleSheet("font-size:14")
-        # self.lbl_title_plot_time.setFont(QFont('Arial', 10))
-        # self.lbl_title_plot_time.resize(200, 20)
-        # color_effect = QGraphicsColorizeEffect()
-        # color_effect.setColor(Qt.darkGreen)
-        # self.lbl_title_plot_time.setGraphicsEffect(color_effect)
+        self.lbl_title_plot_time = QLabel("Plots:", objectName="large")
 
         self.lbl_plt_time_stim = QLabel(to_html("Stim. x", frmt='bi'), self)
         self.cmb_plt_time_stim = QComboBox(self)
@@ -333,9 +315,8 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_plt_time_stim_interp = QLabel(
             to_html("&nbsp;&nbsp;x(t)", frmt='bi'), self)
-        self.chk_plt_time_stim_interp = QCheckBox(self)
+        self.chk_plt_time_stim_interp = QCheckBox(self, objectName="chk_plt_time_stim_interp")
         self.chk_plt_time_stim_interp.setChecked(False)
-        self.chk_plt_time_stim_interp.setObjectName("chk_plt_time_stim_interp")
         self.chk_plt_time_stim_interp.setToolTip(
             '<span>Plot interpolated pseudo-analog stimulus "<i>x</i>(<i>t</i>)", '
             'valid up to approx. 0.4 <i>f<sub>S</sub></i>.</span>')
@@ -366,12 +347,11 @@ class PlotImpz_UI(QWidget):
         line1 = QVLine()
         line2 = QVLine(width=5)
 
-        self.but_log_time = PushButton(" dB")
-        self.but_log_time.setObjectName("but_log_time")
+        self.but_log_time = PushButton(" dB", objectName="but_log_time")
         self.but_log_time.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
 
-        lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'), self)
+        lbl_plt_time_spgr = QLabel(to_html("Spectrogram", frmt='bi'))
         self.cmb_plt_time_spgr = QComboBox(self)
         qcmb_box_populate(
             self.cmb_plt_time_spgr, self.cmb_time_spgr_items, self.plt_time_spgr)
@@ -382,15 +362,13 @@ class PlotImpz_UI(QWidget):
 
         self.lbl_byfs_spgr_time = QLabel(
             to_html("&nbsp;per f_S", frmt='b'), self)
-        self.chk_byfs_spgr_time = QCheckBox(self)
-        self.chk_byfs_spgr_time.setObjectName("chk_log_spgr")
+        self.chk_byfs_spgr_time = QCheckBox(self, objectName="chk_log_spgr")
         self.chk_byfs_spgr_time.setToolTip("<span>Display spectral density "
                                            "i.e. scale by f_S</span>")
         self.chk_byfs_spgr_time.setChecked(True)
 
-        self.but_log_spgr_time = QPushButton("dB")
+        self.but_log_spgr_time = QPushButton("dB", objectName="but_log_spgr")
         self.but_log_spgr_time.setMaximumWidth(qtext_width(text=" dB"))
-        self.but_log_spgr_time.setObjectName("but_log_spgr")
         self.but_log_spgr_time.setToolTip(
             "<span>Logarithmic scale for spectrogram.</span>")
         self.but_log_spgr_time.setCheckable(True)
@@ -494,9 +472,8 @@ class PlotImpz_UI(QWidget):
         layG_ctrl_time.setContentsMargins(0, 0, 0, 0)
         layG_ctrl_time.setVerticalSpacing(0)
 
-        self.wdg_ctrl_time = QWidget(self)
+        self.wdg_ctrl_time = QWidget(self, objectName="transparent")
         self.wdg_ctrl_time.setLayout(layG_ctrl_time)
-        self.wdg_ctrl_time.setObjectName("transparent")
         self.wdg_ctrl_time.setContentsMargins(0, 0, 0, 0) # (*rc.params['wdg_margins'])
 
         self.wdg_ctrl_time_spgr.setVisible(self.plt_time_spgr != "none")
@@ -506,8 +483,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        self.lbl_title_plot_freq = QLabel("Plots:")
-        self.lbl_title_plot_freq.setObjectName("large")
+        self.lbl_title_plot_freq = QLabel("Plots:", objectName="large")
         #
         self.lbl_plt_freq_stim = QLabel(to_html("Stim. X", frmt='bi'), self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -532,9 +508,8 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq_resp.setToolTip(
             "<span>Plot style for response.</span>")
 
-        self.but_log_freq = QPushButton("dB")
+        self.but_log_freq = QPushButton("dB", objectName="but_log_freq")
         self.but_log_freq.setMaximumWidth(qtext_width(" dB"))
-        self.but_log_freq.setObjectName(".but_log_freq")
         self.but_log_freq.setToolTip(
             "<span>Logarithmic scale for y-axis.</span>")
         self.but_log_freq.setCheckable(True)
@@ -552,10 +527,9 @@ class PlotImpz_UI(QWidget):
         if not self.but_log_freq.isChecked():
             self.bottom_f = 0
 
-        self.cmb_freq_display = QComboBox(self)
+        self.cmb_freq_display = QComboBox(self, objectName="cmb_re_im_freq")
         qcmb_box_populate(self.cmb_freq_display, self.cmb_freq_display_items,
                           self.cmb_freq_display_item)
-        self.cmb_freq_display.setObjectName("cmb_re_im_freq")
 
         self.but_Hf = QPushButtonRT(self, to_html("H_id", frmt="bi"), margin=5)
         self.but_Hf.setObjectName("chk_Hf")
@@ -575,9 +549,8 @@ class PlotImpz_UI(QWidget):
         self.but_freq_norm_impz.setChecked(True)
         self.but_freq_norm_impz.setObjectName("freq_norm_impz")
 
-        self.but_freq_show_info = QPushButton("Info", self)
+        self.but_freq_show_info = QPushButton("Info", objectName="but_show_info_freq")
         self.but_freq_show_info.setMaximumWidth(qtext_width(" Info "))
-        self.but_freq_show_info.setObjectName("but_show_info_freq")
         self.but_freq_show_info.setToolTip(
             "<span>Show signal power in legend.</span>")
         self.but_freq_show_info.setCheckable(True)
@@ -625,9 +598,8 @@ class PlotImpz_UI(QWidget):
         layG_ctrl_freq.setContentsMargins(0, 0, 0, 0)
         layG_ctrl_freq.setVerticalSpacing(0)
 
-        self.wdg_ctrl_freq = QWidget(self)
+        self.wdg_ctrl_freq = QWidget(self, objectName="transparent")
         self.wdg_ctrl_freq.setLayout(layG_ctrl_freq)
-        self.wdg_ctrl_freq.setObjectName("transparent")
         self.wdg_ctrl_freq.setContentsMargins(0, 0, 0, 0)  # (*rc.params['wdg_margins'])
         # ---- end Frequency Domain ------------------
 

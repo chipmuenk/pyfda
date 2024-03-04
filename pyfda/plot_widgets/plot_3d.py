@@ -91,64 +91,54 @@ class Plot_3D(QWidget):
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
-        self.but_log = PushButton("dB", checked=False)
-        self.but_log.setObjectName("but_log")
+        self.but_log = PushButton("dB", checked=False, objectName="but_log")
         self.but_log.setToolTip("Logarithmic scale")
 
-        self.but_plot_in_UC = PushButton("|z| < 1 ", checked=False)
-        self.but_plot_in_UC.setObjectName("but_plot_in_UC")
+        self.but_plot_in_UC = PushButton("|z| < 1 ", checked=False,
+                                         objectName="but_plot_in_UC")
         self.but_plot_in_UC.setToolTip("Only plot H(z) within the unit circle")
 
         self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
-        self.ledBottom = QLineEdit(self)
-        self.ledBottom.setObjectName("ledBottom")
+        self.ledBottom = QLineEdit(self, objectName="ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
         self.lblBottomdB = QLabel("dB", self)
         self.lblBottomdB.setVisible(self.but_log.isChecked())
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
-        self.ledTop = QLineEdit(self)
-        self.ledTop.setObjectName("ledTop")
+        self.ledTop = QLineEdit(self, objectName="ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
         self.lblTopdB = QLabel("dB", self)
         self.lblTopdB.setVisible(self.but_log.isChecked())
 
-        self.plt_UC = PushButton("UC", checked=True)
-        self.plt_UC.setObjectName("plt_UC")
+        self.plt_UC = PushButton("UC", checked=True, objectName="plt_UC")
         self.plt_UC.setToolTip("Plot unit circle")
 
-        self.but_PZ = PushButton("P/Z ", checked=True)
-        self.but_PZ.setObjectName("but_PZ")
+        self.but_PZ = PushButton("P/Z ", checked=True, objectName="but_PZ")
         self.but_PZ.setToolTip("Plot poles and zeros")
 
-        self.but_Hf = PushButton("H(f) ", checked=True)
-        self.but_Hf.setObjectName("but_Hf")
+        self.but_Hf = PushButton("H(f) ", checked=True, objectName="but_Hf")
         self.but_Hf.setToolTip("Plot H(f) along the unit circle")
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
-        self.cmbMode3D = QComboBox(self)
+        self.cmbMode3D = QComboBox(self, objectName="cmbShow3D")
         self.cmbMode3D.addItems(modes)
-        self.cmbMode3D.setObjectName("cmbShow3D")
         self.cmbMode3D.setToolTip("Select 3D-plot mode.")
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.but_colormap_r = PushButton("reverse", checked=True)
-        self.but_colormap_r.setObjectName("but_colormap_r")
+        self.but_colormap_r = PushButton("reverse", checked=True, objectName="but_colormap_r")
         self.but_colormap_r.setToolTip("reverse colormap")
 
         self.cmbColormap = QComboBox(self)
         self._init_cmb_colormap(cmap_init=self.cmap_default)
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.but_colbar = PushButton("Colorbar ", checked=False)
-        self.but_colbar.setObjectName("chkColBar")
+        self.but_colbar = PushButton("Colorbar ", checked=False, objectName="chkColBar")
         self.but_colbar.setToolTip("Show colorbar")
 
-        self.but_lighting = PushButton("Lighting", checked=False)
-        self.but_lighting.setObjectName("but_lighting")
+        self.but_lighting = PushButton("Lighting", checked=False, objectName="but_lighting")
         self.but_lighting.setToolTip("Enable light source")
 
         self.lblAlpha = QLabel(to_html("Alpha", frmt='bi'), self)
@@ -171,8 +161,8 @@ class Plot_3D(QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set line density for various plots.")
 
-        self.but_contour_2d = PushButton("Contour2D ", checked=False)
-        self.but_contour_2d.setObjectName("chkContour2D")
+        self.but_contour_2d = PushButton("Contour2D ", checked=False,
+                                         objectName="chkContour2D")
         self.but_contour_2d.setToolTip("Plot 2D-contours at z =0")
 
         # ----------------------------------------------------------------------
@@ -208,8 +198,7 @@ class Plot_3D(QWidget):
         layGControls.addWidget(self.diaHatch, 1, 16)
 
         # This widget encompasses all control subwidgets
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
+        self.frmControls = QFrame(self, objectName="frmControls")
         self.frmControls.setLayout(layGControls)
 
         # ----------------------------------------------------------------------

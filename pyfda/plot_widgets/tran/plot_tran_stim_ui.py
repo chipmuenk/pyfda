@@ -240,20 +240,18 @@ class Plot_Tran_Stim_UI(QWidget):
         # Controls for stimuli
         # =====================================================================
 
-        self.lbl_title_stim = QLabel("Stim:")
-        self.lbl_title_stim.setObjectName("large")
+        self.lbl_title_stim = QLabel("Stim:", objectName="large")
         #
         self.cmbStimulus = QComboBox(self)
         qcmb_box_populate(self.cmbStimulus,
                           self.cmb_stim_items, self.cmb_stim_item)
 
         self.lblStimPar1 = QLabel(to_html("&alpha; =", frmt='b'), self)
-        self.ledStimPar1 = QLineEdit(self)
+        self.ledStimPar1 = QLineEdit(self, objectName="ledStimPar1")
         self.ledStimPar1.setText("0.5")
         self.ledStimPar1.setToolTip("Duty Cycle, 0 ... 1")
-        self.ledStimPar1.setObjectName("ledStimPar1")
 
-        self.but_stim_bl = QPushButton(self)
+        self.but_stim_bl = QPushButton(self, objectName="stim_bl")
         self.but_stim_bl.setText("BL")
         self.but_stim_bl.setToolTip(
             "<span>Bandlimit the signal to the Nyquist "
@@ -262,7 +260,6 @@ class Plot_Tran_Stim_UI(QWidget):
         self.but_stim_bl.setMaximumWidth(qtext_width(text="BL "))
         self.but_stim_bl.setCheckable(True)
         self.but_stim_bl.setChecked(True)
-        self.but_stim_bl.setObjectName("stim_bl")
 
         # -------------------------------------
         self.cmbChirpType = QComboBox(self)
@@ -287,20 +284,18 @@ class Plot_Tran_Stim_UI(QWidget):
             self.cmb_stim_modulation_item)
 
         # -------------------------------------
-        self.chk_step_err = QPushButton("Error", self)
+        self.chk_step_err = QPushButton("Error", objectName="stim_step_err")
         self.chk_step_err.setToolTip(
             "<span>Display the step response error.</span>")
         self.chk_step_err.setMaximumWidth(qtext_width(text="Error "))
         self.chk_step_err.setCheckable(True)
         self.chk_step_err.setChecked(False)
-        self.chk_step_err.setObjectName("stim_step_err")
         #
         self.but_file_io = PushButton("<", checkable=False)
         self.but_file_io.setToolTip(
             "<span>Use file length as number of data points.</span>")
         self.lbl_file_io = QLabel(to_html("&nbsp;File IO", frmt='bi'))
-        self.cmb_file_io = QComboBox(self)
-        self.cmb_file_io.setObjectName("cmb_file_io")
+        self.cmb_file_io = QComboBox(self, objectName="cmb_file_io")
         qcmb_box_populate(
             self.cmb_file_io, self.cmb_file_io_items, self.cmb_file_io_default)
 
@@ -325,10 +320,9 @@ class Plot_Tran_Stim_UI(QWidget):
         layHCmbStim.addWidget(self.chk_step_err)
 
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
-        self.ledDC = QLineEdit(self)
+        self.ledDC = QLineEdit(self, objectName="stimDC")
         self.ledDC.setText(str(self.DC))
         self.ledDC.setToolTip("DC Level")
-        self.ledDC.setObjectName("stimDC")
 
         layHStimDC = QHBoxLayout()
         layHStimDC.addWidget(self.lblDC)
@@ -336,109 +330,95 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # ======================================================================
         self.lblAmp1 = QLabel(to_html("&nbsp;A_1", frmt='bi') + " =", self)
-        self.ledAmp1 = QLineEdit(self)
+        self.ledAmp1 = QLineEdit(self, objectName="stimAmp1")
         self.ledAmp1.setText(str(self.A1))
         self.ledAmp1.setToolTip(
-            "Stimulus amplitude, complex values like 3j - 1 are allowed")
-        self.ledAmp1.setObjectName("stimAmp1")
+            "Stimulus amplitude; complex values like 3j - 1 are allowed")
 
         self.lblAmp2 = QLabel(to_html("&nbsp;A_2", frmt='bi') + " =", self)
-        self.ledAmp2 = QLineEdit(self)
+        self.ledAmp2 = QLineEdit(self, objectName="stimAmp2")
         self.ledAmp2.setText(str(self.A2))
         self.ledAmp2.setToolTip(
-            "Stimulus amplitude 2, complex values like 3j - 1 are allowed")
-        self.ledAmp2.setObjectName("stimAmp2")
+            "Stimulus amplitude 2; complex values like 3j - 1 are allowed")
         # ----------------------------------------------
         self.lblPhi1 = QLabel(to_html("&nbsp;&phi;_1", frmt='bi') + " =", self)
-        self.ledPhi1 = QLineEdit(self)
+        self.ledPhi1 = QLineEdit(self, objectName="stimPhi1")
         self.ledPhi1.setText(str(self.phi1))
         self.ledPhi1.setToolTip("Stimulus phase 1 in degrees")
-        self.ledPhi1.setObjectName("stimPhi1")
         self.lblPhU1 = QLabel(to_html("&deg;", frmt='i'), self)
 
         self.lblPhi2 = QLabel(to_html("&nbsp;&phi;_2", frmt='bi') + " =", self)
-        self.ledPhi2 = QLineEdit(self)
+        self.ledPhi2 = QLineEdit(self, objectName="stimPhi2")
         self.ledPhi2.setText(str(self.phi2))
         self.ledPhi2.setToolTip("Stimulus phase 2 in degrees")
-        self.ledPhi2.setObjectName("stimPhi2")
         self.lblPhU2 = QLabel(to_html("&deg;", frmt='i'), self)
         # ----------------------------------------------
         self.lbl_T1 = QLabel(to_html("&nbsp;T_1", frmt='bi') + " =", self)
-        self.led_T1 = QLineEdit(self)
+        self.led_T1 = QLineEdit(self, objectName="led_T1")
         self.led_T1.setText(str(self.T1))
         self.led_T1.setToolTip("Time shift 1")
-        self.led_T1.setObjectName("led_T1")
         self.lbl_TU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_T2 = QLabel(to_html("&nbsp;T_2", frmt='bi') + " =", self)
-        self.led_T2 = QLineEdit(self)
+        self.led_T2 = QLineEdit(self, objectName="led_T2")
         self.led_T2.setText(str(self.T2))
         self.led_T2.setToolTip("Time shift 2")
-        self.led_T2.setObjectName("led_T2")
         self.lbl_TU2 = QLabel(to_html("T_S", frmt='i'), self)
 
         # ----------------------------------------------
         self.lbl_N1 = QLabel(to_html("&nbsp;N_1", frmt='bi') + " =", self)
-        self.led_N1 = QLineEdit(self)
+        self.led_N1 = QLineEdit(self, objectName="stimN1")
         self.led_N1.setText(str(self.N1))
         self.led_N1.setToolTip("Parameter N1")
-        self.led_N1.setObjectName("stimN1")
 
         self.lbl_N2 = QLabel(to_html("&nbsp;N_2", frmt='bi') + " =", self)
-        self.led_N2 = QLineEdit(self)
+        self.led_N2 = QLineEdit(self, objectName="stimN2")
         self.led_N2.setText(str(self.N2))
         self.led_N2.setToolTip("Parameter N2")
-        self.led_N2.setObjectName("stimN2")
         # ---------------------------------------------
         self.lbl_TW1 = QLabel(
             to_html("&nbsp;&Delta;T_1", frmt='bi') + " =", self)
-        self.led_TW1 = QLineEdit(self)
+        self.led_TW1 = QLineEdit(self, objectName="led_TW1")
         self.led_TW1.setText(str(self.TW1))
         self.led_TW1.setToolTip("Time width")
-        self.led_TW1.setObjectName("led_TW1")
         self.lbl_TWU1 = QLabel(to_html("T_S", frmt='i'), self)
 
         self.lbl_TW2 = QLabel(
             to_html("&nbsp;&Delta;T_2", frmt='bi') + " =", self)
-        self.led_TW2 = QLineEdit(self)
+        self.led_TW2 = QLineEdit(self, objectName="led_TW2")
         self.led_TW2.setText(str(self.TW2))
         self.led_TW2.setToolTip("Time width 2")
-        self.led_TW2.setObjectName("led_TW2")
         self.lbl_TWU2 = QLabel(to_html("T_S", frmt='i'), self)
         # ----------------------------------------------
         self.txtFreq1_f = to_html("&nbsp;f_1", frmt='bi') + " ="
         self.txtFreq1_F = to_html("&nbsp;F_1", frmt='bi') + " ="
         self.txtFreq1_k = to_html("&nbsp;k_1", frmt='bi') + " ="
         self.lblFreq1 = QLabel(self.txtFreq1_f, self)
-        self.led_f1 = QLineEdit(self)
+        self.led_f1 = QLineEdit(self, objectName="led_f1")
         self.led_f1.setText(str(self.f1))
         self.led_f1.setToolTip("Stimulus frequency")
-        self.led_f1.setObjectName("led_f1")
         self.lblFreqUnit1 = QLabel(to_html("f_S", frmt='i'), self)
 
         self.txtFreq2_f = to_html("&nbsp;f_2", frmt='bi') + " ="
         self.txtFreq2_F = to_html("&nbsp;F_2", frmt='bi') + " ="
         self.txtFreq2_k = to_html("&nbsp;k_2", frmt='bi') + " ="
         self.lblFreq2 = QLabel(self.txtFreq2_f, self)
-        self.led_f2 = QLineEdit(self)
+        self.led_f2 = QLineEdit(self, objectName="led_f2")
         self.led_f2.setText(str(self.f2))
         self.led_f2.setToolTip("Stimulus frequency 2")
-        self.led_f2.setObjectName("led_f2")
         self.lblFreqUnit2 = QLabel(to_html("f_S", frmt='i'), self)
         # ----------------------------------------------
         self.lbl_BW1 = QLabel(
             to_html(self.tr("&nbsp;BW_1"), frmt='bi') + " =", self)
-        self.led_BW1 = QLineEdit(self)
+        self.led_BW1 = QLineEdit(self, objectName="stimBW1")
         self.led_BW1.setText(str(self.BW1))
         self.led_BW1.setToolTip(self.tr("Relative bandwidth"))
-        self.led_BW1.setObjectName("stimBW1")
 
         self.lbl_BW2 = QLabel(
             to_html(self.tr("&nbsp;BW_2"), frmt='bi') + " =", self)
-        self.led_BW2 = QLineEdit(self)
+        self.led_BW2 = QLineEdit(self, objectName="stimBW2")
         self.led_BW2.setText(str(self.BW2))
         self.led_BW2.setToolTip(self.tr("Relative bandwidth 2"))
-        self.led_BW2.setObjectName("stimBW2")
         # ----------------------------------------------
         self.lblNoise = QLabel(to_html("&nbsp;Noise", frmt='bi'), self)
         self.cmb_stim_noise = QComboBox(self)
@@ -446,11 +426,10 @@ class Plot_Tran_Stim_UI(QWidget):
 
         line2 = QVLine()
         self.lblNoi = QLabel("not initialized", self)
-        self.ledNoi = QLineEdit(self)
+        self.ledNoi = QLineEdit(self, objectName="stimNoi")
         self.ledNoi.setMaximumWidth(self.cmb_stim_noise.width())
         self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("not initialized")
-        self.ledNoi.setObjectName("stimNoi")
         self.lblNoi_par = QLabel("not initialized", self)
         self.ledNoi_par = QLineEdit(self)
         self.ledNoi_par.setMaximumWidth(qtext_width(N_x=4))
@@ -462,14 +441,13 @@ class Plot_Tran_Stim_UI(QWidget):
         # ----------------------------------------------
         # Widget and Layout containing formula editor
         self.lblStimFormula = QLabel(to_html("x =", frmt='bi'), self)
-        self.ledStimFormula = QLineEdit(self)
+        self.ledStimFormula = QLineEdit(self, objectName="stimFormula")
         self.ledStimFormula.setText(str(self.stim_formula))
         self.ledStimFormula.setToolTip(
             "<span>Enter formula for stimulus in numexpr syntax, using the index "
             "<i>n</i> or the time vector <i>t</i> and the following UI settings: "
             + to_html("A_1, A_2, phi_1, phi_2, f_1, f_2, T_1, T_2, BW_1, BW_2",
                       frmt='i') + ".</span>")
-        self.ledStimFormula.setObjectName("stimFormula")
 
         layH_formula_stim = QHBoxLayout()
         layH_formula_stim.addWidget(self.lblStimFormula)
@@ -572,8 +550,7 @@ class Plot_Tran_Stim_UI(QWidget):
         layH_stim.addWidget(self.wdg_ctrl_stim)
         layH_stim.setContentsMargins(0, 0, 0, 0)
 
-        self.wdg_stim = QWidget(self)
-        self.wdg_stim.setObjectName("transparent")
+        self.wdg_stim = QWidget(self, objectName="transparent")
         self.wdg_stim.setLayout(layH_stim)
         self.wdg_stim.setContentsMargins(0, 0, 0, 0)
 

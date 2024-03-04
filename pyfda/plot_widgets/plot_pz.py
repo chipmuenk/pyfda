@@ -107,8 +107,7 @@ class Plot_PZ(QWidget):
         qcmb_box_populate(
             self.cmb_overlay, self.cmb_overlay_items, self.cmb_overlay_default)
 
-        self.but_log = PushButton(" Log.", checked=True)
-        self.but_log.setObjectName("but_log")
+        self.but_log = PushButton(" Log.", checked=True, objectName="but_log")
         self.but_log.setToolTip("<span>Log. scale for overlays.</span>")
 
         self.diaRad_Hf = QDial(self)
@@ -123,8 +122,7 @@ class Plot_PZ(QWidget):
         self.lblRad_Hf = QLabel("Radius", self)
 
         self.lblBottom = QLabel(to_html("Bottom =", frmt='bi'), self)
-        self.ledBottom = QLineEdit(self)
-        self.ledBottom.setObjectName("ledBottom")
+        self.ledBottom = QLineEdit(self, objectName="ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setMaximumWidth(qtext_width(N_x=8))
         self.ledBottom.setToolTip("Minimum display value.")
@@ -132,8 +130,7 @@ class Plot_PZ(QWidget):
         self.lblBottomdB.setVisible(self.but_log.isChecked())
 
         self.lblTop = QLabel(to_html("Top =", frmt='bi'), self)
-        self.ledTop = QLineEdit(self)
-        self.ledTop.setObjectName("ledTop")
+        self.ledTop = QLineEdit(self, objectName="ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
         self.ledTop.setMaximumWidth(qtext_width(N_x=8))
@@ -163,8 +160,7 @@ class Plot_PZ(QWidget):
         #
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
+        self.frmControls = QFrame(self, objectName="frmControls")
         self.frmControls.setLayout(layHControls)
 
         # ----------------------------------------------------------------------

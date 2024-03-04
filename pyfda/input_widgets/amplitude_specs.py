@@ -56,9 +56,8 @@ class AmplitudeSpecs(QWidget):
 
         lblUnits = QLabel("in", self)
 
-        self.cmbUnitsA = QComboBox(self)
+        self.cmbUnitsA = QComboBox(self, objectName="cmbUnitsA")
         self.cmbUnitsA.addItems(amp_units)
-        self.cmbUnitsA.setObjectName("cmbUnitsA")
         self.cmbUnitsA.setToolTip(
             "<span>Unit for amplitude specifications:"
             " dB is attenuation (&gt; 0); levels in V and W have to be &lt; 1.</span>")

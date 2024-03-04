@@ -74,16 +74,13 @@ class SelectFilter(QWidget):
         # ----------------------------------------------------------------------
         # Combo boxes for filter selection
         # ----------------------------------------------------------------------
-        self.cmbResponseType = QComboBox(self)
-        self.cmbResponseType.setObjectName("comboResponseType")
+        self.cmbResponseType = QComboBox(self, objectName="comboResponseType")
         self.cmbResponseType.setToolTip("Select filter response type.")
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType = QComboBox(self, objectName="comboFilterType")
         self.cmbFilterType.setToolTip(
           "<span>Choose filter type, either recursive (Infinite Impulse Response) "
           "or transversal (Finite Impulse Response).</span>")
-        self.cmbFilterClass = QComboBox(self)
-        self.cmbFilterClass.setObjectName("comboFilterClass")
+        self.cmbFilterClass = QComboBox(self, objectName="comboFilterClass")
         self.cmbFilterClass.setToolTip("Select the filter design class.")
 
         # Adapt comboboxes size dynamically to largest element

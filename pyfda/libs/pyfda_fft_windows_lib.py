@@ -598,16 +598,14 @@ class QFFTWinSelector(QWidget):
 
         # First numeric parameter for FFT window
         self.lbl_win_par_0 = QLabel("Param1")
-        self.led_win_par_0 = QLineEdit(self)
+        self.led_win_par_0 = QLineEdit(self, objectName="ledWinPar1")
         self.led_win_par_0.setText("1")
-        self.led_win_par_0.setObjectName("ledWinPar1")
         self.cmb_win_par_0 = QComboBox(self)
 
         # Second numeric parameter for FFT window
         self.lbl_win_par_1 = QLabel("Param2")
-        self.led_win_par_1 = QLineEdit(self)
+        self.led_win_par_1 = QLineEdit(self, objectName="ledWinPar2")
         self.led_win_par_1.setText("2")
-        self.led_win_par_1.setObjectName("ledWinPar2")
         self.cmb_win_par_1 = QComboBox(self)
 
         layH_main = QHBoxLayout(self)

@@ -167,34 +167,31 @@ class FX_UI_WQ(QWidget):
         self.wdg_name = ui_dict['wdg_name']
         lbl_wdg = QLabel(ui_dict['label'], self)
 
-        self.cmbQuant = QComboBox(self)
+        self.cmbQuant = QComboBox(self, objectName='quant')
         idx = qcmb_box_populate(self.cmbQuant, ui_dict['cmb_q_items'], self.q_dict['quant'])
         if idx == -1:
             logger.warning(
                 f"""Initialization value "{self.q_dict['quant']}" was not found in """
                 f"""'quant' combo box.""")
-        self.cmbQuant.setObjectName('quant')
 
-        self.cmbOvfl = QComboBox(self)
+        self.cmbOvfl = QComboBox(self, objectName='ovfl')
         idx = qcmb_box_populate(self.cmbOvfl, ui_dict['cmb_ov_items'], self.q_dict['ovfl'])
         if idx == -1:
             logger.warning(
                 f"""Initialization value "{self.q_dict['ovfl']}" was not found in """
                 f"""'ovfl' combo box.""")
-        self.cmbOvfl.setObjectName('ovfl')
 
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.cmbW = QComboBox(self)
+        self.cmbW = QComboBox(self, objectName="cmbW")
         idx = qcmb_box_populate(self.cmbW, ui_dict['cmb_w_items'], self.q_dict['w_a_m'])
         if idx == -1:
             logger.warning(
                 f"""Initialization value "{self.q_dict['w_a_m']}" was not found in """
                 f"""'auto/man' combo box.""")
         self.cmbW.setVisible(ui_dict['cmb_w_vis'] == 'on')
-        self.cmbW.setObjectName("cmbW")
 
         self.butLock = QPushButton(self)
         self.butLock.setCheckable(True)
@@ -207,23 +204,21 @@ class FX_UI_WQ(QWidget):
         sp_retain.setRetainSizeWhenHidden(True)
         self.butLock.setSizePolicy(sp_retain)
 
-        self.ledWI = QLineEdit(self)
+        self.ledWI = QLineEdit(self, objectName="WI")
         self.ledWI.setToolTip(ui_dict['tip_WI'])
         self.ledWI.setMaxLength(ui_dict['WI_len'])  # maximum of 2 digits
         self.ledWI.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
-        self.ledWI.setObjectName("WI")
 
         self.lbl_sep1 = QLabel(to_html(ui_dict['lbl_sep'], frmt='b'), self)
         self.lbl_sep1.setVisible(ui_dict['fractional'])
         self.lbl_sep2 = QLabel(to_html(')', frmt='b'), self)
         self.lbl_sep2.setVisible(False)
 
-        self.ledWF = QLineEdit(self)
+        self.ledWF = QLineEdit(self, objectName="WF")
         self.ledWF.setToolTip(ui_dict['tip_WF'])
         self.ledWF.setMaxLength(ui_dict['WI_len'])  # maximum of 2 digits
         self.ledWF.setFixedWidth(ui_dict['max_led_width'])  # width of lineedit in points
         self.ledWF.setVisible(ui_dict['fractional'])
-        self.ledWF.setObjectName("WF")
 
         self.count_ovfl_vis = ui_dict['count_ovfl_vis']
         self.lbl_ovfl_count = QLabel(to_html("N_ov = 0"))

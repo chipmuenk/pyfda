@@ -81,8 +81,7 @@ class Plot_tau_g(QWidget):
         layHControls.addWidget(self.cmbAlgorithm)
 
         # This widget encompasses all control subwidgets:
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
+        self.frmControls = QFrame(self, objectName="frmControls")
         self.frmControls.setLayout(layHControls)
 
         self.mplwidget = MplWidget(self)

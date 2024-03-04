@@ -176,8 +176,7 @@ class Input_Coeffs_UI(QWidget):
         #
         # UI Elements for loading / storing / manipulating cells and rows
         # -----------------------------------------------------------------
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType = QComboBox(self, objectName="comboFilterType")
         self.cmbFilterType.setToolTip(
             "<span>Select between IIR and FIR filter for manual entry. "
             "Changing the type reloads the filter from the filter dict.</span>")

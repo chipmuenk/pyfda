@@ -152,12 +152,11 @@ class Input_PZ_UI(QWidget):
             "either 1 or the max. of the previous system.</span>")
 
         self.lblGain = QLabel(to_html("k =", frmt='bi'), self)
-        self.ledGain = QLineEdit(self)
+        self.ledGain = QLineEdit(self, objectName="ledGain")
         self.ledGain.setToolTip(
             "<span>Specify gain factor <i>k</i>"
             " (only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
-        self.ledGain.setObjectName("ledGain")
 
         layHGain = QHBoxLayout()
         layHGain.addWidget(self.lblNorm)

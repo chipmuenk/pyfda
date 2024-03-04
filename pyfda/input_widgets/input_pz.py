@@ -208,10 +208,9 @@ class Input_PZ(QWidget):
         Construct the UI from the table widget and the control part (`self.ui`),
         initialize the widget and setup signal-slot connections and event filters
         """
-        self.tblPZ = QTableWidget(self)
+        self.tblPZ = QTableWidget(self, objectName="tblPZ")
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True)  # alternating row colors)
-        self.tblPZ.setObjectName("tblPZ")
 
         # highlight when selected:
         self.tblPZ.horizontalHeader().setHighlightSections(True)
