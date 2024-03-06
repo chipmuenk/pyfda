@@ -46,13 +46,12 @@ class SelectFilter(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, objectName=""):
         super(SelectFilter, self).__init__(parent)
 
+        self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
-
         self._construct_UI()
-
         self._set_response_type()  # first time initialization
 
     def _construct_UI(self):

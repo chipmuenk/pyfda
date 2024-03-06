@@ -158,12 +158,10 @@ class Input_Specs(QWidget):
 
         # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
-        self.sel_fil = select_filter.SelectFilter(self)
-        self.sel_fil.setObjectName("select_filter")
+        self.sel_fil = select_filter.SelectFilter(self, objectName="sel_fil_name")
 
         # Subwidget for selecting the frequency unit and range
-        self.f_units = freq_units.FreqUnits(self)
-        self.f_units.setObjectName("freq_units")
+        self.f_units = freq_units.FreqUnits(self, objectName="f_units_name")
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -174,20 +172,17 @@ class Input_Specs(QWidget):
         # in other hierarchy levels, e.g. in the plot tabs
 
         # Subwidget for Frequency Specs
-        self.f_specs = freq_specs.FreqSpecs(self)
-        self.f_specs.setObjectName("freq_specs")
+        self.f_specs = freq_specs.FreqSpecs(self, objectName="f_specs_corner")
 
         # Subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self)
-        self.a_specs.setObjectName("amplitude_specs")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, objectName="a_specs_general")
 
         # Subwidget for Weight Specs
-        self.w_specs = weight_specs.WeightSpecs(self)
-        self.w_specs.setObjectName("weight_specs")
+        self.w_specs = weight_specs.WeightSpecs(self, objectName="w_specs_name")
 
         # Subwidget for target specs (frequency and amplitude)
-        self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
-        self.t_specs.setObjectName("target_specs")
+        self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications",
+                                                objectName="t_specs_name")
 
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)

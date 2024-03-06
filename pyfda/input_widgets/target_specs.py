@@ -33,10 +33,11 @@ class TargetSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     # from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, title="Target Specs"):
+    def __init__(self, parent=None, title="Target Specs", objectName=""):
         super(TargetSpecs, self).__init__(parent)
 
         self.title = title
+        self.setObjectName(objectName)
 
         self._construct_UI()
 

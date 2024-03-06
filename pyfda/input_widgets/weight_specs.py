@@ -28,9 +28,10 @@ class WeightSpecs(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, objectName=""):
         super(WeightSpecs, self).__init__(parent)
 
+        self.setObjectName(objectName)
         self.qlabels = []  # list with references to QLabel widgets
         self.qlineedit = []  # list with references to QLineEdit widgets
 

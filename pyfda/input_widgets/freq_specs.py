@@ -35,7 +35,7 @@ class FreqSpecs(QWidget):
     sig_rx = pyqtSignal(object)  # incoming
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, title="Frequency Specs"):
+    def __init__(self, parent=None, title="Frequency Specs", objectName=""):
 
         super(FreqSpecs, self).__init__(parent)
         self.title = title
@@ -44,6 +44,7 @@ class FreqSpecs(QWidget):
         self.qlineedit = []  # list with references to QLineEdit widgetss
 
         self.spec_edited = False  # flag whether QLineEdit field has been edited
+        self.setObjectName(objectName)
 
         self._construct_UI()
 

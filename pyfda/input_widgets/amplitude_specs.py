@@ -26,14 +26,16 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
     sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
+
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, title="Amplitude Specs"):
+    def __init__(self, parent=None, title="Amplitude Specs", objectName=""):
         """
         Initialize
         """
         super(AmplitudeSpecs, self).__init__(parent)
         self.title = title
+        self.setObjectName(objectName)
 
         self.qlabels = []    # list with references to QLabel widgets
         self.qlineedit = []  # list with references to QLineEdit widgets

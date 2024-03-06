@@ -49,10 +49,11 @@ class FreqUnits(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, title="Frequency Units"):
+    def __init__(self, parent=None, title="Frequency Units", objectName=""):
 
         super(FreqUnits, self).__init__(parent)
         self.title = title
+        self.setObjectName(objectName)
         self.spec_edited = False  # flag whether QLineEdit field has been edited
 
         # combobox tooltip + data / text / tooltip for frequency unit
