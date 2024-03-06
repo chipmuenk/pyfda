@@ -220,12 +220,15 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
+        # connect incoming signals to process_sig_rx and other widgets?!
         self.sig_rx.connect(self.process_sig_rx)
         self.sig_rx.connect(self.f_units.sig_rx)
         self.sig_rx_local.connect(self.process_sig_rx_local)
 
+        # connect outgoing signal to receive slots of f_specs, t_specs and f_units
         self.sig_tx.connect(self.f_specs.sig_rx)
         self.sig_tx.connect(self.t_specs.sig_rx)
+        self.sig_tx.connect(self.w_specs.sig_rx)
         self.sig_tx.connect(self.f_units.sig_rx)
 
         self.sel_fil.sig_tx.connect(self.sig_rx_local)
@@ -342,7 +345,7 @@ class Input_Specs(QWidget):
     def _load_filter(self):
         """
         Load filter dict `fb.fil[0]` either from file or from memory and update the
-        widgets via `load_dict()`.
+        widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
         sel = qget_cmb_box(self.cmb_filter_selection)
         if sel == "file":
@@ -377,13 +380,14 @@ class Input_Specs(QWidget):
         Reload all specs/parameters entries from global dict fb.fil[0],
         directly or using the "load_dict" methods of the individual classes
         """
+        logger.error("input specs load_dict()")
         self.led_info.setText(str(fb.fil[0]['info']))
         self.sel_fil.load_dict()  # select filter widget
-        self.f_units.load_dict()  # frequency units widget
-        self.f_specs.load_dict()  # frequency specification widget
-        self.a_specs.load_dict()  # magnitude specs with unit
-        self.w_specs.load_dict()  # weight specification
-        self.t_specs.load_dict()  # target specs
+        # self.f_units.load_dict()  # frequency units widget
+        # self.f_specs.load_dict()  # frequency specification widget
+        # self.a_specs.load_dict()  # magnitude specs with unit
+        # self.w_specs.load_dict()  # weight specification
+        # self.t_specs.load_dict()  # target specs
 
         self.color_design_button("ok")
 
@@ -429,33 +433,20 @@ class Input_Specs(QWidget):
             elif err == -1:  # filter design cancelled by user
                 return
             else:
-                # Update filter order. weights and freq display in case they
-                # have been changed by the design algorithm
+                # Update filter order in case it has been changed by the
+                # design algorithm and emit {'data_changed': 'filter_designed'}
                 self.sel_fil.load_filter_order()
-                self.w_specs.load_dict()
-                self.f_specs.load_dict()
                 self.color_design_button("ok")
 
                 self.emit({'data_changed': 'filter_designed'})
                 logger.info(
-                    'Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
-# =============================================================================
-#                 logger.debug("Results:\n"
-#                     "F_PB = %s, F_SB = %s "
-#                     "Filter order N = %s\n"
-#                     "NDim fil[0]['ba'] = %s\n\n"
-#                     "b,a = %s\n\n"
-#                     "zpk = %s\n",
-#                     str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-#                     str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
-#                     pformat(fb.fil[0]['zpk']))
-#
-# =============================================================================
+                    f"Designed filter with order = {str(fb.fil[0]['N'])}")
+
         except Exception as e:
             if ('__doc__' in str(e)):
-                logger.warning("Filter design:\n %s\n %s\n", e.__doc__, e)
+                logger.warning(f"Filter design:\n {e.__doc__}\n{e}\n")
             else:
-                logger.warning("{0}".format(e))
+                logger.warning(f"{e}")
             self.color_design_button("error")
 
     def color_design_button(self, state):

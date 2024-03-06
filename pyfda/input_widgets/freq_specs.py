@@ -60,6 +60,9 @@ class FreqSpecs(QWidget):
             return
         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
             self.recalc_freqs()
+        elif 'data_changed' in dict_sig and\
+            dict_sig['data_changed'] in {'filter_loaded', 'filter_designed'}:
+                self.load_dict()
 
 # -------------------------------------------------------------
     def _construct_UI(self):

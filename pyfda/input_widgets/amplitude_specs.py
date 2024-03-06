@@ -12,7 +12,7 @@ from pyfda.libs.compat import (
     QFont, QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval
+from pyfda.libs.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval, pprint_log
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qget_cmb_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -25,6 +25,7 @@ class AmplitudeSpecs(QWidget):
     Build and update widget for entering the amplitude
     specifications like A_SB, A_PB etc.
     """
+    sig_rx = pyqtSignal(object)  # receive signals from higher hierarchies
     sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
 
     from pyfda.libs.pyfda_qt_lib import emit
@@ -42,6 +43,20 @@ class AmplitudeSpecs(QWidget):
 
         self.spec_edited = False  # flag whether QLineEdit field has been edited
         self._construct_UI()
+
+# -------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.warning(
+           f"vis: {self.isVisible()} | {pprint_log(dict_sig)}")
+        if dict_sig['id'] == id(self):
+            # this should never happen
+            logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
+            return
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+            self.load_dict()
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -103,6 +118,11 @@ class AmplitudeSpecs(QWidget):
         # ATTENTION: Entries need to be converted from QString to str for Py 2
         new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A']
         self.update_UI(new_labels=new_labels)
+
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
 
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs / EVENT MONITORING

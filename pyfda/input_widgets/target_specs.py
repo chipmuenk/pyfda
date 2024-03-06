@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #
 # This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
@@ -16,6 +17,7 @@ from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
+from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params
 
@@ -31,7 +33,8 @@ class TargetSpecs(QWidget):
     # class variables (shared between instances if more than one exists)
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
-    # from pyfda.libs.pyfda_qt_lib import emit
+    sig_tx_local = pyqtSignal(object)  # outgoing to lower hierarchies
+    from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent=None, title="Target Specs", objectName=""):
         super(TargetSpecs, self).__init__(parent)
@@ -42,19 +45,23 @@ class TargetSpecs(QWidget):
         self._construct_UI()
 
 # =============================================================================
-# #------------------------------------------------------------------------------
-#     def process_sig_rx(self, dict_sig=None):
-#         """
-#         Process signals coming in via subwidgets and sig_rx
-#         """
-#         logger.warning("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-#         if dict_sig['id'] == id(self):
-#           logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-#           return
-#         elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
-#             # update target frequencies with new f_S
-#             self.f_specs.recalc_freqs()
-#
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.warning(f"sig_rx: {pprint_log(dict_sig)}")
+        if dict_sig['id'] == id(self):
+          logger.warning("Stopped infinite loop.")
+          return
+        elif 'view_changed' in dict_sig and dict_sig['view_changed'] == 'f_S':
+            # update target frequencies with new f_S
+            self.emit(dict_sig, sig_name='sig_tx_local')
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+            self.emit(dict_sig, sig_name='sig_tx_local')
+        else:
+            return
+
 # =============================================================================
 
     def _construct_UI(self):
@@ -62,9 +69,11 @@ class TargetSpecs(QWidget):
         Construct user interface
         """
         # subwidget for Frequency Specs
-        self.f_specs = freq_specs.FreqSpecs(self, title="Frequency")
+        self.f_specs = freq_specs.FreqSpecs(self, title="Frequency",
+                                            objectName="f_specs_targ")
         # subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title="Ripple",
+                                                      objectName="a_specs_targ")
         self.a_specs.setVisible(True)
         """
         LAYOUT
@@ -102,10 +111,14 @@ class TargetSpecs(QWidget):
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        # connect f_specs and a_specs subwidget to signalling
-        self.f_specs.sig_tx.connect(self.sig_tx)  # pass signal upwards
-        self.sig_rx.connect(self.f_specs.sig_rx)  # pass on received signals
-        self.a_specs.sig_tx.connect(self.sig_tx)  # pass signal upwards
+        # process incoming global signals
+        self.sig_rx.connect(self.process_sig_rx)
+        # connect signals from f_specs and a_specs subwidget to higher hierarchies
+        self.f_specs.sig_tx.connect(self.sig_tx)
+        self.a_specs.sig_tx.connect(self.sig_tx)
+        # pass on prefiltered received signals
+        self.sig_tx_local.connect(self.f_specs.sig_rx)
+        self.sig_tx_local.connect(self.a_specs.sig_rx)
 
         self.update_UI()  # first time initialization
 
@@ -135,15 +148,6 @@ class TargetSpecs(QWidget):
             self.a_specs.update_UI(new_labels=new_labels['amp'])
         else:
             self.a_specs.hide()
-
-# ------------------------------------------------------------------------------
-    def load_dict(self):
-        """
-        Update entries from global dict fb.fil[0]
-        parameters, using the "load_dict" methods of the classes
-        """
-        self.a_specs.load_dict()
-        self.f_specs.load_dict()
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
