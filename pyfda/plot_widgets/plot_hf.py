@@ -69,6 +69,7 @@ class Plot_Hf(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
+                    or 'filt_changed' in dict_sig\
                     or ('mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home')\
                          or self.needs_calc:
                 self.draw()
@@ -81,7 +82,8 @@ class Plot_Hf(QWidget):
                 self.frmControls.setVisible(dict_sig['value'] == 0)
 
         else:
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
+                    or 'filt_changed' in dict_sig:
                 self.needs_calc = True
             if 'view_changed' in dict_sig:
                 self.needs_draw = True
