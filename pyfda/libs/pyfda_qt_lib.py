@@ -47,6 +47,9 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
         if k not in DICT_SIG_KEYS:
             logger.warning(f"Unknown entry '{k}:{dict_sig[k]}' in 'dict_sig'!")
             logger.warning(pprint_log(dict_sig))
+    if self.sender() and self.sender().objectName():
+        logger.info(f"SenderName: {self.sender().objectName()}")
+    logger.info(f"objectName = {self.objectName()}")
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
     if 'class' not in dict_sig:
@@ -54,6 +57,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     # Count down time-to-live counter and terminate the signal when ttl < 1
     if 'ttl' in dict_sig:
         if dict_sig['ttl'] < 1:
+            logger.info("terminated with ttl = 0")
             return
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
@@ -61,6 +65,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
         self.sender() and self.sender().objectName():
         dict_sig.update({'sender_name': self.sender().objectName()})
     # Get signal (default name: `sig_tx`) from calling instance and emit it
+    logger.info(f"emit out:\n{pprint_log(dict_sig)}")
+
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
 
