@@ -442,7 +442,7 @@ class Plot_Impz(QWidget):
                     self.file_io()
                     self.impz_init()
 
-            elif 'view_changed' in dict_sig:
+            elif 'view_changed' in dict_sig or any(self.needs_redraw):
                 self.draw()  # redraw a.o. changed axes scaling
 
         else:  # invisible
