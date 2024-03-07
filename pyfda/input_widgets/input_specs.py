@@ -246,6 +246,7 @@ class Input_Specs(QWidget):
         self.butSaveFilt.clicked.connect(self._save_filter)
         self.led_info.editingFinished.connect(self._save_info2dict)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
+        self.cmb_filter_selection.currentIndexChanged.connect(self.update_info)
         self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
         # ----------------------------------------------------------------------
 
@@ -386,7 +387,13 @@ class Input_Specs(QWidget):
         self.sel_fil.load_dict()  # select filter widget
 
         self.color_design_button("ok")
-
+# ------------------------------------------------------------------------------
+    def update_info(self):
+        """
+        Update the info field of the filter selection
+        """
+        self.led_info.setText(
+            str(fb.fil[self.cmb_filter_selection.currentIndex()]['info']))
 # ------------------------------------------------------------------------------
     def start_design_filt(self):
         """
