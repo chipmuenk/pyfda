@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.libs.pyfda_lib import pprint_log, to_html
+from pyfda.libs.pyfda_lib import pprint_log, to_html, first_item
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, qget_selected
 from pyfda.libs.pyfda_io_lib import load_filter, save_filter
 from pyfda.pyfda_rc import params
@@ -87,7 +87,7 @@ class Input_Specs(QWidget):
         logger.warning(f"SIG_RX: {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
-            #               \n{pprint_log(dict_sig)}")
+            #               \n{first_item(dict_sig)}")
             return
 
         elif 'specs_changed' in dict_sig:
