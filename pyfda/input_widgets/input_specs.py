@@ -384,11 +384,6 @@ class Input_Specs(QWidget):
         logger.error("input specs load_dict()")
         self.led_info.setText(str(fb.fil[0]['info']))
         self.sel_fil.load_dict()  # select filter widget
-        # self.f_units.load_dict()  # frequency units widget
-        # self.f_specs.load_dict()  # frequency specification widget
-        # self.a_specs.load_dict()  # magnitude specs with unit
-        # self.w_specs.load_dict()  # weight specification
-        # self.t_specs.load_dict()  # target specs
 
         self.color_design_button("ok")
 
