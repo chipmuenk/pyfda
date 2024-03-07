@@ -112,9 +112,9 @@ class Input_Specs(QWidget):
             self.load_dict()
 
         if propagate:
-            # local signals are propagated with the class name of this widget,
+            # local signals are propagated with the class name and id of this widget,
             # global signals terminate here
-            dict_sig.update({'class': self.__class__.__name__})
+            dict_sig.update({'class': self.__class__.__name__, 'id': id(self)})
             self.emit(dict_sig)
 
     def _construct_UI(self):
