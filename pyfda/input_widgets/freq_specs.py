@@ -222,8 +222,8 @@ class FreqSpecs(QWidget):
     # --------------------------------------------------------------------------
     def recalc_freqs(self):
         """
-        Update normalized frequencies when absolute frequencies are locked. This is called by via signal
-        ['view_changed': 'f_S']
+        Update normalized frequencies when absolute frequencies are locked and
+        update frequency unit. This is called by via signal {'view_changed': 'f_S'}.
         """
         if fb.fil[0]['freq_locked']:
             for i in range(len(self.qlineedit)):
