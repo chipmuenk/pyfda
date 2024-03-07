@@ -223,7 +223,7 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         # connect incoming signals to process_sig_rx and other widgets?!
         self.sig_rx.connect(self.process_sig_rx)
-        self.sig_rx.connect(self.f_units.sig_rx)
+        # self.sig_rx.connect(self.f_units.sig_rx)
         self.sig_rx_local.connect(self.process_sig_rx_local)
 
         # connect outgoing signal to receive slots of f_specs, t_specs and f_units
