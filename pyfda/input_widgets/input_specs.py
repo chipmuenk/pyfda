@@ -44,7 +44,7 @@ class Input_Specs(QWidget):
     sig_tx = pyqtSignal(object)  # from process_sig_rx: propagate local signals
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, objectName="input_specs_default_name"):
+    def __init__(self, parent=None, objectName="input_specs_inst"):
         super(Input_Specs, self).__init__(parent)
         self.setObjectName(objectName)
         self.tab_label = "Specs"
@@ -159,10 +159,10 @@ class Input_Specs(QWidget):
 
         # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
-        self.sel_fil = select_filter.SelectFilter(self, objectName="sel_fil_name")
+        self.sel_fil = select_filter.SelectFilter(self, objectName="select_filter_inst")
 
         # Subwidget for selecting the frequency unit and range
-        self.f_units = freq_units.FreqUnits(self, objectName="f_units_name")
+        self.f_units = freq_units.FreqUnits(self, objectName="freq_units_inst")
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -173,17 +173,17 @@ class Input_Specs(QWidget):
         # in other hierarchy levels, e.g. in the plot tabs
 
         # Subwidget for Frequency Specs
-        self.f_specs = freq_specs.FreqSpecs(self, objectName="f_specs_corner")
+        self.f_specs = freq_specs.FreqSpecs(self, objectName="freq_specs_corner")
 
         # Subwidget for Amplitude Specs
-        self.a_specs = amplitude_specs.AmplitudeSpecs(self, objectName="a_specs_general")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, objectName="amplitude_specs_general")
 
         # Subwidget for Weight Specs
-        self.w_specs = weight_specs.WeightSpecs(self, objectName="w_specs_name")
+        self.w_specs = weight_specs.WeightSpecs(self, objectName="weight_specs_inst")
 
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications",
-                                                objectName="t_specs_name")
+                                                objectName="target_specs_inst")
 
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)

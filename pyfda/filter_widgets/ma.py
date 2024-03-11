@@ -72,9 +72,10 @@ near ``f_S/2`` (highpass).
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, objectName='ma_inst'):
         QWidget.__init__(self)
 
+        self.setObjectName(objectName)
         self.delays = 12 # number of delays per stage
         self.stages = 1 # number of stages
 

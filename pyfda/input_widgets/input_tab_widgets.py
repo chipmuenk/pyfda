@@ -36,8 +36,9 @@ class InputTabWidgets(QWidget):
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, objectName='input_tab_widgets_inst'):
         super(InputTabWidgets, self).__init__(parent)
+        self.setObjectName(objectName)
         self._construct_UI()
 
     def _construct_UI(self):

@@ -31,8 +31,9 @@ class PlotTabWidgets(QTabWidget):
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, objectName="plot_tab_widgets_inst"):
         super(PlotTabWidgets, self).__init__(parent)
+        self.setObjectName(objectName)
         self._construct_UI()
 
 # ------------------------------------------------------------------------------

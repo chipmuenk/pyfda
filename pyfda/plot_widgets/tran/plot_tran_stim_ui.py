@@ -59,7 +59,7 @@ class Plot_Tran_Stim_UI(QWidget):
                 self.normalize_freqs()
 
 # ------------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, objectName='plot_tran_stim_ui_inst'):
         super().__init__()
 
         """
@@ -69,6 +69,7 @@ class Plot_Tran_Stim_UI(QWidget):
         - two bottom rows with action buttons
         """
         # initial settings
+        self.setObjectName(objectName)
         self.N_FFT = 0  # TODO: FFT value needs to be passed here somehow?
 
         # stimuli

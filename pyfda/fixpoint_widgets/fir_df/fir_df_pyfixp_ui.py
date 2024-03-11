@@ -75,7 +75,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs',
+            fb.fil[0]['fxqc']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
+            wdg_name='wq_coeffs',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
         layV_wq_coeffs = QVBoxLayout()
@@ -89,7 +90,8 @@ class FIR_DF_pyfixp_UI(QWidget):
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
              'N_over': 0, 'wdg_name': 'unknown'})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu', cmb_w_vis='on',
+            fb.fil[0]['fxqc']['QACC'], objectName='fx_ui_wq_fir_df_accu',
+            wdg_name='wq_accu', cmb_w_vis='on',
             cmb_w_items=self.cmb_wq_accu_items,
             label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
         layV_wq_accu = QVBoxLayout()

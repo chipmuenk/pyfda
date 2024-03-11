@@ -80,9 +80,10 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
     sig_tx = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, objectName='equiripple_inst'):
         QWidget.__init__(self)
 
+        self.setObjectName(objectName)
         self.grid_density = 16
 
         self.ft = 'FIR'

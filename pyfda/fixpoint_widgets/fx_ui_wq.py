@@ -95,9 +95,10 @@ class FX_UI_WQ(QWidget):
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, q_dict: dict, **kwargs) -> None:
+    def __init__(self, q_dict: dict, objectName='fx_ui_wq_inst', **kwargs) -> None:
         super().__init__()
 
+        self.setObjectName(objectName)
         # default settings for q_dict
         q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
                           'ovfl': 'sat', 'wdg_name': 'unknown'}

@@ -68,9 +68,10 @@ class Firwin(QWidget):
     sig_tx_local = pyqtSignal(object)
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, objectName='firwin_inst'):
         QWidget.__init__(self)
 
+        self.setObjectName(objectName)
         self.ft = 'FIR'
 
         win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",

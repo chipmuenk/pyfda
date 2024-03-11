@@ -136,9 +136,11 @@ class pyFDA(QMainWindow):
         """
 
         # ============== UI Layout with H and V-Splitter =====================
-
-        inputTabWidgets = input_tab_widgets.InputTabWidgets(self)  # input widgets
-        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self)  # plot widgets
+        # create tab widgets for input and plot widgets
+        inputTabWidgets = input_tab_widgets.InputTabWidgets(
+            self, objectName='input_tab_widgets_inst')
+        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(
+            self, objectName='plot_tab_widgets_inst')
         self.loggerWin = QPlainTextEdit(self)  # logger window
         self.loggerWin.setReadOnly(True)
         # set custom right-button context menu policy

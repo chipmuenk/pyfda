@@ -19,7 +19,7 @@ from .pyfda_dirs import OS, OS_VER
 import logging
 logger = logging.getLogger(__name__)
 
-DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name',
+DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name'
                  'view_changed',   # view on the data (e.g. f_S) has changed
                  'specs_changed',  # filter specs (corner freqs. etc.) have changed
                  'data_changed',   # actual filter data (coeffs. etc.) has changed
@@ -49,7 +49,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
             logger.warning(pprint_log(dict_sig))
     if self.sender() and self.sender().objectName():
         logger.info(f"this_sender_name: {self.sender().objectName()}")
-    logger.info(f"objectName = {self.objectName()}")
+    # logger.info(f"objectName = {self.objectName()}")
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
     if 'class' not in dict_sig:
@@ -64,9 +64,12 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     if 'sender_name' not in dict_sig and\
         self.sender() and self.sender().objectName():
         dict_sig.update({'sender_name': self.sender().objectName()})
+    if 'object_name' not in dict_sig:
+        dict_sig.update({'object_name': self.objectName()})
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     logger.info(f"emit out:\n{pprint_log(dict_sig)}")
 
+    logger.info(f"EMIT:{pprint_log(dict_sig)}")
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
 

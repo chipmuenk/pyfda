@@ -86,7 +86,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc'].update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("Empty dict / missing key 'fxqc['QCB]'!")
         self.wdg_wq_coeffs_b = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QCB'], wdg_name='wq_coeffs_b',
+            fb.fil[0]['fxqc']['QCB'], objectName='fx_ui_wq_iir_df1_coeffs_b',
+            wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_b_items)
         layV_wq_coeffs_b = QVBoxLayout()
@@ -97,7 +98,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             fb.fil[0]['fxqc'].update({'QCA': {}})  # no coefficient settings in dict yet
             logger.warning("Empty dict / missing key 'fxqc['QCA]'!")
         self.wdg_wq_coeffs_a = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QCA'], wdg_name='wq_coeffs_a',
+            fb.fil[0]['fxqc']['QCA'], objectName='fx_ui_wq_iir_df1_coeffs_a',
+            wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items)
         layV_wq_coeffs_a = QVBoxLayout()
@@ -112,7 +114,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
              'N_over': 0, 'wdg_name': 'unknown'})
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
+            fb.fil[0]['fxqc']['QACC'], objectName='fx_ui_wq_iir_df1_accu',
+            wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items)
         layV_wq_accu = QVBoxLayout()
