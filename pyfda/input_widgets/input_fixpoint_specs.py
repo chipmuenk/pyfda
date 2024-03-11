@@ -64,7 +64,9 @@ class Input_Fixpoint_Specs(QWidget):
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                          " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
-        self.fx_specs_changed = True  # fixpoint specs have been changed outside
+        self.fx_specs_changed = True  # fixpoint specs have been changed
+        self.fx_filt_changed = True  # (fixpoint) filter has been changed
+
         self.fx_path = os.path.realpath(
             os.path.join(dirs.INSTALL_DIR, 'fixpoint_widgets'))
 
@@ -188,98 +190,128 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        # have fixpoint specs been changed previously when widget was invisible?
-        if self.fx_specs_changed:
-            # update wordlengths in UI and set RUN button to 'changed':
-            self.dict2ui()
-            self.fx_specs_changed = False  # reset flag
+        if True:  # fb.fil[0]['fx_sim']:  # fixpoint mode active?
+            #  =================== UI_CHANGED =======================================
+            if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+                    in {'resized', 'tab'} and self.isVisible():
+                # Widget size has changed / "Fixpoint" tab has been selected -> resize image
+                self.resize_img()
 
-        #  =================== UI_CHANGED =======================================
-        if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
-                in {'resized', 'tab'} and self.isVisible():
-            # Widget size has changed / "Fixpoint" tab has been selected -> resize image
-            self.resize_img()
-
-        # =================== DATA CHANGED =====================================
-        elif 'data_changed' in dict_sig:
-            if dict_sig['data_changed'] == "filter_designed":
-                # New filter has been designed, update list of available filter topologies
+            # have fixpoint specs / filter been changed when widget was invisible
+            # or in float mode? If yes, update fixpoint topologies and UI from dict,
+            # set RUN button to "changed" and resize fixpoint image.
+            if self.fx_filt_changed:
                 self._update_filter_cmb()
-                return
+                self._update_fixp_widget()
+                self.resize_img()
+                self.fx_filt_changed = False  # reset flag
+                self.fx_specs_changed = False  # reset flag
 
-            elif dict_sig['data_changed'] == "filter_loaded":
-                # New filter has been loaded, update fixpoint topologies and UI from dict,
-                # set RUN button to "changed"
-                # TODO: Is this needed? Is the fixpoint widget updated?
-                self._update_filter_cmb()
-                self.dict2ui()
-                return
-
-            else:
-                # Filter data has changed (but not the filter type):
-                # Reload UI from dict and set RUN button to "changed"
-                self.dict2ui()
-
-        # =================== FX SIM ============================================
-        elif 'fx_sim' in dict_sig:
-            # --------------- init -------------------
-            if dict_sig['fx_sim'] == 'init':
-                # fixpoint simulation has been started externally, e.g. by
-                # `impz.impz_init()`, return a handle to the fixpoint filter function
-                # via signal-slot connection
-                if not self.fx_wdg_found:
-                    logger.error("No fixpoint widget found!")
-                    # qstyle_widget(self.butSimFx, "error")
-                    self.emit({'fx_sim': 'error'})
-                    return
-                # initialize fixpoint filter and check for error during initialization
-                err = self.fx_filt_init()
-                if err != 0:  # returned an error
-                    # qstyle_widget(self.butSimFx, "error")
-                    self.emit({'fx_sim': 'error'})
-                else:
-                    # Reset overflow counter for input and output quantization,
-                    self.wdg_wq_input.QObj.resetN()
-                    self.wdg_wq_output.QObj.resetN()
-                    # Trigger fixpoint response calculation, passing a handle to the
-                    # fixpoint filter function in the emitted dict
-                    if hasattr(self.fx_filt_ui, 'fxfilter'):
-                        self.emit({'fx_sim': 'start_fx_response_calculation',
-                                   'fxfilter_func': self.fx_filt_ui.fxfilter})
-                    else:
-                        logger.error(
-                            "Couldn't find fixpoint filter definition\n"
-                            f"\t'{self.fx_filt_ui.__class__.__name__}.fxfilter'!")
-                        self.emit({'fx_sim': 'error'})
-
-                    # next, start fx response calculation in `plot_impz()`
-                    return
-
-            # --------------- finish --------------
-            elif dict_sig['fx_sim'] == 'finish':
-                # update I/O widgets and dynamically instantiated filter widget with
-                # number of overflows etc.
-                self.wdg_wq_input.update_ovfl_cnt()
-                self.wdg_wq_output.update_ovfl_cnt()
-                if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update_ovfl_cnt_all'):
-                    self.fx_filt_ui.update_ovfl_cnt_all()
-                else:
-                    logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
-                # qstyle_widget(self.butSimFx, "normal")
-            # fixpoint specifications / quantization settings have been changed
-            # somewhere else, update UI and set run button to "changed" in dict2ui()
-
-            # --------------- fx specs_changed ------------
-            elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
+            elif self.fx_specs_changed:
                 # update wordlengths in UI and set RUN button to 'changed':
                 self.dict2ui()
-                self.fx_specs_changed = False
-            elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
-                self.fx_specs_changed = True
-            else:
-                logger.error('Unknown "fx_sim" command option "{0}"\n'
-                             '\treceived from "{1}".'
-                             .format(dict_sig['fx_sim'], dict_sig['class']))
+                self.fx_specs_changed = False  # reset flag
+
+            #  =================== UI_CHANGED =======================================
+            if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
+                    in {'resized', 'tab'} and self.isVisible():
+                # Widget size has changed / "Fixpoint" tab has been selected -> resize image
+                self.resize_img()
+
+            # =================== DATA CHANGED =====================================
+            elif 'data_changed' in dict_sig:
+                if dict_sig['data_changed'] == "filter_designed":
+                    # New filter has been designed, update list of available filter topologies
+                    self._update_filter_cmb()
+                    return
+
+                elif dict_sig['data_changed'] == "filter_loaded":
+                    # New filter has been loaded, update fixpoint topologies and UI from dict,
+                    # set RUN button to "changed"
+                    # TODO: Is this needed? Is the fixpoint widget updated?
+                    self._update_filter_cmb()
+                    self.dict2ui()
+                    return
+
+                else:
+                    # Filter data has changed (but not the filter type):
+                    # Reload UI from dict and set RUN button to "changed"
+                    self.dict2ui()
+
+            # =================== FX SIM ============================================
+            elif 'fx_sim' in dict_sig:
+                # --------------- init -------------------
+                if dict_sig['fx_sim'] == 'init':
+                    # fixpoint simulation has been started externally, e.g. by
+                    # `impz.impz_init()`, return a handle to the fixpoint filter function
+                    # via signal-slot connection
+                    if not self.fx_wdg_found:
+                        logger.error("No fixpoint widget found!")
+                        # qstyle_widget(self.butSimFx, "error")
+                        self.emit({'fx_sim': 'error'})
+                        return
+                    # initialize fixpoint filter and check for error during initialization
+                    err = self.fx_filt_init()
+                    if err != 0:  # returned an error
+                        # qstyle_widget(self.butSimFx, "error")
+                        self.emit({'fx_sim': 'error'})
+                    else:
+                        # Reset overflow counter for input and output quantization,
+                        self.wdg_wq_input.QObj.resetN()
+                        self.wdg_wq_output.QObj.resetN()
+                        # Trigger fixpoint response calculation, passing a handle to the
+                        # fixpoint filter function in the emitted dict
+                        if hasattr(self.fx_filt_ui, 'fxfilter'):
+                            self.emit({'fx_sim': 'start_fx_response_calculation',
+                                    'fxfilter_func': self.fx_filt_ui.fxfilter})
+                        else:
+                            logger.error(
+                                "Couldn't find fixpoint filter definition\n"
+                                f"\t'{self.fx_filt_ui.__class__.__name__}.fxfilter'!")
+                            self.emit({'fx_sim': 'error'})
+
+                        # next, start fx response calculation in `plot_impz()`
+                        return
+
+                # --------------- finish --------------
+                elif dict_sig['fx_sim'] == 'finish':
+                    # update I/O widgets and dynamically instantiated filter widget with
+                    # number of overflows etc.
+                    self.wdg_wq_input.update_ovfl_cnt()
+                    self.wdg_wq_output.update_ovfl_cnt()
+                    if hasattr(self, 'fx_filt_ui') and hasattr(self.fx_filt_ui, 'update_ovfl_cnt_all'):
+                        self.fx_filt_ui.update_ovfl_cnt_all()
+                    else:
+                        logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
+                    # qstyle_widget(self.butSimFx, "normal")
+                # fixpoint specifications / quantization settings have been changed
+                # somewhere else, update UI and set run button to "changed" in dict2ui()
+
+                # --------------- fx specs_changed ------------
+                elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
+                    # update wordlengths in UI and set RUN button to 'changed':
+                    self.dict2ui()
+                    self.fx_specs_changed = False
+                elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
+                    self.fx_specs_changed = True
+                else:
+                    logger.error('Unknown "fx_sim" command option "{0}"\n'
+                                '\treceived from "{1}".'
+                                .format(dict_sig['fx_sim'], dict_sig['class']))
+
+        # =============================================================================
+        else:  # fixpoint mode is not active
+            if 'data_changed' in dict_sig:
+                if dict_sig['data_changed'] in {"filter_designed", "filter_loaded"}:
+                    # New filter has been designed or loaded, update list of available
+                    # filter topologies and UI from dict, set RUN button to "changed"
+                    self.fx_filt_changed = True
+
+                else:
+                    # Filter data has changed (but not the filter type):
+                    # Reload UI from dict and set RUN button to "changed"
+                    self.fx_specs_changed = True
+                return
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
@@ -773,13 +805,14 @@ class Input_Fixpoint_Specs(QWidget):
         error: int
             0 for sucessful fx widget construction, -1 for error
         """
-        try:
+        if True:
+        # try:
             # initialize fixpoint filter instance with fixpoint quantizer
             self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
 
             return 0
-
-        except (ValueError, AttributeError) as e:
+        else:
+        # except (ValueError, AttributeError) as e:
             logger.error('Fixpoint filter reset or instantiation failed.'
                          '\nwith "{0} "'.format(e))
         return -1
