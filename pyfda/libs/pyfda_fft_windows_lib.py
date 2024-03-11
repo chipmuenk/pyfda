@@ -551,10 +551,11 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, win_dict):
+    def __init__(self, win_dict, objectName=""):
         super().__init__()
 
         self.win_dict = win_dict
+        self.setObjectName(objectName)
         self.err = False  # error flag for window calculation
         self._construct_UI()
         self.set_window_name()  # initialize win_dict

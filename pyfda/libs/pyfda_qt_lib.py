@@ -48,7 +48,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
             logger.warning(f"Unknown entry '{k}:{dict_sig[k]}' in 'dict_sig'!")
             logger.warning(pprint_log(dict_sig))
     if self.sender() and self.sender().objectName():
-        logger.info(f"SenderName: {self.sender().objectName()}")
+        logger.info(f"this_sender_name: {self.sender().objectName()}")
     logger.info(f"objectName = {self.objectName()}")
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})

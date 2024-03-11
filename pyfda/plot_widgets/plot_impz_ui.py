@@ -61,6 +61,7 @@ class PlotImpz_UI(QWidget):
 
         # --- signals coming from the FFT window widget or the FFT window selector
         if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
+            logger.error(f"FFT: pprint_log(dict_sig)")
             if 'closeEvent' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
@@ -261,7 +262,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self.win_dict, objectName='win_select_qfft')
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")

@@ -156,7 +156,7 @@ class Firwin(QWidget):
                     # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.emit(dict_sig, sig_name='sig_tx_local')
-                    # global connection to upper hierachies
+                    # global connection to upper hierarchies
                     # send notification that filter design has changed
                     self.emit({'filt_changed': 'firwin'})
 
@@ -175,7 +175,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
-        self.qfft_win_select = QFFTWinSelector(self.win_dict)
+        self.qfft_win_select = QFFTWinSelector(self.win_dict, objectName='fir_win_qfft')
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 

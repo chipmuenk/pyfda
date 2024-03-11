@@ -54,11 +54,12 @@ class Input_Fixpoint_Specs(QWidget):
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, objectName="input_fixpoint_spec_inst"):
         super(Input_Fixpoint_Specs, self).__init__(parent)
     # def __init__(self) -> None:
     #    super().__init__()
 
+        self.setObjectName(objectName)
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                          " simulate it or generate a Verilog netlist.</span>")
@@ -463,7 +464,7 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
         """
-        (Re-)Read list of available fixpoint filters for a given filter design
+        (Re-)Read list of available fixpoint filters for a given filter class
         every time a new filter has been designed or loaded.
 
         Then try to import the fixpoint designs in the list and populate the
@@ -478,8 +479,8 @@ class Input_Fixpoint_Specs(QWidget):
         inst_wdg_str = ""  # full names of successfully instantiated widgets for logging
         # remember last fx widget setting:
         last_fx_wdg = qget_cmb_box(self.cmb_fx_wdg, data=False)
-        self.cmb_fx_wdg.clear()
-        fc = fb.fil[0]['fc']
+        self.cmb_fx_wdg.clear()  # clear combobox
+        fc = fb.fil[0]['fc']  # get current filter class
 
         if 'fix' in fb.filter_classes[fc]:
             self.cmb_fx_wdg.blockSignals(True)
