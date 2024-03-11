@@ -57,19 +57,21 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     # Count down time-to-live counter and terminate the signal when ttl < 1
     if 'ttl' in dict_sig:
         if dict_sig['ttl'] < 1:
-            logger.info("terminated with ttl = 0")
+            logger.warning("Terminated with ttl = 0")
             return
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
+    else:
+        dict_sig.update({'ttl': 50})
     if 'sender_name' not in dict_sig and\
         self.sender() and self.sender().objectName():
         dict_sig.update({'sender_name': self.sender().objectName()})
     if 'object_name' not in dict_sig:
         dict_sig.update({'object_name': self.objectName()})
-    # Get signal (default name: `sig_tx`) from calling instance and emit it
-    logger.info(f"emit out:\n{pprint_log(dict_sig)}")
 
     logger.info(f"EMIT:{pprint_log(dict_sig)}")
+
+    # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
     signal.emit(dict_sig)
 
