@@ -190,7 +190,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        if True:  # fb.fil[0]['fx_sim']:  # fixpoint mode active?
+        if fb.fil[0]['fx_sim']:  # fixpoint mode active?
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
