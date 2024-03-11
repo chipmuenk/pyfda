@@ -17,7 +17,7 @@ from pyfda.libs.compat import (
     QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt, QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import pprint_log
+from pyfda.libs.pyfda_lib import pprint_log, first_item
 from pyfda.input_widgets import amplitude_specs, freq_specs
 from pyfda.pyfda_rc import params
 
@@ -50,7 +50,7 @@ class TargetSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        logger.warning(f"sig_rx: {pprint_log(dict_sig)}")
+        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
           logger.warning("Stopped infinite loop.")
           return

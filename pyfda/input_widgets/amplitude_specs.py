@@ -12,7 +12,8 @@ from pyfda.libs.compat import (
     QFont, QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import(
+    to_html, lin2unit, unit2lin, safe_eval, pprint_log, first_item)
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qget_cmb_box
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -50,7 +51,7 @@ class AmplitudeSpecs(QWidget):
         Process signals coming in via subwidgets and sig_rx
         """
         logger.warning(
-           f"vis: {self.isVisible()} | {pprint_log(dict_sig)}")
+           f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             # this should never happen
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))

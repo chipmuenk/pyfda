@@ -15,7 +15,7 @@ from pyfda.libs.compat import (
     QIcon, QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qcmb_box_populate, PushButton
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -97,8 +97,7 @@ class FreqUnits(QWidget):
         - qfft_win_select
         """
 
-        logger.warning("PROCESS_SIG_RX - vis: {0}\n{1}"
-                   .format(self.isVisible(), pprint_log(dict_sig)))
+        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.debug("Stopped infinite loop")

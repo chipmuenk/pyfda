@@ -16,7 +16,7 @@ from pyfda.libs.compat import (
     QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
+from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log, first_item
 from pyfda.libs.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -49,7 +49,7 @@ class WeightSpecs(QWidget):
         Process signals coming in via subwidgets and sig_rx
         """
         logger.warning(
-            f"{pprint_log(dict_sig)}")
+            f"SIG RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
             return
