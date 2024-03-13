@@ -51,10 +51,11 @@ class Plot_Impz(QWidget):
     sig_tx = pyqtSignal(object)  # outgoing, e.g. when stimulus has been calculated
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self):
+    def __init__(self, objectName='plot_impz_inst'):
         super().__init__()
 
         # arrays that need to be passed to subwidgets
+        self.setObjectName(objectName)
         self.x = self.y = self.x_q = None
 
         # create the UI part with buttons etc.
