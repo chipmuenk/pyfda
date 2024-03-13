@@ -107,7 +107,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         # logger.warning(
         #     f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
-
+        logger.warning(
+            f"SIG_RX_LOCAL: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(
                 f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -163,6 +164,7 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             self.dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            logger.error("fx_sim: specs_changed emitted thru ui_local_changes")
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
 
@@ -185,7 +187,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         # logger.warning(
         #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-
+        logger.warning(
+            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
@@ -197,33 +200,11 @@ class Input_Fixpoint_Specs(QWidget):
                 # Widget size has changed / "Fixpoint" tab has been selected -> resize image
                 self.resize_img()
 
-            # have fixpoint specs / filter been changed when widget was invisible
-            # or in float mode? If yes, update fixpoint topologies and UI from dict,
-            # set RUN button to "changed" and resize fixpoint image.
-            if self.fx_filt_changed:
-                self._update_filter_cmb()
-                self._update_fixp_widget()
-                self.resize_img()
-                self.fx_filt_changed = False  # reset flag
-                self.fx_specs_changed = False  # reset flag
-
-            elif self.fx_specs_changed:
-                # update wordlengths in UI and set RUN button to 'changed':
-                self.dict2ui()
-                self.fx_specs_changed = False  # reset flag
-
-            #  =================== UI_CHANGED =======================================
-            if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
-                    in {'resized', 'tab'} and self.isVisible():
-                # Widget size has changed / "Fixpoint" tab has been selected -> resize image
-                self.resize_img()
-
             # =================== DATA CHANGED =====================================
             elif 'data_changed' in dict_sig:
                 if dict_sig['data_changed'] == "filter_designed":
                     # New filter has been designed, update list of available filter topologies
                     self._update_filter_cmb()
-                    return
 
                 elif dict_sig['data_changed'] == "filter_loaded":
                     # New filter has been loaded, update fixpoint topologies and UI from dict,
@@ -231,17 +212,21 @@ class Input_Fixpoint_Specs(QWidget):
                     # TODO: Is this needed? Is the fixpoint widget updated?
                     self._update_filter_cmb()
                     self.dict2ui()
-                    return
 
                 else:
                     # Filter data has changed (but not the filter type):
                     # Reload UI from dict and set RUN button to "changed"
                     self.dict2ui()
 
+                # ------------- reset change flags ------------------
+                self.fx_filt_changed = False
+                self.fx_specs_changed = False
+
             # =================== FX SIM ============================================
             elif 'fx_sim' in dict_sig:
                 # --------------- init -------------------
                 if dict_sig['fx_sim'] == 'init':
+                    logger.error("init fx_sim")
                     # fixpoint simulation has been started externally, e.g. by
                     # `impz.impz_init()`, return a handle to the fixpoint filter function
                     # via signal-slot connection
@@ -283,14 +268,12 @@ class Input_Fixpoint_Specs(QWidget):
                         self.fx_filt_ui.update_ovfl_cnt_all()
                     else:
                         logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
-                    # qstyle_widget(self.butSimFx, "normal")
-                # fixpoint specifications / quantization settings have been changed
-                # somewhere else, update UI and set run button to "changed" in dict2ui()
 
                 # --------------- fx specs_changed ------------
                 elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
                     # update wordlengths in UI and set RUN button to 'changed':
                     self.dict2ui()
+                    self.resize_img()
                     self.fx_specs_changed = False
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
@@ -298,6 +281,26 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error('Unknown "fx_sim" command option "{0}"\n'
                                 '\treceived from "{1}".'
                                 .format(dict_sig['fx_sim'], dict_sig['class']))
+
+                # ------------- reset change flags ------------------
+                self.fx_filt_changed = False
+                self.fx_specs_changed = False
+
+            # =================== Previous Changes ====================================
+            # have fixpoint specs / filter been changed when widget was invisible
+            # or in float mode? If yes, update fixpoint topologies and UI from dict,
+            # set RUN button to "changed" and resize fixpoint image.
+            elif self.fx_filt_changed:
+                self._update_filter_cmb()
+                self._update_fixp_widget()
+                self.resize_img()
+                self.fx_filt_changed = False  # reset flag
+                self.fx_specs_changed = False  # reset flag
+
+            elif self.fx_specs_changed:
+                # update wordlengths in UI and set RUN button to 'changed':
+                self.dict2ui()
+                self.fx_specs_changed = False  # reset flag
 
         # =============================================================================
         else:  # fixpoint mode is not active
@@ -708,6 +711,7 @@ class Input_Fixpoint_Specs(QWidget):
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
             # self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
+            logger.error("emitted thru _update_fixp_widget")
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
