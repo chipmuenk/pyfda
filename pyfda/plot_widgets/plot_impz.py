@@ -93,7 +93,7 @@ class Plot_Impz(QWidget):
 
         # --------------------------------------------
         # initialize UI and `fb.fil[0]['fx_sim']` for fixpoint or float simulation
-        self.update_fx_ui_settings()
+        self.toggle_fx_settings()
 
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
@@ -214,7 +214,7 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         self.tab_stim_w.currentChanged.connect(self.resize_stim_tab_widget)
         # --- run control ---
-        self.ui.cmb_sim_select.currentIndexChanged.connect(self.update_fx_ui_settings)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.toggle_fx_settings)
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.stim_wdg.ui.but_file_io.clicked.connect(self.set_N_to_file_len)
@@ -341,7 +341,7 @@ class Plot_Impz(QWidget):
             #     self.needs_calc_fx = True   # force fx recalculation
             #     self.error = False          # reset error flag
 
-            #     self.update_fx_ui_settings("fixpoint")  # set fixpoint mode
+            #     self.toggle_fx_settings("fixpoint")  # set fixpoint mode
             #     qstyle_widget(self.ui.but_run, "changed")
             #     self.ui.but_run.setIcon(QIcon(":/play.svg"))
             #     self.impz_init(True)
@@ -361,7 +361,7 @@ class Plot_Impz(QWidget):
                 """
                 self.needs_calc_fx = True   # fx sim needs recalculation
                 # set cmb box for fixpoint / float simulation and update ui
-                self.update_fx_ui_settings()
+                self.toggle_fx_settings()
                 if fb.fil[0]['fx_sim']:     # fixpoint mode is active
                     self.error = False      # reset error flag
                     self.needs_calc = True  # force recalculation
@@ -546,7 +546,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw = [True] * 2
 
         # check for fixpoint setting (fb.fil[0]['fx_sim']) and update UI if needed
-        self.update_fx_ui_settings()
+        self.toggle_fx_settings()
 
         if type(arg) == bool:
             self.needs_calc = True  # but_run has been pressed -> force run
@@ -774,11 +774,11 @@ class Plot_Impz(QWidget):
     #     else:  # combobox modified, set fb.fil[0]['fx_sim'] according to combo box
     #         fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
     #         self.emit({'fx_sim': 'specs_changed'})
-    #     self.update_fx_ui_settings()
+    #     self.toggle_fx_settings()
     #     self.calc_auto()  # run simulation if autostart has been selected
 
     # --------------------------------------------------------------------------
-    def update_fx_ui_settings(self, arg=None):
+    def toggle_fx_settings(self, arg=None):
         """
          Argument `arg` can be:
 
