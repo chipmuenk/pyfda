@@ -202,7 +202,6 @@ class WeightSpecs(QWidget):
         """
         Reload textfields from filter dictionary to update changed settings
         """
-        logger.error("weight_specs: load_dict")
         for i in range(len(self.qlineedit)):
             weight_value = fb.fil[0][str(self.qlineedit[i].objectName())]
 
