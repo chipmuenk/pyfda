@@ -721,9 +721,18 @@ class Input_Fixpoint_Specs(QWidget):
         Emit {'fx_sim': 'specs_changed'}.
         """
         qfrmt = qget_cmb_box(self.cmb_qfrmt)
-        fb.fil[0]['fx_sim'] = (qfrmt != 'float')
-        if qfrmt != 'float':
+        is_fixp = qfrmt != 'float'
+        fb.fil[0]['fx_sim'] = is_fixp
+
+        self.wdg_wq_input.setVisible(is_fixp)
+        self.wdg_wq_output.setVisible(is_fixp)
+        self.frmImg.setVisible(is_fixp)
+        # if self.fx_wdg_found:
+        #    self.fx_filt_ui.setVisible(is_fixp)
+
+        if is_fixp:
             fb.fil[0]['qfrmt'] = qfrmt
+            self.resize_img()  # refresh image when switching from float to fix
 
         self.dict2ui()
         self.emit({'fx_sim': 'specs_changed'})
