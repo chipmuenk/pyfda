@@ -474,7 +474,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
         # self.butSimFx.clicked.connect(self._start_fx_sim)
-        self.cmb_qfrmt.currentIndexChanged.connect(self.ui2dict)
+        self.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2ui)
 
         # ----------------------------------------------------------------------
         # EVENT FILTER
@@ -711,7 +711,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
-    def ui2dict(self):
+    def qfrmt2ui(self):
         """
         Triggered by a change of fixpoint format.
 
