@@ -285,7 +285,7 @@ class FX_UI_WQ(QWidget):
         self.QObj = fx.Fixed(self.q_dict)
 
         # initialize button icon
-        self.butLock_clicked(self.butLock.isChecked())
+        self.but_lock_update_icon(self.butLock.isChecked())
 
         # ----------------------------------------------------------------------
         # GLOBAL SIGNALS
@@ -300,7 +300,7 @@ class FX_UI_WQ(QWidget):
         self.ledWF.editingFinished.connect(self.ui2dict)
         self.cmbW.currentIndexChanged.connect(self.ui2dict)
 
-        self.butLock.clicked.connect(self.butLock_clicked)
+        self.butLock.clicked.connect(self.but_lock_checked)
 
         # initialize the UI from the quantization and the global dictionary
         self.dict2ui()
@@ -308,17 +308,24 @@ class FX_UI_WQ(QWidget):
         self.update_ovfl_cnt()
 
     # --------------------------------------------------------------------------
-    def butLock_clicked(self, clicked):
+    def but_lock_checked(self, checked: bool) -> None:
+        """
+        Update the icon of the push button depending on its state (checked or not)
+        and fire the signal {'ui_local_changed': 'butLock'}
+        """
+        self.but_lock_update_icon(checked)
+        self.emit({'ui_local_changed': 'butLock'})
+
+    # --------------------------------------------------------------------------
+    def but_lock_update_icon(self, checked: bool) -> None:
         """
         Update the icon of the push button depending on its state
         """
-        if clicked:
+        if checked:
             self.butLock.setIcon(QIcon(':/lock-locked.svg'))
         else:
             self.butLock.setIcon(QIcon(':/lock-unlocked.svg'))
-
-        dict_sig = {'sender_name': self.wdg_name, 'ui_local_changed': 'butLock'}
-        self.emit(dict_sig)
+        return
 
     # --------------------------------------------------------------------------
     def update_ovfl_cnt(self):
