@@ -800,12 +800,18 @@ class Plot_Impz(QWidget):
 
         If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
         is set to True and the run button is set to "changed".
+        ------------------------------------------------------
+        Triggered:
+        - during construction
+        - when combobox float / fixpoint simulation is changed
+        - when {dict_sig['fx_sim'] == 'specs_changed'} is received
+        - in impz_init()
         """
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         if arg in {"float", "fixpoint"}:
             qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
             fb.fil[0]['fx_sim'] = (arg == "fixpoint")
-        # Direct call with no argument set combobox according to fb.fil[0]['fx_sim']
+        # Direct call with no argument, set combobox according to fb.fil[0]['fx_sim']
         elif arg is None:
             if fb.fil[0]['fx_sim']:
                 qset_cmb_box(self.ui.cmb_sim_select, "fixpoint", data=True)

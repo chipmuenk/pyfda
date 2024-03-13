@@ -713,7 +713,9 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def ui2dict(self):
         """
-        Triggered by a change of fixpoint format, call `dict2ui()` to propagate this to
+        Triggered by a change of fixpoint format.
+
+        Update visibility of subwidgets, then call `dict2ui()` to propagate this to
         input, output and dyn. filter widget and set the simFX button to "changed".
 
         Emit {'fx_sim': 'specs_changed'}.
