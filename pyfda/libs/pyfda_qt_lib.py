@@ -19,7 +19,7 @@ from .pyfda_dirs import OS, OS_VER
 import logging
 logger = logging.getLogger(__name__)
 
-DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name'
+DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
                  'view_changed',   # view on the data (e.g. f_S) has changed
                  'specs_changed',  # filter specs (corner freqs. etc.) have changed
                  'data_changed',   # actual filter data (coeffs. etc.) has changed
@@ -45,7 +45,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     """
     for k in dict_sig:
         if k not in DICT_SIG_KEYS:
-            logger.warning(f"Unknown entry '{k}:{dict_sig[k]}' in 'dict_sig'!")
+            logger.warning(f"Unknown entry '{k}':'{dict_sig[k]}' in 'dict_sig'!")
             logger.warning(pprint_log(dict_sig))
     if self.sender() and self.sender().objectName():
         logger.info(f"this_sender_name: {self.sender().objectName()}")
