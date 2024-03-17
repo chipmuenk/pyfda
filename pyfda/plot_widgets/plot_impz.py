@@ -326,26 +326,6 @@ class Plot_Impz(QWidget):
             return
 
         if 'fx_sim' in dict_sig:
-            # --------------- START (ext. widget) ------------
-            # if dict_sig['fx_sim'] == 'start_fx_sim':
-            #     """
-            #     Fixpoint simulation started from external widget, e.g.
-            #     from 'input_fixpoint_specs' by pressing the "Sim FX" button
-            #     - Reset error flag and set 'needs_calc' flags
-            #     - Set fixpoint mode
-            #     - Update run button to 'changed'
-            #     - Force-start simulation with `self.impz_init(True)`
-            #     """
-
-            #     self.needs_calc = True      # force recalculation
-            #     self.needs_calc_fx = True   # force fx recalculation
-            #     self.error = False          # reset error flag
-
-            #     self.toggle_fx_settings("fixpoint")  # set fixpoint mode
-            #     qstyle_widget(self.ui.but_run, 'changed')
-            #     self.ui.but_run.setIcon(QIcon(":/play.svg"))
-            #     self.impz_init(True)
-            #     return
             # --------------- specs changed ------------
             if dict_sig['fx_sim'] == 'specs_changed':
                 """
