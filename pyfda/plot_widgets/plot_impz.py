@@ -802,16 +802,19 @@ class Plot_Impz(QWidget):
             qset_cmb_box(self.ui.cmb_sim_select, arg, data=True)
             fb.fil[0]['fx_sim'] = (arg == "fixpoint")
         # Direct call with no argument, set combobox according to fb.fil[0]['fx_sim']
-        elif arg is None:
+        if arg is None:
             if fb.fil[0]['fx_sim']:
                 qset_cmb_box(self.ui.cmb_sim_select, "fixpoint", data=True)
             else:
                 qset_cmb_box(self.ui.cmb_sim_select, "float", data=True)
-        # Combobox modified, set fb.fil[0]['fx_sim'] according to combo box
-        else:
+        # Combobox modified, set fb.fil[0]['fx_sim'] according to combobox and start sim
+        elif type(arg) == int:
             fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})
             self.calc_auto()  # run simulation if autostart has been selected
+        else:
+            logger.error(f"Unknown argument '{arg}'!")
+            return
 
         fx_mode = fb.fil[0]['fx_sim']
         # enable plot widgets for quantized stimulus signal
