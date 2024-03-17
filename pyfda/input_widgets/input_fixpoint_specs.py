@@ -757,7 +757,7 @@ class Input_Fixpoint_Specs(QWidget):
            self.fx_filt_ui.setVisible(is_fixp)
 
         if is_fixp:
-            self.resize_img()  # refresh image when switching from float to fix
+            self.resize_img()  # refresh image to cover switching from float to fix
             self.dict2ui()  # update fixpoint widgets
 
         if arg is not None:  # triggered by changed combo box
