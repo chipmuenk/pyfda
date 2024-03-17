@@ -337,19 +337,18 @@ class Plot_Impz(QWidget):
                 - Update run button style to 'changed'
                 - If widget is visible and autorun is selected,
                     initialize fixpoint widget and
-                    start simulation via `self.impz_init()`
+                    start simulation via `calc_auto` -> `self.impz_init()`
                 """
                 self.needs_calc_fx = True   # fx sim needs recalculation
+                self.needs_calc = True  # force recalculation
+                self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
                 self.toggle_fx_settings()
-                if fb.fil[0]['fx_sim']:     # fixpoint mode is active
-                    self.error = False      # reset error flag
-                    self.needs_calc = True  # force recalculation
 
-                    qstyle_widget(self.ui.but_run, 'changed')
-                    self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                    if self.isVisible():
-                        self.calc_auto() # call impz_init() if autorun is selected
+                qstyle_widget(self.ui.but_run, 'changed')
+                self.ui.but_run.setIcon(QIcon(":/play.svg"))
+                if self.isVisible():
+                    self.calc_auto() # call impz_init() if autorun is selected
 
             # --------------- 'start_fx_response_calculation' ---------
             elif dict_sig['fx_sim'] == 'start_fx_response_calculation':
