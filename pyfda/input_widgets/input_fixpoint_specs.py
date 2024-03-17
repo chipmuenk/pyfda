@@ -98,6 +98,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.debug("Imported {0:d} fixpoint filters:\n{1}"
                          .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
         self._update_fixp_widget()
+        self.qfrmt2ui()  # initialize ui settings
 
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
