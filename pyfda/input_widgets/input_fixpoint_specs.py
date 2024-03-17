@@ -277,7 +277,6 @@ class Input_Fixpoint_Specs(QWidget):
                 elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
                     # update wordlengths in UI and set RUN button to 'changed':
                     self.dict2ui()
-                    self.resize_img()
                     self.fx_specs_changed = False
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
