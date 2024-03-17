@@ -715,18 +715,37 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
-    def qfrmt2ui(self):
+    def qfrmt2ui(self, arg=None):
         """
-        Triggered by a change of fixpoint format.
+        Update UI (fixpoint format, visibility of fixpoint widgets)
+        either from combobox `self.cmb_qfrmt` to `fb.fil[0]['fx_sim']` and
+        `fb.fil[0]['qfrmt']` or the other way round.
 
-        Update visibility of subwidgets, then call `dict2ui()` to propagate this to
-        input, output and dyn. filter widget and set the simFX button to "changed".
+        `arg` can be:
+        - `None` when called directly (during `__init__()` or from `process_sig_rx()`).
+           In this case, the combobox `self.cmb_qfrmt` is set from `fb.fil[0]['qfrmt']`.
 
-        Emit {'fx_sim': 'specs_changed'}.
+        - int 0 or 1 when triggered by a change of index of the combo box
+          `self.cmb_qfrmt`. In this case, `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`
+          are setting according to the combobox setting.
+          Emit {'fx_sim': 'specs_changed'}.
+
+        In any case, update visibility of subwidgets, then call `dict2ui()` to propagate
+        this to input, output and dyn. filter widget and set the simFX button to
+        "changed".
         """
-        qfrmt = qget_cmb_box(self.cmb_qfrmt)
-        is_fixp = qfrmt != 'float'
-        fb.fil[0]['fx_sim'] = is_fixp
+        if arg is None:  # called directly (from another widget or during __init__() )
+            if fb.fil[0]['fx_sim']:  # fixpoint mode
+                pass # qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
+            else:
+                qset_cmb_box(self.cmb_qfrmt, 'float')
+        else:  # triggered by changed combo box
+            fb.fil[0]['fx_sim'] = (qget_cmb_box(self.cmb_qfrmt) != 'float')
+            if fb.fil[0]['fx_sim']:
+                fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+
+        is_fixp = fb.fil[0]['fx_sim']
+
 
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
@@ -735,7 +754,6 @@ class Input_Fixpoint_Specs(QWidget):
         #    self.fx_filt_ui.setVisible(is_fixp)
 
         if is_fixp:
-            fb.fil[0]['qfrmt'] = qfrmt
             self.resize_img()  # refresh image when switching from float to fix
 
         self.dict2ui()
