@@ -739,7 +739,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()  # refresh image when switching from float to fix
 
         self.dict2ui()
-        self.emit({'fx_sim': 'specs_changed'})
+        if arg is not None:  # triggered by changed combo box
+            self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
     def dict2ui(self):
