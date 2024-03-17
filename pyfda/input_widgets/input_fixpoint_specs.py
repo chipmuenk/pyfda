@@ -118,7 +118,7 @@ class Input_Fixpoint_Specs(QWidget):
         # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.dict2ui()  # update wordlengths in UI, set RUN button to 'changed'
+            self.dict2ui()  # update wordlengths in UI
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
             return
@@ -164,7 +164,7 @@ class Input_Fixpoint_Specs(QWidget):
                              .format(dict_sig['sender_name'], pprint_log(dict_sig)))
                 return
 
-            self.dict2ui()  # update wordlengths in UI and set RUN button to 'changed'
+            self.dict2ui()  # update wordlengths in UI
             logger.error("fx_sim: specs_changed emitted thru ui_local_changes")
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
@@ -213,14 +213,13 @@ class Input_Fixpoint_Specs(QWidget):
 
                 elif dict_sig['data_changed'] == "filter_loaded":
                     # New filter has been loaded, update fixpoint topologies and UI from dict,
-                    # set RUN button to 'changed'
                     # TODO: Is this needed? Is the fixpoint widget updated?
                     self._update_filter_cmb()
                     self.dict2ui()
 
                 else:
                     # Filter data has changed (but not the filter type):
-                    # Reload UI from dict and set RUN button to 'changed'
+                    # Reload UI from dict
                     self.dict2ui()
 
                 # ------------- reset change flags ------------------
@@ -275,8 +274,7 @@ class Input_Fixpoint_Specs(QWidget):
 
                 # --------------- fx specs_changed ------------
                 elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
-                    # update wordlengths in UI and set RUN button to 'changed':
-                    self.dict2ui()
+                    self.dict2ui()  # update wordlengths in UI
                     self.fx_specs_changed = False
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
@@ -301,8 +299,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_specs_changed = False  # reset flag
 
             elif self.fx_specs_changed:
-                # update wordlengths in UI and set RUN button to 'changed':
-                self.dict2ui()
+                self.dict2ui()  # update wordlengths in UI
                 self.fx_specs_changed = False  # reset flag
 
         # =============================================================================
@@ -310,12 +307,11 @@ class Input_Fixpoint_Specs(QWidget):
             if 'data_changed' in dict_sig:
                 if dict_sig['data_changed'] in {"filter_designed", "filter_loaded"}:
                     # New filter has been designed or loaded, update list of available
-                    # filter topologies and UI from dict, set RUN button to 'changed'
+                    # filter topologies and UI from dict
                     self.fx_filt_changed = True
-
                 else:
                     # Filter data has changed (but not the filter type):
-                    # Reload UI from dict and set RUN button to 'changed'
+                    # Reload UI from dict and
                     self.fx_specs_changed = True
                 return
 
@@ -423,15 +419,6 @@ class Input_Fixpoint_Specs(QWidget):
                           self.cmb_qfrmt_default)
         self.cmb_qfrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        # lay_v_qfrmt = QVBoxLayout()
-        # lay_v_qfrmt.addWidget(self.cmb_qfrmt)
-        # frm_qfrmt = QFrame(self)
-        # frm_qfrmt.setLayout(lay_v_qfrmt)
-        # frm_qfrmt.setContentsMargins(*params['wdg_margins'])
-        # self.butSimFx = QPushButton(self)
-        # self.butSimFx.setToolTip("Start fixpoint simulation.")
-        # self.butSimFx.setText("Sim. FX")
-
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip(
             "Create Verilog or VHDL netlist for fixpoint filter.")
@@ -440,7 +427,6 @@ class Input_Fixpoint_Specs(QWidget):
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
         layH_fx_btns = QHBoxLayout()
         layH_fx_btns.addWidget(self.cmb_qfrmt)
-        # layH_fx_btns.addWidget(self.butSimFx)
         layH_fx_btns.addWidget(self.butExportHDL)
 
         frmHdlBtns = QFrame(self)
@@ -479,7 +465,6 @@ class Input_Fixpoint_Specs(QWidget):
         # ----------------------------------------------------------------------
         self.cmb_fx_wdg.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        # self.butSimFx.clicked.connect(self._start_fx_sim)
         self.cmb_qfrmt.currentIndexChanged.connect(self.qfrmt2ui)
 
         # ----------------------------------------------------------------------
@@ -651,7 +636,6 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n{0}".format(e))
 
             self.fx_wdg_found = False
-            # self.butSimFx.setEnabled(False)
             self.butExportHDL.setVisible(False)
             self.img_fixp = self.embed_fixp_img(self.no_fx_filter_img)
             self.resize_img()
@@ -713,7 +697,6 @@ class Input_Fixpoint_Specs(QWidget):
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
-            # self.butSimFx.setEnabled(hasattr(self.fx_filt_ui, "fxfilter"))
             logger.error("emitted thru _update_fixp_widget")
             self.emit({'fx_sim': 'specs_changed'})
 
@@ -784,8 +767,6 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_filt_ui.dict2ui()
         except AttributeError as e:
             logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
-
-        # qstyle_widget(self.butSimFx, 'changed')
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
@@ -888,10 +869,6 @@ class Input_Fixpoint_Specs(QWidget):
                 f'"{type(fb.fx_results)}"')
             fb.fx_results = None
 
-    #    if fb.fx_results is None:
-    #        qstyle_widget(self.butSimFx, "error")
-    #    else:
-    #        pass  # everything ok, return
         return
 
 
