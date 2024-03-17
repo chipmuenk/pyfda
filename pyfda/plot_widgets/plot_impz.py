@@ -793,6 +793,7 @@ class Plot_Impz(QWidget):
         elif type(arg) == int:
             fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
             self.emit({'fx_sim': 'specs_changed'})
+            self.needs_calc = True
             self.calc_auto()  # run simulation if autostart has been selected
         else:
             logger.error(f"Unknown argument '{arg}'!")
