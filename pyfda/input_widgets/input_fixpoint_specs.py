@@ -748,11 +748,12 @@ class Input_Fixpoint_Specs(QWidget):
 
         logger.error(f"qfrmt = {qget_cmb_box(self.cmb_qfrmt)}, fx_sim = {is_fixp}")
 
+        # fixpoint widgets are only visible for fixpoint settings
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
         self.frmImg.setVisible(is_fixp)
-        # if self.fx_wdg_found:
-        #    self.fx_filt_ui.setVisible(is_fixp)
+        if self.fx_wdg_found:
+           self.fx_filt_ui.setVisible(is_fixp)
 
         if is_fixp:
             self.resize_img()  # refresh image when switching from float to fix
