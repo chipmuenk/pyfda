@@ -360,7 +360,7 @@ class Plot_Impz(QWidget):
                     start simulation via `self.impz_init()`
                 """
                 self.needs_calc_fx = True   # fx sim needs recalculation
-                # set cmb box for fixpoint / float simulation and update ui
+                # set cmb box for fixpoint / float simulation and update ui:
                 self.toggle_fx_settings()
                 if fb.fil[0]['fx_sim']:     # fixpoint mode is active
                     self.error = False      # reset error flag
@@ -757,25 +757,6 @@ class Plot_Impz(QWidget):
 
         if fb.fil[0]['fx_sim']:
             self.emit({'fx_sim': 'finish'})
-
-# =============================================================================
-    # def toggle_fx_setting(self, param=-1):
-    #     """
-    #     Triggered by changing `self.ui.cmb_sim_select` (param = 0 or 1, representing
-    #     the combo selection) or by an incoming signal {fx_sim:'specs_changed'},
-    #     calling toggle_fx_setting directly without parameter, yielding param = -1.
-    #     """
-    #     logger.warning(f"toggle_fx: param = {param}")
-    #     if param == -1:  # direct call, set combobox according to fb.fil[0]['fx_sim']
-    #         if fb.fil[0]['fx_sim']:
-    #             qset_cmb_box(self.ui.cmb_sim_select, 'fixpoint')
-    #         else:
-    #             qset_cmb_box(self.ui.cmb_sim_select, 'float')
-    #     else:  # combobox modified, set fb.fil[0]['fx_sim'] according to combo box
-    #         fb.fil[0]['fx_sim'] = (qget_cmb_box(self.ui.cmb_sim_select) == 'fixpoint')
-    #         self.emit({'fx_sim': 'specs_changed'})
-    #     self.toggle_fx_settings()
-    #     self.calc_auto()  # run simulation if autostart has been selected
 
     # --------------------------------------------------------------------------
     def toggle_fx_settings(self, arg=None):
