@@ -213,14 +213,14 @@ class Input_Fixpoint_Specs(QWidget):
 
                 elif dict_sig['data_changed'] == "filter_loaded":
                     # New filter has been loaded, update fixpoint topologies and UI from dict,
-                    # set RUN button to "changed"
+                    # set RUN button to 'changed'
                     # TODO: Is this needed? Is the fixpoint widget updated?
                     self._update_filter_cmb()
                     self.dict2ui()
 
                 else:
                     # Filter data has changed (but not the filter type):
-                    # Reload UI from dict and set RUN button to "changed"
+                    # Reload UI from dict and set RUN button to 'changed'
                     self.dict2ui()
 
                 # ------------- reset change flags ------------------
@@ -292,7 +292,7 @@ class Input_Fixpoint_Specs(QWidget):
             # =================== Previous Changes ====================================
             # have fixpoint specs / filter been changed when widget was invisible
             # or in float mode? If yes, update fixpoint topologies and UI from dict,
-            # set RUN button to "changed" and resize fixpoint image.
+            # set RUN button to 'changed' and resize fixpoint image.
             elif self.fx_filt_changed:
                 self._update_filter_cmb()
                 self._update_fixp_widget()
@@ -310,12 +310,12 @@ class Input_Fixpoint_Specs(QWidget):
             if 'data_changed' in dict_sig:
                 if dict_sig['data_changed'] in {"filter_designed", "filter_loaded"}:
                     # New filter has been designed or loaded, update list of available
-                    # filter topologies and UI from dict, set RUN button to "changed"
+                    # filter topologies and UI from dict, set RUN button to 'changed'
                     self.fx_filt_changed = True
 
                 else:
                     # Filter data has changed (but not the filter type):
-                    # Reload UI from dict and set RUN button to "changed"
+                    # Reload UI from dict and set RUN button to 'changed'
                     self.fx_specs_changed = True
                 return
 
@@ -735,7 +735,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         In any case, update visibility of subwidgets, then call `dict2ui()` to propagate
         this to input, output and dyn. filter widget and set the simFX button to
-        "changed".
+        'changed'.
         """
         if arg is None:  # called directly (from another widget or during __init__() )
             if fb.fil[0]['fx_sim']:  # fixpoint mode
@@ -772,7 +772,7 @@ class Input_Fixpoint_Specs(QWidget):
         (i.e. fixpoint coefficient format) or data have been changed outside this
         class.
 
-        Set the RUN button to "changed".
+        Set the RUN button to 'changed'.
         """
         if not fb.fil[0]['fx_sim']:  # float mode
             qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
@@ -785,7 +785,7 @@ class Input_Fixpoint_Specs(QWidget):
         except AttributeError as e:
             logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
 
-        # qstyle_widget(self.butSimFx, "changed")
+        # qstyle_widget(self.butSimFx, 'changed')
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):

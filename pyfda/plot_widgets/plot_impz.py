@@ -333,7 +333,7 @@ class Plot_Impz(QWidget):
             #     from 'input_fixpoint_specs' by pressing the "Sim FX" button
             #     - Reset error flag and set 'needs_calc' flags
             #     - Set fixpoint mode
-            #     - Update run button to "changed"
+            #     - Update run button to 'changed'
             #     - Force-start simulation with `self.impz_init(True)`
             #     """
 
@@ -342,7 +342,7 @@ class Plot_Impz(QWidget):
             #     self.error = False          # reset error flag
 
             #     self.toggle_fx_settings("fixpoint")  # set fixpoint mode
-            #     qstyle_widget(self.ui.but_run, "changed")
+            #     qstyle_widget(self.ui.but_run, 'changed')
             #     self.ui.but_run.setIcon(QIcon(":/play.svg"))
             #     self.impz_init(True)
             #     return
@@ -354,7 +354,7 @@ class Plot_Impz(QWidget):
                 If fixpoint mode is active:
                 - Reset error flag
                 - Force recalculation (`self.needs_calc = True`)
-                - Update run button style to "changed"
+                - Update run button style to 'changed'
                 - If widget is visible and autorun is selected,
                     initialize fixpoint widget and
                     start simulation via `self.impz_init()`
@@ -366,7 +366,7 @@ class Plot_Impz(QWidget):
                     self.error = False      # reset error flag
                     self.needs_calc = True  # force recalculation
 
-                    qstyle_widget(self.ui.but_run, "changed")
+                    qstyle_widget(self.ui.but_run, 'changed')
                     self.ui.but_run.setIcon(QIcon(":/play.svg"))
                     if self.isVisible():
                         self.calc_auto() # call impz_init() if autorun is selected
@@ -419,7 +419,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
                 # Highlight "RUN" button
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
-                qstyle_widget(self.ui.but_run, "changed")
+                qstyle_widget(self.ui.but_run, 'changed')
                 self.impz_init()
 
             elif 'mpl_toolbar' in dict_sig:
@@ -795,7 +795,7 @@ class Plot_Impz(QWidget):
         visible and `fb.fil[0]['fx_sim']` is set to True.
 
         If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
-        is set to True and the run button is set to "changed".
+        is set to True and the run button is set to 'changed'.
         """
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         if arg in {"float", "fixpoint"}:
@@ -837,7 +837,7 @@ class Plot_Impz(QWidget):
 
         if fx_mode != self.fx_mode_old:
             self.ui.but_run.setIcon(QIcon(":/play.svg"))
-            qstyle_widget(self.ui.but_run, "changed")
+            qstyle_widget(self.ui.but_run, 'changed')
             # force recalculation of stimulus and response when switching
             # between float and fixpoint
             self.needs_calc = True

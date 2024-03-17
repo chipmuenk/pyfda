@@ -418,24 +418,24 @@ def qstyle_widget(widget, state):
     This requires setting the property, "unpolishing" and "polishing" the widget
     and finally forcing an update.
 
-    - "normal": default, no color styling
-    - "ok":  green, filter has been designed, everything ok
-    - "changed": yellow, filter specs have been changed
-    - "running": orange, simulation is running
-    - "error" : red, an error has occurred during filter design
-    - "failed" : pink, filter fails to meet target specs (not used yet)
-    - "u" or "unused": grey text color
-    - "d" or "disabled": background color darkgrey
-    - "a" or "active": no special style defined
+    - 'normal' : default, no color styling
+    - 'ok':  green, filter has been designed, everything ok
+    - 'changed': yellow, filter specs have been changed
+    - 'running': orange, simulation is running
+    - 'error'  : red, an error has occurred during filter design
+    - 'failed' : pink, filter fails to meet target specs (not used yet)
+    - 'u' or 'unused'  : grey text color
+    - 'd' or 'disabled': background color darkgrey
+    - 'a' or 'active'  : no special style defined
     """
     state = str(state)
     if state == 'u':
-        state = "unused"
+        state = 'unused'
         # *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
     elif state == 'a':
-        state = "active"
+        state = 'active'
     elif state == 'd':
-        state = "disabled"
+        state = 'disabled'
         # QLineEdit:disabled{background-color:darkgrey;}
     # widget.setAttribute(Qt.WA_StyledBackground, True)
     widget.setProperty("state", state)

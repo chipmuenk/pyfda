@@ -95,7 +95,7 @@ class Input_Specs(QWidget):
                 # sort and update the frequency widgets
                 self.f_specs.sort_dict_freqs()
                 self.t_specs.f_specs.sort_dict_freqs()
-            self.color_design_button("changed")
+            self.color_design_button('changed')
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> call update_UI
@@ -341,7 +341,7 @@ class Input_Specs(QWidget):
 
         # Update state of "DESIGN FILTER" button
         # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
-        self.color_design_button("changed")
+        self.color_design_button('changed')
 
 # ------------------------------------------------------------------------------
     def _load_filter(self):
