@@ -233,24 +233,23 @@ class Input_Fixpoint_Specs(QWidget):
                 if dict_sig['fx_sim'] == 'init':
                     logger.error("init fx_sim")
                     # fixpoint simulation has been started externally, e.g. by
-                    # `impz.impz_init()`, return a handle to the fixpoint filter function
-                    # via signal-slot connection
+                    # `impz.impz_init()`
                     if not self.fx_wdg_found:
                         logger.error("No fixpoint widget found!")
-                        # qstyle_widget(self.butSimFx, "error")
+                        # process this in PlotImpz()
                         self.emit({'fx_sim': 'error'})
                         return
                     # initialize fixpoint filter and check for error during initialization
                     err = self.fx_filt_init()
                     if err != 0:  # returned an error
-                        # qstyle_widget(self.butSimFx, "error")
+                        # process this in PlotImpz()
                         self.emit({'fx_sim': 'error'})
                     else:
-                        # Reset overflow counter for input and output quantization,
+                        # Reset overflow counter for input and output quantizer
                         self.wdg_wq_input.QObj.resetN()
                         self.wdg_wq_output.QObj.resetN()
                         # Trigger fixpoint response calculation, passing a handle to the
-                        # fixpoint filter function in the emitted dict
+                        # fixpoint filter function in the emitted dict via signal-slot
                         if hasattr(self.fx_filt_ui, 'fxfilter'):
                             self.emit({'fx_sim': 'start_fx_response_calculation',
                                     'fxfilter_func': self.fx_filt_ui.fxfilter})
