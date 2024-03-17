@@ -746,6 +746,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         is_fixp = fb.fil[0]['fx_sim']
 
+        logger.error(f"qfrmt = {qget_cmb_box(self.cmb_qfrmt)}, fx_sim = {is_fixp}")
 
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
