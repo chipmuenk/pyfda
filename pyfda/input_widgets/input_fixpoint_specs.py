@@ -179,8 +179,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         Trigger fx simulation:
 
-        1. ``fx_sim': 'init'``: Start fixpoint simulation by sending
-           'fx_sim':'start_fx_response_calculation'
+        1. `fx_sim': 'init'`: Start fixpoint simulation by sending
+           `'fx_sim':'start_fx_response_calculation'`
 
         2. Store fixpoint response in `fb.fx_result` and return to initiating routine
         """
@@ -759,7 +759,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             self.fx_filt_ui.dict2ui()
         except AttributeError as e:
-            logger.error(f"Error using FX filter widget's 'dict2ui()' method:\n{e}")
+            logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
 
         # qstyle_widget(self.butSimFx, "changed")
 

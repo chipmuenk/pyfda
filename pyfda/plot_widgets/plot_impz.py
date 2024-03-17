@@ -780,32 +780,22 @@ class Plot_Impz(QWidget):
     # --------------------------------------------------------------------------
     def toggle_fx_settings(self, arg=None):
         """
-         Argument `arg` can be:
+        `arg` can be the following arguments, triggered by:
 
-        - str "fixpoint", "float" or `None` when called directly. "fixpoint" or "float"
-          update ui and combobox `self.ui.cmb_sim_select` correspondingly (not used
-          currently). `None` does the same, reading the state of `fb.fil[0]['fx_sim']`.
-
-          Triggered by:
-
-            - init()
-            - impz_init()
-
-        - int 0 or 1 when triggered by changing the index of combobox
-          `self.ui.cmb_sim_select` (signal-slot-connection). This updates the ui,
-          `fb.fil[0]['fx_sim']` and sends the signal {'fx_sim': 'specs_changed'}.
+            - arg `None`: from `__init__()`, `impz_init()` or `process_sig_rx()` when
+              {dict_sig['fx_sim'] == 'specs_changed'} was received. Read the state of
+              `fb.fil[0]['fx_sim']` and update combobox correspondingly
+            - arg int 0 or 1 from `self.ui.cmb_sim_select` when index was changed
+              (signal-slot-connection), update `fb.fil[0]['fx_sim']` correspondingly,
+              fire signal {'fx_sim': 'specs_changed'} and start simulation
+            - arg "fixpoint" or "float" from a direct call with (not used currently),
+              update ui and combobox `self.ui.cmb_sim_select` correspondingly
 
         When fixpoint simulation is selected, all corresponding widgets are made
         visible and `fb.fil[0]['fx_sim']` is set to True.
 
         If `fb.fil[0]['fx_sim']` has been changed since last time, `self.needs_calc`
         is set to True and the run button is set to "changed".
-        ------------------------------------------------------
-        Triggered:
-        - during construction
-        - when combobox float / fixpoint simulation is changed
-        - when {dict_sig['fx_sim'] == 'specs_changed'} is received
-        - in impz_init()
         """
         # Function call with argument: Set UI and fb.fil[0]['fx_sim'] accord. to `arg`
         if arg in {"float", "fixpoint"}:
