@@ -18,6 +18,7 @@ import warnings
 from typing import TextIO, Tuple  # replace by built-in tuple from Py 3.9
 
 import pickle
+import json
 
 import numpy as np
 from scipy.io import loadmat, savemat, wavfile
@@ -53,6 +54,7 @@ file_filters_dict = {
     'cmsis': 'CMSIS DSP FIR or IIR SOS coefficients',
     'coe': 'Xilinx FIR coefficients format',
     'csv': 'Comma / Tab Separated Values',
+    'json': 'Javascript Object Notation',
     'mat': 'Matlab-Workspace',
     'npy': 'Binary Numpy Array',
     'npz': 'Zipped Binary Numpy Array',
