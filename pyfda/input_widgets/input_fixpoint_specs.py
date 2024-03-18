@@ -786,7 +786,7 @@ class Input_Fixpoint_Specs(QWidget):
         dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
         if dlg.exec_() == QFileDialog.Accepted:
             hdl_file = str(dlg.selectedFiles()[0])
-            # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))[0]
+            # hdl_type = extract_file_ext(qstr(dlg.selectedNameFilter()))
 
             hdl_dir_name = os.path.dirname(hdl_file)  # extract the directory path
             if not os.path.isdir(hdl_dir_name):  # create directory if it doesn't exist

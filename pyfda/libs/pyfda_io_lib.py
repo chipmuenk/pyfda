@@ -111,7 +111,7 @@ def prune_file_ext(file_type: str) -> str:
 
 
 # ------------------------------------------------------------------------------
-def extract_file_ext(file_type: str) -> str:
+def extract_file_ext(file_type: str, return_list=False) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
     'VHDL (\*.vhd)' returned by QFileDialog. Depending on the OS, this may be the
@@ -125,16 +125,24 @@ def extract_file_ext(file_type: str) -> str:
     ----------
     file_type : str
 
+    return_list: bool (default = False)
+       When True, return a list with file extensions (possibly empty or with only one
+       element), when False (default) only return the first element (a string)
+
     Returns
     -------
-    str
-        The file extension between ( ... ) or the unchanged input argument
-        `file_type` when no '('  was contained.
+    str or list of str
+        The file extension between ( ... ), e.g. 'csv' or the list of file extension
+        or the unchanged input argument `file_type` when no '('  was contained.
 
     """
     if "(" in file_type:
         ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
-        return [t.strip('(*)') for t in ext_list]  # remove '(*)'
+        file_type_list = [t.strip('(*.)') for t in ext_list]  # remove '(*.)'
+        if return_list:
+            return file_type_list
+        else:
+            return str(file_type_list[0])
     else:
         return file_type
 
@@ -247,7 +255,7 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 
         if file_type == "":
             # No file type specified, add the type from the file filter
-            file_type = extract_file_ext(sel_filt)[0].strip('.')
+            file_type = extract_file_ext(sel_filt)
             file_name = file_name + '.' + file_type
 
         dirs.last_file_name = file_name
