@@ -1190,15 +1190,19 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
         file extension (e.g. `(csv)` or list of file extensions (e.g. `(csv, txt)`
         which are used to create a file filter.
     """
-    logger.debug(
-        f"export data: type{type(data)}|dim{np.ndim(data)}|"
-        f"shape{np.shape(data)}\n{data}")
+    # logger.debug(
+    #     f"export data: type{type(data)}|dim{np.ndim(data)}|"
+    #     f"shape{np.shape(data)}\n{data}")
 
-    # add file types for FIR filter coefficients
-    if fb.fil[0]['ft'] == 'FIR':
-        file_types += ('coe', 'vhd', 'txt')
+    # add file types for coefficients and a description text for messages.
+    if fkey == 'ba':
+        if fb.fil[0]['ft'] == 'FIR':
+            file_types += ('coe', 'vhd', 'txt')
+        else:
+            file_types += ('cmsis',)
+        description = "Coefficient"
     else:
-        file_types += ('cmsis',)
+        description = "Pole / zero"
 
     # Add file types when Excel modules are available:
     if xlwt is not None:
@@ -1235,7 +1239,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
             np_data = csv2array(io.StringIO(data))  # convert csv data to numpy array
             if isinstance(np_data, str):
                 # returned an error message instead of numpy data:
-                logger.error("Error converting coefficient data:\n{0}".format(np_data))
+                logger.error(f"Error converting {description.lower()} data:\n{np_data}")
                 return None
 
             with open(file_name, 'wb') as f:
@@ -1292,7 +1296,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = True
 
         if not err:
-            logger.info(f'Filter saved as\n\t"{file_name}"')
+            logger.info(f'{description} data saved as\n\t"{file_name}"')
 
     except IOError as e:
         logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
