@@ -225,6 +225,11 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 
     file_filters, last_file_filter = create_file_filters(file_types=file_types)
 
+    # check whether last file type is in the list of file types for the current
+    # operation, otherwise delete last_file_filter
+    if extract_file_ext(last_file_filter) not in file_types:
+        last_file_filter = ""
+
     dlg = QFileDialog(parent)  # create instance for QFileDialog
     dlg.setDirectory(dirs.last_file_dir)
     if mode in {"r", "rb"}:
