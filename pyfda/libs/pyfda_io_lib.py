@@ -1657,6 +1657,17 @@ def load_filter(self) -> int:
                     or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
                 logger.error("Missing key 'sos' or wrong data type!")
                 return -1
+
+            if type(fb.fil[0]['ba']) == np.ndarray:
+                if np.ndim(fb.fil[0]['ba']) != 2:
+                    logger.error(
+                        f"Unsuitable dimension of 'ba' data, ndim = {np.ndim(fb.fil[0]['ba'])}")
+                elif np.shape(fb.fil[0]['ba'])[0] != 2:
+                    logger.error(
+                        f"Unsuitable shape {np.shape(fb.fil[0]['ba'])} of 'ba' data ")
+            elif type(fb.fil[0]['ba']) == list:
+                fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
+
             if type(fb.fil[0]['zpk']) == np.ndarray:
                 if np.ndim(fb.fil[0]['zpk']) != 2:
                     logger.error(
