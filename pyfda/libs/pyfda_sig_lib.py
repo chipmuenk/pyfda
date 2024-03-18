@@ -156,7 +156,7 @@ def zpk2array(zpk):
                 if zpk[2] == 0:
                     zpk[2] = 1
             else:
-                logger.error(zpk[2])
+                # logger.error(zpk[2])
                 if zpk[2][0] in {0, None}:
                     zpk[2][0] = 1
 
