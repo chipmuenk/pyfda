@@ -1584,86 +1584,97 @@ def load_filter(self) -> int:
     filter dictionary
     """
     file_name, file_type = select_file(
-        self, title="Load Filter", mode="rb", file_types = ("npz", "pkl"))
+        self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
 
     if file_name is None:
         return -1  # operation cancelled or some other error
 
     err = False
     fb.redo() # backup filter dict
-    # fb.fil[10] = copy.deepcopy(fb.fil[0])  # backup filter dict
 
+    if file_type in {"npz", "pkl"}:
+        try:
+            with io.open(file_name, 'rb') as f:  # open in binary mode
+                if file_type == 'npz':
+                    # array containing dict, dtype 'object':
+                    a = np.load(f, allow_pickle=True)
 
+                    # logger.debug(f"Entries in {file_name}:\n{a.files}")
+                    for key in sorted(a):
+                        # logger.warning(
+                        #     f"key: {key}|{type(key).__name__}|"
+                        #     f"{type(a[key]).__name__}|{a[key]}")
+                        if np.ndim(a[key]) == 0:
+                            # scalar objects may be extracted with the item() method
+                            fb.fil[0][key] = a[key].item()
+                        else:
+                            # array objects are converted to list first
+                            fb.fil[0][key] = a[key].tolist()
+                else:  # file_type == 'pkl':
+                    fb.fil[0] = pickle.load(f)
+
+        except IOError as e:
+            logger.error(f"Failed loading {file_name}!\n{e}")
+            return -1
+
+    elif file_type == 'json':
+        try:
+            with io.open(file_name, 'r') as f:  # open in text mode
+                fb.fil[0] = json.load(f)
+
+        except IOError as e:
+            logger.error(f"Failed loading {file_name}!\n{e}")
+            return -1
+    else:
+        logger.error(f'Unknown file type "{file_type}"')
+        err = True
+
+# --------------------
     try:
-        with io.open(file_name, 'rb') as f:
-            if file_type == 'npz':
-                # array containing dict, dtype 'object':
-                a = np.load(f, allow_pickle=True)
+        if not err:
+            ret = fb.sanitize_imported_dict(fb.fil[0], 'the loaded dict')
+            if ret != "":
+                logger.warning(ret)
 
-                logger.debug(f"Entries in {file_name}:\n{a.files}")
-                for key in sorted(a):
-                    # logger.warning(
-                    #     f"key: {key}|{type(key).__name__}|"
-                    #     f"{type(a[key]).__name__}|{a[key]}")
-                    if np.ndim(a[key]) == 0:
-                        # scalar objects may be extracted with the item() method
-                        fb.fil[0][key] = a[key].item()
-                    else:
-                        # array objects are converted to list first
-                        fb.fil[0][key] = a[key].tolist()
-            elif file_type == 'pkl':
-                fb.fil[0] = pickle.load(f)
-            else:
-                logger.error(f'Unknown file type "{file_type}"')
-                err = True
-            if not err:
-                ret = fb.sanitize_imported_dict(fb.fil[0], 'the loaded dict')
-                if ret != "":
-                    logger.warning(ret)
+            # sanitize values in filter dictionary, keys are ok by now
+            for k in fb.fil[0]:
+                # Bytes need to be decoded for py3 to be used as keys later on
+                if type(fb.fil[0][k]) == bytes:
+                    fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                if fb.fil[0][k] is None:
+                    logger.warning(f"Entry fb.fil[0][{k}] is empty!")
+            if 'ba' not in fb.fil[0]\
+                or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
+                    or np.ndim(fb.fil[0]['ba']) != 2\
+                    or (np.shape(fb.fil[0]['ba'][0]) != 2
+                        and np.shape(fb.fil[0]['ba'])[1] < 3):
+                logger.error("Missing key 'ba' or wrong data type!")
+                return -1
+            elif 'zpk' not in fb.fil[0]:
+                logger.error("Missing key 'zpk'!")
+                return -1
+            elif 'sos' not in fb.fil[0]\
+                    or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
+                logger.error("Missing key 'sos' or wrong data type!")
+                return -1
+            if type(fb.fil[0]['zpk']) == np.ndarray:
+                if np.ndim(fb.fil[0]['zpk']) != 2:
+                    logger.error(
+                        f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
+                elif np.shape(fb.fil[0]['zpk'])[0] != 3:
+                    logger.error(
+                        f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
+            elif type(fb.fil[0]['zpk']) == list:
+                fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
 
-                # sanitize values in filter dictionary, keys are ok by now
-                for k in fb.fil[0]:
-                    # Bytes need to be decoded for py3 to be used as keys later on
-                    if type(fb.fil[0][k]) == bytes:
-                        fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-                    if fb.fil[0][k] is None:
-                        logger.warning(f"Entry fb.fil[0][{k}] is empty!")
-                if 'ba' not in fb.fil[0]\
-                    or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
-                        or np.ndim(fb.fil[0]['ba']) != 2\
-                        or (np.shape(fb.fil[0]['ba'][0]) != 2
-                            and np.shape(fb.fil[0]['ba'])[1] < 3):
-                    logger.error("Missing key 'ba' or wrong data type!")
-                    return -1
-                elif 'zpk' not in fb.fil[0]:
-                    logger.error("Missing key 'zpk'!")
-                    return -1
-                elif 'sos' not in fb.fil[0]\
-                        or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
-                    logger.error("Missing key 'sos' or wrong data type!")
-                    return -1
-                if type(fb.fil[0]['zpk']) == np.ndarray:
-                    if np.ndim(fb.fil[0]['zpk']) != 2:
-                        logger.error(
-                            f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
-                    elif np.shape(fb.fil[0]['zpk'])[0] != 3:
-                        logger.error(
-                            f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
-                elif type(fb.fil[0]['zpk']) == list:
-                    fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
+            logger.info(f'Successfully loaded filter\n\t"{file_name}"')
+            dirs.last_file_name = file_name
+            dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
+            dirs.last_file_type = file_type  # save new default file type
+            return 0
 
-                logger.info(f'Successfully loaded filter\n\t"{file_name}"')
-                dirs.last_file_name = file_name
-                dirs.last_file_dir = os.path.dirname(file_name)  # update working dir
-                dirs.last_file_type = file_type  # save file type
-                return 0
-
-    except IOError as e:
-        logger.error(f"Failed loading {file_name}!\n{e}")
-        return -1
     except Exception as e:
         logger.error(f"Unexpected error:\n{e}")
-        # fb.fil[0] = copy.deepcopy(fb.fil[10])  # restore backup
         fb.undo()
         return -1
 
@@ -1671,32 +1682,69 @@ def load_filter(self) -> int:
 # ------------------------------------------------------------------------------
 def save_filter(self):
     """
-    Save filter as zipped binary numpy array or pickle object
+    Save filter as JSON formatted textfile, zipped binary numpy array or pickle object
     """
     file_name, file_type = select_file(
-        self, title="Save Filter", mode='wb', file_types = ("npz", "pkl"))
+        self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
 
     if file_name is None:
         return -1  # operation cancelled or other error
     err = False
-    try:
-        with io.open(file_name, 'wb') as f:
-            if file_type == 'npz':
-                np.savez(f, **fb.fil[0])
-            elif file_type == 'pkl':
-                pickle.dump(fb.fil[0], f)  # save in default pickle version
+    if file_type in {"npz", "pkl"}:
+        try:
+            with io.open(file_name, 'wb') as f:  # open in binary mode
+                if file_type == 'npz':
+                    np.savez(f, **fb.fil[0])
+                else:  # file_type == 'pkl':
+                    pickle.dump(fb.fil[0], f)  # save in default pickle version
+
+        except IOError as e:
+            err = True
+            logger.error(f'Failed saving "{file_name}"!\n{e}')
+
+    elif file_type == 'json':
+        try:
+            with io.open(file_name, 'w') as f:  # open in text mode
+                # first, convert dict containing numpy arrays to a pure json string
+                fb_fil_0_json = json.dumps(fb.fil[0], cls=NumpyEncoder, indent=2,
+                                        ensure_ascii=False, sort_keys=True )
+                # next, dump the string to a file
+                f.write(fb_fil_0_json)
+
+        except IOError as e:
+            err = True
+            logger.error(f'Failed saving "{file_name}"!\n{e}')
+    else:
+        err = True
+        logger.error('Unknown file type "{0}"'.format(file_type))
+
+    if not err:
+        logger.info(f'Filter saved as\n\t"{file_name}"')
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
+        dirs.last_file_type = file_type  # save new default file type
+
+
+
+# ------------------------------------------------------------------------------
+class NumpyEncoder(json.JSONEncoder):
+    """
+    Special json encoder for numpy and other non-supported types, building upon
+    https://stackoverflow.com/questions/26646362/numpy-array-is-not-json-serializable
+    """
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, complex):
+            if obj.imag < 0:
+                return str(obj.real) + str(obj.imag) + "j"
             else:
-                err = True
-                logger.error('Unknown file type "{0}"'.format(file_type))
-
-        if not err:
-            logger.info(f'Filter saved as\n\t"{file_name}"')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)  # save new dir
-            dirs.last_file_type = file_type  # save file type
-
-    except IOError as e:
-        logger.error(f'Failed saving "{file_name}"!\n{e}')
+                return str(obj.real) + "+" + str(obj.imag) + "j"
+        return json.JSONEncoder.default(self, obj)
 
 
 # ==============================================================================
