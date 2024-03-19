@@ -476,15 +476,6 @@ class Input_Fixpoint_Specs(QWidget):
         # self.sig_resize.connect(self.resize_img)
 
 # ------------------------------------------------------------------------------
-    # def _start_fx_sim(self) -> None:
-    #     """
-    #     Start fixpoint simulation by setting the global fixpoint flag
-    #     `fb.fil[0]['fx_sim'] = True` and emitting `{'fx_sim': 'start_fx_sim'}`.
-    #     """
-    #     fb.fil[0]['fx_sim'] = True
-    #     self.emit({'fx_sim': 'start_fx_sim'})
-
-# ------------------------------------------------------------------------------
     def _update_filter_cmb(self) -> str:
         """
         (Re-)Read list of available fixpoint filters for a given filter class
