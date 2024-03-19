@@ -101,7 +101,6 @@ filter_classes = OrderedDict(
      ('Manual_FIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'}),
      ('Manual_IIR', {'name': 'Manual', 'mod': 'pyfda.filter_widgets.manual'})
      ])
-
 """
 The keys of this dictionary are the names of all found filter classes, the values
 are the name to be displayed e.g. in the comboboxes and the fully qualified
@@ -109,7 +108,8 @@ name of the module containing the class.
 """
 
 # Dictionary describing the available combinations of response types (rt),
-# filter types (ft), design methods (dm) and filter order (fo):
+# filter types (ft), design methods (dm) and filter order (fo). This dictionary
+# is also overwritten during initialization:
 fil_tree = freeze_hierarchical({
     'LP': {
         'FIR': {
@@ -264,15 +264,16 @@ fil_ref = {
     'qfrmt': 'qfrac',
     # number format for fixpoint display {'dec', 'hex', 'bin', 'oct', 'csd'}
     'fx_base': 'dec',
-    # Settings for fixpoint widgets:
+
+    # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
+    #    (more subwidget can be added by fixpoint widgets if needed)
     #  Keys:
-    #   'wdg_name': name of the fixpoint widget (for easier debugging)
+    #   'wdg_name': name of the quantization subwidget (for easier debugging)
     #   'WI': integer bits, 'WF': fractional bits,
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
     #   'N_over': number of overflows during last quantization process
-
     'fxqc':{
         # Input quantization
         'QI': {'wdg_name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'm',

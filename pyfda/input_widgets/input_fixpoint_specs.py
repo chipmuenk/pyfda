@@ -194,11 +194,12 @@ class Input_Fixpoint_Specs(QWidget):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
-        # update visibility of subwidgets and resize image, also when switching to float
+        # always update visibility of subwidgets and resize image, also when in float mode
+        # or invisible (?)
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.qfrmt2ui()
 
-        if fb.fil[0]['fx_sim']:  # fixpoint mode active?
+        if fb.fil[0]['fx_sim']:  # fixpoint mode active
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
@@ -272,7 +273,7 @@ class Input_Fixpoint_Specs(QWidget):
                     else:
                         logger.warning("No method 'fx_filt_ui.update_ovfl_cnt_all()'")
 
-                # --------------- fx specs_changed ------------
+                # --------------- fx_sim : specs_changed ------------
                 elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
                     self.dict2ui()  # update wordlengths in UI
                     self.fx_specs_changed = False
