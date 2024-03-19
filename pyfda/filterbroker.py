@@ -295,6 +295,7 @@ fil_ref = {
         # 'a': [65536, 6553, 0]
         # },
     'fx_sim': False,  # fixpoint simulation mode
+    'fx_mod_class_name': '',  # string with current fixpoint module and class
     'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
     'timestamp': time.time(),
     'amp_specs_unit': 'dB',

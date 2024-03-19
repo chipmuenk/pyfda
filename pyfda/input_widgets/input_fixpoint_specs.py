@@ -686,6 +686,8 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 self.lbl_descr.setVisible(False)
 
+            # store fully qualified name of current fixpoint class:
+            fb.fil[0]['fx_mod_class_name'] = fx_mod_class_name[0]
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
