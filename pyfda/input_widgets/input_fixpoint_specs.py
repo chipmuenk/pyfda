@@ -98,7 +98,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.debug("Imported {0:d} fixpoint filters:\n{1}"
                          .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
         self._update_fixp_widget()
-        self.qfrmt2ui()  # initialize ui settings
+        self.dict2ui()  # update fixpoint widgets
 
 # ------------------------------------------------------------------------------
     def process_sig_rx_local(self, dict_sig: dict = None) -> None:
@@ -112,13 +112,13 @@ class Input_Fixpoint_Specs(QWidget):
             f"SIG_RX_LOCAL: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(
-                f'RX_LOCAL - Stopped infinite loop: "{first_item(dict_sig)}"')
+                f'RX_LOCAL - Stopped infinite loop: "{pprint_log(dict_sig)}"')
             return
         # ---------------------------------------------------------------------
         # Updated fixpoint specs in filter widget, update UI + emit with self id
 
         elif 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.dict2ui()  # update wordlengths in UI
+            self.dict2ui() # update fixpoint widgets
             dict_sig.update({'id': id(self)})  # propagate 'specs_changed' with self 'id'
             self.emit(dict_sig)
             return
@@ -164,7 +164,7 @@ class Input_Fixpoint_Specs(QWidget):
                              .format(dict_sig['sender_name'], pprint_log(dict_sig)))
                 return
 
-            self.dict2ui()  # update wordlengths in UI
+            self.dict2ui() # update fixpoint widgets
             logger.error("fx_sim: specs_changed emitted thru ui_local_changes")
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ class Input_Fixpoint_Specs(QWidget):
         # logger.warning(
         #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
         logger.warning(
-            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
+            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
@@ -197,7 +197,10 @@ class Input_Fixpoint_Specs(QWidget):
         # always update visibility of subwidgets and resize image, also when in float mode
         # or invisible (?)
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
-            self.qfrmt2ui()
+            self.dict2ui()
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+            self.load_fx_filter()
+            return
 
         if fb.fil[0]['fx_sim']:  # fixpoint mode active
             #  =================== UI_CHANGED =======================================
@@ -212,15 +215,13 @@ class Input_Fixpoint_Specs(QWidget):
                     # New filter has been designed, update list of available filter topologies
                     self._update_filter_cmb()
 
-                elif dict_sig['data_changed'] == "filter_loaded":
-                    # New filter has been loaded, update fixpoint topologies and UI from dict,
-                    # TODO: Is this needed? Is the fixpoint widget updated?
-                    self._update_filter_cmb()
-                    self.dict2ui()
+                # elif dict_sig['data_changed'] == "filter_loaded":
+                #     # New filter has been loaded, update fixpoint topologies and UI from dict,
+                #     self.load_fx_filter()
 
                 else:
                     # Filter data has changed (but not the filter type):
-                    # Reload UI from dict
+                    # Update fixpoint widgets from dict
                     self.dict2ui()
 
                 # ------------- reset change flags ------------------
@@ -275,7 +276,7 @@ class Input_Fixpoint_Specs(QWidget):
 
                 # --------------- fx_sim : specs_changed ------------
                 elif dict_sig['fx_sim'] == 'specs_changed' and self.isVisible():
-                    self.dict2ui()  # update wordlengths in UI
+                    self.dict2ui()  # update fixpoint widgets
                     self.fx_specs_changed = False
                 elif dict_sig['fx_sim'] == 'specs_changed' and not self.isVisible():
                     self.fx_specs_changed = True
@@ -300,14 +301,14 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_specs_changed = False  # reset flag
 
             elif self.fx_specs_changed:
-                self.dict2ui()  # update wordlengths in UI
+                self.dict2ui()  # update fixpoint widgets
                 self.fx_specs_changed = False  # reset flag
 
         # =============================================================================
         else:  # fixpoint mode is not active
             if 'data_changed' in dict_sig:
-                if dict_sig['data_changed'] in {"filter_designed", "filter_loaded"}:
-                    # New filter has been designed or loaded, update list of available
+                if dict_sig['data_changed'] == "filter_designed":
+                    # New filter has been designed, update list of available
                     # filter topologies and UI from dict
                     self.fx_filt_changed = True
                 else:
@@ -477,14 +478,42 @@ class Input_Fixpoint_Specs(QWidget):
         # self.sig_resize.connect(self.resize_img)
 
 # ------------------------------------------------------------------------------
-    def _update_filter_cmb(self) -> str:
+    def load_fx_filter(self) -> None:
         """
+        A new filter has been loaded, create fixpoint filter from scratch.
+
         (Re-)Read list of available fixpoint filters for a given filter class
         every time a new filter has been designed or loaded.
 
         Then try to import the fixpoint designs in the list and populate the
         fixpoint implementation combo box `self.cmb_fx_wdg` with successfull
         imports.
+        """
+        widgets = self._update_filter_cmb(fx_wdg=fb.fil[0]['fx_mod_class_name'])
+
+        logger.error(f"\n\nload_fx_filter: {fb.fil[0]['fx_mod_class_name']}")
+        logger.error(widgets)
+
+        self.dict2ui()  # update fixpoint widgets
+
+# ------------------------------------------------------------------------------
+    def _update_filter_cmb(self, fx_wdg: str = "") -> str:
+        """
+        (Re-)Read list of available fixpoint filters for a given filter class
+        every time a new filter has been designed or loaded.
+
+        Then try to import the fixpoint designs in the list and populate the
+        fixpoint implementation combo box `self.cmb_fx_wdg` with successful
+        imports.
+
+        Try to set the combobox to the passed argument `fx_wdg` or (if empty), try
+        to use the last combobox setting. If both fail, use the first entry of the
+        combobox.
+
+        Parameters
+        ----------
+        fx_wdg: str
+          fully qualified name of fixpoint widget (optional)
 
         Returns
         -------
@@ -517,8 +546,11 @@ class Input_Fixpoint_Specs(QWidget):
                     self.embed_fixp_img(self.no_fx_filter_img)
                     continue  # with next `class_name` in for loop
 
-            # restore last fx widget if possible
-            idx = self.cmb_fx_wdg.findText(last_fx_wdg)
+            # set passed fx_widget or restore last fx widget if possible
+            if fx_wdg:
+                idx = self.cmb_fx_wdg.findText(fx_wdg)
+            else:
+                idx = self.cmb_fx_wdg.findText(last_fx_wdg)
             # set to idx 0 if not found (returned -1)
             self.cmb_fx_wdg.setCurrentIndex(max(idx, 0))
             self.cmb_fx_wdg.blockSignals(False)
@@ -655,8 +687,7 @@ class Input_Fixpoint_Specs(QWidget):
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
-            self.fx_filt_ui.setVisible(True)
-            self.dict2ui()  # initialize the fixpoint subwidgets from the fxqc_dict
+            self.dict2ui()  # update fixpoint widgets from dictionary
 
             # ---- connect signals to fx_filt_ui ----
             if hasattr(self.fx_filt_ui, "sig_rx"):
@@ -695,40 +726,39 @@ class Input_Fixpoint_Specs(QWidget):
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
-    def qfrmt2ui(self, arg=None):
+    def qfrmt2ui(self):
         """
-        Update UI (fixpoint format, visibility of fixpoint widgets)
-        either from combobox `self.cmb_qfrmt` to `fb.fil[0]['fx_sim']` and
-        `fb.fil[0]['qfrmt']` or the other way round.
+        Triggered by by a change of index of the combo box `self.cmb_qfrmt`.
 
-        `arg` can be:
-        - `None` when called directly (during `__init__()` or from `process_sig_rx()`).
-           In this case, the combobox `self.cmb_qfrmt` is set from `fb.fil[0]['qfrmt']`.
+        - Update UI (fixpoint format, visibility of fixpoint widgets) from combobox
+          `self.cmb_qfrmt` to `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`.
 
-        - int 0 or 1 when triggered by a change of index of the combo box
-          `self.cmb_qfrmt`. In this case, `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`
-          are setting according to the combobox setting.
-          Emit {'fx_sim': 'specs_changed'}.
+        - Update fixpoint widget settings via `self.dict2ui()`
 
-        In any case, update visibility of subwidgets, then call `dict2ui()` to propagate
-        this to input, output and dyn. filter widget and set the simFX button to
-        'changed'.
+        - Emit {'fx_sim': 'specs_changed'}.
+          """
+        fb.fil[0]['fx_sim'] = (qget_cmb_box(self.cmb_qfrmt) != 'float')
+        if fb.fil[0]['fx_sim']:
+            fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+
+        self.dict2ui()
+
+        self.emit({'fx_sim': 'specs_changed'})
+
+# ------------------------------------------------------------------------------
+    def dict2ui(self, arg=None):
         """
-        if arg is None:  # called directly (from another widget or during __init__() )
-            if fb.fil[0]['fx_sim']:  # fixpoint mode
-                pass # qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
-            else:
-                qset_cmb_box(self.cmb_qfrmt, 'float')
-        else:  # triggered by changed combo box
-            fb.fil[0]['fx_sim'] = (qget_cmb_box(self.cmb_qfrmt) != 'float')
-            if fb.fil[0]['fx_sim']:
-                fb.fil[0]['qfrmt'] = qget_cmb_box(self.cmb_qfrmt)
+        Called during `__init__()` and from `process_sig_rx()`.
 
+        Update UI (fixpoint widgets and their visibility, `self.cmb_qfrmt`)
+        from `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`.
+
+        Update visibility of subwidgets depending on fb.fil[0]['fx_sim'], then load
+        fixpoint settings of input, output and dyn. filter widget from dictionary
+        """
         is_fixp = fb.fil[0]['fx_sim']
 
-        logger.error(f"qfrmt = {qget_cmb_box(self.cmb_qfrmt)}, fx_sim = {is_fixp}")
-
-        # fixpoint widgets are only visible for fixpoint settings
+        # fixpoint widgets are only visible in fixpoint mode
         self.wdg_wq_input.setVisible(is_fixp)
         self.wdg_wq_output.setVisible(is_fixp)
         self.frmImg.setVisible(is_fixp)
@@ -736,31 +766,21 @@ class Input_Fixpoint_Specs(QWidget):
            self.fx_filt_ui.setVisible(is_fixp)
 
         if is_fixp:
-            self.resize_img()  # refresh image to cover switching from float to fix
-            self.dict2ui()  # update fixpoint widgets
-
-        if arg is not None:  # triggered by changed combo box
-            self.emit({'fx_sim': 'specs_changed'})
-
-# ------------------------------------------------------------------------------
-    def dict2ui(self):
-        """
-        Trigger an update of the input, output and fixpoint widgets UI when view
-        (i.e. fixpoint coefficient format) or data have been changed outside this
-        class.
-
-        Set the RUN button to 'changed'.
-        """
-        if not fb.fil[0]['fx_sim']:  # float mode
-            qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
-        else:  # fixpoint mode
+            # set combobox from dictionary
             qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
-        self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-        self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
-        try:
-            self.fx_filt_ui.dict2ui()
-        except AttributeError as e:
-            logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
+            # refresh image in case of switching from float to fix
+            self.resize_img()
+            # update fixpoint widgets
+            self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
+            self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+            try:
+                self.fx_filt_ui.dict2ui()
+            except AttributeError as e:
+                logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
+        else:
+            qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
+
+        logger.error(f"dict2ui: qfrmt = {qget_cmb_box(self.cmb_qfrmt)}, fx_sim = {is_fixp}")
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
