@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.libs.pyfda_lib import safe_eval
+from pyfda.libs.pyfda_lib import safe_eval, first_item
 import pyfda.pyfda_rc as rc
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
@@ -43,16 +43,43 @@ class SelectFilter(QWidget):
     sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
     where it triggers the recreation of all subwidgets.
     """
+    # class variables (shared between instances if more than one exists)
+    sig_rx = pyqtSignal(object)  # incoming -> process_sig_rx
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, parent=None, objectName=""):
+    def __init__(self, parent=None, objectName="select_filter_inst"):
         super(SelectFilter, self).__init__(parent)
 
         self.setObjectName(objectName)
         self.fc_last = ''  # previous filter class
         self._construct_UI()
         self._set_response_type()  # first time initialization
+
+    def process_sig_rx(self, dict_sig):
+        """
+        Process signals coming in via sig_rx
+
+        All signals terminate here.
+
+        The sender name of signals coming in from local subwidgets is changed to
+        its parent widget to prevent infinite loops.
+
+        """
+        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        if dict_sig['id'] == id(self):
+            # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
+            #               \n{first_item(dict_sig)}")
+            return
+
+        elif 'data_changed' in dict_sig:
+            if dict_sig['data_changed'] == 'filter_loaded':
+                """
+                Called when a new filter has been LOADED,
+                pass new filter data from the global filter dict to load_dict()
+                """
+            self.load_dict()
+
 
     def _construct_UI(self):
         """
@@ -174,10 +201,14 @@ class SelectFilter(QWidget):
 
         self.setLayout(layHMain)
 
-# ==============================================================================
+        # ----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        # ----------------------------------------------------------------------
+        # connect incoming signals to process_sig_rx and other widgets?!
+        self.sig_rx.connect(self.process_sig_rx)
 
         # ------------------------------------------------------------
-        # SIGNALS & SLOTS
+        # LOCAL SIGNALS & SLOTS
         # ------------------------------------------------------------
         # Connect comboBoxes and setters, propgate change events hierarchically
         #  through all widget methods and emit 'filt_changed' in the end.

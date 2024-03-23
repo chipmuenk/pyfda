@@ -100,16 +100,10 @@ class Input_Specs(QWidget):
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> call update_UI
             self.update_UI(dict_sig)
-        elif 'data_changed' in dict_sig:
-            if dict_sig['data_changed'] == 'filter_loaded':
-                """
-                Called when a new filter has been LOADED:
-                Pass new filter data from the global filter dict by
-                specifically calling SelectFilter.load_dict()
-                """
-                self.sel_fil.load_dict()  # update select_filter widget
-            # Pass new filter data from the global filter dict & set button = "ok"
-            self.load_dict()
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+                # Update info string from filter dict & set button = "ok"
+                # This is only triggered from global signals
+                self.load_dict()
 
         if propagate:
             # local signals are propagated with the class name and id of this widget,
@@ -226,7 +220,8 @@ class Input_Specs(QWidget):
         # self.sig_rx.connect(self.f_units.sig_rx)
         self.sig_rx_local.connect(self.process_sig_rx_local)
 
-        # connect outgoing signal to receive slots of f_specs, t_specs and f_units
+        # connect outgoing signal to receive slots of various subwidgets
+        self.sig_tx.connect(self.sel_fil.sig_rx)
         self.sig_tx.connect(self.f_specs.sig_rx)
         self.sig_tx.connect(self.t_specs.sig_rx)
         self.sig_tx.connect(self.w_specs.sig_rx)
@@ -379,13 +374,11 @@ class Input_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def load_dict(self):
         """
-        Reload all specs/parameters entries from global dict fb.fil[0],
-        directly or using the "load_dict" methods of the individual classes
+        Reload all info test from global dict `fb.fil[0]` and reset the 'DESIGN'
+        button.
         """
         logger.error("input specs load_dict()")
         self.led_info.setText(str(fb.fil[0]['info']))
-        self.sel_fil.load_dict()  # select filter widget
-
         self.color_design_button("ok")
 # ------------------------------------------------------------------------------
     def update_info(self):
