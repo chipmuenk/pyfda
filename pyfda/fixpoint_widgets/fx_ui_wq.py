@@ -398,7 +398,7 @@ class FX_UI_WQ(QWidget):
                                           # like W and Q and reset counters
 
         self.update_WI_WF()
-
+        logger.error(f"ui2dict: WI = {WI} {self.QObj.q_dict['WI']} - {self.q_dict['WI']}")
         if self.sender():
             # logger.error(f"sender = {self.sender().objectName()}")
 #             if self.sender().objectName() == 'cmbW':
@@ -464,6 +464,7 @@ class FX_UI_WQ(QWidget):
         self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
 
         self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m_
+        logger.error(f"dict2ui: WI = {WI} {self.QObj.q_dict['WI']} - {self.q_dict['WI']}")
 
     # --------------------------------------------------------------------------
     def update_WI_WF(self):
