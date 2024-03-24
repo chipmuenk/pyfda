@@ -417,7 +417,6 @@ class FX_UI_WQ(QWidget):
         * UI subwidgets `WI`, `WF` `quant`, `ovfl`, `cmbW`
         * the instance quantization dict `self.q_dict` (usually a reference to some
           global quantization dict like `self.q_dict = fb.fil[0]['fxqc']['QCB']`)
-        * the `scale` setting of the instance quantization dict if WF / WI require this
         * the instance quantization object `self.QObj` from the instance quantization dict
         * overflow counters need to be updated from calling instance
 
