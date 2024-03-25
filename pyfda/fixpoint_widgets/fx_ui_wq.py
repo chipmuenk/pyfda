@@ -424,7 +424,8 @@ class FX_UI_WQ(QWidget):
         instead, this can be used to update the UI.
         """
         if q_dict is None:
-            q_dict = self.q_dict  # update UI from instance qdict
+            q_dict = self.QObj.q_dict  # update UI from quantizer qdict
+            # TODO: from quantizer dict?
         else:
             for k in q_dict:
                 if k not in {'wdg_name', 'quant', 'ovfl', 'WI', 'WF',
@@ -435,35 +436,35 @@ class FX_UI_WQ(QWidget):
         if 'w_a_m' in q_dict:
             qset_cmb_box(self.cmbW, q_dict['w_a_m'])
             # Re-read combobox setting to sanitize dictionary entry
-            self.q_dict.update({'w_a_m': qget_cmb_box(self.cmbW)})
+            q_dict.update({'w_a_m': qget_cmb_box(self.cmbW)})
             # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
-            self.q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
+            q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
 
         if 'ovfl' in q_dict:
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
-            self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
+            q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
             logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'")
 
         WI = safe_eval(
             q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
-        self.q_dict.update({'WI': WI})
+        q_dict.update({'WI': WI})
 
         self.ledWI.setText(str(WI))
 
         WF = safe_eval(
             q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
         self.ledWF.setText(str(WF))
-        self.q_dict.update({'WF': WF})
+        q_dict.update({'WF': WF})
 
-        self.QObj.set_qdict(self.q_dict)  # update quantization object and derived parameters
+        self.QObj.set_qdict(q_dict)  # update quantization object and derived parameters
 
         self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m_
-        logger.error(f"dict2ui: WI = {WI} {self.QObj.q_dict['WI']} - {self.q_dict['WI']}")
+        logger.error(f"dict2ui: WI = {WI} {self.QObj.q_dict['WI']} - {q_dict['WI']}")
 
     # --------------------------------------------------------------------------
     def update_WI_WF(self):
