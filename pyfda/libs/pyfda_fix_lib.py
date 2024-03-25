@@ -360,7 +360,9 @@ class Fixed(object):
     Define a dictionary with the format options and pass it to the constructor:
 
     >>> q_dict = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'}
-    >>> myQ = Fixed(q_dict)
+    >>> myQ = Fixed(q_dict)  # instantiate fixpoint quantizer
+    >>> WI = myQ.q_dict['WI']  # access quantizer parameters
+    >>> myQ.set_qdict({'WF': 13, 'WI': 2})  # update quantizer parameters
 
 
     Parameters

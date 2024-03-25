@@ -186,15 +186,15 @@ class FIR_DF_pyfixp_UI(QWidget):
             logger.error("An error occured:", exc_info=True)
             return
 
-        # calculate required accumulator word format
+        # calculate required accumulator word format and update filter dict
         if qget_cmb_box(self.wdg_wq_accu.cmbW) in {'f', 'a'}:
             fb.fil[0]['fxqc']['QACC']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
                 + fb.fil[0]['fxqc']['QCB']['WF']
             fb.fil[0]['fxqc']['QACC']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
                 + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
 
-        # update quantization settings and UI
-        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
+        # update quantization settings and UI from filter dict
+        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.QObj.q_dict`
         self.wdg_wq_accu.dict2ui()  # update UI
 
     # --------------------------------------------------------------------------
