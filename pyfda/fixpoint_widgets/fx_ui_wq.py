@@ -432,33 +432,37 @@ class FX_UI_WQ(QWidget):
                     logger.warning(f"Unknown quantization dict key '{k}'")
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`
+        # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
         if 'w_a_m' in q_dict:
-            qset_cmb_box(self.cmbW, q_dict['w_a_m'])
-            # Re-read combobox setting to sanitize dictionary entry
-            q_dict.update({'w_a_m': qget_cmb_box(self.cmbW)})
-            # Auto-calculation of integer bits etc. needs to performed in parent subwidget!
+            i = qset_cmb_box(self.cmbW, q_dict['w_a_m'])
+            if i < 0:
+                logger.error(f"Unknown value q_dict['w_a_m'] = {q_dict['w_a_m']}")
 
         if 'quant' in q_dict:
             qset_cmb_box(self.cmbQuant, q_dict['quant'])
-            q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
+            if i < 0:
+                logger.error(f"Unknown value q_dict['quant'] = {q_dict['quant']}")
+            # q_dict.update({'quant': qget_cmb_box(self.cmbQuant)})
 
         if 'ovfl' in q_dict:
             qset_cmb_box(self.cmbOvfl, q_dict['ovfl'])
-            q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
+            if i < 0:
+                logger.error(f"Unknown value q_dict['ovfl'] = {q_dict['ovfl']}")
+            # q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl)})
 
         if fb.fil[0]['qfrmt'] not in {'qfrac', 'qint'}:
             logger.error(f"Unknown quantization format '{fb.fil[0]['qfrmt']}'")
 
         WI = safe_eval(
             q_dict['WI'], self.QObj.q_dict['WI'], return_type="int", sign='poszero')
-        q_dict.update({'WI': WI})
+        # q_dict.update({'WI': WI})
 
         self.ledWI.setText(str(WI))
 
         WF = safe_eval(
             q_dict['WF'], self.QObj.q_dict['WF'], return_type="int", sign='poszero')
         self.ledWF.setText(str(WF))
-        q_dict.update({'WF': WF})
+        # q_dict.update({'WF': WF})
 
         self.QObj.set_qdict(q_dict)  # update quantization object and derived parameters
 
