@@ -138,24 +138,30 @@ class Input_Fixpoint_Specs(QWidget):
 
             elif dict_sig['sender_name'] == 'wq_input':
                 """
-                Input fixpoint format has been changed or butLock has been clicked.
-                When I/O lock is active, copy input fixpoint word format to output
-                word format.
+                Input fixpoint format has been changed: Update filter dict with the
+                settings of the input quantizer dict. If I/O lock is active, copy
+                input fixpoint word format to output word format. Do the same
+                if butLock has been activated.
                 """
+                fb.fil[0]['fxqc']['QI'].update(self.wdg_wq_input.QObj.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
                     return
                 elif self.wdg_wq_input.butLock.isChecked():
                     # button lock was activated or wordlength settings have been changed
+                    # with active lock -> copy input settings to output
                     fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
                     fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
 
             elif dict_sig['sender_name'] == 'wq_output':
                 """
-                Output fixpoint format has been changed. When I/O lock is active, copy
+                Output fixpoint format has been changed: Update filter dict with the
+                settings of the output quantizer dict. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
+                fb.fil[0]['fxqc']['QO'].update(self.wdg_wq_outpuput.QObj.q_dict)
+
                 if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
                     fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
@@ -750,11 +756,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Called during `__init__()` and from `process_sig_rx()`.
 
-        Update UI (fixpoint widgets and their visibility, `self.cmb_qfrmt`)
-        from `fb.fil[0]['fx_sim']` and `fb.fil[0]['qfrmt']`.
-
-        Update visibility of subwidgets depending on fb.fil[0]['fx_sim'], then load
-        fixpoint settings of input, output and dyn. filter widget from dictionary
+        Update UI from `fb.fil[0]['fx_sim']`, `fb.fil[0]['qfrmt']` and the fx filter
+        dict `fb.fil[0]['fxqc']`. This affects the visibility and the fx settings of
+        input, output and dyn. filter widget via their `dict2ui()` methods.
+        The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
+        format is updated as well.
         """
         is_fixp = fb.fil[0]['fx_sim']
 
@@ -770,10 +776,11 @@ class Input_Fixpoint_Specs(QWidget):
             qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             # refresh image in case of switching from float to fix
             self.resize_img()
-            # update fixpoint widgets
+            # update fixpoint widgets from the central filter dict
             self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
             self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
             try:
+                # this should use the central filter dict as well
                 self.fx_filt_ui.dict2ui()
             except AttributeError as e:
                 logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
