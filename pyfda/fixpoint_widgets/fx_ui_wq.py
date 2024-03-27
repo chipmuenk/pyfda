@@ -425,7 +425,6 @@ class FX_UI_WQ(QWidget):
         """
         if q_dict is None:
             q_dict = self.QObj.q_dict  # update UI from quantizer qdict
-            # TODO: from quantizer dict?
         else:
             for k in q_dict:
                 if k not in {'wdg_name', 'quant', 'ovfl', 'WI', 'WF',
@@ -463,16 +462,16 @@ class FX_UI_WQ(QWidget):
 
         self.QObj.set_qdict(q_dict)  # update quantization object and derived parameters
 
-        self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m_
+        self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m'
         logger.error(f"dict2ui: WI = {WI} {self.QObj.q_dict['WI']} - {q_dict['WI']}")
 
     # --------------------------------------------------------------------------
     def update_WI_WF(self):
         """
-        Update visibility / writability of integer and fractional part of the
-        quantization format. depending on 'qfrmt' and 'w_a_m' settings
+        Update display, visibility / writability of integer and fractional part of the
+        quantization format. depending on `fb.fil[0]['fx_sim']` ...['qfrmt'] and
+        ...['w_a_m'] settings
         """
-        ## logger.error(f"{self.q_dict['wdg_name']}: {qfrmt}, self.w_a_m = {self.q_dict['w_a_m']}")
         self.ledWI.setVisible(fb.fil[0]['fx_sim'])
         self.ledWF.setVisible(fb.fil[0]['fx_sim'])
 

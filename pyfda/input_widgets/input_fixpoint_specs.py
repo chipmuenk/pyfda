@@ -746,7 +746,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
-    def dict2ui(self, arg=None):
+    def dict2ui(self):
         """
         Called during `__init__()` and from `process_sig_rx()`.
 
