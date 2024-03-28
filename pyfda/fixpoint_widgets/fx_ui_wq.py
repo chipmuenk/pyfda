@@ -459,7 +459,6 @@ class FX_UI_WQ(QWidget):
         If `q_dict is None`, use data from the quantizer dict `self.QObj.q_dict`
         instead, this can be used to update the UI.
         """
-        logger.error(f"dict2ui: QObj={self.QObj.q_dict['WI']} - q_dict={q_dict}")
         if q_dict is None:
             q_dict = self.q_dict  # update UI from quantizer qdict
             # q_dict = self.QObj.q_dict  # update UI from quantizer q_dict
@@ -501,7 +500,6 @@ class FX_UI_WQ(QWidget):
         self.QObj.set_qdict(q_dict)  # update quantization object and derived parameters
 
         self.update_WI_WF()  # set WI / WF widgets visibility depending on 'w_a_m'
-        logger.error(f"dict2ui: WI = {WI} {self.QObj.q_dict['WI']} - {q_dict['WI']}")
 
     # --------------------------------------------------------------------------
     def update_WI_WF(self):
