@@ -341,7 +341,7 @@ class FX_UI_WQ(QWidget):
         and fire the signal {'ui_local_changed': 'butLock'}
         """
         self.but_lock_update_icon(checked)
-        self.emit({'ui_local_changed': 'butLock'})
+        self.emit({'sender_name': self.wdg_name, 'ui_local_changed': 'butLock'})
 
     # --------------------------------------------------------------------------
     def but_lock_update_icon(self, checked: bool) -> None:
