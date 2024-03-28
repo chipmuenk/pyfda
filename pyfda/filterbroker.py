@@ -319,8 +319,10 @@ fil_ref = {
         'info': "",     # Docstring for the window
         'win_len': 1024,
         },
+    # dynamically instantiated filter widget
+    'wdg_fil' :
+        {'equiripple': {'grid_density': 16}},
     # Parameters for filter design window function
-    'wdg_dyn': {'win': 'hann'},
     'win_fir':
         {'name': 'Hann',  # Window name
             'fn_name': 'hann',  # function name or array with values
