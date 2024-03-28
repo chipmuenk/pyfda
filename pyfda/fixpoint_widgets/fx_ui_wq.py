@@ -35,35 +35,49 @@ logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------
 class FX_UI_WQ(QWidget):
     """
-    Subwidget for selecting and displaying quantization / overflow options.
+    Subwidget for selecting and displaying fixpoint quantization / overflow options.
 
-    A quantization dictionary `q_dict` is passed to the constructor.
-    This can be a global quantization dict like `fb.fil[0]['fxq']['QCB']` or a local
-    dict.
+    When ui subwidgets are modified, the dictionary specified during the construction
+    is modified.
 
-    This widget allows the user to modify the values for the following keys:
+    Subwidgets can be modified by calling the instance method `dict2ui(q_dict)`.
+    q_dict is an optional quantization dict, when omitted, the dictionary passed
+    during construction is used.
+
+    Constructor parameters
+    ----------------------
+    q_dict: dict
+        A dictionary containing the quantization settings that can be modified via
+        the UI of this widget. This is usually a global quantization dict like
+        `fb.fil[0]['fxq']['QCB']`, it can also be a local dict.
+
+        Attention: The dict is passed by reference, its values are modified via the UI.
+        The quantizer dict `self.QObj.q_dict` contains a copy of these keys / values.
+
+    objectName: str
+        The string  is used to set the objectName of the Qt widget.
+
+    Returns
+    -------
+    None
+
+    The values for the following keys can be modified via the UI:
 
     - `quant`   : quantization behaviour
     - `ovfl`    : overflow behaviour
     - `WI`      : number of integer bits
     - `WF`      : number of fractional bits
+
+    Programmatically, the values for the following keys can be modified.
     - `w_a_m`   : automatic or manual update of word format
 
-    These quantization settings are also stored in the instance quantizer object
-    `self.QObj`.
 
     Widget (UI) settings are stored in the local `ui_dict` dictionary with the keys and
-    their default settings described below. When instantiating the widget, these settings
-    can be modified by corresponding keyword parameters, e.g.
+    their default settings described below.
 
-    ```
-        self.wdg_wq_accu = UI_WQ(
-            fb.fil[0]['fxq']['QACC'], wdg_name='wq_accu',
-            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
-    ```
 
-    All labels support HTML formatting.
-
+        Key         : Default value             # Comment
+    ----------------:---------------------------#-------------------------------------
     'wdg_name'      : 'fx_ui_wq'                # widget name, used to discern between
                                                 # multiple instances
     'label'         : ''                        # widget text label, usually set by the
@@ -83,7 +97,7 @@ class FX_UI_WQ(QWidget):
     'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
 
     'lock_vis'      : 'off''                    # Pushbutton for locking visible
-    'tip_lock'      : 'Sync input/output quant.'# Tooltip for  lock push button
+    'tip_lock'      : 'Sync input/output quant.'# Tooltip for lock push button
 
     'cmb_w_vis'     : 'off'                     # Is Auto/Man. selection visible?
                                                 #  ['a', 'm', 'f']
@@ -91,6 +105,20 @@ class FX_UI_WQ(QWidget):
     'count_ovfl_vis': 'on'                      # Is overflow counter visible?
                                                 #   ['on', 'off', 'auto']
     'MSB_LSB_vis'   : 'off'                     # Are MSB / LSB settings visible?
+
+
+    All labels support HTML formatting.
+
+    When instantiating the widget, these settings can be modified by setting keyword
+    parameters, e.g.:
+
+    ```
+        self.wdg_wq_accu = FX_UI_WQ(
+            fb.fil[0]['fxq']['QACC'], objectName='wdg_wq_accu_inst', wdg_name='wq_accu',
+            label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
+    ```
+
+
     """
     # sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outcgoing
@@ -305,9 +333,9 @@ class FX_UI_WQ(QWidget):
 
         self.butLock.clicked.connect(self.but_lock_checked)
 
-        # initialize the UI from the quantization and the global dictionary
+        # initialize the UI from the global dictionary
         self.dict2ui()
-        # initialize overflow counter and MSB / LSB display
+        # reset overflow counter and update MSB / LSB display
         self.update_ovfl_cnt()
 
     # --------------------------------------------------------------------------
@@ -364,11 +392,11 @@ class FX_UI_WQ(QWidget):
     # --------------------------------------------------------------------------
     def ui2dict(self) -> None:
         """
-        These are the subwidgets for `ovfl`, `quant`, `WI`, `WF` which also
-        trigger this method when edited.
+        The subwidgets for `ovfl`, `quant`, `WI`, `WF`, `w_a_m` trigger this method
+        when modified.
 
-        Update the quantization dict `self.QObj.q_dict` and the quantization object
-        `self.QObj` from the UI.
+        Update the quantization dict `self.QObj.q_dict` and the global quantization
+        dict `self.q_dict` from the UI.
 
         Emit a signal with `{'ui_local_changed': <objectName of the sender>}`.
         """
@@ -396,11 +424,10 @@ class FX_UI_WQ(QWidget):
         if not w_a_m in {'m', 'a', 'f'}:
             logger.error(f"Unknown option '{w_a_m}' for cmbW combobox!")
 
-        # self.q_dict.update(
-        #     {'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
-        # set quant. object, update derived quantities like W and Q and reset counters
+        # update quantizer dict and derived quantities like W and reset counters
         self.QObj.set_qdict(
             {'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
+        # update display of WI and WF depending on fixpoint mode
 
         self.update_WI_WF()
         logger.error(
@@ -422,7 +449,7 @@ class FX_UI_WQ(QWidget):
         Use the passed quantization dict `q_dict` to update:
 
         * UI subwidgets `WI`, `WF` `quant`, `ovfl`, `cmbW`
-        * the instance quantization object `self.QObj.q_dict`
+        * the instance quantizer object `self.QObj.q_dict`
         * overflow counters need to be updated from calling instance
 
         If `q_dict is None`, use data from the quantizer dict `self.QObj.q_dict`
