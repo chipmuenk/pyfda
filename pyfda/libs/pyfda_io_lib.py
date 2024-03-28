@@ -1417,7 +1417,7 @@ def export_coe_xilinx(f: TextIO) -> bool:
 
     Returns error status (False if the file was saved successfully)
     """
-    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
 
     if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
         logger.error("Fractional formats are not supported!")
@@ -1460,7 +1460,7 @@ def export_coe_microsemi(f: TextIO) -> bool:
     For (anti)symmetric filter only one half of the coefficients must be
     specified?
     """
-    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
 
     if qc.q_dict['WF'] != 0  and fb.fil[0]['qfrmt'] != 'qint':
         logger.error("Fractional formats are not supported!")
@@ -1489,7 +1489,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
-    qc = fx.Fixed(fb.fil[0]['fxqc']['QCB'])  # instantiate fixpoint object
+    qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])  # instantiate fixpoint object
     if not fb.fil[0]['fx_sim'] or fb.fil[0]['qfrmt'] == 'qint'\
         or fb.fil[0]['qfrmt'] == 'qfrac' and qc.q_dict['WF'] == 0:
             pass
@@ -1497,7 +1497,7 @@ def export_coe_vhdl_package(f: TextIO) -> bool:
         logger.error("Fractional numbers are only supported for floats!")
         return True
 
-    WO = fb.fil[0]['fxqc']['QO']['WI'] + fb.fil[0]['fxqc']['QO']['WF'] + 1
+    WO = fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QO']['WF'] + 1
 
     if fb.fil[0]['fx_base'] == 'dec' or not fb.fil[0]['fx_sim']:
         pre = ""

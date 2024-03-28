@@ -274,7 +274,7 @@ fil_ref = {
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
     #   'N_over': number of overflows during last quantization process
-    'fxqc':{
+    'fxq':{
         # Input quantization
         'QI': {'wdg_name': 'QI', 'WI': 0, 'WF': 15, 'w_a_m': 'm',
                'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
@@ -381,9 +381,6 @@ def redo():
     # increase buffer pointer, allowing for circular wrap around
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
-
-# Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
-# 'fxqc'
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries

@@ -90,7 +90,7 @@ class FIR_DF_nmigen(Elaboratable):
         -------
         None.
         """
-        self.p = p  # fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        self.p = p  # fb.fil[0]['fxq']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os --------------------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length

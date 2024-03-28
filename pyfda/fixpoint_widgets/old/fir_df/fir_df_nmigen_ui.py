@@ -52,7 +52,7 @@ class FIR_DF_nmigen_UI(QWidget):
 
         self._construct_UI()
         # Construct an instance of the fixpoint filter using the settings from
-        # the 'fxqc' quantizer dict
+        # the 'fxq' quantizer dict
 # ------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -60,30 +60,30 @@ class FIR_DF_nmigen_UI(QWidget):
         Intitialize the UI with widgets for coefficient format and input and
         output quantization
         """
-        if 'QA' not in fb.fil[0]['fxqc']:
-            fb.fil[0]['fxqc']['QA'] = {}
-        set_dict_defaults(fb.fil[0]['fxqc']['QA'],
+        if 'QA' not in fb.fil[0]['fxq']:
+            fb.fil[0]['fxq']['QA'] = {}
+        set_dict_defaults(fb.fil[0]['fxq']['QA'],
                           {'WI': 0, 'WF': 30, 'ovfl': 'wrap', 'quant': 'floor',
                            'w_a_m': 'a', 'N_over': 0, 'wdg_name': 'unknown'})
 
-        self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxqc']['QCB'], wdg_name='w_coeff',
+        self.wdg_w_coeffs = UI_W(self, fb.fil[0]['fxq']['QCB'], wdg_name='w_coeff',
                                  label='Coeff. Format <i>B<sub>I.F&nbsp;</sub></i>:',
                                  tip_WI='Number of integer bits - edit in "b,a" tab',
                                  tip_WF='Number of fractional bits - edit in "b,a" tab',
-                                 WI=fb.fil[0]['fxqc']['QCB']['WI'],
-                                 WF=fb.fil[0]['fxqc']['QCB']['WF'])
+                                 WI=fb.fil[0]['fxq']['QCB']['WI'],
+                                 WF=fb.fil[0]['fxq']['QCB']['WF'])
 
 
-#        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxqc']['QCB'],
-#                                        cur_ov=fb.fil[0]['fxqc']['QCB']['ovfl'],
-#                                        cur_q=fb.fil[0]['fxqc']['QCB']['quant'])
+#        self.wdg_q_coeffs = UI_Q(self, fb.fil[0]['fxq']['QCB'],
+#                                        cur_ov=fb.fil[0]['fxq']['QCB']['ovfl'],
+#                                        cur_q=fb.fil[0]['fxq']['QCB']['quant'])
 #        self.wdg_q_coeffs.sig_tx.connect(self.update_q_coeff)
 
-        self.wdg_w_accu = UI_W(self, fb.fil[0]['fxqc']['QA'],
+        self.wdg_w_accu = UI_W(self, fb.fil[0]['fxq']['QA'],
                                label='', wdg_name='w_accu',
                                fractional=True, combo_visible=True)
 
-        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxqc']['QA'], wdg_name='q_accu',
+        self.wdg_q_accu = UI_Q(self, fb.fil[0]['fxq']['QA'], wdg_name='q_accu',
                                label='Accu Format <i>Q<sub>A&nbsp;</sub></i>:')
 
         # initial setting for accumulator
@@ -123,10 +123,10 @@ class FIR_DF_nmigen_UI(QWidget):
                 Update coefficient quantization settings and coefficients.
 
                 The new values are written to the fixpoint coefficient dict as
-                `fb.fil[0]['fxqc']['QCB']` and  `fb.fil[0]['fxqc']['b']`.
+                `fb.fil[0]['fxq']['QCB']` and  `fb.fil[0]['fxq']['b']`.
                 """
 
-                fb.fil[0]['fxqc'].update(self.ui2dict())
+                fb.fil[0]['fxq'].update(self.ui2dict())
 
             elif dict_sig['wdg_name'] == 'w_accu':  # accu format updated
                 cmbW = qget_cmb_box(self.wdg_w_accu.cmbW, data=False)
@@ -150,7 +150,7 @@ class FIR_DF_nmigen_UI(QWidget):
 
             # - update fixpoint accu and coefficient quantization dict
             # - emit {'fx_sim': 'specs_changed'}
-            fb.fil[0]['fxqc'].update(self.ui2dict())
+            fb.fil[0]['fxq'].update(self.ui2dict())
             self.emit({'fx_sim': 'specs_changed'})
 
         else:
@@ -163,13 +163,13 @@ class FIR_DF_nmigen_UI(QWidget):
         Update coefficient quantization settings and coefficients.
 
         The new values are written to the fixpoint coefficient dict as
-        `fb.fil[0]['fxqc']['QCB']` and
-        `fb.fil[0]['fxqc']['b']`.
+        `fb.fil[0]['fxq']['QCB']` and
+        `fb.fil[0]['fxq']['b']`.
         """
         logger.debug("update q_coeff - dict_sig:\n{0}".format(pprint_log(dict_sig)))
         # dict_sig.update({'ui':'C'+dict_sig['ui']})
-        fb.fil[0]['fxqc'].update(self.ui2dict())
-        logger.debug("b = {0}".format(pprint_log(fb.fil[0]['fxqc']['b'])))
+        fb.fil[0]['fxq'].update(self.ui2dict())
+        logger.debug("b = {0}".format(pprint_log(fb.fil[0]['fxq']['b'])))
 
         self.process_sig_rx(dict_sig)
 
@@ -183,11 +183,11 @@ class FIR_DF_nmigen_UI(QWidget):
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxqc']['QA']`.
+        `fb.fil[0]['fxq']['QA']`.
         """
         try:
             if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f':
-                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxqc']['b']))))
+                A_coeff = int(np.ceil(np.log2(len(fb.fil[0]['fxq']['b']))))
             elif qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
                 A_coeff = int(np.ceil(np.log2(np.sum(np.abs(fb.fil[0]['ba'][0])))))
         except Exception as e:
@@ -196,20 +196,20 @@ class FIR_DF_nmigen_UI(QWidget):
 
         if qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'f' or\
                 qget_cmb_box(self.wdg_w_accu.cmbW, data=False) == 'a':
-            fb.fil[0]['fxqc']['QA']['WF'] = fb.fil[0]['fxqc']['QI']['WF']\
-                + fb.fil[0]['fxqc']['QCB']['WF']
-            fb.fil[0]['fxqc']['QA']['WI'] = fb.fil[0]['fxqc']['QI']['WI']\
-                + fb.fil[0]['fxqc']['QCB']['WI'] + A_coeff
+            fb.fil[0]['fxq']['QA']['WF'] = fb.fil[0]['fxq']['QI']['WF']\
+                + fb.fil[0]['fxq']['QCB']['WF']
+            fb.fil[0]['fxq']['QA']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
+                + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
 
         # calculate total accumulator word length
-        fb.fil[0]['fxqc']['QA']['W'] = fb.fil[0]['fxqc']['QA']['WI']\
-            + fb.fil[0]['fxqc']['QA']['WF'] + 1
+        fb.fil[0]['fxq']['QA']['W'] = fb.fil[0]['fxq']['QA']['WI']\
+            + fb.fil[0]['fxq']['QA']['WF'] + 1
 
         # update quantization settings
-        fb.fil[0]['fxqc']['QA'].update(self.wdg_q_accu.q_dict)
+        fb.fil[0]['fxq']['QA'].update(self.wdg_q_accu.q_dict)
 
         # update UI
-        self.wdg_w_accu.dict2ui(fb.fil[0]['fxqc']['QA'])
+        self.wdg_w_accu.dict2ui(fb.fil[0]['fxq']['QA'])
 
 # ------------------------------------------------------------------------------
     def dict2ui(self):
@@ -222,7 +222,7 @@ class FIR_DF_nmigen_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxqc_dict = fb.fil[0]['fxqc']
+        fxqc_dict = fb.fil[0]['fxq']
         if 'QA' not in fxqc_dict:
             fxqc_dict.update({'QA': {}})  # no accumulator settings in dict yet
             logger.warning("QA key missing")
@@ -238,13 +238,13 @@ class FIR_DF_nmigen_UI(QWidget):
     def ui2dict(self):
         """
         Read out the quantization subwidgets and store their settings in the central
-        fixpoint dictionary `fb.fil[0]['fxqc']` using the keys described below.
+        fixpoint dictionary `fb.fil[0]['fxq']` using the keys described below.
 
         Coefficients are quantized with these settings in the subdictionary under
         the key 'b'.
 
         Additionally, these subdictionaries are returned  to the caller
-        (``input_fixpoint_specs``) where they are used to update ``fb.fil[0]['fxqc']``
+        (``input_fixpoint_specs``) where they are used to update ``fb.fil[0]['fxq']``
 
         Parameters
         ----------
@@ -264,18 +264,18 @@ class FIR_DF_nmigen_UI(QWidget):
         - 'b' : list of quantized b coefficients in format WI.WF
 
         """
-        fxqc_dict = fb.fil[0]['fxqc']
+        fxqc_dict = fb.fil[0]['fxq']
         if 'QA' not in fxqc_dict:
             # no accumulator settings in dict yet:
             fxqc_dict.update({'QA': self.wdg_w_accu.q_dict})
-            logger.warning("Empty dict 'fxqc['QA]'!")
+            logger.warning("Empty dict 'fb.fil{0]['fxq']['QA']'!")
         else:
             fxqc_dict['QA'].update(self.wdg_w_accu.q_dict)
 
         if 'QCB' not in fxqc_dict:
             # no coefficient settings in dict yet
             fxqc_dict.update({'QCB': self.wdg_w_coeffs.q_dict})
-            logger.warning("Empty dict 'fxqc['QCB]'!")
+            logger.warning("Empty dict 'fb.fil{0]['fxq']['QCB']'!")
         else:
             fxqc_dict['QCB'].update(self.wdg_w_coeffs.q_dict)
 
@@ -287,9 +287,9 @@ class FIR_DF_nmigen_UI(QWidget):
     def init_filter(self):
         """
         Construct an instance of the fixpoint filter object using the settings from
-        the 'fxqc' quantizer dict
+        the 'fxq' quantizer dict
         """
-        p = fb.fil[0]['fxqc']  # parameter dictionary with coefficients etc.
+        p = fb.fil[0]['fxq']  # parameter dictionary with coefficients etc.
         if not all(np.isfinite(p['b'])):
             logger.error("Coefficients contain non-finite values!")
             return

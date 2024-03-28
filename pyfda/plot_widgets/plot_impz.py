@@ -591,7 +591,7 @@ class Plot_Impz(QWidget):
                         "Complex stimulus: Only its real part is used for the "
                         "fixpoint filter!")
                 # setup and initialize input quantizer
-                self.q_i = fx.Fixed(fb.fil[0]['fxqc']['QI'])
+                self.q_i = fx.Fixed(fb.fil[0]['fxq']['QI'])
                 # always use integer decimal format for input quantizer
                 # self.q_i.set_qdict({'fx_base': 'dec'})
 
@@ -882,31 +882,31 @@ class Plot_Impz(QWidget):
                 if fb.fil[0]['qfrmt'] == 'qint':
                     # display stimulus and response as integer values
                     # in the range +/- 2 ** (WI + WF)
-                    self.scale_i = 1 << fb.fil[0]['fxqc']['QI']['WF']
+                    self.scale_i = 1 << fb.fil[0]['fxq']['QI']['WF']
                     self.scale_iq = 1
-                    self.scale_o = 1 << fb.fil[0]['fxqc']['QO']['WF']
+                    self.scale_o = 1 << fb.fil[0]['fxq']['QO']['WF']
 
-                    self.fx_min_x = - (1 << (fb.fil[0]['fxqc']['QI']['WI']
-                                     + fb.fil[0]['fxqc']['QI']['WF']))
+                    self.fx_min_x = - (1 << (fb.fil[0]['fxq']['QI']['WI']
+                                     + fb.fil[0]['fxq']['QI']['WF']))
                     self.fx_max_x = -self.fx_min_x - 1
-                    self.fx_min_y = - (1 << (fb.fil[0]['fxqc']['QO']['WI']
-                                     + fb.fil[0]['fxqc']['QO']['WF']))
+                    self.fx_min_y = - (1 << (fb.fil[0]['fxq']['QO']['WI']
+                                     + fb.fil[0]['fxq']['QO']['WF']))
                     self.fx_max_y = -self.fx_min_y - 1
                 elif fb.fil[0]['qfrmt'] == 'qfrac':
                     # display values scaled as "real world (float) values"
                     self.scale_i = self.scale_iq = self.scale_o = 1
-                    self.fx_min_x = -(1 << fb.fil[0]['fxqc']['QI']['WI'])
+                    self.fx_min_x = -(1 << fb.fil[0]['fxq']['QI']['WI'])
                     self.fx_max_x = -self.fx_min_x\
-                        - 1. / (1 << fb.fil[0]['fxqc']['QI']['WF'])
-                    self.fx_min_y = -(1 << fb.fil[0]['fxqc']['QO']['WI'])
+                        - 1. / (1 << fb.fil[0]['fxq']['QI']['WF'])
+                    self.fx_min_y = -(1 << fb.fil[0]['fxq']['QO']['WI'])
                     self.fx_max_y = -self.fx_min_y -\
-                        1. / (1 << fb.fil[0]['fxqc']['QO']['WF'])
+                        1. / (1 << fb.fil[0]['fxq']['QO']['WF'])
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
             except TypeError as e:
                 logger.error(
-                    "Type error: 'fxqc_dict'={0},\n{1}".format(fb.fil[0]['fxqc'], e))
+                    "Type error: 'fxqc_dict'={0},\n{1}".format(fb.fil[0]['fxq'], e))
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
 

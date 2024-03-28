@@ -140,7 +140,7 @@ class Delay_wdg(QWidget):
 # A delay with quantization and parametrizable length
 class Delay(Module):
     def __init__(self):
-        p = fb.fil[0]['fxqc']
+        p = fb.fil[0]['fxq']
         # ------------- Define I/Os -------------------------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1

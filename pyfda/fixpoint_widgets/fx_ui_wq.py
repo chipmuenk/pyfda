@@ -38,7 +38,7 @@ class FX_UI_WQ(QWidget):
     Subwidget for selecting and displaying quantization / overflow options.
 
     A quantization dictionary `q_dict` is passed to the constructor.
-    This can be a global quantization dict like `fb.fil[0]['fxqc']['QCB']` or a local
+    This can be a global quantization dict like `fb.fil[0]['fxq']['QCB']` or a local
     dict.
 
     This widget allows the user to modify the values for the following keys:
@@ -58,7 +58,7 @@ class FX_UI_WQ(QWidget):
 
     ```
         self.wdg_wq_accu = UI_WQ(
-            fb.fil[0]['fxqc']['QACC'], wdg_name='wq_accu',
+            fb.fil[0]['fxq']['QACC'], wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
 

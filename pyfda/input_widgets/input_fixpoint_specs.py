@@ -143,7 +143,7 @@ class Input_Fixpoint_Specs(QWidget):
                 input fixpoint word format to output word format. Do the same
                 if butLock has been activated.
                 """
-                fb.fil[0]['fxqc']['QI'].update(self.wdg_wq_input.QObj.q_dict)
+                fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.QObj.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
@@ -151,8 +151,8 @@ class Input_Fixpoint_Specs(QWidget):
                 elif self.wdg_wq_input.butLock.isChecked():
                     # button lock was activated or wordlength settings have been changed
                     # with active lock -> copy input settings to output
-                    fb.fil[0]['fxqc']['QO']['WI'] = fb.fil[0]['fxqc']['QI']['WI']
-                    fb.fil[0]['fxqc']['QO']['WF'] = fb.fil[0]['fxqc']['QI']['WF']
+                    fb.fil[0]['fxq']['QO']['WI'] = fb.fil[0]['fxq']['QI']['WI']
+                    fb.fil[0]['fxq']['QO']['WF'] = fb.fil[0]['fxq']['QI']['WF']
 
             elif dict_sig['sender_name'] == 'wq_output':
                 """
@@ -160,11 +160,11 @@ class Input_Fixpoint_Specs(QWidget):
                 settings of the output quantizer dict. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
-                fb.fil[0]['fxqc']['QO'].update(self.wdg_wq_outpuput.QObj.q_dict)
+                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_outpuput.QObj.q_dict)
 
                 if self.wdg_wq_input.butLock.isChecked():
-                    fb.fil[0]['fxqc']['QI']['WI'] = fb.fil[0]['fxqc']['QO']['WI']
-                    fb.fil[0]['fxqc']['QI']['WF'] = fb.fil[0]['fxqc']['QO']['WF']
+                    fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
+                    fb.fil[0]['fxq']['QI']['WF'] = fb.fil[0]['fxq']['QO']['WF']
             else:
                 logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
                              .format(dict_sig['sender_name'], pprint_log(dict_sig)))
@@ -380,7 +380,7 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
 
         self.wdg_wq_input = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QI'], objectName='fx_ui_wq_input', wdg_name='wq_input',
+            fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input', wdg_name='wq_input',
             label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
@@ -391,7 +391,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
         self.wdg_wq_output = FX_UI_WQ(
-            fb.fil[0]['fxqc']['QO'], objectName='fx_ui_wq_output', wdg_name='wq_output',
+            fb.fil[0]['fxq']['QO'], objectName='fx_ui_wq_output', wdg_name='wq_output',
             label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>',
             cmb_w_vis='off')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
@@ -757,7 +757,7 @@ class Input_Fixpoint_Specs(QWidget):
         Called during `__init__()` and from `process_sig_rx()`.
 
         Update UI from `fb.fil[0]['fx_sim']`, `fb.fil[0]['qfrmt']` and the fx filter
-        dict `fb.fil[0]['fxqc']`. This affects the visibility and the fx settings of
+        dict `fb.fil[0]['fxq']`. This affects the visibility and the fx settings of
         input, output and dyn. filter widget via their `dict2ui()` methods.
         The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
         format is updated as well.
@@ -777,8 +777,8 @@ class Input_Fixpoint_Specs(QWidget):
             # refresh image in case of switching from float to fix
             self.resize_img()
             # update fixpoint widgets from the central filter dict
-            self.wdg_wq_input.dict2ui(fb.fil[0]['fxqc']['QI'])
-            self.wdg_wq_output.dict2ui(fb.fil[0]['fxqc']['QO'])
+            self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
+            self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])
             try:
                 # this should use the central filter dict as well
                 self.fx_filt_ui.dict2ui()
@@ -849,7 +849,7 @@ class Input_Fixpoint_Specs(QWidget):
         if True:
         # try:
             # initialize fixpoint filter instance with fixpoint quantizer
-            self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxqc'])
+            self.fx_filt_ui.fx_filt.init(fb.fil[0]['fxq'])
 
             return 0
         else:
