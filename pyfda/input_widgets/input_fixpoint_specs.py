@@ -160,7 +160,7 @@ class Input_Fixpoint_Specs(QWidget):
                 settings of the output quantizer dict. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
-                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_outpuput.QObj.q_dict)
+                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.QObj.q_dict)
 
                 if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
