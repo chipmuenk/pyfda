@@ -776,11 +776,11 @@ class Input_Fixpoint_Specs(QWidget):
             qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             # refresh image in case of switching from float to fix
             self.resize_img()
-            # update fixpoint widgets from the central filter dict
-            self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
-            self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])
+            # update fixpoint widgets from the global filter dict
+            self.wdg_wq_input.dict2ui()  # fb.fil[0]['fxq']['QI']
+            self.wdg_wq_output.dict2ui()  # fb.fil[0]['fxq']['QO']
             try:
-                # this should use the central filter dict as well
+                # this should use the global filter dict as well
                 self.fx_filt_ui.dict2ui()
             except AttributeError as e:
                 logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
