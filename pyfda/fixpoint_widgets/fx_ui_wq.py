@@ -307,10 +307,6 @@ class FX_UI_WQ(QWidget):
         self.ledWI.setText(str(WI))
         self.ledWF.setText(str(WF))
 
-        self.q_dict.update({'ovfl': qget_cmb_box(self.cmbOvfl),
-                            'quant': qget_cmb_box(self.cmbQuant),
-                            'w_a_m': qget_cmb_box(self.cmbW),
-                            'WI': WI, 'WF': WF})
         # create fixpoint quantization object from passed quantization dict
         self.QObj = fx.Fixed(self.q_dict)
         # use only self.QObj.q_dict from here on!!
