@@ -124,17 +124,23 @@ class FX_UI_WQ(QWidget):
     sig_tx = pyqtSignal(object)  # outcgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, q_dict: dict, objectName='fx_ui_wq_inst', **kwargs) -> None:
+    def __init__(self, q_dict: dict, objectName: str = 'fx_ui_wq_inst',
+                 **kwargs) -> None:
         super().__init__()
 
         self.setObjectName(objectName)
+        if not q_dict:
+            logger(crash)
+
         # default settings for q_dict
-        q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
-                          'ovfl': 'sat', 'wdg_name': 'unknown'}
-        # copy passed dictionary to prevent messing it up
-        self.q_dict = copy.deepcopy(q_dict)
+        # q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
+        #                   'ovfl': 'sat', 'wdg_name': 'unknown'}
+        # make a deep copy of passed dictionary to prevent messing it up
+        # self.q_dict = copy.deepcopy(q_dict)
         # merge 'q_dict_default' into `self.q_dict``, prioritizing `self.q_dict`` entries
-        merge_dicts_hierarchically(self.q_dict, q_dict_default)
+        # merge_dicts_hierarchically(self.q_dict, q_dict_default)
+
+        self.q_dict = q_dict
 
         self._construct_UI(**kwargs)
 
@@ -423,6 +429,8 @@ class FX_UI_WQ(QWidget):
         # update quantizer dict and derived quantities like W and reset counters
         self.QObj.set_qdict(
             {'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
+        # update global filter dict
+        self.q_dict = self.QObj.q_dict
         # update display of WI and WF depending on fixpoint mode
 
         self.update_WI_WF()
@@ -453,7 +461,8 @@ class FX_UI_WQ(QWidget):
         """
         logger.error(f"dict2ui: QObj={self.QObj.q_dict['WI']} - q_dict={q_dict}")
         if q_dict is None:
-            q_dict = self.QObj.q_dict  # update UI from quantizer qdict
+            q_dict = self.q_dict  # update UI from quantizer qdict
+            # q_dict = self.QObj.q_dict  # update UI from quantizer q_dict
         else:
             for k in q_dict:
                 if k not in {'wdg_name', 'quant', 'ovfl', 'WI', 'WF',
