@@ -89,7 +89,7 @@ class Plot_Tran_Stim_UI(QWidget):
         self.A2 = 0.0
         self.phi1 = self.phi2 = 0
         self.T1 = self.T2 = 0
-        self.TW1 = self.TW2 = 1
+        self.TW1 = self.TW2 = 10
         self.BW1 = self.BW2 = 0.5
         self.N1 = self.N2 = 5
         self.noi = 0.1
