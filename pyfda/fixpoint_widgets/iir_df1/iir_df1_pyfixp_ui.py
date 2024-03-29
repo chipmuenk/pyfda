@@ -247,7 +247,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         coefficients and input signal, depending on which one is larger.
 
         The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxq']['QACC']`.
+        `fb.fil[0]['fxq']['QACC']` and the UI is updated.
         """
         # except BaseException as e: # Exception as e:
         #     logger.error("An error occured:", exc_info=True)
@@ -262,12 +262,12 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 fb.fil[0]['fxq']['QI']['WI'] + fb.fil[0]['fxq']['QCB']['WI'],
                 fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QCA']['WI'])
 
-        # update quantization settings and UI
-        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.q_dict`
-        self.wdg_wq_accu.dict2ui()
+        # update UI and QObj.q_dict (quantization settings) from filter dict
+        #self.wdg_wq_accu.QObj.set_qdict({fb.fil[0]['fxq']['QACC']})
+        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
 
     # --------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self, fxq_dict: dict = {}):
         """
         Update all parts of the UI that need to be updated when specs or data have been
         changed outside this class, e.g. coefficients and coefficient quantization
@@ -277,7 +277,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxq_dict = fb.fil[0]['fxq']
+        if fxq_dict == {}:
+            fxq_dict = fb.fil[0]['fxq']
+
         if 'QACC' not in fxq_dict:
             fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
             logger.warning("'QACC' key missing in filter dict")
@@ -287,7 +289,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("'QCB' key missing in filter dict")
 
         self.wdg_wq_coeffs_b.dict2ui(fxq_dict['QCB'])  # update coefficient quantization
-        self.wdg_wq_coeffs_a.dict2ui()  # settings
+        self.wdg_wq_coeffs_a.dict2ui(fxq_dict['QCA'])  # settings
+        # TODO: In the past, only 'QCB' was passed directly - why?!
         self.update_accu_settings()   # update accumulator settings and UI
 
     # --------------------------------------------------------------------------

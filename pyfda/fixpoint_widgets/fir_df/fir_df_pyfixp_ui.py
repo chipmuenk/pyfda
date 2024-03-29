@@ -173,7 +173,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         requires more bits.
 
         The new values are written to the fixpoint coefficient dict
-        `fb.fil[0]['fxq']['QACC']`.
+        `fb.fil[0]['fxq']['QACC']` and the UI is updated.
         """
         try:
             if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'f':
@@ -193,12 +193,11 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QACC']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
                 + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
 
-        # update quantization settings and UI from filter dict
-        self.wdg_wq_accu.QObj.set_qdict({})  # update `self.wdg_wq_accu.QObj.q_dict`
-        self.wdg_wq_accu.dict2ui()  # update UI
+        # update UI and QObj.q_dict (quantization settings) from filter dict
+        self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
 
     # --------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self, fxq_dict: dict = {}):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
@@ -208,7 +207,9 @@ class FIR_DF_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxq_dict = fb.fil[0]['fxq']
+        if fxq_dict == {}:
+            fxq_dict = fb.fil[0]['fxq']
+
         if 'QACC' not in fxq_dict:
             fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
             logger.warning("'QACC' key missing")
@@ -217,7 +218,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             fxq_dict.update({'QCB': {}})  # no coefficient settings in dict yet
             logger.warning("'QCB' key missing in filter dict")
 
-        self.wdg_wq_coeffs.dict2ui()  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui(fxq_dict['QCB'])  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator settings and UI
 
     # --------------------------------------------------------------------------
