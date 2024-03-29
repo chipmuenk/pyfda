@@ -806,8 +806,8 @@ class Input_Coeffs(QWidget):
             qset_cmb_box(self.ui.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
 
         # update quantizer objects and widgets
-        self.ui.wdg_wq_coeffs_a.dict2ui()
-        self.ui.wdg_wq_coeffs_b.dict2ui()
+        self.ui.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
+        self.ui.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
 
         # quantize coefficient view according to new settings and update table
         self.quant_coeffs_view()
