@@ -50,7 +50,7 @@ class TargetSpecs(QWidget):
         """
         Process signals coming in via subwidgets and sig_rx
         """
-        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
           logger.warning("Stopped infinite loop.")
           return

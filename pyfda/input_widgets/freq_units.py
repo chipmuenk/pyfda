@@ -97,7 +97,7 @@ class FreqUnits(QWidget):
         - qfft_win_select
         """
 
-        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.debug("Stopped infinite loop")

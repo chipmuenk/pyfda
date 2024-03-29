@@ -374,8 +374,7 @@ class Input_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def load_dict(self):
         """
-        Reload all info test from global dict `fb.fil[0]` and reset the 'DESIGN'
-        button.
+        Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
         self.led_info.setText(str(fb.fil[0]['info']))
         self.color_design_button("ok")

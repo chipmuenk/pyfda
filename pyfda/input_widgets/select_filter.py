@@ -66,7 +66,7 @@ class SelectFilter(QWidget):
         its parent widget to prevent infinite loops.
 
         """
-        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{first_item(dict_sig)}")
