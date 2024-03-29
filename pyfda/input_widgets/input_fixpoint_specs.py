@@ -493,8 +493,6 @@ class Input_Fixpoint_Specs(QWidget):
         """
         self._update_filter_cmb(fx_wdg=fb.fil[0]['fx_mod_class_name'])
 
-        logger.error(f"\nload_fx_filter: {fb.fil[0]['fx_mod_class_name']}")
-
         self.dict2ui()  # update fixpoint widgets
 
 # ------------------------------------------------------------------------------
@@ -774,7 +772,6 @@ class Input_Fixpoint_Specs(QWidget):
             # update fixpoint widgets from the global filter dict:
             # when loading a filter, a new instance of fb.fil[0] is created, requiring
             # passing a hard update of the filter dict
-            # logger.error(f"id(QO) = {id(fb.fil[0]['fxq']['QO'])}")
             self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
             self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])
             try:
@@ -785,8 +782,6 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
         else:
             qset_cmb_box(self.cmb_qfrmt, 'float', data=True)
-
-        logger.error(f"dict2ui: qfrmt = {qget_cmb_box(self.cmb_qfrmt)}, fx_sim = {is_fixp}")
 
 # ------------------------------------------------------------------------------
     def exportHDL(self):
