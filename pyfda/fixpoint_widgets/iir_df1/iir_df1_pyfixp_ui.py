@@ -193,7 +193,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         return
 
             # changes in coeffs 'a' widget
-            elif dict_sig['sender_name'] is 'wq_coeffs_a':
+            elif dict_sig['sender_name'] == 'wq_coeffs_a':
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
                     if cmbW == 'm':
@@ -217,7 +217,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         self.update_accu_settings()
 
             # changes in coeffs 'b' widget
-            elif dict_sig['sender_name'] is 'wq_coeffs_b':
+            elif dict_sig['sender_name'] == 'wq_coeffs_b':
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_b.cmbW)
                     if cmbW == 'm':
