@@ -734,8 +734,8 @@ class PlotImpz_UI(QWidget):
                 # IIR: No algorithm yet, set N = 100
                 N = 100
             else:
-                # FIR: N = number of coefficients (max. 100)
-                N = min(len(fb.fil[0]['ba'][0]), 100)
+                # FIR: N = number of coefficients (min. 25, max. 100)
+                N = max(min(len(fb.fil[0]['ba'][0]), 100), 25)
         else:
             N = N_user
 
