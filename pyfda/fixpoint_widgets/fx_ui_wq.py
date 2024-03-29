@@ -430,9 +430,8 @@ class FX_UI_WQ(QWidget):
         self.QObj.set_qdict(
             {'ovfl': ovfl, 'quant': quant, 'WI': WI, 'WF': WF, 'w_a_m': w_a_m})
         # update global filter dict
-        self.q_dict = self.QObj.q_dict
+        self.q_dict.update(self.QObj.q_dict)
         # update display of WI and WF depending on fixpoint mode
-
         self.update_WI_WF()
         logger.error(
             f"ui2dict: WI = {WI} {self.QObj.q_dict['WI']}")
@@ -460,8 +459,7 @@ class FX_UI_WQ(QWidget):
         instead, this can be used to update the UI.
         """
         if q_dict is None:
-            q_dict = self.q_dict  # update UI from quantizer qdict
-            # q_dict = self.QObj.q_dict  # update UI from quantizer q_dict
+            q_dict = self.q_dict  # update UI from instance / global qdict
         else:
             for k in q_dict:
                 if k not in {'wdg_name', 'quant', 'ovfl', 'WI', 'WF',
