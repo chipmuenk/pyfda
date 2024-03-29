@@ -197,7 +197,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
 
     # --------------------------------------------------------------------------
-    def dict2ui(self, fxq_dict: dict = {}):
+    def dict2ui(self):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
@@ -207,8 +207,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        if fxq_dict == {}:
-            fxq_dict = fb.fil[0]['fxq']
+        fxq_dict = fb.fil[0]['fxq']
 
         if 'QACC' not in fxq_dict:
             fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
