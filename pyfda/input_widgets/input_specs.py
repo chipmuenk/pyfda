@@ -377,7 +377,6 @@ class Input_Specs(QWidget):
         Reload all info test from global dict `fb.fil[0]` and reset the 'DESIGN'
         button.
         """
-        logger.error("input specs load_dict()")
         self.led_info.setText(str(fb.fil[0]['info']))
         self.color_design_button("ok")
 # ------------------------------------------------------------------------------

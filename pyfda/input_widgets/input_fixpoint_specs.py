@@ -221,10 +221,6 @@ class Input_Fixpoint_Specs(QWidget):
                     # New filter has been designed, update list of available filter topologies
                     self._update_filter_cmb()
 
-                # elif dict_sig['data_changed'] == "filter_loaded":
-                #     # New filter has been loaded, update fixpoint topologies and UI from dict,
-                #     self.load_fx_filter()
-
                 else:
                     # Filter data has changed (but not the filter type):
                     # Update fixpoint widgets from dict
@@ -495,10 +491,9 @@ class Input_Fixpoint_Specs(QWidget):
         fixpoint implementation combo box `self.cmb_fx_wdg` with successfull
         imports.
         """
-        widgets = self._update_filter_cmb(fx_wdg=fb.fil[0]['fx_mod_class_name'])
+        self._update_filter_cmb(fx_wdg=fb.fil[0]['fx_mod_class_name'])
 
-        logger.error(f"\n\nload_fx_filter: {fb.fil[0]['fx_mod_class_name']}")
-        logger.error(widgets)
+        logger.error(f"\nload_fx_filter: {fb.fil[0]['fx_mod_class_name']}")
 
         self.dict2ui()  # update fixpoint widgets
 
@@ -776,11 +771,15 @@ class Input_Fixpoint_Specs(QWidget):
             qset_cmb_box(self.cmb_qfrmt, fb.fil[0]['qfrmt'], data=True)
             # refresh image in case of switching from float to fix
             self.resize_img()
-            # update fixpoint widgets from the global filter dict
-            self.wdg_wq_input.dict2ui()  # fb.fil[0]['fxq']['QI']
-            self.wdg_wq_output.dict2ui()  # fb.fil[0]['fxq']['QO']
+            # update fixpoint widgets from the global filter dict:
+            # when loading a filter, a new instance of fb.fil[0] is created, requiring
+            # passing a hard update of the filter dict
+            # logger.error(f"id(QO) = {id(fb.fil[0]['fxq']['QO'])}")
+            self.wdg_wq_input.dict2ui(fb.fil[0]['fxq']['QI'])
+            self.wdg_wq_output.dict2ui(fb.fil[0]['fxq']['QO'])
             try:
-                # this should use the global filter dict as well
+                # this uses the global filter dict as well but it is reinstantiated
+                # when loading a filter, using the new instance
                 self.fx_filt_ui.dict2ui()
             except AttributeError as e:
                 logger.error(f"Error using FX filter widget 'dict2ui()' method:\n{e}")
