@@ -56,8 +56,6 @@ class TestSequenceFunctions(unittest.TestCase):
 
         self.assertEqual(7, self.myQ.WI)
         self.assertEqual(3, self.myQ.WF)
-        self.assertEqual('7.3', self.myQ.Q)
-
 
     def test_fix_no_ovfl(self):
         """

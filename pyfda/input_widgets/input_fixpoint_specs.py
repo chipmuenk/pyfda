@@ -721,7 +721,6 @@ class Input_Fixpoint_Specs(QWidget):
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
-            logger.error("emitted thru _update_fixp_widget")
             self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
