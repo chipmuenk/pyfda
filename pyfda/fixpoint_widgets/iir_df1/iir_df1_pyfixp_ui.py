@@ -104,7 +104,11 @@ class IIR_DF1_pyfixp_UI(QWidget):
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items)
         layV_wq_coeffs_a = QVBoxLayout()
         layV_wq_coeffs_a.addWidget(self.wdg_wq_coeffs_a)
-        self.update_coeffs_settings()
+        # calculate wordlength needed for coefficients if required
+        if qget_cmb_box(self.wdg_wq_coeffs_a.cmbW) == 'a':
+            self.calc_wi_coeffs_a()
+        if qget_cmb_box(self.wdg_wq_coeffs_b.cmbW) == 'a':
+            self.calc_wi_coeffs_b()
 
         # widget for accumulator quantization
         if 'QACC' not in fb.fil[0]['fxq']:
@@ -168,6 +172,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                              f"in '{__name__}' !")
                 return
 
+            # changes in accu widget
             elif dict_sig['sender_name'] == 'wq_accu':  # accu format updated
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
@@ -187,7 +192,8 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         logger.error(f"Unknown accu combobox setting '{cmbW}'!")
                         return
 
-            elif dict_sig['sender_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:  # coeffs updated
+            # changes in coeffs 'a' widget
+            elif dict_sig['sender_name'] is 'wq_coeffs_a':
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
                     if cmbW == 'm':
@@ -201,9 +207,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         # when switching to auto settings, run automatic calculation
                         # of required integer bits for coeffs a
                         # this also reverses manual edits of WI or WF wordlengths
-                        # manual entry of word lengths cannot be disabled easily due to
-                        # additional logic in the wdg_wq_accu widget (class FX_UI_WQ)
-                        self.update_coeffs_settings()
+                        self.calc_wi_coeffs_a()
                     else:
                         logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
                         return
@@ -211,6 +215,31 @@ class IIR_DF1_pyfixp_UI(QWidget):
                     # in case coefficient length has been changed, update accu as well
                     if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
                         self.update_accu_settings()
+
+            # changes in coeffs 'b' widget
+            elif dict_sig['sender_name'] is 'wq_coeffs_b':
+                if ui_changed in {'cmbW', 'WF', 'WI'}:
+                    cmbW = qget_cmb_box(self.wdg_wq_coeffs_b.cmbW)
+                    if cmbW == 'm':
+                        if ui_changed == 'cmbW':
+                            # returning to manual setting, don't do anything
+                            return
+                        else:
+                            pass  # WI or WF have been edited, emit 'specs_changed'
+
+                    elif cmbW == 'a':
+                        # when switching to auto settings, run automatic calculation
+                        # of required integer bits for coeffs b
+                        # this also reverses manual edits of WI or WF wordlengths
+                        self.calc_wi_coeffs_b()
+                    else:
+                        logger.error(f"Unknown coeff. combobox setting '{cmbW}'!")
+                        return
+
+                    # in case coefficient length has been changed, update accu as well
+                    if qget_cmb_box(self.wdg_wq_accu.cmbW) == 'a':
+                        self.update_accu_settings()
+
 
             # emit signal, replace UI id with id of *this* widget
             self.emit({'fx_sim': 'specs_changed', 'id': id(self)})
@@ -221,18 +250,30 @@ class IIR_DF1_pyfixp_UI(QWidget):
             self.dict2ui()
 
     # --------------------------------------------------------------------------
-    def update_coeffs_settings(self):
+    def calc_wi_coeffs_a(self):
         """
-        Calculate required number of integer bits for the largest coefficient
+        Calculate required number of integer bits for the largest 'a' coefficient
 
         The new value is written to the fixpoint coefficient dict
         `fb.fil[0]['fxq']['QCA']` and the UI is updated.
         """
         WI_A = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][1]))))))
         fb.fil[0]['fxq']['QCA']['WI'] = WI_A
-        # update quantization settings and UI
-        self.wdg_wq_coeffs_a.QObj.set_qdict({})  # update `self.wdg_wq_coeffs_a.q_dict`
-        self.wdg_wq_coeffs_a.dict2ui()
+        # update quantizer settings and UI
+        self.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])
+
+    # --------------------------------------------------------------------------
+    def calc_wi_coeffs_b(self):
+        """
+        Calculate required number of integer bits for the largest 'b' coefficient
+
+        The new value is written to the fixpoint coefficient dict
+        `fb.fil[0]['fxq']['QCB']` and the UI is updated.
+        """
+        WI_B = int(np.ceil(np.log2((np.abs(np.max(fb.fil[0]['ba'][0]))))))
+        fb.fil[0]['fxq']['QCB']['WI'] = max(WI_B, 0)
+        # update quantizer settings and UI
+        self.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])
 
     # --------------------------------------------------------------------------
     def update_accu_settings(self):
@@ -263,7 +304,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
                 fb.fil[0]['fxq']['QO']['WI'] + fb.fil[0]['fxq']['QCA']['WI'])
 
         # update UI and QObj.q_dict (quantization settings) from filter dict
-        #self.wdg_wq_accu.QObj.set_qdict({fb.fil[0]['fxq']['QACC']})
         self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
 
     # --------------------------------------------------------------------------
