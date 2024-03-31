@@ -1643,6 +1643,12 @@ def load_filter(self) -> int:
         logger.error(f'Unknown file type "{file_type}"')
         err = True
 
+    # TODO: when no id is contained, finish loading of file
+    if '_id' not in fb.fil[0] or len(fb.fil[0]['_id']) != 2\
+            or fb.fil[0]['_id'] != 'pyfda':
+        logger.warning("This is no pyfda filter or an outdated file format!")
+        # err = True
+
 # --------------------
     try:
         if not err:
@@ -1709,6 +1715,9 @@ def save_filter(self):
     """
     Save filter as JSON formatted textfile, zipped binary numpy array or pickle object
     """
+    # provide an identifier with version number for pyfda files
+    fb.fil[0].update({'_id': ['pyfda', '1']})
+
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
 
