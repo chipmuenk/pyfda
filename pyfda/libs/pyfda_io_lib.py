@@ -1611,22 +1611,19 @@ def load_filter(self) -> int:
 
     if file_type in {"npz", "pkl"}:
         try:
-            with io.open(file_name, 'rb') as f:  # open in binary mode
+            with io.open(file_name, 'rb') as f:  # open in binary mode for npy and pkl
                 if file_type == 'npz':
                     # array containing dict, dtype 'object':
-                    a = np.load(f, allow_pickle=True)
+                    arr = np.load(f, allow_pickle=True)
 
-                    # logger.debug(f"Entries in {file_name}:\n{a.files}")
-                    for key in sorted(a):
-                        # logger.warning(
-                        #     f"key: {key}|{type(key).__name__}|"
-                        #     f"{type(a[key]).__name__}|{a[key]}")
-                        if np.ndim(a[key]) == 0:
+                    # convert arrays to lists and extract scalar objects
+                    for key in sorted(arr):
+                        if np.ndim(arr[key]) == 0:
                             # scalar objects may be extracted with the item() method
-                            fb.fil[0][key] = a[key].item()
+                            fb.fil[0][key] = arr[key].item()
                         else:
                             # array objects are converted to list first
-                            fb.fil[0][key] = a[key].tolist()
+                            fb.fil[0][key] = arr[key].tolist()
                 else:  # file_type == 'pkl':
                     fb.fil[0] = pickle.load(f)
 
@@ -1636,7 +1633,7 @@ def load_filter(self) -> int:
 
     elif file_type == 'json':
         try:
-            with io.open(file_name, 'r') as f:  # open in text mode
+            with io.open(file_name, 'r') as f:  # open in text mode for json files
                 fb.fil[0] = json.load(f)
 
         except IOError as e:
