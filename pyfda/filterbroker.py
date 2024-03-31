@@ -389,65 +389,54 @@ def redo():
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
 
 
-def sanitize_imported_dict(new_dict: dict, new_dict_name: str) -> str:
+def sanitize_imported_dict(new_dict: dict) -> list:
 
     def compare_dictionaries(
-            dict_1: dict, dict_2: dict, path: str = "") -> list:
+            ref_dict: dict, new_dict: dict, path: str = "") -> list:
         """
         Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
         Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
         keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
 
-        Copy key:value pairs not present in dict_2 from dict_1
-        Delete key:value pairs from dict_2 that are not present in dict_1
+        Params
+        ------
+        ref_dict: dict
+            reference dictionary
+        new_dict: dict
+            new dictionary
+        path: str
+            current path while traversing through the dictionaries
 
-        Args:
-            dict_1: dict, reference dictionary
-            dict_2: dict, new dictionary
-            path: str, contains current path while traversing through the dictionaries
-
-        Returns:
-            str: formatted string with all discarded keys from dict 2 and all key:value
-                pairs copied from ref_dict to new_dict
+        Returns
+        -------
+        key_errs: list
+            `key_errs[0]` contains all keys copied from `ref_dict` to `new_dict`.
+            `key_errs[1]` contains all discarded keys from `new_dict`.
         """
-        key_errs = []
+        key_errs = [[], []]
         old_path = path
 
-        for k in dict_1:
-            path = old_path + f"[{k}]"
-            if not k in dict_2:
-                key_errs.append(f"Missing in d1:{path}")
-                dict_2.update({k: dict_1[k]})
+        for k in ref_dict:
+            path = old_path + f"'{k}'"
+            if not k in new_dict:
+                key_errs[0].append(path)
+                new_dict.update({k: ref_dict[k]})
             else:
-                if isinstance(dict_1[k], dict) and isinstance(dict_2[k], dict):
-                    key_errs += compare_dictionaries(dict_1[k], dict_2[k], path)
+                if isinstance(ref_dict[k], dict) and isinstance(new_dict[k], dict):
+                    key_errs.append(compare_dictionaries(ref_dict[k], new_dict[k], path))
 
         # emulate slightly inefficient Python 2 way of copying the dict keys to a list
-        # to avoid runtime error "dictionary changed size during iteration" due to dict_2.pop(k)
-        for k in list(dict_2):
-            path = old_path + f"[{k}]"
-            if not k in dict_1:
-                key_errs.append(f"Unsupported in d2:{path}") # {dict_2_name}
-                dict_2.pop(k)
+        # to avoid runtime error "dictionary changed size during iteration" due to new_dict.pop(k)
+        for k in list(new_dict):
+            path = old_path + f"'{k}'"
+            if not k in ref_dict:
+                key_errs[1].append(path)
+                new_dict.pop(k)
 
-        # logger.warning(key_errs)
         return key_errs
     # ----------------------------------------
-    err_str = ""
-    err_list = compare_dictionaries(fil_ref, new_dict)
-    err_list.sort()
-    # Convert list to multi-line string
-    err_unsupported = '\n'.join(
-        [i.replace("Unsupported in d2:", "\t") for i in err_list if "Unsupported in d2:" in i])
-    err_missing =' \n'.join(
-        [i.replace("Missing in d1:", "\t") for i in err_list if "Missing in d1:" in i])
-    logger.warning(f"d1: {len(err_missing)}, d2: {len(err_unsupported)}")
-    if err_missing != "":
-        err_str = f"The following key(s) have not been found in {new_dict_name},\n\t"\
-        "they are copied with their values from the reference dict:\n" + err_missing
-    if err_unsupported != "":
-        err_str += "\nThe following key(s) are not part of the reference dict "\
-        "and have been deleted:\n" + err_unsupported
+    key_errs = compare_dictionaries(fil_ref, new_dict)
+    key_errs[0].sort()
+    key_errs[1].sort()
 
-    return err_str
-
+    return key_errs[0], key_errs[1]

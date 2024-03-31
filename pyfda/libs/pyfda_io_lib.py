@@ -1652,9 +1652,24 @@ def load_filter(self) -> int:
 # --------------------
     try:
         if not err:
-            ret = fb.sanitize_imported_dict(fb.fil[0], 'the loaded dict')
-            if ret != "":
-                logger.warning(ret)
+            keys_missing, keys_unsupported = fb.sanitize_imported_dict(fb.fil[0])
+            err_str = ""
+            if keys_missing != []:
+                # '\n'.join(...) converts list to multi-line string
+                err_str += (
+                    f"The following {len(keys_missing)} key(s) have not been found in "
+                    f"the loaded dict,\n"\
+                    f"\tthey are copied with their values from the reference dict:\n"
+                     + "{0}".format('\n'.join(keys_missing))
+                    )
+            if keys_unsupported != []:
+                err_str += (
+                    f"\nThe following {len(keys_unsupported)} key(s) are not part of the "
+                    f"reference dict and have been deleted:\n"
+                    + "{0}".format('\n'.join(keys_unsupported))
+                )
+            if err_str != "":
+                logger.warning(err_str)
 
             # sanitize values in filter dictionary, keys are ok by now
             for k in fb.fil[0]:
@@ -1757,7 +1772,6 @@ def save_filter(self):
         dirs.last_file_name = file_name
         dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
         dirs.last_file_type = file_type  # save new default file type
-
 
 
 # ------------------------------------------------------------------------------
