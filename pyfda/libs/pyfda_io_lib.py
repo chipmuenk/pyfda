@@ -34,7 +34,7 @@ except ImportError:
 
 from pyfda.libs.pyfda_lib import (
     safe_eval, lin2unit, pprint_log, iter2ndarray, sanitize_imported_dict)
-from pyfda.libs.pyfda_qt_lib import qget_selected
+from pyfda.libs.pyfda_qt_lib import qget_selected, popup_warning
 
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.pyfda_rc import params
@@ -49,6 +49,9 @@ logger = logging.getLogger(__name__)
 
 
 # ##############################################################################
+# Include this version number as `'_id': ('pyfda', FILTER_FILE_VERSION)` when saving
+# filter files and test for the version when loading filter files.
+FILTER_FILE_VERSION = 1
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
@@ -1644,14 +1647,16 @@ def load_filter(self) -> int:
         logger.error(f'Unknown file type "{file_type}"')
         err = True
 
-    # TODO: when no id is contained, finish loading of file
     if '_id' not in fb.fil[0] or len(fb.fil[0]['_id']) != 2\
             or fb.fil[0]['_id'] != 'pyfda':
-        logger.warning("This is no pyfda filter or an outdated file format!")
-        # err = True
-        # TODO: This should reject the file in future versions
-    elif fb.fil[0]['_id'] != '1':
-        logger.warning(f"Wrong version of filter file")
+        msg = "This is no pyfda filter or an outdated file format! Load anyway?"
+        err = not popup_warning(None, message=msg)
+
+    elif fb.fil[0]['_id'] != FILTER_FILE_VERSION:
+        msg = (
+            f"The filter file has version {str( fb.fil[0]['_id'])} instead of "
+            f"of required version {FILTER_FILE_VERSION}! Load anyway?")
+        err = not popup_warning(None, message=msg)
 
     # Catch errors occurring during file opening
     if err:
@@ -1742,7 +1747,7 @@ def save_filter(self):
     Save filter as JSON formatted textfile, zipped binary numpy array or pickle object
     """
     # provide an identifier with version number for pyfda files
-    fb.fil[0].update({'_id': ['pyfda', '1']})
+    fb.fil[0].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
 
     file_name, file_type = select_file(
         self, title="Save Filter", mode='w', file_types = ("json", "npz", "pkl"))
