@@ -24,6 +24,7 @@ import markdown
 import scipy.signal as sig
 
 from distutils.version import LooseVersion
+import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.libs.pyfda_sig_lib as pyfda_sig_lib
 
@@ -431,6 +432,8 @@ def iter2ndarray(iterable, dtype=complex) -> ndarray:
     except Exception as e:
         logger.error(f"Error '{e}'\nfor iterable =\n{iterable}")
         return None
+
+
 # -----------------------------------------------------------------------------
 def set_dict_defaults(d: dict, default_dict: dict) -> None:
     """
@@ -448,6 +451,60 @@ def set_dict_defaults(d: dict, default_dict: dict) -> None:
         for k, v in default_dict.items():
             if k not in d:
                 d[k] = v
+
+
+# -------------------------------------------------------------------------------
+def sanitize_imported_dict(new_dict: dict) -> list:
+
+    def compare_dictionaries(
+            ref_dict: dict, new_dict: dict, path: str = "") -> list:
+        """
+        Compare recursively a new dictionary `new_dict` to a reference dictionary `ref_dict`.
+        Keys in `new_dict` that are not contained in `ref_dict` are deleted from `new_dict`,
+        keys in `ref_dict` missing in `new_dict` are copied with their value to `new_dict`.
+
+        Params
+        ------
+        ref_dict: dict
+            reference dictionary
+        new_dict: dict
+            new dictionary
+        path: str
+            current path while traversing through the dictionaries
+
+        Returns
+        -------
+        key_errs: list
+            `key_errs[0]` contains all keys copied from `ref_dict` to `new_dict`.
+            `key_errs[1]` contains all discarded keys from `new_dict`.
+        """
+        key_errs = [[], []]
+        old_path = path
+
+        for k in ref_dict:
+            path = old_path + f"'{k}'"
+            if not k in new_dict:
+                key_errs[0].append(path)
+                new_dict.update({k: ref_dict[k]})
+            else:
+                if isinstance(ref_dict[k], dict) and isinstance(new_dict[k], dict):
+                    key_errs.append(compare_dictionaries(ref_dict[k], new_dict[k], path))
+
+        # emulate slightly inefficient Python 2 way of copying the dict keys to a list
+        # to avoid runtime error "dictionary changed size during iteration" due to new_dict.pop(k)
+        for k in list(new_dict):
+            path = old_path + f"'{k}'"
+            if not k in ref_dict:
+                key_errs[1].append(path)
+                new_dict.pop(k)
+
+        return key_errs
+    # ----------------------------------------
+    key_errs = compare_dictionaries(fb.fil_ref, new_dict)
+    key_errs[0].sort()
+    key_errs[1].sort()
+
+    return key_errs[0], key_errs[1]
 
 
 # -----------------------------------------------------------------------------

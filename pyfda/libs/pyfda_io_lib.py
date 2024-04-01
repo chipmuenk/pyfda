@@ -32,7 +32,8 @@ try:
 except ImportError:
     xlsx = None
 
-from pyfda.libs.pyfda_lib import safe_eval, lin2unit, pprint_log, iter2ndarray
+from pyfda.libs.pyfda_lib import (
+    safe_eval, lin2unit, pprint_log, iter2ndarray, sanitize_imported_dict)
 from pyfda.libs.pyfda_qt_lib import qget_selected
 
 import pyfda.libs.pyfda_fix_lib as fx
@@ -1652,7 +1653,7 @@ def load_filter(self) -> int:
 # --------------------
     try:
         if not err:
-            keys_missing, keys_unsupported = fb.sanitize_imported_dict(fb.fil[0])
+            keys_missing, keys_unsupported = sanitize_imported_dict(fb.fil[0])
             err_str = ""
             if keys_missing != []:
                 # '\n'.join(...) converts list to multi-line string
