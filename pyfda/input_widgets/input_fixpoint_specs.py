@@ -194,10 +194,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         # logger.warning(
         #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-        logger.warning(
-            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
+        # logger.warning(
+        #     f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         # always update visibility of subwidgets and resize image, also when in float mode
@@ -234,7 +234,6 @@ class Input_Fixpoint_Specs(QWidget):
             elif 'fx_sim' in dict_sig:
                 # --------------- init -------------------
                 if dict_sig['fx_sim'] == 'init':
-                    logger.error("init fx_sim")
                     # fixpoint simulation has been started externally, e.g. by
                     # `impz.impz_init()`
                     if not self.fx_wdg_found:

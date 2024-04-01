@@ -47,8 +47,8 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
         if k not in DICT_SIG_KEYS:
             logger.warning(f"Unknown entry '{k}':'{dict_sig[k]}' in 'dict_sig'!")
             logger.warning(pprint_log(dict_sig))
-    if self.sender() and self.sender().objectName():
-        logger.info(f"this_sender_name: {self.sender().objectName()}")
+    # if self.sender() and self.sender().objectName():
+    #     logger.info(f"this_sender_name: {self.sender().objectName()}")
     # logger.info(f"objectName = {self.objectName()}")
     if 'id' not in dict_sig:
         dict_sig.update({'id': id(self)})
@@ -69,7 +69,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     if 'object_name' not in dict_sig:
         dict_sig.update({'object_name': self.objectName()})
 
-    logger.info(f"EMIT:{pprint_log(dict_sig)}")
+    # logger.info(f"EMIT:{pprint_log(dict_sig)}")
 
     # Get signal (default name: `sig_tx`) from calling instance and emit it
     signal = getattr(self, sig_name)
