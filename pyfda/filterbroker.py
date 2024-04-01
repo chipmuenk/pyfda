@@ -232,7 +232,7 @@ fil_tree = freeze_hierarchical({
 # which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
 fil_ref = {
-    '_id': [], # a list with the keyword 'pyfda' and the version: ['pyfda', '1']
+    '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
     'info': 'Initial filter design',
     'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
     'N': 10,  # filter order

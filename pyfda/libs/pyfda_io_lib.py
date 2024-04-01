@@ -1648,13 +1648,13 @@ def load_filter(self) -> int:
         err = True
 
     if '_id' not in fb.fil[0] or len(fb.fil[0]['_id']) != 2\
-            or fb.fil[0]['_id'] != 'pyfda':
+            or fb.fil[0]['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
 
-    elif fb.fil[0]['_id'] != FILTER_FILE_VERSION:
+    elif fb.fil[0]['_id'][1] != FILTER_FILE_VERSION:
         msg = (
-            f"The filter file has version {str( fb.fil[0]['_id'])} instead of "
+            f"The filter file has version {str(fb.fil[0]['_id'][1])} instead of "
             f"of required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
