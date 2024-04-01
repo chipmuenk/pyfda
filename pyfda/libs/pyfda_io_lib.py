@@ -1808,7 +1808,16 @@ class NumpyEncoder(json.JSONEncoder):
                 return str(obj.real) + str(obj.imag) + "j"
             else:
                 return str(obj.real) + "+" + str(obj.imag) + "j"
-        return json.JSONEncoder.default(self, obj)
+        elif callable(obj):
+            logger.warning(f"Object '{obj}' not JSON serializable as it is a function.")
+            return ""
+        else:
+            try:
+                return json.JSONEncoder.default(self, obj)
+            except TypeError as e:
+                logger.warning(
+                    f"Object of type '{type(obj)}' is not JSON serializable.\n{e}")
+                return ""
 
 
 # ==============================================================================
