@@ -72,8 +72,8 @@ class ItemDelegate(QStyledItemDelegate):
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent  # instance of the parent (not the base) class
         # handles to quantization objects (fx.Fixed() instance) of coefficient widgets
-        self.QObj = [self.parent.ui.wdg_wq_coeffs_b.QObj,
-                     self.parent.ui.wdg_wq_coeffs_a.QObj]
+        self.Q = [self.parent.ui.wdg_wq_coeffs_b.Q,
+                     self.parent.ui.wdg_wq_coeffs_a.Q]
 
 # ==============================================================================
 #     def paint(self, painter, option, index):
@@ -97,7 +97,7 @@ class ItemDelegate(QStyledItemDelegate):
 #             super(ItemDelegate, self).paint(painter, option, index)
 #             #painter.restore()
 # ----------------------------------
-#         logger.debug("Ovr_flag:".format(self.parent.self.QObj[0].ovr_flag))
+#         logger.debug("Ovr_flag:".format(self.parent.self.Q[0].ovr_flag))
 #         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
 #             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
 #         # continue with the original `paint()` method
@@ -147,7 +147,7 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
 
-        The instance parameter `QObj[c].ovr_flag` is set to +1 or -1 for
+        The instance parameter `Q[c].ovr_flag` is set to +1 or -1 for
          positive / negative overflows, else it is 0.
         """
 
@@ -156,7 +156,7 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:.{1}g}".format(data, params['FMT_ba'])
 
         elif fb.fil[0]['fx_base'] == 'dec':
-            return "{0:>{1}}".format(text, self.QObj[0].places)
+            return "{0:>{1}}".format(text, self.Q[0].places)
 
         else:
             return text
@@ -197,8 +197,8 @@ class ItemDelegate(QStyledItemDelegate):
             # fixpoint format with base:
             # pass requantized data with required number of decimal places
             editor.setText(
-                "{0:>{1}}".format(self.QObj[index.column()].float2frmt(data),
-                                  self.QObj[index.column()].places))
+                "{0:>{1}}".format(self.Q[index.column()].float2frmt(data),
+                                  self.Q[index.column()].places))
         else:
             # floating point format: pass data with full resolution
             editor.setText(str(data))
@@ -235,8 +235,8 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             # fixpoint format: read editor string and transform to float (`data`)
             # convert `data` to fixpoint format as `data_q`
-            data = self.QObj[index.column()].frmt2float(str(editor.text()))
-            data_q = self.QObj[index.column()].float2frmt(data)
+            data = self.Q[index.column()].frmt2float(str(editor.text()))
+            data_q = self.Q[index.column()].float2frmt(data)
 
         if isinstance(data, complex):
             # if data is complex, convert whole column (b or a array) to complex
@@ -290,8 +290,8 @@ class Input_Coeffs(QWidget):
         self.ui = Input_Coeffs_UI(self)  # create the UI part with buttons etc.
 
         # handles to quantization objects (`fx.Fixed()` instances) of coefficient widgets
-        self.QObj = [self.ui.wdg_wq_coeffs_b.QObj,
-                     self.ui.wdg_wq_coeffs_a.QObj]
+        self.Q = [self.ui.wdg_wq_coeffs_b.Q,
+                     self.ui.wdg_wq_coeffs_a.Q]
 
         self._construct_UI()
 
@@ -413,7 +413,7 @@ class Input_Coeffs(QWidget):
         * Reset overflow counters
 
         * Quantize filter coefficients `self.ba` with quantizer objects
-          `self.QObj[0]` and `self.QObj[1]` for `b` and `a` coefficients respectively
+          `self.Q[0]` and `self.Q[1]` for `b` and `a` coefficients respectively
           and store them in the array `self.ba_q`. Depending on the number base
           (float, dec, hex, ...) the result can be of type float or string.
 
@@ -422,8 +422,8 @@ class Input_Coeffs(QWidget):
         """
 
         # Reset overflow counters of quantization objects
-        self.QObj[0].resetN()
-        self.QObj[1].resetN()
+        self.Q[0].resetN()
+        self.Q[1].resetN()
 
         if np.isscalar(self.ba[0]) or np.isscalar(self.ba[1]):
             logger.error("No proper filter, coefficients are scalar!")
@@ -452,20 +452,20 @@ class Input_Coeffs(QWidget):
         # with a defined number of places
         elif fb.fil[0]['fx_base'] == 'dec':
             self.ba_q = [
-                ["{0:>{1}}".format(x, self.QObj[0].places)
-                    for x in self.QObj[0].float2frmt(self.ba[0])],
-                ["{0:>{1}}".format(x, self.QObj[1].places)
-                    for x in self.QObj[1].float2frmt(a)],
-                self.QObj[0].ovr_flag,
-                self.QObj[1].ovr_flag
+                ["{0:>{1}}".format(x, self.Q[0].places)
+                    for x in self.Q[0].float2frmt(self.ba[0])],
+                ["{0:>{1}}".format(x, self.Q[1].places)
+                    for x in self.Q[1].float2frmt(a)],
+                self.Q[0].ovr_flag,
+                self.Q[1].ovr_flag
                         ]
         # Other fixpoint formats: Print coefficients as strings
         else:
             self.ba_q = [
-                self.QObj[0].float2frmt(self.ba[0]),
-                self.QObj[1].float2frmt(a),
-                self.QObj[0].ovr_flag,
-                self.QObj[1].ovr_flag
+                self.Q[0].float2frmt(self.ba[0]),
+                self.Q[1].float2frmt(a),
+                self.Q[0].ovr_flag,
+                self.Q[1].ovr_flag
                         ]
         # convert self.ba_q to list of arrays for easier handling
         self.ba_q = [np.asarray(self.ba_q[i]) for i in range(4)]
@@ -485,8 +485,8 @@ class Input_Coeffs(QWidget):
         idx = qget_selected(self.tblCoeff)['idx']  # get all selected indices
         # returns e.g. [[0, 0], [0, 6]]
         if not idx:  # nothing selected, quantize all elements
-            self.ba[0] = self.QObj[0].frmt2float(self.ba_q[0])
-            self.ba[1] = self.QObj[1].frmt2float(self.ba_q[1])
+            self.ba[0] = self.Q[0].frmt2float(self.ba_q[0])
+            self.ba[1] = self.Q[1].frmt2float(self.ba_q[1])
             self.ba_q[2] = np.zeros(len(self.ba_q[0]))
             self.ba_q[3] = np.zeros(len(self.ba_q[1]))
             # idx = [[j, i] for i in range(self.num_rows) for j in range(self.num_cols)]
@@ -496,7 +496,7 @@ class Input_Coeffs(QWidget):
             except ValueError:
                 pass
             for i in idx:
-                self.ba[i[0]][i[1]] = self.QObj[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
+                self.ba[i[0]][i[1]] = self.Q[i[0]].frmt2float(self.ba_q[i[0]][i[1]])
                 self.ba_q[i[0] + 2][i[1]] = 0
 
         self.refresh_table()
@@ -742,10 +742,10 @@ class Input_Coeffs(QWidget):
             for c in range(num_cols):
                 if formatted_import:
                     self.ba[0].append(
-                        self.QObj[0].frmt2float(data_str[c][0]))
+                        self.Q[0].frmt2float(data_str[c][0]))
                     if num_rows > 1:
                         self.ba[1].append(
-                            self.QObj[1].frmt2float(data_str[c][1]))
+                            self.Q[1].frmt2float(data_str[c][1]))
                 else:
                     self.ba[0].append(data_str[c][0])
                     if num_rows > 1:
@@ -758,14 +758,14 @@ class Input_Coeffs(QWidget):
         else:
             if formatted_import:
                 self.ba[0] =\
-                    [self.QObj[0].frmt2float(s) for s in data_str[0]]
+                    [self.Q[0].frmt2float(s) for s in data_str[0]]
             else:
                 self.ba[0] = data_str[0]
             # IIR
             if num_cols > 1:
                 if formatted_import:
                     self.ba[1] =\
-                        [self.QObj[1].frmt2float(s) for s in data_str[1]]
+                        [self.Q[1].frmt2float(s) for s in data_str[1]]
                 else:
                     self.ba[1] = data_str[1]
                 self._filter_type(ftype='IIR')

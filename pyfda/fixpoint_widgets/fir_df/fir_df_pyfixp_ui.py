@@ -193,7 +193,7 @@ class FIR_DF_pyfixp_UI(QWidget):
             fb.fil[0]['fxq']['QACC']['WI'] = fb.fil[0]['fxq']['QI']['WI']\
                 + fb.fil[0]['fxq']['QCB']['WI'] + A_coeff
 
-        # update UI and QObj.q_dict (quantization settings) from filter dict
+        # update UI and Q.q_dict (quantization settings) from filter dict
         self.wdg_wq_accu.dict2ui(fb.fil[0]['fxq']['QACC'])
 
     # --------------------------------------------------------------------------

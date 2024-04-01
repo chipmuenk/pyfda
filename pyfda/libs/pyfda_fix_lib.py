@@ -351,7 +351,7 @@ csd2dec_vec = np.vectorize(csd2dec)  # safer than np.frompyfunc()
 class Fixed(object):
     """
     Implement binary quantization of signed scalar or array-like objects
-    in the form `Q = WI.WF` where WI and WF are the wordlength of integer resp.
+    in the form WI.WF where WI and WF are the wordlength of integer resp.
     fractional part; total wordlength is `W = WI + WF + 1` due to the sign bit.
 
     Examples
@@ -1366,19 +1366,19 @@ class Fixed(object):
 ########################################
 
 # --------------------------------------------------------------------------
-def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
+def quant_coeffs(coeffs: iterable, Q, recursive: bool = False) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
-    using the quantization settings of `Fixed()` instance QObj and global setting
-    `fb.fil[0]['qfrmt']` ('qfrac' or 'qint') and `fb.fil[0]['fx_sim']` (`True` or
-    `False`)
+    using the quantization settings of `Fixed()` instance `Q` and global setting
+    `fb.fil[0]['qfrmt']` (`'qfrac'` or `'qint'`) and `fb.fil[0]['fx_sim']` (`True`
+    or `False`)
 
     Parameters
     ----------
     coeffs: iterable
         a list or ndarray of coefficients to be quantized
 
-    QObj: dict
+    Q: dict
         instance of Fixed object containing quantization dict `q_dict`
 
     recursive: bool
@@ -1395,7 +1395,7 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     # always use decimal display format for coefficient quantization
     fb.fil[0]['fx_base'] = 'dec'
     out_frmt=fb.fil[0]['qfrmt']
-    QObj.resetN()  # reset all overflow counters
+    Q.resetN()  # reset all overflow counters
 
     if coeffs is None:
         logger.error("Coeffs empty!")
@@ -1406,10 +1406,10 @@ def quant_coeffs(coeffs: iterable, QObj, recursive: bool = False) -> np.ndarray:
     #                            -> list of int (scaled by 2^WF) when `'qfrmt':'qint'`
     if recursive:
         # recursive coefficients: quantize coefficients except for first (= 1)
-        coeff_q = np.concatenate(([1], QObj.fixp(coeffs[1:], out_frmt=out_frmt)))
+        coeff_q = np.concatenate(([1], Q.fixp(coeffs[1:], out_frmt=out_frmt)))
     else:
         # quantize all coefficients
-        coeff_q = QObj.fixp(coeffs, out_frmt=out_frmt)
+        coeff_q = Q.fixp(coeffs, out_frmt=out_frmt)
 
     # self.update_ovfl_cnt()  # update display of overflow counter and MSB / LSB
 

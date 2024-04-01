@@ -143,7 +143,7 @@ class Input_Fixpoint_Specs(QWidget):
                 input fixpoint word format to output word format. Do the same
                 if butLock has been activated.
                 """
-                fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.QObj.q_dict)
+                fb.fil[0]['fxq']['QI'].update(self.wdg_wq_input.Q.q_dict)
                 if dict_sig['ui_local_changed'] == 'butLock'\
                         and not self.wdg_wq_input.butLock.isChecked():
                     # butLock was deactivitated, don't do anything
@@ -160,7 +160,7 @@ class Input_Fixpoint_Specs(QWidget):
                 settings of the output quantizer dict. When I/O lock is active, copy
                 output fixpoint word format to input word format.
                 """
-                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.QObj.q_dict)
+                fb.fil[0]['fxq']['QO'].update(self.wdg_wq_output.Q.q_dict)
 
                 if self.wdg_wq_input.butLock.isChecked():
                     fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
@@ -249,8 +249,8 @@ class Input_Fixpoint_Specs(QWidget):
                         self.emit({'fx_sim': 'error'})
                     else:
                         # Reset overflow counter for input and output quantizer
-                        self.wdg_wq_input.QObj.resetN()
-                        self.wdg_wq_output.QObj.resetN()
+                        self.wdg_wq_input.Q.resetN()
+                        self.wdg_wq_output.Q.resetN()
                         # Trigger fixpoint response calculation, passing a handle to the
                         # fixpoint filter function in the emitted dict via signal-slot
                         if hasattr(self.fx_filt_ui, 'fxfilter'):
