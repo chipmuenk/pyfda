@@ -487,7 +487,7 @@ def qget_selected(table, select_all=False, reverse=True):
 
 
 # ----------------------------------------------------------------------------
-def popup_warning(self, param1: int, param2: str, message="") -> bool:
+def popup_warning(self, param1: int = 0, param2: str = "", message: str = "") -> bool:
     """
     Pop-up a warning box and require a user prompt. When `message == ""`, warn of
     very large filter orders, otherwise display the passed message
