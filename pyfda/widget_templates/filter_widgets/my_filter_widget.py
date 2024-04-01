@@ -25,7 +25,7 @@ import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_lib import fil_save, safe_eval
 
 __version__ = "1.0"
@@ -164,7 +164,7 @@ poles can be entered manually.
         Warn the user if one of the poles is outside the unit circle
         """
         if abs(self.p[0]) >= 1 or abs(self.p[1])  >=1:
-            return qfilter_warning(self, self.p[0], "Delay")
+            return popup_warning(self, self.p[0], "Delay")
         else:
             return True
 

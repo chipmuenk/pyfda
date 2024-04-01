@@ -39,7 +39,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 
 __version__ = "2.2"
@@ -328,7 +328,7 @@ near ``f_S/2`` (highpass).
             norm = np.sum(b0)
 
         if self.delays > 1000:
-            if not qfilter_warning(None, self.delays*self.stages, "Moving Average"):
+            if not popup_warning(None, self.delays*self.stages, "Moving Average"):
                 return -1
 
 

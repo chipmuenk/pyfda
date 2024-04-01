@@ -35,7 +35,7 @@ API version info:
 import scipy.signal as sig
 from scipy.signal import ellipord
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 
 from .common import Common
 
@@ -130,7 +130,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         design.
         """
         if self.N > 25:
-            return qfilter_warning(None, self.N, "Elliptic")
+            return popup_warning(None, self.N, "Elliptic")
         else:
             return True
 

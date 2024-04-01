@@ -29,7 +29,7 @@ from numpy import conj, sqrt, sum, zeros
 import numpy as np
 from scipy.signal import ellipord
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_io_lib import extract_file_ext
 import pyfda.libs.pyfda_dirs as dirs
 
@@ -290,7 +290,7 @@ to be complex (no real values).
         design.
         """
         if self.N > 30:
-            return qfilter_warning(self, self.N, "Zero-phase Elliptic")
+            return popup_warning(self, self.N, "Zero-phase Elliptic")
         else:
             return True
 

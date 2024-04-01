@@ -39,7 +39,7 @@ import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord
 
@@ -257,7 +257,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         design.
         """
         if self.N > 2000:
-            return qfilter_warning(self, self.N, "Equiripple")
+            return popup_warning(self, self.N, "Equiripple")
         else:
             return True
 

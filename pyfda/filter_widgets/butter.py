@@ -37,7 +37,7 @@ import scipy.signal as sig
 from scipy.signal import buttord
 
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 
 __version__ = "2.2"
 
@@ -164,7 +164,7 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         design.
         """
         if self.N > 25:
-            return qfilter_warning(None, self.N, "Butterworth")
+            return popup_warning(None, self.N, "Butterworth")
         else:
             return True
 

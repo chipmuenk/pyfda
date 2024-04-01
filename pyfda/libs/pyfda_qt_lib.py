@@ -487,17 +487,20 @@ def qget_selected(table, select_all=False, reverse=True):
 
 
 # ----------------------------------------------------------------------------
-def qfilter_warning(self, N, fil_class):
+def popup_warning(self, param1: int, param2: str, message="") -> bool:
     """
-    Pop-up a warning box for very large filter orders
+    Pop-up a warning box and require a user prompt. When `message == ""`, warn of
+    very large filter orders, otherwise display the passed message
     """
+    if message == "":
+        message = (
+            f"<span><b><i>N</i> = {param1}</b> is a rather high order for<br />"
+            f"{param2} filters and may cause large <br />"
+            "numerical errors and compute times.<br />Continue?</span>")
+
     reply = QMessageBox.warning(
-        self, 'Warning',
-        ("<span><i><b>N = {0}</b></i> &nbsp; is a rather high order for<br />"
-         "an {1} filter and may cause large <br />"
-         "numerical errors and compute times.<br />"
-         "Continue?</span>".format(N, fil_class)),
-        QMessageBox.Yes, QMessageBox.No)
+        self, 'Warning', message, QMessageBox.Yes, QMessageBox.No)
+
     if reply == QMessageBox.Yes:
         return True
     else:

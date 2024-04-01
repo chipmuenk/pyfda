@@ -37,7 +37,7 @@ from scipy.signal import cheb2ord
 from .common import Common
 
 from pyfda.libs.pyfda_lib import fil_save, lin2unit
-from pyfda.libs.pyfda_qt_lib import qfilter_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning
 
 __version__ = "2.2"
 
@@ -134,7 +134,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         design.
         """
         if self.N > 25:
-            return qfilter_warning(None, self.N, "Chebyshev 2")
+            return popup_warning(None, self.N, "Chebyshev 2")
         else:
             return True
 
