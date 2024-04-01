@@ -1649,76 +1649,86 @@ def load_filter(self) -> int:
             or fb.fil[0]['_id'] != 'pyfda':
         logger.warning("This is no pyfda filter or an outdated file format!")
         # err = True
+        # TODO: This should reject the file in future versions
+    elif fb.fil[0]['_id'] != '1':
+        logger.warning(f"Wrong version of filter file")
+
+    # Catch errors occurring during file opening
+    if err:
+        fb.undo()
+        return -1
 
 # --------------------
     try:
-        if not err:
-            keys_missing, keys_unsupported = sanitize_imported_dict(fb.fil[0])
-            err_str = ""
-            if keys_missing != []:
-                # '\n'.join(...) converts list to multi-line string
-                err_str += (
-                    f"The following {len(keys_missing)} key(s) have not been found in "
-                    f"the loaded dict,\n"\
-                    f"\tthey are copied with their values from the reference dict:\n"
-                     + "{0}".format('\n'.join(keys_missing))
-                    )
-            if keys_unsupported != []:
-                err_str += (
-                    f"\nThe following {len(keys_unsupported)} key(s) are not part of the "
-                    f"reference dict and have been deleted:\n"
-                    + "{0}".format('\n'.join(keys_unsupported))
+        keys_missing, keys_unsupported = sanitize_imported_dict(fb.fil[0])
+        err_str = ""
+        if keys_missing != []:
+            # '\n'.join(...) converts list to multi-line string
+            err_str += (
+                f"The following {len(keys_missing)} key(s) have not been found in "
+                f"the loaded dict,\n"\
+                f"\tthey are copied with their values from the reference dict:\n"
+                    + "{0}".format('\n'.join(keys_missing))
                 )
-            if err_str != "":
-                logger.warning(err_str)
+        if keys_unsupported != []:
+            err_str += (
+                f"\nThe following {len(keys_unsupported)} key(s) are not part of the "
+                f"reference dict and have been deleted:\n"
+                + "{0}".format('\n'.join(keys_unsupported))
+            )
+        if err_str != "":
+            logger.warning(err_str)
 
-            # sanitize values in filter dictionary, keys are ok by now
-            for k in fb.fil[0]:
-                # Bytes need to be decoded for py3 to be used as keys later on
-                if type(fb.fil[0][k]) == bytes:
-                    fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
-                if fb.fil[0][k] is None:
-                    logger.warning(f"Entry fb.fil[0][{k}] is empty!")
-            if 'ba' not in fb.fil[0]\
-                or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
-                    or np.ndim(fb.fil[0]['ba']) != 2\
-                    or (np.shape(fb.fil[0]['ba'][0]) != 2
-                        and np.shape(fb.fil[0]['ba'])[1] < 3):
-                logger.error("Missing key 'ba' or wrong data type!")
-                return -1
-            elif 'zpk' not in fb.fil[0]:
-                logger.error("Missing key 'zpk'!")
-                return -1
-            elif 'sos' not in fb.fil[0]\
-                    or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
-                logger.error("Missing key 'sos' or wrong data type!")
-                return -1
+        # sanitize *values* in filter dictionary, keys are ok by now
+        for k in fb.fil[0]:
+            # Bytes need to be decoded for py3 to be used as keys later on
+            if type(fb.fil[0][k]) == bytes:
+                fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+            if fb.fil[0][k] is None:
+                logger.warning(f"Entry fb.fil[0][{k}] is empty!")
+        if 'ba' not in fb.fil[0]\
+            or type(fb.fil[0]['ba']) not in {list, np.ndarray}\
+                or np.ndim(fb.fil[0]['ba']) != 2\
+                or (np.shape(fb.fil[0]['ba'][0]) != 2
+                    and np.shape(fb.fil[0]['ba'])[1] < 3):
+            logger.error("Missing key 'ba' or wrong data type!")
+            fb.undo()
+            return -1
+        elif 'zpk' not in fb.fil[0]:
+            logger.error("Missing key 'zpk'!")
+            fb.undo()
+            return -1
+        elif 'sos' not in fb.fil[0]\
+                or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
+            logger.error("Missing key 'sos' or wrong data type!")
+            fb.undo()
+            return -1
 
-            if type(fb.fil[0]['ba']) == np.ndarray:
-                if np.ndim(fb.fil[0]['ba']) != 2:
-                    logger.error(
-                        f"Unsuitable dimension of 'ba' data, ndim = {np.ndim(fb.fil[0]['ba'])}")
-                elif np.shape(fb.fil[0]['ba'])[0] != 2:
-                    logger.error(
-                        f"Unsuitable shape {np.shape(fb.fil[0]['ba'])} of 'ba' data ")
-            elif type(fb.fil[0]['ba']) == list:
-                fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
+        if type(fb.fil[0]['ba']) == np.ndarray:
+            if np.ndim(fb.fil[0]['ba']) != 2:
+                logger.error(
+                    f"Unsuitable dimension of 'ba' data, ndim = {np.ndim(fb.fil[0]['ba'])}")
+            elif np.shape(fb.fil[0]['ba'])[0] != 2:
+                logger.error(
+                    f"Unsuitable shape {np.shape(fb.fil[0]['ba'])} of 'ba' data ")
+        elif type(fb.fil[0]['ba']) == list:
+            fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
 
-            if type(fb.fil[0]['zpk']) == np.ndarray:
-                if np.ndim(fb.fil[0]['zpk']) != 2:
-                    logger.error(
-                        f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
-                elif np.shape(fb.fil[0]['zpk'])[0] != 3:
-                    logger.error(
-                        f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
-            elif type(fb.fil[0]['zpk']) == list:
-                fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
+        if type(fb.fil[0]['zpk']) == np.ndarray:
+            if np.ndim(fb.fil[0]['zpk']) != 2:
+                logger.error(
+                    f"Unsuitable dimension of 'zpk' data, ndim = {np.ndim(fb.fil[0]['zpk'])}")
+            elif np.shape(fb.fil[0]['zpk'])[0] != 3:
+                logger.error(
+                    f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
+        elif type(fb.fil[0]['zpk']) == list:
+            fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
 
-            logger.info(f'Successfully loaded filter\n\t"{file_name}"')
-            dirs.last_file_name = file_name
-            dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
-            dirs.last_file_type = file_type  # save new default file type
-            return 0
+        logger.info(f'Successfully loaded filter\n\t"{file_name}"')
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)  # update default working dir
+        dirs.last_file_type = file_type  # save new default file type
+        return 0
 
     except Exception as e:
         logger.error(f"Unexpected error:\n{e}")
