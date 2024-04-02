@@ -205,6 +205,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.dict2ui()
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
             self.load_fx_filter()
+            # TODO: should self._update_filter_cmb() be called here?
             return
 
         if fb.fil[0]['fx_sim']:  # fixpoint mode active
@@ -214,8 +215,6 @@ class Input_Fixpoint_Specs(QWidget):
             # set RUN button to 'changed' and resize fixpoint image.
             if self.fx_filt_changed:
                 self._update_filter_cmb()
-                self._update_fixp_widget()
-                self.resize_img()
                 self.fx_filt_changed = False  # reset flag
                 self.fx_specs_changed = False  # reset flag
 
@@ -666,6 +665,7 @@ class Input_Fixpoint_Specs(QWidget):
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_fx_wdg, data=False)
         if cmb_wdg_fx_cur:  # at least one valid fixpoint widget found
             self.fx_wdg_found = True
+            self.cmb_qfrmt.setEnabled(True)
             # get list [module name and path, class name]
             fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
@@ -715,7 +715,15 @@ class Input_Fixpoint_Specs(QWidget):
             # Check which methods the fixpoint widget provides and enable
             # corresponding buttons:
             self.butExportHDL.setVisible(hasattr(self.fx_filt_ui, "to_hdl"))
-            self.emit({'fx_sim': 'specs_changed'})
+
+        else:  # no fixpoint widget found
+            fb.fil[0]['fx_mod_class_name'] = ""
+            self.fx_wdg_found = False
+            # fb.fil[0]['fx_sim'] = False
+            self.lbl_descr.setVisible(False)
+            self.cmb_qfrmt.setEnabled(False)
+
+        self.emit({'fx_sim': 'specs_changed'})
 
 # ------------------------------------------------------------------------------
     def qfrmt2ui(self):
