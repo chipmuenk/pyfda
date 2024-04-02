@@ -900,7 +900,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    # change initial settings to FIR (no IIR fixpoint filters available yet)
+    # change initial settings to FIR
     # fb.fil[0].update({'ft': 'FIR', 'fc': 'Equiripple'})
     # _ = Tree_Builder()  # TODO_ couldn't this be a function?
     fb.fil[0].update({'ft': 'IIR', 'fc': 'Ellip'})
