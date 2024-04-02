@@ -1,4 +1,32 @@
 # Changelog
+## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
+### Changed settings and behaviour
+- Minimum initial number of data points in the y[n] tab now is 25
+- Initial width of rect pulse now is T_1 = 10
+
+### New features
+- load / save filters to 9 different memory locations
+- coefficients can be saved in CMSIS format directly via 'save coefficients', this
+  is no longer hidden in the CSV options
+- in 'float' mode, fixpoint widget is now invisible and fixpoint simulations are no longer run
+- filters can be saved and loaded in JSON format
+- show fixpoint ranges for input and output separately
+- filter coefficients can also be complex as float2frmt() now handles complex numbers
+- accept complex number of the kind +.234j (pos. sign, no leading zero)
+- add separate quantizers for partial products x*b and y*a in iir_df1_pyfixp
+- new fixpoint number format 'octal'
+- numexpr >= 2.8.8 is now required as '1j' is parsed by numexpr again
+
+### Bugfixes
+- fixed bugs w.r.t. behaviour of locking absolute frequencies in filter design widget
+- highlighting frequencies outside the first Nyquist zone 0 ... f_S resp. -f_S/2 ... f_S/2 didn't work
+  reliably
+- #243 where deleting all cells results in an index error
+- #239: lots of bugs fixed w.r.t. fixpoint and especially integer fixpoint behaviour
+- fix behaviour when no fixpoint filter exists for a filter class
+- lots of bugs fixed for loading / saving filters
+- fixed several bugs w.r.t. signalling, causing multiple executions of code and erroneous ui updates
+
 
 ## [v0.8.4](https://github.com/chipmuenk/pyfda/tree/v0.8.4) (2023-10-10)
 
