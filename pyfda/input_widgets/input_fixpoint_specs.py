@@ -208,6 +208,21 @@ class Input_Fixpoint_Specs(QWidget):
             return
 
         if fb.fil[0]['fx_sim']:  # fixpoint mode active
+            # =================== Previous Changes ====================================
+            # have fixpoint specs / filter been changed when widget was invisible
+            # or in float mode? If yes, update fixpoint topologies and UI from dict,
+            # set RUN button to 'changed' and resize fixpoint image.
+            if self.fx_filt_changed:
+                self._update_filter_cmb()
+                self._update_fixp_widget()
+                self.resize_img()
+                self.fx_filt_changed = False  # reset flag
+                self.fx_specs_changed = False  # reset flag
+
+            elif self.fx_specs_changed:
+                self.dict2ui()  # update fixpoint widgets
+                self.fx_specs_changed = False  # reset flag
+
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
@@ -224,10 +239,6 @@ class Input_Fixpoint_Specs(QWidget):
                     # Filter data has changed (but not the filter type):
                     # Update fixpoint widgets from dict
                     self.dict2ui()
-
-                # ------------- reset change flags ------------------
-                self.fx_filt_changed = False
-                self.fx_specs_changed = False
 
             # =================== FX SIM ============================================
             elif 'fx_sim' in dict_sig:
@@ -288,21 +299,6 @@ class Input_Fixpoint_Specs(QWidget):
                 # ------------- reset change flags ------------------
                 self.fx_filt_changed = False
                 self.fx_specs_changed = False
-
-            # =================== Previous Changes ====================================
-            # have fixpoint specs / filter been changed when widget was invisible
-            # or in float mode? If yes, update fixpoint topologies and UI from dict,
-            # set RUN button to 'changed' and resize fixpoint image.
-            elif self.fx_filt_changed:
-                self._update_filter_cmb()
-                self._update_fixp_widget()
-                self.resize_img()
-                self.fx_filt_changed = False  # reset flag
-                self.fx_specs_changed = False  # reset flag
-
-            elif self.fx_specs_changed:
-                self.dict2ui()  # update fixpoint widgets
-                self.fx_specs_changed = False  # reset flag
 
         # =============================================================================
         else:  # fixpoint mode is not active
