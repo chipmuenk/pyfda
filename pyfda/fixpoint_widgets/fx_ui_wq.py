@@ -430,8 +430,6 @@ class FX_UI_WQ(QWidget):
         self.q_dict.update(self.Q.q_dict)
         # update display of WI and WF depending on fixpoint mode
         self.update_WI_WF()
-        logger.error(
-            f"ui2dict: WI = {WI} {self.Q.q_dict['WI']}")
 
         if self.sender():
             # logger.error(f"sender = {self.sender().objectName()}")

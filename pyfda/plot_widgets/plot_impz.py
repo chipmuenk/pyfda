@@ -322,7 +322,7 @@ class Plot_Impz(QWidget):
         #     f"{first_item(dict_sig)}")
 
         if dict_sig['id'] == id(self):
-            logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
+            # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
 
         if 'fx_sim' in dict_sig:

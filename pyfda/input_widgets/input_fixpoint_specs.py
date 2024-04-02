@@ -108,11 +108,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
         # logger.warning(
         #     f"SIG_RX_LOCAL(): vis={self.isVisible()}\n{pprint_log(dict_sig)}")
-        logger.warning(
-            f"SIG_RX_LOCAL: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
+        # logger.warning(
+        #    f"SIG_RX_LOCAL: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
-            logger.warning(
-                f'RX_LOCAL - Stopped infinite loop: "{pprint_log(dict_sig)}"')
+            # logger.warning(
+            #     f'RX_LOCAL - Stopped infinite loop: "{pprint_log(dict_sig)}"')
             return
         # ---------------------------------------------------------------------
         # Updated fixpoint specs in filter widget, update UI + emit with self id
@@ -171,7 +171,6 @@ class Input_Fixpoint_Specs(QWidget):
                 return
 
             self.dict2ui() # update fixpoint widgets
-            logger.error("fx_sim: specs_changed emitted thru ui_local_changes")
             self.emit({'fx_sim': 'specs_changed'})  # propagate 'specs_changed'
         # --------------------------------------------------------------------------------
 
