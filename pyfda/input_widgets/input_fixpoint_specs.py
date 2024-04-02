@@ -752,7 +752,9 @@ class Input_Fixpoint_Specs(QWidget):
         The setting of the `self.cmb_qfrmt` combobox influencing float / fixpoint number
         format is updated as well.
         """
-        is_fixp = fb.fil[0]['fx_sim']
+        # if not fb.fil[0]['fx_mod_class_name']:  # no fixpoint filter available
+        #     fb.fil[0]['fx_sim'] = False
+        is_fixp = fb.fil[0]['fx_sim'] # or not self.fx_wdg_found
 
         # fixpoint widgets are only visible in fixpoint mode
         self.wdg_wq_input.setVisible(is_fixp)
