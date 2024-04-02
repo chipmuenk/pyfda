@@ -281,12 +281,12 @@ class Input_Coeffs_UI(QWidget):
 
         # -------------------
         self.wdg_wq_coeffs_b = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCB'], wdg_name='wq_coeffs_b',
+            fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
         # -------------------
         self.wdg_wq_coeffs_a = FX_UI_WQ(
-            fb.fil[0]['fxq']['QCA'], wdg_name='wq_coeffs_a',
+            fb.fil[0]['fxq']['QCA'], objectName='fx_ui_wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max')
 

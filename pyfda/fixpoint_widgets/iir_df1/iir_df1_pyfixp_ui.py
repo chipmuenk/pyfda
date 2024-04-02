@@ -87,7 +87,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("Empty dict / missing key 'fb.fil{0]['fxq']['QCB']'!")
         self.wdg_wq_coeffs_b = FX_UI_WQ(
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_iir_df1_coeffs_b',
-            wdg_name='wq_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_b_items)
         layV_wq_coeffs_b = QVBoxLayout()
@@ -99,7 +98,6 @@ class IIR_DF1_pyfixp_UI(QWidget):
             logger.warning("Empty dict / missing key 'fb.fil{0]['fxq']['QCA']'!")
         self.wdg_wq_coeffs_a = FX_UI_WQ(
             fb.fil[0]['fxq']['QCA'], objectName='fx_ui_wq_iir_df1_coeffs_a',
-            wdg_name='wq_coeffs_a',
             label='<b>Coeff. Quantization <i>a<sub>I.F&nbsp;</sub></i>:</b>',
             MSB_LSB_vis='max', cmb_w_vis='on', cmb_w_items=self.cmb_wq_coeffs_a_items)
         layV_wq_coeffs_a = QVBoxLayout()
@@ -116,10 +114,9 @@ class IIR_DF1_pyfixp_UI(QWidget):
         set_dict_defaults(
             fb.fil[0]['fxq']['QACC'],
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
-             'N_over': 0, 'wdg_name': 'unknown'})
+             'N_over': 0})
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_iir_df1_accu',
-            wdg_name='wq_accu',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items)
         layV_wq_accu = QVBoxLayout()
@@ -167,13 +164,15 @@ class IIR_DF1_pyfixp_UI(QWidget):
         if 'ui_local_changed' in dict_sig:
             # signal generated locally by modifying coefficient / accu format
             ui_changed = dict_sig['ui_local_changed']  # name of changed ui element
-            if not dict_sig['sender_name'] in {'wq_coeffs_b', 'wq_coeffs_a', 'wq_accu'}:
-                logger.error(f"Unknown widget name '{dict_sig['sender_name']}' "
+            if not dict_sig['sender_name']\
+                    in {'fx_ui_wq_iir_df1_coeffs_b', 'fx_ui_wq_iir_df1_coeffs_a',
+                        'fx_ui_wq_iir_df1_accu'}:
+                logger.error(f"Unknown sender name '{dict_sig['sender_name']}' "
                              f"in '{__name__}' !")
                 return
 
             # changes in accu widget
-            elif dict_sig['sender_name'] == 'wq_accu':  # accu format updated
+            elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_accu':  # accu format updated
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_accu.cmbW)
                     if cmbW == 'm':
@@ -193,7 +192,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         return
 
             # changes in coeffs 'a' widget
-            elif dict_sig['sender_name'] == 'wq_coeffs_a':
+            elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_a':
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_a.cmbW)
                     if cmbW == 'm':
@@ -217,7 +216,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
                         self.update_accu_settings()
 
             # changes in coeffs 'b' widget
-            elif dict_sig['sender_name'] == 'wq_coeffs_b':
+            elif dict_sig['sender_name'] == 'fx_ui_wq_iir_df1_coeffs_b':
                 if ui_changed in {'cmbW', 'WF', 'WI'}:
                     cmbW = qget_cmb_box(self.wdg_wq_coeffs_b.cmbW)
                     if cmbW == 'm':

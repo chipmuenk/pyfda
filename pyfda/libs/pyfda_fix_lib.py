@@ -478,8 +478,7 @@ class Fixed(object):
         """
         # define valid keys and default values for quantization dict
         self.q_dict_default = {
-            'wdg_name': 'unknown', 'WI': 0, 'WF': 15, 'w_a_m': 'm',
-            'quant': 'round', 'ovfl': 'sat',
+            'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round', 'ovfl': 'sat',
         # these keys are calculated and should be regarded as read-only
             'N_over': 0}
         # these attributes are calculated and should be regarded as read-only

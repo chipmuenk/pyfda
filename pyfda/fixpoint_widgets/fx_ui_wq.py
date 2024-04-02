@@ -78,8 +78,6 @@ class FX_UI_WQ(QWidget):
 
         Key         : Default value             # Comment
     ----------------:---------------------------#-------------------------------------
-    'wdg_name'      : 'fx_ui_wq'                # widget name, used to discern between
-                                                # multiple instances
     'label'         : ''                        # widget text label, usually set by the
     'label_q'       : 'Quant.'                  # subwidget text label
     'cmb_q'         : List with tooltip and combo box choices (default: 'round', 'fix',
@@ -114,7 +112,7 @@ class FX_UI_WQ(QWidget):
 
     ```
         self.wdg_wq_accu = FX_UI_WQ(
-            fb.fil[0]['fxq']['QACC'], objectName='wdg_wq_accu_inst', wdg_name='wq_accu',
+            fb.fil[0]['fxq']['QACC'], objectName='wdg_wq_accu_inst',
             label='<b>Accu Quantizer <i>Q<sub>A&nbsp;</sub></i>:</b>')
     ```
 
@@ -134,7 +132,7 @@ class FX_UI_WQ(QWidget):
 
         # default settings for q_dict
         # q_dict_default = {'WI': 0, 'WF': 15, 'w_a_m': 'm', 'quant': 'round',
-        #                   'ovfl': 'sat', 'wdg_name': 'unknown'}
+        #                   'ovfl': 'sat'}
         # make a deep copy of passed dictionary to prevent messing it up
         # self.q_dict = copy.deepcopy(q_dict)
         # merge 'q_dict_default' into `self.q_dict``, prioritizing `self.q_dict`` entries
@@ -178,7 +176,7 @@ class FX_UI_WQ(QWidget):
                 ("a", "A", "<span><b>Automatic</b> estimation of required integer "
                  "and fractional word length.</span>")                 ]
         # default widget settings:
-        ui_dict = {'wdg_name': 'fx_ui_wq', 'label': '',
+        ui_dict = {'label': '',
                    'label_q': 'Quant.', 'cmb_q_items': cmb_q,
                    'label_ov': 'Ovfl.', 'cmb_ov_items': cmb_ov,
                    #
@@ -201,7 +199,6 @@ class FX_UI_WQ(QWidget):
                 ui_dict.update({key: val})
         # ui_dict.update(map(kwargs)) # same as above?
 
-        self.wdg_name = ui_dict['wdg_name']
         lbl_wdg = QLabel(ui_dict['label'], self)
 
         self.cmbQuant = QComboBox(self, objectName='quant')
@@ -347,7 +344,7 @@ class FX_UI_WQ(QWidget):
         and fire the signal {'ui_local_changed': 'butLock'}
         """
         self.but_lock_update_icon(checked)
-        self.emit({'sender_name': self.wdg_name, 'ui_local_changed': 'butLock'})
+        self.emit({'sender_name': self.objectName(), 'ui_local_changed': 'butLock'})
 
     # --------------------------------------------------------------------------
     def but_lock_update_icon(self, checked: bool) -> None:
@@ -367,7 +364,7 @@ class FX_UI_WQ(QWidget):
         """
         # -------
         # frm = inspect.stack()[1]
-        # logger.warning(f"update: {id(self)}|{id(self.q_dict)} | {self.wdg_name} :"
+        # logger.warning(f"update: {id(self)}|{id(self.q_dict)}:"
         #              f"{self.q_dict['N_over']} "
         #              f"{inspect.getmodule(frm[0]).__name__.split('.')[-1]}."
         #              f"{frm[3]}:{frm[2]}")
@@ -440,7 +437,7 @@ class FX_UI_WQ(QWidget):
             # logger.error(f"sender = {self.sender().objectName()}")
 #             if self.sender().objectName() == 'cmbW':
 #                self.enable_subwidgets()  # enable / disable WI and WF subwidgets
-            dict_sig = {'sender_name': self.wdg_name,
+            dict_sig = {'sender_name': self.objectName(),
                         'ui_local_changed': self.sender().objectName()}
             self.emit(dict_sig)
         else:
@@ -462,8 +459,7 @@ class FX_UI_WQ(QWidget):
             q_dict = self.q_dict  # update UI from instance / global qdict
         else:
             for k in q_dict:
-                if k not in {'wdg_name', 'quant', 'ovfl', 'WI', 'WF',
-                             'w_a_m', 'N_over'}:
+                if k not in {'quant', 'ovfl', 'WI', 'WF', 'w_a_m', 'N_over'}:
                     logger.warning(f"Unknown quantization dict key '{k}'")
 
         # Update all non-numeric instance quantization dict entries from passed `q_dict`

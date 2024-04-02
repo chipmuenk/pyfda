@@ -312,7 +312,7 @@ class Input_Coeffs(QWidget):
             self.ui._set_load_save_icons()
 
         elif 'ui_local_changed' in dict_sig and 'sender_name' in dict_sig and\
-                dict_sig['sender_name'] in {'wq_coeffs_a', 'wq_coeffs_b'}:
+                dict_sig['sender_name'] in {'fx_ui_wq_coeffs_a', 'fx_ui_wq_coeffs_b'}:
             # local events from UI, trigger requant and refresh table
             self.refresh_table()
             self.emit({'fx_sim': 'specs_changed'})

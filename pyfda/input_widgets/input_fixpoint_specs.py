@@ -136,7 +136,7 @@ class Input_Fixpoint_Specs(QWidget):
                     "for key 'ui_local_changed'")
                 return
 
-            elif dict_sig['sender_name'] == 'wq_input':
+            elif dict_sig['sender_name'] == 'fx_ui_wq_input':
                 """
                 Input fixpoint format has been changed: Update filter dict with the
                 settings of the input quantizer dict. If I/O lock is active, copy
@@ -154,7 +154,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxq']['QO']['WI'] = fb.fil[0]['fxq']['QI']['WI']
                     fb.fil[0]['fxq']['QO']['WF'] = fb.fil[0]['fxq']['QI']['WF']
 
-            elif dict_sig['sender_name'] == 'wq_output':
+            elif dict_sig['sender_name'] == 'fx_ui_wq_output':
                 """
                 Output fixpoint format has been changed: Update filter dict with the
                 settings of the output quantizer dict. When I/O lock is active, copy
@@ -166,7 +166,7 @@ class Input_Fixpoint_Specs(QWidget):
                     fb.fil[0]['fxq']['QI']['WI'] = fb.fil[0]['fxq']['QO']['WI']
                     fb.fil[0]['fxq']['QI']['WF'] = fb.fil[0]['fxq']['QO']['WF']
             else:
-                logger.error("Unknown wdg_name '{0}' in dict_sig:\n{1}"
+                logger.error("Unknown wdg_name / sender_name '{0}' in dict_sig:\n{1}"
                              .format(dict_sig['sender_name'], pprint_log(dict_sig)))
                 return
 
@@ -375,7 +375,7 @@ class Input_Fixpoint_Specs(QWidget):
 # ------------------------------------------------------------------------------
 
         self.wdg_wq_input = FX_UI_WQ(
-            fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input', wdg_name='wq_input',
+            fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input',
             label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
@@ -386,7 +386,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_wq_input.sig_tx.connect(self.sig_rx_local)
 
         self.wdg_wq_output = FX_UI_WQ(
-            fb.fil[0]['fxq']['QO'], objectName='fx_ui_wq_output', wdg_name='wq_output',
+            fb.fil[0]['fxq']['QO'], objectName='fx_ui_wq_output',
             label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>',
             cmb_w_vis='off')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
