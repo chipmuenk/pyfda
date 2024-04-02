@@ -47,8 +47,6 @@ class Input_Fixpoint_Specs(QWidget):
     """
     Create the widget that holds the dynamically loaded fixpoint filter UI
     """
-
-    # sig_resize = pyqtSignal()  # emit a signal when the image has been resized
     sig_rx_local = pyqtSignal(object)  # incoming from subwidgets -> process_sig_rx_local
     sig_rx = pyqtSignal(object)  # incoming, connected to input_tab_widget.sig_rx
     sig_tx = pyqtSignal(object)  # outcgoing
@@ -203,25 +201,16 @@ class Input_Fixpoint_Specs(QWidget):
         # or invisible (?)
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'specs_changed':
             self.dict2ui()
-        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
-            self.load_fx_filter()
-            # TODO: should self._update_filter_cmb() be called here?
-            return
+        elif 'data_changed' in dict_sig:
+            if dict_sig['data_changed'] == 'filter_loaded':
+                self.load_fx_filter()
+                # TODO: should self._update_filter_cmb() be called here?
+                return
+            elif dict_sig['data_changed'] == "filter_designed":
+                # New filter has been designed, update list of available filter topologies
+                self._update_filter_cmb()
 
         if fb.fil[0]['fx_sim']:  # fixpoint mode active
-            # =================== Previous Changes ====================================
-            # have fixpoint specs / filter been changed when widget was invisible
-            # or in float mode? If yes, update fixpoint topologies and UI from dict,
-            # set RUN button to 'changed' and resize fixpoint image.
-            if self.fx_filt_changed:
-                self._update_filter_cmb()
-                self.fx_filt_changed = False  # reset flag
-                self.fx_specs_changed = False  # reset flag
-
-            elif self.fx_specs_changed:
-                self.dict2ui()  # update fixpoint widgets
-                self.fx_specs_changed = False  # reset flag
-
             #  =================== UI_CHANGED =======================================
             if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed']\
                     in {'resized', 'tab'} and self.isVisible():
@@ -230,14 +219,9 @@ class Input_Fixpoint_Specs(QWidget):
 
             # =================== DATA CHANGED =====================================
             elif 'data_changed' in dict_sig:
-                if dict_sig['data_changed'] == "filter_designed":
-                    # New filter has been designed, update list of available filter topologies
-                    self._update_filter_cmb()
-
-                else:
-                    # Filter data has changed (but not the filter type):
-                    # Update fixpoint widgets from dict
-                    self.dict2ui()
+                # Filter data has changed (but not the filter type):
+                # Update fixpoint widgets from dict
+                self.dict2ui()
 
             # =================== FX SIM ============================================
             elif 'fx_sim' in dict_sig:
@@ -295,22 +279,28 @@ class Input_Fixpoint_Specs(QWidget):
                                 '\treceived from "{1}".'
                                 .format(dict_sig['fx_sim'], dict_sig['class']))
 
-                # ------------- reset change flags ------------------
-                self.fx_filt_changed = False
-                self.fx_specs_changed = False
+            # the next part is reached when fx_sim is active but no fx_sim command
+            # has been issued:
+            # =================== Previous Changes ====================================
+            # have fixpoint specs / filter been changed when widget was invisible
+            # or in float mode? If yes, update fixpoint topologies and UI from dict,
+            # set RUN button to 'changed' and resize fixpoint image.
+            if self.fx_filt_changed:
+                self.fx_filt_changed = False  # reset flag
+                self.fx_specs_changed = False  # reset flag
+                self._update_filter_cmb()
+
+            elif self.fx_specs_changed:
+                self.fx_specs_changed = False  # reset flag
+                self.dict2ui()  # update fixpoint widgets
 
         # =============================================================================
         else:  # fixpoint mode is not active
             if 'data_changed' in dict_sig:
-                if dict_sig['data_changed'] == "filter_designed":
-                    # New filter has been designed, update list of available
-                    # filter topologies and UI from dict
-                    self.fx_filt_changed = True
-                else:
-                    # Filter data has changed (but not the filter type):
-                    # Reload UI from dict and
-                    self.fx_specs_changed = True
-                return
+                # Filter data has changed (but not the filter type):
+                # Reload UI from dict and
+                self.fx_specs_changed = True
+
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self) -> None:
