@@ -135,7 +135,7 @@ class MplWidget(QWidget):
         # initialize toolbar settings. Send events through event filter
         #
         self.mplToolbar = MplToolbar(self.canvas, self)
-        self.mplToolbar.zoom_locked = False
+        self.mplToolbar.a_zo_locked = False
         self.mplToolbar.cursor_enabled = False
         self.mplToolbar.plot_enabled = True
         self.mplToolbar.save_button_states()  # store initial setting of buttons
@@ -198,7 +198,7 @@ class MplWidget(QWidget):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
-        if not self.mplToolbar.zoom_locked:
+        if not self.mplToolbar.a_zo_locked:
             for ax in self.fig.axes:
                 self.limits = ax.axis()  # save old limits
 
@@ -206,7 +206,7 @@ class MplWidget(QWidget):
     def redraw(self):
         """
         Redraw the figure with new properties (grid, linewidth) and restore the plot
-        limits when `zoom_locked` is True
+        limits when `a_zo_locked` is True
 
         When zoom lock is used and / or plot limits shall be pushed into the queue,
         you need to call redraw()
@@ -215,7 +215,7 @@ class MplWidget(QWidget):
             self.mplToolbar.cycle_draw_grid(cycle=False, axes=self.fig.axes)
             for ax in self.fig.axes:
 
-                if self.mplToolbar.zoom_locked:
+                if self.mplToolbar.a_zo_locked:
                     ax.axis(self.limits)  # restore old limits
                 else:
                     self.limits = ax.axis()  # save old limits
@@ -698,8 +698,8 @@ class MplToolbar(NavigationToolbar):
             when previously locked, current settings can be saved without effect
         """
         self.mpl_widget.save_limits()  # save limits in any case:
-        self.zoom_locked = not self.zoom_locked
-        if self.zoom_locked:
+        self.a_zo_locked = not self.a_zo_locked
+        if self.a_zo_locked:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
             if self.a_zo.isChecked():
                 self.a_zo.trigger()  # toggle off programmatically
@@ -718,7 +718,7 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
 
-        self.emit({'mpl_toolbar': 'lock_zoom', 'value': self.zoom_locked})  # unused?
+        self.emit({'mpl_toolbar': 'lock_zoom'})
 
 # ------------------------------------------------------------------------------
     def enable_plot(self, state=None):
