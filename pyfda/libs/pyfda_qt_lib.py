@@ -28,7 +28,8 @@ DICT_SIG_KEYS = {'id', 'class', 'ttl', 'sender_name', 'object_name',
                  'ui_global_changed', # this relates to resize, tab change or CSV options
                  'fx_sim',         # parameters relating to fixpoint simulation
                  'fxfilter_func',  # handle to filter function
-                 'close_event'     # propagate close event to finish some task upstream
+                 'close_event',    # propagate close event to finish some task upstream
+                 'mpl_toolbar'     # events triggered by the toolbar
                 }
 # ------------------------------------------------------------------------------
 def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:

@@ -666,7 +666,7 @@ class MplToolbar(NavigationToolbar):
         ui_level : int, optional
             Set the ui level and the icon accordingly when ui_level != -1,
             (was not passed as a parameter), cycle through the `self.ai_num_levels`
-            and emit `{'mpl_toolbar': 'ui_level', 'value': self.a_ui_level}`
+            and emit `{'mpl_toolbar': 'ui_level'}`
 
         Returns
         -------
@@ -674,8 +674,10 @@ class MplToolbar(NavigationToolbar):
 
         """
         if ui_level == -1:
+            # increase self.a_ui_level until max. is reached
             self.a_ui_level = (self.a_ui_level + 1) % self.a_ui_num_levels
         else:
+            # assign self.a_ui_level to passed parameter
             self.a_ui_level = ui_level
 
         if self.a_ui_level == 0:
@@ -686,7 +688,7 @@ class MplToolbar(NavigationToolbar):
             self.a_ui.setIcon(QIcon(':/ui_level_mid.svg'))
 
         if ui_level == -1:
-            self.emit({'mpl_toolbar': 'ui_level', 'value': self.a_ui_level})
+            self.emit({'mpl_toolbar': 'ui_level'})
 
 # ------------------------------------------------------------------------------
     def toggle_lock_zoom(self):

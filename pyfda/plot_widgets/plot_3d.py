@@ -83,7 +83,7 @@ class Plot_3D(QWidget):
                 self.draw()
                 self.data_changed = False
             elif 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
-                self.frmControls.setVisible(dict_sig['value'] == 0)
+                self.frmControls.setVisible(self.mplwidget.mplToolbar.a_ui_level == 0)
 
         else:
             if 'data_changed' in dict_sig:

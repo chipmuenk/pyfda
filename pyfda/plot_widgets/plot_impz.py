@@ -203,8 +203,8 @@ class Plot_Impz(QWidget):
         self.ui.sig_tx.connect(self.process_sig_rx)
         self.stim_wdg.sig_tx.connect(self.process_sig_rx)
         self.file_io_wdg.sig_tx.connect(self.process_sig_rx)
-        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx)
-        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx)
+        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx_t)
+        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx_f)
         # self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
         # When user has selected a different local tab, trigger a redraw of current tab
@@ -283,6 +283,8 @@ class Plot_Impz(QWidget):
             self.ui.wdg_ctrl_freq.setVisible(False)
             self.tab_stim_w.setVisible(False)
             self.ui.wdg_ctrl_run.setVisible(False)
+        else:
+            logger.warning(f"Undefined 'ui_level = {ui_level}!")
 
 # ------------------------------------------------------------------------------
     def resize_stim_tab_widget(self):
@@ -308,6 +310,31 @@ class Plot_Impz(QWidget):
             h = self.tab_stim_w.currentWidget().minimumSizeHint().height()
         self.tab_stim_w.setMaximumHeight(max(h, h_min))
         self.tab_stim_w.setMinimumHeight(max(h, h_min))
+
+
+    # ------------------------------------------------------------------------------
+    def process_sig_rx_t(self, dict_sig=None):
+        """
+        Special treatment for signals coming from TIME plot navigation toolbar
+        """
+        if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+            # read out ui level directly
+            self.set_ui_level(self.mplwidget_t.mplToolbar.a_ui_level)
+            return
+        else:
+            self.process_sig_rx(dict_sig)
+
+    # ------------------------------------------------------------------------------
+    def process_sig_rx_f(self, dict_sig=None):
+        """
+        Special treatment for signals coming from FREQ plot navigation toolbar
+        """
+        if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
+            # read out ui level directly
+            self.set_ui_level(self.mplwidget_f.mplToolbar.a_ui_level)
+            return
+        else:
+            self.process_sig_rx(dict_sig)
 
     # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -402,9 +429,7 @@ class Plot_Impz(QWidget):
                 self.impz_init()
 
             elif 'mpl_toolbar' in dict_sig:
-                if dict_sig['mpl_toolbar'] == 'ui_level':
-                    self.set_ui_level(dict_sig['value'])
-                elif dict_sig['mpl_toolbar'] == 'home':
+                if dict_sig['mpl_toolbar'] == 'home':
                     self.zoom_home()
                     self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
                 elif dict_sig['mpl_toolbar'] == 'enable_plot'\
