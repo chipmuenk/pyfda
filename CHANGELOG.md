@@ -1,4 +1,8 @@
 # Changelog
+## [v0.9.0b2](https://github.com/chipmuenk/pyfda/tree/v0.9.0b2) (2024-04-xx)
+### Bugfixes
+- Fixed warnings about unknown entries 'value' and 'matplotlib'
+
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
 ### Changed settings and behaviour
 - Minimum initial number of data points in the y[n] tab now is 25
