@@ -727,11 +727,12 @@ class MplToolbar(NavigationToolbar):
         and emit
         """
         if state is not None:
-            self.plot_enabled = state
+            self.a_en_enabled = state
         else:
-            self.plot_enabled = not self.plot_enabled
+            self.a_en_enabled = not self.a_en_enabled
 
-        if self.plot_enabled:
+        if self.a_en_enabled:
+            # enable canvas and plot
             self.a_en.setIcon(QIcon(':/circle-check.svg'))
             # These UI elements can be enabled / disabled elsewhere,
             # restore their previous state
@@ -741,8 +742,9 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(self.a_fv_prev_state)  # full view
             self.a_lk.setEnabled(self.a_ho_prev_state)  # lock zoom
         else:
+            # disable canvas and plot
             self.a_en.setIcon(QIcon(':/circle-x.svg'))
-            # Some UI elements can be enabled / disabled elsewhere,
+            # These UI elements can be enabled / disabled elsewhere,
             # save their state before disabling them
             self.save_button_states()
 
@@ -758,15 +760,15 @@ class MplToolbar(NavigationToolbar):
 
         # These UI elements are always enabled (if not disabled here),
         # no need to save their state
-        self.a_ba.setEnabled(self.plot_enabled)  # back
-        self.a_fw.setEnabled(self.plot_enabled)  # forward
-        self.a_gr.setEnabled(self.plot_enabled)  # grid
-        self.a_sv.setEnabled(self.plot_enabled)  # save
-        self.a_cr.setEnabled(self.plot_enabled)  # cursor
-        self.a_cb.setEnabled(self.plot_enabled)  # clipboard
-        self.a_op.setEnabled(self.plot_enabled)  # options
+        self.a_ba.setEnabled(self.a_en_enabled)  # back
+        self.a_fw.setEnabled(self.a_en_enabled)  # forward
+        self.a_gr.setEnabled(self.a_en_enabled)  # grid
+        self.a_sv.setEnabled(self.a_en_enabled)  # save
+        self.a_cr.setEnabled(self.a_en_enabled)  # cursor
+        self.a_cb.setEnabled(self.a_en_enabled)  # clipboard
+        self.a_op.setEnabled(self.a_en_enabled)  # options
 
-        self.emit({'mpl_toolbar': 'enable_plot', 'value': self.plot_enabled})
+        self.emit({'mpl_toolbar': 'enable_plot'})
 
 # =============================================================================
 # ------------------------------------------------------------------------------

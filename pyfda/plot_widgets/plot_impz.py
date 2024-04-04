@@ -317,10 +317,14 @@ class Plot_Impz(QWidget):
         """
         Special treatment for signals coming from TIME plot navigation toolbar
         """
+        # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
             self.set_ui_level(self.mplwidget_t.mplToolbar.a_ui_level)
-            return
+        # redraw plot when it has become enabled
+        elif dict_sig['mpl_toolbar'] == 'enable_plot'\
+                and self.mplwidget_t.mplToolbar.a_en_enabled:
+            self.draw()
         else:
             self.process_sig_rx(dict_sig)
 
@@ -329,10 +333,14 @@ class Plot_Impz(QWidget):
         """
         Special treatment for signals coming from FREQ plot navigation toolbar
         """
+        # cycle ui level
         if 'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'ui_level':
             # read out ui level directly
             self.set_ui_level(self.mplwidget_f.mplToolbar.a_ui_level)
-            return
+        # redraw plot when it has become enabled
+        elif dict_sig['mpl_toolbar'] == 'enable_plot'\
+                and self.mplwidget_f.mplToolbar.a_en_enabled:
+            self.draw()
         else:
             self.process_sig_rx(dict_sig)
 
@@ -432,9 +440,6 @@ class Plot_Impz(QWidget):
                 if dict_sig['mpl_toolbar'] == 'home':
                     self.zoom_home()
                     self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
-                elif dict_sig['mpl_toolbar'] == 'enable_plot'\
-                        and dict_sig['value']:  # enabled is True
-                    self.draw()
 
             elif 'ui_local_changed' in dict_sig:
                 if dict_sig['ui_local_changed'] == 'csv':
