@@ -283,15 +283,22 @@ class Input_Info(QWidget):
 
         self.txtFiltInfoBox.moveCursor(QTextCursor.Start)
 
-    def _clean_doc(self, doc):
+    def _clean_doc(self, doc: str) -> str:
         """
+        Split doc into list of lines, filter out any lines containing '.. versionadded::'
+        as this statment cannot be parsed anymore (?).
+
         Remove uniform number of leading blanks from docstrings for subsequent
         processing of rich text. The first line is treated differently, _all_
         leading blanks are removed (if any). This allows for different formats
         of docstrings.
+
+        Finally, join lines and linebreaks to a new string.
+
         """
-        lines = doc.splitlines()
-        result = lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
+        lines = [l for l in doc.splitlines() if ".. versionadded::" not in l]
+        result = "\n" + lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
+
         return result
 
 # ------------------------------------------------------------------------------
