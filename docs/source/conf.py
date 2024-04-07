@@ -24,7 +24,7 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'pyfda'
-copyright = '2023, Christian Muenker'
+copyright = '2024, Christian Muenker'
 author = 'Christian Muenker'
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
@@ -56,6 +56,7 @@ extensions = [
     'sphinx.ext.viewcode',
 	'sphinx.ext.napoleon',
 	'sphinx.ext.autosummary',
+    'sphinx.ext.myst_parser'
 ]
 # see http://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 # https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
@@ -78,8 +79,8 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+# source_suffix = ['.rst']
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
