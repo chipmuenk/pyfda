@@ -24,7 +24,7 @@ Welcome to pyfda's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   .. mdinclude:: README.md
+   README
    manual/index
    development/index
    references
