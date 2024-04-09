@@ -1,2 +1,4 @@
 myst_parser
 sphinx-mdinclude
+numpy
+scipy
