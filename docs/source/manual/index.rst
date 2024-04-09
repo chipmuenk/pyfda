@@ -16,9 +16,10 @@ that can be resized with the handles (red dots).
 The tabs on the left-hand side access widgets to enter and view various
 specification and parameters for the filter / system to be designed resp. analyzed.
 
+**Subwindow for Input Widgets**
+
    .. toctree::
       :maxdepth: 1
-      :caption: **Subwindow for Input Widgets**
 
       input_specs
       input_coeffs
