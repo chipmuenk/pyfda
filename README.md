@@ -78,17 +78,17 @@ A pip installation creates a start script `pyfdax` in `<python>/Scripts` which s
 
 The following libraries are required and installed automatically by pip when missing.
 
-- [**PyQt**](https://www.riverbankcomputing.com/software/pyqt/) and [**Qt5**](https://qt.io/)
-- [**numpy**](https://numpy.org/)
-- [**numexpr**](https://github.com/pydata/numexpr)
-- [**scipy**](https://scipy.org/): **1.2.0** or higher
-- [**matplotlib**](https://matplotlib.org/): **3.1** or higher
-- [**Markdown**](https://github.com/Python-Markdown/markdown)
+- **[PyQt](https://www.riverbankcomputing.com/software/pyqt/)** and **[Qt5](https://qt.io/)**
+- **[numpy](https://numpy.org/)**
+- **[numexpr](https://github.com/pydata/numexpr)**
+- **[scipy](https://scipy.org/)**: **1.2.0** or higher
+- **[matplotlib](https://matplotlib.org/)**: **3.1** or higher
+- **[Markdown](https://github.com/Python-Markdown/markdown)**
   
 **Optional libraries:**
 
-- [**mplcursors**](https://mplcursors.readthedocs.io/) for annotating cursors
-- [**docutils**](https://docutils.sourceforge.io) for rich text in documentation
+- **[mplcursors](https://mplcursors.readthedocs.io/)** for annotating cursors
+- **[docutils](https://docutils.sourceforge.io)** for rich text in documentation
 - **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### conda
@@ -128,7 +128,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 
 ## Features
 
-### Filter design ###
+### Filter design
 
 - **Design methods**: Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebyshev 1 and 2 (from scipy.signal and custom methods)
 - **Second-Order Sections** are used in the filter design when available for more robust filter design and analysis
@@ -136,7 +136,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 - **Compare filter designs** for a given set of specifications and different design methods
 - **Filter coefficients and poles / zeroes** can be displayed, edited and quantized in various formats
 
-### User Interface ###
+### User Interface
 
 - only widgets needed for the currently selected design method are visible
 - specifications are remembered when switching between filter design methods
@@ -161,7 +161,7 @@ Facilitate the implementation of new filter design / analysis / display methods.
 - Filter design widgets with your algorithm
 - Plotting widgets
 - Input widgets
-- Fixpoint filter widgets, using the integrated `Fixed()` class 
+- Fixpoint filter widgets, using the integrated `Fixed()` class
 
 ### Import / Export
 
@@ -172,7 +172,6 @@ Facilitate the implementation of new filter design / analysis / display methods.
 ## Why yet another filter design tool?
 
 - **Education:** Provide an easy-to-use FOSS tool for demonstrating basic digital stuff and filter design interactively that also works with the limited resolution of a beamer.
-- **Show-off:** Demonstrate that Python is a potent tool for digital signal processing as well.
 - **Fixpoint filter design:** Recursive fixpoint filter design has become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable especially for uCs and low-budget FPGAs.
 
 ## Release History / Roadmap
