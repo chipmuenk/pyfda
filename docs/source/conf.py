@@ -54,8 +54,9 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-	'sphinx.ext.napoleon',
-	'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary',
+    'sphinx_mdinclude'
 ]
 # see http://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 # https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
