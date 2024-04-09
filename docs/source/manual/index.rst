@@ -1,6 +1,9 @@
 User Manual
 ===========
 
+UI Overview
+-----------
+
 .. _fig_pyfda_screenshot:
 
 .. figure:: ../screenshots/pyfda_screenshot.png
@@ -29,9 +32,10 @@ specification and parameters for the filter / system to be designed resp. analyz
 
 The subwidgets on the right-hand side allow for graphical analyses of the system.
 
+Subwindow for Plotting Widgets
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    .. toctree::
       :maxdepth: 1
-      :caption: **Subwindow for Plotting Widgets**
 
       plot_hf
       plot_phi
@@ -42,15 +46,15 @@ The subwidgets on the right-hand side allow for graphical analyses of the system
 
 Some documentation treats general filter design and fixpoint arithmetics stuff.
 
+**General Documentation**
    .. toctree::
       :maxdepth: 1
-      :caption: **General Documentation**
 
       fixpoint_arithmetics
 
 
 Logger Subwindow
-----------------
+^^^^^^^^^^^^^^^^
 
 The logging window in the lower part of the plotting window can be resized
 or completely closed. Its content can be selected, copied
