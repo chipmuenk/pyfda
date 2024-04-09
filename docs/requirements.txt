@@ -5,3 +5,4 @@ scipy
 PyQt5
 numexpr
 matplotlib
+markdown
