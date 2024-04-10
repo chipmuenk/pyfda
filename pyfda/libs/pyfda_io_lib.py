@@ -115,7 +115,7 @@ def prune_file_ext(file_type: str) -> str:
 
 
 # ------------------------------------------------------------------------------
-def extract_file_ext(file_type: str, return_list=False) -> str:
+def extract_file_ext(file_type: str, return_list: bool = False) -> str:
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
     'VHDL (\*.vhd)' returned by QFileDialog. Depending on the OS, this may be the
@@ -163,6 +163,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     Parameters
     ----------
+
     file_types : tuple of str
         list of file extensions which are used to create a file filter.
 
@@ -174,12 +175,12 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     Returns
     -------
+
     file_filters : str
         String containing file filters for a QFileDialog object
 
     last_file_filter : str
         Single file filter to setup the default file extension in QFileDialog
-
     """
     for t in file_types:
         if t in file_filters_dict:

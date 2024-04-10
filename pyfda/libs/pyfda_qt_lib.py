@@ -148,11 +148,12 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> N
          ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
 
     item_init: str
-        data for initial positition of combobox. When data is not found,
+        data for initial setting of combobox. When data is not found,
         set combobox to first item.
 
     Returns
     -------
+
     Index of `item_init`. If index == -1, `item_init` was not in `items_list`
     """
     cmb_box.clear()
@@ -651,8 +652,9 @@ class QHLine(QFrame):
     """
     Create a thin horizontal line utilizing the HLine property of QFrames
     Usage:
-        myline = QHLine()
-        mylayout.addWidget(myline)
+
+    > myline = QHLine()
+    > mylayout.addWidget(myline)
     """
     def __init__(self, width=1):
         super(QHLine, self).__init__()
@@ -662,6 +664,14 @@ class QHLine(QFrame):
 
 
 class QVLine(QFrame):
+    """
+    Create a thin vertical line utilizing the HLine property of QFrames
+    Usage:
+
+    > myline = QVLine()
+    > mylayout.addWidget(myline)
+    """
+
     def __init__(self, width=2):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
