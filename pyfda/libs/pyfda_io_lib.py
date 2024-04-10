@@ -541,10 +541,12 @@ def csv2array(f: TextIO):
     to numpy array, taking into accout the settings of the CSV dict:
 
     Read data as it is, splitting each row into the column items when:
+
     - `CSV_dict['orientation'] == cols` or
     - `CSV_dict['orientation'] == auto` and cols <= rows:
 
     Transpose data when:
+
     - `CSV_dict['orientation'] == rows` or
     - `CSV_dict['orientation'] == auto` and cols > rows:
 

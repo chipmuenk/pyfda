@@ -476,6 +476,7 @@ class Input_Coeffs(QWidget):
     def quant_coeffs_save(self):
         """
         Triggered by pushing "Quantize button":
+
         - Store selected / all quantized coefficients in `self.ba`
         - Refresh table (for the case that anything weird happens during quantization)
         - Reset Overflow flags `self.ba_q[2]` and `self.ba_q[3]`
@@ -659,7 +660,7 @@ class Input_Coeffs(QWidget):
         self.dict2ui()
 
         qstyle_widget(self.ui.butSave, 'normal')
- 
+
 
     # --------------------------------------------------------------------------
     def export_table(self):
@@ -793,11 +794,11 @@ class Input_Coeffs(QWidget):
         - Refresh the table
 
         Triggered by:
+
         - `process_sig_rx()`: self.fx_specs_changed == True or
-                                dict_sig['fx_sim'] == 'specs_changed'
+            dict_sig['fx_sim'] == 'specs_changed'
         - `self.qfrmt2dict()`
         - `self.fx_base2dict()`
-
         """
         # update ui
         if not fb.fil[0]['fx_sim']:  # float mode
@@ -838,7 +839,7 @@ class Input_Coeffs(QWidget):
         """
         Read out the UI settings of `self.ui.cmb_fx_base` (triggering this method)
         which specifies the fx number base (dec, bin, ...) for display
-        and store it in `fb.fil[0]['fx_base'].
+        and store it in `fb.fil[0]['fx_base']`.
 
         Refresh the table and update quantization widgets. Don't emit a signal
         because this only influences the view not the data itself.
