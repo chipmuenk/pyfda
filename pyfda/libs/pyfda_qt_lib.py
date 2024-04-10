@@ -36,14 +36,15 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
     """
     Emit a signal `self.<sig_name>` (defined as a class attribute) with a
     dict `dict_sig` using Qt's `emit()`.
+
     - Add the keys `'id'` and `'class'` with id resp. class name of the calling
       instance if not contained in the dict
     - If key 'ttl' is in the dict and its value is less than one, terminate the
       signal. Otherwise, reduce the value by one.
     - If the sender has passed an objectName, add it with the key "sender_name"
       to the dict.
-
     """
+
     for k in dict_sig:
         if k not in DICT_SIG_KEYS:
             logger.warning(f"Unknown entry '{k}':'{dict_sig[k]}' in 'dict_sig'!")

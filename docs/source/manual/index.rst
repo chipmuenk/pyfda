@@ -67,7 +67,7 @@ Customization
 You can customize pyfda behaviour in some configuration files:
 
 pyfda.conf
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 A copy of ``pyfda/pyfda.conf`` is created in ``<USER_HOME>/.pyfda/pyfda.conf``
 where it can be edited by the user to choose which widgets and filters will be included.
@@ -77,7 +77,7 @@ be defined if you want to develop and integrate your own widgets (it's not so ha
 .. include:: pyfda_conf.rst
 
 pyfda_log.conf
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 A copy of ``pyfda/pyfda_log.conf`` is created in ``<USER_HOME>/.pyfda/pyfda_log.conf``
 where it can be edited to control logging behaviour:
@@ -85,7 +85,7 @@ where it can be edited to control logging behaviour:
 .. include:: pyfda_conf_log.rst
 
 pyfda_rc.py
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 Layout and some parameters can be customized with the file
 ``pyfda/pyfda_rc.py`` (within the install directory right now, no user copy).

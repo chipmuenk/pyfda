@@ -554,7 +554,6 @@ def csv2array(f: TextIO):
 
     Parameters
     ----------
-
     f: handle to file or file-like object, e.g.
 
     >>> f = open(file_name, 'r') # or
@@ -562,11 +561,9 @@ def csv2array(f: TextIO):
 
     Returns
     -------
-
     data_arr: ndarray
         numpy array of str with table data from file or `None` when import was
         unsuccessful
-
 
     While opening a file, the `newline` parameter can be used to
     control how universal newlines works (it only applies to text mode).
