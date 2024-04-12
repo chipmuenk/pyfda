@@ -74,13 +74,11 @@ Three kinds of partioning can be selected in a combo box:
     - The **general fractional** format has an arbitrary number of fractional
         and integer bits, ``W = WI + WF + 1``.
 
-In any case, scaling is determined by the number of fractional bits,
-:math:`RWV = INT \cdot 2^{-WF}`.
+In any case, scaling is determined by the number of fractional bits:
 
 .. math::
 
-    c^2 = a^2 + b^2
-
+    RWV = INT \cdot 2^{-WF}
 
 In addition to setting the position of the binary point you can select the
 behaviour for:
@@ -93,10 +91,6 @@ behaviour for:
     - **Saturation:** When the floating point number is outside the range of
         the fixpoint format, either two's complement overflow occurs (``wrap``)
         or the value is clipped to the maximum resp. minimum ("saturation", ``sat``)
-
-
-
-
 
 More info on fixpoint arithmetics can be found under :ref:`man_fixpoint_arithmetics`.
 

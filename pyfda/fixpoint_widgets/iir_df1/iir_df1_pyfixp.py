@@ -188,6 +188,7 @@ class IIR_DF1_pyfixp(object):
 
         Parameters
         ----------
+
         x : array of float or float or None
             input value(s) scaled and quantized according to the setting of `p['QI']`
             - When x is a scalar, calculate impulse response with the
@@ -204,6 +205,7 @@ class IIR_DF1_pyfixp(object):
 
         Returns
         -------
+
         yq : ndarray
             The quantized input value(s) as an ndarray of np.float64
             and the same shape as `x` resp. `b` or `a`(impulse response).
