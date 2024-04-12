@@ -15,6 +15,7 @@ import pyfda.filterbroker as fb
 # from pyfda.libs.pyfda_lib import pprint_log
 import pyfda.libs.pyfda_fix_lib as fx
 from pyfda.libs.pyfda_fix_lib import quant_coeffs
+
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
 
 
@@ -23,6 +24,7 @@ from operator import add
 
 # from nmigen import *
 # from nmigen.back import verilog
+import amaranth as am
 from amaranth import Signal, signed, Elaboratable, Module
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
 # from nmigen.build.plat import Platform
@@ -125,7 +127,7 @@ class FIR_DF_amaranth(Elaboratable):
                 self.zi = zi[:self.L - 1]
 
     # ---------------------------------------------------------
-    def reset_py(self):
+    def reset(self):
         """
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
@@ -233,6 +235,73 @@ class FIR_DF_amaranth(Elaboratable):
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
+    # ---------------------------------------------------------
+    def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
+        """
+        Calculate FIR filter (direct form) response via difference equation with
+        quantization. Registers can be initialized with `zi`.
+
+        Parameters
+        ----------
+        x : array of float or float or None
+            input value(s) scaled and quantized according to the setting of `p['QI']`
+            and fb.fil[0]['qfrmt']
+            - When x is a scalar, calculate impulse response with the
+                amplitude defined by the scalar.
+            - When `x == None`, calculate impulse response with amplitude = 1.
+
+        zi : array-like
+             initial conditions for filter memory; when `zi == None`, register contents
+             from last run are used.
+
+        Returns
+        -------
+        yq : ndarray
+            The quantized input value(s) as an ndarray of np.float64
+            and the same shape as `x` resp. `b` (impulse response).
+        """
+        if zi is not None:
+            if len(zi) == self.L - 1:   # use zi as it is
+                self.zi = zi
+            elif len(zi) < self.L - 1:  # append zeros
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:                       # truncate zi
+                self.zi = zi[:self.L - 1]
+                logger.warning("len(zi) > len(b) - 1, zi was truncated")
+
+        # initialize quantized partial products and output arrays
+        y_q = xb_q = np.zeros(len(x))
+
+        # Calculate response by:
+        # - append new stimuli `x` to register state `self.zi`
+        # - slide a window with length `len(b)` over `self.zi`, starting at position `k`
+        #   and multiply it with the coefficients `b`, yielding the partial products x*b
+        #   TODO: Doing this for the last len(x) terms should be enough
+        # - quantize the partial products x*b, yielding xb_q
+        # - accumulate the quantized partial products and quantize result, yielding y_q[k]
+
+        self.zi = np.concatenate((self.zi, x))
+
+        # for k in range(len(x)):
+        #     # partial products xb_q at time k, quantized with Q_mul:
+        #     xb_q = self.Q_mul.fixp(self.zi[k:k + self.L] * self.b_q,
+        #                            in_frmt=fb.fil[0]['qfrmt'],
+        #                            out_frmt=fb.fil[0]['qfrmt'])
+        #     # accumulate x_bq to get accu[k]
+        #     y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb.fil[0]['qfrmt'],
+        #                              out_frmt=fb.fil[0]['qfrmt'])
+
+        # self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
+
+        # # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
+        # if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
+        #     logger.warning(f"Overflows: N_Acc = {self.Q_acc.q_dict['N_over']}, "
+        #                    f"N_Mul = {self.Q_mul.q_dict['N_over']}")
+
+        # self.Q_acc.q_dict['N_over'] = self.Q_acc.q_dict['N_over'] + self.Q_mul.q_dict['N_over']
+        # self.Q_mul.resetN()
+
+        # return self.Q_O.requant(y_q[:len(x)], self.Q_acc), self.zi
 
 
     # ---------------------------------------------------------
