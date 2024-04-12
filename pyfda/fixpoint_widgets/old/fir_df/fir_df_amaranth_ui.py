@@ -299,7 +299,7 @@ class FIR_DF_amaranth_UI(QWidget):
             logger.error("Coefficients contain complex values!")
             return
 
-        self.fx_filt = FIR_DF_nmigen(p)
+        self.fx_filt = FIR_DF_amaranth(p)
 
 # ------------------------------------------------------------------------------
     def to_hdl(self, **kwargs):
@@ -348,14 +348,14 @@ class FIR_DF_amaranth_UI(QWidget):
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     """ Run widget standalone with
-        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_nmigen_ui`
+        `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_ui`
     """
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = FIR_DF_nmigen_UI()
+    mainw = FIR_DF_amaranth_UI()
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
