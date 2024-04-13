@@ -196,19 +196,29 @@ if __name__ == '__main__':
     Run widget standalone with
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_pyfixp`
     """
+    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
 
-    p = {'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
+    fb.fil[0]['ba'] = [[1.1, 2.2, 3.3, 2, 1], []]
+    p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
-         'QACC': {'WI': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'WI': 5, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
-    dut = FIR_DF_pyfixp(p)
-    print("Filter fixpoint response and state variables for input =")
-    print("x = np.ones(7):")
-    x = np.ones(7)
-    y = dut.fxfilter(x=x)
-    print(y)
-    print("\nfollowed by x = np.zeros(5):")
-    y = dut.fxfilter(x=np.zeros(5))
-    print(y)
+    for frmt in ['qint', 'qfrac']:
+        print(f"\nFormat = '{frmt}'")
+        fb.fil[0]['qfrmt'] = frmt  # enable fixpoint mode
+        dut = FIR_DF_pyfixp(p)
+        print("Filter fixpoint response / state variables for input = np.ones(7):")
+        x = np.ones(7)
+        y = dut.fxfilter(x=x)
+        # if dut.Q_I.N_over != 0:
+        #    print(f"N_over(Q_I) = {dut.Q_I.N_over}")
+        if dut.Q_O.N_over != 0:
+            print(f"N_over(Q_O) = {dut.Q_O.N_over}")
+        if dut.Q_mul.N_over != 0:
+            print(f"N_over(Q_mul) = {dut.Q_mul.N_over}")
+        print(y)
+        print("... followed by x = np.zeros(5):")
+        y = dut.fxfilter(x=np.zeros(5))
+        print(y)
