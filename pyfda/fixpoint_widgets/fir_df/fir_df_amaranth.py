@@ -53,7 +53,7 @@ class FIR_DF_amaranth(Elaboratable):
         Dictionary with coefficients and quantizer settings with a.o.
         the following keys : values
 
-        - 'b', value: array of coefficients as floats, scaled as `WI:WF`
+        - 'QCB', value: array of coefficients as floats, scaled as `WI:WF`
 
         - 'QACC', value: dict with quantizer settings for the accumulator
 
@@ -324,7 +324,7 @@ class FIR_DF_amaranth(Elaboratable):
         src = self.i  # first register is connected to input signal
 
         i = 0
-        for b in self.p['b']:
+        for b in self.p['ba'][0]:
             sreg = Signal(signed(self.WI))  # create chain of registers
             m.d.sync += sreg.eq(src)        # with input word length
             src = sreg
@@ -354,7 +354,7 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
     """
 
-    p = {'b': [1, 2, 3, 2, 1],
+    p = {'ba': [[1, 2, 3, 2, 1], []],
          'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
          'QACC': {'WI': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
