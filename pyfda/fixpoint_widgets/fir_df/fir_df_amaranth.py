@@ -235,6 +235,7 @@ class FIR_DF_amaranth(Elaboratable):
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
+
     # ---------------------------------------------------------
     def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
         """

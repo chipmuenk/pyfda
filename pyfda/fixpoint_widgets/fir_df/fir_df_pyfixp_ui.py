@@ -250,6 +250,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
+    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+
     mainw = FIR_DF_pyfixp_UI()
     app.setActiveWindow(mainw)
     mainw.show()
