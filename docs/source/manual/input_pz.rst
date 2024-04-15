@@ -49,11 +49,11 @@ suitable.
 During editing, use the '>' character to separate radius and phase. The phase can
 be displayed and entered in the following formats:
 
-* **Degrees** with a range of :math:`\pm -180° \ldots +180°`, terminate the phase
+- **Degrees** with a range of :math:`\pm -180° \ldots +180°`, terminate the phase
   with an 'o' or '°' to indicate degrees.
-* **Rad** with a range of :math:`\pm -\pi \ldots +\pi`, simply enter the value or terminate
+- **Rad** with a range of :math:`\pm -\pi \ldots +\pi`, simply enter the value or terminate
   the phase with an 'r' or with 'rad' to indicate rads.
-* Multiples of **pi** with a range of :math:`\pm -1 \ldots +1`, terminate the phase with
+- Multiples of **pi** with a range of :math:`\pm -1 \ldots +1`, terminate the phase with
   a 'p' or 'pi' to specifiy multiples of pi.
 
 When entering poles or zeros, the format is chosen automatically, depending on which 
