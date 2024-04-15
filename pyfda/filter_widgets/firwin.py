@@ -466,7 +466,6 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         if not self._test_N():
             return -1
-        logger.warning(self.win_dict["cur_win_name"])
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
                                window=self.qfft_win_select.get_window(self.N, sym=True)))
