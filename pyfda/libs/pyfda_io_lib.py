@@ -1755,11 +1755,22 @@ def save_filter(self):
     if file_name is None:
         return -1  # operation cancelled or other error
     err = False
+    # create a copy of the filter to be saved that only contains keys of the
+    # reference filter dict and warn of unsupported keys:
+    keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
+    if keys_unsupported != []:
+        fil_0 = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
+        logger.warning(
+            "The following keys are ignored because they are not part of the\n"
+            f"\tfilter reference dict:\n\t{keys_unsupported}")
+    else:
+        fil_0 = fb.fil[0]
+
     if file_type in {"npz", "pkl"}:
         try:
             with io.open(file_name, 'wb') as f:  # open in binary mode
                 if file_type == 'npz':
-                    np.savez(f, **fb.fil[0])
+                    np.savez(f, **fil_0)
                 else:  # file_type == 'pkl':
                     pickle.dump(fb.fil[0], f)  # save in default pickle version
 
@@ -1771,7 +1782,7 @@ def save_filter(self):
         try:
             with io.open(file_name, 'w') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_0_json = json.dumps(fb.fil[0], cls=NumpyEncoder, indent=2,
+                fb_fil_0_json = json.dumps(fil_0, cls=NumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
                 # next, dump the string to a file
                 f.write(fb_fil_0_json)
