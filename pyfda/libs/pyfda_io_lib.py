@@ -169,7 +169,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     file_filters : str
         String with file filters for QFileDialog object with the form
-        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
+        `"Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)"`. By default,
         this string is empty, but it can be used to add file filters not contained
         in the global `file_filters_dict`.
 
@@ -464,7 +464,7 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
     Copy tabular data from clipboard or file to a numpy array
 
     Parameters
-    -----------
+    ----------
 
     parent: object
             parent instance with a QFileDialog attribute.
@@ -479,7 +479,8 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
         When True, return ndarray in raw str format, otherwise convert to float or complex
 
     Returns
-    --------
+    -------
+    
     ndarray of str or None
         table data
 
@@ -555,6 +556,7 @@ def csv2array(f: TextIO):
 
     Parameters
     ----------
+    
     f: handle to file or file-like object, e.g.
 
     >>> f = open(file_name, 'r') # or
@@ -562,6 +564,7 @@ def csv2array(f: TextIO):
 
     Returns
     -------
+    
     data_arr: ndarray
         numpy array of str with table data from file or `None` when import was
         unsuccessful
@@ -582,7 +585,7 @@ def csv2array(f: TextIO):
       no translation takes place. If newline is any of the other legal values,
       any '\n' characters written are translated to the given string.
 
-      Example: convert from Windows-style line endings to Linux:
+    Example: convert from Windows-style line endings to Linux:
 
     .. code-block:: python
 
