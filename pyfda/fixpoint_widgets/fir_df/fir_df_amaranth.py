@@ -312,10 +312,11 @@ class FIR_DF_amaranth(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        muls = [0] * len(self.p['b'])
+        # muls = [0] * self.L
+        muls = [0] * len(self.p['ba'][0])
         WACC = p['QACC']['WI'] + p['QACC']['WF'] + 1  # total accu word length
 
-        DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
+        DW = int(np.ceil(np.log2(len(self.p['ba'][0]))))  # word growth
         # word format for sum of partial products b_i * x_i
         QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
               'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
