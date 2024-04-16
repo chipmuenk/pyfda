@@ -9,6 +9,7 @@ numpy
 scipy >= 1.2.0
 matplotlib >= 3.1
 pyqt5
+pyqtdarktheme
 docutils
 nose
 mplcursors

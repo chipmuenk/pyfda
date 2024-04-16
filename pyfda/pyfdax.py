@@ -13,26 +13,43 @@ import sys
 
 import logging
 import logging.config
+
 logger = logging.getLogger(__name__)
 
-import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+import pyfda.libs.pyfda_dirs as dirs  # initial import constructs file paths
 import pyfda.pyfda_rc as rc
 
 import matplotlib
+
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid
 # "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
 matplotlib.use("Qt5Agg")
 # turn off matplotlib debug messages by elevating the level to "Warning"
-mpl_logger = logging.getLogger('matplotlib')
+mpl_logger = logging.getLogger("matplotlib")
 mpl_logger.setLevel(logging.WARNING)
 
-from pyfda.libs.compat import (Qt, QtCore, QtGui, QMainWindow, QApplication, QSplitter, QIcon,
-                     QMessageBox, QPlainTextEdit, QMenu, pyqtSignal, QtWidgets, QFont, QFontMetrics)
+from pyfda.libs.compat import (
+    Qt,
+    QtCore,
+    QtGui,
+    QMainWindow,
+    QApplication,
+    QSplitter,
+    QIcon,
+    QMessageBox,
+    QPlainTextEdit,
+    QMenu,
+    pyqtSignal,
+    QtWidgets,
+    QFont,
+    QFontMetrics,
+)
 
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
 import numpy as np
 from pyfda.pyfda_class import pyFDA
+
 
 def main():
     """
@@ -83,36 +100,26 @@ def main():
     # os.environ["QT_SCALE_FACTOR"]             = "1"
     """
     # Enable High DPI display with PyQt5
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    if hasattr(QtCore.Qt, "AA_EnableHighDpiScaling"):
         Qt.AA_EnableHighDpiScaling = True
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
-    if len(rc.qss_rc) > 20:
-        app = QApplication(sys.argv)
-        app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
-        style = "'pyfda' style sheet"
-    else:
-        qstyle = QApplication.setStyle(rc.qss_rc) # this is just a name for a system stylesheet
-        app = QApplication(sys.argv)
-        if qstyle:
-            style = f"system style sheet '{rc.qss_rc}'"
-        else:
-            style = f"default style sheet ('{rc.qss_rc}' not found)"
+    app = QApplication(sys.argv)
 
     if dirs.OS.lower() == "darwin":  # Mac OS
         ref_dpi = 72
     else:
         ref_dpi = 96
 
-    if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    if hasattr(Qt, "AA_UseHighDpiPixmaps"):
         app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     else:
         logger.warning("Qt attribute 'AA_UseHighDpiPixmaps' not available.")
 
     ldpi = app.primaryScreen().logicalDotsPerInch()
-#    ldpix = app.primaryScreen().logicalDotsPerInchX()
-#    ldpiy = app.primaryScreen().logicalDotsPerInchY()
+    #    ldpix = app.primaryScreen().logicalDotsPerInchX()
+    #    ldpiy = app.primaryScreen().logicalDotsPerInchY()
     pdpi = app.primaryScreen().physicalDotsPerInch()
     pdpix = app.primaryScreen().physicalDotsPerInchX()
     pdpiy = app.primaryScreen().physicalDotsPerInchY()
@@ -132,16 +139,24 @@ def main():
     fontsize = round(9.5 * np.sqrt(pdpiy / ref_dpi) * scaling)
     # fontsize = round(font.pointSizeF() * 1.5 * ldpi / 96)
 
-    rc.mpl_rc['font.size'] = fontsize
-    rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
-                           'height': height, 'width': width}
+    rc.mpl_rc["font.size"] = fontsize
+    rc.params["screen"] = {
+        "ref_dpi": ref_dpi,
+        "scaling": scaling,
+        "height": height,
+        "width": width,
+    }
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
-    logger.info(f"Starting pyfda with screen resolution {width} x {height}, "
-                f"avail: {avail_geometry.width()}x{avail_geometry.height()}")
-    logger.info(f"with {style} and matplotlib fontsize {fontsize}.")
-    logger.info(f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), pix.ratio = {pixel_ratio}")
+    logger.info(
+        f"Starting pyfda with screen resolution {width} x {height}, "
+        f"avail: {avail_geometry.width()}x{avail_geometry.height()}"
+    )
+    logger.info(f"with matplotlib fontsize {fontsize}.")
+    logger.info(
+        f"lDPI = {ldpi:.2f}, pDPI = {pdpi:.2f} ({pdpix:.2f} x {pdpiy:.2f}), pix.ratio = {pixel_ratio}"
+    )
 
     # Available signals:
     # - logicalDotsPerInchChanged(qreal dpi)
@@ -157,28 +172,30 @@ def main():
         # for Pythonw.exe, sometimes the icon is just blank. The following
         # instructions tell Windows that pythonw is merely hosting other applications.
         import ctypes
-        myappid = u'chipmuenk.pyfda.v0.8'
+
+        myappid = "chipmuenk.pyfda.v0.8"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # set taskbar icon
-    app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
+    app.setWindowIcon(QIcon(":/pyfda_icon.svg"))
 
     # Sets the active window to the active widget in response to a system event
     app.setActiveWindow(mainw)
     # Set default icon for window
-    mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
+    mainw.setWindowIcon(QIcon(":/pyfda_icon.svg"))
     # set main window on desktop to full size
     # mainw.setGeometry(0, 0, width, height) # top L / top R, dx, dy
     mainw.setGeometry(app.desktop().availableGeometry())
     # Give the keyboard input focus to this widget if this widget
     # or one of its parents is the active window:
-#    mainw.setFocus()
+    #    mainw.setFocus()
     mainw.show()
 
-    #start the application's exec loop, return the exit code to the OS
-    app.exec_() # sys.exit(app.exec_()) and app.exec_() have same behaviour
+    # start the application's exec loop, return the exit code to the OS
+    app.exec_()  # sys.exit(app.exec_()) and app.exec_() have same behaviour
 
-#------------------------------------------------------------------------------
 
-if __name__ == '__main__':
+# ------------------------------------------------------------------------------
+
+if __name__ == "__main__":
     main()
