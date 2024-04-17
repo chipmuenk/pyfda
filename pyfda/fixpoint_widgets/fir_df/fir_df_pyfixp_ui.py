@@ -212,7 +212,8 @@ class FIR_DF_pyfixp_UI(QWidget):
     # --------------------------------------------------------------------------
     def update_ovfl_cnt_all(self):
         """
-        Update all overflow counters of the UI after simulation has finished.
+        Update all overflow counters of the UI after simulation has finished
+        (except for coefficient quantizers).
 
         This is usually called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
