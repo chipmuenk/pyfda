@@ -206,17 +206,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        fxq_dict = fb.fil[0]['fxq']
-
-        # if 'QACC' not in fxq_dict:
-        #     fxq_dict.update({'QACC': {}})  # no accumulator settings in dict yet
-        #     logger.warning("'QACC' key missing")
-
-        # if 'QCB' not in fxq_dict:
-        #     fxq_dict.update({'QCB': {}})  # no coefficient settings in dict yet
-        #     logger.warning("'QCB' key missing in filter dict")
-
-        self.wdg_wq_coeffs.dict2ui(fxq_dict['QCB'])  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui(fb.fil[0]['fxq'])  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator q settings and UI
 
     # --------------------------------------------------------------------------
