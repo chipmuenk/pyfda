@@ -595,7 +595,7 @@ class Fixed(object):
         Saturation / two's complement wrapping happens outside the range +/- MSB,
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
-        * Fractional number format WI.WF ('qfrmt':'qfrac'): *
+        **Fractional number format WI.WF** (`fb.fil[0]['qfrmt'] = 'qfrac'`):
         `LSB =  2 ** -WF`
 
         - Multiply float input by `1 / self.LSB = 2**WF`, obtaining integer scale
@@ -604,7 +604,7 @@ class Fixed(object):
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
-        * Integer number format W = 1 + WI + WF ('qfrmt':'qint'): *
+        **Integer number format W = 1 + WI + WF** (`fb.fil[0]['qfrmt'] = 'qint'):
         `LSB = 1`
 
         - Multiply float input by `2 ** WF` to obtain integer scale
