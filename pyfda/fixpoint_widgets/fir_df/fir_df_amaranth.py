@@ -231,6 +231,11 @@ class FIR_DF_amaranth(Elaboratable):
         """
         self.p = p  # fb.fil[0]['fxq']  # parameter dictionary with coefficients etc.
         # ------------- Define I/Os --------------------------------------
+
+        # Quantize coefficients and store them locally
+        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+
+        self.L = len(self.b_q)  # filter length = number of taps
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
@@ -312,8 +317,7 @@ class FIR_DF_amaranth(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        # muls = [0] * self.L
-        muls = [0] * len(self.p['ba'][0])
+        muls = [0] * self.L
         WACC = p['QACC']['WI'] + p['QACC']['WF'] + 1  # total accu word length
 
         DW = int(np.ceil(np.log2(len(self.p['ba'][0]))))  # word growth
@@ -326,12 +330,12 @@ class FIR_DF_amaranth(Elaboratable):
         src = self.i  # first register is connected to input signal
 
         i = 0
-        for b in self.p['ba'][0]:
+        for b_q in self.b_q:
             sreg = Signal(signed(self.WI))  # create chain of registers
             m.d.sync += sreg.eq(src)        # with input word length
             src = sreg
             # TODO: keep old data sreg to allow frame based processing (requiring reset)
-            muls[i] = int(b)*sreg
+            muls[i] = int(b_q)*sreg
             i += 1
 
         # logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
