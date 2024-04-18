@@ -68,7 +68,6 @@ class FIR_DF_amaranth(Elaboratable):
         self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(p['QO'])  # output
-
         self.init(p)
 
     # ---------------------------------------------------------
@@ -383,20 +382,21 @@ if __name__ == '__main__':
     Run widget standalone with
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
     """
-
-    p = {'ba': [[1, 2, 3, 2, 1], []],
-         'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
+    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+    fb.fil[0]['qfrmt'] = 'qint'
+    fb.fil[0]['ba'] = [[1, 2, 3, 2, 1], []]
+    p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
-         'QACC': {'WI': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'WI': 5, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
     dut = FIR_DF_amaranth(p)
 
     def process():
         # input = stimulus
         output = []
-        for i in np.ones(20):
+        for i in stimulus:
             yield dut.i.eq(int(i))
             yield Tick()
             output.append((yield dut.o))
@@ -404,8 +404,14 @@ if __name__ == '__main__':
 
     sim = Simulator(dut)
     # with Simulator(m) as sim:
-
     sim.add_clock(1/48000)
+
+
+    stimulus = np.ones(20)
+    sim.add_process(process)
+    sim.run()
+    # This remembers sreg from last run!
+    stimulus = np.zeros(20)
     sim.add_process(process)
     sim.run()
 
