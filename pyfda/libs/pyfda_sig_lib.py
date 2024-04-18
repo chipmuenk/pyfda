@@ -188,10 +188,11 @@ def angle_zero(X, n_eps=1e3, mode='auto', wrapped='auto'):
 
 
 # ------------------------------------------------------------------------------
-def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
+def div_safe(num, den, n_eps: float = 1., i_scale: float = 1., verbose: bool = False):
 
     """
     Perform elementwise array division after treating singularities, meaning:
+
     - check whether denominator (`den`) coefficients approach zero
     - check whether numerator (`num`) or denominator coefficients are non-finite, i.e.
       one of `nan`, `ìnf` or `ninf`.
@@ -203,6 +204,7 @@ def div_safe(num, den, n_eps=1, i_scale=1, verbose=False):
     ----------
     num : array_like
         numerator coefficients
+
     den : array_like
         denominator coefficients
 
