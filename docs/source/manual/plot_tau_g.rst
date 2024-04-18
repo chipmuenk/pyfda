@@ -18,9 +18,6 @@ There are no user servicable parts on this tab.
 The algorithm for calculating the group delay is explained in detail in 
  :func:`pyfda.libs.pyfda_sig_lib.group_delay`.
  
- 
-.. automodule:: pyfda.libs.pyfda_sig_lib
-
 Show :func:`group_delay`
 
    
