@@ -128,7 +128,7 @@ def qwindow_stay_on_top(win: QDialog, top: bool) -> None:
 
 
 # ------------------------------------------------------------------------------
-def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> None:
+def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> int:
     """
     Clear and populate combo box `cmb_box` with text, data and tooltip from the list
     `items_list` with initial selection of `init_item` (data).
@@ -154,7 +154,8 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> N
     Returns
     -------
 
-    Index of `item_init`. If index == -1, `item_init` was not in `items_list`
+    ret: int
+        Index of `item_init` in combobox. If index == -1, `item_init` was not in `items_list`
     """
     cmb_box.clear()
     if type(items_list[0]) is str:  # combo box tool tipp (optional)
