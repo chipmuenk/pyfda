@@ -2,6 +2,9 @@
 ## [v0.9.0b2](https://github.com/chipmuenk/pyfda/tree/v0.9.0b2) (2024-04-xx)
 ### Bugfixes
 - Fixed warnings about unknown entries 'value' and 'matplotlib'
+- Fixed a lot of errors in docstrings and documentation generating errors and warnings
+  during the Sphinx ReadTheDocs document generation
+- When saving filters, only the keys from the reference filter dict are stored
 
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
 ### Changed settings and behaviour
