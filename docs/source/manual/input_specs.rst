@@ -1,6 +1,9 @@
 Input Specs
 ===========
 
+Introduction
+-------------
+
 :numref:`fig_specs_input_window` shows a typical view of the **Specs** tab.
 
 "Load" and "Save" ... well, loads and saves complete filter designs. Coefficients and 
@@ -29,16 +32,19 @@ specifications in the frequency domain:
 Not all combinations of design algorithms and response types are available - you
 won't be offered unavailable combinations and some fields may be greyed out.
 
+A nice description of the design of FIR filters (also with pyfda) can be found at 
+[Designing Generic FIR Filters with pyFDA and NumPy]
+(https://tomverbeure.github.io/2020/10/11/Designing-Generic-FIR-Filters-with-pyFDA-and-Numpy.html)
 
 Order
--------
+------
 The **order** of the filter, i.e. the number of poles / zeros / delays is
 either specified manually or the minimum order can be estimated for many filter
 algorithms to fulfill a set of given specifications.
 
 
 Frequency Unit
--------------- 
+---------------
 In DSP, specifications and frequencies are expressed in different ways:
 
 .. math::
@@ -59,7 +65,7 @@ normalized frequency :math:`{{F}}` w.r.t. to  the :ref:`sampling_frequency`
    Displaying normalized frequencies
 
 Amplitude Unit
--------------- 
+--------------
 Amplitude specification can be entered as V, dB or W; they are converted 
 automatically. Conversion depends on the filter type (IIR vs. FIR) and whether
 pass or stop band are specified. For details see the conversion functions
@@ -117,6 +123,13 @@ represented and reconstructed without errors is given by :math:`B < f_S/2 = f_{N
 is also called the *Nyquist frequency* or *bandwidth* :math:`f_{Ny}`. 
 Some filter design tools and algorithms normalize frequencies w.r.t. to  :math:`f_{Ny}`
 instead of :math:`f_S`.
+
+Half-Band Filters
+-----------------
+
+Explanation of half-band filters and how to design them with pyfda can be found at 
+[Half-Band Filters, a Workhorse of Decimation Filters]
+(https://tomverbeure.github.io/2020/12/15/Half-Band-Filters-A-Workhorse-of-Decimation-Filters.html#designing-a-half-band-fir-filter-with-pyfda)
 
    
 Development

@@ -169,7 +169,7 @@ def create_file_filters(file_types: tuple, file_filters: str = ""):
 
     file_filters : str
         String with file filters for QFileDialog object with the form
-        "Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)". By default,
+        `"Comma / Tab Separated Values (*.csv);; Audio (*.wav *.mp3)"`. By default,
         this string is empty, but it can be used to add file filters not contained
         in the global `file_filters_dict`.
 
@@ -464,7 +464,7 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
     Copy tabular data from clipboard or file to a numpy array
 
     Parameters
-    -----------
+    ----------
 
     parent: object
             parent instance with a QFileDialog attribute.
@@ -479,7 +479,8 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
         When True, return ndarray in raw str format, otherwise convert to float or complex
 
     Returns
-    --------
+    -------
+    
     ndarray of str or None
         table data
 
@@ -555,6 +556,7 @@ def csv2array(f: TextIO):
 
     Parameters
     ----------
+    
     f: handle to file or file-like object, e.g.
 
     >>> f = open(file_name, 'r') # or
@@ -562,6 +564,7 @@ def csv2array(f: TextIO):
 
     Returns
     -------
+    
     data_arr: ndarray
         numpy array of str with table data from file or `None` when import was
         unsuccessful
@@ -582,7 +585,7 @@ def csv2array(f: TextIO):
       no translation takes place. If newline is any of the other legal values,
       any '\n' characters written are translated to the given string.
 
-      Example: convert from Windows-style line endings to Linux:
+    Example: convert from Windows-style line endings to Linux:
 
     .. code-block:: python
 
@@ -1755,11 +1758,22 @@ def save_filter(self):
     if file_name is None:
         return -1  # operation cancelled or other error
     err = False
+    # create a copy of the filter to be saved that only contains keys of the
+    # reference filter dict and warn of unsupported keys:
+    keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
+    if keys_unsupported != []:
+        fil_0 = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
+        logger.warning(
+            "The following keys are ignored because they are not part of the\n"
+            f"\tfilter reference dict:\n\t{keys_unsupported}")
+    else:
+        fil_0 = fb.fil[0]
+
     if file_type in {"npz", "pkl"}:
         try:
             with io.open(file_name, 'wb') as f:  # open in binary mode
                 if file_type == 'npz':
-                    np.savez(f, **fb.fil[0])
+                    np.savez(f, **fil_0)
                 else:  # file_type == 'pkl':
                     pickle.dump(fb.fil[0], f)  # save in default pickle version
 
@@ -1771,7 +1785,7 @@ def save_filter(self):
         try:
             with io.open(file_name, 'w') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_0_json = json.dumps(fb.fil[0], cls=NumpyEncoder, indent=2,
+                fb_fil_0_json = json.dumps(fil_0, cls=NumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
                 # next, dump the string to a file
                 f.write(fb_fil_0_json)
