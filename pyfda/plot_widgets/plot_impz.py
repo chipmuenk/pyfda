@@ -466,7 +466,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True
 
     # ------------------------------------------------------------------------------
-    def set_N_to_file_len(self):
+    def set_N_to_file_len(self) -> None:
         """
         Check status of file_io widget:
         - if no file is loaded, do nothing. This shouldn't happen (check to be sure ...)
@@ -480,9 +480,10 @@ class Plot_Impz(QWidget):
             self.ui.update_N(N_end = self.file_io_wdg.N)
 
     # ------------------------------------------------------------------------------
-    def file_io(self):
+    def file_io(self) -> None:
         """
         Check status of file_io widget:
+
         - if no file is loaded, do nothing and return 0, disable `cmb_file_io` and
           the option to transfer the number of samples to N
         - else map the file data to `self.stim_wdg.x_file` to make it accessible
@@ -508,7 +509,7 @@ class Plot_Impz(QWidget):
     # =========================================================================
     # Simulation: Calculate stimulus, response and draw them
     # =========================================================================
-    def calc_auto(self, autorun=None):
+    def calc_auto(self, autorun: bool = None) -> None:
         """
         Triggered when checkbox "Autorun" is clicked or specs have been edited,
         requiring a recalculation.
@@ -523,21 +524,23 @@ class Plot_Impz(QWidget):
     def impz_init(self, arg=None):
         """
         Triggered by:
-            - _construct_UI()  [Initialization]
+
+            - `_construct_UI()`  [Initialization]
             - Pressing "Run" button, passing button state as a boolean
             - Changing between fixpoint and float mode (`self.ui.cmb_sim_select)
             - Activating "Autorun" via `self.calc_auto()`
             - Autorun (when something relevant in the UI has been updated)
-            - 'fx_sim' : 'specs_changed'
+            - `{'fx_sim' : 'specs_changed'}`
 
         The following tasks are performed:
+
             - Enable energy scaling for impulse stimuli when requirements are met
             - check for and enable fixpoint settings
             - resize stimulus widget
             - when triggered by `but_run` or when `Auto`== pressed and
               `self.needs_calc == True`, continue with calculating stimulus / response
             - When in fixpoint mode, initialize quantized stimulus `x_q` and input
-              quantizer and emit {'fx_sim':'init'}
+              quantizer and emit `{'fx_sim':'init'}`
         """
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
@@ -651,6 +654,7 @@ class Plot_Impz(QWidget):
         Calculate floating point / fixpoint response and redraw it
 
         Triggered by:
+
         - `self.impz_init()` (floating point)
         -  Fixpoint widget, requesting "start_fx_response_calculation"
             via `process_rx_signal()` (fixpoint filter)
