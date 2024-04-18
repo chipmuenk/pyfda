@@ -229,13 +229,36 @@ class FIR_DF_amaranth(Elaboratable):
         -------
         None.
         """
-        self.p = p  # fb.fil[0]['fxq']  # parameter dictionary with coefficients etc.
-        # ------------- Define I/Os --------------------------------------
+        # Do not initialize filter unless fixpoint mode is active
+        if not fb.fil[0]['fx_sim']:
+            return
+
+        self.p = p  # parameter dictionary with coefficients etc.
+
+        # update the quantizers from the dictionary
+        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs
+        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
+        self.Q_O.set_qdict(self.p['QO'])  # output
 
         # Quantize coefficients and store them locally
         self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
 
         self.L = len(self.b_q)  # filter length = number of taps
+        DW = int(np.ceil(np.log2(self.L)))  # word growth
+
+        # Partial products: use accumulator settings and update word length
+        # to sum of coefficient and input word lengths
+        self.Q_mul.set_qdict(p['QACC'].copy())  # partial products
+        self.Q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
+              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
+        self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
+
+        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
+
+        self.reset() # reset overflow counters (except coeffs) and registers
+
+        # Initialize filter memory with passed values zi and fill up with zeros
+        # ------------- Define I/Os for amaranth module ---------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
@@ -318,14 +341,6 @@ class FIR_DF_amaranth(Elaboratable):
         m = Module()  # instantiate a module
         ###
         muls = [0] * self.L
-        WACC = p['QACC']['WI'] + p['QACC']['WF'] + 1  # total accu word length
-
-        DW = int(np.ceil(np.log2(len(self.p['ba'][0]))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
-        WP = QP['WI'] + QP['WF'] + 1
-        # QP.update({'W': QP['WI'] + QP['WF'] + 1})
 
         src = self.i  # first register is connected to input signal
 
@@ -340,14 +355,14 @@ class FIR_DF_amaranth(Elaboratable):
 
         # logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
-        sum_full = Signal(signed(WP))  # sum of all multiplication products with
+        sum_full = Signal(signed(self.W_mul))  # sum of all multiplication products with
         m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
 
-        # rescale from full product wordlength to accumulator format
-        sum_accu = Signal(signed(WACC))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QACC']))
+        # requantize from full partial product wordlength to accumulator format
+        sum_accu = Signal(signed(self.W_acc))
+        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC']))
 
-        # rescale from accumulator format to output width
+        # requantize from accumulator format to output width
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO']))
 
         return m   # return result as list of integers
