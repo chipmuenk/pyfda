@@ -143,9 +143,11 @@ def qcmb_box_populate(cmb_box: QComboBox, items_list: list, item_init: str) -> i
 
     items_list: list
         List of combobox entries, in the format
-        [ "Tooltip for Combobox", # [optional]
-         ("data 1st item", "text 1st item", "tooltip for 1st item" # [optional]),
-         ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
+        ["Tooltip for Combobox",
+        ("data 1st item", "text 1st item", "tooltip for 1st item"),
+        ("data 2nd item", "text 2nd item", "tooltip for 2nd item")]
+
+        Tooltipps are optional.
 
     item_init: str
         data for initial setting of combobox. When data is not found,

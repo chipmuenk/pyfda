@@ -480,7 +480,7 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
 
     Returns
     -------
-    
+
     ndarray of str or None
         table data
 
@@ -540,7 +540,23 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
 def csv2array(f: TextIO):
     """
     Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict:
+    to numpy array, taking into accout the settings of the CSV dict.
+
+    Parameters
+    ----------
+
+    f: file handle
+        handle to file or file-like object, e.g.
+
+    >>> f = open(file_name, 'r') # or
+    >>> f = io.StringIO(text)
+
+    Returns
+    -------
+
+    data_arr: ndarray
+        numpy array of str with table data from file or `None` when import was
+        unsuccessful
 
     Read data as it is, splitting each row into the column items when:
 
@@ -554,44 +570,28 @@ def csv2array(f: TextIO):
 
     `np.shape(data)` returns rows, columns
 
-    Parameters
-    ----------
-    
-    f: file handle
-        handle to file or file-like object, e.g.
-
-    >>> f = open(file_name, 'r') # or
-    >>> f = io.StringIO(text)
-
-    Returns
-    -------
-    
-    data_arr: ndarray
-        numpy array of str with table data from file or `None` when import was
-        unsuccessful
-
     While opening a file, the `newline` parameter can be used to
     control how universal newlines works (it only applies to text mode).
-    It can be None, '', '`\n`', '`\r`', and '`\r\n`'. It works as follows:
+    It can be None, '', '\\n', '\\r', and '\\r\n'. It works as follows:
 
     - Input: If `newline == None`, universal newlines mode is enabled. Lines in
-      the input can end in `\n`, `\r`, or `\r\n`, and these are translated into
-      `\n` before being returned to the caller. If it is '', universal newline
+      the input can end in '\\n', '\\r', or '\\r\\n', and these are translated into
+      '\\n' before being returned to the caller. If it is '', universal newline
       mode is enabled, but line endings are returned to the caller untranslated.
       If it has any of the other legal values, input lines are only terminated
       by the given string, and the line ending is returned to the caller untranslated.
 
-    - On output, if newline is None, any `\n` characters written are translated
+    - On output, if newline is None, any '\\n' characters written are translated
       to the system default line separator, os.linesep. If newline is '',
       no translation takes place. If newline is any of the other legal values,
-      any `\n` characters written are translated to the given string.
+      any '\\n' characters written are translated to the given string.
 
     Example: convert from Windows-style line endings to Linux:
 
     .. code-block:: python
 
         fileContents = open(filename,"r").read()
-        f = open(filename,"w", newline="\n")
+        f = open(filename,"w", newline="\\n")
         f.write(fileContents)
         f.close()
 

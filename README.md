@@ -152,7 +152,7 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 - Phase response (wrapped / unwrapped) and group delay
 - Pole / Zero plot
 - Transient response (impulse, step and various stimulus signals) in the time and frequency domain. Define your own stimuli like `abs(sin(2*pi*n*f1))` using [numexpr](https://github.com/pydata/numexpr) syntax and the UI.
-- 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
+- 3D-Plots (H\|(f)\|, mesh, surface, contour) with optional pole / zero display
 
 ### Modular Architecture
 
