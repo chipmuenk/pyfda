@@ -14,11 +14,6 @@ Main Routines
 
 .. automodule:: pyfda.libs.tree_builder
    :members: 
-
-:mod:`pyfda.libs.pyfda_lib`
----------------------------
-.. automodule:: pyfda.libs.pyfda_lib
-    :members:
     
 
 :mod:`pyfda.filter_factory`
@@ -32,8 +27,3 @@ Main Routines
 .. automodule:: pyfda.filterbroker
    :members: 
 
-:mod:`pyfda.libs.pyfda_io_lib`
-------------------------------
-
-.. automodule:: pyfda.libs.pyfda_io_lib
-    :members:

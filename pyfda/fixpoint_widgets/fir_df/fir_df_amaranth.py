@@ -53,7 +53,7 @@ class FIR_DF_amaranth(Elaboratable):
         Dictionary with coefficients and quantizer settings with a.o.
         the following keys : values
 
-        - 'b', value: array of coefficients as floats, scaled as `WI:WF`
+        - 'QCB', value: array of coefficients as floats, scaled as `WI:WF`
 
         - 'QACC', value: dict with quantizer settings for the accumulator
 
@@ -68,7 +68,6 @@ class FIR_DF_amaranth(Elaboratable):
         self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(p['QO'])  # output
-
         self.init(p)
 
     # ---------------------------------------------------------
@@ -229,12 +228,50 @@ class FIR_DF_amaranth(Elaboratable):
         -------
         None.
         """
-        self.p = p  # fb.fil[0]['fxq']  # parameter dictionary with coefficients etc.
-        # ------------- Define I/Os --------------------------------------
+        # Do not initialize filter unless fixpoint mode is active
+        if not fb.fil[0]['fx_sim']:
+            return
+
+        self.p = p  # parameter dictionary with coefficients etc.
+
+        # update the quantizers from the dictionary
+        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs
+        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
+        self.Q_O.set_qdict(self.p['QO'])  # output
+
+        # Quantize coefficients and store them locally
+        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
+
+        self.L = len(self.b_q)  # filter length = number of taps
+        DW = int(np.ceil(np.log2(self.L)))  # word growth
+
+        # Partial products: use accumulator settings and update word length
+        # to sum of coefficient and input word lengths
+        self.Q_mul.set_qdict(p['QACC'].copy())  # partial products
+        self.Q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
+              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
+        self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
+
+        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
+
+        self.reset() # reset overflow counters (except coeffs) and registers
+
+        # Initialize filter memory with passed values zi and fill up with zeros
+        # or truncate to filter length L
+        if zi is not None:
+            if len(zi) == self.L - 1:
+                self.zi = zi
+            elif len(zi) < self.L - 1:
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:
+                self.zi = zi[:self.L - 1]
+
+        # ------------- Define I/Os for amaranth module ---------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
+
     # ---------------------------------------------------------
     def fxfilter(self, x: iterable = None, zi: iterable = None) -> np.ndarray:
         """
@@ -291,7 +328,7 @@ class FIR_DF_amaranth(Elaboratable):
         #     y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb.fil[0]['qfrmt'],
         #                              out_frmt=fb.fil[0]['qfrmt'])
 
-        # self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
+        self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         # if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
@@ -311,37 +348,29 @@ class FIR_DF_amaranth(Elaboratable):
         """
         m = Module()  # instantiate a module
         ###
-        muls = [0] * len(self.p['b'])
-        WACC = p['QACC']['WI'] + p['QACC']['WF'] + 1  # total accu word length
-
-        DW = int(np.ceil(np.log2(len(self.p['b']))))  # word growth
-        # word format for sum of partial products b_i * x_i
-        QP = {'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']}
-        WP = QP['WI'] + QP['WF'] + 1
-        # QP.update({'W': QP['WI'] + QP['WF'] + 1})
+        muls = [0] * self.L
 
         src = self.i  # first register is connected to input signal
 
         i = 0
-        for b in self.p['b']:
+        for b_q in self.b_q:
             sreg = Signal(signed(self.WI))  # create chain of registers
             m.d.sync += sreg.eq(src)        # with input word length
             src = sreg
             # TODO: keep old data sreg to allow frame based processing (requiring reset)
-            muls[i] = int(b)*sreg
+            muls[i] = int(b_q)*sreg
             i += 1
 
         # logger.debug(f"b = {pprint_log(self.p['b'])}\nW(b) = {self.p['QCB']['W']}")
 
-        sum_full = Signal(signed(WP))  # sum of all multiplication products with
+        sum_full = Signal(signed(self.W_mul))  # sum of all multiplication products with
         m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
 
-        # rescale from full product wordlength to accumulator format
-        sum_accu = Signal(signed(WACC))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, QP, self.p['QACC']))
+        # requantize from full partial product wordlength to accumulator format
+        sum_accu = Signal(signed(self.W_acc))
+        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC']))
 
-        # rescale from accumulator format to output width
+        # requantize from accumulator format to output width
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO']))
 
         return m   # return result as list of integers
@@ -353,20 +382,21 @@ if __name__ == '__main__':
     Run widget standalone with
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth`
     """
-
-    p = {'b': [1, 2, 3, 2, 1],
-         'QCB': {'WI': 0, 'WF': 5, 'w_a_m': 'a',
+    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+    fb.fil[0]['qfrmt'] = 'qint'
+    fb.fil[0]['ba'] = [[1, 2, 3, 2, 1], []]
+    p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
-         'QACC': {'WI': 4, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
+         'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
-         'QO': {'WI': 5, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
+         'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
     dut = FIR_DF_amaranth(p)
 
     def process():
         # input = stimulus
         output = []
-        for i in np.ones(20):
+        for i in stimulus:
             yield dut.i.eq(int(i))
             yield Tick()
             output.append((yield dut.o))
@@ -374,8 +404,14 @@ if __name__ == '__main__':
 
     sim = Simulator(dut)
     # with Simulator(m) as sim:
-
     sim.add_clock(1/48000)
+
+
+    stimulus = np.ones(20)
+    sim.add_process(process)
+    sim.run()
+    # This remembers sreg from last run!
+    stimulus = np.zeros(20)
     sim.add_process(process)
     sim.run()
 
