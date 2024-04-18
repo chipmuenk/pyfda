@@ -882,7 +882,8 @@ class Fixed(object):
         Returns
         -------
 
-        y: requantized output data with same shape as input data, quantized as specified
+        y: any
+            requantized output data with same shape as input data, quantized as specified
             in `self.qdict`.
 
         Documentation

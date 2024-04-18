@@ -545,7 +545,7 @@ def csv2array(f: TextIO):
     Parameters
     ----------
 
-    f: file handle
+    f: TextIO
         handle to file or file-like object, e.g.
 
     >>> f = open(file_name, 'r') # or
@@ -572,7 +572,7 @@ def csv2array(f: TextIO):
 
     While opening a file, the `newline` parameter can be used to
     control how universal newlines works (it only applies to text mode).
-    It can be None, '', '\\n', '\\r', and '\\r\n'. It works as follows:
+    It can be None, '', '`\\n`', '`\\r`', and '`\\r\\n`'. It works as follows:
 
     - Input: If `newline == None`, universal newlines mode is enabled. Lines in
       the input can end in '\\n', '\\r', or '\\r\\n', and these are translated into
