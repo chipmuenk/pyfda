@@ -258,6 +258,15 @@ class FIR_DF_amaranth(Elaboratable):
         self.reset() # reset overflow counters (except coeffs) and registers
 
         # Initialize filter memory with passed values zi and fill up with zeros
+        # or truncate to filter length L
+        if zi is not None:
+            if len(zi) == self.L - 1:
+                self.zi = zi
+            elif len(zi) < self.L - 1:
+                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
+            else:
+                self.zi = zi[:self.L - 1]
+
         # ------------- Define I/Os for amaranth module ---------------------------
         self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
@@ -320,7 +329,7 @@ class FIR_DF_amaranth(Elaboratable):
         #     y_q[k] = self.Q_acc.fixp(np.sum(xb_q), in_frmt=fb.fil[0]['qfrmt'],
         #                              out_frmt=fb.fil[0]['qfrmt'])
 
-        # self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
+        self.zi = self.zi[-(self.L-1):]  # store last L-1 inputs (i.e. the L-1 registers)
 
         # # Overflows in Q_mul are added to overflows in Q_Acc, then Q_mul is reset
         # if self.Q_acc.q_dict['N_over'] > 0 or self.Q_mul.q_dict['N_over'] > 0:
