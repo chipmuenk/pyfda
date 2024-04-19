@@ -13,7 +13,7 @@
 
 **pyfda** is a tool written in Python / Qt for analyzing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
-![Screenshot](docs/source/screenshots/pyfda_screenshot.png)
+![Screenshot](/docs/source/screenshots/pyfda_screenshot.png)
 
 <table>
     <tr>
