@@ -51,7 +51,7 @@ Binaries for **Linux** are created as Flatpaks as well **(currently defunct)** w
 
 ### pip
 
-Supported Python versions are 3.7 ... 3.11, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
+Supported **Python 3.8** and above is supported, there is only one version of pyfda for all operating systems at [PyPI](https://pypi.org/project/pyfda/). As pyfda is a pure Python project (no compilation required), you can install pyfda the usual way, required libraries are downloaded automatically if missing:
 
     > pip install pyfda
 
