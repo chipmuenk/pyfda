@@ -68,62 +68,8 @@ class FIR_DF_amaranth(Elaboratable):
         self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
         self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(p['QO'])  # output
+
         self.init(p)
-
-    # ---------------------------------------------------------
-    def init_py(self, p, zi: iterable = None) -> None:
-        """
-        Initialize filter with parameter dict `p` by initialising all registers
-        and quantizers.
-        This needs to be done every time quantizers or coefficients are updated.
-
-        Parameters
-        ----------
-        p : dict
-            dictionary with coefficients and quantizer settings (see docstring of
-            `__init__()` for details)
-
-        zi : array-like
-            Initialize `L = len(b)` filter registers. Strictly speaking, `zi[0]` is
-            not a register but the current input value.
-            When `len(zi) != len(b)`, truncate or fill up with zeros.
-            When `zi == None`, all registers are filled with zeros.
-
-        Returns
-        -------
-        None.
-        """
-        # Do not initialize filter unless fixpoint mode is active
-        if not fb.fil[0]['fx_sim']:
-            return
-
-        self.p = p  # parameter dictionary with coefficients etc.
-
-        q_mul = p['QACC'].copy()
-
-        # update the quantizers
-        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs.s
-        self.Q_mul.set_qdict(q_mul)  # partial products
-        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.Q_O.set_qdict(self.p['QO'])  # output
-
-        # Quantize coefficients and store them in local attributes
-        # This also resets the overflow counters.
-        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-
-        self.L = len(self.b_q)  # filter length = number of taps
-
-        self.reset() # reset overflow counters (except coeffs) and registers
-
-        # Initialize filter memory with passed values zi and fill up with zeros
-        # or truncate to filter length L
-        if zi is not None:
-            if len(zi) == self.L - 1:
-                self.zi = zi
-            elif len(zi) < self.L - 1:
-                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
-            else:
-                self.zi = zi[:self.L - 1]
 
     # ---------------------------------------------------------
     def reset(self):
@@ -235,15 +181,16 @@ class FIR_DF_amaranth(Elaboratable):
         self.p = p  # parameter dictionary with coefficients etc.
 
         # update the quantizers from the dictionary
-        self.Q_b.set_qdict(self.p['QCB'])  # transversal coeffs
-        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
-        self.Q_O.set_qdict(self.p['QO'])  # output
-
-        # Quantize coefficients and store them locally
+        
+        # Quantize b coefficients and store them locally
+        self.Q_b.set_qdict(self.p['QCB'])
         self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-
-        self.L = len(self.b_q)  # filter length = number of taps
+        self.L = len(self.b_q)  # filter length = number of coefficients / taps
         DW = int(np.ceil(np.log2(self.L)))  # word growth
+
+        # Accumulator settings
+        self.Q_acc.set_qdict(self.p['QACC'])  # accumulator
+        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
 
         # Partial products: use accumulator settings and update word length
         # to sum of coefficient and input word lengths
@@ -252,12 +199,16 @@ class FIR_DF_amaranth(Elaboratable):
               'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
         self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
 
-        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
+        # Output settings
+        self.Q_O.set_qdict(self.p['QO'])  # output
+        
+        # Input signal is already quantized, no need for a quantizer
 
         self.reset() # reset overflow counters (except coeffs) and registers
 
         # Initialize filter memory with passed values zi and fill up with zeros
-        # or truncate to filter length L
+        # or truncate to filter length
+        ######  NOT IMPLEMENTED YET - Amaranth remembers state variables between sims?
         if zi is not None:
             if len(zi) == self.L - 1:
                 self.zi = zi
