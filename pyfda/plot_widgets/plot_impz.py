@@ -536,12 +536,12 @@ class Plot_Impz(QWidget):
 
         Triggered by:
 
-            - `_construct_UI()`  [Initialization]
-            - Pressing "Run" button, passing button state as a boolean
-            - Changing between fixpoint and float mode (`self.ui.cmb_sim_select)
-            - Activating "Autorun" via `self.calc_auto()`
+            - `_construct_UI()` during initialization
+            - Pressing "Run" button, passing button state as a bool
+            - `self.ui.cmb_sim_select` when changing between fixpoint and float mode
+            - `self.calc_auto()` when activating "Autorun"
             - Autorun (when something relevant in the UI has been updated)
-            - `{'fx_sim' : 'specs_changed'}`
+            - signal ``{'fx_sim' : 'specs_changed'}``
 
         The following tasks are performed:
 
