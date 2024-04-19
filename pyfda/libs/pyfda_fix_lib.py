@@ -459,14 +459,15 @@ class Fixed(object):
 
     Example
     -------
-    class `Fixed()` can be used like Matlabs quantizer object / function from the
-    fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
+    class `Fixed()` can be used like the Matlab `quantizer()` object / function from
+    the fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
 
-    MATLAB:
+    **MATLAB**
+
     >>> q_dsp = quantizer('fixed', 'round', [16 15], 'wrap');
     >>> yq = quantize(q_dsp, y)
 
-    PYTHON
+    **PYTHON**
     >>> q_dsp = {'WI':0, 'WF': 15, 'quant':'round', 'ovfl':'wrap'}
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
@@ -588,8 +589,8 @@ class Fixed(object):
 
         This is used a.o. by the following methods / classes:
 
-        - frmt2float(): always returns a float with RWV
-        - float2frmt(): starts with RWV, passes on the scaling argument
+        - `frmt2float()`: always returns a float with RWV
+        - `float2frmt()`: starts with RWV, passes on the scaling argument
         - input_coeffs: uses both methods above when quantizing coefficients
 
         Saturation / two's complement wrapping happens outside the range +/- MSB,
@@ -604,7 +605,7 @@ class Fixed(object):
         - Find pos. and neg. overflows and replace them by wrapped or saturated
           values
 
-        **Integer number format W = 1 + WI + WF** (`fb.fil[0]['qfrmt'] = 'qint'):
+        **Integer number format W = 1 + WI + WF** (`fb.fil[0]['qfrmt'] = 'qint'`):
         `LSB = 1`
 
         - Multiply float input by `2 ** WF` to obtain integer scale
@@ -616,15 +617,16 @@ class Fixed(object):
             input value (floating point format) to be quantized
 
         in_frmt: str
-            Determine the scaling before quantizing / saturation
+            Determine the scaling *before* quantizing / saturation
+            *'qfrac'* (default): fractional float input,
+            `y` is multiplied by `2 ** WF` *before* quantizing / saturating.
 
-            *'qfrac'* (default): fractional float input
-                `y` is multiplied by `2 ** WF` *before* quantizing / saturating
+            For all other settings, `y` is transformed unscaled.
 
         out_frmt: str
-            Determine the scaling after quantizing / saturation
-            **'qfrac'** (default): fractional fixpoint output format
-                `y` is divided by `2 ** WF` *after* quantizing / saturating.
+            Determine the scaling *after* quantizing / saturation
+            **'qfrac'** (default): fractional fixpoint output format,
+            `y` is divided by `2 ** WF` *after* quantizing / saturating.
 
             For all other settings, `y` is transformed unscaled.
 
@@ -886,8 +888,8 @@ class Fixed(object):
             requantized output data with same shape as input data, quantized as specified
             in `self.qdict`.
 
-        Documentation
-        -------------
+        Example
+        --------
 
         The following shows an example of rescaling an input word from Q2.4 to Q0.3
         using wrap-around and truncation. It's easy to see that for simple wrap-around
@@ -912,8 +914,7 @@ class Fixed(object):
 
         When operating on bit level in hardware, the following operations are used:
 
-        Fractional Bits
-        ---------------
+        **Fractional Bits**
 
         - For reducing the number of fractional bits by `dWF`, simply right-shift the
           integer number by `dWF`. For rounding, add '1' to the bit below the truncation
@@ -922,8 +923,7 @@ class Fixed(object):
         - Extend the number of fractional bits by left-shifting the integer by `dWF`,
           LSB's are filled with zeros.
 
-        Integer Bits
-        ------------
+        **Integer Bits**
 
         - For reducing the number of integer bits by `dWI`, simply right-shift the
           integer by `dWI`.
@@ -1252,26 +1252,38 @@ class Fixed(object):
 
         Returns
         -------
-        A string, a float or an ndarray of float or string is returned in the
-        numeric format set in `fb.fil[0]['fx_base'])`. It has the same shape as `y`.
-        For all formats except `float` a fixpoint representation with
-        a total number of W = WI + WF + 1 binary digits is returned.
-
-
-        Define vectorized functions using numpys automatic type casting:
-        Vectorized functions for inserting binary point in string `bin_str`
-        after position `pos`.
-
-        Usage:  insert_binary_point(bin_str, pos)
-
-        Parameters: bin_str : string
-                    pos     : integer
+        str, float or an ndarray of float or string
+            The numeric format is set in `fb.fil[0]['fx_base'])`. It has the same shape as `y`.
+            For all formats except `float` a fixpoint representation with
+            a total number of W = WI + WF + 1 binary digits is returned.
         """
-        insert_binary_point = np.vectorize(lambda bin_str, pos: (
-                                    bin_str[:pos+1] + "." + bin_str[pos+1:]))
+
+        insert_binary_point = np.vectorize(
+            lambda bin_str, pos: (bin_str[:pos+1] + "." + bin_str[pos+1:]))
+        """
+            Define vectorized functions using numpys automatic type casting:
+            Vectorized functions for inserting binary point in string `bin_str`
+            after position `pos`.
+
+            Usage:  insert_binary_point(bin_str, pos)
+
+            Parameters
+            ----------
+            bin_str : str
+                String in binary format (only '0' and '1')
+            pos     : int
+                Position of binary point to be inserted
+        """
+
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
 
         def binary_repr(y_int, W):
+            """
+            Convert a scalar, array, list or tuple of integer values
+            to the binary representation using `np.binary_repr()` or
+            the vectorized form.
+            """
+
             if type(y_int) in {np.ndarray, list, tuple}:
                 return binary_repr_vec(y_int, W).astype('U')
             elif isinstance(y_int, (int, np.integer)):

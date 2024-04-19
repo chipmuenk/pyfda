@@ -521,8 +521,18 @@ class Plot_Impz(QWidget):
             self.impz_init()
 
     # --------------------------------------------------------------------------
-    def impz_init(self, arg=None):
+    def impz_init(self, arg=None) -> Nonet:
         """
+        Initialize transient simulation.
+
+        Parameters
+        ----------
+        arg: bool or None
+
+        Returns
+        --------
+        None
+
         Triggered by:
 
             - `_construct_UI()`  [Initialization]
