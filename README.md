@@ -135,11 +135,12 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 - **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms
 - **Compare filter designs** for a given set of specifications and different design methods
 - **Filter coefficients and poles / zeroes** can be displayed, edited and quantized in various formats
+- **Fixpoint filters** based on the integrated `Fixed()` class or on the 
+[Amaranth](https://amaranth-lang.org/docs/amaranth/latest/intro.html) hardware description
+language.
 
 ### User Interface
 
-- only widgets needed for the currently selected design method are visible
-- specifications are remembered when switching between filter design methods
 - enhanced Matplotlib NavigationToolbar (nicer icons, additional functions)
 - tooltips for all UI widgets and help files
 - specify frequencies as absolute values or normalized to sampling or Nyquist frequency
@@ -154,27 +155,18 @@ Layout and some default paths can be customized using the file `pyfda/pyfda_rc.p
 - Transient response (impulse, step and various stimulus signals) in the time and frequency domain. Define your own stimuli like `abs(sin(2*pi*n*f1))` using [numexpr](https://github.com/pydata/numexpr) syntax and the UI.
 - 3D-Plots (H\|(f)\|, mesh, surface, contour) with optional pole / zero display
 
-### Modular Architecture
-
-Facilitate the implementation of new filter design / analysis / display methods. Generate your own
-
-- Filter design widgets with your algorithm
-- Plotting widgets
-- Input widgets
-- Fixpoint filter widgets, using the integrated `Fixed()` class
-
 ### Import / Export
 
-- Filter designs in pickled and in numpy's NPZ-format
-- Coefficients and poles/zeros as comma-separated values (CSV) in numpy's NPY- and NPZ-formats, in Excel (R), as a Matlab (R) workspace or in FPGA vendor specific formats like Xilinx (R) COE-format
+- Filter designs in JSON, pickled and in numpy's NPZ-format
+- Coefficients and poles/zeros as comma-separated values (CSV), in CMSIS format in numpy's NPY- and NPZ-formats, in Excel (R), as a Matlab (R) workspace or in FPGA vendor specific formats like Xilinx (R) COE-format
 - Transient stimuli (y[n] tab) as wav and csv files
 
-## Why yet another filter design tool?
+## Target group
 
-- **Education:** Provide an easy-to-use FOSS tool for demonstrating basic digital stuff and filter design interactively that also works with the limited resolution of a beamer.
-- **Fixpoint filter design:** Recursive fixpoint filter design has become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable especially for uCs and low-budget FPGAs.
+- **Educators and students:** Provide an easy-to-use FOSS tool for demonstrating DSP stuff and interactive filter design that also works with the limited resolution of a beamer.
+- **Fixpoint filter designer:** Recursive fixpoint filter design has become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable especially for uCs and low-budget FPGAs.
 
-## Release History / Roadmap
+## Release History
 
 For details, see [CHANGELOG.md](./CHANGELOG.md).
 
