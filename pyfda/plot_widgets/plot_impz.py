@@ -529,6 +529,11 @@ class Plot_Impz(QWidget):
         ----------
         arg: bool or None
 
+        Returns
+        --------
+        None
+
+
         Triggered by:
 
             - `_construct_UI()`  [Initialization]
