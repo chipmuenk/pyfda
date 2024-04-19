@@ -897,11 +897,11 @@ class Fixed(object):
 
         ::
 
-        S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
-        0 |  1  |  0  *  1  |  0  |  1  |  1   =  43 (dec) or 43/16 = 2 + 11/16 (float)
-                      *
-                |  S  * WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
-                   0  *  1  |  0  |  1         =  7 (dec) or 7/8 (float)
+            S | WI1 | WI0 * WF0 | WF1 | WF2 | WF3  :  WI = 2, WF = 4, W = 7
+            0 |  1  |  0  *  1  |  0  |  1  |  1   =  43 (dec) or 43/16 = 2 + 11/16 (float)
+                        *
+                    |  S  * WF0 | WF1 | WF2        :  WI = 0, WF = 3, W = 4
+                    0  *  1  |  0  |  1         =  7 (dec) or 7/8 (float)
 
 
         When the input is integer format, the fractional value is calculated as an
