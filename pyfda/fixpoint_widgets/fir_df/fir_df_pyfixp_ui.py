@@ -206,7 +206,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         This is called from one level above by
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        self.wdg_wq_coeffs.dict2ui(fb.fil[0]['fxq'])  # update coefficient wordlength
+        self.wdg_wq_coeffs.dict2ui(fb.fil[0]['fxq']['QCB'])  # update coefficient wordlength
         self.update_accu_settings()   # update accumulator q settings and UI
 
     # --------------------------------------------------------------------------

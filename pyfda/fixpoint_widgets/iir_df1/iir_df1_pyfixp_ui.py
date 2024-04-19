@@ -317,7 +317,7 @@ class IIR_DF1_pyfixp_UI(QWidget):
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
 
-        self.wdg_wq_coeffs_b.dict2ui(ffb.fil[0]['fxq']['QCB'])  # update coefficient quantization
+        self.wdg_wq_coeffs_b.dict2ui(fb.fil[0]['fxq']['QCB'])  # update coefficient quantization
         self.wdg_wq_coeffs_a.dict2ui(fb.fil[0]['fxq']['QCA'])  # settings
         # TODO: In the past, only 'QCB' was passed directly - why?!
         self.update_accu_settings()   # update accumulator settings and UI
@@ -354,6 +354,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
+    fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
+
     mainw = IIR_DF1_pyfixp_UI()
     app.setActiveWindow(mainw)
     mainw.show()
