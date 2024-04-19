@@ -36,6 +36,8 @@ but requires an additional adder. Only rounding-towards-zero guarantees that the
 magnitude of the rounded number is not larger than the input, thus preventing
 limit cycles in recursive filters.
 
+See also [Yates_2020]_ and [Lyons]_
+
 .. _fig_input_fixpoint:
 
 .. figure:: ../img/manual/pyfda_input_fixpoint.png

@@ -29,6 +29,9 @@ Literature
 
 .. [SPA] https://github.com/spatialaudio/group-delay-of-filters
 
+.. [Yates_2020] Randy Yates, "Fixed-Point Arithmetic: An Introduction",
+    15. Sep. 2020, http://www.digitalsignallabs.com/fp.pdf
+
 
 
 
