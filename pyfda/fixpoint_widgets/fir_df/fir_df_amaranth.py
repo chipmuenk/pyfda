@@ -18,20 +18,16 @@ from pyfda.libs.pyfda_fix_lib import quant_coeffs
 
 from pyfda.libs.pyfda_fix_lib_amaranth import requant
 
-
 from functools import reduce
 from operator import add
 
-# from nmigen import *
-# from nmigen.back import verilog
-import amaranth as am
+# from amaranth import *
+from amaranth.back import verilog
 from amaranth import Signal, signed, Elaboratable, Module
 from amaranth.sim import Simulator, Tick  # , Delay, Settle
-# from nmigen.build.plat import Platform
-# from nmigen.hdl import ast, dsl, ir
-# from nmigen.sim.core import Simulator, Tick, Delay
-# from nmigen.build import Platform
-# from nmigen.back.pysim import Simulator, Delay, Settle
+
+import pyfda.fixpoint_widgets.fir_df.fir_df_amaranth_mod as mod
+
 import logging
 logger = logging.getLogger(__name__)
 
