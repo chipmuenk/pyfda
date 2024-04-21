@@ -861,7 +861,7 @@ class Fixed(object):
         """
         Change word length of input signal `x_i` with fractional and integer widths
         defined by 'QI' to the word format defined by `self.q_dict` using the
-        quantization and saturaion methods specified by `self.q_dict['quant']` and
+        quantization and saturation methods specified by `self.q_dict['quant']` and
         `self.q_dict['ovfl']`.
 
         **Input and output word are aligned at their binary points.**
@@ -1388,10 +1388,10 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False) -> np.ndarray:
     Parameters
     ----------
     coeffs: iterable
-        a list or ndarray of coefficients to be quantized
+        An iterable of coefficients to be quantized
 
-    Q: dict
-        instance of Fixed object containing quantization dict `q_dict`
+    Q: object
+        Instance of Fixed object containing quantization dict `q_dict`
 
     recursive: bool
         When `False` (default), process all coefficients. When `True`,

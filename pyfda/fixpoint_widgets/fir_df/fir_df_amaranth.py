@@ -51,7 +51,7 @@ class FIR_DF_amaranth(object):
     ----------
     p : dict
         Dictionary with coefficients and quantizer settings with a.o.
-        the following keys : values
+        the following key : value pairs:
 
         - 'QCB', value: array of coefficients as floats, scaled as `WI:WF`
 
