@@ -1378,7 +1378,8 @@ class Fixed(object):
 ########################################
 
 # --------------------------------------------------------------------------
-def quant_coeffs(coeffs: iterable, Q, recursive: bool = False) -> np.ndarray:
+def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = ""
+                 ) -> np.ndarray:
     """
     Quantize the coefficients, scale and convert them to a list of integers,
     using the quantization settings of `Fixed()` instance `Q` and global setting
@@ -1397,6 +1398,10 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False) -> np.ndarray:
         When `False` (default), process all coefficients. When `True`,
         The first coefficient is ignored (must be 1)
 
+    out_frmt: str
+        Output quantization format ("qint" or "qfrac"). When nothing is specified,
+        use the global setting from `fb.fil[0]['qfrmt']`.
+
     Returns
     -------
     A numpy array of integer coeffcients, quantized and scaled with the
@@ -1406,7 +1411,12 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False) -> np.ndarray:
     disp_frmt_tmp = fb.fil[0]['fx_base']  # temporarily store fx display format and
     # always use decimal display format for coefficient quantization
     fb.fil[0]['fx_base'] = 'dec'
-    out_frmt=fb.fil[0]['qfrmt']
+    if out_frmt == "":
+        out_frmt=fb.fil[0]['qfrmt']
+    elif out_frmt not in {"qint", "qfrac"}:
+        logger.error(f"Unknown quantization format '{out_frmt}', using default.")
+        out_frmt=fb.fil[0]['qfrmt']
+
     Q.resetN()  # reset all overflow counters
 
     if coeffs is None:
