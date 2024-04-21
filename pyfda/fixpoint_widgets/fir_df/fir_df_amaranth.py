@@ -59,8 +59,7 @@ class FIR_DF_amaranth(object):
     def __init__(self, p):
 
         logger.info("Instantiating filter")
-        self.dut = FIR_DF_amaranth_mod(p)
-        # self.init(p)
+        self.init(p)
 
     # ---------------------------------------------------------
     def init(self, p, zi: iterable = None) -> None:
@@ -88,8 +87,21 @@ class FIR_DF_amaranth(object):
         # Do not initialize filter unless fixpoint mode is active
         if not fb.fil[0]['fx_sim']:
             return
-
         self.p = p  # parameter dictionary with coefficients etc.
+
+        # self.Q_I = fx.Fixed(p['QI'])  # input
+        self.Q_O = fx.Fixed(p['QI'])  # output
+
+        self.Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
+        b_q = quant_coeffs(fb.fil[0]['ba'], self.Q_b, out_frmt="qint")
+        self.L = len(b_q)
+
+        self.reset()
+
+        # Unpack p and coeff. dict in new dict without modifying p
+        d = {**p, **{'ba': b_q}}  # unpack p and coeff. dict in new dict without
+        # d = p | {'ba': b_q}  # python 3.9+ only
+        self.mod = mod.FIR_DF_amaranth_mod(d)
 
         # Initialize filter memory with passed values zi and fill up with zeros
         # or truncate to filter length
@@ -102,15 +114,31 @@ class FIR_DF_amaranth(object):
             else:
                 self.zi = zi[:self.L - 1]
 
+        self.sim = Simulator(self.mod)
+        # with Simulator(m) as sim:
+        self.sim.add_clock(1/48000)
+
+    # ---------------------------------------------------------
+    def process(self):
+        """
+        Amaranth process, apply stimuli via input `mod.i` from list `self.input`
+        and collect filter outputs from `mod.o` in list `self.output`
+        """
+        self.output = []
+        for i in self.input:
+            yield self.mod.i.eq(int(i))
+            yield Tick()
+            self.output.append((yield self.mod.o))
+
     # ---------------------------------------------------------
     def reset(self):
         """
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        self.Q_mul.resetN()
-        self.Q_acc.resetN()
+        # self.Q_acc.resetN()
         self.Q_O.resetN()
+        # self.Q_I.resetN()
         self.N_over_filt = 0
         self.zi = np.zeros(self.L - 1)
 
@@ -140,13 +168,6 @@ class FIR_DF_amaranth(object):
             and the same shape as `x` resp. `b` (impulse response).
         """
 
-        def process():
-            self.output = []
-            for i in stimulus:
-                yield self.dut.i.eq(int(i))
-                yield Tick()
-                self.output.append((yield self.dut.o))
-
         # -------------------------
         if zi is not None:
             if len(zi) == self.L - 1:   # use zi as it is
@@ -157,8 +178,8 @@ class FIR_DF_amaranth(object):
                 self.zi = zi[:self.L - 1]
                 logger.warning("len(zi) > len(b) - 1, zi was truncated")
 
-        # initialize quantized partial products and output arrays
-        y_q = xb_q = np.zeros(len(x))
+        # store last L-1 inputs (i.e. the L-1 registers)
+        self.zi = np.concatenate((self.zi, x))[-(self.L-1):]
 
         # Calculate response by:
         # - append new stimuli `x` to register state `self.zi`
@@ -168,189 +189,20 @@ class FIR_DF_amaranth(object):
         # - quantize the partial products x*b, yielding xb_q
         # - accumulate the quantized partial products and quantize result, yielding y_q[k]
 
-        sim = Simulator(self.dut)
-        # with Simulator(m) as sim:
-        sim.add_clock(1/48000)
+        # convert stimulus to integer
+        if fb.fil[0]['qfrmt'] == 'qfrac':
+            self.input = x * (1 << self.p['QI']['WF'])
+        else:
+            self.input = x
+        # self.input = self.Q_I.fixp(x, in_frmt=fb.fil[0]['qfrmt'], out_frmt='qint')
+        logger.warning(f"stim = {self.input}")
+        self.sim.add_process(self.process)
+        self.sim.run()
 
+#        logger.warning(f"y = {self.output}")
+        logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
 
-        stimulus = x
-        sim.add_process(process)
-        sim.run()
-
-        # y = self.dut.o
-        # logger.warning(type(self.dut.o))
-
-        return self.output
-
-# ===========================================================
-class FIR_DF_amaranth_mod(Elaboratable):
-    """
-    A synthesizable nMigen FIR filter in Direct Form.
-
-    Construct fixed point object with parameter dict `p`
-
-    Usage:
-    ------
-    filt = FIR_DF(p) # Instantiate fixpoint filter object with parameter dict
-
-    Parameters
-    ----------
-    p : dict
-        Dictionary with coefficients and quantizer settings with a.o.
-        the following keys : values
-
-        - 'QCB', value: array of coefficients as floats, scaled as `WI:WF`
-
-        - 'QACC', value: dict with quantizer settings for the accumulator
-
-        - 'q_mul', value: dict with quantizer settings for the partial products
-           optional, 'quant' and 'sat' are both set to 'none' if there is none
-    """
-    def __init__(self, p):
-        logger.info("Instantiating filter")
-
-        self.p = p  # parameter dictionary with coefficients etc.
-        self.Q_b = fx.Fixed(p['QCB'])  # transversal coeffs
-        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-        self.L = len(self.b_q)  # filter length = number of coefficients / taps
-        DW = int(np.ceil(np.log2(self.L)))  # word growth
-
-        # Accumulator settings
-        self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
-        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
-
-        # Partial products: use accumulator settings and update word length
-        # to sum of coefficient and input word lengths
-        self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
-        self.Q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
-
-        # Output settings
-        self.Q_O = fx.Fixed(p['QO'])  # output
-        # Input signal is already quantized, no need for a quantizer
-
-        # ------------- Define I/Os for amaranth module ---------------------------
-        self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
-        self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
-        self.i = Signal(signed(self.WI))  # input signal
-        self.o = Signal(signed(self.WO))  # output signal
-        # self.init(p)
-
-    def init(self, p, zi: iterable = None) -> None:
-        """
-        Initialize filter with parameter dict `p` by initialising all registers
-        and quantizers.
-        This needs to be done every time quantizers or coefficients are updated.
-
-        Parameters
-        ----------
-        p : dict
-            dictionary with coefficients and quantizer settings (see docstring of
-            `__init__()` for details)
-
-        zi : array-like
-            Initialize `L = len(b)` filter registers. Strictly speaking, `zi[0]` is
-            not a register but the current input value.
-            When `len(zi) != len(b)`, truncate or fill up with zeros.
-            When `zi == None`, all registers are filled with zeros.
-
-        Returns
-        -------
-        None.
-        """
-        # Do not initialize filter unless fixpoint mode is active
-        if not fb.fil[0]['fx_sim']:
-            return
-
-        # self.p = p  # parameter dictionary with coefficients etc.
-
-        # update the quantizers from the dictionary
-
-        # Quantize b coefficients and store them locally
-        self.Q_b = fx.Fixed(p['QCB'])  # transversal coeffs
-        self.b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b)
-        self.L = len(self.b_q)  # filter length = number of coefficients / taps
-        DW = int(np.ceil(np.log2(self.L)))  # word growth
-
-        # Accumulator settings
-        self.Q_acc = fx.Fixed(p['QACC'])  # accumulator
-        self.W_acc = self.p['QACC']['WI'] + self.p['QACC']['WF'] + 1  # total accu word length
-
-        # Partial products: use accumulator settings and update word length
-        # to sum of coefficient and input word lengths
-        self.Q_mul = fx.Fixed(p['QACC'].copy())  # partial products
-        self.Q_mul.set_qdict({'WI': self.p['QI']['WI'] + self.p['QCB']['WI'] + DW,
-              'WF': self.p['QI']['WF'] + self.p['QCB']['WF']})
-        self.W_mul = self.Q_mul.q_dict['WI'] + self.Q_mul.q_dict['WF'] + 1
-
-        # Output settings
-        self.Q_O = fx.Fixed(p['QO'])  # output
-        # Input signal is already quantized, no need for a quantizer
-
-        self.reset() # reset overflow counters (except coeffs) and registers
-
-        # Initialize filter memory with passed values zi and fill up with zeros
-        # or truncate to filter length
-        ######  NOT IMPLEMENTED YET - Amaranth remembers state variables between sims?
-        if zi is not None:
-            if len(zi) == self.L - 1:
-                self.zi = zi
-            elif len(zi) < self.L - 1:
-                self.zi = np.concatenate((zi, np.zeros(self.L - 1 - len(zi))))
-            else:
-                self.zi = zi[:self.L - 1]
-
-        # ------------- Define I/Os for amaranth module ---------------------------
-        self.WI = p['QI']['WI'] + p['QI']['WF'] + 1  # total input word length
-        self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
-        self.i = Signal(signed(self.WI))  # input signal
-        self.o = Signal(signed(self.WO))  # output signal
-
-    # ---------------------------------------------------------
-    def reset(self):
-        """
-        Reset register and overflow counters of quantizers
-        (but don't reset coefficient quantizers)
-        """
-        self.Q_mul.resetN()
-        self.Q_acc.resetN()
-        self.Q_O.resetN()
-        self.N_over_filt = 0
-        self.zi = np.zeros(self.L - 1)
-
-    # ---------------------------------------------------------
-    def elaborate(self, platform) -> Module:
-        """
-        `platform` normally specifies FPGA platform, not needed here.
-        """
-        logger.warning("elaborate!")
-        m = Module()  # instantiate a module
-        ###
-        muls = [0] * len(self.b_q)
-
-        src = self.i  # first register is connected to input signal
-
-        i = 0
-        for b_q in self.b_q:
-            sreg = Signal(signed(self.WI))  # create chain of registers
-            m.d.sync += sreg.eq(src)        # with input word length
-            src = sreg
-            # TODO: keep old data sreg to allow frame based processing (requiring reset)
-            muls[i] = int(b_q)*sreg
-            i += 1
-
-        sum_full = Signal(signed(self.W_mul))  # sum of all multiplication products with
-        m.d.sync += sum_full.eq(reduce(add, muls))  # full product wordlength
-
-        # requantize from full partial product wordlength to accumulator format
-        sum_accu = Signal(signed(self.W_acc))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC']))
-
-        # requantize from accumulator format to output width
-        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO']))
-
-        return m   # return result as list of integers
+        return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt']), self.zi
 
 
 # ------------------------------------------------------------------------------
@@ -361,35 +213,23 @@ if __name__ == '__main__':
     `python -m pyfda.fixpoint_widgets.fir_df.fir_df_amaranth.FIR_DF_amaranth_mod`
     """
     fb.fil[0]['fx_sim'] = True  # enable fixpoint mode
-    fb.fil[0]['qfrmt'] = 'qint'
-    fb.fil[0]['ba'] = [[1, 2, 3, 2, 1], []]
+    # fb.fil[0]['qfrmt'] = 'qint'
+
     p = {'QCB': {'WI': 2, 'WF': 5, 'w_a_m': 'a',
                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
          'QACC': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'},
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
-    dut = FIR_DF_amaranth_mod(p)
 
-    def process():
-        # input = stimulus
-        output = []
-        for i in stimulus:
-            yield dut.i.eq(int(i))
-            yield Tick()
-            output.append((yield dut.o))
-        print(output)
+    Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
+    b_q = quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
+    Q_I = fx.Fixed(p['QI'])
+    Q_O = fx.Fixed(p['QO'])
 
-    sim = Simulator(dut)
-    # with Simulator(m) as sim:
-    sim.add_clock(1/48000)
+    p.update({'ba': [b_q, []]})
 
-
-    stimulus = np.ones(20)
-    sim.add_process(process)
-    sim.run()
-    # This remembers sreg from last run!
-    stimulus = np.zeros(20)
-    sim.add_process(process)
-    sim.run()
+    dut = FIR_DF_amaranth(p)
+    print(dut.fxfilter(Q_I.fixp(np.ones(20), out_frmt='qint')))
+    print(dut.fxfilter(Q_I.fixp(np.zeros(20), out_frmt='qint')))
 
