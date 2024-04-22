@@ -59,6 +59,11 @@ class FIR_DF_amaranth(object):
     def __init__(self, p):
 
         logger.info("Instantiating filter")
+        self.p = p  # parameter dictionary with coefficients etc.
+        self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
+        # self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
+        # self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
+        self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.init(p)
 
     # ---------------------------------------------------------
@@ -87,12 +92,7 @@ class FIR_DF_amaranth(object):
         # Do not initialize filter unless fixpoint mode is active
         if not fb.fil[0]['fx_sim']:
             return
-        self.p = p  # parameter dictionary with coefficients etc.
 
-        # self.Q_I = fx.Fixed(p['QI'])  # input
-        self.Q_O = fx.Fixed(p['QI'])  # output
-
-        self.Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
         b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
         self.L = len(b_q)
 
@@ -136,9 +136,7 @@ class FIR_DF_amaranth(object):
         Reset register and overflow counters of quantizers
         (but don't reset coefficient quantizers)
         """
-        # self.Q_acc.resetN()
         self.Q_O.resetN()
-        # self.Q_I.resetN()
         self.N_over_filt = 0
         self.zi = np.zeros(self.L - 1)
 
