@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Helper classes and functions for nmigen fixpoint filters
+Helper classes and functions for amaranth fixpoint filters
 """
 from pyfda.libs.pyfda_lib import cmp_version
 import logging
@@ -132,7 +132,9 @@ if cmp_version("amaranth", "0.3") >= 0:
                 # add sign bit (sig_i[-1]) as LSB (1 << dWF) before right shift
                 mod.d.comb += sig_i_q.eq((sig_i + (sig_i[-1] << dWF)) >> dWF)
             else:
-                raise Exception(u'Unknown quantization method "%s"!' % (QI['quant']))
+                logger.error(f"Unknown output quantization method <{QO['quant']}>,\n"
+                             "\tusing <floor> instead.")
+                mod.d.comb += sig_i_q.eq(sig_i >> dWF)
 
         # -----------------------------------------------------------------------
         # Requantize integer part
@@ -152,12 +154,12 @@ if cmp_version("amaranth", "0.3") >= 0:
             with mod.Else():
                 mod.d.comb += sig_o.eq(sig_i_q)
 
-        elif QO['ovfl'] == 'wrap':  # wrap around (shift left)
+        else:  # wrap around (shift left)
             mod.d.comb += sig_o.eq(sig_i_q)
 
-        else:
-            raise Exception(u'Unknown overflow method "%s"!' % (QI['ovfl']))
-
+            if QO['ovfl'] != 'wrap':
+                logger.error(f"Unknown output overflow method <{QO['ovfl']}>,\n"
+                            "\tusing <wrap> instead.")
         return sig_o
 else:
     logger.error('Module "amaranth" not found!')
