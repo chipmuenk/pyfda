@@ -80,7 +80,17 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
-            MSB_LSB_vis='max')
+            MSB_LSB_vis='max',
+            cmb_ov_items=["<span>Select overflow behaviour.</span>",
+                  ("wrap", "Wrap", "Two's complement wrap around"),
+                  ("sat", "Sat",
+                   "<span>Saturation, i.e. limit at min. / max. value</span>")],
+            cmb_q_items=["Select the kind of quantization.",
+                 ("round", "Round",
+                  "<span>Round towards nearest representable number</span>"),
+                 ("fix", "Fix", "Round towards zero"),
+                 ("floor", "Floor", "<span>Round towards negative infinity / "
+                  "two's complement truncation.</span>")])
         layV_wq_coeffs = QVBoxLayout()
         layV_wq_coeffs.addWidget(self.wdg_wq_coeffs)
 
@@ -94,7 +104,18 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
-            label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
+            count_ovfl_vis='off',
+            label='<b>Accu Format <i>Q<sub>Acc&nbsp;</sub></i>:</b>',
+            cmb_ov_items=["<span>Select overflow behaviour.</span>",
+                  ("wrap", "Wrap", "Two's complement wrap around"),
+                  ("sat", "Sat",
+                   "<span>Saturation, i.e. limit at min. / max. value</span>")],
+            cmb_q_items=["Select the kind of quantization.",
+                 ("round", "Round",
+                  "<span>Round towards nearest representable number</span>"),
+                 ("fix", "Fix", "Round towards zero"),
+                 ("floor", "Floor", "<span>Round towards negative infinity / "
+                  "two's complement truncation.</span>")])
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 
