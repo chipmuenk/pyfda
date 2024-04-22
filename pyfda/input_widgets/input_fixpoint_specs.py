@@ -360,7 +360,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_wq_input = FX_UI_WQ(
             fb.fil[0]['fxq']['QI'], objectName='fx_ui_wq_input',
-            label='<b>Input Quantizer <i>Q<sub>X&nbsp;</sub></i>:</b>',
+            label='<b>Input Quantizer <i>Q<sub>I&nbsp;</sub></i>:</b>',
             lock_vis='on', cmb_w_vis='off')
         if HAS_DS:
             self.wdg_wq_input.cmbQuant.addItem('DSM', userData='dsm')
@@ -371,7 +371,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_wq_output = FX_UI_WQ(
             fb.fil[0]['fxq']['QO'], objectName='fx_ui_wq_output',
-            label='<b>Output Quantizer <i>Q<sub>Y&nbsp;</sub></i>:</b>',
+            label='<b>Output Quantizer <i>Q<sub>O&nbsp;</sub></i>:</b>',
             cmb_w_vis='off')
         self.wdg_wq_output.sig_tx.connect(self.sig_rx_local)
 

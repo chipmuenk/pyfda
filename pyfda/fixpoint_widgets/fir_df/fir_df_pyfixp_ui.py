@@ -91,7 +91,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         self.wdg_wq_accu = FX_UI_WQ(
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
-            label='<b>Accu Format <i>Q<sub>A&nbsp;</sub></i>:</b>')
+            label='<b>Accu Format <i>Q<sub>ACC&nbsp;</sub></i>:</b>')
         layV_wq_accu = QVBoxLayout()
         layV_wq_accu.addWidget(self.wdg_wq_accu)
 

@@ -105,7 +105,7 @@ class FIR_DF_amaranth_UI(QWidget):
             fb.fil[0]['fxq']['QACC'], objectName='fx_ui_wq_fir_df_accu',
             cmb_w_vis='on', cmb_w_items=self.cmb_wq_accu_items,
             count_ovfl_vis='off',
-            label='<b>Accu Format <i>Q<sub>Acc&nbsp;</sub></i>:</b>',
+            label='<b>Accu Format <i>Q<sub>ACC&nbsp;</sub></i>:</b>',
             cmb_ov_items=["<span>Select overflow behaviour.</span>",
                   ("wrap", "Wrap", "Two's complement wrap around"),
                   ("sat", "Sat",
