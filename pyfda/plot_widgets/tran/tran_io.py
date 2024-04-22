@@ -65,7 +65,7 @@ class Tran_IO(QWidget):
 
         if 'id' in dict_sig and dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
-        elif 'closeEvent' in dict_sig:
+        elif 'close_event' in dict_sig:
             self.close_csv_win()
             self.emit({'ui_local_changed': 'csv'})  # propagate one level up
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':

@@ -117,7 +117,7 @@ class Plot_FFT_win(QDialog):
         """
         if self.ignore_close_event:
             event.ignore()
-            self.emit({'closeEvent': ''})
+            self.emit({'close_event': ''})
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

@@ -61,7 +61,7 @@ class PlotImpz_UI(QWidget):
 
         # --- signals coming from the FFT window widget or the FFT window selector
         if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
-            if 'closeEvent' in dict_sig:   # hide FFT window widget and return
+            if 'close_event' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
             else:

@@ -74,7 +74,7 @@ class Input_PZ_UI(QWidget):
                 # this should not happen as the rx slot is not connected globally
                 f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
-        elif 'closeEvent' in dict_sig:
+        elif 'close_event' in dict_sig:
             self._close_csv_win()
             # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})

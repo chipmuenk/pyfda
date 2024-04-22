@@ -149,7 +149,7 @@ class Firwin(QWidget):
 
         # --- signals coming from the FFT window widget or the qfft_win_select
         if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
-            if 'closeEvent' in dict_sig:  # hide FFT window windget and return
+            if 'close_event' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
             else:

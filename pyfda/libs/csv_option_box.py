@@ -52,7 +52,7 @@ class CSV_option_box(QDialog):
         signal to parent where window closing is registered before actually
         closing the window.
         """
-        self.emit({'closeEvent': ''})
+        self.emit({'close_event': ''})
         event.accept()
 
 # ------------------------------------------------------------------------------
