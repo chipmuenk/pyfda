@@ -192,13 +192,15 @@ class FIR_DF_amaranth(object):
             self.input = x * (1 << self.p['QI']['WF'])
         else:
             self.input = x
-        # self.input = self.Q_I.fixp(x, in_frmt=fb.fil[0]['qfrmt'], out_frmt='qint')
-        logger.warning(f"stim = {self.input}")
+        # logger.warning(f"stim = {self.input}")
         self.sim.add_process(self.process)
         self.sim.run()
 
-#        logger.warning(f"y = {self.output}")
-        logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
+        # Currently doesn't work, output signal is quantized afterwards, resetting 'N_over'
+        # fb.fil[0]['fxq']['QO']['N_over'] = 13  # doesn't work, output signal is quantized
+
+        # TODO: Pass Quantizer instead of quantizer dict to requant etc. to update overflow counter
+        # logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
 
         return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt']), self.zi
 
