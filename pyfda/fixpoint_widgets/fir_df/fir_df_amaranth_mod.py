@@ -83,7 +83,7 @@ class FIR_DF_amaranth_mod(Elaboratable):
 
         # update the quantizers from the dictionary
         self.b_q = p['ba']
-        logger.warning(f"b_q = {self.b_q}")
+        # logger.warning(f"b_q = {self.b_q}")
         self.L = len(self.b_q)  # filter length = number of coefficients / taps
         DW = int(np.ceil(np.log2(self.L)))  # word growth
 
