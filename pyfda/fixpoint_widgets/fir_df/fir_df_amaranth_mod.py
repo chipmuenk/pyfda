@@ -82,7 +82,7 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.p = p  # parameter dictionary with coefficients etc.
 
         # update the quantizers from the dictionary
-        self.b_q = p['ba'][0]
+        self.b_q = p['ba']
         logger.warning(f"b_q = {self.b_q}")
         self.L = len(self.b_q)  # filter length = number of coefficients / taps
         DW = int(np.ceil(np.log2(self.L)))  # word growth
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     
     Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
     b_q = quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
-    p.update({'ba': [b_q, []]})
+    p.update({'ba': b_q})
     Q_I = fx.Fixed(p['QI'])
     Q_O = fx.Fixed(p['QO'])
 

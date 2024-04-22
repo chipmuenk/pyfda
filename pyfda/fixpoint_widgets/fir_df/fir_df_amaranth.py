@@ -93,7 +93,7 @@ class FIR_DF_amaranth(object):
         self.Q_O = fx.Fixed(p['QI'])  # output
 
         self.Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
-        b_q = quant_coeffs(fb.fil[0]['ba'], self.Q_b, out_frmt="qint")
+        b_q = quant_coeffs(fb.fil[0]['ba'][0], self.Q_b, out_frmt="qint")
         self.L = len(b_q)
 
         self.reset()
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     Q_I = fx.Fixed(p['QI'])
     Q_O = fx.Fixed(p['QO'])
 
-    p.update({'ba': [b_q, []]})
+    p.update({'ba': b_q})
 
     dut = FIR_DF_amaranth(p)
     print(dut.fxfilter(Q_I.fixp(np.ones(20), out_frmt='qint')))
