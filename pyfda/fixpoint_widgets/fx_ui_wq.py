@@ -370,7 +370,9 @@ class FX_UI_WQ(QWidget):
         #              f"{frm[3]}:{frm[2]}")
 
         if self.count_ovfl_vis == 'off':
-            self.lbl_ovfl_count.setVisible(False)
+            self.lbl_ovfl_count.setVisible(True)
+            self.lbl_ovfl_count.setEnabled(False)
+            self.lbl_ovfl_count.setText(to_html("<b>&nbsp;&nbsp; -----</b>"))
         elif self.count_ovfl_vis == 'auto' and self.Q.q_dict['N_over'] == 0:
             self.lbl_ovfl_count.setVisible(False)
         elif self.count_ovfl_vis == 'on' or\
