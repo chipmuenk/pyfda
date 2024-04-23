@@ -74,9 +74,9 @@ class FIR_DF_amaranth_UI(QWidget):
         """
         # widget for quantization of coefficients 'b'
         # Attention: fb.fil[0]['fxq']['QCB'] == self.wdg_wq_coeffs.q_dict
-        if 'QCB' not in fb.fil[0]['fxq']:
-            fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
-            logger.warning("QCB key missing")
+        # if 'QCB' not in fb.fil[0]['fxq']:
+        #     fb.fil[0]['fxq'].update({'QCB': {}})  # no coefficient settings in dict yet
+        #     logger.warning("QCB key missing")
         self.wdg_wq_coeffs = FX_UI_WQ(
             fb.fil[0]['fxq']['QCB'], objectName='fx_ui_wq_fir_df_coeffs_b',
             label='<b>Coeff. Quantization <i>b<sub>I.F&nbsp;</sub></i>:</b>',
@@ -96,8 +96,8 @@ class FIR_DF_amaranth_UI(QWidget):
 
         # widget for accumulator quantization
         # Attention: fb.fil[0]['fxq']['QACC'] == self.wdg_wq_accu.q_dict
-        if 'QACC' not in fb.fil[0]['fxq']:
-            fb.fil[0]['fxq']['QACC'] = {}
+        # if 'QACC' not in fb.fil[0]['fxq']:
+        #     fb.fil[0]['fxq']['QACC'] = {}
         set_dict_defaults(fb.fil[0]['fxq']['QACC'],
             {'WI': 0, 'WF': 31, 'ovfl': 'wrap', 'quant': 'floor', 'w_a_m': 'a',
              'N_over': 0})
