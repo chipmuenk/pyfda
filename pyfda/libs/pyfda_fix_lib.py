@@ -391,7 +391,8 @@ class Fixed(object):
       - 'none': no overflow; the integer word length is ignored
 
     * **N_over** : integer
-        total number of overflows (should be considered as read-only)
+        total number of overflows (should be considered as read-only
+        except for when an external quantizer is used)
 
     Additionally, the following keys from global dict `fb.fil[0]` define the
     number base and quantization/overflow behaviour for fixpoint numbers:
@@ -434,10 +435,10 @@ class Fixed(object):
         total number of simulation data points
 
     N_over_neg : integer
-        number of negative overflows
+        number of negative overflows (commented out)
 
     N_over_pos : integer
-        number of positive overflows
+        number of positive overflows (commented out)
 
     ovr_flag: integer or integer array (same shape as input argument)
         overflow flag, meaning:
@@ -799,7 +800,7 @@ class Fixed(object):
 
         if self.q_dict['ovfl'] == 'none':
             # set all overflow flags to zero
-            self.N_over_neg = self.N_over_pos = self.N_over = 0
+            self.N_over = 0  # self.N_over_neg = self.N_over_pos =
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < MIN)
@@ -807,9 +808,9 @@ class Fixed(object):
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
-            self.N_over_neg += np.sum(over_neg)
-            self.N_over_pos += np.sum(over_pos)
-            self.N_over = self.N_over_neg + self.N_over_pos
+            # self.N_over_neg += np.sum(over_neg)
+            # self.N_over_pos += np.sum(over_pos)
+            self.N_over += np.sum(over_neg) + np.sum(over_pos)
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.q_dict['ovfl'] == 'sat':
@@ -851,8 +852,8 @@ class Fixed(object):
         self.q_dict.update({'N_over': 0})
 
         self.ovr_flag = 0
-        self.N_over_pos = 0
-        self.N_over_neg = 0
+        # self.N_over_pos = 0
+        # self.N_over_neg = 0
         self.N_over = 0
         self.N = 0
 
