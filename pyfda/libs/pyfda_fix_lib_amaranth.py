@@ -26,8 +26,8 @@ if cmp_version("amaranth", "0.3") >= 0:
         Parameters
         ----------
 
-        mod: Module (nmigen)
-            instance of migen module
+        mod: Module
+            instance of amaranth module
 
         sig_i: Signal (nmigen)
             Signal to be requantized
@@ -46,8 +46,8 @@ if cmp_version("amaranth", "0.3") >= 0:
         Returns
         -------
 
-        sig_o: Signal (amaranth)
-            Requantized signal
+        sig_o: Signal
+            Requantized Amaranth signal
 
         Documentation
         -------------
