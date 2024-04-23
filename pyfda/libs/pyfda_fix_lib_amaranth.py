@@ -101,6 +101,7 @@ if cmp_version("amaranth", "0.3") >= 0:
         WO_I = QO['WI']         # number of integer bits (output signal)
         WO_F = QO['WF']         # number of fractional bits (output signal)
         WO   = WO_I + WO_F + 1  # total word length (output signal)
+        N_over = QO['N_over']  # number of overflows
 
         dWF = WI_F - WO_F       # difference of fractional lengths
         dWI = WI_I - WO_I       # difference of integer lengths
@@ -160,6 +161,7 @@ if cmp_version("amaranth", "0.3") >= 0:
             if QO['ovfl'] != 'wrap':
                 logger.error(f"Unknown output overflow method <{QO['ovfl']}>,\n"
                             "\tusing <wrap> instead.")
+        QO['N_over'] = 15  # TODO: dummy
         return sig_o
 else:
     logger.error('Module "amaranth" not found!')
