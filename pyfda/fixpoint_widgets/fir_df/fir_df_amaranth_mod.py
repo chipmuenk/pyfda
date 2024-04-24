@@ -120,6 +120,8 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
+        self.ovfl_acc_o = Signal()  # requantization overflow bit accumulator
+        self.ovfl_out_o = Signal()  # requantization overflow bit output
 
     # ---------------------------------------------------------
     def reset(self):
@@ -150,7 +152,7 @@ class FIR_DF_amaranth_mod(Elaboratable):
             m.d.sync += sreg.eq(src)        # with input word length
             src = sreg
             # TODO: keep old data sreg to allow frame based processing (requiring reset)?
-            muls[i] = int(b_q)*sreg
+            muls[i] = int(b_q) * sreg
             i += 1
 
         sum_full = Signal(signed(self.W_mul))  # sum of all multiplication products with
@@ -158,10 +160,12 @@ class FIR_DF_amaranth_mod(Elaboratable):
 
         # requantize from full partial product wordlength to accumulator format
         sum_accu = Signal(signed(self.W_acc))
-        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC']))
+        m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[0])
+        m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[1])
 
         # requantize from accumulator format to output width
-        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO']))
+        m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[0])
+        m.d.comb += self.ovfl_out_o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[1])
 
         return m   # return result as list of integers
 
@@ -181,7 +185,7 @@ if __name__ == '__main__':
          'QI': {'WI': 2, 'WF': 3, 'ovfl': 'sat', 'quant': 'round'},
          'QO': {'WI': 6, 'WF': 3, 'ovfl': 'wrap', 'quant': 'round'}
          }
-    
+
     Q_b = fx.Fixed(p['QCB'])  # quantizer for transversal coeffs
     b_q = quant_coeffs([1, 2, 3, 2, 1], Q_b, out_frmt="qint")
     p.update({'ba': b_q})
@@ -189,7 +193,7 @@ if __name__ == '__main__':
     Q_O = fx.Fixed(p['QO'])
 
     dut = FIR_DF_amaranth_mod(p)
-    
+
     def process():
         # input = stimulus
         output = []

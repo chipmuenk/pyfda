@@ -101,7 +101,6 @@ if cmp_version("amaranth", "0.3") >= 0:
         WO_I = QO['WI']         # number of integer bits (output signal)
         WO_F = QO['WF']         # number of fractional bits (output signal)
         WO   = WO_I + WO_F + 1  # total word length (output signal)
-        N_over = QO['N_over']  # number of overflows
 
         dWF = WI_F - WO_F       # difference of fractional lengths
         dWI = WI_I - WO_I       # difference of integer lengths
@@ -113,6 +112,8 @@ if cmp_version("amaranth", "0.3") >= 0:
         # intermediate signal with requantized fractional part
         sig_i_q = Signal(signed(max(WI, WO)))
         sig_o = Signal(signed(WO))
+        # overflow bit, indicating that the requantization caused an overflow
+        ovfl_o = Signal()  # single bit
 
         # logger.debug(f"rescale: dWI={dWI}, dWF={dWF}, Qu:{QO['quant']}, Ov:{QO['ovfl']}")
 
@@ -142,27 +143,34 @@ if cmp_version("amaranth", "0.3") >= 0:
         # -----------------------------------------------------------------------
         if dWI < 0:  # WI_I < WO_I, sign extend integer part (prepend copies of sign bit)
             mod.d.comb += sig_o.eq(Cat(sig_i_q, Repl(sig_i_q[-1], -dWI)))
+            mod.d.comb += ovfl_o.eq(0)
         elif dWI == 0:  # WI = WO, don't change integer part
             mod.d.comb += sig_o.eq(sig_i_q)
+            mod.d.comb += ovfl_o.eq(0)
         elif QO['ovfl'] == 'sat':
             with mod.If(sig_i_q[-1] == 1):
                 with mod.If(sig_i_q < MIN_o):
                     mod.d.comb += sig_o.eq(MIN_o)
+                    mod.d.comb += ovfl_o.eq(1)
                 with mod.Else():
                     mod.d.comb += sig_o.eq(sig_i_q)
+                    mod.d.comb += ovfl_o.eq(0)
             with mod.Elif(sig_i_q > MAX_o):  # sig_i_q[-1] == 0
                 mod.d.comb += sig_o.eq(MAX_o)
+                mod.d.comb += ovfl_o.eq(1)
             with mod.Else():
                 mod.d.comb += sig_o.eq(sig_i_q)
+                mod.d.comb += ovfl_o.eq(0)
 
         else:  # wrap around (shift left)
             mod.d.comb += sig_o.eq(sig_i_q)
+            mod.d.comb += ovfl_o.eq(0)  # TODO: detect overflow from discarded bits
 
             if QO['ovfl'] != 'wrap':
                 logger.error(f"Unknown output overflow method <{QO['ovfl']}>,\n"
                             "\tusing <wrap> instead.")
-        QO['N_over'] = 15  # TODO: dummy
-        return sig_o
+        # QO['N_over'] = 15  # TODO: this passes the value to the quantizer, but it's a dummy
+        return sig_o, ovfl_o
 else:
     logger.error('Module "amaranth" not found!')
 
