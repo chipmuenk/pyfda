@@ -977,7 +977,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    """ Run widget standalone with `python -m pyfda.libs.pyfda_fft_windows` """
+    """ Run widget standalone with `python -m pyfda.libs.pyfda_fft_windows_lib` """
     import sys
     from pyfda.libs.compat import QApplication
     from pyfda import pyfda_rc as rc
