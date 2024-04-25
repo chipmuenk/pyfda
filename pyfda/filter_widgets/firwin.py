@@ -176,10 +176,12 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
+        # subwidget for entering window parameters (if any)
         self.qfft_win_select = QFFTWinSelector(self.win_dict, objectName='fir_win_qfft')
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
+        # button for opening FFT window
         self.but_fft_wdg = QPushButton(self)
         self.but_fft_wdg.setIcon(QIcon(":/fft.svg"))
         but_height = self.qfft_win_select.sizeHint().height()
@@ -236,7 +238,7 @@ class Firwin(QWidget):
     def _load_dict(self):
         """
         Reload window selection and parameters from filter dictionary
-        and set UI elements accordingly. load_dict() is called upon
+        and set UI elements accordingly. _load_dict() is called upon
         initialization and when the filter is loaded from disk.
         """
         self.N = fb.fil[0]['N']
