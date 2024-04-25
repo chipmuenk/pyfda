@@ -85,6 +85,7 @@ class Firwin(QWidget):
         self.win_dict = get_windows_dict(
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
+        self.cur_win_dict = self.win_dict[self.cur_win_name]
 
         # get initial / last setting from dictionary, updating self.win_dict
         self._load_dict()
@@ -232,6 +233,8 @@ class Firwin(QWidget):
     def _update_fft_window(self):
         """ Update window type for FirWin - unneeded at the moment """
         self.alg = str(self.cmb_firwin_alg.currentText())
+        self.cur_win_name = self.win_dict['cur_win_name']
+        logger.warning(self.cur_win_name)
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
@@ -245,7 +248,26 @@ class Firwin(QWidget):
         # alg_idx = 0
         if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
-            self.win_dict = fb.fil[0]['wdg_fil']['firwin']
+            # self.win_dict.update(fb.fil[0]['wdg_fil']['firwin'])
+            # Get window name (should be the only key!)
+            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin'].keys[0]
+            logger.warning(f"curwin = {self.cur_win_name}")
+            if self.cur_win_name in self.win_dict:
+                # get window related infos from global filter dict
+                self.cur_win_dict = self.win_dict[self.cur_win_name]
+                # window related infos from loaded dict
+                firwin_loaded = fb.fil[0]['wdg_fil']['firwin'][self.cur_win_name]
+            else:
+                logger.warning(f"No window '{self.cur_win_name}' in windows dict!")
+                self.cur_win_dict = self.win_dict['Hann']
+                return
+            if 'par' in firwin_loaded:
+                n_params = len(firwin_loaded['par'])
+                params = [firwin_loaded['par'][p]['val'] for p in range(n_params)]
+                for i in range(n_params):
+                    self.cur_win_dict['par'][i]['val'] = params[i]
+            else:
+                logger.info(f"Window type '{self.cur_win_name} has no parameters.")
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
@@ -254,9 +276,12 @@ class Firwin(QWidget):
         """
         Store window and parameter settings using `self.win_dict` in filter dictionary.
         """
+        # fb.fil[0]['wdg_fil'] = {'firwin': self.cur_win_dict}
+        logger.warning(fb.fil[0]['wdg_fil'])
         if 'wdg_fil' not in fb.fil[0]:
             fb.fil[0].update({'wdg_fil': {}})
-        fb.fil[0]['wdg_fil'].update({'firwin': self.win_dict})
+            logger.warning("Key 'wdg_fil' is missing in filter dict!")
+        fb.fil[0]['wdg_fil'] = {'firwin': self.cur_win_dict}
 
     # --------------------------------------------------------------------------
     def _get_params(self, fil_dict):
@@ -444,6 +469,7 @@ class Firwin(QWidget):
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             # logger.warning(f"N={N}, beta={beta}, A_SB={fb.fil[0]['A_SB']}")
             self.win_dict["Kaiser"]["par"][0]["val"] = beta
+            self.self.cur_win_dict["Kaiser"] = {"val":[beta]}
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
         else:
