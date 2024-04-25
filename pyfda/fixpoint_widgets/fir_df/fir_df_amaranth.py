@@ -125,12 +125,12 @@ class FIR_DF_amaranth(object):
         and collect filter outputs from `mod.o` in list `self.output`
         """
         self.output = []
-        self.ovfl_acc = []
+        # self.ovfl_acc = []
         for i in self.input:
             yield self.mod.i.eq(int(i))
             yield Tick()
             self.output.append((yield self.mod.o))
-            self.ovfl_acc.append((yield self.mod.ovfl_acc_o))
+            # self.ovfl_acc.append((yield self.mod.ovfl_acc_o))
 
     # ---------------------------------------------------------
     def reset(self):
@@ -201,10 +201,9 @@ class FIR_DF_amaranth(object):
         # Currently doesn't work, output signal is quantized afterwards, resetting 'N_over'
         # fb.fil[0]['fxq']['QO']['N_over'] = 13  # doesn't work, output signal is quantized
 
-        # TODO: Pass Quantizer instead of quantizer dict to requant etc. to update overflow counter
         # logger.warning(f"y = {self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt'])}")
-        N_ovfl_acc = sum(self.ovfl_acc)
-        logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
+        # N_ovfl_acc = sum(self.ovfl_acc)
+        # logger.error(f"N_ovfl_acc = {self.ovfl_acc}")
         return self.Q_O.fixp(self.output, in_frmt='qint', out_frmt=fb.fil[0]['qfrmt']), self.zi
 
 

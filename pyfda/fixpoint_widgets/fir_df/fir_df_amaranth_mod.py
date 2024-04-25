@@ -120,8 +120,8 @@ class FIR_DF_amaranth_mod(Elaboratable):
         self.WO = p['QO']['WI'] + p['QO']['WF'] + 1  # total output word length
         self.i = Signal(signed(self.WI))  # input signal
         self.o = Signal(signed(self.WO))  # output signal
-        self.ovfl_acc_o = Signal()  # requantization overflow bit accumulator
-        self.ovfl_out_o = Signal()  # requantization overflow bit output
+        # self.ovfl_acc_o = Signal()  # requantization overflow bit accumulator
+        # self.ovfl_out_o = Signal()  # requantization overflow bit output
 
     # ---------------------------------------------------------
     def reset(self):
@@ -161,11 +161,11 @@ class FIR_DF_amaranth_mod(Elaboratable):
         # requantize from full partial product wordlength to accumulator format
         sum_accu = Signal(signed(self.W_acc))
         m.d.comb += sum_accu.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[0])
-        m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[1])
+        # m.d.comb += self.ovfl_acc_o.eq(requant(m, sum_full, self.Q_mul.q_dict, self.p['QACC'])[1])
 
         # requantize from accumulator format to output width
         m.d.comb += self.o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[0])
-        m.d.comb += self.ovfl_out_o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[1])
+        # m.d.comb += self.ovfl_out_o.eq(requant(m, sum_accu, self.p['QACC'], self.p['QO'])[1])
 
         return m   # return result as list of integers
 
