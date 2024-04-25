@@ -322,15 +322,15 @@ fil_ref = {
     # dynamically instantiated filter widget
     'wdg_fil' :
         {'equiripple': {'grid_density': 16}},
-    # Parameters for filter design window function
-    'win_fir':
-        {'name': 'Hann',  # Window name
-            'fn_name': 'hann',  # function name or array with values
-            'par': [],    # set of list of window parameters
-            'n_par': 0,   # number of window parameters
-            'info': "",   # Docstring for the window
-            'win_len': 1024
-        }
+    # Parameters for filter design window function - is part of 'wdg_fil'
+    # 'win_fir':
+    #     {'name': 'Hann',  # Window name
+    #         'fn_name': 'hann',  # function name or array with values
+    #         'par': [],    # set of list of window parameters
+    #         'n_par': 0,   # number of window parameters
+    #         'info': "",   # Docstring for the window
+    #         'win_len': 1024
+    #     }
     }
 
   # create empty lists with length 10 for multiple filter designs and undo functions
