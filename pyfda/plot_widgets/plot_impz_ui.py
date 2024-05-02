@@ -14,6 +14,8 @@ from pyfda.libs.compat import (
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
+from scipy.signal import residuez
+
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
@@ -84,8 +86,7 @@ class PlotImpz_UI(QWidget):
         """
         # initial settings
         self.N_start = 0
-        self.N_user = 0
-        self.N = 0
+        self.N = 100
         self.N_frame_user = 0
         self.N_frame = 0
 
@@ -215,18 +216,24 @@ class PlotImpz_UI(QWidget):
         self.prg_wdg.setMinimum(0)
         self.prg_wdg.setValue(0)
 
-        self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
-        self.led_N_points = QLineEdit(self)
-        self.led_N_points.setText(str(self.N))
-        self.led_N_points.setToolTip(
-            "<span>Number of data points to plot. "
-            "<i>N</i> = 0 tries to choose for you.</span>")
-        self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.led_N_start = QLineEdit(self)
         self.led_N_start.setText(str(self.N_start))
         self.led_N_start.setToolTip("<span>First point to plot.</span>")
         self.led_N_start.setMaximumWidth(qtext_width(N_x=8))
+
+        self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
+        self.but_N_auto.setCheckable(True)
+        self.but_N_auto.setChecked(True)
+        # self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
+        self.led_N_points = QLineEdit(self)
+        self.led_N_points.setText(str(self.N))
+        self.led_N_points.setToolTip(
+            "<span>Number of data points to plot. "
+            "Disable <b><i>N</i> =</b> for manual entry.</span>")
+        self.led_N_points.setMaximumWidth(qtext_width(N_x=8))
+        # Enable entry field only for manual mode
+        self.led_N_points.setEnabled(not self.but_N_auto.isChecked())
 
         self.lbl_N_frame = QLabel(to_html("N_Frame", frmt='bi') + " =", self)
         self.lbl_N_frame.setVisible(False)
@@ -281,7 +288,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_frame)
         layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.led_N_start)
-        layH_ctrl_run.addWidget(self.lbl_N_points)
+        layH_ctrl_run.addWidget(self.but_N_auto)
+        # layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addWidget(self.frm_file_io)
         layH_ctrl_run.addSpacing(5)
@@ -618,9 +626,21 @@ class PlotImpz_UI(QWidget):
         # ----------------------------------------------------------------------
         # --- run control ---
         self.led_N_start.editingFinished.connect(self.update_N)
+        self.but_N_auto.clicked.connect(self.update_N_auto)
         self.led_N_points.editingFinished.connect(self.update_N)
         self.led_N_frame.editingFinished.connect(self.update_N)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
+
+    # -------------------------------------------------------------------------
+    def update_N_auto(self):
+        if not self.but_N_auto.isChecked():
+            # manual entry of number of data points, enable data entry and return
+            self.led_N_points.setEnabled(True)
+            return
+        else:
+            # automatic calculation of number of data points, disable data entry
+            self.led_N_points.setEnabled(False)
+            self.update_N()
 
     # -------------------------------------------------------------------------
     def update_N(self, emit=True, N_end=0):
@@ -643,7 +663,7 @@ class PlotImpz_UI(QWidget):
 
         - `self._construct_ui()` with `emit==False`
         - `plot_impz()` with `emit==False` when the automatic calculation
-                of N has to be updated (e.g. order of FIR Filter has changed
+                of N has to be updated (e.g. order of FIR filter) has changed
         - signal-slot connection when `N_start` or `N_end` QLineEdit widgets have
                 been changed (`emit==True`)
         """
@@ -655,30 +675,28 @@ class PlotImpz_UI(QWidget):
                                  return_type='int', sign='poszero')
 
         # Read value for number of data points to be plotted from UI
-        self.N_user = safe_eval(self.led_N_points.text(), self.N_user,
-                                return_type='int', sign='poszero')
+        self.N = safe_eval(self.led_N_points.text(), self.N,
+                                return_type='int', sign='pos')
 
-        if N_end > 0:  # total number of data points was specified, e.g. from file I/O
+        if N_end > 0: # specified max. number of data points, e.g. by file io
             if N_end <= self.N_start:
                 logger.warning(
                     f"Total number of data points must be {N_end} > "
                     f"N_start = {self.N_start}, setting N_start = 0.")
                 self.N_start = 0
-                self.led_N_start.setText(str(self.N_start))  # update widget
+                self.led_N_start.setText("0")  # update widget
 
             self.N_end = N_end
             # calculate number of data points to be plotted
             self.N = self.N_end - self.N_start
-            self.led_N_points.setText(str(self.N))  # update widget
         else:
-            if self.N_user == 0:  # automatic calculation
-                self.N = self.calc_n_points(self.N_user)
-                self.led_N_points.setText("0")  # widget remains set to 0
-            else:
-                self.N = self.N_user  # specified by user
-                self.led_N_points.setText(str(self.N))  # update widget
-            # total number of points to be calculated: N + N_start
+            if self.but_N_auto.isChecked():  # automatic calculation
+                self.N = self.calc_n_points()
+
+            # total number of points to be calculated: N_end = N + N_start
             self.N_end = self.N + self.N_start
+
+        self.led_N_points.setText(str(self.N))  # update widget
 
         # read number of data points per frame from UI
         self.N_frame_user = safe_eval(self.led_N_frame.text(), self.N_frame_user,
@@ -719,7 +737,7 @@ class PlotImpz_UI(QWidget):
         self.fft_widget.hide()
 
     # ------------------------------------------------------------------------------
-    def calc_n_points(self, N_user=0):
+    def calc_n_points(self):
         """
         Calculate number of points to be displayed, depending on type of filter
         (FIR, IIR) and user input. If the user selects 0 points, the number is
@@ -728,15 +746,39 @@ class PlotImpz_UI(QWidget):
         An improvement would be to calculate the dominant pole and the corresponding
         settling time.
         """
-        if N_user == 0:  # set number of data points automatically
-            if fb.fil[0]['ft'] == 'IIR':
-                # IIR: No algorithm yet, set N = 100
-                N = 100
-            else:
-                # FIR: N = number of coefficients (min. 25, max. 100)
-                N = max(min(len(fb.fil[0]['ba'][0]), 100), 25)
+        if fb.fil[0]['ft'] == 'IIR':
+            # IIR: No algorithm yet, set N = 100
+            # https://dsp.stackexchange.com/questions/68023/iir-filter-relaxation-time-computation
+            # calculation from p/z:
+            # https://stackoverflow.com/questions/63042332/scipy-signal-residue-or-scipy-signal-residuez-using-zeros-poles-gain-represe
+            # num = [2 3 4];
+            # den = [7 -6 5 -4 3];
+            # [r, p] = residuez(num, den);
+            # n = [0:25];
+            # h = real(sum(  abs(r).*exp( n.*log( abs(p) ) ) ...
+            # .*sin( n.*arg(p) + arg(1j*r) )  ));
+            # h(1) = num(1)/den(1);
+            # t = linspace(0, 25, 1001);
+            # g = sum( r.*p.^t );
+            # c1 = sum( abs(r).*exp(t.*log(abs(p))) );
+            # c2 = sum( abs(r).*abs(p).^t );
+            # plot( n, h, "or", ...
+            #     n, impz(num, den)(1:length(n)), "xb", ...
+            #     t, g, "g", ...
+            #     t, abs(g), ":k", ...
+            #     t, c1, ".-c", ...
+            #     t, c2, "-.m" )
+
+            # calculate partial fraction expansion of b(z) / a(z), returning
+            # residues, poles,
+            r, p, k = residuez(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], tol=0.001, rtype='avg')
+            logger.error(f"r = {r}\np = {p},\nk = {k}")
+            ord = max(len(r), len(p))
+
+            N = 100
         else:
-            N = N_user
+            # FIR: N = number of coefficients (min. 25, max. 2048)
+            N = max(min(len(fb.fil[0]['ba'][0]), 2048), 25)
 
         return N
 
