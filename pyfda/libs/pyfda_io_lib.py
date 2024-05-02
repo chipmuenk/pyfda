@@ -729,7 +729,7 @@ def csv2array(f: TextIO):
             logger.error(f"Not enough data: '{data_arr}'")
             return None
         else:
-            return data_arr
+            data = data_arr
 
     elif np.ndim(data_arr) == 2:
         rows, cols = np.shape(data_arr)
@@ -745,20 +745,23 @@ def csv2array(f: TextIO):
             csv2array.info_str = "T:" + csv2array.info_str
             if use_header:
                 logger.info(f"Skipping header {data_arr.T[0]}")
-                return data_arr.T[1:]
+                data = data_arr.T[1:]
             else:
-                return data_arr.T
+                data = data_arr.T
         else:  # column format
             logger.info(f"Building table with {cols} column(s) and {rows} rows.")
             if use_header:
                 logger.info(f"Skipping header {data_arr[0]}")
-                return data_arr[1:]
+                data = data_arr[1:]
             else:
-                return data_arr
+                data = data_arr
     else:
         logger.error(f"Unsuitable data shape: ndim = {np.ndim(data_arr)}, "
                      f"shape = { np.shape(data_arr)}")
         return None
+
+    csv2array.nchans = np.ndim(data)
+    return data
 
 #-------------------------------------------------------------------------------
 def read_csv_info_old(filename):
@@ -999,6 +1002,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = 
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 load_data_np.info_str = csv2array.info_str
+                logger.error(f"load_data_np: {csv2array.info_str}")
                 # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if data_arr is None:
                     # an error has occurred
