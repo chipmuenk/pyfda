@@ -154,6 +154,7 @@ class Tran_IO(QWidget):
         When an error occurred, return -1.
 
         """
+
         # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
 
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
@@ -164,10 +165,11 @@ class Tran_IO(QWidget):
             self, title="Select file for data import", mode="r",
             file_types=file_type)
 
-        if self.file_name is None:  # operation cancelled
+        if self.file_name is None:  # operation cancelled, restore previous settings
             self.file_name = file_name_prev
             self.file_type = file_type_prev
             qset_cmb_box(self.ui.cmb_file_format, self.file_type)
+            self.ui.set_ui_visibility()
             return -1
 
         self.unload_data()  # reset load and normalize button
@@ -177,6 +179,7 @@ class Tran_IO(QWidget):
         self.WL = None
 
         info_str = ""
+        err = False
 
         if self.file_type == 'wav':
             ret = io.read_wav_info(self.file_name)
@@ -184,40 +187,51 @@ class Tran_IO(QWidget):
                 return -1
             self.data_raw = io.load_data_np(self.file_name, 'wav')
             if self.data_raw is None:  # an error occurred
-                return -1
-            self.N = io.read_wav_info.N
-            self.nchans = io.read_wav_info.nchans
-            self.f_s_file = io.read_wav_info.f_S
-            self.WL = io.read_wav_info.WL
-            # info_str = f" x {self.WL * 8} bits,"
-            info_str = f" x {io.read_wav_info.sample_format},"
-            self.ui.frm_f_s.setVisible(True)
-            self.ui.lbl_f_s_value.setText(str(self.f_s_file))
+                err = True
+            else:
+                self.f_s_file = io.read_wav_info.f_S
+                self.WL = io.read_wav_info.WL
+                info_str = f" x {io.read_wav_info.sample_format},"
+                self.ui.lbl_f_s_value.setText(str(self.f_s_file))
 
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
             self.data_raw = io.load_data_np(self.file_name, 'csv')
             if self.data_raw is None:
-                logger.error(f"Could not load '{self.file_name}'.")
-                qstyle_widget(self.ui.but_load, "error")
-                return -1
-
-            # self.N, self.nchans = np_shape(self.data_raw)
-            # if self.N in {None, 0}:  # data is scalar, None or multidim
-            #     qstyle_widget(self.ui.but_load, "error")
-            #     logger.warning("Unsuitable data format")
-            #     return -1
-            info_str = f" ({io.load_data_np.info_str})"
+                err = True
+            else:
+                info_str = f" ({io.load_data_np.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
             qstyle_widget(self.ui.but_load, "error")
             return -1
+
+        if len(self.file_name) < 45:
+            self.ui.lbl_filename.setText(self.file_name)
+        else:
+            self.ui.lbl_filename.setText(
+                self.file_name[:10] + ' ... ' + self.file_name[-20:])
+        self.ui.lbl_filename.setToolTip(self.file_name)
+
+        if err:
+            logger.error(f"Could not load '{self.file_name}'.")
+            self.ui.lbl_shape_actual.setText("None")
+            qstyle_widget(self.ui.but_load, "error")
+            return -1
+
+        if np.ndim(self.data_raw) == 1:
+            self.N = len(self.data_raw)
+            self.nchans = 1
+        else:
+            self.N = np.shape(self.data_raw)[0]
+            self.nchans = np.shape(self.data_raw)[1]
 
         if self.nchans > 2:
             logger.warning(
                 f"Unsuitable file format with {self.nchans} > 2 channels.")
             qstyle_widget(self.ui.but_load, "error")
             return -1
+
         elif self.nchans == 1:
             self.ui.lbl_chan_import.setVisible(False)
             self.ui.cmb_chan_import.setVisible(False)
@@ -225,13 +239,6 @@ class Tran_IO(QWidget):
             self.ui.lbl_chan_import.setVisible(True)
             self.ui.cmb_chan_import.setVisible(True)
 
-        if len(self.file_name) < 45:
-            self.ui.lbl_filename.setText(self.file_name)
-        else:
-            self.ui.lbl_filename.setText(
-                self.file_name[:10] + ' ... ' + self.file_name[-20:])
-
-        self.ui.lbl_filename.setToolTip(self.file_name)
         self.ui.lbl_shape_actual.setText(
             f"{self.nchans} x {self.N}{info_str}")
         return 0
@@ -273,8 +280,6 @@ class Tran_IO(QWidget):
         if not hasattr(self, 'data_raw') or self.data_raw is None:
             logger.warning("No data loaded yet.")
             return None
-
-        logger.info(pprint_log(self.data_raw))
 
         if self.data_raw.ndim == 1:
             data = self.data_raw
