@@ -84,9 +84,9 @@ def impz(b, a=1, FS=1, N=0, step=False):
 
     if N == 0:  # set number of data points automatically
         if IIR:
-            N = 100  # TODO: IIR: more intelligent algorithm needed
+            N = impz_len([b, a])
         else:
-            N = min(len(b),  100)  # FIR: N = number of coefficients (max. 100)
+            N = len(b)  # FIR: N = number of coefficients
 
     impulse = np.zeros(N)
     impulse[0] = 1.0  # create dirac impulse as input signal
@@ -97,6 +97,86 @@ def impz(b, a=1, FS=1, N=0, step=False):
         hn = np.cumsum(hn)
 
     return hn, td
+
+# ------------------------------------------------------------------------------
+def impz_len(system, zpk: bool = False, level: float = -40) -> int:
+    """
+    Calculate length of impulse response for FIR and IIR filters.
+
+    Parameters
+    ----------
+    system: array-like
+        The discrete-time system, either specified by its coefficients or its poles
+        and zeros.
+
+    zpk: bool
+        When False (default), the system is specified by its coefficients.
+
+    level: float
+        The relative level in dB to which the impulse response has decayed (relevant
+         IIR filters only).
+
+    Returns
+    -------
+    N: int
+        The length of the impulse response.
+
+    Notes
+    ------
+
+    For FIR filters, the lenngth of the impulse response is equal to the number
+    of filter taps (= filter order + 1).
+
+    For IIR filters, it is only possible to approximate the number of steps until
+    the relative level of the impulse response is below the specified `level`.
+
+    The most simple approximation for IIR filters is to only regard the pole :math:`p_{max}`
+    nearest to the unit circle. For many real-world filters and systems, this pole
+    dominates the transient response ("dominant pole approximation") [JOS_time_constant]_
+    with a time constant
+
+    .. math::
+
+        \\tau\\approx \\frac{T_S}{1-\\abs{p}_{max}}
+
+    When calculating the number of samples instead of an absolute time, `T_S = 1`.
+
+    The number of samples required to reach `level` in dBs is calculated with
+
+    .. math::
+
+        N \\approx -level/20 * \\ln(10) \\tau
+
+    When poles are specified (`zpk == True`), it is of course easy to find the
+    dominant pole. When coefficients of the system are specified, poles can be
+    calculated as the roots of the system
+
+    Alternatively, partial fraction expansion (PFE) yields
+    poles and residues. These can be used for a more general solution, see
+    [dsp_stackexchange_2021]_, [dsp_stackexchange_2022]_.
+    """
+
+    if fb.fil[0]['ft'] == 'IIR':
+        if zpk:
+            p = system[1]
+        else:
+            r, p, k = sig.residuez(system[0], system[1], tol=0.001, rtype='avg')
+        if max(abs(p)) >= 1:
+            logger.warning(
+                "Unstable system with one or more poles outside the unit circle!")
+            N = 100
+        else:
+            # only use dominant pole with for calculation and
+            # estimate limit when impulse response has dropped to `level`
+            N = int(round(abs(level)/20 * np.log(10)  / (1 - max(np.abs(p)))))
+    else:
+        # FIR: length of impulse response = number of coefficients or order + 1
+        if zpk:
+            N = len(system[0]) + 1
+        else:
+            N = len(system[0])
+    return N
+
 # --------------------------------------------------------------------------
 def zeros_with_val(N: int, val: float = 1., pos: int = 0):
     """

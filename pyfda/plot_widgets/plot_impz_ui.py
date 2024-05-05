@@ -14,9 +14,8 @@ from pyfda.libs.compat import (
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
-from scipy.signal import residuez
-
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
+from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
@@ -691,7 +690,7 @@ class PlotImpz_UI(QWidget):
             self.N = self.N_end - self.N_start
         else:
             if self.but_N_auto.isChecked():  # automatic calculation
-                self.N = self.calc_n_points()
+                self.N = impz_len(fb.fil[0]['ba'], level=-40)
 
             # total number of points to be calculated: N_end = N + N_start
             self.N_end = self.N + self.N_start
@@ -735,53 +734,6 @@ class PlotImpz_UI(QWidget):
         """
         self.but_fft_wdg.setChecked(False)
         self.fft_widget.hide()
-
-    # ------------------------------------------------------------------------------
-    def calc_n_points(self):
-        """
-        Calculate number of points to be displayed, depending on type of filter
-        (FIR, IIR) and user input. If the user selects 0 points, the number is
-        calculated automatically.
-
-        An improvement would be to calculate the dominant pole and the corresponding
-        settling time.
-        """
-        if fb.fil[0]['ft'] == 'IIR':
-            # IIR: No algorithm yet, set N = 100
-            # https://dsp.stackexchange.com/questions/68023/iir-filter-relaxation-time-computation
-            # calculation from p/z:
-            # https://stackoverflow.com/questions/63042332/scipy-signal-residue-or-scipy-signal-residuez-using-zeros-poles-gain-represe
-            # num = [2 3 4];
-            # den = [7 -6 5 -4 3];
-            # [r, p] = residuez(num, den);
-            # n = [0:25];
-            # h = real(sum(  abs(r).*exp( n.*log( abs(p) ) ) ...
-            # .*sin( n.*arg(p) + arg(1j*r) )  ));
-            # h(1) = num(1)/den(1);
-            # t = linspace(0, 25, 1001);
-            # g = sum( r.*p.^t );
-            # c1 = sum( abs(r).*exp(t.*log(abs(p))) );
-            # c2 = sum( abs(r).*abs(p).^t );
-            # plot( n, h, "or", ...
-            #     n, impz(num, den)(1:length(n)), "xb", ...
-            #     t, g, "g", ...
-            #     t, abs(g), ":k", ...
-            #     t, c1, ".-c", ...
-            #     t, c2, "-.m" )
-
-            # calculate partial fraction expansion of b(z) / a(z), returning
-            # residues, poles,
-            r, p, k = residuez(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1], tol=0.001, rtype='avg')
-            logger.error(f"r = {r}\np = {p},\nk = {k}")
-            ord = max(len(r), len(p))
-
-            N = 100
-        else:
-            # FIR: N = number of coefficients (min. 25, max. 2048)
-            N = max(min(len(fb.fil[0]['ba'][0]), 2048), 25)
-
-        return N
-
 
 # ------------------------------------------------------------------------------
 def main():
