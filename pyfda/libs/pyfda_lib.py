@@ -1736,6 +1736,8 @@ def fil_convert(fil_dict: dict, format_in) -> None:
     elif 'ba' in format_in:  # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite([b, a])):
+            # TODO: use mpmath.polyroots() here for higher precision
+            # https://mpmath.org/doc/current/calculus/polynomials.html
             zpk = sig.tf2zpk(b, a)
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"

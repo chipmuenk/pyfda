@@ -21,46 +21,48 @@ import pyfda.libs.pyfda_lib as pyfda_lib
 import pyfda.filterbroker as fb
 
 
+# ------------------------------------------------------------------------------
+
 def impz(b, a=1, FS=1, N=0, step=False):
     """
-Calculate impulse response of a discrete time filter, specified by
-numerator coefficients b and denominator coefficients a of the system
-function H(z).
+    Calculate impulse response of a discrete time filter, specified by
+    numerator coefficients b and denominator coefficients a of the system
+    function H(z).
 
-When only b is given, the impulse response of the transversal (FIR)
-filter specified by b is calculated.
+    When only b is given, the impulse response of the transversal (FIR)
+    filter specified by b is calculated.
 
-Parameters
-----------
-b :  array_like
-     Numerator coefficients (transversal part of filter)
+    Parameters
+    ----------
+    b :  array_like
+        Numerator coefficients (transversal part of filter)
 
-a :  array_like (optional, default = 1 for FIR-filter)
-     Denominator coefficients (recursive part of filter)
+    a :  array_like (optional, default = 1 for FIR-filter)
+        Denominator coefficients (recursive part of filter)
 
-FS : float (optional, default: FS = 1)
-     Sampling frequency.
+    FS : float (optional, default: FS = 1)
+        Sampling frequency.
 
-N :  float (optional)
-     Number of calculated points.
-     Default: N = len(b) for FIR filters, N = 100 for IIR filters
+    N :  float (optional)
+        Number of calculated points.
+        Default: N = len(b) for FIR filters, N = 100 for IIR filters
 
-step : bool (optional, default False)
-     return the step response instead of the impulse response
+    step : bool (optional, default False)
+        return the step response instead of the impulse response
 
-Returns
--------
-hn : ndarray
-    impulse or step response with length N (see above)
-td : ndarray
-    contains the time steps with same length as hn
+    Returns
+    -------
+    hn : ndarray
+        impulse or step response with length N (see above)
+    td : ndarray
+        contains the time steps with same length as hn
 
 
-Examples
---------
->>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
->>> h, n = dsp_lib.impz(b)
-"""
+    Examples
+    --------
+    >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
+    >>> h, n = dsp_lib.impz(b)
+    """
     a = np.asarray(a)
     b = np.asarray(b)
 
