@@ -3,6 +3,12 @@ Literature
 
 .. rubric:: References
 
+.. [dsp_stackexchange_2021] "Estimating reverberant time (T60) of an IIR filter", 30.8. 2021, 
+    https://dsp.stackexchange.com/questions/77005/estimating-reverberant-time-t60-of-an-iir-filter
+
+.. [dsp_stackexchange_2022] "IIR filter relaxation time computation", 30.6.2022
+    https://dsp.stackexchange.com/questions/68023/iir-filter-relaxation-time-computation
+
 .. [Endolith_5828333] Endolith,"designtools.py", Github Gist https://gist.github.com/endolith/5828333
 
 .. [JOS] Julius O. Smith III, "Numerical Computation of Group Delay" in
@@ -11,6 +17,10 @@ Literature
     http://ccrma.stanford.edu/~jos/filters/Numerical_Computation_Group_Delay.html,
     referenced 2014-04-02 or
     https://www.dsprelated.com/freebooks/filters/Numerical_Computation_Group_Delay.html
+
+.. [JOS_time_constant] Julius O. Smith III, "Time Constant of One Pole", from "Introduction to
+    digital filters",
+    https://ccrma.stanford.edu/~jos/fp/Time_Constant_One_Pole.html
 
 .. [Lyons] Richard Lyons, "Understanding Digital Signal Processing", 3rd Ed.,
     Prentice Hall, 2010.
