@@ -33,7 +33,7 @@ except ImportError:
     xlsx = None
 
 from pyfda.libs.pyfda_lib import (
-    safe_eval, lin2unit, pprint_log, iter2ndarray, sanitize_imported_dict)
+    safe_eval, lin2unit, pprint_log, iter2ndarray, compare_dictionaries)
 from pyfda.libs.pyfda_qt_lib import qget_selected, popup_warning
 
 import pyfda.libs.pyfda_fix_lib as fx
@@ -1612,6 +1612,13 @@ def load_filter(self) -> int:
     Load filter from zipped binary numpy array or (c)pickled object to
     filter dictionary
     """
+    def sanitize_imported_dict(new_dict: dict) -> list:
+        key_errs = compare_dictionaries(fb.fil_ref, new_dict)
+        key_errs[0].sort()
+        key_errs[1].sort()
+        return key_errs[0], key_errs[1]
+    # ----------------------------
+
     file_name, file_type = select_file(
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
 
@@ -1673,21 +1680,24 @@ def load_filter(self) -> int:
 
 # --------------------
     try:
-        keys_missing, keys_unsupported = sanitize_imported_dict(fb.fil[0])
+        key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
+        key_errs[0].sort()  # keys missing in the loaded dict
+        key_errs[1].sort()  # unsupported keys; keys not in reference dict
+
         err_str = ""
-        if keys_missing != []:
+        if key_errs[0] != []:
             # '\n'.join(...) converts list to multi-line string
             err_str += (
-                f"The following {len(keys_missing)} key(s) have not been found in "
+                f"The following {len(key_errs[0])} key(s) have not been found in "
                 f"the loaded dict,\n"\
-                f"\tthey are copied with their values from the reference dict:\n"
-                    + "{0}".format('\n'.join(keys_missing))
+                f"\tthey are copied with their values from the reference dict:\n\t"
+                    + "{0}".format('\n\t'.join(key_errs[0]))
                 )
-        if keys_unsupported != []:
+        if key_errs[1] != []:
             err_str += (
-                f"\nThe following {len(keys_unsupported)} key(s) are not part of the "
-                f"reference dict and have been deleted:\n"
-                + "{0}".format('\n'.join(keys_unsupported))
+                f"\nThe following {len(key_errs[1])} key(s) are not part of the "
+                f"reference dict and have been ignored:\n\t"
+                + "{0}".format('\n\t'.join(key_errs[1]))
             )
         if err_str != "":
             logger.warning(err_str)
