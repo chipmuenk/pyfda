@@ -1,10 +1,28 @@
 # Changelog
-## [v0.9.0b2](https://github.com/chipmuenk/pyfda/tree/v0.9.0b2) (2024-04-xx)
+## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-04-xx)
+### Open
+- Coefficients are saved with only 8 digits of accuracy (\#239)
+- Scaling of single-sided complex-valued spectra (\#242)
+- Amaranth verilog export
+
 ### Bugfixes
+- The number of data points for the impulse response of FIR filters is no longer limited to 100 and the
+  automatic calculation for the number of data points now is enabled by a push button instead of setting
+  'N = 0' [issue \#246](https://github.com/chipmuenk/pyfda/issues/246)
 - Fixed warnings about unknown entries 'value' and 'matplotlib'
 - Fixed a lot of errors in docstrings and documentation generating errors and warnings
   during the Sphinx ReadTheDocs document generation
-- When saving filters, only the keys from the reference filter dict are stored
+- When saving filters, store only keys from the reference filter (and warn about unsupported
+  keys).
+- Fixed more problems when loading / saving fixpoint filters [issue \#239](https://github.com/chipmuenk/pyfda/issues/239)
+- Fixed problems when loading / saving windowed and equiripple filters.
+- Fixed problems when loading csv audio files
+
+### New features
+- Provide a simple example of an Amaranth fixpoint filter (needs to be enabled in pyfda.conf)
+- Provide an estimation for the length of the impulse response of IIR filters until -40 dB are
+  reached (currently hardcoded)
+
 
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
 ### Changed settings and behaviour
@@ -12,9 +30,9 @@
 - Initial width of rect pulse now is T_1 = 10
 
 ### New features
-- load / save filters to 9 different memory locations
+- load / save filters to 9 different memory locations [issue \#220](https://github.com/chipmuenk/pyfda/issues/220)
 - coefficients can be saved in CMSIS format directly via 'save coefficients', this
-  is no longer hidden in the CSV options
+  is no longer hidden in the CSV options [issue \#213](https://github.com/chipmuenk/pyfda/issues/213)
 - in 'float' mode, fixpoint widget is now invisible and fixpoint simulations are no longer run
 - filters can be saved and loaded in JSON format
 - show fixpoint ranges for input and output separately
@@ -28,8 +46,8 @@
 - fixed bugs w.r.t. behaviour of locking absolute frequencies in filter design widget
 - highlighting frequencies outside the first Nyquist zone 0 ... f_S resp. -f_S/2 ... f_S/2 didn't work
   reliably
-- #243 where deleting all cells results in an index error
-- #239: lots of bugs fixed w.r.t. fixpoint and especially integer fixpoint behaviour
+- [issue \#243](https://github.com/chipmuenk/pyfda/issues/243) where deleting all cells results in an index error
+- [issue \#239](https://github.com/chipmuenk/pyfda/issues/239): lots of bugs fixed w.r.t. fixpoint and especially integer fixpoint behaviour
 - fix behaviour when no fixpoint filter exists for a filter class
 - lots of bugs fixed for loading / saving filters
 - fixed several bugs w.r.t. signalling, causing multiple executions of code and erroneous ui updates
@@ -57,7 +75,7 @@
 
 ### Bugfixes
 
-- Fix crashes when saving coefficients in fixpoint format ( [Issue \#230](https://github.com/chipmuenk/pyfda/issues/230) and [Issue \#238](https://github.com/chipmuenk/pyfda/issues/238))
+- Fix crashes when saving coefficients in fixpoint format ( [issue \#230](https://github.com/chipmuenk/pyfda/issues/230) and [\#238](https://github.com/chipmuenk/pyfda/issues/238))
 - Update images for README.md and readthedocs documentation
 - Rename square to rect stimulus in y[n] stimuli
 - Allow for zero or negative delays in y[n] stimuli
