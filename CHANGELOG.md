@@ -1,11 +1,14 @@
 # Changelog
-## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-04-xx)
+
+## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-05-xx)
+
 ### Open
-- Coefficients are saved with only 8 digits of accuracy (\#239)
+
 - Scaling of single-sided complex-valued spectra (\#242)
 - Amaranth verilog export
 
 ### Bugfixes
+
 - The number of data points for the impulse response of FIR filters is no longer limited to 100 and the
   automatic calculation for the number of data points now is enabled by a push button instead of setting
   'N = 0' [issue \#246](https://github.com/chipmuenk/pyfda/issues/246)
@@ -19,17 +22,20 @@
 - Fixed problems when loading csv audio files
 
 ### New features
+
 - Provide a simple example of an Amaranth fixpoint filter (needs to be enabled in pyfda.conf)
 - Provide an estimation for the length of the impulse response of IIR filters until -40 dB are
   reached (currently hardcoded)
 
-
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
+
 ### Changed settings and behaviour
+
 - Minimum initial number of data points in the y[n] tab now is 25
 - Initial width of rect pulse now is T_1 = 10
 
 ### New features
+
 - load / save filters to 9 different memory locations [issue \#220](https://github.com/chipmuenk/pyfda/issues/220)
 - coefficients can be saved in CMSIS format directly via 'save coefficients', this
   is no longer hidden in the CSV options [issue \#213](https://github.com/chipmuenk/pyfda/issues/213)
@@ -43,6 +49,7 @@
 - numexpr >= 2.8.8 is now required as '1j' is parsed by numexpr again
 
 ### Bugfixes
+
 - fixed bugs w.r.t. behaviour of locking absolute frequencies in filter design widget
 - highlighting frequencies outside the first Nyquist zone 0 ... f_S resp. -f_S/2 ... f_S/2 didn't work
   reliably
@@ -51,7 +58,6 @@
 - fix behaviour when no fixpoint filter exists for a filter class
 - lots of bugs fixed for loading / saving filters
 - fixed several bugs w.r.t. signalling, causing multiple executions of code and erroneous ui updates
-
 
 ## [v0.8.4](https://github.com/chipmuenk/pyfda/tree/v0.8.4) (2023-10-10)
 
@@ -145,7 +151,8 @@
 - All tabs: Allow hiding the control options for maximum plotting area via a new
    button in the toolbar
 
-- All tabs: Lots of little UI and tooltip improvements 
+- All tabs: Lots of little UI and tooltip improvements
+
 ## [v0.7.1](https://github.com/chipmuenk/pyfda/tree/v0.7.1) (2022-10-05)
 
 ### Bugfixes
@@ -195,7 +202,7 @@
 
 ## [v0.6.0](https://github.com/chipmuenk/pyfda/tree/v0.6.0) (2021-12-23)
 
-### Bug fixes
+### Bugfixes
 
 - Recalculate frequency specs in 'k' in the y[n] widget when `self.N` has been changed
 - Renamed file `iir_df1.py` to `iir_df1.py_bak` to prevent it from being analyzed
@@ -280,7 +287,7 @@
 
 (There is no release v0.5.2)
 
-### Bug fixes
+### Bugfixes
 
 - Use f_C widgets in elliptic manual filter design (entered values had not been
   used for the filter design)
@@ -294,7 +301,7 @@
 
 ## [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
 
-### Bug fixes
+### Bugfixes
 
 - Stimulus FM modulation had a false definition. For sinusoidal modulation, it
   is identical to PM modulation. FM modulation is deleted, PM modulation is renamed
