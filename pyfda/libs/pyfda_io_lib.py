@@ -1609,16 +1609,9 @@ def export_coe_cmsis(f: TextIO) -> None:
 # ==============================================================================
 def load_filter(self) -> int:
     """
-    Load filter from zipped binary numpy array or (c)pickled object to
+    Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
     """
-    def sanitize_imported_dict(new_dict: dict) -> list:
-        key_errs = compare_dictionaries(fb.fil_ref, new_dict)
-        key_errs[0].sort()
-        key_errs[1].sort()
-        return key_errs[0], key_errs[1]
-    # ----------------------------
-
     file_name, file_type = select_file(
         self, title="Load Filter", mode="rb", file_types = ("json", "npz", "pkl"))
 
