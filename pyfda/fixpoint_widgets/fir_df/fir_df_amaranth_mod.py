@@ -78,7 +78,6 @@ class FIR_DF_amaranth_mod(Elaboratable):
         -------
         None.
         """
-        logger.warning("Initializing filter")
         self.p = p  # parameter dictionary with coefficients etc.
 
         # update the quantizers from the dictionary
