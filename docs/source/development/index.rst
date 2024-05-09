@@ -12,7 +12,7 @@ This part of the documentation describes the features of pyFDA that are relevant
    
    dev_general
    pyfda_main_routines
-   pyfda.libs.rst
+..   pyfda.libs.rst
    pyfda_input_widgets
    pyfda_plot_widgets
    pyfda_filter_widgets
