@@ -245,6 +245,15 @@ class FIR_DF_amaranth_UI(QWidget):
         self.wdg_wq_coeffs.update_ovfl_cnt()
         self.wdg_wq_accu.update_ovfl_cnt()
 
+# ------------------------------------------------------------------------------
+    def to_hdl(self, **kwargs):
+        """
+        Convert the Amaranth description to Verilog
+        """
+        return verilog.convert(self.fx_filt.mod,
+                               ports=[self.fx_filt.mod.i, self.fx_filt.mod.o],
+                               **kwargs)
+
     # --------------------------------------------------------------------------
     def fxfilter(self, stimulus):
         """

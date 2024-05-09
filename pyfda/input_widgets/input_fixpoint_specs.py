@@ -804,14 +804,12 @@ class Input_Fixpoint_Specs(QWidget):
             hdl_full_name = os.path.join(hdl_dir_name, hdl_file_name + ".v")
             dirs.last_file_name = hdl_full_name
             dirs.last_file_dir = hdl_dir_name  # make this directory the new default / base dir
-            # dirs.file
             # remove all non-alphanumeric chars:
             vlog_mod_name = re.sub(r'\W+', '', hdl_file_name).lower()
 
             logger.info('Creating hdl_file "{0}"\n\twith top level module "{1}"'
                         .format(hdl_full_name, vlog_mod_name))
             try:
-                self.fx_filt_ui.construct_fixp_filter()
                 code = self.fx_filt_ui.to_hdl(name=vlog_mod_name)
                 # logger.info(str(code)) # print verilog code to console
                 with io.open(hdl_full_name, 'w', encoding="utf8") as f:
