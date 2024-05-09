@@ -21,12 +21,12 @@ def col(i):
     def _col(self):
         return g(self,i)
     return _col
-    
+
 #--------------------------------------------------------------------------
 def freeze_hierarchical(hier_dict):
     """
     Return the argumenent as a FrozenDict where all nested dicts have also been
-    converted to FrozenDicts recursively. When the argument is not a dict, 
+    converted to FrozenDicts recursively. When the argument is not a dict,
     return the argument unchanged.
     """
     if isinstance(hier_dict, dict):
@@ -53,20 +53,21 @@ class Item(tuple):
         fundamental property of mathematics. That property, which says that
         a == b and b == c implies a == c, does not hold for this object.
         Here's a demonstration:
-            [in]  >>> x = Item(('a',4))
-            [in]  >>> y = Item(('a',5))
-            [in]  >>> hash('a')
-            [out] >>> 194817700
-            [in]  >>> hash(x)
-            [out] >>> 194817700
-            [in]  >>> hash(y)
-            [out] >>> 194817700
-            [in]  >>> 'a' == x
-            [out] >>> True
-            [in]  >>> 'a' == y
-            [out] >>> True
-            [in]  >>> x == y
-            [out] >>> False
+
+        >>> x = Item(('a',4))
+        >>> y = Item(('a',5))
+        >>> hash('a')
+        >>> 194817700
+        >>> hash(x)
+        >>> 194817700
+        >>> hash(y)
+        >>> 194817700
+        >>> 'a' == x
+        >>> True
+        >>> 'a' == y
+        >>> True
+        >>> x == y
+        >>> False
     '''
 
     __slots__ = ()
@@ -85,37 +86,44 @@ class Item(tuple):
         return 'Item((%r, %r))' % self
 
 class FrozenDict(frozenset):
-    ''' Behaves in most ways like a regular dictionary, except that it's immutable.
+    '''
+    Behaves in most ways like a regular dictionary, except that it's immutable.
         It differs from other implementations because it doesn't subclass "dict".
         Instead it subclasses "frozenset" which guarantees immutability.
         FrozenDict instances are created with the same arguments used to initialize
         regular dictionaries, and has all the same methods.
-            [in]  >>> f = FrozenDict(x=3,y=4,z=5)
-            [in]  >>> f['x']
-            [out] >>> 3
-            [in]  >>> f['a'] = 0
-            [out] >>> TypeError: 'FrozenDict' object does not support item assignment
 
-        FrozenDict can accept un-hashable values, but FrozenDict is only hashable if its values are hashable.
-            [in]  >>> f = FrozenDict(x=3,y=4,z=5)
-            [in]  >>> hash(f)
-            [out] >>> 646626455
-            [in]  >>> g = FrozenDict(x=3,y=4,z=[])
-            [in]  >>> hash(g)
-            [out] >>> TypeError: unhashable type: 'list'
+        >>> f = FrozenDict(x=3,y=4,z=5)
+        >>> f['x']
+        >>> 3
+        >>> f['a'] = 0
+        >>> TypeError: 'FrozenDict' object does not support item assignment
 
-        FrozenDict interacts with dictionary objects as though it were a dict itself.
-            [in]  >>> original = dict(x=3,y=4,z=5)
-            [in]  >>> frozen = FrozenDict(x=3,y=4,z=5)
-            [in]  >>> original == frozen
-            [out] >>> True
+        FrozenDict can accept un-hashable values, but FrozenDict is only hashable
+        if its values are hashable.
 
-        FrozenDict supports bi-directional conversions with regular dictionaries.
-            [in]  >>> original = {'x': 3, 'y': 4, 'z': 5}
-            [in]  >>> FrozenDict(original)
-            [out] >>> FrozenDict({'x': 3, 'y': 4, 'z': 5})
-            [in]  >>> dict(FrozenDict(original))
-            [out] >>> {'x': 3, 'y': 4, 'z': 5}   '''
+        >>> f = FrozenDict(x=3, y=4, z=5)
+        >>> hash(f)
+        >>> 646626455
+        >>> g = FrozenDict(x=3,y=4,z=[])
+        >>> hash(g)
+        >>> TypeError: unhashable type: 'list'
+
+        FrozenDict interacts with dictionary objects as though it were a dict itself:
+
+        >>> original = dict(x=3, y=4, z=5)
+        >>> frozen = FrozenDict(x=3, y=4, z=5)
+        >>> original == frozen
+        >>> True
+
+        FrozenDict supports bi-directional conversions with regular dictionaries:
+
+        >>> original = {'x': 3, 'y': 4, 'z': 5}
+        >>> FrozenDict(original)
+        >>> FrozenDict({'x': 3, 'y': 4, 'z': 5})
+        >>> dict(FrozenDict(original))
+        >>> {'x': 3, 'y': 4, 'z': 5}
+        '''
 
     __slots__ = ()
     def __new__(cls, orig={}, **kw):
