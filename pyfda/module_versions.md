@@ -10,7 +10,7 @@
 | [Qt5](https://qt.io/) | {V_QT} | LPGLv3 | Widget library (UI etc.) |
 | [PyQt](https://www.riverbankcomputing.com/software/pyqt/) | {V_PYQT} | GPLv3 | Python bindings for Qt5 |
 | [Markdown](https://github.com/Python-Markdown/markdown) |  {V_MD} | BSD | Markdown implementation |
-| **Optional** |||
+| **Optional** ||||
 | [docutils](https://docutils.sourceforge.io) | {V_DOC} | GPLv3 a.o. | Plain text -> markup formats |
 | [mplcursors](https://github.com/anntzer/mplcursors)&emsp; | {V_CUR} | MIT | Interactive cursors (needs Matplotlib >= 3.1) |
 | [Amaranth](https://amaranth-lang.org) | {V_AM} | BSD-2 | Hardware definition language |
