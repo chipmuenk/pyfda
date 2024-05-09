@@ -190,7 +190,7 @@ def mod_version(mod: str = "") -> str:
         if mod in MODULES:
             return LooseVersion(list(MODULES[mod].values())[0])
         else:
-            return None
+            return ""
     else:
         v_md = ""
         with open(os.path.join(dirs.INSTALL_DIR, "module_versions.md"), 'r') as f:
