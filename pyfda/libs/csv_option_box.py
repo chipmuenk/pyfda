@@ -29,13 +29,12 @@ class CSV_option_box(QDialog):
     reading Comma-Separated Value (CSV) files containing coefficients or poles
     and zeros.
     """
-    sig_tx = pyqtSignal(object)  # outgoing  # was: (dict)
+    sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
 
-        # self.has_cmsis = has_cmsis
         self.cmb_destination_default = "file"
         self.cmb_delimiter_default = "auto"
         self.cmb_terminator_default = "auto"
@@ -130,15 +129,6 @@ class CSV_option_box(QDialog):
         qcmb_box_populate(self.cmb_header, cmb_header_items,
                           self.cmb_header_default)
 
-        # lbl_cmsis = QLabel("CMSIS SOS format", self)
-        # lbl_cmsis.setVisible(self.has_cmsis)
-        # self.chk_cmsis = QCheckBox()
-        # self.chk_cmsis.setChecked(False)
-        # self.chk_cmsis.setToolTip(
-        #     "<span>Use CMSIS DSP second-order sections format "
-        #     "(only for IIR coefficients).</span>")
-        # self.chk_cmsis.setVisible(self.has_cmsis)
-
         lay_grid = QGridLayout()
         lay_grid.addWidget(lbl_destination, 0, 1)
         lay_grid.addWidget(self.cmb_destination, 0, 2)
@@ -150,8 +140,6 @@ class CSV_option_box(QDialog):
         lay_grid.addWidget(self.cmb_orientation, 3, 2)
         lay_grid.addWidget(lbl_header, 4, 1)
         lay_grid.addWidget(self.cmb_header, 4, 2)
-        # lay_grid.addWidget(lbl_cmsis, 5, 1)
-        # lay_grid.addWidget(self.chk_cmsis, 5, 2)
 
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
