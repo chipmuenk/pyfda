@@ -128,9 +128,9 @@ CRLF = os.linesep  # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
 
 # ------------------------------------------------------------------------------
-def cmp_version(mod, version):
+def cmp_version(mod: str, version: str) -> int:
     """
-    Compare version number of installed module `mod` against string `version` and
+    Compare version number of installed module `mod` against value `version` (str) and
     return 1, 0 or -1 if the installed version is greater, equal or less than
     the number in `version`. If `mod` is not installed, return -2.
 
@@ -180,10 +180,10 @@ def cmp_version(mod, version):
 
 
 # ------------------------------------------------------------------------------
-def mod_version(mod=None):
+def mod_version(mod: str = "") -> str:
     """
     Return the version of the module 'mod'. If the module is not found, return
-    None. When no module is specified, return a string with all modules and
+    empty string. When no module is specified, return a string with all modules and
     their versions sorted alphabetically.
     """
     if mod:
