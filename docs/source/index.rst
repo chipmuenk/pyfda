@@ -27,7 +27,7 @@ Welcome to pyfda's documentation!
    README
    manual/index
    development/index
-   api/modules
+   api/pyfda
    references
 
 
