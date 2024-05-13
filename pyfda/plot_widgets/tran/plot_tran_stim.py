@@ -19,8 +19,7 @@ from scipy.special import sinc, diric
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_sig_lib import angle_zero
 from pyfda.libs.pyfda_lib import (
-    safe_eval, pprint_log, np_type, calc_ssb_spectrum,
-    rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
+    pprint_log, rect_bl, sawtooth_bl, triang_bl, comb_bl, safe_numexpr_eval)
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.tran.plot_tran_stim_ui import Plot_Tran_Stim_UI
