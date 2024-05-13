@@ -1659,25 +1659,32 @@ class Plot_Impz(QWidget):
             # scale with window NENBW for correct power calculation
             P_scale = scale_impz / nenbw
             if plt_stimulus:
+                if fb.fil[0]['freqSpecsRangeType'] == 'half' and self.cmplx and not freq_resp:
+                    logger.warning(
+                        "For complex-valued time signals, only the magnitude of the "
+                        "single-sided spectrum can be shown. You should display both "
+                        "sides (0 ... f_S or -f_S/2 ... f_S/2).")
                 # scale display of stimulus: `self.x` is unscaled, hence X needs
                 # to be multiplied by self.scale_i
                 Px = np.sum(np.square(np.abs(self.X))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X = calc_ssb_spectrum(self.X) * scale_impz
+                        X = calc_ssb_spectrum(self.X, mag=self.cmplx) * scale_impz
                 else:
                     X = self.X * scale_impz
 
             if plt_stimulus_q:
                 Pxq = np.sum(np.square(np.abs(self.X_q))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    X_q = calc_ssb_spectrum(self.X_q) / self.scale_iq * scale_impz
+                    X_q = calc_ssb_spectrum(
+                        self.X_q, mag=self.cmplx) / self.scale_iq * scale_impz
                 else:
                     X_q = self.X_q / self.scale_iq * scale_impz
 
             if plt_response:
                 Py = np.sum(np.square(np.abs(self.Y * self.scale_o))) * P_scale
                 if fb.fil[0]['freqSpecsRangeType'] == 'half' and not freq_resp:
-                    Y = calc_ssb_spectrum(self.Y) / self.scale_o * scale_impz
+                    Y = calc_ssb_spectrum(
+                        self.Y, mag=self.cmplx) / self.scale_o * scale_impz
                 else:
                     Y = self.Y / self.scale_o * scale_impz
 
