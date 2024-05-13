@@ -1365,17 +1365,20 @@ def unique_roots(p, tol: float = 1e-3, magsort: bool = False,
 
 
 # ------------------------------------------------------------------------------
-def calc_ssb_spectrum(A: ndarray) -> ndarray:
+def calc_ssb_spectrum(A: ndarray, mag=False) -> ndarray:
     """
     Calculate the single-sideband spectrum from a double-sideband
-    spectrum by doubling the spectrum below fS/2 (leaving the DC-value
+    spectrum by doubling the spectrum below f_S/2 (leaving the DC-value
     untouched). This approach is wrong when the spectrum is not symmetric.
 
     The alternative approach of  adding the mirrored conjugate complex of the
     second half of the spectrum to the first doesn't work, spectra of either
     sine-like or cosine-like signals are cancelled out.
 
-    When len(A) is even, A[N//2] represents half the sampling frequencvy
+    Hence, the magnitudes of both halves are summed (for `mag=True`), yielding
+    the magnitude spectrum.
+
+    When len(A) is even, A[N//2] represents half the sampling frequency
     and is discarded (Q: also for the power calculation?).
 
     Parameters
@@ -1383,7 +1386,16 @@ def calc_ssb_spectrum(A: ndarray) -> ndarray:
     A : array-like
         double-sided spectrum, usually complex. The sequence is as follows:
 
-            [0, 1, 2, ..., 4, -5, -4, ... , -1] for len(A) = 10
+            [ A[0], A[1] ... A[4], A[5], A[-4] ...  A[-1] ] for len(A) = 10
+            [ A[0], A[1] ... A[4], A[-4] ...  A[-1] ] for len(A) = 9
+            ->
+            [A[0], A[1] + A[-1] ... A[4] + A[-4], A[5]] for len(A) = 10
+            [A[0], A[1] + A[-1] ... A[4] + A[-4]] for len(A) = 9
+            both cases
+
+    mag : bool
+        calculate the magnitude spectrum when True (default: False) by adding the
+        magnitudes of negative and positive halfband.
 
     Returns
     -------
@@ -1393,8 +1405,11 @@ def calc_ssb_spectrum(A: ndarray) -> ndarray:
     """
     N = len(A)
 
-    A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
-    # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
+    if mag:
+        A_SSB = np.insert(np.abs(A[1:N//2]) + np.abs(A[-1:(N+1)//2:-1]), 0, A[0])
+    else:
+        A_SSB = np.insert(A[1:N//2] * 2, 0, A[0])
+        # A_SSB = np.insert(A[1:N//2] + A[-1:-(N//2):-1].conj(),0, A[0]) # doesn't work
 
     return A_SSB
 
