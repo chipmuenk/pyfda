@@ -2,30 +2,30 @@
 
 ## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-05-xx)
 
-### Open
-
-- Scaling of single-sided complex-valued spectra (\#242)
-- Amaranth verilog export
-
 ### Bugfixes
 
 - The number of data points for the impulse response of FIR filters is no longer limited to 100 and the
   automatic calculation for the number of data points now is enabled by a push button instead of setting
   'N = 0' [issue \#246](https://github.com/chipmuenk/pyfda/issues/246)
 - Fixed warnings about unknown entries 'value' and 'matplotlib'
-- Fixed a lot of errors in docstrings and documentation generating errors and warnings
+- Fixed a lot of errors in docstrings and documentation causing errors and warnings
   during the Sphinx ReadTheDocs document generation
-- When saving filters, store only keys from the reference filter (and warn about unsupported
+- When saving filters, use only keys from the reference filter (and warn about unsupported
   keys).
-- Fixed more problems when loading / saving fixpoint filters [issue \#239](https://github.com/chipmuenk/pyfda/issues/239)
+- Fixed more problems when loading / saving fixpoint filters
+  [issue \#239](https://github.com/chipmuenk/pyfda/issues/239)
 - Fixed problems when loading / saving windowed and equiripple filters.
 - Fixed problems when loading csv audio files
 
 ### New features
 
-- Provide a simple example of an Amaranth fixpoint filter (needs to be enabled in pyfda.conf)
+- Provide a simple example of an Amaranth fixpoint filter (needs to be enabled in pyfda.conf) with fixpoint
+  simulation and Verilog export
 - Provide an estimation for the length of the impulse response of IIR filters until -40 dB are
   reached (currently hardcoded)
+- For complex-valued time signals, display single-sided spectra as magnitude
+  [issue \#242](https://github.com/chipmuenk/pyfda/issues/242)
+
 
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
 
@@ -114,7 +114,7 @@
 - 'H(f'): Fix deprecation error w.r.t. matplotlib, causing a crash when using
   inset plot in the H(f) tab (#234)
 - 'Specs': Fix wrong / erroneous behaviour of 'Lock frequencies' button
-- 'Specs': Sampling frequency, unit and display mode are now exported and 
+- 'Specs': Sampling frequency, unit and display mode are now exported and
   imported to /from filters.
 - 'FFT': Replace deprecated Slepian window by DPSS
 - Several tabs: Fixed some strange behaviours and crashes with complex data / plots
@@ -168,7 +168,7 @@
 - When the filter is complex-valued, set data type to 'complex' for the response
   signal in y[n] (was 'float' so only the real part was displayed)
 - Fix crash when entering a complex coefficient in a previously real-valued filter
-- Default file filters for QFileDialog objects could not be set in some cases, 
+- Default file filters for QFileDialog objects could not be set in some cases,
   producing warning messages in the console
 - Remove module import and version display for module nmigen to avoid message
   "KeyError: 'V_NMG'"
@@ -206,10 +206,10 @@
 
 - Recalculate frequency specs in 'k' in the y[n] widget when `self.N` has been changed
 - Renamed file `iir_df1.py` to `iir_df1.py_bak` to prevent it from being analyzed
-  by `python setup.py install`. The myhdl keyword `async` creates an error with 
+  by `python setup.py install`. The myhdl keyword `async` creates an error with
   python 3.7 and up.
 - Update frequency specs when the frequency unit has been changed (regression)
-- Angles now can be entered in the Input P/Z tab by preceding "<" instead of the 
+- Angles now can be entered in the Input P/Z tab by preceding "<" instead of the
   angle character
 - It is now possible to set the filter type ('FIR' or 'IIR') in the Coeffs tab.
   Changing the filter type now highlights the save button.
@@ -218,7 +218,7 @@
 - Improved legend in the y[n] / Y(f) tab (markers were missing, tab alignment didn't
   work)
 - Improve group delay algorithms for IIR, allow selection between algorithms.
-  Equalize length of f and tau_g in differentiation algorithm (selecting 'Diff' 
+  Equalize length of f and tau_g in differentiation algorithm (selecting 'Diff'
   crashed pyfda for dual sided spectra)
 
 ### New features accessible from the UI
@@ -228,7 +228,7 @@
   much improved selection of window function for spectral analysis (`y[n]` tab)
   and Firwin filter design
 
-  - Window function can be changed from combo boxes in the main widget and in 
+  - Window function can be changed from combo boxes in the main widget and in
     the FFT widget
   - improved tooltipps
   - optional combobox for window parameters (used e.g. for Blackmanharris window)
@@ -236,9 +236,9 @@
 - Lots of improvements in `y[n]` tab:
 
   - UI overhaul
-  - Simulation is now frame based simulation to interrupt simulation of long 
+  - Simulation is now frame based simulation to interrupt simulation of long
     sequences and audio I/O in the future. Progress bar works, though.
-  - Add widgets T1 and T2 for time and TW1 and TW2 for delays in y[n] and use them 
+  - Add widgets T1 and T2 for time and TW1 and TW2 for delays in y[n] and use them
       for impulse shaped stimuli
   - New stimuli 'Gauss' and 'Rect impulse'
   - New stimulus 'Exp' (complex exponentials)
@@ -247,8 +247,8 @@
   - Replace check boxes by checkable push bottons for a cleaner UI
   - Group stimuli for a better overview
   - Display magnitude and phase in frequency tab
-  
-- Allow turning off automatic grid alignment between mag. and phase in the 
+
+- Allow turning off automatic grid alignment between mag. and phase in the
   `H(f)` tab
 - Allow changing the number of FFT data points via `Info -> Settings`
 - Plots can be copied to the clipboard in base64 encoded PNG format for easier
@@ -260,7 +260,7 @@
 ### Code maintenance
 
 - Complete make-over of signalling for DRY using new method
-  'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and 
+  'pyfda_qt_lib.emit()' to generate default dict keys 'id' and 'class' and
      providing an time-to-live mechanisms for signals
 
 - Fixpoint and floating point simulation is now frame based; in a future version
@@ -279,7 +279,7 @@
   other widgets and updated required config file version from 3 to 4
 - Provide a simple IIR allpass design as an template for a simple filter
   widget
-- New command options when starting pyfda: -h for help, -i for infos on 
+- New command options when starting pyfda: -h for help, -i for infos on
   paths and files and -r for replacing the config files with copies of
   the templates
 
@@ -296,7 +296,7 @@
 
 - Added widget duty cycle for the rect pulse, enabling and disabling of widgets
   is now structured much cleaner
-- Absolute frequencies can be locked now, i.e. normalized frequencies change 
+- Absolute frequencies can be locked now, i.e. normalized frequencies change
   with the sampling frequency, absolute frequencies remain unchanged
 
 ## [v0.5.1](https://github.com/chipmuenk/pyfda/tree/v0.5.1) (2020-12-01)
@@ -309,7 +309,7 @@
 - Various scaling errors for new frequency unit "k" have been fixed
 - Wrong time scaling for frequency unit "f_Ny"
 - Corrected calculation and display of single-sided spectra and H_id
-  
+
 ### New features
 
 - Added stimulus "sinc"
@@ -345,36 +345,36 @@
 
 #### New features
 
-- [PR \#183:](https://github.com/chipmuenk/pyfda/pull/187) Include license information for 
-  distribution of pyFDA as source code and in bundled form, redesign the whole 
+- [PR \#183:](https://github.com/chipmuenk/pyfda/pull/187) Include license information for
+  distribution of pyFDA as source code and in bundled form, redesign the whole
   "About" window, add CHANGELOG.md (this file) and move attributions to AUTHORS.md
-- Add cursor / annotations in plots ([Issue \#112](https://github.com/chipmuenk/pyfda/issues/112)) This is only available when 
+- Add cursor / annotations in plots ([Issue \#112](https://github.com/chipmuenk/pyfda/issues/112)) This is only available when
   [mplcursors](https://mplcursors.readthedocs.io/) module is installed and for matplotlib >= 3.1.
-- [PR \#183:](https://github.com/chipmuenk/pyfda/pull/183) Replace simpleeval library by numexpr. 
-  This enables the creation of formula based stimuli, closing [Issue \#162](https://github.com/chipmuenk/pyfda/issues/162) and 
+- [PR \#183:](https://github.com/chipmuenk/pyfda/pull/183) Replace simpleeval library by numexpr.
+  This enables the creation of formula based stimuli, closing [Issue \#162](https://github.com/chipmuenk/pyfda/issues/162) and
   part of [Issue \#44](https://github.com/chipmuenk/pyfda/issues/144).
 - Add chirp stimulus in Impulse Response tab.
 - The top level module name for generated Verilog netlists (Fixpoint tab) is now derived from the
-  specified file name. The module name is converted to lower cased and sanitized so that is only 
-  contains alpha-numeric characters and '_'.  [(Issue \#176)](https://github.com/chipmuenk/pyfda/issues/176), 
+  specified file name. The module name is converted to lower cased and sanitized so that is only
+  contains alpha-numeric characters and '_'.  [(Issue \#176)](https://github.com/chipmuenk/pyfda/issues/176),
   "allow different module names for verilog export").
-- User and user log config files now can be replaced automatically if the config file version number is wrong 
+- User and user log config files now can be replaced automatically if the config file version number is wrong
    ([Issue \#44](https://github.com/chipmuenk/pyfda/issues/144))
-- Comment out filter `ellip_zero` in configuration template as it is too special for 
+- Comment out filter `ellip_zero` in configuration template as it is too special for
 general usage. If needed, it can be commented back in the user config file.
 - Eliminate tab *Files*, its three buttons have been moved to the *Specs* and the *Info* tab
 
 ### Bug fixes
 
 - Make compatible to matplotlib 3.3 by cleaning up hierarchy for NavigationToolbar in mpl_widgets.py
- ([Issue \#179](https://github.com/chipmuenk/pyfda/issues/179), [Issue \#44](https://github.com/chipmuenk/pyfda/issues/144)) 
-  and get rid of mpl 3.3 related deprecation warnings. Disable zoom rectangle and pan when zoom is locked. 
+ ([Issue \#179](https://github.com/chipmuenk/pyfda/issues/179), [Issue \#44](https://github.com/chipmuenk/pyfda/issues/144))
+  and get rid of mpl 3.3 related deprecation warnings. Disable zoom rectangle and pan when zoom is locked.
 - [PR \#182:](https://github.com/chipmuenk/pyfda/pull/182) Get rid of deprecation warnings "Creating an ndarray from ragged nested sequences"  [(Issue \#180)](https://github.com/chipmuenk/pyfda/issues/180)
   by declaring explicitly np.array(some_ragged_list , dtype=object) or by handling the elements of ragged list indidually
   ([chipmuenk](https://github.com/chipmuenk))
-- [PR \#186](https://github.com/chipmuenk/pyfda/pull/186), fixing [Issue \#184](https://github.com/chipmuenk/pyfda/issues/184) "Filter type "Delay" can crash pyfda", 
-  syntax errors in the UI description have been fixed. As the filter class does not produce a proper 
-  delay, it is commented out in the configuratiion file for the time being 
+- [PR \#186](https://github.com/chipmuenk/pyfda/pull/186), fixing [Issue \#184](https://github.com/chipmuenk/pyfda/issues/184) "Filter type "Delay" can crash pyfda",
+  syntax errors in the UI description have been fixed. As the filter class does not produce a proper
+  delay, it is commented out in the configuratiion file for the time being
   (see [Issue \#184](https://github.com/chipmuenk/pyfda/issues/185))
 - When the gain *k* has been changed in the P/Z input widget, highlight the save button.
 - Fix several small bugs and deprecation warnings in the Coeff input widget
@@ -423,12 +423,12 @@ The truth value of an array with more than one element is ambiguous. Use a.any()
   - Much improved modularity - new functionality can be easily added
 
 - **Reorganization of configuration files**
-  - Specify module names instead of class names for widgets, class names are defined in the modules 
+  - Specify module names instead of class names for widgets, class names are defined in the modules
   - More flexibility in defining user directories
   - List suitable fixpoint implementations for each filter design as well as the other way around
 
 - **HDL synthesis (beta status, expect bugs)**
-  - Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation 
+  - Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation
   - When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
 
 - **Didactic improvements**
@@ -437,7 +437,7 @@ The truth value of an array with more than one element is ambiguous. Use a.any()
 - **Documentation using Sphinx / ReadTheDocs**
 
     Could be more and better ... but hey, it's a start!
-  
+
 ## Release 0.1 (2018-02-04)
 
-Initial release 
+Initial release
