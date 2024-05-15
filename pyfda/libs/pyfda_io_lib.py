@@ -1002,8 +1002,6 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = 
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
                 load_data_np.info_str = csv2array.info_str
-                logger.error(f"load_data_np: {csv2array.info_str}")
-                # data_arr = np.loadtxt(f, delimiter=params['CSV']['delimiter'].lower())
                 if data_arr is None:
                     # an error has occurred
                     logger.error(f"Error loading file '{file_name}'")
