@@ -292,10 +292,18 @@ class Plot_Tran_Stim(QWidget):
                 + self.ui.A2 * sinc(2 * (n - self.ui.T2) * self.ui.f2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "gauss":
-            x[frm_slc] = self.ui.A1 * sig.gausspulse(
-                    (n - self.ui.T1), fc=self.ui.f1, bw=self.ui.BW1) +\
-                self.ui.A2 * sig.gausspulse(
-                    (n - self.ui.T2), fc=self.ui.f2, bw=self.ui.BW2)
+            f1 = self.ui.f1
+            f2 = self.ui.f2
+            if (self.ui.A1 != 0 and f1 < 0) or (self.ui.A2 != 0 and f2 < 0):
+                logger.warning(f"Center frequencies f1, f2 need to be >= 0!")
+                return None
+            if f1 < 0:
+                f1 = 0.1  # dummy value, A1 == 0
+            if f2 < 0:
+                f2 = 0.1  # dummy value, A2 == 0
+            x[frm_slc] =\
+                self.ui.A1 * sig.gausspulse((n - self.ui.T1), fc=f1, bw=self.ui.BW1) +\
+                self.ui.A2 * sig.gausspulse((n - self.ui.T2), fc=f2, bw=self.ui.BW2)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect":
             n_rise = int(self.T1_idx - np.floor(self.ui.TW1/2))  # pos. of rising edge
@@ -337,6 +345,13 @@ class Plot_Tran_Stim(QWidget):
 
         # ----------------------------------------------------------------------
         elif self.ui.stim == "chirp":
+            if self.ui.chirp_type == 'hyperbolic' and self.ui.f1 * self.ui.f2 == 0:
+                logger.warning("Frequencies f1 and f2 need to be != 0!")
+                return None
+            elif self.ui.chirp_type == 'logarithmic' and self.ui.f1 * self.ui.f2 <= 0:
+                logger.warning(
+                    "Frequencies f1 and f2 need to be != 0 and have the same sign!")
+                return None
             if self.ui.T2 == 0:  # sig.chirp is buggy, T_sim cannot be larger than T_end
                 T_end = N_end  # frequency sweep over complete interval
             else:
@@ -347,6 +362,9 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "triang":
             if self.ui.but_stim_bl.isChecked():
+                if self.ui.f1 <= 0:
+                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    return None
                 x[frm_slc] = self.ui.A1 * triang_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
                 x[frm_slc] = self.ui.A1 * sig.sawtooth(
@@ -354,12 +372,18 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "saw":
             if self.ui.but_stim_bl.isChecked():
+                if self.ui.f1 <= 0:
+                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    return None
                 x[frm_slc] = self.ui.A1 * sawtooth_bl(2*pi * n * self.ui.f1 + self.rad_phi1)
             else:
                 x[frm_slc] = self.ui.A1 * sig.sawtooth(2*pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "rect_per":
             if self.ui.but_stim_bl.isChecked():
+                if self.ui.f1 <= 0:
+                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    return None
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
             else:
@@ -367,6 +391,9 @@ class Plot_Tran_Stim(QWidget):
                     2 * pi * n * self.ui.f1 + self.rad_phi1, duty=self.ui.stim_par1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "comb":
+            if self.ui.f1 <= 0:
+                logger.warning(f"Frequency f1 needs to be > 0!")
+                return None
             x[frm_slc] = self.ui.A1 * comb_bl(2 * pi * n * self.ui.f1 + self.rad_phi1)
         # ----------------------------------------------------------------------
         elif self.ui.stim == "am":
@@ -380,6 +407,9 @@ class Plot_Tran_Stim(QWidget):
         # ----------------------------------------------------------------------
         elif self.ui.stim == "pwm":
             if self.ui.but_stim_bl.isChecked():
+                if self.ui.f1 <= 0:
+                    logger.warning(f"Frequency f1 needs to be > 0!")
+                    return None
                 x[frm_slc] = self.ui.A1 * rect_bl(
                     2 * np.pi * n * self.ui.f1 + self.rad_phi1,
                     duty=(1/2 + self.ui.A2 / 2 *
