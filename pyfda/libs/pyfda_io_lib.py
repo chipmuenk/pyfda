@@ -1617,7 +1617,6 @@ def load_filter(self) -> int:
         return -1  # operation cancelled or some other error
 
     err = False
-    fb.redo() # backup filter dict
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -1625,17 +1624,18 @@ def load_filter(self) -> int:
                 if file_type == 'npz':
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
+                    logger.warning(f"Load 'npz', returned type is {type(arr)}.")
 
                     # convert arrays to lists and extract scalar objects
                     for key in sorted(arr):
                         if np.ndim(arr[key]) == 0:
                             # scalar objects may be extracted with the item() method
-                            fb.fil[0][key] = arr[key].item()
+                            fb_temp[key] = arr[key].item()
                         else:
                             # array objects are converted to list first
-                            fb.fil[0][key] = arr[key].tolist()
+                            fb_temp[key] = arr[key].tolist()
                 else:  # file_type == 'pkl':
-                    fb.fil[0] = pickle.load(f)
+                    fb_temp = pickle.load(f)
 
         except IOError as e:
             logger.error(f"Failed loading {file_name}!\n{e}")
@@ -1644,7 +1644,7 @@ def load_filter(self) -> int:
     elif file_type == 'json':
         try:
             with io.open(file_name, 'r') as f:  # open in text mode for json files
-                fb.fil[0] = json.load(f)
+                fb_temp = json.load(f)
 
         except IOError as e:
             logger.error(f"Failed loading {file_name}!\n{e}")
@@ -1653,21 +1653,32 @@ def load_filter(self) -> int:
         logger.error(f'Unknown file type "{file_type}"')
         err = True
 
-    if '_id' not in fb.fil[0] or len(fb.fil[0]['_id']) != 2\
-            or fb.fil[0]['_id'][0] != 'pyfda':
+    if type(fb_temp) == list and len(fb_temp) == 10 and '_id' in fb_temp[0]\
+         and len(fb_temp[0]['_id']) == 2 and fb_temp[0]['_id'][0] == 'pyfda':
+        msg = ("This file contains all 10 memory locations! "
+            "Load the first one to memory (Yes) or abort (No)?")
+        err = not popup_warning(None, message=msg)
+        if not err:
+            fb_temp = fb_temp[0]
+    elif type(fb_temp) is not dict:
+        logger.warning(f"Wrong data type '{type(fb_temp)}', cannot load file.")
+        err = True
+    elif '_id' not in fb_temp or len(fb_temp['_id']) != 2\
+            or fb_temp['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
-
-    elif fb.fil[0]['_id'][1] != FILTER_FILE_VERSION:
+    elif fb_temp['_id'][1] != FILTER_FILE_VERSION:
         msg = (
-            f"The filter file has version {str(fb.fil[0]['_id'][1])} instead of "
-            f"of required version {FILTER_FILE_VERSION}! Load anyway?")
+            f"The filter file has version {str(fb_temp['_id'][1])} instead of "
+            f"required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
     # Catch errors occurring during file opening
     if err:
-        fb.undo()
         return -1
+    else:
+        fb.redo() # backup filter dict
+        fb.fil[0] = fb_temp
 
 # --------------------
     try:
@@ -1753,7 +1764,8 @@ def load_filter(self) -> int:
 # ------------------------------------------------------------------------------
 def save_filter(self):
     """
-    Save filter as JSON formatted textfile, zipped binary numpy array or pickle object
+    Save filter `fb.fil[0]` as JSON formatted textfile, zipped binary numpy array
+    or pickle object
     """
     # provide an identifier with version number for pyfda files
     fb.fil[0].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
@@ -1768,20 +1780,20 @@ def save_filter(self):
     # reference filter dict and warn of unsupported keys:
     keys_unsupported = [k for k in fb.fil[0] if k not in fb.fil_ref]
     if keys_unsupported != []:
-        fil_0 = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
+        fil_clean = {k:v for k, v in fb.fil[0].items() if k in fb.fil_ref}
         logger.warning(
             "The following keys are ignored because they are not part of the\n"
             f"\tfilter reference dict:\n\t{keys_unsupported}")
     else:
-        fil_0 = fb.fil[0]
+        fil_clean = fb.fil[0]
 
     if file_type in {"npz", "pkl"}:
         try:
             with io.open(file_name, 'wb') as f:  # open in binary mode
                 if file_type == 'npz':
-                    np.savez(f, **fil_0)
+                    np.savez(f, **fil_clean)
                 else:  # file_type == 'pkl':
-                    pickle.dump(fb.fil[0], f)  # save in default pickle version
+                    pickle.dump(fil_clean, f)  # save in default pickle version
 
         except IOError as e:
             err = True
@@ -1791,7 +1803,71 @@ def save_filter(self):
         try:
             with io.open(file_name, 'w') as f:  # open in text mode
                 # first, convert dict containing numpy arrays to a pure json string
-                fb_fil_0_json = json.dumps(fil_0, cls=NumpyEncoder, indent=2,
+                fb_fil_clean_json = json.dumps(fil_clean, cls=NumpyEncoder, indent=2,
+                                        ensure_ascii=False, sort_keys=True )
+                # next, dump the string to a file
+                f.write(fb_fil_clean_json)
+
+        except IOError as e:
+            err = True
+            logger.error(f'Failed saving "{file_name}"!\n{e}')
+    else:
+        err = True
+        logger.error('Unknown file type "{0}"'.format(file_type))
+
+    if not err:
+        logger.info(f'Filter saved as\n\t"{file_name}"')
+        dirs.last_file_name = file_name
+        dirs.last_file_dir = os.path.dirname(file_name)  # save new default dir
+        dirs.last_file_type = file_type  # save new default file type
+
+
+# ------------------------------------------------------------------------------
+def save_all_filters(self):
+    """
+    Save all filters `fb.fil` as JSON formatted textfile, zipped binary numpy array
+    or pickle object
+    """
+
+    file_name, file_type = select_file(
+        self, title="Save All Filters", mode='w', file_types = ("json", "npz", "pkl"))
+
+    if file_name is None:
+        return -1  # operation cancelled or other error
+    err = False
+    # create a copy of the filters to be saved that only contains keys of the
+    # reference filter dict and warn of unsupported keys:
+    fil_clean = [None] * 10
+    for i in range(10):
+        # provide an identifier with version number for pyfda files
+        fb.fil[i].update({'_id': ['pyfda', FILTER_FILE_VERSION]})
+        keys_unsupported = [k for k in fb.fil[i] if k not in fb.fil_ref]
+        if keys_unsupported != []:
+            fil_clean[i] = {k:v for k, v in fb.fil[i].items() if k in fb.fil_ref}
+            logger.warning(
+                "The following keys are ignored because they are not part of the\n"
+                f"\tfilter reference dict:\n\t{keys_unsupported}")
+        else:
+            fil_clean[i] = fb.fil[i]
+
+    if file_type in {"npz", "pkl"}:
+        try:
+            with io.open(file_name, 'wb') as f:  # open in binary mode
+                if file_type == 'npz':
+                    np.savez(f, **fil_clean) # TODO: Doesn't work, this needs to be a mapping
+                else:  # file_type == 'pkl':
+                    pickle.dump(fil_clean, f)  # save in default pickle version
+                    # TODO: Does this work?
+
+        except IOError as e:
+            err = True
+            logger.error(f'Failed saving "{file_name}"!\n{e}')
+
+    elif file_type == 'json':
+        try:
+            with io.open(file_name, 'w') as f:  # open in text mode
+                # first, convert dict containing numpy arrays to a pure json string
+                fb_fil_0_json = json.dumps(fil_clean, cls=NumpyEncoder, indent=2,
                                         ensure_ascii=False, sort_keys=True )
                 # next, dump the string to a file
                 f.write(fb_fil_0_json)
