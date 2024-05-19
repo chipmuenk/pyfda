@@ -21,7 +21,7 @@ import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 from pyfda.libs.pyfda_lib import pprint_log, to_html, first_item
 from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, qget_cmb_box, qget_selected
-from pyfda.libs.pyfda_io_lib import load_filter, save_filter
+from pyfda.libs.pyfda_io_lib import load_filter, save_filter, save_all_filters
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
@@ -50,20 +50,41 @@ class Input_Specs(QWidget):
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
-        self.cmb_filter_selection_items = [
-            "<span>Select file or memory location for saving or loading filters.</span>",
-            ("file", "File", "Save / load filter to / from file."),
-            ("1", "Mem 1", "Save / load to / from memory 1"),
-            ("2", "Mem 2", "Save / load to / from memory 2"),
-            ("3", "Mem 3", "Save / load to / from memory 3"),
-            ("4", "Mem 4", "Save / load to / from memory 4"),
-            ("5", "Mem 5", "Save / load to / from memory 5"),
-            ("6", "Mem 6", "Save / load to / from memory 6"),
-            ("7", "Mem 7", "Save / load to / from memory 7"),
-            ("8", "Mem 8", "Save / load to / from memory 8"),
-            ("9", "Mem 9", "Save / load to / from memory 9")
+        filter_load_help_txt = "Load from Mem {0} (initial design)"
+        self.cmb_filter_load_items = [
+            "<span>Load current filter(s) from memory location or file.</span>",
+            ("0", "Load", "Current filter, no action."),
+            ("1", "Mem 1", filter_load_help_txt.format("1")),
+            ("2", "Mem 2", filter_load_help_txt.format("2")),
+            ("3", "Mem 3", filter_load_help_txt.format("3")),
+            ("4", "Mem 4", filter_load_help_txt.format("4")),
+            ("5", "Mem 5", filter_load_help_txt.format("5")),
+            ("6", "Mem 6", filter_load_help_txt.format("6")),
+            ("7", "Mem 7", filter_load_help_txt.format("7")),
+            ("8", "Mem 8", filter_load_help_txt.format("8")),
+            ("9", "Mem 9", filter_load_help_txt.format("9")),
+            ("file", "File", "Save current filter to file."),
+            ("file_all", "File (all)", "Save all filters to file.")
         ]
-        self.cmb_filter_selection_default = "file"
+        self.cmb_filter_load_default = "0"
+
+        filter_save_help_txt = "Copy-> Mem {0} (initial design)"
+        self.cmb_filter_save_items = [
+            "<span>Copy / save current filter(s) to memory location or file.</span>",
+            ("0", "Save", "Current filter, no action."),
+            ("1", "Mem 1", filter_save_help_txt.format("1")),
+            ("2", "Mem 2", filter_save_help_txt.format("2")),
+            ("3", "Mem 3", filter_save_help_txt.format("3")),
+            ("4", "Mem 4", filter_save_help_txt.format("4")),
+            ("5", "Mem 5", filter_save_help_txt.format("5")),
+            ("6", "Mem 6", filter_save_help_txt.format("6")),
+            ("7", "Mem 7", filter_save_help_txt.format("7")),
+            ("8", "Mem 8", filter_save_help_txt.format("8")),
+            ("9", "Mem 9", filter_save_help_txt.format("9")),
+            ("file", "File", "Save current filter to file."),
+            ("file_all", "File (all)", "Save all filters to file.")
+        ]
+        self.cmb_filter_save_default = "0"
 
         self._construct_UI()
 
@@ -115,22 +136,22 @@ class Input_Specs(QWidget):
         """
         Construct User Interface from all input subwidgets
         """
-        self.butLoadFilt = QPushButton("LOAD FILTER", self)
-        self.butLoadFilt.setToolTip("Load filter from disk or memory")
-        self.cmb_filter_selection = QComboBox(self)
-        qcmb_box_populate(self.cmb_filter_selection, self.cmb_filter_selection_items,
-                          self.cmb_filter_selection_default)
-        self.cmb_filter_selection.setSizePolicy(
-            QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.butSaveFilt = QPushButton("SAVE FILTER", self)
-        self.butSaveFilt.setToolTip("Save filter to disk or memory")
+        self.cmb_filter_load = QComboBox(self)
+        qcmb_box_populate(self.cmb_filter_load, self.cmb_filter_load_items,
+                          self.cmb_filter_load_default)
+        self.cmb_filter_load.insertSeparator(1)
+        self.cmb_filter_load.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.cmb_filter_save = QComboBox(self)
+        qcmb_box_populate(self.cmb_filter_save, self.cmb_filter_save_items,
+                          self.cmb_filter_save_default)
+        self.cmb_filter_save.insertSeparator(1)
+        self.cmb_filter_save.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.lbl_info = QLabel(to_html("Info:", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
-        self.led_info.setToolTip("Add an info / comment for the filter")
+        self.led_info.setToolTip("Enter info / comment / label for the filter")
         lay_h_buttons_load_save_1 = QHBoxLayout()
-        lay_h_buttons_load_save_1.addWidget(self.butLoadFilt)  # <Load Filter> button
-        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_selection) # File or memory
-        lay_h_buttons_load_save_1.addWidget(self.butSaveFilt)  # <Save Filter> button
+        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
+        lay_h_buttons_load_save_1.addWidget(self.cmb_filter_save)  # <Save Filter> combo
         lay_h_buttons_load_save_1.setContentsMargins(*params['wdg_margins_spc'])
         lay_h_buttons_load_save_2 = QHBoxLayout()
         lay_h_buttons_load_save_2.addWidget(self.lbl_info)
@@ -195,7 +216,6 @@ class Input_Specs(QWidget):
         # LAYOUT for input specifications and buttons
         # ----------------------------------------------------------------------
         layVMain = QVBoxLayout(self)
-        # layVMain.addLayout(lay_v_buttons_load_save)  # <Load> & <Save> buttons
         layVMain.addWidget(self.frm_buttons_load_save)  # <Load> & <Save> buttons
         layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)
         layVMain.addLayout(layHButtons2)  # <Design> & <Quit> buttons
@@ -237,11 +257,10 @@ class Input_Specs(QWidget):
         # ----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.butLoadFilt.clicked.connect(self._load_filter)
-        self.butSaveFilt.clicked.connect(self._save_filter)
+        self.cmb_filter_load.currentIndexChanged.connect(self._load_filter)
+        self.cmb_filter_save.currentIndexChanged.connect(self._save_filter)
         self.led_info.editingFinished.connect(self._save_info2dict)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.cmb_filter_selection.currentIndexChanged.connect(self.update_info)
         self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
         # ----------------------------------------------------------------------
 
@@ -344,7 +363,7 @@ class Input_Specs(QWidget):
         Load filter dict `fb.fil[0]` either from file or from memory and update the
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
-        sel = qget_cmb_box(self.cmb_filter_selection)
+        sel = qget_cmb_box(self.cmb_filter_load)
         if sel == "file":
             ret = load_filter(self)
             if ret == 0:
@@ -354,22 +373,47 @@ class Input_Specs(QWidget):
                 return  # error occurred, do nothing
             else:
                 logger.error(f'Unknown return code "{ret}"!')
+                return
+        elif sel == "file_all":
+            logger.warning("File (all) is not yet supported!")
+            return
         else:
             fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
             self.load_dict()
-            self.emit({'data_changed': 'filter_loaded'})
+
+        # update info string
+        self.led_info.setText(str(fb.fil[0]['info']))
+        self.cmb_filter_load.setCurrentIndex(0)
+        self.emit({'data_changed': 'filter_loaded'})
 
 # ------------------------------------------------------------------------------
     def _save_filter(self):
         """ Save current filter fb.fil[0] either to file or to one of the memories"""
-        sel = qget_cmb_box(self.cmb_filter_selection)
+        # sel contains the data field of the combo box which is either "file" / "file_all"
+        # or the number of the memory location (e.g. "2" for "Mem 2"). This is larger by 1
+        # than the combobox index
+        sel = qget_cmb_box(self.cmb_filter_save)
+
         if sel == "file":
+            # save current filter to file
             save_filter(self)
+        elif sel == "file_all":
+            # save all filters
+            save_all_filters(self)
+        elif sel == "0":
+            # filter 0 selected, don't do anything
+            return
         else:
+            # save fil[0] to selected location
             fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
-            # set info string as new tool tip
-            self.cmb_filter_selection.setItemData(
-                int(sel), self.led_info.text(), Qt.ToolTipRole)
+            # insert info string into new tool tip
+            # self.cmb_filter_selection.setItemData(
+            #     int(sel) - 1, self.led_info.text(), Qt.ToolTipRole)
+            self.cmb_filter_save.setItemData(
+                int(sel) + 1, f"Copy -> Mem {sel} ({self.led_info.text()})", Qt.ToolTipRole)
+            self.cmb_filter_load.setItemData(
+                int(sel) + 1, f"Load from Mem {sel} ({self.led_info.text()})", Qt.ToolTipRole)
+        self.cmb_filter_save.setCurrentIndex(0)
 
 # ------------------------------------------------------------------------------
     def load_dict(self):
@@ -378,13 +422,7 @@ class Input_Specs(QWidget):
         """
         self.led_info.setText(str(fb.fil[0]['info']))
         self.color_design_button("ok")
-# ------------------------------------------------------------------------------
-    def update_info(self):
-        """
-        Update the info field of the filter selection
-        """
-        self.led_info.setText(
-            str(fb.fil[self.cmb_filter_selection.currentIndex()]['info']))
+
 # ------------------------------------------------------------------------------
     def start_design_filt(self):
         """
