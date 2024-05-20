@@ -1620,6 +1620,7 @@ def load_filter(self, all=False) -> int:
         try:
             with io.open(file_name, 'rb') as f:  # open in binary mode for npy and pkl
                 if file_type == 'npz':
+                    fb_temp = {}
                     # array containing dict, dtype 'object':
                     arr = np.load(f, allow_pickle=True)
                     logger.warning(f"Load 'npz', returned type is {type(arr)}.")
@@ -1628,10 +1629,10 @@ def load_filter(self, all=False) -> int:
                     for key in sorted(arr):
                         if np.ndim(arr[key]) == 0:
                             # scalar objects may be extracted with the item() method
-                            fb_temp[key] = arr[key].item()
+                            fb_temp.update({key: arr[key].item()})
                         else:
                             # array objects are converted to list first
-                            fb_temp[key] = arr[key].tolist()
+                            fb_temp.update({key: arr[key].tolist()})
                 else:  # file_type == 'pkl':
                     fb_temp = pickle.load(f)
 
