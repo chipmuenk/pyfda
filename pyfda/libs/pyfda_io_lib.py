@@ -1605,7 +1605,7 @@ def export_coe_cmsis(f: TextIO) -> None:
 
 
 # ==============================================================================
-def load_filter(self) -> int:
+def load_filter(self, all=False) -> int:
     """
     Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
@@ -1615,8 +1615,6 @@ def load_filter(self) -> int:
 
     if file_name is None:
         return -1  # operation cancelled or some other error
-
-    err = False
 
     if file_type in {"npz", "pkl"}:
         try:
@@ -1638,7 +1636,7 @@ def load_filter(self) -> int:
                     fb_temp = pickle.load(f)
 
         except IOError as e:
-            logger.error(f"Failed loading {file_name}!\n{e}")
+            logger.error(f"Failed opening {file_name}!\n{e}")
             return -1
 
     elif file_type == 'json':
@@ -1651,20 +1649,36 @@ def load_filter(self) -> int:
             return -1
     else:
         logger.error(f'Unknown file type "{file_type}"')
-        err = True
+        return -1
 
-    if type(fb_temp) == list and len(fb_temp) == 10 and '_id' in fb_temp[0]\
-         and len(fb_temp[0]['_id']) == 2 and fb_temp[0]['_id'][0] == 'pyfda':
-        msg = ("This file contains all 10 memory locations! "
-            "Load the first one to memory (Yes) or abort (No)?")
-        err = not popup_warning(None, message=msg)
-        if not err:
-            fb_temp = fb_temp[0]
-    elif type(fb_temp) is not dict:
+    # -------
+    err = False
+    if type(fb_temp) == list or len(fb_temp) == 10:
+        if all:
+            pass  # file content is well-formed for loading all filters
+        else:
+            msg = ("This file contains all 10 memory locations! "
+                "Load the first one to memory (Yes) or abort (No)?")
+            err = not popup_warning(None, message=msg)
+            if not err:
+                fb_temp = fb_temp[0]  # only process first filter
+            else:
+                return -1
+    else:
+        logger.error(
+            f"Wrong data type '{type(fb_temp)}' or shape, cannot load file.")
+        return -1
+
+    if not all and type(fb_temp) is not dict:
         logger.warning(f"Wrong data type '{type(fb_temp)}', cannot load file.")
-        err = True
-    elif '_id' not in fb_temp or len(fb_temp['_id']) != 2\
-            or fb_temp['_id'][0] != 'pyfda':
+        return -1
+
+    if all:
+        fb_id = fb_temp[0]  # test a slice of all filters for correct id
+    else:
+        fb_id = fb_temp
+
+    if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
     elif fb_temp['_id'][1] != FILTER_FILE_VERSION:
@@ -1673,14 +1687,16 @@ def load_filter(self) -> int:
             f"required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
-    # Catch errors occurring during file opening
+    # Handle errors occurring during file opening
     if err:
         return -1
+    elif all:
+        fb.fil = fb_temp  # assign all filters
     else:
-        fb.redo() # backup filter dict
-        fb.fil[0] = fb_temp
+        fb.fil[0] = fb_temp  # only assign one slice
 
 # --------------------
+    fb.redo()  # backup current filter fb.fil[0]
     try:
         key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
         key_errs[0].sort()  # keys missing in the loaded dict

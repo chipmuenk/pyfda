@@ -370,13 +370,20 @@ class Input_Specs(QWidget):
                 self.load_dict()
                 self.emit({'data_changed': 'filter_loaded'})
             elif ret == -1:
-                return  # error occurred, do nothing
+                return  # aborted or error occurred -> do nothing
             else:
                 logger.error(f'Unknown return code "{ret}"!')
                 return
         elif sel == "file_all":
-            logger.warning("File (all) is not yet supported!")
-            return
+            ret = load_filter(self, all=True)
+            if ret == 0:
+                self.load_dict()
+                self.emit({'data_changed': 'filter_loaded'})
+            elif ret == -1:
+                return  # aborted or error occurred -> do nothing
+            else:
+                logger.error(f'Unknown return code "{ret}"!')
+                return
         else:
             fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
             self.load_dict()
