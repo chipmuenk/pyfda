@@ -1605,7 +1605,7 @@ def export_coe_cmsis(f: TextIO) -> None:
 
 
 # ==============================================================================
-def load_filter(self, all=False) -> int:
+def load_filter(self, all_filters=False) -> int:
     """
     Load filter from JSON, zipped binary numpy array or (c)pickled object to
     filter dictionary
@@ -1652,46 +1652,61 @@ def load_filter(self, all=False) -> int:
         logger.error(f'Unknown file type "{file_type}"')
         return -1
 
-    # -------
-    err = False
-    if type(fb_temp) == list or len(fb_temp) == 10:
-        if all:
+    # --- Test loaded file content for correct type and shape ------------------
+    if type(fb_temp) == list:
+        if len(fb_temp) != 10:
+            logger.error(
+                f"File contains a list with wrong length = {len(fb_temp)} != 10 "
+                f"which cannot be loaded!")
+            return -1
+        if all_filters:
             pass  # file content is well-formed for loading all filters
         else:
             msg = ("This file contains all 10 memory locations! "
-                "Load the first one to memory (Yes) or abort (No)?")
+                "Load the first one as current design (Yes) or abort (No)?")
             err = not popup_warning(None, message=msg)
             if not err:
                 fb_temp = fb_temp[0]  # only process first filter
             else:
                 return -1
+
+    elif type(fb_temp) is dict:
+        if not all_filters:
+            pass  # file contains a single filter -> o.k.
+        else:
+            msg = ("This file contains only one filter! "
+                "Load as current design (Yes) or abort (No)?")
+            err = not popup_warning(None, message=msg)
+            if not err:
+                all_filters = False  # process as single filter
+            else:
+                return -1
+
     else:
         logger.error(
             f"Wrong data type '{type(fb_temp)}' or shape, cannot load file.")
         return -1
 
-    if not all and type(fb_temp) is not dict:
-        logger.warning(f"Wrong data type '{type(fb_temp)}', cannot load file.")
-        return -1
-
-    if all:
-        fb_id = fb_temp[0]  # test a slice of all filters for correct id
+    # --- Test for correct id and version number ------------------------------
+    err = False
+    if all_filters:
+        fb_id = fb_temp[0]  # test first slice of all filters for correct id
     else:
         fb_id = fb_temp
 
     if '_id' not in fb_id or len(fb_id['_id']) != 2 or fb_id['_id'][0] != 'pyfda':
         msg = "This is no pyfda filter or an outdated file format! Load anyway?"
         err = not popup_warning(None, message=msg)
-    elif fb_temp['_id'][1] != FILTER_FILE_VERSION:
+    elif fb_id['_id'][1] != FILTER_FILE_VERSION:
         msg = (
-            f"The filter file has version {str(fb_temp['_id'][1])} instead of "
+            f"The filter file has version {str(fb_id['_id'][1])} instead of "
             f"required version {FILTER_FILE_VERSION}! Load anyway?")
         err = not popup_warning(None, message=msg)
 
-    # Handle errors occurring during file opening
+    # Handle errors occurring during id test
     if err:
         return -1
-    elif all:
+    elif all_filters:
         fb.fil = fb_temp  # assign all filters
     else:
         fb.fil[0] = fb_temp  # only assign one slice

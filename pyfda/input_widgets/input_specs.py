@@ -375,7 +375,7 @@ class Input_Specs(QWidget):
                 logger.error(f'Unknown return code "{ret}"!')
                 return
         elif sel == "file_all":
-            ret = load_filter(self, all=True)
+            ret = load_filter(self, all_filters=True)
             if ret == 0:
                 self.load_dict()
                 self.emit({'data_changed': 'filter_loaded'})
