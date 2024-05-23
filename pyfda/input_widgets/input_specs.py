@@ -50,10 +50,10 @@ class Input_Specs(QWidget):
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
-        filter_load_help_txt = "Load from Mem {0} (initial design)"
+        filter_load_help_txt = "Load <- Mem {0}: " + fb.fil[0]['info']
         self.cmb_filter_load_items = [
             "<span>Load current filter(s) from memory location or file.</span>",
-            ("0", "Load", "Current filter, no action."),
+            ("0", "LOAD", "Current filter, no action."),
             ("1", "Mem 1", filter_load_help_txt.format("1")),
             ("2", "Mem 2", filter_load_help_txt.format("2")),
             ("3", "Mem 3", filter_load_help_txt.format("3")),
@@ -68,10 +68,10 @@ class Input_Specs(QWidget):
         ]
         self.cmb_filter_load_default = "0"
 
-        filter_save_help_txt = "Copy-> Mem {0} (initial design)"
+        filter_save_help_txt = "Copy-> Mem {0}: " + fb.fil[0]['info']
         self.cmb_filter_save_items = [
             "<span>Copy / save current filter(s) to memory location or file.</span>",
-            ("0", "Save", "Current filter, no action."),
+            ("0", "SAVE", "Current filter, no action."),
             ("1", "Mem 1", filter_save_help_txt.format("1")),
             ("2", "Mem 2", filter_save_help_txt.format("2")),
             ("3", "Mem 3", filter_save_help_txt.format("3")),
@@ -146,19 +146,19 @@ class Input_Specs(QWidget):
                           self.cmb_filter_save_default)
         self.cmb_filter_save.insertSeparator(1)
         self.cmb_filter_save.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.lbl_info = QLabel(to_html("Info:", frmt='b'))
+        lbl_info_1 = QLabel(to_html(">", frmt='b'))
+        lbl_info_2 = QLabel(to_html(">", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
-        self.led_info.setToolTip("Enter info / comment / label for the filter")
+        self.led_info.setToolTip("Info / comment / label for current filter")
         lay_h_buttons_load_save_1 = QHBoxLayout()
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
+        lay_h_buttons_load_save_1.addWidget(lbl_info_1)
+        lay_h_buttons_load_save_1.addWidget(self.led_info)
+        lay_h_buttons_load_save_1.addWidget(lbl_info_2)
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_save)  # <Save Filter> combo
         lay_h_buttons_load_save_1.setContentsMargins(*params['wdg_margins_spc'])
-        lay_h_buttons_load_save_2 = QHBoxLayout()
-        lay_h_buttons_load_save_2.addWidget(self.lbl_info)
-        lay_h_buttons_load_save_2.addWidget(self.led_info)
         lay_v_buttons_load_save = QVBoxLayout()
         lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save_1)
-        lay_v_buttons_load_save.addLayout(lay_h_buttons_load_save_2)
         self.frm_buttons_load_save = QFrame()
         self.frm_buttons_load_save.setLayout(lay_v_buttons_load_save)
         self.frm_buttons_load_save.setContentsMargins(*params['wdg_margins'])
@@ -413,13 +413,11 @@ class Input_Specs(QWidget):
         else:
             # save fil[0] to selected location
             fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
-            # insert info string into new tool tip
-            # self.cmb_filter_selection.setItemData(
-            #     int(sel) - 1, self.led_info.text(), Qt.ToolTipRole)
+            # insert info string into new tool tipRole)
             self.cmb_filter_save.setItemData(
-                int(sel) + 1, f"Copy -> Mem {sel} ({self.led_info.text()})", Qt.ToolTipRole)
+                int(sel) + 1, f"Copy -> Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
             self.cmb_filter_load.setItemData(
-                int(sel) + 1, f"Load from Mem {sel} ({self.led_info.text()})", Qt.ToolTipRole)
+                int(sel) + 1, f"Load <- Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
         self.cmb_filter_save.setCurrentIndex(0)
 
 # ------------------------------------------------------------------------------
@@ -428,6 +426,11 @@ class Input_Specs(QWidget):
         Reload info text from global dict `fb.fil[0]` and reset 'DESIGN' button
         """
         self.led_info.setText(str(fb.fil[0]['info']))
+        for i in range(1,10):
+            self.cmb_filter_save.setItemData(
+                i + 1, f"Copy -> Mem {i}: {str(fb.fil[i]['info'])}", Qt.ToolTipRole)
+            self.cmb_filter_load.setItemData(
+                i + 1, f"Load <- Mem {i}: {str(fb.fil[i]['info'])}", Qt.ToolTipRole)
         self.color_design_button("ok")
 
 # ------------------------------------------------------------------------------
