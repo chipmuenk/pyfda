@@ -404,7 +404,7 @@ def np_shape(data):
         return (None, None)
 
 # -----------------------------------------------------------------------------
-def iter2ndarray(iterable, dtype=complex) -> ndarray:
+def iter2ndarray(iterable, dtype=complex) -> np.ndarray:
     """
     Convert an iterable (tuple, list, dict) to a numpy ndarray, egalizing
     different lengths of sub-iterables by adding zeros. This prevents
@@ -424,9 +424,9 @@ def iter2ndarray(iterable, dtype=complex) -> ndarray:
                     arrs.append(np.array(iterable[i]))
                 max_l = max(max_l, len(arrs[i]))
 
-            # equalize lengths of sub-arrays by filling up with zeros
+            # equalize lengths of sub-arrays by filling up with zeros and convert to arrays
             for i in range(len(iterable)):
-                arrs[i] = np.append(arrs[i], np.zeros(max_l - len(arrs[i])))
+                arrs[i] = np.asarray(np.append(arrs[i], np.zeros(max_l - len(arrs[i]))))
 
             return np.nan_to_num(np.array(arrs, dtype=dtype))  # convert list of arrays to two-dimensional array
         else:
