@@ -345,7 +345,7 @@ def is_numeric(a) -> bool:
 
     Parameters
     ----------
-    a : array-like or scalar
+    a : array-like, list, tuple or scalar
 
     Returns
     -------
