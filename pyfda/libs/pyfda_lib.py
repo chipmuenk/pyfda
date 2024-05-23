@@ -389,7 +389,7 @@ def np_type(a):
 def np_shape(data):
     """
     Return the shape of `data` as tuple (rows, columns) for up to
-    2-dimensional data. Otherwise, return None
+    2-dimensional data. Otherwise, return `(None, None)`
     """
     d = np.ndim(data)
     if d == 0:

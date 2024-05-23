@@ -1406,7 +1406,7 @@ def quant_coeffs(coeffs: iterable, Q, recursive: bool = False, out_frmt: str = "
     Returns
     -------
     A numpy array of integer coeffcients, quantized and scaled with the
-    settings of the quantization object dict.
+    settings of the quantization object dict or None in case of an error
 
     """
     disp_frmt_tmp = fb.fil[0]['fx_base']  # temporarily store fx display format and
