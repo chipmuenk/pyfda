@@ -1295,13 +1295,15 @@ class Fixed(object):
 
         # ======================================================================
         # logger.warning(f"float2frmt: y = {y}")
-        if not is_numeric(y):
-            logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
-            return 0.0
         if not fb.fil[0]['fx_sim']:  # return float input value unchanged (no string)
+            logger.error("Not in fixpoint mode, 'float2frmt()' should not be called!")
             return y
 
-        if np.iscomplexobj(y):  # convert complex arguments recursively
+        elif not is_numeric(y):
+            logger.error(f"float2frmt() received a non-numeric argument '{y}'!")
+            return "0"
+
+        elif np.iscomplexobj(y):  # convert complex arguments recursively to format
             y_re = self.float2frmt(y.real)
             y_im = self.float2frmt(y.imag)
             if fb.fil[0]['fx_base'] == 'csd':
