@@ -354,6 +354,8 @@ def is_numeric(a) -> bool:
     """
     if isinstance(a, np.ndarray):
         is_num = np.issubdtype(a.dtype, np.number)
+    elif type(a) in {list, tuple} and len(a) > 0:
+        is_num = np.issubdtype(type(a[0]), np.number)
     else:
         is_num = np.issubdtype(type(a), np.number)
     return is_num
