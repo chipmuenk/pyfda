@@ -50,6 +50,8 @@ class Input_Specs(QWidget):
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
+        self.led_info_tooltip = "Info / comment / label for the filter"
+
         filter_load_help_txt = "Load from Mem {0} (initial design)"
         self.cmb_filter_load_items = [
             "<span>Load current filter(s) from memory location or file.</span>",
@@ -148,7 +150,8 @@ class Input_Specs(QWidget):
         self.cmb_filter_save.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.lbl_info = QLabel(to_html("Info:", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
-        self.led_info.setToolTip("Enter info / comment / label for the filter")
+        self.led_info.setToolTip(self.led_info_tooltip)
+        # self.led_info.home(True)  # move cursor to beginning of line
         lay_h_buttons_load_save_1 = QHBoxLayout()
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_save)  # <Save Filter> combo
@@ -270,9 +273,12 @@ class Input_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def _save_info2dict(self) -> None:
         """
-        Update_filter dict every time the info field is changed
+        Update_filter dict and tooltip every time the info field is changed
         """
         fb.fil[0]['info'] = self.led_info.text()
+        self.led_info.setToolTip("<span>" + self.led_info_tooltip + "\n"
+                                 +self.led_info.text())
+        self.led_info.home(True)  # move cursor to beginning
 
 # ------------------------------------------------------------------------------
     def update_UI(self, dict_sig={}) -> None:
