@@ -149,7 +149,8 @@ class Input_Specs(QWidget):
         lbl_info_1 = QLabel(to_html(">", frmt='b'))
         lbl_info_2 = QLabel(to_html(">", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
-        self.led_info.setToolTip("Info / comment / label for current filter")
+        self.led_info.setToolTip(self.led_info_tooltip)
+        # self.led_info.home(True)  # move cursor to beginning of line
         lay_h_buttons_load_save_1 = QHBoxLayout()
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
         lay_h_buttons_load_save_1.addWidget(lbl_info_1)
@@ -270,9 +271,12 @@ class Input_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def _save_info2dict(self) -> None:
         """
-        Update_filter dict every time the info field is changed
+        Update_filter dict and tooltip every time the info field is changed
         """
         fb.fil[0]['info'] = self.led_info.text()
+        self.led_info.setToolTip("<span>" + self.led_info_tooltip + "\n"
+                                 +self.led_info.text())
+        self.led_info.home(True)  # move cursor to beginning
 
 # ------------------------------------------------------------------------------
     def update_UI(self, dict_sig={}) -> None:
@@ -413,7 +417,7 @@ class Input_Specs(QWidget):
         else:
             # save fil[0] to selected location
             fb.fil[int(sel)] = copy.deepcopy(fb.fil[0])
-            # insert info string into new tool tipRole)
+            # insert info string into new tool tip
             self.cmb_filter_save.setItemData(
                 int(sel) + 1, f"Copy -> Mem {sel}: {self.led_info.text()}", Qt.ToolTipRole)
             self.cmb_filter_load.setItemData(
