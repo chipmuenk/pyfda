@@ -50,6 +50,8 @@ class Input_Specs(QWidget):
         self.tab_label = "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
+        self.led_info_tool_tip = "Filter info:"
+
         filter_load_help_txt = "Load <- Mem {0}: " + fb.fil[0]['info']
         self.cmb_filter_load_items = [
             "<span>Load current filter(s) from memory location or file.</span>",
@@ -68,7 +70,7 @@ class Input_Specs(QWidget):
         ]
         self.cmb_filter_load_default = "0"
 
-        filter_save_help_txt = "Copy-> Mem {0}: " + fb.fil[0]['info']
+        filter_save_help_txt = "Copy -> Mem {0}: " + fb.fil[0]['info']
         self.cmb_filter_save_items = [
             "<span>Copy / save current filter(s) to memory location or file.</span>",
             ("0", "SAVE", "Current filter, no action."),
@@ -149,7 +151,7 @@ class Input_Specs(QWidget):
         lbl_info_1 = QLabel(to_html(">", frmt='b'))
         lbl_info_2 = QLabel(to_html(">", frmt='b'))
         self.led_info = QLineEdit(fb.fil[0]['info'])
-        self.led_info.setToolTip(self.led_info_tooltip)
+        self.led_info.setToolTip(self.led_info_tool_tip)
         # self.led_info.home(True)  # move cursor to beginning of line
         lay_h_buttons_load_save_1 = QHBoxLayout()
         lay_h_buttons_load_save_1.addWidget(self.cmb_filter_load) # Load from mem or file
@@ -274,9 +276,10 @@ class Input_Specs(QWidget):
         Update_filter dict and tooltip every time the info field is changed
         """
         fb.fil[0]['info'] = self.led_info.text()
-        self.led_info.setToolTip("<span>" + self.led_info_tooltip + "\n"
-                                 +self.led_info.text())
+        self.led_info.setToolTip("<span>" + self.led_info_tool_tip + "\n"
+                                 + self.led_info.text() + "</span>")
         self.led_info.home(True)  # move cursor to beginning
+        self.led_info.deselect()
 
 # ------------------------------------------------------------------------------
     def update_UI(self, dict_sig={}) -> None:
