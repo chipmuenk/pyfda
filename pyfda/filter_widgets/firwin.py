@@ -469,7 +469,7 @@ class Firwin(QWidget):
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             # logger.warning(f"N={N}, beta={beta}, A_SB={fb.fil[0]['A_SB']}")
             self.win_dict["Kaiser"]["par"][0]["val"] = beta
-            self.self.cur_win_dict["Kaiser"] = {"val":[beta]}
+            self.cur_win_dict["Kaiser"] = {"val":[beta]}
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
         else:
