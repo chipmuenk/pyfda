@@ -1644,7 +1644,7 @@ def fil_save(fil_dict: dict, arg, format_in: str, sender: str,
                 a = a[:D]  # discard last D elements of a (only zeros anyway)
 
         fil_dict['N'] = len(b) - 1  # correct filter order accordingly
-        fil_dict['ba'] = [np.array(b, dtype=complex), np.array(a, dtype=complex)]
+        fil_dict['ba'] = np.asarray([np.array(b, dtype=complex), np.array(a, dtype=complex)])
 
     else:
         raise ValueError("\t'fil_save()':Unknown input format {0:s}".format(format_in))
@@ -1727,8 +1727,9 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
-                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0], -1)
-                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1], -1)
+                # fil_dict['ba'][0] = np.delete(fil_dict['ba'][0], -1)
+                # fil_dict['ba'][1] = np.delete(fil_dict['ba'][1], -1)
+                fil_dict['ba'] = np.delete(fil_dict['ba'], (-1), axis=1)
 
     elif 'zpk' in format_in:  # z, p, k have been generated,convert to other formats
         zpk = fil_dict['zpk']
@@ -1746,11 +1747,11 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     elif 'ba' in format_in:  # arg = [b,a]
-        b, a = fil_dict['ba'][0], fil_dict['ba'][1]
-        if np.all(np.isfinite([b, a])):
+        # b, a = fil_dict['ba'][0], fil_dict['ba'][1]
+        if np.all(np.isfinite(fil_dict['ba'])):
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
-            zpk = sig.tf2zpk(b, a)
+            zpk = sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1])  # (b, a)
             if len(zpk[0]) != len(zpk[1]):
                 logger.warning("Bad coefficients, some values of b are too close to zero,"
                                "\n\tresults may be inaccurate.")
