@@ -469,8 +469,10 @@ class SelectFilter(QWidget):
 
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
-
-            ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
+            try:
+                ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
+            except RuntimeError as e:
+                logger.error(e)
 
 # ------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
