@@ -233,93 +233,156 @@ fil_tree = freeze_hierarchical({
 # ------------------------------------------------------------------------------
 fil_ref = {
     '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
-    'info': 'Initial filter design',
-    'rt': 'LP', 'ft': 'IIR', 'fc': 'Cheby1', 'fo': 'man',  # filter type
-    'N': 10,  # filter order
-    'f_S': 1, 'T_S': 1,  # current sampling frequency and period
+    # amplitude specs (linear units)
+    "A_PB": 0.2056717652757185,
+    "A_PB2": 0.01,
+    "A_SB": 0.001,
+    "A_SB2": 0.0001,
+    # frequency specs (normalized to F_S)
+    "F_C": 0.1,
+    "F_C2": 0.4,
+    "F_N": 0.2,
+    "F_N2": 0.4,
+    "F_PB": 0.1,
+    "F_PB2": 0.3,
+    "F_SB": 0.2,
+    "F_SB2": 0.4,
+    "N": 4,  # filter order
+    "T_S": 1.0,  # sample time
+    # weights for pass- and stopbands
+    "W_PB": 1,
+    "W_PB2": 1,
+    "W_SB": 1,
+    "W_SB2": 1,
+    #
+    "amp_specs_unit": "dB",
+    # [b, a] coefficients:
+    "ba": [
+        [
+            0.005009993265049969,
+            0.002969044992011087,
+            0.007446465726559892,
+            0.0029690449920110867,
+            0.00500999326504997
+        ],
+        [
+            1.0,
+            -3.18194574253062,
+            4.1391887955869535,
+            -2.567503107299107,
+            0.639724627220979
+        ]
+    ],
+    "creator": [
+        "sos",
+        "pyfda.filter_widgets.ellip"
+    ],
+    "f_S": 1.0,
+    "f_S_prev": 1,  # previous sampling frequency
     # 'f_s_wav': 16000,  # sampling frequency for wav files
-    'f_S_prev': 1,  # previous sampling frequency
-    'freq_locked': False,  # don't update absolute frequencies when f_S is changed
-    'f_s_scale': 1,  #
-    'f_max': 1,
-    'freqSpecsRangeType': 'Half',
-    'freqSpecsRange': [0, 0.5],
-    'freq_specs_sort': True,  # sort freq. specs in ascending order
-    'freq_specs_unit': 'f_S',
-    'plt_fLabel': r'$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$',
-    'plt_fUnit': 'f_S',
-    'plt_tLabel': r'$n \; \rightarrow$',
-    'plt_tUnit': 's',
-    'A_PB': 0.02, 'A_PB2': 0.01, 'F_PB': 0.1, 'F_PB2': 0.4, 'F_C': 0.2, 'F_N': 0.2,
-    'A_SB': 0.001, 'A_SB2': 0.0001, 'F_SB': 0.2, 'F_SB2': 0.3, 'F_C2': 0.4, 'F_N2': 0.4,
-    'W_PB': 1, 'W_PB2': 1, 'W_SB': 1, 'W_SB2': 1,
-    #
-    'ba': ([0.3, 0.3, 0.3], [1, 0, 0.66666666]),  # (bb, aa) tuple coefficient lists
-    # causal zeros/poles/gain
-    'zpk': [[-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-            [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j],
-            [0.3, 0]],
-    #
-    'sos': [],
-    # global quantization format {'qint', 'qfrac'}
-    'qfrmt': 'qfrac',
-    # number format for fixpoint display {'dec', 'hex', 'bin', 'oct', 'csd'}
-    'fx_base': 'dec',
-
+    "f_max": 1.0,
+    "f_s_scale": 1,
+    "fc": "Ellip",  # filter class
+    "fo": "man",  # filter order, manual or min
+    "freqSpecsRange": [
+        0,
+        0.5
+    ],
+    "freqSpecsRangeType": "half",
+    "freq_locked": False, # don't update absolute frequencies when f_S is changed
+    "freq_specs_sort": True,  # sort freq. specs in ascending order
+    "freq_specs_unit": "f_S",
+    "ft": "IIR",  # filter type 
+    "fx_base": "dec", # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
+    # string with current fixpoint module and class
+    "fx_mod_class_name": "pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui",
+    "fx_sim": False, # fixpoint simulation mode active
     # Settings for quantization subwidgets:
     #   'QI':input, 'QO': output, 'QCA': coeffs a, 'QCB': coeffs b, 'QACC': accumulator
-    #    (more subwidget can be added by fixpoint widgets if needed)
+    #    (more subwidgets can be added by fixpoint widget if needed)
     #  Keys:
     #   'WI': integer bits, 'WF': fractional bits,
     #   'w_a_m': word length automatic / manual calculation (not needed for 'QI', 'QO')
     #   'ovfl': overflow behaviour, 'quant': quantizer behaviour
     #   'N_over': number of overflows during last quantization process
     'fxq':{
-        # Input quantization
-        'QI': {'WI': 0, 'WF': 15, 'w_a_m': 'm',
-               'ovfl': 'sat', 'quant': 'round', 'N_over': 0},
-        # Output quantization
-        'QO': {'WI': 0, 'WF': 15, 'w_a_m': 'm',
-               'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
-        # 'b' coefficient quantization
-        'QCB': {'WI': 0, 'WF': 15, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
-        # 'a' coefficient quantization
-        'QCA': {'WI': 2, 'WF': 13, 'w_a_m': 'a',
-                'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0},
         # accumulator quantization
-        'QACC': {'WI': 0, 'WF': 31, 'w_a_m': 'a',
-                 'ovfl': 'wrap', 'quant': 'floor', 'N_over': 0}
+        "QACC": {
+            "N_over": 0,
+            "WF": 28,
+            "WI": 3,
+            "ovfl": "wrap",
+            "quant": "floor",
+            "w_a_m": "a"
         },
-        # 'b': [32768, 32768, 32768],
-        # 'a': [65536, 6553, 0]
-        # },
-    'fx_sim': False,  # fixpoint simulation mode
-    'fx_mod_class_name': '',  # string with current fixpoint module and class
-    'creator': ('ba', 'filterbroker'),  #(format ['ba', 'zpk', 'sos'], routine)
-    'timestamp': time.time(),
-    'amp_specs_unit': 'dB',
-    'plt_phiUnit': 'rad',
-    'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad '\
-            + r'$\rightarrow $',
-    # Parameters for spectral analysis window function
-    'win_fft':
-        {'name': 'Kaiser',  # Window name
-        'fn_name': 'kaiser',  # function name or array with values
-        'par': [{'name': '&beta;',
-                'name_tex': r'$\beta$',
-                'val': 10,
-                'min': 0,
-                'max': 30,
-                'tooltip':
-                    ("<span>Shape parameter; lower values reduce main lobe width, "
-                    "higher values reduce side lobe level, typ. in the range "
-                    "5 ... 20.</span>")}],
-        'n_par': 1,   # number of window parameters
-        'info': "",     # Docstring for the window
-        'win_len': 1024,
+        # 'a' coefficient quantization
+        "QCA": {
+            "N_over": 0,
+            "WF": 12,
+            "WI": 3,
+            "ovfl": "wrap",
+            "quant": "floor",
+            "w_a_m": "a"
         },
-    # dynamically instantiated filter widget
+        # 'b' coefficient quantization
+        "QCB": {
+            "N_over": 0,
+            "WF": 15,
+            "WI": 0,
+            "ovfl": "wrap",
+            "quant": "floor",
+            "w_a_m": "a"
+        },
+        # input quantization
+        "QI": {
+            "N_over": 0,
+            "WF": 15,
+            "WI": 0,
+            "ovfl": "sat",
+            "quant": "round",
+            "w_a_m": "m"
+        },
+        # output quantization
+        "QO": {
+            "N_over": 0,
+            "WF": 15,
+            "WI": 0,
+            "ovfl": "wrap",
+            "quant": "floor",
+            "w_a_m": "m"
+        }
+    },
+    "info": "Ellip. LP (default)",
+    "plt_fLabel": "$F = f\\, /\\, f_S = \\Omega \\, /\\,  2 \\mathrm{\\pi} \\; \\rightarrow$",
+    "plt_fUnit": "f_S",
+    "plt_phiLabel": "$\\angle H(\\mathrm{e}^{\\mathrm{j} \\Omega})$ in rad $\\rightarrow $",
+    "plt_phiUnit": "rad",
+    "plt_tLabel": "$n = t\\, /\\, T_S \\; \\rightarrow$",
+    "plt_tUnit": "T_S",
+    "qfrmt": "qfrac",  # global quantization format {'qint', 'qfrac'}
+    "rt": "LP",  # filter response type
+    # coefficients as second order sections
+    "sos": [
+        [
+            0.005009993265049969,
+            0.005370024900373368,
+            0.00500999326504997,
+            1.0,
+            -1.6295801387915057,
+            0.7159415650206529
+        ],
+        [
+            1.0,
+            -0.47923815089965677,
+            1.0,
+            1.0,
+            -1.5523656037391145,
+            0.8935430745699543
+        ]
+    ],
+    "timestamp": 1717151329.1387591,  # time when filter was created
+    # 'timestamp': time.time(),
+    # parameter(s) of dynamically instantiated filter widget
     'wdg_fil' :
         {'equiripple': {'grid_density': 16}},
     # Parameters for filter design window function - is part of 'wdg_fil'
@@ -331,7 +394,50 @@ fil_ref = {
     #         'info': "",   # Docstring for the window
     #         'win_len': 1024
     #     }
-    }
+
+    # Parameters for spectral analysis window function
+    "win_fft": {
+        "fn_name": "kaiser",  # window function name or array with values
+        "info": "",  # Docstring for the window
+        "n_par": 1, # number of window parameters
+        "name": "Kaiser",  # display name
+        "par": [  # list of parameters
+            {
+                "max": 30,
+                "min": 0,
+                "name": "&beta;",
+                "name_tex": "$\\beta$",
+                # 'name_tex': r'$\beta$',
+                "tooltip": ("<span>Shape parameter; lower values reduce main lobe width, "
+                            "higher values reduce side lobe level, typ. in the range "
+                            "5 ... 20.</span>"),
+                "val": 10
+            }
+        ],
+        "win_len": 1024
+    },
+    # causal zeros/poles/gain
+    "zpk": [
+        [
+            -0.5359313492330422+0.8442615642733304j,
+            -0.5359313492330422-0.8442615642733304j,
+            0.23961907544982838+0.9708669830005394j,
+            0.23961907544982838-0.9708669830005394j
+        ],
+        [
+            0.8147900693957527+0.22816377415075598j,
+            0.8147900693957527-0.22816377415075598j,
+            0.7761828018695571+0.539521392209686j,
+            0.7761828018695571-0.539521392209686j
+        ],
+        [
+            0.005009993265049969+0.0j,
+            0.0+0.0j,
+            0.0+0.0j,
+            0.0+0.0j
+        ]
+    ]
+}
 
   # create empty lists with length 10 for multiple filter designs and undo functions
 fil = [None] * 10
