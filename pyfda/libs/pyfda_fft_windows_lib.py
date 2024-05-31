@@ -645,7 +645,6 @@ class QFFTWinSelector(QWidget):
 
         win_dict['cur_win_name']        # win_name: new current window name (str)
         win_dict['win']                 # []: clear window function array (empty list)
-        win_dict[win_name]['win_fnct']  # function object
         win_dict[win_name]['n_par']     # number of parameters (int)
 
         The above is only updated when the window type has been changed compared to
@@ -715,7 +714,8 @@ class QFFTWinSelector(QWidget):
             n_par = 0
 
         self.win_dict.update({'cur_win_name': win_name, 'win': []})
-        self.win_dict[win_name].update({'win_fnct': win_fnct, 'n_par': n_par})
+        self.win_fnct = win_fnct  # handle to windows function
+        self.win_dict[win_name].update({'n_par': n_par})
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
@@ -774,7 +774,6 @@ class QFFTWinSelector(QWidget):
                         # logger.warning(f"cache win {i} / {self.win_idx} (N = {N})")
                         return win[i] # return unchanged window function
 
-        win_fnct = self.win_dict[win_name]['win_fnct']
         fn_name = self.win_dict[win_name]['fn_name']
         n_par = self.win_dict[win_name]['n_par']
 
@@ -783,11 +782,11 @@ class QFFTWinSelector(QWidget):
                 w = scipy.signal.windows.dpss(N, self.win_dict[win_name]['par'][0]['val'],
                                               sym=sym)
             elif n_par == 0:
-                w = win_fnct(N, sym=sym)
+                w = self.win_fnct(N, sym=sym)
             elif n_par == 1:
-                w = win_fnct(N, self.win_dict[win_name]['par'][0]['val'], sym=sym)
+                w = self.win_fnct(N, self.win_dict[win_name]['par'][0]['val'], sym=sym)
             elif n_par == 2:
-                w = win_fnct(N, self.win_dict[win_name]['par'][0]['val'],
+                w = self.win_fnct(N, self.win_dict[win_name]['par'][0]['val'],
                              self.win_dict[win_name]['par'][1]['val'], sym=sym)
             else:
                 logger.error(
