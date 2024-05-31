@@ -720,8 +720,7 @@ class QFFTWinSelector(QWidget):
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
-    def get_window(self, N: int, win_name: str = None, sym: bool = False,
-                   clear_cache: bool = False) -> np.array:
+    def get_window(self, N: int, win_name: str = None, sym: bool = False) -> np.array:
         """
         Calculate or retrieve from cache the selected window function with `N` points.
 
@@ -745,9 +744,6 @@ class QFFTWinSelector(QWidget):
             When True, generate a symmetric window for filter design.
             When False (default), generate a periodic window for spectral analysis.
 
-        clear_cache : bool, optional
-            Clear the window cache
-
         Returns
         -------
         win_fnct : ndarray
@@ -761,9 +757,9 @@ class QFFTWinSelector(QWidget):
         win = self.win_dict['win']
         self.err = False
 
-        if clear_cache:
-            self.win_dict['win'] = []  # clear the cache
-            self.win_idx = 0
+        # if clear_cache:
+        #     self.win_dict['win'] = []  # clear the cache
+        #     self.win_idx = 0
         if win_name is None or win_name == self.win_dict['cur_win_name']:
             win_name = self.win_dict['cur_win_name']
             if win == []: # cache has been cleared, reset index
