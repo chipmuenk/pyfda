@@ -1698,13 +1698,14 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             for section in range(n_sections):
                 b1 = chk[section, :3]
                 a1 = chk[section, 3:]
-                if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
+                if (np.amin(b1) < 1e-14 and np.amin(b1) > 0):
                     raise ValueError(
                         "\t'fil_convert()': Bad coefficients, Order N is too high!")
 
         if 'zpk' not in format_in:
             try:
                 # returns a tuple (zeros, poles, gain) where gain is scalar:
+                # convert zpk to list to allow for individual editing of z and p
                 zpk = list(sig.sos2zpk(fil_dict['sos']))
             except Exception as e:
                 raise ValueError(e)
@@ -1721,7 +1722,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 
         if 'ba' not in format_in:
             try:
-                fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+                fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
             except Exception as e:
                 raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
@@ -1747,8 +1748,10 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 #                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     elif 'ba' in format_in:  # arg = [b,a]
-        # b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         if np.all(np.isfinite(fil_dict['ba'])):
+            if type(fb.fil[0]['ba']) in {list, tuple}:
+                logger.warning(f"fb.fil[0]['ba'] is of type '{type(fb.fil[0]['ba'])}', should be ndarray!")
+
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
             zpk = sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1])  # (b, a)
@@ -1765,7 +1768,6 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
                 "to zpk format!")
-            zpk = None
         fil_dict['sos'] = []  # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
