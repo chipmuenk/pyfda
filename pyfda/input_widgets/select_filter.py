@@ -462,18 +462,26 @@ class SelectFilter(QWidget):
         if hasattr(ff.fil_inst, 'wdg_fil'):
             # not needed, connection is destroyed automatically
             # ff.fil_inst.sig_tx.disconnect()
-            try:
-                # remove widget from layout
-                self.layHDynWdg.removeWidget(self.dyn_wdg_fil)
-                # delete UI widget when scope has been left
-                self.dyn_wdg_fil.deleteLater()
+            if hasattr(self, 'dyn_wdg_fil'):
+                try:
+                    # remove widget from layout
+                    self.layHDynWdg.removeWidget(self.dyn_wdg_fil)
+                    # delete UI widget when scope has been left
+                    self.dyn_wdg_fil.deleteLater()
 
-            except AttributeError as e:
-                logger.error("Could not destruct_UI!\n{0}".format(e))
-            try:
-                ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
-            except RuntimeError as e:
-                logger.error(e)
+                except AttributeError as e:
+                    logger.error("Could not destruct_UI!\n{0}".format(e))
+            else:
+                logger.error("Dynamic filter instance 'wdg_fil' does not exist, "
+                             "you should not see this message!")
+            if hasattr(ff, 'fil_inst'):
+                try:
+                    ff.fil_inst.deleteLater()  # delete QWidget when scope has been left
+                except RuntimeError as e:
+                    logger.error(e)
+            else:
+                logger.error("Dynamic filter instance 'fil_inst' does not exist, "
+                             "you should not see this message!")
 
 # ------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
