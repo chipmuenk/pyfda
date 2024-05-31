@@ -1711,7 +1711,7 @@ def load_filter(self, all_filters=False) -> int:
     else:
         fb.fil[0] = fb_temp  # only assign one slice
 
-# --------------------
+    # --- Sanitize keys by comparing to reference dict -----------------------
     fb.redo()  # backup current filter fb.fil[0]
     try:
         key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
@@ -1736,7 +1736,7 @@ def load_filter(self, all_filters=False) -> int:
         if err_str != "":
             logger.warning(err_str)
 
-        # sanitize *values* in filter dictionary, keys are ok by now
+    # --- Sanitize *values* in filter dictionary, keys are ok by now
         for k in fb.fil[0]:
             # Bytes need to be decoded for py3 to be used as keys later on
             if type(fb.fil[0][k]) == bytes:

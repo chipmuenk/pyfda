@@ -484,7 +484,7 @@ class Input_PZ(QWidget):
                            f"{len(fb.fil[0]['zpk'][0])} != {len(fb.fil[0]['zpk'][1])}")
             return
         # logger.warning(f"New shape (zpk) = {np.shape(zpk)}")
-        self.zpk = np.array(zpk)  # this enforces a deep copy
+        self.zpk = np.array(zpk)  # this enforces a deep copy and converts back to ndarray
         qstyle_widget(self.ui.butSave, 'normal')
         self._refresh_table()
 
