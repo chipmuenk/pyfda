@@ -1768,8 +1768,10 @@ def load_filter(self, all_filters=False) -> int:
             elif np.shape(fb.fil[0]['ba'])[0] != 2:
                 logger.error(
                     f"Unsuitable shape {np.shape(fb.fil[0]['ba'])} of 'ba' data ")
-        elif type(fb.fil[0]['ba']) == list:
+        elif type(fb.fil[0]['ba']) in {list, tuple}:
             fb.fil[0]['ba'] = iter2ndarray(fb.fil[0]['ba'])
+        else:
+            logger.error(f"Unsuitable 'ba' data type '{type(fb.fil[0]['ba'])}!")
 
         if type(fb.fil[0]['zpk']) == np.ndarray:
             if np.ndim(fb.fil[0]['zpk']) != 2:
@@ -1778,8 +1780,11 @@ def load_filter(self, all_filters=False) -> int:
             elif np.shape(fb.fil[0]['zpk'])[0] != 3:
                 logger.error(
                     f"Unsuitable shape {np.shape(fb.fil[0]['zpk'])} of 'zpk' data ")
-        elif type(fb.fil[0]['zpk']) == list:
+        elif type(fb.fil[0]['zpk']) in {list, tuple}:
             fb.fil[0]['zpk'] = iter2ndarray(fb.fil[0]['zpk'])
+        else:
+            logger.error(f"Unsuitable 'zpk' data type '{type(fb.fil[0]['zpk'])}!")
+
 
         logger.info(f'Successfully loaded filter\n\t"{file_name}"')
         dirs.last_file_name = file_name
