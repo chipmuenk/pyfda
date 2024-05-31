@@ -334,15 +334,16 @@ all_windows_dict = {
 # ------------------------------------------------------------------------------
 def get_valid_windows_list(win_names_list=[], win_dict={}):
     """
-    Extract the list of all the keys from `win_dict` that define a
-    window and are contained in the list of window names 'win_names_list'.
-    This is verified by checking whether the key in `win_dict` has a dict
-    as a value with the key `fn_name` and the window function as a value.
-    When `win_dict` is empty, use the global `all_windows_dict`.
+    Return a list of all keys (= window names) from `win_dict` that are contained in the
+    list of window names 'win_names_list'. It is checked whether each key has a dict as
+    a value defining the window and whether this dict has a key `fn_name` specifying
+    the fully qualified name of the window function
 
-    When `win_names_list` is empty, return all valid window names from `all_windows_dict`.
+    When `win_dict` is empty, use the global `all_windows_dict` instead.
 
-    All window names in 'win_names_list' without a corresponding key in `all_windows_dict`
+    When `win_names_list` is empty, return all valid window names.
+
+    All window names in 'win_names_list' without a corresponding key in the windows dict
     raise a warning.
 
     The result is a alphabetically sorted (on the lower-cased names)
@@ -360,7 +361,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 
     Returns
     -------
-    A validated list of window names
+    A validated list of str with window names
 
     """
     if not win_dict:  # empty dictionary, use global one
@@ -379,8 +380,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
         for wn in win_names_list:
             if wn not in wl:
                 logger.warning(
-                    'Ignoring window name "{}", not found in "all_windows_dict".'
-                    .format(wn))
+                    f'Ignoring window name "{wn}", not found in "all_windows_dict".')
 
     return sorted(wl, key=lambda v: (v.lower(), v))
 
@@ -388,10 +388,10 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 # ------------------------------------------------------------------------------
 def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
-    Return a subdictionary of a deep copy of `all_windows_dict` containing all valid
-    windows for the names passed in `win_names_list`. When the latter is empty, put all
-    valid windows into the returned subdictionary (which should be more or less a mutable
-    deep copy of `all_windows_dict` in this case.).
+    Return a deep copy of `all_windows_dict` with only the keys from `win_names_list`
+    that specify valid windows. When the latter is empty, put all valid windows from
+    `all_windows_dict` into the returned subdictionary (which should be a deep copy of
+    `all_windows_dict` in this case).
 
     `cur_win_name` determines the initial value of the `cur_win_name` key in the
     returned dictionary.
@@ -406,8 +406,8 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
 
     Returns
     -------
-    dict
-      A dictionary with windows, window functions, docstrings etc
+    win_dict: dict
+        A dictionary with windows, window functions, docstrings etc
     """
     awd = copy.deepcopy(all_windows_dict)
     d = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
@@ -771,7 +771,6 @@ class QFFTWinSelector(QWidget):
             else:
                 for i in range(len(win)):
                     if len(win[i]) == N:
-                        # logger.warning(f"cache win {i} / {self.win_idx} (N = {N})")
                         return win[i] # return unchanged window function
 
         fn_name = self.win_dict[win_name]['fn_name']

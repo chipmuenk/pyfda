@@ -447,13 +447,14 @@ class SelectFilter(QWidget):
 # ------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
         """
-        Delete the dynamically created filter design subwidget (if there is one)
+        Delete the dynamically instantiated filter design subwidget 'wdg_fil'
+        (if there is one).
 
         see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-
         widgets-in-pyqt
 
         This does NOT work when the subwidgets to be deleted and created are
-        identical, as the deletion is only performed when the current scope has
+        identical, as the deletion is only performed after the current scope has
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
