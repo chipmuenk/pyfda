@@ -52,9 +52,6 @@ rectangular_info =\
     transition of all windowed FIR filters but the worst stop band attenuation.
     </span>'''
 all_windows_dict = {
-    # array for caching window values, dtype=object because subarrays
-    # differ in length
-    'win': np.array([], dtype=object),
     'cur_win_name': 'Hamming',  # name of current window
     #
     'Boxcar': {
@@ -411,7 +408,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
     awd = copy.deepcopy(all_windows_dict)
     win_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
-    win_dict.update({'cur_win_name': cur_win_name, 'win': awd['win']})
+    win_dict.update({'cur_win_name': cur_win_name})
     return win_dict
 
 
@@ -554,9 +551,11 @@ class QFFTWinSelector(QWidget):
     def __init__(self, win_dict, objectName=""):
         super().__init__()
 
-        self.win_dict = win_dict
         self.setObjectName(objectName)
         self.err = False  # error flag for window calculation
+        self.win_dict = win_dict
+        self.win_last = None  # array with previous window function values
+        self.win_fnct = None  # handle to windows function
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
         self.ui2dict_win()
@@ -644,8 +643,12 @@ class QFFTWinSelector(QWidget):
         `win_dict` dictionary correspondingly with:
 
         win_dict['cur_win_name']        # win_name: new current window name (str)
-        win_dict['win']                 # []: clear window function array (empty list)
         win_dict[win_name]['n_par']     # number of parameters (int)
+
+        Additionally, the following class attributes are updated / reset:
+
+        self.win_fnct = win_fnct        # handle to windows function
+        self.win_last = None            # clear last window function
 
         The above is only updated when the window type has been changed compared to
         `win_dict['cur_win_name']` !
@@ -713,9 +716,10 @@ class QFFTWinSelector(QWidget):
             win_name = "Rectangular"
             n_par = 0
 
-        self.win_dict.update({'cur_win_name': win_name, 'win': []})
-        self.win_fnct = win_fnct  # handle to windows function
+        self.win_dict.update({'cur_win_name': win_name})
         self.win_dict[win_name].update({'n_par': n_par})
+        self.win_fnct = win_fnct  # handle to windows function
+        self.win_last = None
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
@@ -734,7 +738,7 @@ class QFFTWinSelector(QWidget):
             obtain the window function, its parameters and tool tips etc. via
             `set_window_name()`. If not, the previous setting are used. If window
             and number of data points are unchanged, the stored window from
-            `self.win_dict['win']` is used instead of recalculating it.
+            `self.win_last` is used instead of recalculating it.
 
             If some kind of error occurs during calculation of the window, a rectangular
             window is used as a fallback and the class attribute `self.err` is
@@ -748,26 +752,19 @@ class QFFTWinSelector(QWidget):
         -------
         win_fnct : ndarray
             The window function with `N` data points (should be normalized to 1)
-            This is also stored in `self.win_dict['win']`. Additionally, the normalized
+            This is also stored in `self.win_last`. Additionally, the normalized
             equivalent noise bandwidth is calculated and stored as
             `self.win_dict['nenbw']` as well as the correlated gain
             `self.win_dict['cgain']`.
         """
-        N_cache = 6  # number of windows that can be cached
-        win = self.win_dict['win']
         self.err = False
 
-        # if clear_cache:
-        #     self.win_dict['win'] = []  # clear the cache
-        #     self.win_idx = 0
         if win_name is None or win_name == self.win_dict['cur_win_name']:
             win_name = self.win_dict['cur_win_name']
-            if win == []: # cache has been cleared, reset index
-                self.win_idx = 0
-            else:
-                for i in range(len(win)):
-                    if len(win[i]) == N:
-                        return win[i] # return unchanged window function
+            # window name and length are unchanged, use stored window function
+            if self.win_last is not None and len(self.win_last) == N:
+                logger.warning("using cached window!")
+                return self.win_last
 
         fn_name = self.win_dict[win_name]['fn_name']
         n_par = self.win_dict[win_name]['n_par']
@@ -801,15 +798,8 @@ class QFFTWinSelector(QWidget):
         nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
         cgain = np.sum(w) / N  # coherent gain / DC average
 
-        # build a cache with window values and keep an index to replace
-        # oldest entry first
-        if len(win) < N_cache:
-            win.append(w)
-        else:
-            win[self.win_idx] = w
-            self.win_idx = (self.win_idx + 1) % N_cache
-
-        self.win_dict.update({'win': win, 'nenbw': nenbw, 'cgain': cgain})
+        self.win_last = w
+        self.win_dict.update({'nenbw': nenbw, 'cgain': cgain})
 
         return w
 
@@ -859,7 +849,7 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win_par'
         """
         cur = self.win_dict['cur_win_name']  # current window name / key
-        self.win_dict['win'] = []  # reset the window cache
+        self.win_last = None
 
         if self.win_dict[cur]['n_par'] > 1:
             if 'list' in self.win_dict[cur]['par'][1]:
