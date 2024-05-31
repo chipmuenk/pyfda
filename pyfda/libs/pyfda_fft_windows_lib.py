@@ -640,7 +640,7 @@ class QFFTWinSelector(QWidget):
 # ------------------------------------------------------------------------------
     def set_window_name(self, win_name: str = "") -> bool:
         """
-        Select and set a window function object from its name `win_name` and update the
+        Select and set a window function object from its string `win_name` and update the
         `win_dict` dictionary correspondingly with:
 
         win_dict['cur_win_name']        # win_name: new current window name (str)
@@ -669,7 +669,7 @@ class QFFTWinSelector(QWidget):
                 f'Unknown window name "{win_name}", using rectangular window instead.')
             win_name = "Rectangular"
 
-        # operate with the window specific sub-dictionary `win_dict[win_name]`
+        # operate with the window specific sub-dictionary `d = win_dict[win_name]`
         # dictionary in the following
         d = self.win_dict[win_name]
         fn_name = d['fn_name']
@@ -731,10 +731,10 @@ class QFFTWinSelector(QWidget):
 
         win_name : str, optional
             Name of the window. If specified (default is None), this will be used to
-            obtain the window function, its parameters and tool tipps etc. via
+            obtain the window function, its parameters and tool tips etc. via
             `set_window_name()`. If not, the previous setting are used. If window
-            and number of data points are unchanged, the window is retrieved from
-            `self.win_dict['win']` instead of recalculating it.
+            and number of data points are unchanged, the stored window from
+            `self.win_dict['win']` is used instead of recalculating it.
 
             If some kind of error occurs during calculation of the window, a rectangular
             window is used as a fallback and the class attribute `self.err` is
