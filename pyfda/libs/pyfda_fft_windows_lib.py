@@ -780,7 +780,6 @@ class QFFTWinSelector(QWidget):
 
         try:
             if fn_name == 'dpss':
-                logger.info("dpss!")
                 w = scipy.signal.windows.dpss(N, self.win_dict[win_name]['par'][0]['val'],
                                               sym=sym)
             elif n_par == 0:

@@ -141,10 +141,6 @@ class Firwin(QWidget):
         - FFT window widget
         - qfft_win_select
         """
-
-        logger.debug("SIG_RX - vis: {0}\n{1}"
-                     .format(self.isVisible(), pprint_log(dict_sig)))
-
         if dict_sig['id'] == id(self):
             logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
 
@@ -234,7 +230,7 @@ class Firwin(QWidget):
         """ Update window type for FirWin - unneeded at the moment """
         self.alg = str(self.cmb_firwin_alg.currentText())
         self.cur_win_name = self.win_dict['cur_win_name']
-        logger.warning(self.cur_win_name)
+        # logger.warning(self.cur_win_name)
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
@@ -251,7 +247,7 @@ class Firwin(QWidget):
             # self.win_dict.update(fb.fil[0]['wdg_fil']['firwin'])
             # Get window name (should be the only key!)
             self.cur_win_name = fb.fil[0]['wdg_fil']['firwin'].keys[0]
-            logger.warning(f"curwin = {self.cur_win_name}")
+            # logger.warning(f"curwin = {self.cur_win_name}")
             if self.cur_win_name in self.win_dict:
                 # get window related infos from global filter dict
                 self.cur_win_dict = self.win_dict[self.cur_win_name]
@@ -277,7 +273,7 @@ class Firwin(QWidget):
         Store window and parameter settings using `self.win_dict` in filter dictionary.
         """
         # fb.fil[0]['wdg_fil'] = {'firwin': self.cur_win_dict}
-        logger.warning(fb.fil[0]['wdg_fil'])
+        # logger.warning(fb.fil[0]['wdg_fil'])
         if 'wdg_fil' not in fb.fil[0]:
             fb.fil[0].update({'wdg_fil': {}})
             logger.warning("Key 'wdg_fil' is missing in filter dict!")
@@ -467,7 +463,6 @@ class Firwin(QWidget):
         # delta_A = np.sqrt(A[0] * A[1])
         if "Kaiser" in self.win_dict and self.win_dict['cur_win_name'] == "Kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
-            # logger.warning(f"N={N}, beta={beta}, A_SB={fb.fil[0]['A_SB']}")
             self.win_dict["Kaiser"]["par"][0]["val"] = beta
             self.cur_win_dict["Kaiser"] = {"val":[beta]}
             self.qfft_win_select.led_win_par_0.setText(str(beta))
