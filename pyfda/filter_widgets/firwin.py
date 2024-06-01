@@ -86,6 +86,8 @@ class Firwin(QWidget):
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
         self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
+        # copy the display name of the current window into the current dict
+        self.cur_win_dict.update({'name': self.cur_win_name})
 
         # get initial / last setting from dictionary, updating self.all_wins_dict
         self._load_dict()
@@ -245,19 +247,21 @@ class Firwin(QWidget):
         if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
             logger.warning(fb.fil[0]['wdg_fil'])
-            # Get window name
-            # self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['fn_name']
-            self.cur_win_name = self.all_wins_dict['cur_win_name']
+            firwin_loaded = fb.fil[0]['wdg_fil']['firwin']
+
+            # Get window display name
+            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['name']
             logger.warning(f"curwin = {self.cur_win_name}")
-            if self.cur_win_name in self.all_wins_dict:
-                # get window related infos from global filter dict
-                self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
-                # window related infos from loaded dict
-                firwin_loaded = fb.fil[0]['wdg_fil']['firwin'][self.cur_win_name]
-            else:
-                logger.warning(f"No window '{self.cur_win_name}' in windows dict!")
-                self.cur_win_dict = self.all_wins_dict['Hann']
-                return
+            # if self.cur_win_name in self.all_wins_dict:
+            #     # get window related infos from global filter dict
+            #     self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
+            #     # window related infos from loaded dict
+            #     firwin_loaded = fb.fil[0]['wdg_fil']['firwin'][self.cur_win_name]
+            # else:
+            #     logger.warning(f"No window '{self.cur_win_name}' in all-windows dict, "
+            #                    "using Hann window!")
+            #     self.cur_win_dict = self.all_wins_dict['Hann']
+            #     return
             if 'par' in firwin_loaded:
                 n_params = len(firwin_loaded['par'])
                 params = [firwin_loaded['par'][p]['val'] for p in range(n_params)]
