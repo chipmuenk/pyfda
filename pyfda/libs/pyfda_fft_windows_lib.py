@@ -558,7 +558,7 @@ class QFFTWinSelector(QWidget):
         self.win_fnct = None  # handle to windows function
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
-        self.ui2dict_win()
+        self.ui2win_dict()
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -810,14 +810,14 @@ class QFFTWinSelector(QWidget):
         `self.all_wins_dict['cur_win_name']` is different from current combo box entry:
 
         - set FFT window type combobox from `self.all_wins_dict['cur_win_name']`
-        - use `ui2dict_win()` to update parameter widgets for new window type
+        - use `ui2win_dict()` to update parameter widgets for new window type
           from `self.all_wins_dict` without emitting a signal
         """
         if qget_cmb_box(self.cmb_win_fft, data=False) == self.all_wins_dict['cur_win_name']:
             return
         else:
             qset_cmb_box(self.cmb_win_fft, self.all_wins_dict['cur_win_name'], data=False)
-            self.ui2dict_win()
+            self.ui2win_dict()
 
 # ------------------------------------------------------------------------------
     def dict2ui_params(self):
@@ -888,11 +888,11 @@ class QFFTWinSelector(QWidget):
           update parameter widgets accordingly
         - emit 'view_changed': 'fft_win_type'
         """
-        self.ui2dict_win()
+        self.ui2win_dict()
         self.emit({'view_changed': 'fft_win_type'})
 
 # ------------------------------------------------------------------------------
-    def ui2dict_win(self) -> None:
+    def ui2win_dict(self) -> None:
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
