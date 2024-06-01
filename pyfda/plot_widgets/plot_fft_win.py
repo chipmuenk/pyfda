@@ -83,7 +83,7 @@ class Plot_FFT_win(QDialog):
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
-        self.win_dict = win_dict
+        self.all_wins_dict = win_dict
         self.sym = sym
         self.ignore_close_event = ignore_close_event
         self.setWindowTitle(title)
@@ -160,7 +160,8 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.qfft_win_select = QFFTWinSelector(self.win_dict, objectName='plot_fft_win_qfft')
+        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict,
+                                               objectName='plot_fft_win_qfft')
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)
@@ -559,8 +560,8 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
-        cur = self.win_dict['cur_win_name']
-        cur_win_d = self.win_dict[cur]
+        cur = self.all_wins_dict['cur_win_name']
+        cur_win_d = self.all_wins_dict[cur]
         param_txt = ""
         if cur_win_d['n_par'] > 0:
             if type(cur_win_d['par'][0]['val']) in {str}:
@@ -570,7 +571,7 @@ class Plot_FFT_win(QDialog):
             param_txt = " ({0:s} = {1:s})".format(
                 cur_win_d['par'][0]['name_tex'], p1)
 
-        if self.win_dict[cur]['n_par'] > 1:
+        if self.all_wins_dict[cur]['n_par'] > 1:
             if type(cur_win_d['par'][1]['val']) in {str}:
                 p2 = cur_win_d['par'][1]['val']
             else:
@@ -622,9 +623,9 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        cur = self.win_dict['cur_win_name']
-        if 'info' in self.win_dict[cur]:
-            self.txtInfoBox.setText(self.win_dict[cur]['info'])
+        cur = self.all_wins_dict['cur_win_name']
+        if 'info' in self.all_wins_dict[cur]:
+            self.txtInfoBox.setText(self.all_wins_dict[cur]['info'])
         else:
             self.txtInfoBox.clear()
 

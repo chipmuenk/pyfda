@@ -123,13 +123,13 @@ class PlotImpz_UI(QWidget):
         self.cur_win_name = "Rectangular"  # set initial window type
 
         # initialize windows dict with the list above
-        self.win_dict = get_windows_dict(
+        self.all_wins_dict = get_windows_dict(
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
 
         # instantiate FFT window with default windows dict
         self.fft_widget = Plot_FFT_win(
-            self.win_dict, sym=False, title="pyFDA Spectral Window Viewer")
+            self.all_wins_dict, sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
 
@@ -267,7 +267,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self.win_dict, objectName='win_select_qfft')
+        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, objectName='win_select_qfft')
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")
@@ -644,7 +644,7 @@ class PlotImpz_UI(QWidget):
     # -------------------------------------------------------------------------
     def update_N(self, emit=True, N_end=0):
         """
-        Update values for `self.N` and `self.win_dict['N']`, for `self.N_start` and
+        Update values for `self.N` and `self.all_wins_dict['N']`, for `self.N_start` and
         `self.N_end` from the corresponding QLineEditWidgets.
 
         Parameters

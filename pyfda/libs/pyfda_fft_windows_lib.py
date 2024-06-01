@@ -553,7 +553,7 @@ class QFFTWinSelector(QWidget):
 
         self.setObjectName(objectName)
         self.err = False  # error flag for window calculation
-        self.win_dict = win_dict
+        self.all_wins_dict = win_dict
         self.win_last = None  # array with previous window function values
         self.win_fnct = None  # handle to windows function
         self._construct_UI()
@@ -587,9 +587,9 @@ class QFFTWinSelector(QWidget):
         """
         # FFT window type
         self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(get_valid_windows_list(win_dict=self.win_dict))
+        self.cmb_win_fft.addItems(get_valid_windows_list(win_dict=self.all_wins_dict))
         self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'])
+        qset_cmb_box(self.cmb_win_fft, self.all_wins_dict['cur_win_name'])
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
@@ -657,7 +657,7 @@ class QFFTWinSelector(QWidget):
         ----------
         win_name : str
             Name of the window, which will be looked up in `all_windows_dict`. If it is
-            "", use `self.win_dict['cur_win_name']` instead
+            "", use `self.all_wins_dict['cur_win_name']` instead
 
         Returns
         -------
@@ -665,16 +665,16 @@ class QFFTWinSelector(QWidget):
             Error flag; `True` when `win_name` could not be resolved
         """
         if win_name == "":
-            win_name = self.win_dict['cur_win_name']
+            win_name = self.all_wins_dict['cur_win_name']
 
-        elif win_name not in self.win_dict:
+        elif win_name not in self.all_wins_dict:
             logger.warning(
                 f'Unknown window name "{win_name}", using rectangular window instead.')
             win_name = "Rectangular"
 
         # operate with the window specific sub-dictionary `d = win_dict[win_name]`
         # dictionary in the following
-        d = self.win_dict[win_name]
+        d = self.all_wins_dict[win_name]
         fn_name = d['fn_name']
 
         if 'par' in d:
@@ -716,8 +716,8 @@ class QFFTWinSelector(QWidget):
             win_name = "Rectangular"
             n_par = 0
 
-        self.win_dict.update({'cur_win_name': win_name})
-        self.win_dict[win_name].update({'n_par': n_par})
+        self.all_wins_dict.update({'cur_win_name': win_name})
+        self.all_wins_dict[win_name].update({'n_par': n_par})
         self.win_fnct = win_fnct  # handle to windows function
         self.win_last = None
 
@@ -754,32 +754,32 @@ class QFFTWinSelector(QWidget):
             The window function with `N` data points (should be normalized to 1)
             This is also stored in `self.win_last`. Additionally, the normalized
             equivalent noise bandwidth is calculated and stored as
-            `self.win_dict['nenbw']` as well as the correlated gain
-            `self.win_dict['cgain']`.
+            `self.all_wins_dict['nenbw']` as well as the correlated gain
+            `self.all_wins_dict['cgain']`.
         """
         self.err = False
 
-        if win_name is None or win_name == self.win_dict['cur_win_name']:
-            win_name = self.win_dict['cur_win_name']
+        if win_name is None or win_name == self.all_wins_dict['cur_win_name']:
+            win_name = self.all_wins_dict['cur_win_name']
             # window name and length are unchanged, use stored window function
             if self.win_last is not None and len(self.win_last) == N:
                 logger.warning("using cached window!")
                 return self.win_last
 
-        fn_name = self.win_dict[win_name]['fn_name']
-        n_par = self.win_dict[win_name]['n_par']
+        fn_name = self.all_wins_dict[win_name]['fn_name']
+        n_par = self.all_wins_dict[win_name]['n_par']
 
         try:
             if fn_name == 'dpss':
-                w = scipy.signal.windows.dpss(N, self.win_dict[win_name]['par'][0]['val'],
+                w = scipy.signal.windows.dpss(N, self.all_wins_dict[win_name]['par'][0]['val'],
                                               sym=sym)
             elif n_par == 0:
                 w = self.win_fnct(N, sym=sym)
             elif n_par == 1:
-                w = self.win_fnct(N, self.win_dict[win_name]['par'][0]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_name]['par'][0]['val'], sym=sym)
             elif n_par == 2:
-                w = self.win_fnct(N, self.win_dict[win_name]['par'][0]['val'],
-                             self.win_dict[win_name]['par'][1]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_name]['par'][0]['val'],
+                             self.all_wins_dict[win_name]['par'][1]['val'], sym=sym)
             else:
                 logger.error(
                     "{0:d} parameters are not supported for windows at the moment!"
@@ -799,7 +799,7 @@ class QFFTWinSelector(QWidget):
         cgain = np.sum(w) / N  # coherent gain / DC average
 
         self.win_last = w
-        self.win_dict.update({'nenbw': nenbw, 'cgain': cgain})
+        self.all_wins_dict.update({'nenbw': nenbw, 'cgain': cgain})
 
         return w
 
@@ -808,16 +808,16 @@ class QFFTWinSelector(QWidget):
         """
         The `win_dict` dictionary has been updated somewhere else, now update the window
         selection widget and make corresponding parameter widgets visible if
-        `self.win_dict['cur_win_name']` is different from current combo box entry:
+        `self.all_wins_dict['cur_win_name']` is different from current combo box entry:
 
-        - set FFT window type combobox from `self.win_dict['cur_win_name']`
+        - set FFT window type combobox from `self.all_wins_dict['cur_win_name']`
         - use `ui2dict_win()` to update parameter widgets for new window type
-          from `self.win_dict` without emitting a signal
+          from `self.all_wins_dict` without emitting a signal
         """
-        if qget_cmb_box(self.cmb_win_fft, data=False) == self.win_dict['cur_win_name']:
+        if qget_cmb_box(self.cmb_win_fft, data=False) == self.all_wins_dict['cur_win_name']:
             return
         else:
-            qset_cmb_box(self.cmb_win_fft, self.win_dict['cur_win_name'], data=False)
+            qset_cmb_box(self.cmb_win_fft, self.all_wins_dict['cur_win_name'], data=False)
             self.ui2dict_win()
 
 # ------------------------------------------------------------------------------
@@ -826,19 +826,19 @@ class QFFTWinSelector(QWidget):
         Set parameter values from `win_dict`
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        n_par = self.win_dict[cur]['n_par']
+        n_par = self.all_wins_dict[cur]['n_par']
 
         if n_par > 0:
-            if 'list' in self.win_dict[cur]['par'][0]:
-                qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val']))
+            if 'list' in self.all_wins_dict[cur]['par'][0]:
+                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur]['par'][0]['val']))
             else:
-                self.led_win_par_0.setText(str(self.win_dict[cur]['par'][0]['val']))
+                self.led_win_par_0.setText(str(self.all_wins_dict[cur]['par'][0]['val']))
 
         if n_par > 1:
-            if 'list' in self.win_dict[cur]['par'][1]:
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
+            if 'list' in self.all_wins_dict[cur]['par'][1]:
+                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur]['par'][1]['val']))
             else:
-                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][1]['val']))
+                self.led_win_par_1.setText(str(self.all_wins_dict[cur]['par'][1]['val']))
 
 # ------------------------------------------------------------------------------
     def ui2dict_params(self):
@@ -848,36 +848,36 @@ class QFFTWinSelector(QWidget):
 
         Emit 'view_changed': 'fft_win_par'
         """
-        cur = self.win_dict['cur_win_name']  # current window name / key
+        cur = self.all_wins_dict['cur_win_name']  # current window name / key
         self.win_last = None
 
-        if self.win_dict[cur]['n_par'] > 1:
-            if 'list' in self.win_dict[cur]['par'][1]:
+        if self.all_wins_dict[cur]['n_par'] > 1:
+            if 'list' in self.all_wins_dict[cur]['par'][1]:
                 param = qget_cmb_box(self.cmb_win_par_1, data=False)
             else:
                 param = safe_eval(self.led_win_par_1.text(),
-                                  self.win_dict[cur]['par'][1]['val'],
+                                  self.all_wins_dict[cur]['par'][1]['val'],
                                   return_type='float')
-                if param < self.win_dict[cur]['par'][1]['min']:
-                    param = self.win_dict[cur]['par'][1]['min']
-                elif param > self.win_dict[cur]['par'][1]['max']:
-                    param = self.win_dict[cur]['par'][1]['max']
+                if param < self.all_wins_dict[cur]['par'][1]['min']:
+                    param = self.all_wins_dict[cur]['par'][1]['min']
+                elif param > self.all_wins_dict[cur]['par'][1]['max']:
+                    param = self.all_wins_dict[cur]['par'][1]['max']
                 self.led_win_par_1.setText(str(param))
-            self.win_dict[cur]['par'][1]['val'] = param
+            self.all_wins_dict[cur]['par'][1]['val'] = param
 
-        if self.win_dict[cur]['n_par'] > 0:
-            if 'list' in self.win_dict[cur]['par'][0]:
+        if self.all_wins_dict[cur]['n_par'] > 0:
+            if 'list' in self.all_wins_dict[cur]['par'][0]:
                 param = qget_cmb_box(self.cmb_win_par_0, data=False)
             else:
                 param = safe_eval(self.led_win_par_0.text(),
-                                  self.win_dict[cur]['par'][0]['val'],
+                                  self.all_wins_dict[cur]['par'][0]['val'],
                                   return_type='float')
-                if param < self.win_dict[cur]['par'][0]['min']:
-                    param = self.win_dict[cur]['par'][0]['min']
-                elif param > self.win_dict[cur]['par'][0]['max']:
-                    param = self.win_dict[cur]['par'][0]['max']
+                if param < self.all_wins_dict[cur]['par'][0]['min']:
+                    param = self.all_wins_dict[cur]['par'][0]['min']
+                elif param > self.all_wins_dict[cur]['par'][0]['max']:
+                    param = self.all_wins_dict[cur]['par'][0]['max']
                 self.led_win_par_0.setText(str(param))
-            self.win_dict[cur]['par'][0]['val'] = param
+            self.all_wins_dict[cur]['par'][0]['val'] = param
 
         self.emit({'view_changed': 'fft_win_par'})
 
@@ -904,11 +904,11 @@ class QFFTWinSelector(QWidget):
         # if selected window does not exist (`err = True`) or produces errors, fall back
         # to 'cur_win_name'
         if err:
-            cur = self.win_dict['cur_win_name']
+            cur = self.all_wins_dict['cur_win_name']
             qset_cmb_box(self.cmb_win_fft, cur, data=False)
 
         # update visibility and values of parameter widgets:
-        n_par = self.win_dict[cur]['n_par']
+        n_par = self.all_wins_dict[cur]['n_par']
 
         self.lbl_win_par_0.setVisible(n_par > 0)
         self.led_win_par_0.setVisible(False)
@@ -920,42 +920,42 @@ class QFFTWinSelector(QWidget):
 
         if n_par > 0:
             self.lbl_win_par_0.setText(
-                to_html(self.win_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
-            if 'list' in self.win_dict[cur]['par'][0]:
+                to_html(self.all_wins_dict[cur]['par'][0]['name'] + " =", frmt='bi'))
+            if 'list' in self.all_wins_dict[cur]['par'][0]:
                 self.led_win_par_0.setVisible(False)
                 self.cmb_win_par_0.setVisible(True)
                 self.cmb_win_par_0.blockSignals(True)
                 self.cmb_win_par_0.clear()
-                self.cmb_win_par_0.addItems(self.win_dict[cur]['par'][0]['list'])
-                qset_cmb_box(self.cmb_win_par_0, str(self.win_dict[cur]['par'][0]['val']))
+                self.cmb_win_par_0.addItems(self.all_wins_dict[cur]['par'][0]['list'])
+                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur]['par'][0]['val']))
                 self.cmb_win_par_0.setToolTip(
-                    self.win_dict[cur]['par'][0]['tooltip'])
+                    self.all_wins_dict[cur]['par'][0]['tooltip'])
                 self.cmb_win_par_0.blockSignals(False)
             else:
                 self.led_win_par_0.setVisible(True)
                 self.cmb_win_par_0.setVisible(False)
                 self.led_win_par_0.setText(
-                    str(self.win_dict[cur]['par'][0]['val']))
+                    str(self.all_wins_dict[cur]['par'][0]['val']))
                 self.led_win_par_0.setToolTip(
-                    self.win_dict[cur]['par'][0]['tooltip'])
+                    self.all_wins_dict[cur]['par'][0]['tooltip'])
 
         if n_par > 1:
             self.lbl_win_par_1.setText(
-                to_html(self.win_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
-            if 'list' in self.win_dict[cur]['par'][1]:
+                to_html(self.all_wins_dict[cur]['par'][1]['name'] + " =", frmt='bi'))
+            if 'list' in self.all_wins_dict[cur]['par'][1]:
                 self.led_win_par_1.setVisible(False)
                 self.cmb_win_par_1.setVisible(True)
                 self.cmb_win_par_1.blockSignals(True)
                 self.cmb_win_par_1.clear()
-                self.cmb_win_par_1.addItems(self.win_dict[cur]['par'][1]['list'])
-                qset_cmb_box(self.cmb_win_par_1, str(self.win_dict[cur]['par'][1]['val']))
-                self.cmb_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+                self.cmb_win_par_1.addItems(self.all_wins_dict[cur]['par'][1]['list'])
+                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur]['par'][1]['val']))
+                self.cmb_win_par_1.setToolTip(self.all_wins_dict[cur]['par'][1]['tooltip'])
                 self.cmb_win_par_1.blockSignals(False)
             else:
                 self.led_win_par_1.setVisible(True)
                 self.cmb_win_par_1.setVisible(False)
-                self.led_win_par_1.setText(str(self.win_dict[cur]['par'][1]['val']))
-                self.led_win_par_1.setToolTip(self.win_dict[cur]['par'][1]['tooltip'])
+                self.led_win_par_1.setText(str(self.all_wins_dict[cur]['par'][1]['val']))
+                self.led_win_par_1.setToolTip(self.all_wins_dict[cur]['par'][1]['tooltip'])
 
 # ------------------------------------------------------------------------------
 
