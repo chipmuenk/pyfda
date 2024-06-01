@@ -407,9 +407,9 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
         A dictionary with windows, window functions, docstrings etc
     """
     awd = copy.deepcopy(all_windows_dict)
-    win_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
-    win_dict.update({'cur_win_name': cur_win_name})
-    return win_dict
+    all_wins_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
+    all_wins_dict.update({'cur_win_name': cur_win_name})
+    return all_wins_dict
 
 
 # -------------------------------------------------------------------------------------

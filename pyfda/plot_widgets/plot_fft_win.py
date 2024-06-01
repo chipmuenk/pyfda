@@ -673,11 +673,11 @@ if __name__ == '__main__':
     win_names_list = []
 
     # initialize windows dict with the list above and an initial window
-    win_dict = get_windows_dict(
+    all_wins_dict = get_windows_dict(
         win_names_list=win_names_list,
         cur_win_name="Hann")
 
-    mainw = Plot_FFT_win(win_dict, ignore_close_event=False)
+    mainw = Plot_FFT_win(all_wins_dict, ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()
