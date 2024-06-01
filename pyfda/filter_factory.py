@@ -29,7 +29,7 @@ Instance of current filter design class (e.g. "cheby1"), globally accessible
 
 >>> import filter_factory as ff
 >>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
->>> ff.fil_inst.LPmin(fil[0]) # design a filter 
+>>> ff.fil_inst.LPmin(fil[0]) # design a filter
 
 """
 #------------------------------------------------------------------------------
@@ -40,68 +40,68 @@ class FilterFactory(object):
     """
     def __init__(self):
         #--------------------------------------
-        # return error codes for class instantiation and method 
+        # return error codes for class instantiation and method
         self.err_code = 0
 
 
     def create_fil_inst(self, fc, mod = None):
         # TODO: need to pass both module and class name for more flexibility
         """
-        Create an instance of the filter design class passed as a string ``fc`` 
+        Create an instance of the filter design class passed as a string ``fc``
         from the module found in ``fb.filter_classes[fc]``.
-        This dictionary has been collected by ``tree_builder.py``. 
-        
+        This dictionary has been collected by ``tree_builder.py``.
+
         The instance can afterwards be globally referenced as ``fil_inst``.
 
-    
+
         Parameters
         ----------
-        
+
         fc : str
             The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
 
         mod : str (optional, default = None)
             Fully qualified name of the filter module. When not specified, it is
             read from the global dict ``fb.filter_classes[fc]['mod']``
-            
+
         Returns
         -------
-        
+
         err_code : int
           one of the following error codes:
             :-1: filter design class was instantiated successfully
-            
+
             :0: filter instance exists, no re-instantiation necessary
-             
+
             :1: filter module not found by FilterTreeBuilder
-             
-            :2: filter module found by FilterTreeBuilder but could not be imported 
-             
+
+            :2: filter module found by FilterTreeBuilder but could not be imported
+
             :3: filter class could not be instantiated
 
             :4: unknown error during instantiation
-        
+
         Examples
         --------
-            
+
         >>> create_fil_instance('cheby1')
         >>> fil_inst.LPmin(fil[0])
-        
-        The example first creates an instance of the filter class 'cheby1' and 
+
+        The example first creates an instance of the filter class 'cheby1' and
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary fil[0] as the parameter.
-    
+
         """
         global fil_inst # allow writing to variable
 
         try:
             # Try to dynamically import the module fc, i.e. do the following
-            # import pyfda.<filter_package>.<fc> as fc_module  
-            if not mod:            
+            # import pyfda.<filter_package>.<fc> as fc_module
+            if not mod:
                 mod = fb.filter_classes[fc]['mod']
             #------------------------------------------------------------------
-            fc_module = importlib.import_module(mod)                
-            #------------------------------------------------------------------                
+            fc_module = importlib.import_module(mod)
+            #------------------------------------------------------------------
 
         except KeyError:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
@@ -110,7 +110,7 @@ class FilterFactory(object):
             self.err_code = 1
             logger.warning(err_string)
             return self.err_code
-            
+
         except ImportError as e:
             # Filter module mod is in dictionary 'fb.filter_classes', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
@@ -119,16 +119,16 @@ class FilterFactory(object):
             logger.warning(err_string)
             return self.err_code
 
-        # Check whether create_fil_inst has been called for the first time . 
-        # (= no filter object and hence no attribute 'name' exists) or whether 
-        # the design method has been changed since last time. 
+        # Check whether create_fil_inst has been called for the first time .
+        # (= no filter object and hence no attribute 'name' exists) or whether
+        # the design method has been changed since last time.
         # In both cases, a (new) filter object is instantiated.
 
-        if fil_inst is None or fc != fil_inst.__class__.__name__: 
+        if fil_inst is None or fc != fil_inst.__class__.__name__:
             err_string = ""
             self.err_code = -1
             # get attribute fc from fc_module, here, this returns the class fc
-            fil_class = getattr(fc_module, fc, None) # or None if not in fc_module 
+            fil_class = getattr(fc_module, fc, None) # or None if not in fc_module
 
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
@@ -137,20 +137,21 @@ class FilterFactory(object):
                 self.err_code = 3
             else:
                 try:
-                    fil_inst = fil_class() # instantiate an object         
+                    fil_inst = fil_class() # instantiate an object
                     self.err_code = 0 # filter instance has been created / changed successfully
                     logger.debug("FilterFactory.create_fil_inst(): successfully created {0}".format(fc))
                 except Exception as e:
                     self.err_code = 4
-                    logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))                    
+                    logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))
+                    x = x
         return self.err_code
 
-#------------------------------------------------------------------------------      
+#------------------------------------------------------------------------------
     def call_fil_method(self, method, fil_dict, fc = None):
         """
-        Instantiate the filter design class passed  as string ``fc`` with the 
+        Instantiate the filter design class passed  as string ``fc`` with the
         globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
-        instantiated filter design class. 
+        instantiated filter design class.
 
         Next, call the design method passed as string ``method`` of the instantiated
         filter design class.
@@ -172,7 +173,7 @@ class FilterFactory(object):
 
         Returns
         -------
-        
+
         err_code : int
             one of the following error codes:
              :-1: filter design operation has been cancelled by user
@@ -194,10 +195,10 @@ class FilterFactory(object):
 
         >>> call_fil_method("LPmin", fil[0], fc="cheby1")
 
-        The example first creates an instance of the filter class 'cheby1' and 
+        The example first creates an instance of the filter class 'cheby1' and
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary ``fil[0]`` as the parameter.
-        """                
+        """
         if self.err_code >= 16 or self.err_code < 0:
             self.err_code = 0 #  # clear previous method call error
             err_string = ""
@@ -205,20 +206,20 @@ class FilterFactory(object):
         if fc: # filter design class was part of the argument, (re-)create class instance
             self.err_code = self.create_fil_inst(fc)
 
-        # Error during filter design class instantiation (class fc could not be instantiated)           
+        # Error during filter design class instantiation (class fc could not be instantiated)
         if self.err_code > 0:
             err_string = "Filter design class could not be instantiated, see previous error message."
-            
+
         # Test whether 'method' is a string (Py3):
         elif not isinstance(method, str):
             err_string = "Method name '{0}' is not a string.".format(method)
             self.err_code = 16
-            
-        # method does not exist in filter class:           
+
+        # method does not exist in filter class:
         elif not hasattr(fil_inst, method):
             err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
             self.err_code = 17
- 
+
         else: # everything ok so far, try calling method with the filter dict as argument
               # err_code = -1 means "operation cancelled"
             try:
@@ -236,7 +237,7 @@ class FilterFactory(object):
                 elif "failure to converge" in str(e).lower():
                     self.err_code = 19
                     err_string += "Try relaxing the specifications."
-                else: 
+                else:
                     self.err_code = 99
 
         if self.err_code is None:
@@ -247,7 +248,7 @@ class FilterFactory(object):
         return self.err_code
 
 #------------------------------------------------------------------------------
-fil_factory = FilterFactory() #: Class instance of FilterFactory that can be accessed in other modules   
+fil_factory = FilterFactory() #: Class instance of FilterFactory that can be accessed in other modules
 
 ######################################################################
 if __name__ == '__main__':
@@ -257,15 +258,15 @@ if __name__ == '__main__':
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
     print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
-    
+
     print("LPman, fc = cheby2:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby2"),"\n")
     print("LPmax:", fil_factory.call_fil_method("LPmax", fb.fil[0]),"\n") # doesn't exist
     print("Int 1:", fil_factory.call_fil_method(1, fb.fil[0]),"\n") # not a string
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n") # changed method
-    
+
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n")
     print("LP:", fil_factory.call_fil_method("LP", fb.fil[0]),"\n")
     print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
-    
+
     print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
 
