@@ -674,13 +674,10 @@ class QFFTWinSelector(QWidget):
         else:
             cur_win_name = win_name
 
-        # operate with the window specific sub-dictionary `d = win_dict[win_name]`
-        # dictionary in the following
-        d = self.all_wins_dict[win_name]
-        fn_name = d['fn_name']
+        fn_name = self.all_wins_dict[cur_win_name]['fn_name']
 
-        if 'par' in d:
-            n_par = len(d['par'])
+        if 'par' in self.all_wins_dict[cur_win_name]:
+            n_par = len(self.all_wins_dict[cur_win_name]['par'])
         else:
             n_par = 0
 
