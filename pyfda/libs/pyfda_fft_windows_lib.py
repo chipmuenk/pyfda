@@ -22,7 +22,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
-Dictionary with available FFT windows, their function names and their properties.
+Reference dictionary with available FFT windows, their function names and 
+their properties.
 
 When the function name `fn_name` is just a string, it is taken from
 `scipy.signal.windows`, otherwise it has to be fully qualified name.
@@ -51,7 +52,7 @@ rectangular_info =\
     N terms and transforming back to the time domain. It has the sharpest
     transition of all windowed FIR filters but the worst stop band attenuation.
     </span>'''
-all_windows_dict = {
+all_wins_dict_ref = {
     'cur_win_name': 'Hamming',  # name of current window
     #
     'Boxcar': {
@@ -336,7 +337,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
     a value defining the window and whether this dict has a key `fn_name` specifying
     the fully qualified name of the window function
 
-    When `win_dict` is empty, use the global `all_windows_dict` instead.
+    When `win_dict` is empty, use the global `all_wins_dict_ref` instead.
 
     When `win_names_list` is empty, return all valid window names.
 
@@ -352,7 +353,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
     ---------
     win_names_list: list of str
         A list of window names defining the windows available in the constructed
-        instance, a subset of all the windows defined in `all_windows_dict`
+        instance, a subset of all the windows defined in `all_wins_dict_ref`
 
     win_dict: dict
 
@@ -362,7 +363,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 
     """
     if not win_dict:  # empty dictionary, use global one
-        win_dict = all_windows_dict
+        win_dict = all_wins_dict_ref
 
     if not win_names_list:  # empty list, extract all valid keys
         wl = [k for k in win_dict
@@ -377,7 +378,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
         for wn in win_names_list:
             if wn not in wl:
                 logger.warning(
-                    f'Ignoring window name "{wn}", not found in "all_windows_dict".')
+                    f'Ignoring window name "{wn}", not found in "all_wins_dict_ref".')
 
     return sorted(wl, key=lambda v: (v.lower(), v))
 
@@ -385,10 +386,10 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 # ------------------------------------------------------------------------------
 def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
-    Return a deep copy of `all_windows_dict` with only the keys from `win_names_list`
+    Return a deep copy of `all_wins_dict_ref` with only the keys from `win_names_list`
     that specify valid windows. When the latter is empty, put all valid windows from
-    `all_windows_dict` into the returned subdictionary (which should be a deep copy of
-    `all_windows_dict` in this case).
+    `all_wins_dict_ref` into the returned subdictionary (which should be a deep copy of
+    `all_wins_dict_ref` in this case).
 
     `cur_win_name` sets the initial value of the `'cur_win_name'` key in the
     returned dictionary.
@@ -406,7 +407,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     win_dict: dict
         A dictionary with windows, window functions, docstrings etc
     """
-    awd = copy.deepcopy(all_windows_dict)
+    awd = copy.deepcopy(all_wins_dict_ref)
     all_wins_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
     all_wins_dict.update({'cur_win_name': cur_win_name})
     return all_wins_dict
@@ -656,7 +657,7 @@ class QFFTWinSelector(QWidget):
         Parameters
         ----------
         win_name : str
-            Name of the window, which will be looked up in `all_windows_dict`. If it is
+            Name of the window, which will be looked up in `all_wins_dict_ref`. If it is
             "", use `self.all_wins_dict['cur_win_name']` instead
 
         Returns
@@ -966,7 +967,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = QFFTWinSelector(all_windows_dict)
+    mainw = QFFTWinSelector(all_wins_dict_ref)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

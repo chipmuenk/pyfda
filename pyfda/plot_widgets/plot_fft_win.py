@@ -51,7 +51,7 @@ class Plot_FFT_win(QDialog):
         reference to parent
 
     win_dict : dict
-        dictionary derived from `pyfda_fft_windows_lib.all_windows_dict`
+        dictionary derived from `pyfda_fft_windows_lib.all_wins_dict_ref`
         with valid and available windows and their current settings (if applicable)
 
     sym : bool
