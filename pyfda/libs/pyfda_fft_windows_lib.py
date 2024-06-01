@@ -390,7 +390,7 @@ def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
     `all_windows_dict` into the returned subdictionary (which should be a deep copy of
     `all_windows_dict` in this case).
 
-    `cur_win_name` determines the initial value of the `cur_win_name` key in the
+    `cur_win_name` sets the initial value of the `'cur_win_name'` key in the
     returned dictionary.
 
     Parameters
