@@ -640,18 +640,18 @@ class QFFTWinSelector(QWidget):
     def set_window_name(self, win_name: str = "") -> bool:
         """
         Select and set a window function object from its string `win_name` and update the
-        `win_dict` dictionary correspondingly with:
+        `all_wins_dict` dictionary correspondingly with:
 
-        win_dict['cur_win_name']        # win_name: new current window name (str)
-        win_dict[win_name]['n_par']     # number of parameters (int)
+        all_wins_dict['cur_win_name']        # win_name: new current window name (str)
+        all_wins_dict[win_name]['n_par']     # number of parameters (int)
 
         Additionally, the following class attributes are updated / reset:
 
-        self.win_fnct = win_fnct        # handle to windows function
-        self.win_last = None            # clear last window function
+        self.win_fnct = win_fnct            # handle to windows function
+        self.win_last = None                # clear last window function
 
         The above is only updated when the window type has been changed compared to
-        `win_dict['cur_win_name']` !
+        `all_wins_dict['cur_win_name']` !
 
         Parameters
         ----------
@@ -689,7 +689,7 @@ class QFFTWinSelector(QWidget):
         mod_fnct = fn_name.split('.')  # try to split fully qualified name at "."
         fnct = mod_fnct[-1]  # last / rightmost part = function name
         if len(mod_fnct) == 1:
-            # only one element, no module given -> use scipy.signal.windows
+            # only one element, no module name given -> use scipy.signal.windows
             win_fnct = getattr(sig.windows, fnct, None)
             if not win_fnct:
                 logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
