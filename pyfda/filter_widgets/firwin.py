@@ -244,10 +244,11 @@ class Firwin(QWidget):
         # alg_idx = 0
         if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
-            # self.win_dict.update(fb.fil[0]['wdg_fil']['firwin'])
-            # Get window name (should be the only key!)
-            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin'].keys[0]
-            # logger.warning(f"curwin = {self.cur_win_name}")
+            logger.warning(fb.fil[0]['wdg_fil'])
+            # Get window name
+            # self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['fn_name']
+            self.cur_win_name = self.all_wins_dict['cur_win_name']
+            logger.warning(f"curwin = {self.cur_win_name}")
             if self.cur_win_name in self.all_wins_dict:
                 # get window related infos from global filter dict
                 self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
