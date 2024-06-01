@@ -665,12 +665,14 @@ class QFFTWinSelector(QWidget):
             Error flag; `True` when `win_name` could not be resolved
         """
         if win_name == "":
-            win_name = self.all_wins_dict['cur_win_name']
+            cur_win_name = self.all_wins_dict['cur_win_name']
 
         elif win_name not in self.all_wins_dict:
             logger.warning(
                 f'Unknown window name "{win_name}", using rectangular window instead.')
-            win_name = "Rectangular"
+            cur_win_name = "Rectangular"
+        else:
+            cur_win_name = win_name
 
         # operate with the window specific sub-dictionary `d = win_dict[win_name]`
         # dictionary in the following
@@ -713,11 +715,11 @@ class QFFTWinSelector(QWidget):
 
         if win_err:
             win_fnct = getattr(sig.windows, 'boxcar', None)
-            win_name = "Rectangular"
+            cur_win_name = "Rectangular"
             n_par = 0
 
-        self.all_wins_dict.update({'cur_win_name': win_name})
-        self.all_wins_dict[win_name].update({'n_par': n_par})
+        self.all_wins_dict.update({'cur_win_name': cur_win_name})
+        self.all_wins_dict[cur_win_name].update({'n_par': n_par})
         self.win_fnct = win_fnct  # handle to windows function
         self.win_last = None
 
