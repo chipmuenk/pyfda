@@ -631,7 +631,7 @@ class QFFTWinSelector(QWidget):
         # ----------------------------------------------------------------------
         # careful! currentIndexChanged passes an integer (the current index)
         # to update_win
-        self.cmb_win_fft.currentIndexChanged.connect(self.ui2dict_win_emit)
+        self.cmb_win_fft.currentIndexChanged.connect(self.ui2win_dict_emit)
         self.led_win_par_0.editingFinished.connect(self.ui2dict_params)
         self.led_win_par_1.editingFinished.connect(self.ui2dict_params)
         self.cmb_win_par_0.currentIndexChanged.connect(self.ui2dict_params)
@@ -882,9 +882,9 @@ class QFFTWinSelector(QWidget):
         self.emit({'view_changed': 'fft_win_par'})
 
 # ------------------------------------------------------------------------------
-    def ui2dict_win_emit(self, arg=None) -> None:
+    def ui2win_dict_emit(self, arg=None) -> None:
         """
-        - triggered by the window type combo box
+        Triggered during initialization and by the window type combo box
         - read FFT window type combo box and update win_dict using `set_window_name()`,
           update parameter widgets accordingly
         - emit 'view_changed': 'fft_win_type'
