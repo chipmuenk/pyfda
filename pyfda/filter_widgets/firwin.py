@@ -269,6 +269,8 @@ class Firwin(QWidget):
                     self.cur_win_dict['par'][i]['val'] = params[i]
             else:
                 logger.info(f"Window type '{self.cur_win_name} has no parameters.")
+        else:
+            logger.warning("Couldn't load 'firwin' dict!")
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
