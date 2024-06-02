@@ -384,7 +384,7 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 
 
 # ------------------------------------------------------------------------------
-def get_windows_dict(win_names_list=[], cur_win_name="Rectangular"):
+def construct_all_wins_dict(win_names_list=[], cur_win_name="Rectangular"):
     """
     Return a deep copy of `all_wins_dict_ref` with only the keys from `win_names_list`
     that specify valid windows. When the latter is empty, put all valid windows from

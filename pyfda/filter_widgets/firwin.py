@@ -41,7 +41,7 @@ from scipy.special import sinc
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning
-from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector, get_windows_dict
+from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector, construct_all_wins_dict
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
@@ -82,7 +82,7 @@ class Firwin(QWidget):
         self.alg = "ichige"
 
         # initialize windows dict with the list above for firwin window settings
-        self.all_wins_dict = get_windows_dict(
+        self.all_wins_dict = construct_all_wins_dict(
             win_names_list=win_names_list,
             cur_win_name=self.cur_win_name)
         self.cur_win_dict = self.all_wins_dict[self.cur_win_name]

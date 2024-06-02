@@ -660,7 +660,7 @@ if __name__ == '__main__':
     """ Run widget standalone with `python -m pyfda.plot_widgets.plot_fft_win` """
     import sys
     from pyfda.libs.compat import QApplication
-    from pyfda.libs.pyfda_fft_windows_lib import get_windows_dict
+    from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
@@ -673,7 +673,7 @@ if __name__ == '__main__':
     win_names_list = []
 
     # initialize windows dict with the list above and an initial window
-    all_wins_dict = get_windows_dict(
+    all_wins_dict = construct_all_wins_dict(
         win_names_list=win_names_list,
         cur_win_name="Hann")
 
