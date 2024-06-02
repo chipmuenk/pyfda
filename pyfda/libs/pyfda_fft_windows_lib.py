@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
-Reference dictionary with available FFT windows, their function names and 
+Reference dictionary with available FFT windows, their function names and
 their properties.
 
 When the function name `fn_name` is just a string, it is taken from
@@ -901,6 +901,8 @@ class QFFTWinSelector(QWidget):
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
         err = self.set_window_name(cur)
+        logger.warning(f"{self.objectName()}: cmb_win_fft = {cur}")
+        logger.warning(f"cur_win_name = {self.all_wins_dict['cur_win_name']}")
         # if selected window does not exist (`err = True`) or produces errors, fall back
         # to 'cur_win_name'
         if err:
