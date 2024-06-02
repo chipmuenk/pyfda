@@ -116,11 +116,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 #                                       sign="poszero", return_type='int')
 #         self.led_delay.setText(str(self.N))
 # 
-#         if not 'wdg_fil' in fb.fil[0]:
-#             fb.fil[0].update({'wdg_fil':{}})
-#         fb.fil[0]['wdg_fil'].update({'delay':
-#                                         {'N':self.N}
-#                                     })
+#         fb.fil[0].update({'wdg_fil': {'N': self.N}})
 #         
 #         # sig_tx -> select_filter -> filter_specs   
 #         self.emit({'filt_changed': 'delay'})

@@ -52,7 +52,7 @@ class Equiripple(QWidget):
     FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for equiripple routines
 
-    info ="""
+    info = """
 **Equiripple filters**
 
 have the steepest rate of transition between the frequency response’s passband
@@ -209,11 +209,11 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                       return_type='int', sign='pos' )
         self.led_remez_1.setText(str(self.grid_density))
 
-        if not 'wdg_fil' in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil':{}})
-        fb.fil[0]['wdg_fil'].update({'equiripple':
-                                        {'grid_density':self.grid_density}
-                                    })
+        # if not 'wdg_fil' in fb.fil[0]:
+        #     fb.fil[0].update({'wdg_fil': {'equiripple': {'grid_density': self.grid_density}}})
+        # fb.fil[0]['wdg_fil'] = {'equiripple': {'grid_density': self.grid_density}}
+        fb.fil[0].update(
+            {'wdg_fil': {'equiripple': {'grid_density': self.grid_density}}})
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'equiripple'})
