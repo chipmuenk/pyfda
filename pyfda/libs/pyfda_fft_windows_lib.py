@@ -12,6 +12,7 @@ import numpy as np
 import scipy.signal as sig
 import scipy
 
+import pyfda.filterbroker as fb
 from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
 from .pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.pyfda_rc import params
@@ -958,6 +959,10 @@ class QFFTWinSelector(QWidget):
                 self.cmb_win_par_1.setVisible(False)
                 self.led_win_par_1.setText(str(self.all_wins_dict[cur]['par'][1]['val']))
                 self.led_win_par_1.setToolTip(self.all_wins_dict[cur]['par'][1]['tooltip'])
+
+        self.all_wins_dict['cur_win_name'] = cur
+        fb.fil[0]['wdg_fil']['firwin'] = self.all_wins_dict[cur]
+        fb.fil[0]['wdg_fil']['firwin'].update({'name': cur})
 
 # ------------------------------------------------------------------------------
 
