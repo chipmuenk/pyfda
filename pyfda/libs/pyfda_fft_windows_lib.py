@@ -57,7 +57,9 @@ all_wins_dict_ref = {
     'cur_win_name': 'Hamming',  # name of current window
     #
     'Boxcar': {
+        'app': {'fir', 'spec', 'stft'},
         'fn_name': 'boxcar',
+        'id': 'boxcar',
         'info': rectangular_info,
         'props': {
             'nenbw': 1,
@@ -66,7 +68,9 @@ all_wins_dict_ref = {
             }
          },
     'Rectangular': {
+        'app': {'fir', 'spec'},
         'fn_name': 'boxcar',
+        'id': 'rectangular',
         'info': rectangular_info,
         'props': {
             'nenbw': 1,
@@ -75,7 +79,9 @@ all_wins_dict_ref = {
             }
         },
     'Barthann': {
+        'app': {'fir', 'spec'},
         'fn_name': 'barthann',
+        'id': 'barthann',
         'info':
             '''<span>
             The modified Bartlett-Hann window is a weighted combination of Bartlett
@@ -86,11 +92,15 @@ all_wins_dict_ref = {
             </span>'''
             },
     'Bartlett': {
+        'app': {'fir', 'spec', 'stft'},
         'fn_name': 'bartlett',
+        'id': 'bartlett',
         'info': bartlett_info,
             },
     'Blackman': {
+        'app': {'fir', 'spec'},
         'fn_name': 'blackman',
+        'id': 'blackman',
         'info':
             '''<span>
             The Blackman window is used for both FIR filter design and spectral analysis.
@@ -106,10 +116,9 @@ all_wins_dict_ref = {
             </span>'''
         },
     'Blackmanharris': {
+        'app': {'fir', 'spec'},
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
-        'par': [{
-            'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
-            'tooltip': '<span>Number of cosine terms</span>'}],
+        'id': 'blackmanharris',
         'info':
             '''<span>
             The minimum 4-term Blackman-Harris window gives an excellent
@@ -118,16 +127,23 @@ all_wins_dict_ref = {
 
             5-, 7- and 9-term Blackman-Harris windows achieve side-lobe suppressions
             of up to 125, 180 and 230 dB.
-            </span>'''
+            </span>''',
+        'par': [{
+            'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
+            'tooltip': '<span>Number of cosine terms</span>'}]
         },
     'Bohman': {
+        'app': {'fir', 'spec'},
         'fn_name': 'bohman',
+        'id': 'bohman',
         'info':
             '''<span>Sidelobes of the Bohman window drop with 24 dB/oct.
             </span>'''
         },
     'Cosine': {
+        'app': {'fir', 'spec'},
         'fn_name': 'cosine',
+        'id': 'cosine',
         'info':
             '''<span>
             The window is half a cosine period, shifted by &pi;/2.
@@ -135,25 +151,23 @@ all_wins_dict_ref = {
             </span>''',
         },
     'Dolph-Chebyshev': {
+        'app': {'fir', 'spec'},
         'fn_name': 'chebwin',
-        'par': [{
-            'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
-            'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
+        'id': 'chebwin',
         'info':
             '''<span>
             This window gives the narrowest main lobe width for
             a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>,
             using Chebyshev polynomials.
             </span>''',
+        'par': [{
+            'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
+            'tooltip': '<span>Side lobe attenuation in dB.</span>'}]
         },
     'DPSS': {
+        'app': {'fir', 'spec'},
         'fn_name': 'dpss',
-        'par': [{
-             'name': 'NW', 'name_tex': r'$NW$',
-             'val': 3, 'min': 0, 'max': 100,
-             'tooltip':
-                '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
-                }],
+        'id': 'dpss',
         'info':
             '''<span>
             Digital Prolate Spheroidal Sequences (DPSS) (or Slepian
@@ -164,11 +178,19 @@ all_wins_dict_ref = {
 
             The Kaiser window is an easier to calculate approximation for the
             Slepian window with &beta; = &pi; <i>NW</i> .
-            </span>'''
+            </span>''',
+        'par': [{
+             'name': 'NW', 'name_tex': r'$NW$',
+             'val': 3, 'min': 0, 'max': 100,
+             'tooltip':
+                '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
+                }]
         },
     #
     'Flattop': {
+        'app': {'spec'},
         'fn_name': 'flattop',
+        'id': 'flattop',
         'info':
             '''<span>
             Flattop windows give a very low amplitude error, that's why they are
@@ -178,7 +200,14 @@ all_wins_dict_ref = {
 
         },
     'General Gaussian': {
+        'app': {'spec'},
         'fn_name': 'general_gaussian',
+        'id': 'general_gaussian',
+        'info':
+            '''<span>
+            General Gaussian window, <i>p</i> = 1 yields a Gaussian window,
+            <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+            </span>''',
         'par': [{
             'name': 'p', 'name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
             'tooltip': '<span>Shape parameter p</span>'
@@ -186,27 +215,26 @@ all_wins_dict_ref = {
             {
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
-            }],
-        'info':
-            '''<span>
-            General Gaussian window, <i>p</i> = 1 yields a Gaussian window,
-            <i>p</i> = 0.5 yields the shape of a Laplace distribution.
-            </span>'''
+            }]
         },
     'Gauss': {
+        'app': {'spec'},
         'fn_name': 'gaussian',
-        'par': [{
-            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
-            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
+        'id': 'gaussian',
         'info':
             '''<span>
             The higher the standard deviation of Gaussian window is set,
             the lower the max. sidelobe level becomes. At the same time, the width
             of the main lobe increases.
-            </span>'''
+            </span>''',
+        'par': [{
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         },
     'Hamming': {
+        'app': {'fir', 'spec'},
         'fn_name': 'hamming',
+        'id': 'hamming',
         'info':
             '''<span>
             The Hamming Window is used for both FIR filter design and spectral analysis.
@@ -219,7 +247,9 @@ all_wins_dict_ref = {
             </span>'''
          },
     'Hann': {
+        'app': {'fir', 'spec'},
         'fn_name': 'hann',
+        'id': 'hann',
         'info':
             '''<span>
             The Hann (or, falsely, "Hanning") window is smooth at the
@@ -234,7 +264,16 @@ all_wins_dict_ref = {
             </span>'''
             },
     'Kaiser': {
+        'app': {'fir', 'spec'},
         'fn_name': 'kaiser',
+        'id': 'kaiser',
+        'info':
+            '''<span>
+            The Kaiser window is a very good approximation to the
+            Digital Prolate Spheroidal Sequence (DPSS), or Slepian window,
+            which maximizes the energy in the main lobe of the window relative
+            to the total energy.
+            </span>''',
         'par': [{
             'name': '&beta;', 'name_tex': r'$\beta$',
             'val': 10, 'min': 0, 'max': 30,
@@ -242,19 +281,17 @@ all_wins_dict_ref = {
                 '<span>Shape parameter; lower values reduce  main lobe width, '
                 'higher values reduce side lobe level, typ. in the range '
                 '5 ... 20.</span>'}],
-        'info':
-            '''<span>
-            The Kaiser window is a very good approximation to the
-            Digital Prolate Spheroidal Sequence (DPSS), or Slepian window,
-            which maximizes the energy in the main lobe of the window relative
-            to the total energy.
-            </span>'''
+
         },
     'Nuttall': {
-        'fn_name': 'nuttall'
+        'app': {'fir', 'spec'},
+        'fn_name': 'nuttall',
+        'id': 'nuttall'
         },
     'Parzen': {
+        'app': {'fir', 'spec'},
         'fn_name': 'parzen',
+        'id': 'parzen',
         'info':
             '''<span>
             The Parzen window is a 4th order B-spline window whose sidelobes
@@ -268,30 +305,16 @@ all_wins_dict_ref = {
             See also: Boxcar and Triangular / Bartlett windows.
             </span>'''
             },
-    # 'Slepian': {
-    #     'fn_name': 'slepian',
-    #     'par': [{
-    #          'name': 'BW', 'name_tex': r'$BW$',
-    #          'val': 0.3, 'min': 0, 'max': 100,
-    #          'tooltip': '<span>Bandwidth</span>'}],
-    #     'info':
-    #         '''<span>
-    #         Used to maximize the energy concentration in the main lobe.
-    #         Also called the digital prolate spheroidal sequence (DPSS).
-    #         <br /><br />
-
-    #         See also: Kaiser window.
-    #         </span>'''
-    #     },
     'Triangular': {
+        'app': {'fir', 'spec', 'stft'},
         'fn_name': 'triang',
+        'id': 'triang',
         'info': bartlett_info
         },
     'Tukey': {
+        'app': {'spec', 'stft'},
         'fn_name': 'tukey',
-        'par': [{
-            'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
-                    'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
+        'id': 'tukey',
         'info':
             '''<span>
             Also known as "tapered cosine window", this window is constructed from a
@@ -305,10 +328,21 @@ all_wins_dict_ref = {
             bursts. It is the default window for scipy.signal.spectrogram with
             &alpha; = 0.25). Amplitudes of transient events are less likely to be
             altered by this window than e.g. by a Hann window.
-            </span>'''
+            </span>''',
+        'par': [{
+            'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
+                    'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}]
         },
     'Ultraspherical': {
+        'app': {'fir', 'spec'},
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
+        'id': 'ultraspherical',
+        'info':'''<span>
+            Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
+            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+
+            As this is a three-parameter window (<i>N</i>, &mu;,)
+            </span>''',
         'par': [{
             'name': '&mu;', 'name_tex': r'$\mu$',
             'val': 0.5, 'min': -0.5, 'max': 10,
@@ -319,13 +353,6 @@ all_wins_dict_ref = {
             'val': 1, 'min': -10, 'max': 10,
             'tooltip': '<span>Amplitude</span>'}
              ],
-        'info':
-            '''<span>
-            Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
-            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
-
-            As this is a three-parameter window (<i>N</i>, &mu;,)
-            </span>''',
         }
     }
 
