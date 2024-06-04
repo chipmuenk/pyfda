@@ -19,8 +19,7 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qwindow_stay_on_top, qtext_width, QVLine, QHLine)
-from pyfda.pyfda_rc import params
-from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector
+from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:

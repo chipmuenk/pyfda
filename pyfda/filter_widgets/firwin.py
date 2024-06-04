@@ -41,7 +41,8 @@ from scipy.special import sinc
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning
-from pyfda.libs.pyfda_fft_windows_lib import QFFTWinSelector, construct_all_wins_dict
+from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
+from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 

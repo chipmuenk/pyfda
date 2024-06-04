@@ -20,7 +20,8 @@ import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
     QVLine, PushButton)
-from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict, QFFTWinSelector
+from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
+from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
