@@ -46,8 +46,13 @@ rectangular_info =\
     transition of all windowed FIR filters but the worst stop band attenuation.
     </span>'''
 all_wins_dict_ref = {
-    'cur_win_name': 'Hamming',  # name of current window
+    # 'cur_win_name': 'Hamming',  # name of current window
     #
+    'Current': {
+        'app': {},  # empty -> not listed for any app
+        'fn_name': 'None',  # placeholder for current window
+        'id': 'current'  # placeholder for current window
+    },
     'Boxcar': {
         'app': {'fir', 'spec', 'stft'},
         'fn_name': 'boxcar',
@@ -278,7 +283,8 @@ all_wins_dict_ref = {
     'Nuttall': {
         'app': {'fir', 'spec'},
         'fn_name': 'nuttall',
-        'id': 'nuttall'
+        'id': 'nuttall',
+        'info': ''
         },
     'Parzen': {
         'app': {'fir', 'spec'},
