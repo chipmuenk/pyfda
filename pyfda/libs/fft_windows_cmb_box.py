@@ -12,7 +12,7 @@ import scipy.signal as sig
 import scipy
 
 import pyfda.filterbroker as fb
-from .pyfda_qt_lib import qset_cmb_box, qget_cmb_box
+from .pyfda_qt_lib import qcmb_box_populate, qset_cmb_box, qget_cmb_box
 from .pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.pyfda_rc import params
 from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 # =============================================================================
 class QFFTWinSelector(QWidget):
-    # those signals are class variables, shared between instances for more than one
-    # instance. This is not a problem as signals are distinguished by the attached
-    # dict with the payload
+    """
+    Construct a combo box with window types from the `all_wins_dict_ref`
+    """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
@@ -41,9 +41,17 @@ class QFFTWinSelector(QWidget):
         self.all_wins_dict = win_dict
         self.win_last = None  # array with previous window function values
         self.win_fnct = None  # handle to windows function
+
+        # construct combobox data from all_wins_dict_ref and app type
+        self.cmb_win_fft_items = ["<span>Select window type</span>"]
+        for k, v in all_wins_dict_ref.items():
+            if app in v['app']:
+                self.cmb_win_fft_items.append((v['id'], k, v['info']))
+
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
         self.ui2win_dict()
+
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -70,11 +78,9 @@ class QFFTWinSelector(QWidget):
         - combobox for windows
         - 0 or more parameter fields
         """
-        # FFT window type
+        # Construct FFT window type combobox
         self.cmb_win_fft = QComboBox(self)
-        self.cmb_win_fft.addItems(get_valid_windows_list(win_dict=self.all_wins_dict))
-        self.cmb_win_fft.setToolTip("FFT window type.")
-        qset_cmb_box(self.cmb_win_fft, self.all_wins_dict['cur_win_name'])
+        qcmb_box_populate(self.cmb_win_fft, self.cmb_win_fft_items, 'rectangular')
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
@@ -457,7 +463,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = QFFTWinSelector(all_wins_dict_ref)
+    mainw = QFFTWinSelector(all_wins_dict_ref, app='spec', objectName='TestName')
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
