@@ -268,7 +268,8 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, objectName='win_select_qfft')
+        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='spec',
+                                               objectName='win_select_qfft')
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")

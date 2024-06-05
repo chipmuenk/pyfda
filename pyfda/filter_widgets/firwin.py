@@ -177,7 +177,8 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         # subwidget for selecting window name and entering window parameters (if any)
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, objectName='fir_win_qfft')
+        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='fir',
+                                               objectName='fir_win_qfft')
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 

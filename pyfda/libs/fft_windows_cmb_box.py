@@ -33,7 +33,7 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, win_dict, objectName=""):
+    def __init__(self, win_dict, app='spec', objectName=""):
         super().__init__()
 
         self.setObjectName(objectName)

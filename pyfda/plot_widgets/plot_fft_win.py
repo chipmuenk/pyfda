@@ -159,7 +159,7 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict,
+        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='spec',
                                                objectName='plot_fft_win_qfft')
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
