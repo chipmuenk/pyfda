@@ -137,7 +137,6 @@ class QFFTWinSelector(QWidget):
         `all_wins_dict` dictionary correspondingly with:
 
         all_wins_dict['cur_win_name']        # win_name: new current window name (str)
-        all_wins_dict[win_name]['n_par']     # number of parameters (int)
 
         Additionally, the following class attributes are updated / reset:
 
@@ -169,11 +168,6 @@ class QFFTWinSelector(QWidget):
             cur_win_name = win_name
 
         fn_name = self.all_wins_dict[cur_win_name]['fn_name']
-
-        if 'par' in self.all_wins_dict[cur_win_name]:
-            n_par = len(self.all_wins_dict[cur_win_name]['par'])
-        else:
-            n_par = 0
 
         # --------------------------------------
         # get attribute fn_name from submodule (default: sig.windows) and
@@ -210,7 +204,6 @@ class QFFTWinSelector(QWidget):
             n_par = 0
 
         self.all_wins_dict.update({'cur_win_name': cur_win_name})
-        self.all_wins_dict[cur_win_name].update({'n_par': n_par})
         self.win_fnct = win_fnct  # handle to windows function
         self.win_last = None
 
@@ -260,7 +253,7 @@ class QFFTWinSelector(QWidget):
                 return self.win_last
 
         fn_name = self.all_wins_dict[win_name]['fn_name']
-        n_par = self.all_wins_dict[win_name]['n_par']
+        n_par = len(self.all_wins_dict[win_name]['par'])
 
         try:
             if fn_name == 'dpss':
@@ -319,7 +312,7 @@ class QFFTWinSelector(QWidget):
         Set parameter values from `win_dict`
         """
         cur = qget_cmb_box(self.cmb_win_fft, data=False)
-        n_par = self.all_wins_dict[cur]['n_par']
+        n_par = len(self.all_wins_dict[cur]['par'])
 
         if n_par > 0:
             if 'list' in self.all_wins_dict[cur]['par'][0]:
@@ -344,7 +337,7 @@ class QFFTWinSelector(QWidget):
         cur = self.all_wins_dict['cur_win_name']  # current window name / key
         self.win_last = None
 
-        if self.all_wins_dict[cur]['n_par'] > 1:
+        if len(self.all_wins_dict[cur]['par']) > 1:
             if 'list' in self.all_wins_dict[cur]['par'][1]:
                 param = qget_cmb_box(self.cmb_win_par_1, data=False)
             else:
@@ -358,7 +351,7 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setText(str(param))
             self.all_wins_dict[cur]['par'][1]['val'] = param
 
-        if self.all_wins_dict[cur]['n_par'] > 0:
+        if len(self.all_wins_dict[cur]['par']) > 0:
             if 'list' in self.all_wins_dict[cur]['par'][0]:
                 param = qget_cmb_box(self.cmb_win_par_0, data=False)
             else:
@@ -403,7 +396,7 @@ class QFFTWinSelector(QWidget):
             qset_cmb_box(self.cmb_win_fft, cur, data=False)
 
         # update visibility and values of parameter widgets:
-        n_par = self.all_wins_dict[cur]['n_par']
+        n_par = len(self.all_wins_dict[cur]['par'])
 
         self.lbl_win_par_0.setVisible(n_par > 0)
         self.led_win_par_0.setVisible(False)

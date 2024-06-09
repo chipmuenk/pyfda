@@ -10,7 +10,6 @@
 Create a popup window with FFT window information
 """
 import copy
-
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 from scipy.signal import argrelextrema
@@ -569,7 +568,7 @@ class Plot_FFT_win(QDialog):
         cur = self.all_wins_dict['cur_win_name']
         cur_win_d = self.all_wins_dict[cur]
         param_txt = ""
-        if cur_win_d['n_par'] > 0:
+        if len(cur_win_d['par']) > 0:
             if type(cur_win_d['par'][0]['val']) in {str}:
                 p1 = cur_win_d['par'][0]['val']
             else:
@@ -577,7 +576,7 @@ class Plot_FFT_win(QDialog):
             param_txt = " ({0:s} = {1:s})".format(
                 cur_win_d['par'][0]['name_tex'], p1)
 
-        if self.all_wins_dict[cur]['n_par'] > 1:
+        if len(cur_win_d['par']) > 1:
             if type(cur_win_d['par'][1]['val']) in {str}:
                 p2 = cur_win_d['par'][1]['val']
             else:

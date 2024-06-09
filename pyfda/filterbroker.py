@@ -390,7 +390,6 @@ fil_ref = {
     #     {'name': 'Hann',  # Window name
     #         'fn_name': 'hann',  # function name or array with values
     #         'par': [],    # set of list of window parameters
-    #         'n_par': 0,   # number of window parameters
     #         'info': "",   # Docstring for the window
     #         'win_len': 1024
     #     }
@@ -399,7 +398,6 @@ fil_ref = {
     "win_fft": {
         "fn_name": "kaiser",  # window function name or array with values
         "info": "",  # Docstring for the window
-        "n_par": 1, # number of window parameters
         "name": "Kaiser",  # display name
         "par": [  # list of parameters
             {
