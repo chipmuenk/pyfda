@@ -48,14 +48,14 @@ rectangular_info =\
 all_wins_dict_ref = {
     # 'cur_win_name': 'Hamming',  # name of current window
     #
-    'Current': {
+    'current': {
         'app': {},  # empty -> not listed for any app
         'disp_name': 'None',
         'fn_name': 'None',  # placeholder for current window function name
         'id': 'current',  # placeholder for current window id
         'par': []  # placeholder for current window parameters
     },
-    'Boxcar': {
+    'boxcar': {
         'app': {'fir', 'spec', 'stft'},
         'disp_name': 'Boxcar',
         'fn_name': 'boxcar',
@@ -68,7 +68,7 @@ all_wins_dict_ref = {
             },
         'par': []
          },
-    'Rectangular': {
+    'rectangular': {
         'app': {'fir', 'spec'},
         'disp_name': 'Rectangular',
         'fn_name': 'boxcar',
@@ -81,7 +81,7 @@ all_wins_dict_ref = {
             },
         'par': []
         },
-    'Barthann': {
+    'barthann': {
         'app': {'fir', 'spec'},
         'disp_name': 'Barthann',
         'fn_name': 'barthann',
@@ -96,7 +96,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
             },
-    'Bartlett': {
+    'bartlett': {
         'app': {'fir', 'spec', 'stft'},
         'disp_name': 'Bartlett',
         'fn_name': 'bartlett',
@@ -104,7 +104,7 @@ all_wins_dict_ref = {
         'info': bartlett_info,
         'par': []
             },
-    'Blackman': {
+    'blackman': {
         'app': {'fir', 'spec'},
         'disp_name': 'Blackman',
         'fn_name': 'blackman',
@@ -124,7 +124,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
         },
-    'Blackmanharris': {
+    'blackmanharris': {
         'app': {'fir', 'spec'},
         'disp_name':'Blackmanharris',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
@@ -142,7 +142,7 @@ all_wins_dict_ref = {
             'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
             'tooltip': '<span>Number of cosine terms</span>'}]
         },
-    'Bohman': {
+    'bohman': {
         'app': {'fir', 'spec'},
         'disp_name': 'Bohman',
         'fn_name': 'bohman',
@@ -152,7 +152,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
         },
-    'Cosine': {
+    'cosine': {
         'app': {'fir', 'spec'},
         'disp_name':  'Cosine',
         'fn_name': 'cosine',
@@ -164,7 +164,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
         },
-    'Dolph-Chebyshev': {
+    'chebwin': {
         'app': {'fir', 'spec'},
         'disp_name': 'Dolph-Chebyshev',
         'fn_name': 'chebwin',
@@ -179,7 +179,7 @@ all_wins_dict_ref = {
             'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
             'tooltip': '<span>Side lobe attenuation in dB.</span>'}]
         },
-    'DPSS': {
+    'dpss': {
         'app': {'fir', 'spec'},
         'disp_name': 'DPSS',
         'fn_name': 'dpss',
@@ -203,7 +203,7 @@ all_wins_dict_ref = {
                 }]
         },
     #
-    'Flattop': {
+    'flattop': {
         'app': {'spec'},
         'disp_name': 'Flattop',
         'fn_name': 'flattop',
@@ -216,7 +216,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
         },
-    'General Gaussian': {
+    'general_gaussian': {
         'app': {'spec'},
         'disp_name': 'General Gaussian',
         'fn_name': 'general_gaussian',
@@ -235,7 +235,7 @@ all_wins_dict_ref = {
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
             }]
         },
-    'Gauss': {
+    'gaussian': {
         'app': {'spec'},
         'disp_name': 'Gauss',
         'fn_name': 'gaussian',
@@ -250,7 +250,7 @@ all_wins_dict_ref = {
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}]
         },
-    'Hamming': {
+    'hamming': {
         'app': {'fir', 'spec'},
         'disp_name': 'Hamming',
         'fn_name': 'hamming',
@@ -267,7 +267,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
          },
-    'Hann': {
+    'hann': {
         'app': {'fir', 'spec'},
         'disp_name': 'Hann',
         'fn_name': 'hann',
@@ -286,7 +286,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
             },
-    'Kaiser': {
+    'kaiser': {
         'app': {'fir', 'spec'},
         'disp_name': 'Kaiser',
         'fn_name': 'kaiser',
@@ -306,7 +306,7 @@ all_wins_dict_ref = {
                 'higher values reduce side lobe level, typ. in the range '
                 '5 ... 20.</span>'}]
         },
-    'Nuttall': {
+    'nuttall': {
         'app': {'fir', 'spec'},
         'disp_name': 'Nuttall',
         'fn_name': 'nuttall',
@@ -314,7 +314,7 @@ all_wins_dict_ref = {
         'info': '',
         'par': []
         },
-    'Parzen': {
+    'parzen': {
         'app': {'fir', 'spec'},
         'disp_name': 'Parzen',
         'fn_name': 'parzen',
@@ -333,7 +333,7 @@ all_wins_dict_ref = {
             </span>''',
         'par': []
             },
-    'Triangular': {
+    'triang': {
         'app': {'fir', 'spec', 'stft'},
         'disp_name': 'Triangular',
         'fn_name': 'triang',
@@ -341,7 +341,7 @@ all_wins_dict_ref = {
         'info': bartlett_info,
         'par': []
         },
-    'Tukey': {
+    'tukey': {
         'app': {'spec', 'stft'},
         'disp_name': 'Tukey',
         'fn_name': 'tukey',
@@ -364,7 +364,7 @@ all_wins_dict_ref = {
             'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}]
         },
-    'Ultraspherical': {
+    'ultraspherical': {
         'app': {'fir', 'spec'},
         'disp_name': 'Ultraspherical',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
@@ -444,33 +444,33 @@ def get_valid_windows_list(win_names_list=[], win_dict={}):
 
 
 # ------------------------------------------------------------------------------
-def construct_all_wins_dict(win_names_list=[], cur_win_name="Rectangular"):
-    """
-    Return a deep copy of `all_wins_dict_ref` with only the keys from `win_names_list`
-    that specify valid windows. When the latter is empty, put all valid windows from
-    `all_wins_dict_ref` into the returned subdictionary (which should be a deep copy of
-    `all_wins_dict_ref` in this case).
+# def construct_all_wins_dict(win_names_list=[], cur_win_name="Rectangular"):
+#     """
+#     Return a deep copy of `all_wins_dict_ref` with only the keys from `win_names_list`
+#     that specify valid windows. When the latter is empty, put all valid windows from
+#     `all_wins_dict_ref` into the returned subdictionary (which should be a deep copy of
+#     `all_wins_dict_ref` in this case).
 
-    `cur_win_name` sets the initial value of the `'cur_win_name'` key in the
-    returned dictionary.
+#     `cur_win_name` sets the initial value of the `'cur_win_name'` key in the
+#     returned dictionary.
 
-    Parameters
-    ----------
-    win_names_list : list of window names (str), optional
+#     Parameters
+#     ----------
+#     win_names_list : list of window names (str), optional
 
-    cur_win_name : str, optional
-        Name of initial setting for `cur_win_name` value (current window name),
-        default: "Rectangular"
+#     cur_win_name : str, optional
+#         Name of initial setting for `cur_win_name` value (current window name),
+#         default: "Rectangular"
 
-    Returns
-    -------
-    win_dict: dict
-        A dictionary with windows, window functions, docstrings etc
-    """
-    awd = copy.deepcopy(all_wins_dict_ref)
-    all_wins_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
-    all_wins_dict.update({'cur_win_name': cur_win_name})
-    return all_wins_dict
+#     Returns
+#     -------
+#     win_dict: dict
+#         A dictionary with windows, window functions, docstrings etc
+#     """
+#     awd = copy.deepcopy(all_wins_dict_ref)
+#     all_wins_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
+#     all_wins_dict.update({'cur_win_name': cur_win_name})
+#     return all_wins_dict
 
 
 # -------------------------------------------------------------------------------------

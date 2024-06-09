@@ -49,7 +49,7 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_fft_items = ["<span>Select window type</span>"]
         for k, v in all_wins_dict_ref.items():
             if app in v['app']:
-                self.cmb_win_fft_items.append((v['id'], k, v['info']))
+                self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
 
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
