@@ -50,11 +50,14 @@ all_wins_dict_ref = {
     #
     'Current': {
         'app': {},  # empty -> not listed for any app
-        'fn_name': 'None',  # placeholder for current window
-        'id': 'current'  # placeholder for current window
+        'disp_name': 'None',
+        'fn_name': 'None',  # placeholder for current window function name
+        'id': 'current',  # placeholder for current window id
+        'par': []  # placeholder for current window parameters
     },
     'Boxcar': {
         'app': {'fir', 'spec', 'stft'},
+        'disp_name': 'Boxcar',
         'fn_name': 'boxcar',
         'id': 'boxcar',
         'info': rectangular_info,
@@ -62,10 +65,12 @@ all_wins_dict_ref = {
             'nenbw': 1,
             'cgain': 1,
             'bw': 1
-            }
+            },
+        'par': []
          },
     'Rectangular': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Rectangular',
         'fn_name': 'boxcar',
         'id': 'rectangular',
         'info': rectangular_info,
@@ -73,10 +78,12 @@ all_wins_dict_ref = {
             'nenbw': 1,
             'cgain': 1,
             'bw': 1
-            }
+            },
+        'par': []
         },
     'Barthann': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Barthann',
         'fn_name': 'barthann',
         'id': 'barthann',
         'info':
@@ -86,16 +93,20 @@ all_wins_dict_ref = {
             Sidelobes are asymptotically decaying, near sidelobes have a lower level
             than Bartlett and Hann windows, far sidelobes have lower levels than
             Bartlett and Hamming windows.
-            </span>'''
+            </span>''',
+        'par': []
             },
     'Bartlett': {
         'app': {'fir', 'spec', 'stft'},
+        'disp_name': 'Bartlett',
         'fn_name': 'bartlett',
         'id': 'bartlett',
         'info': bartlett_info,
+        'par': []
             },
     'Blackman': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Blackman',
         'fn_name': 'blackman',
         'id': 'blackman',
         'info':
@@ -110,10 +121,12 @@ all_wins_dict_ref = {
             a_0 = 0.42, a1 = 0.5, a2 = 0.08. The maximum sidelobe level is -57 dB,
             sidelobes have a fall-off rate of -18 dB/dec.
             Its main lobe width is 12 &pi; / <i>N</i>.
-            </span>'''
+            </span>''',
+        'par': []
         },
     'Blackmanharris': {
         'app': {'fir', 'spec'},
+        'disp_name':'Blackmanharris',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
         'id': 'blackmanharris',
         'info':
@@ -131,14 +144,17 @@ all_wins_dict_ref = {
         },
     'Bohman': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Bohman',
         'fn_name': 'bohman',
         'id': 'bohman',
         'info':
             '''<span>Sidelobes of the Bohman window drop with 24 dB/oct.
-            </span>'''
+            </span>''',
+        'par': []
         },
     'Cosine': {
         'app': {'fir', 'spec'},
+        'disp_name':  'Cosine',
         'fn_name': 'cosine',
         'id': 'cosine',
         'info':
@@ -146,9 +162,11 @@ all_wins_dict_ref = {
             The window is half a cosine period, shifted by &pi;/2.
             For that reason it is also known as "half-cosine" or "sine" window.
             </span>''',
+        'par': []
         },
     'Dolph-Chebyshev': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Dolph-Chebyshev',
         'fn_name': 'chebwin',
         'id': 'chebwin',
         'info':
@@ -163,6 +181,7 @@ all_wins_dict_ref = {
         },
     'DPSS': {
         'app': {'fir', 'spec'},
+        'disp_name': 'DPSS',
         'fn_name': 'dpss',
         'id': 'dpss',
         'info':
@@ -186,6 +205,7 @@ all_wins_dict_ref = {
     #
     'Flattop': {
         'app': {'spec'},
+        'disp_name': 'Flattop',
         'fn_name': 'flattop',
         'id': 'flattop',
         'info':
@@ -193,11 +213,12 @@ all_wins_dict_ref = {
             Flattop windows give a very low amplitude error, that's why they are
             used frequently in spectrum analyzers and other measurement equipment.
             They are rarely used for FIR filter design.
-            </span>'''
-
+            </span>''',
+        'par': []
         },
     'General Gaussian': {
         'app': {'spec'},
+        'disp_name': 'General Gaussian',
         'fn_name': 'general_gaussian',
         'id': 'general_gaussian',
         'info':
@@ -216,6 +237,7 @@ all_wins_dict_ref = {
         },
     'Gauss': {
         'app': {'spec'},
+        'disp_name': 'Gauss',
         'fn_name': 'gaussian',
         'id': 'gaussian',
         'info':
@@ -226,10 +248,11 @@ all_wins_dict_ref = {
             </span>''',
         'par': [{
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
-            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
+            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}]
         },
     'Hamming': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Hamming',
         'fn_name': 'hamming',
         'id': 'hamming',
         'info':
@@ -241,10 +264,12 @@ all_wins_dict_ref = {
 
             Mathematically, it is a two-term raised cosine
             window with non-zero endpoints (DC-offset).
-            </span>'''
+            </span>''',
+        'par': []
          },
     'Hann': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Hann',
         'fn_name': 'hann',
         'id': 'hann',
         'info':
@@ -258,10 +283,12 @@ all_wins_dict_ref = {
 
             Mathematically, it is the most simple two-term raised cosine
             or squared sine window.
-            </span>'''
+            </span>''',
+        'par': []
             },
     'Kaiser': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Kaiser',
         'fn_name': 'kaiser',
         'id': 'kaiser',
         'info':
@@ -277,17 +304,19 @@ all_wins_dict_ref = {
             'tooltip':
                 '<span>Shape parameter; lower values reduce  main lobe width, '
                 'higher values reduce side lobe level, typ. in the range '
-                '5 ... 20.</span>'}],
-
+                '5 ... 20.</span>'}]
         },
     'Nuttall': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Nuttall',
         'fn_name': 'nuttall',
         'id': 'nuttall',
-        'info': ''
+        'info': '',
+        'par': []
         },
     'Parzen': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Parzen',
         'fn_name': 'parzen',
         'id': 'parzen',
         'info':
@@ -301,16 +330,20 @@ all_wins_dict_ref = {
             <br /><br />
 
             See also: Boxcar and Triangular / Bartlett windows.
-            </span>'''
+            </span>''',
+        'par': []
             },
     'Triangular': {
         'app': {'fir', 'spec', 'stft'},
+        'disp_name': 'Triangular',
         'fn_name': 'triang',
         'id': 'triang',
-        'info': bartlett_info
+        'info': bartlett_info,
+        'par': []
         },
     'Tukey': {
         'app': {'spec', 'stft'},
+        'disp_name': 'Tukey',
         'fn_name': 'tukey',
         'id': 'tukey',
         'info':
@@ -333,6 +366,7 @@ all_wins_dict_ref = {
         },
     'Ultraspherical': {
         'app': {'fir', 'spec'},
+        'disp_name': 'Ultraspherical',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'id': 'ultraspherical',
         'info':'''<span>
