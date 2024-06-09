@@ -7,6 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 import importlib
+import copy
 import numpy as np
 import scipy.signal as sig
 import scipy
@@ -33,12 +34,14 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, win_dict, app='spec', objectName=""):
+    def __init__(self, app='spec', objectName=""):
         super().__init__()
 
         self.setObjectName(objectName)
         self.err = False  # error flag for window calculation
-        self.all_wins_dict = win_dict
+
+        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
+
         self.win_last = None  # array with previous window function values
         self.win_fnct = None  # handle to windows function
 

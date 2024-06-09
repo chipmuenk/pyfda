@@ -9,6 +9,7 @@
 """
 Create a popup window with FFT window information
 """
+import copy
 
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
@@ -19,6 +20,7 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qwindow_stay_on_top, qtext_width, QVLine, QHLine)
+from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -39,9 +41,10 @@ class Plot_FFT_win(QDialog):
     Create a pop-up widget for displaying time and frequency view of an FFT
     window.
 
-    Data is passed via the dictionary `win_dict` that is specified during
-    construction. Available windows, parameters, tooltipps etc are provided
-    by the widget `pyfda_fft_windows_lib.QFFTWinSelection`
+    Window data is taken from the global dictionary `all_wins_dict_ref` and restricted
+    to the target application `app={'fir', 'spec', 'stft'}. Available windows,
+    parameters, tooltipps etc are then provided by the widget
+    `pyfda_fft_windows_lib.QFFTWinSelection`
 
     Parameters
     ----------
@@ -49,9 +52,11 @@ class Plot_FFT_win(QDialog):
     parent : class instance
         reference to parent
 
-    win_dict : dict
-        dictionary derived from `pyfda_fft_windows_lib.all_wins_dict_ref`
-        with valid and available windows and their current settings (if applicable)
+    app : str
+        String specifying the target application, 'fir' for windowed fir filter design,
+        'spec' for general spectral analysis and 'stft' for short-time fourier transform
+        windowing. The argument is passed to the constructor of `QFFTWinSelector()`
+        in `_construct_UI()`.
 
     sym : bool
         Passed to `get_window()`:
@@ -76,13 +81,15 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, win_dict, sym=False,
-                 title='pyFDA Window Viewer', ignore_close_event=True):
+    def __init__(self, app: str = 'spec', sym: bool = False,
+                 title: str = 'pyFDA Window Viewer', ignore_close_event: bool = True
+                 ) -> None:
         super().__init__()
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
-        self.all_wins_dict = win_dict
+        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
+        self.app = app
         self.sym = sym
         self.ignore_close_event = ignore_close_event
         self.setWindowTitle(title)
@@ -159,8 +166,8 @@ class Plot_FFT_win(QDialog):
         self.bfont = QFont()
         self.bfont.setBold(True)
 
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='spec',
-                                               objectName='plot_fft_win_qfft')
+        self.qfft_win_select = QFFTWinSelector(
+            app=self.app, objectName='plot_fft_win_qfft')
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)
@@ -672,9 +679,10 @@ if __name__ == '__main__':
     win_names_list = []
 
     # initialize windows dict with the list above and an initial window
-    all_wins_dict = construct_all_wins_dict(
-        win_names_list=win_names_list,
-        cur_win_name="Hann")
+    # all_wins_dict = construct_all_wins_dict(
+    #     win_names_list=win_names_list,
+    #     cur_win_name="Hann")
+    all_wins_dict = copy.deepcopy(all_wins_dict_ref)
 
     mainw = Plot_FFT_win(all_wins_dict, ignore_close_event=False)
 

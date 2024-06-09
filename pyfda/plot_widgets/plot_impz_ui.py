@@ -14,13 +14,14 @@ from pyfda.libs.compat import (
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
+import copy
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
     QVLine, PushButton)
-from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
+from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
@@ -124,9 +125,10 @@ class PlotImpz_UI(QWidget):
         self.cur_win_name = "Rectangular"  # set initial window type
 
         # initialize windows dict with the list above
-        self.all_wins_dict = construct_all_wins_dict(
-            win_names_list=win_names_list,
-            cur_win_name=self.cur_win_name)
+        # self.all_wins_dict = construct_all_wins_dict(
+        #     win_names_list=win_names_list,
+        #     cur_win_name=self.cur_win_name)
+        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
 
         # instantiate FFT window with default windows dict
         self.fft_widget = Plot_FFT_win(

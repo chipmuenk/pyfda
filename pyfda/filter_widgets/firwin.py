@@ -33,6 +33,7 @@ API version info:
 """
 from pyfda.libs.compat import (QWidget, pyqtSignal, QComboBox, QIcon, QSize,
                                QPushButton, QHBoxLayout, QVBoxLayout)
+import copy
 import numpy as np
 import scipy.signal as sig
 from scipy.signal import signaltools
@@ -42,7 +43,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
-from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
+from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
 
@@ -82,10 +83,7 @@ class Firwin(QWidget):
         self.cur_win_name = "Kaiser"  # set initial window type
         self.alg = "ichige"
 
-        # initialize windows dict with the list above for firwin window settings
-        self.all_wins_dict = construct_all_wins_dict(
-            win_names_list=win_names_list,
-            cur_win_name=self.cur_win_name)
+        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
         self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
         # copy the display name of the current window into the current dict
         self.cur_win_dict.update({'name': self.cur_win_name})
@@ -177,8 +175,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         # subwidget for selecting window name and entering window parameters (if any)
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='fir',
-                                               objectName='fir_win_qfft')
+        self.qfft_win_select = QFFTWinSelector(app='fir', objectName='fir_win_qfft')
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
