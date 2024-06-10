@@ -6,7 +6,6 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-import copy
 import numpy as np
 import scipy.signal as sig
 import scipy
@@ -33,56 +32,48 @@ bartlett_info =\
     </span>'''
 rectangular_info =\
     '''<span>
-    Boxcar or Rectangular window, best suited for analyzing coherent signals,
-    i.e. where the window length is an integer number of the signal period.
-    It also works great when the signal length is shorter than the window
-    length (e.g. for the impulse response of a FIR filter). For other signals, it
-    has the worst sidelobe suppression (13 dB) of all windows.
-    This window also has the best SNR of all windows.<br /><br />
+    Boxcar or Rectangular window, best suited for analyzing <br />
+    a) coherent signals, i.e. where the window length is an integer number of the 
+    signal period.<br />
+    b) impulses where the signal length is shorter than the window
+    length (e.g. for the impulse response of a FIR filter).
+    c) noisy sinusoids with a low SNR because this window has the best equivalent
+    noise bandwidth.<br />
+    For other signals, it
+    has the worst sidelobe suppression (13 dB) of all windows.<br /><br />
 
     When used for FIR filter design, a filter with the least square error
     is returned, created by truncating the sinc-law frequency response after
-    N terms and transforming back to the time domain. It has the sharpest
-    transition of all windowed FIR filters but the worst stop band attenuation.
+    <i>N</i> terms and transforming back to the time domain. It has the sharpest
+    transition of all windowed FIR filters but the worst stop band attenuation
+    and a large ripple in the passband.
     </span>'''
 all_wins_dict_ref = {
-    # 'cur_win_name': 'Hamming',  # name of current window
-    #
     'current': {
         'app': {},  # empty -> not listed for any app
-        'disp_name': 'None',
-        'fn_name': 'None',  # placeholder for current window function name
-        'id': 'current',  # placeholder for current window id
+        #'disp_name': 'None',
+        #'fn_name': 'None',  # placeholder for current window function name
+        'id': 'rectangular',  # placeholder for current window id
         'par': []  # placeholder for current window parameters
     },
     'boxcar': {
-        'app': {'fir', 'spec', 'stft'},
+        'app': ['fir', 'spec', 'stft', 'all'],
         'disp_name': 'Boxcar',
         'fn_name': 'boxcar',
         'id': 'boxcar',
         'info': rectangular_info,
-        'props': {
-            'nenbw': 1,
-            'cgain': 1,
-            'bw': 1
-            },
         'par': []
          },
     'rectangular': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Rectangular',
         'fn_name': 'boxcar',
         'id': 'rectangular',
         'info': rectangular_info,
-        'props': {
-            'nenbw': 1,
-            'cgain': 1,
-            'bw': 1
-            },
         'par': []
         },
     'barthann': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Barthann',
         'fn_name': 'barthann',
         'id': 'barthann',
@@ -97,7 +88,7 @@ all_wins_dict_ref = {
         'par': []
             },
     'bartlett': {
-        'app': {'fir', 'spec', 'stft'},
+        'app': ['fir', 'spec', 'stft', 'all'],
         'disp_name': 'Bartlett',
         'fn_name': 'bartlett',
         'id': 'bartlett',
@@ -105,7 +96,7 @@ all_wins_dict_ref = {
         'par': []
             },
     'blackman': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Blackman',
         'fn_name': 'blackman',
         'id': 'blackman',
@@ -125,7 +116,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'blackmanharris': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name':'Blackmanharris',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
         'id': 'blackmanharris',
@@ -143,7 +134,7 @@ all_wins_dict_ref = {
             'tooltip': '<span>Number of cosine terms</span>'}]
         },
     'bohman': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Bohman',
         'fn_name': 'bohman',
         'id': 'bohman',
@@ -153,7 +144,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'cosine': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name':  'Cosine',
         'fn_name': 'cosine',
         'id': 'cosine',
@@ -165,7 +156,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'chebwin': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Dolph-Chebyshev',
         'fn_name': 'chebwin',
         'id': 'chebwin',
@@ -180,7 +171,7 @@ all_wins_dict_ref = {
             'tooltip': '<span>Side lobe attenuation in dB.</span>'}]
         },
     'dpss': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'DPSS',
         'fn_name': 'dpss',
         'id': 'dpss',
@@ -204,7 +195,7 @@ all_wins_dict_ref = {
         },
     #
     'flattop': {
-        'app': {'spec'},
+        'app': ['spec', 'all'],
         'disp_name': 'Flattop',
         'fn_name': 'flattop',
         'id': 'flattop',
@@ -217,7 +208,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'general_gaussian': {
-        'app': {'spec'},
+        'app': ['spec', 'all'],
         'disp_name': 'General Gaussian',
         'fn_name': 'general_gaussian',
         'id': 'general_gaussian',
@@ -236,7 +227,7 @@ all_wins_dict_ref = {
             }]
         },
     'gaussian': {
-        'app': {'spec'},
+        'app': ['spec', 'all'],
         'disp_name': 'Gauss',
         'fn_name': 'gaussian',
         'id': 'gaussian',
@@ -251,7 +242,7 @@ all_wins_dict_ref = {
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}]
         },
     'hamming': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Hamming',
         'fn_name': 'hamming',
         'id': 'hamming',
@@ -268,7 +259,7 @@ all_wins_dict_ref = {
         'par': []
          },
     'hann': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Hann',
         'fn_name': 'hann',
         'id': 'hann',
@@ -287,7 +278,7 @@ all_wins_dict_ref = {
         'par': []
             },
     'kaiser': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Kaiser',
         'fn_name': 'kaiser',
         'id': 'kaiser',
@@ -307,7 +298,7 @@ all_wins_dict_ref = {
                 '5 ... 20.</span>'}]
         },
     'nuttall': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Nuttall',
         'fn_name': 'nuttall',
         'id': 'nuttall',
@@ -315,7 +306,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'parzen': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Parzen',
         'fn_name': 'parzen',
         'id': 'parzen',
@@ -334,7 +325,7 @@ all_wins_dict_ref = {
         'par': []
             },
     'triang': {
-        'app': {'fir', 'spec', 'stft'},
+        'app': ['fir', 'spec', 'stft', 'all'],
         'disp_name': 'Triangular',
         'fn_name': 'triang',
         'id': 'triang',
@@ -342,7 +333,7 @@ all_wins_dict_ref = {
         'par': []
         },
     'tukey': {
-        'app': {'spec', 'stft'},
+        'app': ['spec', 'stft', 'all'],
         'disp_name': 'Tukey',
         'fn_name': 'tukey',
         'id': 'tukey',
@@ -365,7 +356,7 @@ all_wins_dict_ref = {
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}]
         },
     'ultraspherical': {
-        'app': {'fir', 'spec'},
+        'app': ['fir', 'spec', 'all'],
         'disp_name': 'Ultraspherical',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'id': 'ultraspherical',
