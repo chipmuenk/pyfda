@@ -384,15 +384,17 @@ fil_ref = {
     # 'timestamp': time.time(),
     # parameter(s) of dynamically instantiated filter widget
     'wdg_fil' :
-        {'equiripple': {'grid_density': 16}},
-    # Parameters for filter design window function - is part of 'wdg_fil'
-    # 'win_fir':
-    #     {'name': 'Hann',  # Window name
-    #         'fn_name': 'hann',  # function name or array with values
-    #         'par': [],    # set of list of window parameters
-    #         'info': "",   # Docstring for the window
-    #         'win_len': 1024
-    #     }
+        # Equiripple FIR filters
+        {'equiripple': {'grid_density': 16},
+        # Windowed FIR filters
+        'firwin':
+            {'id': 'Hann', # Window name
+             'fn_name': 'hann',  # function name or array with values
+             'par': [],    # set of list of window parameters
+             'info': "",   # Docstring for the window
+             'win_len': 1024
+            }
+        },
 
     # Parameters for spectral analysis window function
     "win_fft": {
