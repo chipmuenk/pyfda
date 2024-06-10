@@ -117,17 +117,9 @@ class PlotImpz_UI(QWidget):
 
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
-        # list of windows that are available for FFT analysis
-        win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
-                          "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
-                          "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
-                          "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
-        self.cur_win_name = "Rectangular"  # set initial window type
 
-        # initialize windows dict with the list above
-        # self.all_wins_dict = construct_all_wins_dict(
-        #     win_names_list=win_names_list,
-        #     cur_win_name=self.cur_win_name)
+        self.cur_win_name = "rectangular"  # set initial window type
+
         self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
 
         # instantiate FFT window with default windows dict

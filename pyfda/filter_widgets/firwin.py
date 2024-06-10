@@ -85,8 +85,10 @@ class Firwin(QWidget):
 
         self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
         self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
-        # copy the display name of the current window into the current dict
-        self.cur_win_dict.update({'name': self.cur_win_name})
+        # access a deep copy of the reference window dict to store modified parameters
+        # self.all_wins_dict = self.qfft_win_select.all_wins_dict
+        # get the current window name / id
+        self.all_wins_dict['current']['id'] = self.cur_win_name
 
         # get initial / last setting from dictionary, updating self.all_wins_dict
         self._load_dict()
@@ -230,7 +232,7 @@ class Firwin(QWidget):
     def _update_fft_window(self):
         """ Update window type for FirWin - unneeded at the moment """
         self.alg = str(self.cmb_firwin_alg.currentText())
-        self.cur_win_name = self.all_wins_dict['cur_win_name']
+        self.cur_win_name = self.all_wins_dict['current']['id']
         # logger.warning(self.cur_win_name)
         self.emit({'filt_changed': 'firwin'})
 
@@ -249,7 +251,7 @@ class Firwin(QWidget):
             firwin_loaded = fb.fil[0]['wdg_fil']['firwin']
 
             # Get window display name
-            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['name']
+            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['id']
             logger.warning(f"curwin = {self.cur_win_name}")
             # if self.cur_win_name in self.all_wins_dict:
             #     # get window related infos from global filter dict
@@ -467,10 +469,9 @@ class Firwin(QWidget):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
-        if "Kaiser" in self.all_wins_dict and self.all_wins_dict['cur_win_name'] == "Kaiser":
+        if self.all_wins_dict['current']['id'] == "kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
-            self.all_wins_dict["Kaiser"]["par"][0]["val"] = beta
-            self.cur_win_dict["Kaiser"] = {"val":[beta]}
+            self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))
             self.qfft_win_select.ui2dict_params()  # pass changed parameter to other widgets
         else:

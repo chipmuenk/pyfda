@@ -565,7 +565,7 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
-        cur = self.all_wins_dict['cur_win_name']
+        cur = self.all_wins_dict['current']['id']
         cur_win_d = self.all_wins_dict[cur]
         param_txt = ""
         if len(cur_win_d['par']) > 0:
@@ -628,7 +628,7 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        cur = self.all_wins_dict['cur_win_name']
+        cur = self.all_wins_dict['current']['id']
         if 'info' in self.all_wins_dict[cur]:
             self.txtInfoBox.setText(self.all_wins_dict[cur]['info'])
         else:
@@ -671,19 +671,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
     fb.clipboard = QApplication.clipboard()  # create clipboard instance
-    # win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
-    #                   "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
-    #                   "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
-    #                   "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
-    win_names_list = []
 
-    # initialize windows dict with the list above and an initial window
-    # all_wins_dict = construct_all_wins_dict(
-    #     win_names_list=win_names_list,
-    #     cur_win_name="Hann")
-    all_wins_dict = copy.deepcopy(all_wins_dict_ref)
-
-    mainw = Plot_FFT_win(all_wins_dict, ignore_close_event=False)
+    mainw = Plot_FFT_win(app='spec', ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()

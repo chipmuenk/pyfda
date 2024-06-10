@@ -1303,8 +1303,8 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
-                label=self.ui.win_dict['cur_win_name'])[0])
-            l_r += [self.ui.win_dict['cur_win_name']]
+                label=self.ui.win_dict['current']['id'])[0])
+            l_r += [self.ui.win_dict['current']['id']]
         # --------------- LEGEND (real part) ----------------------------------
         if self.plt_time_enabled:
             self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True,
@@ -1648,7 +1648,7 @@ class Plot_Impz(QWidget):
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.win_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
-                if self.ui.win_dict['cur_win_name'].lower() not in\
+                if self.ui.win_dict['current']['id'] not in\
                         {'boxcar', 'rectangular'}:
                     logger.warning("Boxcar (Rectangular) window needed for "
                                    " a correctly scaled FFT of an impulse!")
