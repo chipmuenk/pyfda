@@ -1650,8 +1650,10 @@ class Plot_Impz(QWidget):
                     * self.stim_wdg.ui.scale_impz
                 if self.ui.win_dict['current']['id'] not in\
                         {'boxcar', 'rectangular'}:
-                    logger.warning("Boxcar (Rectangular) window needed for "
-                                   " a correctly scaled FFT of an impulse!")
+                    logger.warning(
+                        f"Use a Boxcar (Rectangular) window for a correctly scaled\n"
+                        f"\tFFT of an impulse instead of a "
+                        f"{self.ui.all_wins_dict['current']['id'].capitalize()} window!")
             else:
                 freq_resp = False
                 scale_impz = 1.
