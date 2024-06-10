@@ -390,57 +390,57 @@ all_wins_dict_ref = {
 
 
 # ------------------------------------------------------------------------------
-def get_valid_windows_list(win_names_list=[], win_dict={}):
-    """
-    Return a list of all keys (= window names) from `win_dict` that are contained in the
-    list of window names 'win_names_list'. It is checked whether each key has a dict as
-    a value defining the window and whether this dict has a key `fn_name` specifying
-    the fully qualified name of the window function
+# def get_valid_windows_list(win_names_list=[], win_dict={}):
+#     """
+#     Return a list of all keys (= window names) from `win_dict` that are contained in the
+#     list of window names 'win_names_list'. It is checked whether each key has a dict as
+#     a value defining the window and whether this dict has a key `fn_name` specifying
+#     the fully qualified name of the window function
 
-    When `win_dict` is empty, use the global `all_wins_dict_ref` instead.
+#     When `win_dict` is empty, use the global `all_wins_dict_ref` instead.
 
-    When `win_names_list` is empty, return all valid window names.
+#     When `win_names_list` is empty, return all valid window names.
 
-    All window names in 'win_names_list' without a corresponding key in the windows dict
-    raise a warning.
+#     All window names in 'win_names_list' without a corresponding key in the windows dict
+#     raise a warning.
 
-    The result is a alphabetically sorted (on the lower-cased names)
-    list containing the valid window names (strings).
+#     The result is a alphabetically sorted (on the lower-cased names)
+#     list containing the valid window names (strings).
 
-    This list can be used e.g. for initialization of a combo box.
+#     This list can be used e.g. for initialization of a combo box.
 
-    Parameter
-    ---------
-    win_names_list: list of str
-        A list of window names defining the windows available in the constructed
-        instance, a subset of all the windows defined in `all_wins_dict_ref`
+#     Parameter
+#     ---------
+#     win_names_list: list of str
+#         A list of window names defining the windows available in the constructed
+#         instance, a subset of all the windows defined in `all_wins_dict_ref`
 
-    win_dict: dict
+#     win_dict: dict
 
-    Returns
-    -------
-    A validated list of str with window names
+#     Returns
+#     -------
+#     A validated list of str with window names
 
-    """
-    if not win_dict:  # empty dictionary, use global one
-        win_dict = all_wins_dict_ref
+#     """
+#     if not win_dict:  # empty dictionary, use global one
+#         win_dict = all_wins_dict_ref
 
-    if not win_names_list:  # empty list, extract all valid keys
-        wl = [k for k in win_dict
-              if type(win_dict[k]) == dict
-              and "fn_name" in win_dict[k]]
-    else:
-        wl = [k for k in win_dict
-              if k in win_names_list
-              and type(win_dict[k]) == dict
-              and "fn_name" in win_dict[k]]
+#     if not win_names_list:  # empty list, extract all valid keys
+#         wl = [k for k in win_dict
+#               if type(win_dict[k]) == dict
+#               and "fn_name" in win_dict[k]]
+#     else:
+#         wl = [k for k in win_dict
+#               if k in win_names_list
+#               and type(win_dict[k]) == dict
+#               and "fn_name" in win_dict[k]]
 
-        for wn in win_names_list:
-            if wn not in wl:
-                logger.warning(
-                    f'Ignoring window name "{wn}", not found in "all_wins_dict_ref".')
+#         for wn in win_names_list:
+#             if wn not in wl:
+#                 logger.warning(
+#                     f'Ignoring window name "{wn}", not found in "all_wins_dict_ref".')
 
-    return sorted(wl, key=lambda v: (v.lower(), v))
+#     return sorted(wl, key=lambda v: (v.lower(), v))
 
 
 # ------------------------------------------------------------------------------
