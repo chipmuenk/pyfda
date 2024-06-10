@@ -84,7 +84,6 @@ class Firwin(QWidget):
         self.alg = "ichige"
 
         self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
-        self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
         # access a deep copy of the reference window dict to store modified parameters
         # self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # get the current window name / id
@@ -248,28 +247,15 @@ class Firwin(QWidget):
         if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
                 and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
             logger.warning(fb.fil[0]['wdg_fil'])
-            firwin_loaded = fb.fil[0]['wdg_fil']['firwin']
 
             # Get window display name
             self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['id']
             logger.warning(f"curwin = {self.cur_win_name}")
-            # if self.cur_win_name in self.all_wins_dict:
-            #     # get window related infos from global filter dict
-            #     self.cur_win_dict = self.all_wins_dict[self.cur_win_name]
-            #     # window related infos from loaded dict
-            #     firwin_loaded = fb.fil[0]['wdg_fil']['firwin'][self.cur_win_name]
-            # else:
-            #     logger.warning(f"No window '{self.cur_win_name}' in all-windows dict, "
-            #                    "using Hann window!")
-            #     self.cur_win_dict = self.all_wins_dict['Hann']
-            #     return
-            if 'par' in firwin_loaded:
-                n_params = len(firwin_loaded['par'])
-                params = [firwin_loaded['par'][p]['val'] for p in range(n_params)]
-                for i in range(n_params):
-                    self.cur_win_dict['par'][i]['val'] = params[i]
-            else:
-                logger.info(f"Window type '{self.cur_win_name} has no parameters.")
+
+            # Copy all parameters from fb.fil[0] to cur_win_dict
+            for p in range(len(fb.fil[0]['wdg_fil']['firwin']['par'])):
+                self.all_wins_dict[self.cur_win_name]['par'][p]['val'] =\
+                    fb.fil[0]['wdg_fil']['firwin']['par'][p]['val']
         else:
             logger.warning("Couldn't load 'firwin' dict!")
 
@@ -280,12 +266,14 @@ class Firwin(QWidget):
         """
         Store window and parameter settings using `self.all_wins_dict` in filter dictionary.
         """
-        # fb.fil[0]['wdg_fil'] = {'firwin': self.cur_win_dict}
-        # logger.warning(fb.fil[0]['wdg_fil'])
         if 'wdg_fil' not in fb.fil[0]:
             fb.fil[0].update({'wdg_fil': {}})
             logger.warning("Key 'wdg_fil' is missing in filter dict!")
-        fb.fil[0]['wdg_fil'] = {'firwin': self.cur_win_dict}
+
+        fb.fil[0]['wdg_fil'] = {
+            'firwin': {'par': self.all_wins_dict[self.cur_win_name]['par'],
+                       'id': self.all_wins_dict[self.cur_win_name]['id']}
+        }
 
     # --------------------------------------------------------------------------
     def _get_params(self, fil_dict):
