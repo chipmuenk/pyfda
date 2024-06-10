@@ -14,14 +14,11 @@ from pyfda.libs.compat import (
     QIcon, QProgressBar, pyqtSignal, QSize, QFrame,
     QHBoxLayout, QVBoxLayout, QGridLayout)
 
-import copy
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
 from pyfda.libs.pyfda_qt_lib import (
-    qcmb_box_populate, qget_cmb_box, qset_cmb_box, qtext_width, qstyle_widget,
-    QVLine, PushButton)
-from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
+    qcmb_box_populate, qtext_width, QVLine, PushButton)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
@@ -120,11 +117,9 @@ class PlotImpz_UI(QWidget):
 
         self.cur_win_name = "rectangular"  # set initial window type
 
-        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
-
         # instantiate FFT window with default windows dict
         self.fft_widget = Plot_FFT_win(
-            self.all_wins_dict, sym=False, title="pyFDA Spectral Window Viewer")
+            app='spec', sym=False, title="pyFDA Spectral Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
 
@@ -262,8 +257,9 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(self.all_wins_dict, app='spec',
-                                               objectName='win_select_qfft')
+        self.qfft_win_select = QFFTWinSelector(
+            app='spec', objectName='qfft_win_select')
+        self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")

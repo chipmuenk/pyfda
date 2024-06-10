@@ -19,7 +19,6 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qwindow_stay_on_top, qtext_width, QVLine, QHLine)
-from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -87,7 +86,6 @@ class Plot_FFT_win(QDialog):
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
-        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
         self.app = app
         self.sym = sym
         self.ignore_close_event = ignore_close_event
@@ -167,6 +165,7 @@ class Plot_FFT_win(QDialog):
 
         self.qfft_win_select = QFFTWinSelector(
             app=self.app, objectName='plot_fft_win_qfft')
+        self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)

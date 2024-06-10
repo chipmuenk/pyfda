@@ -76,10 +76,6 @@ class Firwin(QWidget):
         self.setObjectName(objectName)
         self.ft = 'FIR'
 
-        win_names_list = ["Boxcar", "Rectangular", "Barthann", "Bartlett", "Blackman",
-                          "Blackmanharris", "Bohman", "Cosine", "Dolph-Chebyshev", "DPSS",
-                          "Flattop", "General Gaussian", "Gauss", "Hamming", "Hann",
-                          "Kaiser", "Nuttall", "Parzen", "Triangular", "Tukey"]
         self.cur_win_name = "Kaiser"  # set initial window type
         self.alg = "ichige"
 
@@ -94,7 +90,7 @@ class Firwin(QWidget):
 
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(
-            win_dict=self.all_wins_dict, sym=True, title="pyFDA FIR Window Viewer")
+            app='fir', sym=True, title="pyFDA FIR Window Viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
         self.fft_widget.hide()
 

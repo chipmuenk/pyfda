@@ -19,7 +19,7 @@ from pyfda.pyfda_rc import params
 from .compat import (QWidget, QLabel, QComboBox, QLineEdit,
                      QHBoxLayout, pyqtSignal)
 
-from pyfda.libs.pyfda_fft_windows_lib import get_valid_windows_list, all_wins_dict_ref
+from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 
 import logging
 logger = logging.getLogger(__name__)
@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 class QFFTWinSelector(QWidget):
     """
-    Construct a combo box with window types from the `all_wins_dict_ref`
+    Construct a combo box with window types from the `all_wins_dict_ref`, restricted
+    to suitable types for `app` applications
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
@@ -142,6 +143,8 @@ class QFFTWinSelector(QWidget):
 
         self.win_fnct = win_fnct            # handle to windows function
         self.win_last = None                # clear last window function
+
+        Also, update the keys 'par' and 'id' of `fb.fil[0]['wdg_fil']['firwin']`
 
         The above is only updated when the window type has been changed compared to
         `all_wins_dict['current']['id']` !
