@@ -855,11 +855,11 @@ class Plot_Impz(QWidget):
     def calc_fft(self):
         """
         (Re-)calculate FFTs of stimulus `self.X`, quantized stimulus `self.X_q`
-        and response `self.Y` using the window function from `self.ui.win_dict['win']`.
+        and response `self.Y` using the window function from `self.ui.all_wins_dict['win']`.
         """
         # calculate FFT of stimulus / response
         N = self.ui.N
-        win = self.ui.qfft_win_select.get_window(N) / self.ui.win_dict['cgain']
+        win = self.ui.qfft_win_select.get_window(N) / self.ui.all_wins_dict['cgain']
         if self.x is None:
             self.X = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
@@ -1303,8 +1303,8 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_time.isChecked():
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
-                label=self.ui.win_dict['current']['id'])[0])
-            l_r += [self.ui.win_dict['current']['id']]
+                label=self.ui.all_wins_dict['current']['id'])[0])
+            l_r += [self.ui.all_wins_dict['current']['id']]
         # --------------- LEGEND (real part) ----------------------------------
         if self.plt_time_enabled:
             self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True,
@@ -1576,8 +1576,8 @@ class Plot_Impz(QWidget):
         self._init_axes_freq()
         self._log_mode_freq()
 
-        nenbw = self.ui.win_dict['nenbw']
-        cgain = self.ui.win_dict['cgain']
+        nenbw = self.ui.all_wins_dict['nenbw']
+        cgain = self.ui.all_wins_dict['cgain']
 
         plt_response = self.plt_freq_resp != "none"
         plt_stimulus = self.plt_freq_stim != "none"
@@ -1646,9 +1646,9 @@ class Plot_Impz(QWidget):
                 and self.ui.but_freq_norm_impz.isEnabled()\
                     and self.ui.but_freq_norm_impz.isChecked():
                 freq_resp = True  # calculate frequency response from impulse response
-                scale_impz = self.ui.N * self.ui.win_dict['cgain']\
+                scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
-                if self.ui.win_dict['current']['id'] not in\
+                if self.ui.all_wins_dict['current']['id'] not in\
                         {'boxcar', 'rectangular'}:
                     logger.warning(
                         f"Use a Boxcar (Rectangular) window for a correctly scaled\n"
