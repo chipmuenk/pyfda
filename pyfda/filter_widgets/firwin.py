@@ -76,9 +76,8 @@ class Firwin(QWidget):
         self.setObjectName(objectName)
         self.ft = 'FIR'
 
-        self.cur_win_name = "Kaiser"  # set initial window type
+        self.cur_win_name = "kaiser"  # set initial window type
         self.alg = "ichige"
-
         self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
         # access a deep copy of the reference window dict to store modified parameters
         # self.all_wins_dict = self.qfft_win_select.all_wins_dict
