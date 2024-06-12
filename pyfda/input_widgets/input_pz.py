@@ -867,7 +867,6 @@ class Input_PZ(QWidget):
             qstyle_widget(self.ui.butSave, 'error')
             return
         else:
-            logger.warning(pprint_log(zpk_arr))
             self.zpk = zpk_arr
             qstyle_widget(self.ui.butSave, 'changed')
             self._refresh_table()

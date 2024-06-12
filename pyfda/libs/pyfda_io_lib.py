@@ -279,10 +279,10 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 
 
 # ------------------------------------------------------------------------------
-def qtable2csv(table: object, data: np.ndarray, zpk=False,
+def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
                formatted: bool = False) -> str:
     """
-    Transform QTableWidget data to CSV formatted text
+    Transform QTableWidget data to CSV formatted text for export to file or clipboard.
 
     Parameters
     ----------
@@ -294,7 +294,7 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
             Instance of the numpy variable shadowing table data
 
     zpk: bool
-            when True, append the gain (`data[2]`) to the table
+            when True, append the gain (``data[2]``) to the table
 
     formatted: bool
         When True, copy data as formatted in the table, otherwise copy from the
@@ -324,14 +324,11 @@ def qtable2csv(table: object, data: np.ndarray, zpk=False,
     :'header': str (default: 'auto').
             When ``header='on'``, write the first row with 'b, a'.
 
-    :'clipboard': bool (default: True),
-            when ``clipboard == True``, copy data to clipboard, else use a file.
-
     Returns
     -------
 
-    None
-        Nothing, text is exported to clipboard or to file via ``export_fil_data``
+    text: str
+         text formatted with selected delimiter and linefeed.
     """
 
     text = ""
@@ -555,8 +552,10 @@ def csv2array(f: TextIO):
     -------
 
     data_arr: ndarray
-        numpy array of str with table data from file or `None` when import was
-        unsuccessful
+        numpy array of ``str_ `` with table data from file or ``None`` when import was
+        unsuccessful. Conversion to a numeric array is not performed here as the array
+        elements can be string representations of various formats like float, complex,
+        or fixpoint formats (bin, hex, oct, csd, ...).
 
     Read data as it is, splitting each row into the column items when:
 
@@ -582,7 +581,7 @@ def csv2array(f: TextIO):
       by the given string, and the line ending is returned to the caller untranslated.
 
     - On output, if newline is None, any '\\n' characters written are translated
-      to the system default line separator, os.linesep. If newline is '',
+      to the system default line separator, `os.linesep`. If newline is '',
       no translation takes place. If newline is any of the other legal values,
       any '\\n' characters written are translated to the given string.
 
@@ -761,15 +760,14 @@ def csv2array(f: TextIO):
         return None
 
     csv2array.nchans = np.ndim(data)
-    return data
 
+    return data
 #-------------------------------------------------------------------------------
 def read_csv_info_old(filename):
 #-------------------------------------------------------------------------------
     """
-    DON'T USE ANYMORE!
     Get infos about the size of a csv file without actually loading the whole
-    file into memory.
+    file into memory - this only makes sense for very large files.
 
     See
     https://stackoverflow.com/questions/64744161/best-way-to-find-out-number-of-rows-in-csv-without-loading-the-full-thing
@@ -832,8 +830,7 @@ def read_csv_info_old(filename):
 def read_wav_info(file):
     """
     Get infos about the following properties of a wav file without actually
-    loading the whole file into memory. This is achieved by reading the
-    header.
+    loading the whole file into memory by reading the header.
     """
     # https://wavefilegem.com/how_wave_files_work.html
     # https://stackoverflow.com/questions/7833807/get-wav-file-length-or-duration
