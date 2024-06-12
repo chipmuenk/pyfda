@@ -667,9 +667,10 @@ def csv2array(f: TextIO):
     if cr != 'auto':
         lineterminator = str(cr)
 
-    logger.info(f"Parsing CSV data with header = '{use_header}'\n"
-                f"\tDelimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
-                f"| quotechar = ' {quotechar} as '{f.__class__.__name__}'")
+    logger.info(f"Parsing CSV data with\n"
+                f"\theader = '{use_header}' | "
+                f"Delimiter = {repr(delimiter)} | Lineterm. = {repr(lineterminator)} "
+                f"| quotechar = ' {quotechar} '")
 
     # --------------------------------------------------------------------------
     # finally, create iterator from csv data
@@ -984,6 +985,29 @@ def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = Fa
     -------
     ndarray of float / complex / int or str
         Data from the file (ndarray) or None (error)
+
+
+    The following keys from the global dict ``params['CSV']`` are evaluated:
+
+    :'delimiter': str (default: <tab>), character for separating columns
+
+    :'lineterminator': str (default: As used by the operating system),
+            character for terminating rows. By default,
+            the character is selected depending on the operating system:
+
+            - Windows: Carriage return + line feed
+
+            - MacOS  : Carriage return
+
+            - \*nix   : Line feed
+
+    :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
+            orientation the table is read.
+
+    :'header': str (**'auto'**, 'on', 'off').
+            When ``header=='on'``, treat first row as a header that will be discarded.
+
+    Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
     """
     file2array.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled

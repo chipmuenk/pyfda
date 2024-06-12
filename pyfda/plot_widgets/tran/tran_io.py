@@ -154,9 +154,6 @@ class Tran_IO(QWidget):
         When an error occurred, return -1.
 
         """
-
-        # TODO: "test_row_ba_IIR_header.csv" fails to read, data should be unloaded
-
         file_type = (qget_cmb_box(self.ui.cmb_file_format),)  # str -> tuple
         file_name_prev = self.file_name
         file_type_prev = self.file_type
