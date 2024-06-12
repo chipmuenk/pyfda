@@ -454,86 +454,6 @@ def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
 #
 # ==============================================================================
 
-
-# ------------------------------------------------------------------------------
-def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = False):
-    """
-    Copy tabular data from clipboard or file to a numpy array
-
-    Parameters
-    ----------
-
-    parent: object
-            parent instance with a QFileDialog attribute.
-
-    fkey: str
-            Key for accessing data in *.npz file or Matlab workspace (*.mat)
-
-    title: str
-        title string for the file dialog box
-
-    as_str: bool
-        When True, return ndarray in raw str format, otherwise convert to float or complex
-
-    Returns
-    -------
-
-    ndarray of str or None
-        table data
-
-
-    The following keys from the global dict ``params['CSV']`` are evaluated:
-
-    :'delimiter': str (default: <tab>), character for separating columns
-
-    :'lineterminator': str (default: As used by the operating system),
-            character for terminating rows. By default,
-            the character is selected depending on the operating system:
-
-            - Windows: Carriage return + line feed
-
-            - MacOS  : Carriage return
-
-            - \*nix   : Line feed
-
-    :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
-            orientation the table is read.
-
-    :'header': str (**'auto'**, 'on', 'off').
-            When ``header=='on'``, treat first row as a header that will be discarded.
-
-    :'clipboard': bool (default: True).
-            When ``clipboard == True``, copy data from clipboard, else use a file
-
-    Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
-
-    """
-    if params['CSV']['destination'] == 'clipboard':  # data from clipboard
-        text = fb.clipboard.text()
-        logger.debug(
-            f"Importing data from clipboard:\n{np.shape(text)}\n{text}")
-        # pass handle to text and convert to numpy array:
-        # data_arr = csv2array(io.StringIO(text))
-        data_arr = file2array(io.StringIO(text), 'clipboard', as_str = as_str)
-
-    else:  # data from file
-        file_name, file_type = select_file(parent, title=title, mode="r",
-                                   file_types=('csv', 'mat', 'npy', 'npz'))
-        if file_name is None:  # operation cancelled or error
-            return None
-        else:  # file types 'csv', 'mat', 'npy', 'npz'
-            data_arr = file2array(file_name, file_type, fkey, as_str = as_str)
-
-    if data_arr is None:
-            logger.error("Couldn't import data.")
-    elif isinstance(data_arr, str):  # returned an error message instead of numpy data
-        logger.error(
-            "You shouldn't see this message!\n"
-            f"Error importing data:\n\t{data_arr}")
-        return None
-
-    return data_arr
-
 # ------------------------------------------------------------------------------
 def csv2array(f: TextIO):
     """
@@ -960,10 +880,11 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = False
+def file2array(file_name: str, file_type: str, fkey: str = "",
+               from_clipboard: bool = False, as_str: bool = False
                  )-> np.ndarray:
     """
-    Import data from a file and convert it to a numpy array.
+    Import data from a file or from clipboard and convert it to a numpy array.
 
     Parameters
     ----------
@@ -976,6 +897,10 @@ def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = Fa
     fkey : str
         Key for accessing data in *.npz or Matlab workspace (*.mat) files with
         multiple entries.
+
+    from_clipboard: bool
+        When False (default), read data from passed file_name / file_type, else get
+        data from clipboard.
 
     as_str: bool
         When False (default), try to convert results to ndarray of float or complex.
@@ -1010,85 +935,101 @@ def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = Fa
     Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
     """
     file2array.info_str = "" # function attribute for file infos
-    if file_name is None:  # error or operation cancelled
-        return -1
 
-    try:
-        if file_type == 'wav':
-            f_S, data_arr = wavfile.read(file_name, mmap=False)
-            # data_arr is 1D for single channel (mono) files and
-            # 2D otherwise (n_chans, n_samples)
-            fb.fil[0]['f_s_wav'] = f_S
+    # ----- Data from clipboard -----------------------------------------------
+    if from_clipboard:
+        clip_text = fb.clipboard.text()
+        if clip_text in {None, ""}:
+            # an error has occurred
+            logger.error(f"Clipboard is empty!")
+            return None
 
-        elif file_type in {'csv', 'txt'}:
-            with open(file_name, 'r', newline=None) as f:
-                data_arr = csv2array(f)
-                file2array.info_str = csv2array.info_str
-                if data_arr is None:
-                    # an error has occurred
-                    logger.error(f"Error loading file '{file_name}'")
-                    return None
-                elif isinstance(data_arr, str):
-                    # returned an error message instead of numpy data:
-                    file2array.info_str = ""
-                    logger.error(f"You shouldn't see this message!! \n"
-                                 "Error loading file '{file_name}':\n{data_arr}")
-                    return None
+        logger.info(f"Importing data from clipboard.")
 
-        elif file_type == 'clipboard':
-                data_arr = csv2array(file_name)
-                file2array.info_str = csv2array.info_str
-                if data_arr is None:
-                    # an error has occurred
-                    logger.error(f"Clipboard was empty!")
-                    return None
-                elif isinstance(data_arr, str):
-                    # returned an error message instead of numpy data:
-                    file2array.info_str = ""
-                    logger.error(f"You shouldn't see this message!! \n"
-                                 "Error copying from clipboard:\n{data_arr}")
-                    return None
+        # convert text from clipboard to a file-like object than can be handled by
+        data_arr = csv2array(io.StringIO(clip_text))
 
-
+        if data_arr is None:
+            # an error has occurred
+            logger.error(f"Couldn't import data from clipboard.")
+            return None
+        elif isinstance(data_arr, str):
+            # returned an error message instead of numpy data:
+            file2array.info_str = ""
+            logger.error(f"You shouldn't see this message!! \n"
+                            "Error copying from clipboard:\n{data_arr}")
+            return None
         else:
-            with open(file_name, 'rb') as f:
-                if file_type == 'mat':
-                    data_arr = loadmat(f)[fkey]
-                elif file_type == 'npy':
-                    data_arr = np.load(f)
-                    # contains only one array
-                elif file_type == 'npz':
-                    fdict = np.load(f)
-                    if fkey in{"", None}:
-                        data_arr = fdict  # pick the whole array
-                    elif fkey not in fdict:
-                        raise IOError(
-                            f"Key '{fkey}' not in file '{file_name}'.\n"
-                            f"Keys found: {fdict.files}")
-                    else:
-                        data_arr = fdict[fkey]  # pick the array `fkey` from the dict
-                else:
-                    logger.error(f'Unknown file type "{file_type}"')
-                    return None
+            file2array.info_str = csv2array.info_str
 
-        if not as_str:
-            try:  # try to convert array elements to float
-                data_arr = data_arr.astype(float)
-            except ValueError as e:
-                try: # try to convert array elements to complex
-                    data_arr = data_arr.astype(complex)
-                except ValueError:
-                    logger.error(f"{e},\n\tconversion to float and complex failed.")
-                    return None
-
+    # ----- Data from file -----------------------------------------------------
+    else:
         logger.info(
-            f'Successfully imported file "{file_name}"\n{pprint_log(data_arr, N=5)}')
-        return data_arr  # returns numpy array of type string or float/complex
+            f"Importing data from file '{file_name}'.")
+        try:
+            if file_type == 'wav':
+                f_S, data_arr = wavfile.read(file_name, mmap=False)
+                # data_arr is 1D for single channel (mono) files and
+                # 2D otherwise (n_chans, n_samples)
+                fb.fil[0]['f_s_wav'] = f_S
 
-    except (IOError, KeyError) as e:
-        logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+            elif file_type in {'csv', 'txt'}:
+                with open(file_name, 'r', newline=None) as f:
+                    data_arr = csv2array(f)
+                    file2array.info_str = csv2array.info_str
+                    if data_arr is None:
+                        # an error has occurred
+                        logger.error(f"Error loading file '{file_name}'")
+                        return None
+                    elif isinstance(data_arr, str):
+                        # returned an error message instead of numpy data:
+                        file2array.info_str = ""
+                        logger.error(f"You shouldn't see this message!! \n"
+                                    "Error loading file '{file_name}':\n{data_arr}")
+                        return None
+
+            else:
+                with open(file_name, 'rb') as f:
+                    if file_type == 'mat':
+                        data_arr = loadmat(f)[fkey]
+                    elif file_type == 'npy':
+                        data_arr = np.load(f)
+                        # contains only one array
+                    elif file_type == 'npz':
+                        fdict = np.load(f)
+                        if fkey in{"", None}:
+                            data_arr = fdict  # pick the whole array
+                        elif fkey not in fdict:
+                            raise IOError(
+                                f"Key '{fkey}' not in file '{file_name}'.\n"
+                                f"Keys found: {fdict.files}")
+                        else:
+                            data_arr = fdict[fkey]  # pick the array `fkey` from the dict
+                    else:
+                        logger.error(f'Unknown file type "{file_type}"')
+                        return None
+
+        except (IOError, KeyError) as e:
+            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+            return None
+
+    if data_arr is None:
+        logger.error("Couldn't import data.")
         return None
 
+    if not as_str:
+        try:  # try to convert array elements to float
+            data_arr = data_arr.astype(float)
+        except ValueError as e:
+            try: # try to convert array elements to complex
+                data_arr = data_arr.astype(complex)
+            except ValueError:
+                logger.error(f"{e},\n\tconversion to float and complex failed.")
+                return None
+
+    logger.info(
+        f'Successfully imported data\n{pprint_log(data_arr, N=5)}')
+    return data_arr  # returns numpy array of type string or float/complex
 
 # ------------------------------------------------------------------------------
 def save_data_np(file_name: str, file_type: str, data: np.ndarray,

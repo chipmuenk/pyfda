@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
     QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, qstyle_widget
-from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, export_fil_data
+from pyfda.libs.pyfda_io_lib import qtable2csv, file2array, export_fil_data, select_file
 from pyfda.libs.pyfda_sig_lib import zeros_with_val, zpk2array
 
 import numpy as np
@@ -823,8 +823,23 @@ class Input_PZ(QWidget):
         Import data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = data2array(self, 'zpk', title="Import Poles / Zeros ",
-                              as_str = self.ui.but_format.isChecked())
+        # Get data as ndarray of str:
+
+        if params['CSV']['destination'] == 'clipboard':  # data from clipboard
+            data_str = file2array(
+                "", "", 'zpk', from_clipboard=True,
+                as_str = self.ui.but_format.isChecked())
+        else:  # data from file
+            file_name, file_type = select_file(self, title="Import Poles / Zeros", mode="r",
+                                    file_types=('csv', 'mat', 'npy', 'npz'))
+            if file_name is None:  # operation cancelled or error
+                return None
+            else:  # file types 'csv', 'mat', 'npy', 'npz'
+                data_str = file2array(
+                    file_name, file_type, 'zpk',
+                    from_clipboard=False,
+                    as_str = self.ui.but_format.isChecked())
+
         if data_str is None:  # file operation has been aborted
             return
 

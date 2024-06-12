@@ -21,7 +21,7 @@ from pyfda.libs.pyfda_lib import fil_save, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import zeros_with_val
 from pyfda.libs.pyfda_qt_lib import (
     qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected)
-from pyfda.libs.pyfda_io_lib import qtable2csv, data2array, export_fil_data
+from pyfda.libs.pyfda_io_lib import qtable2csv, export_fil_data, select_file, file2array
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params
@@ -714,13 +714,27 @@ class Input_Coeffs(QWidget):
         TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         formatted_import = self.ui.but_format.isChecked()
-        # get data as ndarray of str
-        data_str = data2array(self, 'ba', title="Import Filter Coefficients",
-                              as_str = self.ui.but_format.isChecked())
+
+        # Get data as ndarray of str:
+
+        if params['CSV']['destination'] == 'clipboard':  # data from clipboard
+            data_str = file2array(
+                None, None, 'ba', from_clipboard=True,
+                as_str = self.ui.but_format.isChecked())
+        else:  # data from file
+            file_name, file_type = select_file(self, title="Import Filter Coefficients", mode="r",
+                                    file_types=('csv', 'mat', 'npy', 'npz'))
+            if file_name is None:  # operation cancelled or error
+                return None
+            else:  # file types 'csv', 'mat', 'npy', 'npz'
+                data_str = file2array(
+                    file_name, file_type, 'ba',
+                    from_clipboard=False,
+                    as_str = self.ui.but_format.isChecked())
+
         if data_str is None:  # file operation has been aborted or some other error
             logger.info(f"Data was not imported.")
             return
-
 
         if np.ndim(data_str) > 1:
             num_cols, num_rows = np.shape(data_str)
