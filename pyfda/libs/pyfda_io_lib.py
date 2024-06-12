@@ -521,7 +521,7 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
         if file_name is None:  # operation cancelled or error
             return None
         else:  # file types 'csv', 'mat', 'npy', 'npz'
-            data_arr = load_data_np(file_name, file_type, fkey, as_str = as_str)
+            data_arr = file2array(file_name, file_type, fkey, as_str = as_str)
 
     if data_arr is None:
             logger.error("Couldn't import data.")
@@ -958,7 +958,7 @@ def read_wav_info(file):
     return 0
 
 # ------------------------------------------------------------------------------
-def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = False
+def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = False
                  )-> np.ndarray:
     """
     Import data from a file and convert it to a numpy array.
@@ -984,7 +984,7 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = 
     ndarray of float / complex / int or str
         Data from the file (ndarray) or None (error)
     """
-    load_data_np.info_str = "" # function attribute for file infos
+    file2array.info_str = "" # function attribute for file infos
     if file_name is None:  # error or operation cancelled
         return -1
 
@@ -998,14 +998,14 @@ def load_data_np(file_name: str, file_type: str, fkey: str = "", as_str: bool = 
         elif file_type in {'csv', 'txt'}:
             with open(file_name, 'r', newline=None) as f:
                 data_arr = csv2array(f)
-                load_data_np.info_str = csv2array.info_str
+                file2array.info_str = csv2array.info_str
                 if data_arr is None:
                     # an error has occurred
                     logger.error(f"Error loading file '{file_name}'")
                     return None
                 elif isinstance(data_arr, str):
                     # returned an error message instead of numpy data:
-                    load_data_np.info_str = ""
+                    file2array.info_str = ""
                     logger.error(f"You shouldn't see this message!! \n"
                                  "Error loading file '{file_name}':\n{data_arr}")
                     return None

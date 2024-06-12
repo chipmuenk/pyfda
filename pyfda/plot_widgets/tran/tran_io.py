@@ -185,7 +185,7 @@ class Tran_IO(QWidget):
             ret = io.read_wav_info(self.file_name)
             if ret < 0:
                 return -1
-            self.data_raw = io.load_data_np(self.file_name, 'wav')
+            self.data_raw = io.file2array(self.file_name, 'wav')
             if self.data_raw is None:  # an error occurred
                 err = True
             else:
@@ -196,11 +196,11 @@ class Tran_IO(QWidget):
 
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
-            self.data_raw = io.load_data_np(self.file_name, 'csv')
+            self.data_raw = io.file2array(self.file_name, 'csv')
             if self.data_raw is None:
                 err = True
             else:
-                info_str = f" ({io.load_data_np.info_str})"
+                info_str = f" ({io.file2array.info_str})"
         else:
             logger.error(f"Unknown file format '{self.file_type}'")
             qstyle_widget(self.ui.but_load, "error")
@@ -260,7 +260,7 @@ class Tran_IO(QWidget):
     # ------------------------------------------------------------------------------
     def select_chan_normalize(self):
         """
-        `select_chan_normalize()` is triggered by `load_data_np()` and by signal-slot
+        `select_chan_normalize()` is triggered by `file2array()` and by signal-slot
         connections
             * self.ui.cmb_chan_import.currentIndexChanged
             * self.ui.but_normalize.clicked
