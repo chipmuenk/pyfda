@@ -537,8 +537,8 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
 # ------------------------------------------------------------------------------
 def csv2array(f: TextIO):
     """
-    Convert comma-separated values from file or text
-    to numpy array, taking into accout the settings of the CSV dict.
+    Convert comma-separated values from file or text to numpy array of str,
+     taking into account the settings of the CSV dict.
 
     Parameters
     ----------
@@ -764,7 +764,7 @@ def csv2array(f: TextIO):
 
     return data
 #-------------------------------------------------------------------------------
-def read_csv_info_old(filename):
+def read_csv_info_large(filename):
 #-------------------------------------------------------------------------------
     """
     Get infos about the size of a csv file without actually loading the whole
@@ -819,11 +819,11 @@ def read_csv_info_old(filename):
         return -1
 
     # file is ok, copy local variables to function attributes
-    read_csv_info.row_mode = row_mode
-    read_csv_info.file_size = file_size
-    read_csv_info.N = N
-    read_csv_info.nchans = nchans
-    read_csv_info.info_str = f"{transpose} '{lineterminator}' # '{delimiter}'"
+    read_csv_info_large.row_mode = row_mode
+    read_csv_info_large.file_size = file_size
+    read_csv_info_large.N = N
+    read_csv_info_large.nchans = nchans
+    read_csv_info_large.info_str = f"{transpose} '{lineterminator}' # '{delimiter}'"
 
     return 0
 
