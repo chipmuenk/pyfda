@@ -513,7 +513,8 @@ def data2array(parent: object, fkey: str, title: str = "Import", as_str: bool = 
         logger.debug(
             f"Importing data from clipboard:\n{np.shape(text)}\n{text}")
         # pass handle to text and convert to numpy array:
-        data_arr = csv2array(io.StringIO(text))
+        # data_arr = csv2array(io.StringIO(text))
+        data_arr = file2array(io.StringIO(text), 'clipboard', as_str = as_str)
 
     else:  # data from file
         file_name, file_type = select_file(parent, title=title, mode="r",
@@ -1009,6 +1010,22 @@ def file2array(file_name: str, file_type: str, fkey: str = "", as_str: bool = Fa
                     logger.error(f"You shouldn't see this message!! \n"
                                  "Error loading file '{file_name}':\n{data_arr}")
                     return None
+
+        elif file_type == 'clipboard':
+                data_arr = csv2array(file_name)
+                file2array.info_str = csv2array.info_str
+                if data_arr is None:
+                    # an error has occurred
+                    logger.error(f"Clipboard was empty!")
+                    return None
+                elif isinstance(data_arr, str):
+                    # returned an error message instead of numpy data:
+                    file2array.info_str = ""
+                    logger.error(f"You shouldn't see this message!! \n"
+                                 "Error copying from clipboard:\n{data_arr}")
+                    return None
+
+
         else:
             with open(file_name, 'rb') as f:
                 if file_type == 'mat':
