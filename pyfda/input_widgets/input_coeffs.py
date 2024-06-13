@@ -308,8 +308,8 @@ class Input_Coeffs(QWidget):
 
         if 'ui_global_changed' in dict_sig\
                 and dict_sig['ui_global_changed'] == 'csv':
-            # CSV options have been changed, update icons (file vs. clipboard)
-            self.ui._set_load_save_icons()
+            # CSV options have been changed
+            pass
 
         elif 'ui_local_changed' in dict_sig and 'sender_name' in dict_sig and\
                 dict_sig['sender_name'] in {'fx_ui_wq_coeffs_a', 'fx_ui_wq_coeffs_b'}:
@@ -670,7 +670,7 @@ class Input_Coeffs(QWidget):
         """
         text = qtable2csv(
             self.tblCoeff, self.ba, formatted=self.ui.but_format.isChecked())
-        if params['CSV']['destination'] == 'clipboard':
+        if self.ui.load_save_clipboard:
             # clipboard is selected as export target
             fb.clipboard.setText(text)
         else:
@@ -717,7 +717,7 @@ class Input_Coeffs(QWidget):
 
         # Get data as ndarray of str:
 
-        if params['CSV']['destination'] == 'clipboard':  # data from clipboard
+        if self.ui.load_save_clipboard:  # data from clipboard
             data_str = file2array(
                 None, None, 'ba', from_clipboard=True,
                 as_str = self.ui.but_format.isChecked())

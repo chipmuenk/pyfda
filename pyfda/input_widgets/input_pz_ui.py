@@ -61,6 +61,8 @@ class Input_PZ_UI(QWidget):
         # π: u'3C0, °: u'B0, ∠: u'2220
         self.cmb_pz_frmt_init = 'cartesian'  # initial setting
 
+        self.load_save_clipboard = False  # load / save to clipboard or file
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -208,6 +210,11 @@ class Input_PZ_UI(QWidget):
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
 
+        self.but_file_clipboard = QPushButton(self)
+        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.but_file_clipboard.setIconSize(q_icon_size)
+        self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
+
         self.but_csv_options = QPushButton(self)
         self.but_csv_options.setIcon(QIcon(':/settings.svg'))
         self.but_csv_options.setIconSize(q_icon_size)
@@ -217,16 +224,18 @@ class Input_PZ_UI(QWidget):
         self.but_csv_options.setCheckable(True)
         self.but_csv_options.setChecked(False)
 
+        self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butFromTable)
+        layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butToTable)
+        layHButtonsCoeffs1.addWidget(self.butFromTable)
+        layHButtonsCoeffs1.addWidget(self.but_file_clipboard)
         layHButtonsCoeffs1.addWidget(self.but_csv_options)
         layHButtonsCoeffs1.addStretch()
 
@@ -276,6 +285,7 @@ class Input_PZ_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.but_csv_options.clicked.connect(self._open_csv_win)
+        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
 
     # ------------------------------------------------------------------------------
     def _open_csv_win(self):
@@ -310,7 +320,8 @@ class Input_PZ_UI(QWidget):
         Set icons / tooltipps for loading and saving data to / from file or
         clipboard depending on selected options.
         """
-        if params['CSV']['destination'] == 'clipboard':
+        self.load_save_clipboard = not self.load_save_clipboard
+        if self.load_save_clipboard:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
                 "<span>Copy table to clipboard in float format with full precision "
@@ -322,21 +333,23 @@ class Input_PZ_UI(QWidget):
                 "<span>Import table from clipboard in float format "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
                 "Otherwise, import the table in display format.</span>")
+            self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
         else:
-            self.butFromTable.setIcon(QIcon(':/save.svg'))
+            self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
             self.butFromTable.setToolTip(
                 "<span>Export table to file in float format with full precision "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
                 "Otherwise, save the table as displayed.</span>")
 
-            self.butToTable.setIcon(QIcon(':/file.svg'))
+            self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
             self.butToTable.setToolTip(
                 "<span>Import table from file in float format. "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
                 "Otherwise, import the table in file format.</span>")
+            self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
 
         # set state of CSV options button according to state of handle
-        self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+        # self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 
 # ------------------------------------------------------------------------------

@@ -65,6 +65,8 @@ class Input_Coeffs_UI(QWidget):
             ]
         self.cmb_fx_base_default = "dec"
 
+        self.load_save_clipboard = False  # load / save to clipboard or file
+
         self._construct_UI()
 
 # ------------------------------------------------------------------------------
@@ -83,7 +85,7 @@ class Input_Coeffs_UI(QWidget):
             # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
-            self._set_load_save_icons()  # update icons file <-> clipboard
+            # self._set_load_save_icons()  # update icons file <-> clipboard
             # signal change of CSV options to other widgets with current id
             self.emit({'ui_global_changed': 'csv'})
 
@@ -203,13 +205,13 @@ class Input_Coeffs_UI(QWidget):
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
         self.butSave.setToolTip(
-            "<span>Copy coefficient table to filter dict and update all plots "
+            "<span>Create filter from coefficient table and update all plots "
             "and widgets.</span>")
 
         self.butLoad = QPushButton(QIcon(':/download.svg'), "", self)
         self.butLoad.setIconSize(q_icon_size)
         self.butLoad.setToolTip(
-            "<span>Reload coefficient table from filter dict.</span>")
+            "<span>Reload coefficient table from current filter.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -223,6 +225,11 @@ class Input_Coeffs_UI(QWidget):
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
 
+        self.but_file_clipboard = QPushButton(self)
+        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.but_file_clipboard.setIconSize(q_icon_size)
+        self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
+
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
         # self.but_csv_options.setIconSize(q_icon_size)
@@ -230,6 +237,7 @@ class Input_Coeffs_UI(QWidget):
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
+        self.load_save_clipboard = not self.load_save_clipboard  # is inverted next step
         self._set_load_save_icons()  # initialize icon / button settings
 
         layH_buttons_coeffs1 = QHBoxLayout()
@@ -237,10 +245,11 @@ class Input_Coeffs_UI(QWidget):
         layH_buttons_coeffs1.addWidget(self.butAddCells)
         layH_buttons_coeffs1.addWidget(self.butDelCells)
         layH_buttons_coeffs1.addWidget(self.butClear)
-        layH_buttons_coeffs1.addWidget(self.butSave)
         layH_buttons_coeffs1.addWidget(self.butLoad)
-        layH_buttons_coeffs1.addWidget(self.butFromTable)
+        layH_buttons_coeffs1.addWidget(self.butSave)
         layH_buttons_coeffs1.addWidget(self.butToTable)
+        layH_buttons_coeffs1.addWidget(self.butFromTable)
+        layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
         layH_buttons_coeffs1.addWidget(self.but_csv_options)
         layH_buttons_coeffs1.addStretch()
 
@@ -313,6 +322,7 @@ class Input_Coeffs_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         self.but_csv_options.clicked.connect(self._open_csv_win)
+        self.but_file_clipboard.clicked.connect(self._set_load_save_icons)
 
     # --------------------------------------------------------------------------
     def _open_csv_win(self):
@@ -347,7 +357,8 @@ class Input_Coeffs_UI(QWidget):
         Set icons / tooltipps for loading and saving data to / from file or
         clipboard depending on selected options.
         """
-        if params['CSV']['destination'] == 'clipboard':
+        self.load_save_clipboard = not self.load_save_clipboard
+        if self.load_save_clipboard:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
                 "<span>Copy table to clipboard in float format with full precision "
@@ -362,13 +373,13 @@ class Input_Coeffs_UI(QWidget):
                 "(e.g. 'Hex'). If this differs from the clipboard data format, "
                 "imported data may be corrupted.</span>")
         else:
-            self.butFromTable.setIcon(QIcon(':/save.svg'))
+            self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
             self.butFromTable.setToolTip(
                 "<span>Save table to file in float format with full precision "
                 "when the &lt;FORMAT&gt; button is not selected.<br>"
                 "Otherwise, save the table as displayed.</span>")
 
-            self.butToTable.setIcon(QIcon(':/file.svg'))
+            self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
             self.butToTable.setToolTip(
                 "<span>Load table from file in float format when the &lt;FORMAT&gt; "
                 "button is not selected.<br>"
@@ -377,7 +388,7 @@ class Input_Coeffs_UI(QWidget):
                 "imported data may be corrupted.</span>")
 
         # set state of CSV options button according to state of handle
-        self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+        # self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 
 # ------------------------------------------------------------------------------

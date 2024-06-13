@@ -190,7 +190,7 @@ class Input_PZ(QWidget):
             return
 
         if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
-            self.ui._set_load_save_icons()
+            pass # self.ui._set_load_save_icons()
             # self.emit(dict_sig)
 
         elif self.isVisible():
@@ -810,8 +810,7 @@ class Input_PZ(QWidget):
         """
         text = qtable2csv(
             self.tblPZ, self.zpk, zpk=True, formatted=self.ui.but_format.isChecked())
-        if params['CSV']['destination'] == 'clipboard':
-            # clipboard is selected as export target
+        if self.ui.load_save_clipboard:  # data to clipboard:
             fb.clipboard.setText(text)
         else:
             # pass csv formatted text, key for accessing data in ``*.npz`` file or
@@ -825,7 +824,7 @@ class Input_PZ(QWidget):
         """
         # Get data as ndarray of str:
 
-        if params['CSV']['destination'] == 'clipboard':  # data from clipboard
+        if self.ui.load_save_clipboard:  # data from clipboard
             data_str = file2array(
                 "", "", 'zpk', from_clipboard=True,
                 as_str = self.ui.but_format.isChecked())
