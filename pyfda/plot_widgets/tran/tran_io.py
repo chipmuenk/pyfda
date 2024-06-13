@@ -193,7 +193,8 @@ class Tran_IO(QWidget):
 
         elif self.file_type == 'csv':
             self.ui.frm_f_s.setVisible(False)
-            self.data_raw = io.file2array(self.file_name, 'csv')
+            self.data_raw = io.file2array(self.file_name, 'csv',
+                                          from_clipboard=False)
             if self.data_raw is None:
                 err = True
             else:
