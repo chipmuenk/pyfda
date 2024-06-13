@@ -21,7 +21,7 @@
      <!--  <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  -->
     <file alias="help.svg">images/icons/dark/ic_help_24px.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
-    <file alias="load_from_file.svg">images/icons/dark/appbar.disk.download.svg</file>
+    <file alias="load_from_disk.svg">images/icons/dark/appbar.disk.download.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
