@@ -21,6 +21,7 @@
      <!--  <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  -->
     <file alias="help.svg">images/icons/dark/ic_help_24px.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
+    <file alias="load_from_file.svg">images/icons/dark/appbar.disk.download.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
@@ -31,6 +32,7 @@
     <file alias="row_delete.svg">images/icons/dark/appbar.list.delete.svg</file>
     <file alias="row_insert_above.svg">images/icons/dark/appbar.list.add.above.svg</file>
     <file alias="save.svg">images/icons/dark/appbar.disk.svg</file>
+    <file alias="save_to_disk.svg">images/icons/dark/appbar.disk.upload.svg</file>
     <file alias="settings.svg">images/icons/dark/cog.svg</file>
     <file alias="speaker.svg">images/icons/dark/ic_volume_up_48px.svg</file>
     <file alias="speaker_90.svg">images/icons/dark/ic_volume_up_48px_90.svg</file>
