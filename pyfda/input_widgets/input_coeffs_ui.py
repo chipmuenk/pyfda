@@ -361,34 +361,35 @@ class Input_Coeffs_UI(QWidget):
         if self.load_save_clipboard:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard in float format with full precision "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, copy the table as displayed.</span>")
+                "<span>Export coefficients to clipboard in float format with "
+                "full precision when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, export the coefficients as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip(
-                "<span>Import clipboard in float format when the &lt;FORMAT&gt; "
-                "button is not selected.<br>"
-                "Otherwise, try to import data in the selected table data format "
-                "(e.g. 'Hex'). If this differs from the clipboard data format, "
+                "<span>Import coefficients from clipboard in float format when the "
+                "&lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, try to import coefficients in the selected table data "
+                "format (e.g. 'Hex'). If this differs from the clipboard data format, "
                 "imported data may be corrupted.</span>")
+
+            self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+
         else:
             self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
             self.butFromTable.setToolTip(
-                "<span>Save table to file in float format with full precision "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, save the table as displayed.</span>")
+                "<span>Save coefficients to file in float format with full precision "
+                "when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, save the coefficients as displayed.</span>")
 
             self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
             self.butToTable.setToolTip(
-                "<span>Load table from file in float format when the &lt;FORMAT&gt; "
-                "button is not selected.<br>"
+                "<span>Load coefficients from file in float format when the "
+                "&lt;FORMAT&gt; button is not selected.<br><br>"
                 "Otherwise, try to import data in the selected table data format "
                 "(e.g. 'Hex'). If this differs from the file data format, "
                 "imported data may be corrupted.</span>")
 
-        # set state of CSV options button according to state of handle
-        # self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 
 # ------------------------------------------------------------------------------

@@ -324,32 +324,27 @@ class Input_PZ_UI(QWidget):
         if self.load_save_clipboard:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Copy table to clipboard in float format with full precision "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, copy the table as displayed.</span>")
-
+                "<span>Export poles / zeros to clipboard in float format with full "
+                "precision when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, export poles / zeros as displayed.</span>")
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip(
-                "<span>Import table from clipboard in float format "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, import the table in display format.</span>")
+                "<span>Import poles / zeros from clipboard in float format "
+                "when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, import poles / zeros in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
         else:
             self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
             self.butFromTable.setToolTip(
-                "<span>Export table to file in float format with full precision "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, save the table as displayed.</span>")
-
+                "<span>Save poles / zeros to file in float format with full "
+                "precision when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, save poles / zeros as displayed.</span>")
             self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
             self.butToTable.setToolTip(
-                "<span>Import table from file in float format. "
-                "when the &lt;FORMAT&gt; button is not selected.<br>"
-                "Otherwise, import the table in file format.</span>")
+                "<span>Load poles / zeros from file in float format. "
+                "when the &lt;FORMAT&gt; button is not selected.<br><br>"
+                "Otherwise, load poles / zeros in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
-
-        # set state of CSV options button according to state of handle
-        # self.but_csv_options.setChecked(not dirs.csv_options_handle is None)
 
 
 # ------------------------------------------------------------------------------

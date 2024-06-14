@@ -19,7 +19,7 @@ from pyfda.libs.compat import (
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.libs.pyfda_lib import safe_eval, first_item
+from pyfda.libs.pyfda_lib import safe_eval, first_item, pprint_log
 import pyfda.pyfda_rc as rc
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box
 
@@ -66,7 +66,7 @@ class SelectFilter(QWidget):
         its parent widget to prevent infinite loops.
 
         """
-        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        # logger.warning(f"SIG_RX: {pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{first_item(dict_sig)}")
@@ -405,7 +405,6 @@ class SelectFilter(QWidget):
         self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
 
         if enb_signal:
-            logger.debug("Emit 'filt_changed'")
             self.emit({'filt_changed': 'filter_type'})
 
 # ------------------------------------------------------------------------------
