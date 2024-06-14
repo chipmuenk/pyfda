@@ -349,12 +349,13 @@ class Tran_IO(QWidget):
                 dirs.csv_options_handle = CSV_option_box(self)
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
+                # alert other widgets that csv options / visibility have changed
+                self.emit({'ui_local_changed': 'csv'})
+
         else:  # close window, delete handle
             dirs.csv_options_handle.close()
             self.ui.but_csv_options.setChecked(False)
-
-        # alert other widgets that csv options / visibility have changed
-        self.emit({'ui_global_changed': 'csv'})
+            # 'ui_global_changed': 'csv' is emitted by closing pop-up box
 
     # ------------------------------------------------------------------------------
     def close_csv_win(self):

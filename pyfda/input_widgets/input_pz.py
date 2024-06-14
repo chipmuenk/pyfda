@@ -26,6 +26,7 @@ import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import qstr, fil_save, safe_eval, pprint_log
 from pyfda.pyfda_rc import params
 from pyfda.input_widgets.input_pz_ui import Input_PZ_UI
@@ -190,8 +191,8 @@ class Input_PZ(QWidget):
             return
 
         if 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
-            pass # self.ui._set_load_save_icons()
-            # self.emit(dict_sig)
+            self.ui.but_csv_options.setChecked(not dirs.csv_options_handle is None)
+            return
 
         elif self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:

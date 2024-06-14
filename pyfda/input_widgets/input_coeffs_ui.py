@@ -85,7 +85,6 @@ class Input_Coeffs_UI(QWidget):
             # send signal that pop-up box is closed
             self.emit({'ui_global_changed': 'csv'})
         elif 'ui_global_changed' in dict_sig and dict_sig['ui_global_changed'] == 'csv':
-            # self._set_load_save_icons()  # update icons file <-> clipboard
             # signal change of CSV options to other widgets with current id
             self.emit({'ui_global_changed': 'csv'})
 
@@ -338,12 +337,12 @@ class Input_Coeffs_UI(QWidget):
                 dirs.csv_options_handle = CSV_option_box(self)
                 dirs.csv_options_handle.sig_tx.connect(self.process_sig_rx)
                 dirs.csv_options_handle.show()  # modeless i.e. non-blocking popup window
+                self.emit({'ui_global_changed': 'csv'})
 
         else:  # close window, delete handle
             dirs.csv_options_handle.close()
             self.but_csv_options.setChecked(False)
-
-        self.emit({'ui_global_changed': 'csv'})
+            # 'ui_global_changed': 'csv' is emitted by closing pop-up box
 
     # ------------------------------------------------------------------------------
     def _close_csv_win(self):
