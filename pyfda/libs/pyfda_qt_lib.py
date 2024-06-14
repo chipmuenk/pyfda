@@ -64,7 +64,7 @@ def emit(self, dict_sig: dict = {}, sig_name: str = 'sig_tx') -> None:
         else:
             dict_sig.update({'ttl': dict_sig['ttl'] - 1})
     else:
-        dict_sig.update({'ttl': 50})
+        dict_sig.update({'ttl': 10})
     if 'sender_name' not in dict_sig and\
         self.sender() and self.sender().objectName():
         dict_sig.update({'sender_name': self.sender().objectName()})
