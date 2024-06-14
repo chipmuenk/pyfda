@@ -1304,8 +1304,8 @@ class Fixed(object):
             return "0"
 
         elif np.iscomplexobj(y):  # convert complex arguments recursively to format
-            y_re = self.float2frmt(y.real)
-            y_im = self.float2frmt(y.imag)
+            y_re = self.float2frmt(np.real(y))
+            y_im = self.float2frmt(np.imag(y))
             if fb.fil[0]['fx_base'] == 'csd':
                 logger.error(
                     "Complex CSD coefficients are not supported yet, casting  to real. "
