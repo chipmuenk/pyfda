@@ -389,7 +389,7 @@ class Input_Coeffs_UI(QWidget):
                 "(e.g. 'Hex'). If this differs from the file data format, "
                 "imported data may be corrupted.</span>")
 
-
+            self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
