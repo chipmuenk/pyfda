@@ -187,17 +187,17 @@ class Input_PZ_UI(QWidget):
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
 
-        self.butSave = QPushButton(self)
-        self.butSave.setIcon(QIcon(':/upload.svg'))
-        self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip(
+        self.but_apply = QPushButton(self)
+        self.but_apply.setIcon(QIcon(':/check.svg'))
+        self.but_apply.setIconSize(q_icon_size)
+        self.but_apply.setToolTip(
             "<span>Create filter from P/Z table and update all plots and widgets."
             "</span>")
 
-        self.butLoad = QPushButton(self)
-        self.butLoad.setIcon(QIcon(':/download.svg'))
-        self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("<span>(Re)Load P/Z table from current filter.</span>")
+        self.but_undo = QPushButton(self)
+        self.but_undo.setIcon(QIcon(':/action-undo.svg'))
+        self.but_undo.setIconSize(q_icon_size)
+        self.but_undo.setToolTip("<span>(Re)Load P/Z table from current filter.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -231,8 +231,8 @@ class Input_PZ_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butSave)
+        layHButtonsCoeffs1.addWidget(self.but_undo)
+        layHButtonsCoeffs1.addWidget(self.but_apply)
         layHButtonsCoeffs1.addWidget(self.butToTable)
         layHButtonsCoeffs1.addWidget(self.butFromTable)
         layHButtonsCoeffs1.addWidget(self.but_file_clipboard)

@@ -61,9 +61,9 @@ class ItemDelegate(QStyledItemDelegate):
     - `setModelData()` pass edited data back to model (`self.ba`)
 
     Editing the table triggers `setModelData()` but does not emit a signal outside
-    this class, only the `ui.butSave` button is highlighted. When it is pressed,
-    a signal with `'data_changed':'input_coeffs'` is produced in class `Input_Coeffs`.
-    Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
+    this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted. 
+    When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in 
+    class `Input_Coeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 
     def __init__(self, parent):
@@ -249,7 +249,8 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
         # logger.error(f"data_q: {data_q}")
-        qstyle_widget(self.parent.ui.butSave, 'changed')
+        qstyle_widget(self.parent.ui.but_apply, 'changed')
+        qstyle_widget(self.parent.ui.but_undo, 'changed')
         # this is needed to adapt text width to e.g. complex number representation
         self.parent.refresh_table()
         # self.parent._refresh_table_item(index.row(), index.column())  # refresh table item
@@ -388,8 +389,8 @@ class Input_Coeffs(QWidget):
 
         self.ui.butDelCells.clicked.connect(self._delete_cells)
         self.ui.butAddCells.clicked.connect(self._add_cells)
-        self.ui.butLoad.clicked.connect(self.load_dict)
-        self.ui.butSave.clicked.connect(self._save_dict)
+        self.ui.but_undo.clicked.connect(self.load_dict)
+        self.ui.but_apply.clicked.connect(self._save_dict)
         self.ui.butClear.clicked.connect(self.clear_table)
         self.ui.ledEps.editingFinished.connect(self._set_eps)
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
@@ -502,7 +503,6 @@ class Input_Coeffs(QWidget):
                 self.ba_q[i[0] + 2][i[1]] = 0
 
         self.refresh_table()
-        # qstyle_widget(self.ui.butSave, 'changed')
         self._save_dict()
 
     # --------------------------------------------------------------------------
@@ -535,7 +535,8 @@ class Input_Coeffs(QWidget):
 
         self._equalize_ba_length()
         self.refresh_table()
-        qstyle_widget(self.ui.butSave, 'changed')
+        qstyle_widget(self.ui.but_apply, 'changed')
+        qstyle_widget(self.ui.but_undo, 'changed')
 
 # ------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -660,7 +661,8 @@ class Input_Coeffs(QWidget):
         # overflow counter, and refresh table
         self.dict2ui()
 
-        qstyle_widget(self.ui.butSave, 'normal')
+        qstyle_widget(self.ui.but_apply, 'normal')
+        qstyle_widget(self.ui.but_undo, 'normal')
 
 
     # --------------------------------------------------------------------------
@@ -798,7 +800,8 @@ class Input_Coeffs(QWidget):
         self._equalize_ba_length()
         self.refresh_table()
         logger.info(f"Successfully imported data.")
-        qstyle_widget(self.ui.butSave, 'changed')
+        qstyle_widget(self.ui.but_apply, 'changed')
+        qstyle_widget(self.ui.but_undo, 'changed')
 
     # --------------------------------------------------------------------------
     def dict2ui(self):
@@ -891,7 +894,8 @@ class Input_Coeffs(QWidget):
 
         self.emit({'data_changed': 'input_coeffs'})  # -> input_tab_widgets
 
-        qstyle_widget(self.ui.butSave, 'normal')
+        qstyle_widget(self.ui.but_apply, 'normal')
+        qstyle_widget(self.ui.but_undo, 'normal')
 
 # ------------------------------------------------------------------------------
     def clear_table(self):
@@ -903,7 +907,8 @@ class Input_Coeffs(QWidget):
         """
         self.ba = [np.asarray([1., 0.]), np.asarray([1., 0.])]
         self.refresh_table()
-        qstyle_widget(self.ui.butSave, 'changed')
+        qstyle_widget(self.ui.but_apply, 'changed')
+        qstyle_widget(self.ui.but_undo, 'changed')
 
 # ------------------------------------------------------------------------------
     def _equalize_ba_length(self):
@@ -961,7 +966,8 @@ class Input_Coeffs(QWidget):
             # test and equalize if b and a array have different lengths:
             self._equalize_ba_length()
             self.refresh_table()
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')
 
 # ------------------------------------------------------------------------------
     def _add_cells(self):
@@ -990,7 +996,9 @@ class Input_Coeffs(QWidget):
 
         # don't tag as 'changed' when only zeros have been appended to end of table
         if any(sel_01):
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')
+
 
 # ------------------------------------------------------------------------------
     def _set_eps(self):
@@ -1041,7 +1049,8 @@ class Input_Coeffs(QWidget):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
         if changed:
-            qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
+            qstyle_widget(self.ui.but_apply, 'changed')  # mark save button as changed
+            qstyle_widget(self.ui.but_undo, 'changed')
 
         self.refresh_table()
 

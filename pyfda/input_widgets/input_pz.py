@@ -149,7 +149,9 @@ class ItemDelegate(QStyledItemDelegate):
                                       self.parent.zpk[index.column()][index.row()])
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
-        qstyle_widget(self.parent.ui.butSave, 'changed')
+        qstyle_widget(self.parent.ui.but_apply, 'changed')
+        qstyle_widget(self.parent.ui.but_undo, 'changed')
+
         self.parent._refresh_table_item(index.row(), index.column())  # refresh table entry
         self.parent._normalize_gain()  # recalculate gain
 
@@ -246,9 +248,9 @@ class Input_PZ(QWidget):
         # ----------------------------------------------------------------------
         self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
-        self.ui.butLoad.clicked.connect(self.load_dict)
+        self.ui.but_undo.clicked.connect(self.load_dict)
 
-        self.ui.butSave.clicked.connect(self._save_entries)
+        self.ui.but_apply.clicked.connect(self._save_entries)
         self.ui.cmbNorm.activated.connect(self._normalize_gain)
 
         self.ui.butDelCells.clicked.connect(self._delete_cells)
@@ -324,7 +326,9 @@ class Input_PZ(QWidget):
         """
         if self.spec_edited:
             self.zpk[2][0] = safe_eval(source.text(), alt_expr=str(self.zpk[2][0]))
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')
+
             self.spec_edited = False  # reset flag
 
 # ------------------------------------------------------------------------------
@@ -339,7 +343,8 @@ class Input_PZ(QWidget):
         norm = qget_cmb_box(self.ui.cmbNorm, data=False)
         self.ui.ledGain.setEnabled(norm == 'None')
         if norm != self.norm_last:
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')
         if not np.isfinite(self.zpk[2][0]):
             self.zpk[2][0] = 1.
         self.zpk[2][0] = np.real_if_close(self.zpk[2][0]).item()
@@ -486,7 +491,8 @@ class Input_PZ(QWidget):
             return
         # logger.warning(f"New shape (zpk) = {np.shape(zpk)}")
         self.zpk = np.array(zpk)  # this enforces a deep copy and converts back to ndarray
-        qstyle_widget(self.ui.butSave, 'normal')
+        qstyle_widget(self.ui.but_apply, 'normal')
+        qstyle_widget(self.ui.but_undo, 'normal')
         self._refresh_table()
 
     # ------------------------------------------------------------------------------
@@ -514,7 +520,8 @@ class Input_PZ(QWidget):
         self.emit({'data_changed': 'input_pz'})
         # -> input_tab_widgets
 
-        qstyle_widget(self.ui.butSave, 'normal')
+        qstyle_widget(self.ui.but_apply, 'normal')
+        qstyle_widget(self.ui.but_undo, 'normal')
 
         logger.debug(f"b,a = {fb.fil[0]['ba']}\n\n"
                      f"zpk = {pformat(fb.fil[0]['zpk'])}\n")
@@ -528,7 +535,8 @@ class Input_PZ(QWidget):
         self.zpk = np.array([[0, 0], [0, 0], [1, 0]], dtype=complex)
         self.Hmax_last = 1.0
 
-        qstyle_widget(self.ui.butSave, 'changed')
+        qstyle_widget(self.ui.but_apply, 'changed')
+        qstyle_widget(self.ui.but_undo, 'changed')
         self._refresh_table()
 
     # ------------------------------------------------------------------------------
@@ -595,7 +603,8 @@ class Input_PZ(QWidget):
 
             self._delete_PZ_pairs()
             self._normalize_gain()
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')
             self._refresh_table()
 
     # ------------------------------------------------------------------------------
@@ -658,7 +667,8 @@ class Input_PZ(QWidget):
         self._delete_PZ_pairs()
         self._normalize_gain()
         if changed:
-            qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
+            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo 
+            qstyle_widget(self.ui.but_undo, 'changed')   # buttons as changed
         self._refresh_table()
 
     # ------------------------------------------------------------------------------
@@ -690,7 +700,8 @@ class Input_PZ(QWidget):
         self.zpk = np.array((zeros, poles, gain))
 
         if changed:
-            qstyle_widget(self.ui.butSave, 'changed')  # mark save button as changed
+            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo
+            qstyle_widget(self.ui.but_undo, 'changed')   # buttons as changed
 
     # ------------------------------------------------------------------------------
     def cmplx2frmt(self, text, places=-1):
@@ -879,11 +890,13 @@ class Input_PZ(QWidget):
         zpk_arr = zpk2array(zpk)
         if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
             logger.error(zpk_arr)
-            qstyle_widget(self.ui.butSave, 'error')
+            qstyle_widget(self.ui.but_apply, 'error')
+            qstyle_widget(self.ui.but_undo, 'changed')  # 
             return
         else:
             self.zpk = zpk_arr
-            qstyle_widget(self.ui.butSave, 'changed')
+            qstyle_widget(self.ui.but_apply, 'changed')
+            qstyle_widget(self.ui.but_undo, 'changed')  # 
             self._refresh_table()
 
 # ------------------------------------------------------------------------------
