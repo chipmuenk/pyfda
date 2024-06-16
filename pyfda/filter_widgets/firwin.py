@@ -253,6 +253,7 @@ class Firwin(QWidget):
                     fb.fil[0]['wdg_fil']['firwin']['par'][p]['val']
         else:
             logger.warning("Couldn't load 'firwin' dict!")
+            logger.warning(fb.fil[0]['wdg_fil'])
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
