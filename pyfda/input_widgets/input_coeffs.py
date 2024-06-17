@@ -503,7 +503,8 @@ class Input_Coeffs(QWidget):
                 self.ba_q[i[0] + 2][i[1]] = 0
 
         self.refresh_table()
-        self._save_dict()
+        qstyle_widget(self.ui.but_apply, 'changed')
+        qstyle_widget(self.ui.but_undo, 'changed')
 
     # --------------------------------------------------------------------------
     def _filter_type(self, ftype=None):
@@ -659,7 +660,9 @@ class Input_Coeffs(QWidget):
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
+        logger.error(fb.fil[0]['fx_sim'])
         self.dict2ui()
+        logger.error(fb.fil[0]['fx_sim'])
 
         qstyle_widget(self.ui.but_apply, 'normal')
         qstyle_widget(self.ui.but_undo, 'normal')
