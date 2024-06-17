@@ -4,6 +4,7 @@
     <file alias="action-redo.svg">images/icons/dark/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/dark/action-undo.svg</file>
     <file alias="brush.svg">images/icons/dark/brush.svg</file>
+    <file alias="check.svg">images/icons/dark/check.svg</file>
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
     <file alias="circle-x.svg">images/icons/dark/circle-x.svg</file>    
     <file alias="clipboard.svg">images/icons/dark/clipboard.svg</file>

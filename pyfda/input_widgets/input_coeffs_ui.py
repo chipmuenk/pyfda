@@ -200,17 +200,16 @@ class Input_Coeffs_UI(QWidget):
             "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
             "When nothing is selected, delete the last row.</span>")
 
-        self.butSave = QPushButton(self)
-        self.butSave.setIcon(QIcon(':/upload.svg'))
-        self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip(
-            "<span>Create filter from coefficient table and update all plots "
-            "and widgets.</span>")
+        self.but_apply = QPushButton(self)
+        self.but_apply.setIcon(QIcon(':/check.svg'))
+        self.but_apply.setIconSize(q_icon_size)
+        self.but_apply.setToolTip(
+            "<span>Apply changes and update all plots and widgets.</span>")
 
-        self.butLoad = QPushButton(QIcon(':/download.svg'), "", self)
-        self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip(
-            "<span>Reload coefficient table from current filter.</span>")
+        self.but_undo = QPushButton(QIcon(':/action-undo.svg'), "", self)
+        self.but_undo.setIconSize(q_icon_size)
+        self.but_undo.setToolTip(
+            "<span>Restore coefficient table from current filter.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
@@ -244,8 +243,8 @@ class Input_Coeffs_UI(QWidget):
         layH_buttons_coeffs1.addWidget(self.butAddCells)
         layH_buttons_coeffs1.addWidget(self.butDelCells)
         layH_buttons_coeffs1.addWidget(self.butClear)
-        layH_buttons_coeffs1.addWidget(self.butLoad)
-        layH_buttons_coeffs1.addWidget(self.butSave)
+        layH_buttons_coeffs1.addWidget(self.but_undo)
+        layH_buttons_coeffs1.addWidget(self.but_apply)
         layH_buttons_coeffs1.addWidget(self.butToTable)
         layH_buttons_coeffs1.addWidget(self.butFromTable)
         layH_buttons_coeffs1.addWidget(self.but_file_clipboard)

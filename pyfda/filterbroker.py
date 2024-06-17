@@ -383,9 +383,9 @@ fil_ref = {
     "timestamp": 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
     # parameter(s) of dynamically instantiated filter widget
-    'wdg_fil' :
+    'wdg_fil': {
         # Equiripple FIR filters
-        {'equiripple': {'grid_density': 16},
+        'equiripple': {'grid_density': 16},
         # Windowed FIR filters
         'firwin':
             {'id': 'Hann', # Window name

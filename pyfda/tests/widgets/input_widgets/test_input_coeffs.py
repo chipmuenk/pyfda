@@ -188,7 +188,7 @@ class FilterCoeffsTest(unittest.TestCase):
                          Qt.NoModifier, QPoint(x, y))
         QTest.keyClicks(QApplication.instance().focusWidget(), "13", delay=100)
         # QTest.keyClick(QApplication.instance().focusWidget(), Qt.Key_Return, delay=1000)
-        QTest.mouseClick(self.ui.butSave, Qt.LeftButton)
+        QTest.mouseClick(self.ui.but_apply, Qt.LeftButton)
         QTest.qWait(1000)
         # self.set_table_value(1, 0, 25)  # row, col, value
         self.assertEqual(self.form.tblCoeff.item(0, 0).text(), "1.0")
