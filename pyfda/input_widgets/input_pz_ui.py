@@ -116,9 +116,10 @@ class Input_PZ_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>Save and load poles, zeros and gain <i>k</i> formatted as in the "
-            "table when activated, e.g. in polar coordinates, with the selected number "
-            "of digits etc.</span>"
+            "<span>When <b>inactive</b>: Load and save poles, zeros and gain <i>k</i> "
+            "in float / complex format with full precision.<br><br>"
+            "When <b>active</b>: Load and save in displayed format, e.g. in polar "
+            "coordinates with the selected number of digits etc.</span>"
             )
         q_icon_size = self.but_format.iconSize()
         self.but_format.setCheckable(True)
@@ -156,8 +157,8 @@ class Input_PZ_UI(QWidget):
         self.lblGain = QLabel(to_html("k =", frmt='bi'), self)
         self.ledGain = QLineEdit(self, objectName="ledGain")
         self.ledGain.setToolTip(
-            "<span>Specify gain factor <i>k</i>"
-            " (only possible for Normalize = 'None').</span>")
+            "<span>Specify gain factor <i>k</i> "
+            "(only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
 
         layHGain = QHBoxLayout()
@@ -191,29 +192,28 @@ class Input_PZ_UI(QWidget):
         self.but_apply.setIcon(QIcon(':/check.svg'))
         self.but_apply.setIconSize(q_icon_size)
         self.but_apply.setToolTip(
-            "<span>Create filter from P/Z table and update all plots and widgets."
-            "</span>")
+            "<span>Apply changes and update all plots and widgets.</span>")
 
         self.but_undo = QPushButton(self)
         self.but_undo.setIcon(QIcon(':/action-undo.svg'))
         self.but_undo.setIconSize(q_icon_size)
-        self.but_undo.setToolTip("<span>(Re)Load P/Z table from current filter.</span>")
+        self.but_undo.setToolTip("<span>Undo: (Re)Load P/Z table from current filter.</span>")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all table entries.")
 
+        self.but_file_clipboard = QPushButton(self)
+        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.but_file_clipboard.setIconSize(q_icon_size)
+        self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
+
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIconSize(q_icon_size)
 
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
-
-        self.but_file_clipboard = QPushButton(self)
-        self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
-        self.but_file_clipboard.setIconSize(q_icon_size)
-        self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
 
         self.but_csv_options = QPushButton(self)
         self.but_csv_options.setIcon(QIcon(':/settings.svg'))
@@ -233,9 +233,9 @@ class Input_PZ_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.but_undo)
         layHButtonsCoeffs1.addWidget(self.but_apply)
+        layHButtonsCoeffs1.addWidget(self.but_file_clipboard)
         layHButtonsCoeffs1.addWidget(self.butToTable)
         layHButtonsCoeffs1.addWidget(self.butFromTable)
-        layHButtonsCoeffs1.addWidget(self.but_file_clipboard)
         layHButtonsCoeffs1.addWidget(self.but_csv_options)
         layHButtonsCoeffs1.addStretch()
 
@@ -324,26 +324,30 @@ class Input_PZ_UI(QWidget):
         if self.load_save_clipboard:
             self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
             self.butFromTable.setToolTip(
-                "<span>Export poles / zeros to clipboard in float format with full "
-                "precision when the &lt;FORMAT&gt; button is not selected.<br><br>"
-                "Otherwise, export poles / zeros as displayed.</span>")
+                "<span><b> Export poles / zeros / gain to clipboard</b><br><br>" 
+                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
+                "with full precision.<br>"
+                "Otherwise, export as displayed.</span>")
             self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
             self.butToTable.setToolTip(
-                "<span>Import poles / zeros from clipboard in float format "
-                "when the &lt;FORMAT&gt; button is not selected.<br><br>"
-                "Otherwise, import poles / zeros in display format.</span>")
+                "<span><b>Import poles / zeros / gain from clipboard</b><br><br>"
+                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
+                "with full precision.<br>"
+                "Otherwise, import in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
         else:
             self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
             self.butFromTable.setToolTip(
-                "<span>Save poles / zeros to file in float format with full "
-                "precision when the &lt;FORMAT&gt; button is not selected.<br><br>"
-                "Otherwise, save poles / zeros as displayed.</span>")
+                "<span><b>Save poles / zeros / gain to file</b><br><br>"
+                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
+                "with full precision.<br>"
+                "Otherwise, save as displayed.</span>")
             self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
             self.butToTable.setToolTip(
-                "<span>Load poles / zeros from file in float format. "
-                "when the &lt;FORMAT&gt; button is not selected.<br><br>"
-                "Otherwise, load poles / zeros in display format.</span>")
+                "<span><b>Load poles / zeros / gain from file</b><br><br>"
+                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
+                "with full precision.<br>"
+                "Otherwise, load in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
 
 
