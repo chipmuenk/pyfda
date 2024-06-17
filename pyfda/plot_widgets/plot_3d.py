@@ -144,7 +144,7 @@ class Plot_3D(QWidget):
         self.lblAlpha = QLabel(to_html("Alpha", frmt='bi'), self)
         self.diaAlpha = QDial(self)
         self.diaAlpha.setRange(0, 10)
-        self.diaAlpha.setValue(10)
+        self.diaAlpha.setValue(5)
         self.diaAlpha.setTracking(False)  # produce less events when turning
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
