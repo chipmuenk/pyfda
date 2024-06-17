@@ -511,8 +511,10 @@ class Input_PZ(QWidget):
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
 
-        self.emit({'filt_changed': 'input_pz'})
-        # -> input_tab_widgets
+        # Change filter type to "Manual" and update UI in Input_Specs() ...
+        self.emit({'filt_changed': 'input_coeffs'})
+        # ... and update filter data and widgets
+        self.emit({'data_changed': 'filter_designed'})
 
         qstyle_widget(self.ui.butSave, 'normal')
 
