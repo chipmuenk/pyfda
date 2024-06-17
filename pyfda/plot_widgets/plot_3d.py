@@ -22,8 +22,8 @@ from pyfda.libs.pyfda_lib import H_mag, mod_version, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
-from matplotlib import cm  # Colormap
-from matplotlib.pyplot import colormaps
+from matplotlib.cm  import ScalarMappable  # Colormap
+from matplotlib import colormaps
 from matplotlib.colors import LightSource
 from mpl_toolkits.mplot3d import Axes3D  # needed for matplotlib < 3.2
 Axes3D = Axes3D  # prevent auto-deletion by IDE (Axes3D is never referenced)
@@ -248,12 +248,6 @@ class Plot_3D(QWidget):
     def _init_cmb_colormap(self, cmap_init):
         """
         Initialize combobox with available colormaps and try to set it to `cmap_init`
-
-        Since matplotlib 3.2 the reversed "*_r" colormaps are no longer contained in
-        `cm.datad`. They are now obtained by using the `reversed()` method (much simpler!)
-
-        `cm.datad` doesn't return the "new" colormaps like viridis, instead the
-        `colormaps()` method is used.
         """
         self.cmbColormap.addItems([m for m in colormaps() if not m.endswith("_r")])
 
@@ -414,7 +408,7 @@ class Plot_3D(QWidget):
 
         alpha = self.diaAlpha.value()/10.
 
-        cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
+        cmap = colormaps[str(self.cmbColormap.currentText())]
         if self.but_colormap_r.isChecked():
             cmap = cmap.reversed()  # use reversed colormap
 
@@ -543,8 +537,8 @@ class Plot_3D(QWidget):
         # 3D-Plots of |H(z)| clipped between |H(z)| = top
         # ===============================================================
 
-        m_cb = cm.ScalarMappable(cmap=cmap)  # normalized proxy object that is mappable
-        m_cb.set_array(Hmag)                 # for colorbar
+        m_cb = ScalarMappable(cmap=cmap)  # normalized proxy object that is mappable
+        m_cb.set_array(Hmag)              # for colorbar
 
         # ---------------------------------------------------------------
         # 3D-mesh plot
