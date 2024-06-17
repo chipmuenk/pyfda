@@ -869,8 +869,6 @@ class Input_Coeffs(QWidget):
         """
         Save the coefficient register `self.ba` to the filter dict `fb.fil[0]['ba']`.
         """
-        logger.debug("_save_dict called")
-
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
         if fb.fil[0]['ft'] == 'IIR':
@@ -889,7 +887,7 @@ class Input_Coeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
 
-        self.emit({'data_changed': 'input_coeffs'})  # -> input_tab_widgets
+        self.emit({'filt_changed': 'input_coeffs'})  # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
 

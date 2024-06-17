@@ -107,7 +107,7 @@ class Input_Specs(QWidget):
         its parent widget (`input_specs`) to prevent infinite loops.
 
         """
-        # logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{first_item(dict_sig)}")
@@ -121,8 +121,12 @@ class Input_Specs(QWidget):
             self.color_design_button('changed')
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
-            # kind of input fields changes -> call update_UI
-            self.update_UI(dict_sig)
+            # kind of input fields changes -> reload filter parameters and update_UI
+            # self.update_UI(dict_sig)
+            self.sel_fil.load_dict()
+            # Update state of "DESIGN FILTER" button
+            # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
+            self.color_design_button('changed')
         elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
                 # Update info string from filter dict & set button = "ok"
                 # This is only triggered from global signals

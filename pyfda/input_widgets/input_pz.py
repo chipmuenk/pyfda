@@ -511,7 +511,7 @@ class Input_PZ(QWidget):
         if __name__ == '__main__':
             self.load_dict()  # only needed for stand-alone test
 
-        self.emit({'data_changed': 'input_pz'})
+        self.emit({'filt_changed': 'input_pz'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
