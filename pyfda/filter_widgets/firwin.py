@@ -41,7 +41,7 @@ from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
-from pyfda.libs.pyfda_qt_lib import popup_warning
+from pyfda.libs.pyfda_qt_lib import popup_warning, qset_cmb_box
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
@@ -76,18 +76,8 @@ class Firwin(QWidget):
         self.setObjectName(objectName)
         self.ft = 'FIR'
 
-        self.cur_win_name = "kaiser"  # set initial window type
+        self.cur_win_id = "kaiser"  # set initial window
         self.alg = "ichige"
-        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
-        # access a deep copy of the reference window dict to store modified parameters
-        # self.all_wins_dict = self.qfft_win_select.all_wins_dict
-        # get the current window name / id
-        self.all_wins_dict['current']['id'] = self.cur_win_name
-        # instantiate FFT window with windows dict
-        self.fft_widget = Plot_FFT_win(
-            app='fir', sym=True, title="pyFDA FIR Window Viewer")
-        # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_widget.hide()
 
         c = Common()
         self.rt_dict = c.rt_base_iir
@@ -148,7 +138,6 @@ class Firwin(QWidget):
                 return
             else:
                 if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
-                    # self._update_fft_window()  # TODO: needed?
                     # local connection to FFT window widget and qfft_win_select
                     self.emit(dict_sig, sig_name='sig_tx_local')
                     # global connection to upper hierarchies
@@ -172,8 +161,21 @@ class Firwin(QWidget):
 
         # subwidget for selecting window name and entering window parameters (if any)
         self.qfft_win_select = QFFTWinSelector(app='fir', objectName='fir_win_qfft')
+        self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
+
+        # access a deep copy of the reference window dict to store modified parameters
+        # self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
+        # set the current window name / id
+        self.all_wins_dict['current']['id'] = self.cur_win_id
+
+        # instantiate FFT window with windows dict
+        self.fft_widget = Plot_FFT_win(
+            app='fir', all_wins_dict=self.all_wins_dict, sym=True,
+            title="pyFDA FIR Window Viewer")
+        # hide window initially, this is modeless i.e. a non-blocking popup window
+        self.fft_widget.hide()
 
         # button for opening FFT window
         self.but_fft_wdg = QPushButton(self)
@@ -224,10 +226,11 @@ class Firwin(QWidget):
 
 # ==============================================================================
     def _update_fft_window(self):
-        """ Update window type for FirWin - unneeded at the moment """
+        """
+        Update UI when min. calc. algorithm has been changed
+        """
         self.alg = str(self.cmb_firwin_alg.currentText())
-        self.cur_win_name = self.all_wins_dict['current']['id']
-        # logger.warning(self.cur_win_name)
+        # logger.warning(self.cur_win_id)
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
@@ -236,40 +239,55 @@ class Firwin(QWidget):
         Reload window selection and parameters from filter dictionary
         and set UI elements accordingly. _load_dict() is called upon
         initialization and when the filter is loaded from disk.
-        """
-        self.N = fb.fil[0]['N']
-        # alg_idx = 0
-        if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']\
-                and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
-            logger.warning(fb.fil[0]['wdg_fil'])
 
-            # Get window display name
-            self.cur_win_name = fb.fil[0]['wdg_fil']['firwin']['id']
-            logger.warning(f"curwin = {self.cur_win_name}")
+        Structure of fb.fil[0]['wdg_fil']:
+
+        'firwin':
+            {'id': 'Hann', # Window name
+             'fn_name': 'hann',  # function name or array with values
+             'par': [],    # list of window parameters
+            }
+        all_wins_dict_ref['current'] =
+            'app': {},  # empty -> not listed for any app
+            'id': 'rectangular',  # placeholder for current window id
+            'par': []  # placeholder for current window parameters
+            """
+        self.N = fb.fil[0]['N']
+        logger.warning(f"FirWin\n:{fb.fil[0]['wdg_fil']}")
+        # alg_idx = 0
+        # if 'firwin' in fb.fil[0]['wdg_fil']\
+        #         and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
+        try:
+            # Get window display name from filter dict fb.fil[0]['wdg_fil']['firwin']
+            self.cur_win_id = fb.fil[0]['wdg_fil']['firwin']['id']
+            logger.warning(f"curwin = {self.cur_win_id}")
 
             # Copy all parameters from fb.fil[0] to cur_win_dict
             for p in range(len(fb.fil[0]['wdg_fil']['firwin']['par'])):
-                self.all_wins_dict[self.cur_win_name]['par'][p]['val'] =\
+                self.all_wins_dict[self.cur_win_id]['par'][p]['val'] =\
                     fb.fil[0]['wdg_fil']['firwin']['par'][p]['val']
-        else:
-            logger.warning("Couldn't load 'firwin' dict!")
+        except KeyError as e:
+            logger.warning(f"Couldn't load 'firwin' dict!\n{e}")
             logger.warning(fb.fil[0]['wdg_fil'])
+            logger.warning("Updating from all_wins_dict")
+
+            self.cur_win_id = self.all_wins_dict['current']['id']
+            self._store_dict()
+
+        self.qfft_win_select.set_window_name(self.cur_win_id)
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
     def _store_dict(self):
         """
-        Store window and parameter settings using `self.all_wins_dict` in filter dictionary.
+        Store window and parameter settings from current window of `self.all_wins_dict`
+        to filter dictionary fb.fil[0]['wdg_fil']['firwin'].
         """
-        if 'wdg_fil' not in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil': {}})
-            logger.warning("Key 'wdg_fil' is missing in filter dict!")
-
-        fb.fil[0]['wdg_fil'] = {
-            'firwin': {'par': self.all_wins_dict[self.cur_win_name]['par'],
-                       'id': self.all_wins_dict[self.cur_win_name]['id']}
-        }
+        fb.fil[0]['wdg_fil']['firwin'] =\
+            {'par': self.all_wins_dict[self.cur_win_id]['par'],
+             'id': self.all_wins_dict[self.cur_win_id]['id']
+             }
 
     # --------------------------------------------------------------------------
     def _get_params(self, fil_dict):

@@ -115,13 +115,7 @@ class PlotImpz_UI(QWidget):
         self.f_scale = fb.fil[0]['f_S']
         self.t_scale = fb.fil[0]['T_S']
 
-        self.cur_win_name = "rectangular"  # set initial window type
-
-        # instantiate FFT window with default windows dict
-        self.fft_widget = Plot_FFT_win(
-            app='spec', sym=False, title="pyFDA Spectral Window Viewer")
-        # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_widget.hide()
+        self.cur_win_id = "rectangular"  # set initial window type
 
         # combobox fixpoint / floating point simulation
         self.cmb_sim_select_items = [
@@ -260,6 +254,13 @@ class PlotImpz_UI(QWidget):
         self.qfft_win_select = QFFTWinSelector(
             app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
+
+        # instantiate FFT window with default windows dict
+        self.fft_widget = Plot_FFT_win(
+            app='spec', all_wins_dict=self.all_wins_dict, sym=False,
+            title="pyFDA Spectral Window Viewer")
+        # hide window initially, this is modeless i.e. a non-blocking popup window
+        self.fft_widget.hide()
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")

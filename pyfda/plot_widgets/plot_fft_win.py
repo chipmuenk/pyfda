@@ -79,7 +79,7 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, app: str = 'spec', sym: bool = False,
+    def __init__(self, app: str = 'spec', all_wins_dict: dict = {}, sym: bool = False,
                  title: str = 'pyFDA Window Viewer', ignore_close_event: bool = True
                  ) -> None:
         super().__init__()
@@ -105,6 +105,19 @@ class Plot_FFT_win(QDialog):
         #    False, False, False, False]
         self.tbl_cols = 6
         self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
+
+        if all_wins_dict == {}:
+            # construct window selection combo box and all_wins_dict from reference
+            # dict and suitable entries (specified by 'app')
+            self.qfft_win_select = QFFTWinSelector(
+                app=self.app, objectName='plot_fft_win_qfft')
+            self.all_wins_dict = self.qfft_win_select.all_wins_dict
+            # construct combo box from passed dictionary
+        else:
+            self.qfft_win_select = QFFTWinSelector(
+                all_wins_dict=all_wins_dict, app=self.app,
+                objectName='plot_fft_win_qfft')
+            self.all_wins_dict = all_wins_dict
 
         self._construct_UI()
         self.calc_win_draw()
@@ -162,10 +175,6 @@ class Plot_FFT_win(QDialog):
         """
         self.bfont = QFont()
         self.bfont.setBold(True)
-
-        self.qfft_win_select = QFFTWinSelector(
-            app=self.app, objectName='plot_fft_win_qfft')
-        self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self.lbl_N = QLabel(to_html("N =", frmt='bi'))
         self.led_N = QLineEdit(self)
@@ -564,8 +573,9 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
-        cur = self.all_wins_dict['current']['id']
-        cur_win_d = self.all_wins_dict[cur]
+        cur_id = self.all_wins_dict['current']['id']
+        cur_name = self.all_wins_dict[cur_id]['disp_name']
+        cur_win_d = self.all_wins_dict[cur_id]
         param_txt = ""
         if len(cur_win_d['par']) > 0:
             if type(cur_win_d['par'][0]['val']) in {str}:
@@ -583,7 +593,7 @@ class Plot_FFT_win(QDialog):
             param_txt = param_txt[:-1]\
                 + ", {0:s} = {1:s})".format(cur_win_d['par'][1]['name_tex'], p2)
 
-        self.mplwidget.fig.suptitle(r'{0} Window'.format(cur) + param_txt)
+        self.mplwidget.fig.suptitle(r'{0} Window'.format(cur_name) + param_txt)
 
         # plot a line at the max. sidelobe level
         if self.tbl_sel[3]:
@@ -627,9 +637,9 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        cur = self.all_wins_dict['current']['id']
-        if 'info' in self.all_wins_dict[cur]:
-            self.txtInfoBox.setText(self.all_wins_dict[cur]['info'])
+        cur_id = self.all_wins_dict['current']['id']
+        if 'info' in self.all_wins_dict[cur_id]:
+            self.txtInfoBox.setText(self.all_wins_dict[cur_id]['info'])
         else:
             self.txtInfoBox.clear()
 

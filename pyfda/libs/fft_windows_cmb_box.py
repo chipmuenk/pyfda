@@ -27,35 +27,49 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 class QFFTWinSelector(QWidget):
     """
-    Construct a combo box with window types from the `all_wins_dict_ref`, restricted
-    to suitable types for `app` applications
+    When no dict is passed to the constructor, build a combo box with window types from
+    a deep copy of the `all_wins_dict_ref`, restricted to suitable types for `app`
+    applications.
+
+    When a dict is passed to the constructor, work with this dictionary and build the
+    combo box from all the dict entries.
     """
     sig_rx = pyqtSignal(object)  # incoming
     sig_tx = pyqtSignal(object)  # outgoing
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, app='spec', objectName=""):
+    def __init__(self, app='spec', all_wins_dict={}, objectName=""):
         super().__init__()
 
         self.setObjectName(objectName)
         self.err = False  # error flag for window calculation
 
-        self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
+        if all_wins_dict == {}:
+            # construct combobox data from all_wins_dict_ref and app type,
+            # remove unneeded key:value pairs
+            self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
+            self.cmb_win_fft_items = ["<span>Select window type</span>"]
+            for k, v in all_wins_dict_ref.items():
+                if app in v['app']:
+                    self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
+                elif k != 'current':  # remove unneeded keys except 'current
+                    logger.warning(f"removing key {k}")
+                    self.all_wins_dict.pop(k)
+        else:
+            # construct combobox data from passed dict
+            self.all_wins_dict = all_wins_dict
+            self.cmb_win_fft_items = ["<span>Select window type</span>"]
+            for k, v in all_wins_dict.items():
+                if 'disp_name' in v and 'info' in v:
+                    self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
 
         self.win_last = None  # array with previous window function values
         self.win_fnct = None  # handle to windows function
 
-        # construct combobox data from all_wins_dict_ref and app type
-        self.cmb_win_fft_items = ["<span>Select window type</span>"]
-        for k, v in all_wins_dict_ref.items():
-            if app in v['app']:
-                self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
-
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
         self.ui2win_dict()
-
 
     # --------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -391,7 +405,7 @@ class QFFTWinSelector(QWidget):
         cur = qget_cmb_box(self.cmb_win_fft, data=True)
         err = self.set_window_name(cur)
         logger.warning(f"{self.objectName()}: cmb_win_fft = {cur}")
-        logger.warning(f"cur_win_name = {self.all_wins_dict['current']['id']}")
+        logger.warning(f"cur_win_id = {self.all_wins_dict['current']['id']}")
         # if selected window does not exist (`err = True`) or produces errors, fall back
         # to 'cur_win_name'
         if err:
