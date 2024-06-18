@@ -485,10 +485,10 @@ class SelectFilter(QWidget):
 # ------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
-        Create filter widget UI dynamically (if the filter routine has one) and
+        Create filter widget UI dynamically and
         connect its sig_tx signal to sig_tx in this scope.
         """
-        ff.fil_inst.construct_UI()
+        # ff.fil_inst.construct_UI()
         if hasattr(ff.fil_inst, 'wdg_fil'):
             try:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')

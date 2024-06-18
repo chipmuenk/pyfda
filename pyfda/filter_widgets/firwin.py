@@ -83,10 +83,6 @@ class Firwin(QWidget):
         # self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # get the current window name / id
         self.all_wins_dict['current']['id'] = self.cur_win_name
-
-        # get initial / last setting from dictionary, updating self.all_wins_dict
-        self._load_dict()
-
         # instantiate FFT window with windows dict
         self.fft_widget = Plot_FFT_win(
             app='fir', sym=True, title="pyFDA FIR Window Viewer")
@@ -130,6 +126,10 @@ class Firwin(QWidget):
         # self.info_doc = [] is set in self._update_UI()
 
         # ------------------- end of static info for filter tree ---------------
+
+        self.construct_UI()
+        # get initial / last setting from dictionary, updating self.all_wins_dict
+        self._load_dict()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):

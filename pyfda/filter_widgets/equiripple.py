@@ -164,6 +164,8 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
 
+        self.construct_UI()
+
     #--------------------------------------------------------------------------
     def construct_UI(self):
         """
@@ -197,7 +199,6 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         #----------------------------------------------------------------------
 
         self._load_dict() # get initial / last setting from dictionary
-        # self.ui2dict()
 
     def ui2dict(self):
         """

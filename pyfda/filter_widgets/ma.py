@@ -137,6 +137,8 @@ near ``f_S/2`` (highpass).
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
 
+        self.construct_UI()
+
     #--------------------------------------------------------------------------
     def construct_UI(self):
         """
