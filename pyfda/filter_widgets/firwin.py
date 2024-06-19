@@ -250,7 +250,7 @@ class Firwin(QWidget):
             'par': []  # placeholder for current window parameters
             """
         self.N = fb.fil[0]['N']
-        # logger.warning(f"FirWin\n:{fb.fil[0]['wdg_fil']}")
+        logger.warning(f"Firwin ['wdg_fil'] =\n:{fb.fil[0]['wdg_fil']}")
 
         try:
             # Get window id from filter dict fb.fil[0]
