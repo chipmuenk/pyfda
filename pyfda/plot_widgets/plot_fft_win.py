@@ -162,11 +162,17 @@ class Plot_FFT_win(QDialog):
             self.calc_win_draw()
             self.needs_calc = False
 
-        elif  'mpl_toolbar' in dict_sig and dict_sig['mpl_toolbar'] == 'home':
-            self.update_view()
-
+        elif  'mpl_toolbar' in dict_sig:
+            if 'home' in dict_sig['mpl_toolbar']:
+                self.update_view()
+            elif dict_sig['mpl_toolbar'] == 'ui_level':
+                # info frame is only visible for maximum detail level
+                self.frm_info.setVisible(
+                    self.mplwidget.mplToolbar.a_ui_level < 1)
+                # Window and control widget only becomes invisible for minimum detail level
+                self.frm_controls.setVisible(self.mplwidget.mplToolbar.a_ui_level < 2)
         else:
-            logger.error("Unknown content of dict_sig: {0}".format(dict_sig))
+            logger.error("Cannont process dict_sig: {0}".format(dict_sig))
 
 # ------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -238,7 +244,7 @@ class Plot_FFT_win(QDialog):
             "<span>Minimum display value for log. scale.</span>")
 
         # ----------------------------------------------------------------------
-        #               ### frmControls ###
+        #               ### frm_controls ###
         #
         # This widget encompasses all control subwidgets
         # ----------------------------------------------------------------------
@@ -246,8 +252,8 @@ class Plot_FFT_win(QDialog):
         layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.setContentsMargins(0, 0, 0, 0)
         layH_win_select.addStretch(1)
-        frmQFFT = QFrame(self, objectName="frmQFFT")
-        frmQFFT.setLayout(layH_win_select)
+        self.frmQFFT = QFrame(self, objectName="frmQFFT")
+        self.frmQFFT.setLayout(layH_win_select)
 
         hline = QHLine()
 
@@ -270,26 +276,30 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.but_log_f)
 
         layVControls = QVBoxLayout()
-        layVControls.addWidget(frmQFFT)
+        layVControls.addWidget(self.frmQFFT)
         layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
 
-        frmControls = QFrame(self, objectName="frmControls")
-        frmControls.setLayout(layVControls)
+        self.frm_controls = QFrame(self, objectName="frmControls")
+        self.frm_controls.setLayout(layVControls)
 
         # ----------------------------------------------------------------------
         #               ### mplwidget ###
         #
         # Layout layVMainMpl (VBox) is defined within MplWidget, additional
-        # widgets can be added below the matplotlib widget (here: frmControls)
+        # widgets can be added below the matplotlib widget (here: self.frm_controls)
         #
         # ----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(frmControls)
+        self.mplwidget.layVMainMpl.addWidget(self.frm_controls)
         self.mplwidget.layVMainMpl.setContentsMargins(0, 0, 0, 0)
 
+        self.mplwidget.mplToolbar.a_he.setEnabled(False)  # enable help menu
+        self.mplwidget.mplToolbar.a_he.info = "manual/plot_fft.html"  # TODO: missing!
+        self.mplwidget.mplToolbar.a_ui_num_levels = 3 # number of ui levels
+
         # ----------------------------------------------------------------------
-        #               ### frmInfo ###
+        #               ### frm_info ###
         #
         # This widget encompasses the text info box and the table with window
         # parameters.
@@ -321,8 +331,8 @@ class Plot_FFT_win(QDialog):
         layVInfo.addWidget(self.tbl_win_props)
         layVInfo.addWidget(self.txtInfoBox)
 
-        frmInfo = QFrame(self, objectName="frmInfo")
-        frmInfo.setLayout(layVInfo)
+        self.frm_info = QFrame(self, objectName="frmInfo")
+        self.frm_info.setLayout(layVInfo)
 
         # ----------------------------------------------------------------------
         #               ### splitter ###
@@ -333,7 +343,7 @@ class Plot_FFT_win(QDialog):
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.mplwidget)
-        splitter.addWidget(frmInfo)
+        splitter.addWidget(self.frm_info)
 
         # setSizes uses absolute pixel values, but can be "misused" by
         # specifying values that are way too large: in this case, the space
