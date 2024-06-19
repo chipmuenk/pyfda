@@ -256,11 +256,11 @@ class PlotImpz_UI(QWidget):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         # instantiate FFT window with default windows dict
-        self.fft_widget = Plot_FFT_win(
+        self.win_viewer = Plot_FFT_win(
             app='spec', all_wins_dict=self.all_wins_dict, sym=False,
-            title="pyFDA Spectral Window Viewer")
+            title="pyFDA Spectral Window Viewer", object_name="impz_win_viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_widget.hide()
+        self.win_viewer.hide()
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
         self.but_fx_range_x = QCheckBox("X", objectName="but_fx_range_x")
@@ -607,10 +607,10 @@ class PlotImpz_UI(QWidget):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         # connect FFT widget to qfft_selector and vice versa and to and signals upstream:
-        self.fft_widget.sig_tx.connect(self.process_sig_rx)
+        self.win_viewer.sig_tx.connect(self.process_sig_rx)
         self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
         # connect process_sig_rx output to both FFT widgets
-        self.sig_tx_fft.connect(self.fft_widget.sig_rx)
+        self.sig_tx_fft.connect(self.win_viewer.sig_rx)
         self.sig_tx_fft.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
@@ -714,10 +714,10 @@ class PlotImpz_UI(QWidget):
         When widget is shown, trigger an update of the window function.
         """
         if self.but_fft_wdg.isChecked():
-            self.fft_widget.show()
+            self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_fft')
         else:
-            self.fft_widget.hide()
+            self.win_viewer.hide()
 
     # --------------------------------------------------------------------------
     def hide_fft_wdg(self):
@@ -726,7 +726,7 @@ class PlotImpz_UI(QWidget):
         there and routed here to only hide the window
         """
         self.but_fft_wdg.setChecked(False)
-        self.fft_widget.hide()
+        self.win_viewer.hide()
 
 # ------------------------------------------------------------------------------
 def main():

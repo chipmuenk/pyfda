@@ -80,9 +80,11 @@ class Plot_FFT_win(QDialog):
     from pyfda.libs.pyfda_qt_lib import emit
 
     def __init__(self, app: str = 'spec', all_wins_dict: dict = {}, sym: bool = False,
-                 title: str = 'pyFDA Window Viewer', ignore_close_event: bool = True
+                 title: str = 'pyFDA Window Viewer', ignore_close_event: bool = True,
+                 object_name: str = "plot_fft_win"
                  ) -> None:
         super().__init__()
+        self.setObjectName(object_name)
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
@@ -110,14 +112,14 @@ class Plot_FFT_win(QDialog):
             # construct window selection combo box and all_wins_dict from reference
             # dict and suitable entries (specified by 'app')
             self.qfft_win_select = QFFTWinSelector(
-                app=self.app, objectName='plot_fft_win_qfft')
-            self.all_wins_dict = self.qfft_win_select.all_wins_dict
+                app=self.app, objectName=self.objectName() + '_cmb')
             # construct combo box from passed dictionary
         else:
             self.qfft_win_select = QFFTWinSelector(
                 all_wins_dict=all_wins_dict, app=self.app,
-                objectName='plot_fft_win_qfft')
-            self.all_wins_dict = all_wins_dict
+                objectName=self.objectName() + '_cmb')
+
+        self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self._construct_UI()
         self.calc_win_draw()

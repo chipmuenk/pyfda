@@ -164,16 +164,15 @@ class Firwin(QWidget):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
-
         # set the current window name / id
         self.all_wins_dict['current']['id'] = self.cur_win_id
 
-        # instantiate FFT window with windows dict
-        self.fft_widget = Plot_FFT_win(
+        # instantiate FFT window with freshly created windows dict
+        self.win_viewer = Plot_FFT_win(
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
-            title="pyFDA FIR Window Viewer")
+            title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window
-        self.fft_widget.hide()
+        self.win_viewer.hide()
 
         # button for opening FFT window
         self.but_fft_wdg = QPushButton(self)
@@ -209,10 +208,10 @@ class Firwin(QWidget):
         # GLOBAL SIGNALS & SLOTs
         # ----------------------------------------------------------------------
         # connect FFT widget to qfft_selector and vice versa and to signals upstream:
-        self.fft_widget.sig_tx.connect(self.process_sig_rx)
+        self.win_viewer.sig_tx.connect(self.process_sig_rx)
         self.qfft_win_select.sig_tx.connect(self.process_sig_rx)
         # connect process_sig_rx output to both FFT widgets
-        self.sig_tx_local.connect(self.fft_widget.sig_rx)
+        self.sig_tx_local.connect(self.win_viewer.sig_rx)
         self.sig_tx_local.connect(self.qfft_win_select.sig_rx)
 
         # ----------------------------------------------------------------------
@@ -574,10 +573,10 @@ class Firwin(QWidget):
         When widget is shown, trigger an update of the window function.
         """
         if self.but_fft_wdg.isChecked():
-            self.fft_widget.show()
+            self.win_viewer.show()
             self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
         else:
-            self.fft_widget.hide()
+            self.win_viewer.hide()
 
     # --------------------------------------------------------------------------
     def hide_fft_wdg(self):
@@ -586,7 +585,7 @@ class Firwin(QWidget):
         there and routed here to only hide the window
         """
         self.but_fft_wdg.setChecked(False)
-        self.fft_widget.hide()
+        self.win_viewer.hide()
 
 
 # ------------------------------------------------------------------------------
