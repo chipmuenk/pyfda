@@ -388,7 +388,7 @@ fil_ref = {
         'equiripple': {'grid_density': 16},
         # Windowed FIR filters
         'firwin':
-            {'id': 'Hann', # Window name
+            {'id': 'hann', # Window id
              'fn_name': 'hann',  # function name or array with values
              'par': [],    # set of list of window parameters
              'info': "",   # Docstring for the window
