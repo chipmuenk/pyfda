@@ -813,6 +813,13 @@ class MplToolbar(NavigationToolbar):
                 modifiers = modifiers & ~Qt.AltModifier & ~Qt.MetaModifier
 
             title = self.mpl_widget.fig.get_axes()[0].get_title()  # store title text
+            if title == "":  # no figure title, try subplots with suptitle
+                try:
+                    title = self.mpl_widget.fig._suptitle.get_text()
+                except AttributeError:
+                    # no suptitle as well, keep the empty string
+                    pass
+
             title_info = f'"{title}"'
             # SHIFT modifier detected -> remove title
             if modifiers & Qt.ShiftModifier == Qt.ShiftModifier:
