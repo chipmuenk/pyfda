@@ -64,7 +64,6 @@ class QFFTWinSelector(QWidget):
                 if 'disp_name' in v and 'info' in v:
                     self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
 
-        self.win_last = None  # array with previous window function values
         self.win_fnct = None  # handle to windows function
 
         self._construct_UI()
@@ -156,8 +155,7 @@ class QFFTWinSelector(QWidget):
 
         Additionally, the following class attributes are updated / reset:
 
-        self.win_fnct = win_fnct            # handle to windows function
-        self.win_last = None                # clear last window function
+        self.win_fnct = win_fnct            # handle to windows functionn
 
         Also, update the keys 'par' and 'id' of `fb.fil[0]['wdg_fil']['firwin']`
 
@@ -223,7 +221,6 @@ class QFFTWinSelector(QWidget):
 
         self.all_wins_dict.update({'cur_win_name': cur_win_name})
         self.win_fnct = win_fnct  # handle to windows function
-        self.win_last = None
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
@@ -240,9 +237,7 @@ class QFFTWinSelector(QWidget):
         win_name : str, optional
             Name of the window. If specified (default is None), this will be used to
             obtain the window function, its parameters and tool tips etc. via
-            `set_window_name()`. If not, the previous setting are used. If window
-            and number of data points are unchanged, the stored window from
-            `self.win_last` is used instead of recalculating it.
+            `set_window_name()`. If not, the previous setting are used.
 
             If some kind of error occurs during calculation of the window, a rectangular
             window is used as a fallback and the class attribute `self.err` is
@@ -255,20 +250,17 @@ class QFFTWinSelector(QWidget):
         Returns
         -------
         win_fnct : ndarray
-            The window function with `N` data points (should be normalized to 1)
-            This is also stored in `self.win_last`. Additionally, the normalized
-            equivalent noise bandwidth is calculated and stored as
-            `self.all_wins_dict['nenbw']` as well as the correlated gain
-            `self.all_wins_dict['cgain']`.
+            The window function with `N` data points (should be normalized to 1).
+            Additionally, the normalized equivalent noise bandwidth is calculated and
+            stored as `self.all_wins_dict['nenbw']` as well as the 
+            correlated gain `self.all_wins_dict['cgain']`.
         """
         self.err = False
+        logger.warning("get window")
 
         if win_name is None or win_name == self.all_wins_dict['current']['id']:
             win_name = self.all_wins_dict['current']['id']
             # window name and length are unchanged, use stored window function
-            if self.win_last is not None and len(self.win_last) == N:
-                logger.warning("using cached window!")
-                return self.win_last
 
         fn_name = self.all_wins_dict[win_name]['fn_name']
         n_par = len(self.all_wins_dict[win_name]['par'])
@@ -302,7 +294,6 @@ class QFFTWinSelector(QWidget):
         nenbw = N * np.sum(np.square(w)) / (np.square(np.sum(w)))
         cgain = np.sum(w) / N  # coherent gain / DC average
 
-        self.win_last = w
         self.all_wins_dict.update({'nenbw': nenbw, 'cgain': cgain})
 
         return w
@@ -353,7 +344,6 @@ class QFFTWinSelector(QWidget):
         Emit 'view_changed': 'fft_win_par'
         """
         cur_win_id = self.all_wins_dict['current']['id']  # current window id / key
-        self.win_last = None
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 1:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
