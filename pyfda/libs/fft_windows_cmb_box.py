@@ -98,7 +98,8 @@ class QFFTWinSelector(QWidget):
         """
         # Construct FFT window type combobox
         self.cmb_win_fft = QComboBox(self)
-        qcmb_box_populate(self.cmb_win_fft, self.cmb_win_fft_items, 'rectangular')
+        qcmb_box_populate(self.cmb_win_fft, self.cmb_win_fft_items,
+                          self.all_wins_dict['current']['id'])
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
