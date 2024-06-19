@@ -392,7 +392,6 @@ fil_ref = {
              'fn_name': 'hann',  # function name or array with values
              'par': [],    # set of list of window parameters
              'info': "",   # Docstring for the window
-             'win_len': 1024
             }
         },
 

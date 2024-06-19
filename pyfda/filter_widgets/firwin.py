@@ -165,8 +165,6 @@ class Firwin(QWidget):
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
 
-        # access a deep copy of the reference window dict to store modified parameters
-        # self.all_wins_dict = copy.deepcopy(all_wins_dict_ref)
         # set the current window name / id
         self.all_wins_dict['current']['id'] = self.cur_win_id
 
@@ -253,12 +251,10 @@ class Firwin(QWidget):
             'par': []  # placeholder for current window parameters
             """
         self.N = fb.fil[0]['N']
-        logger.warning(f"FirWin\n:{fb.fil[0]['wdg_fil']}")
-        # alg_idx = 0
-        # if 'firwin' in fb.fil[0]['wdg_fil']\
-        #         and type(fb.fil[0]['wdg_fil']['firwin']) is dict:
+        # logger.warning(f"FirWin\n:{fb.fil[0]['wdg_fil']}")
+
         try:
-            # Get window display name from filter dict fb.fil[0]['wdg_fil']['firwin']
+            # Get window id from filter dict fb.fil[0]
             self.cur_win_id = fb.fil[0]['wdg_fil']['firwin']['id']
             logger.warning(f"curwin = {self.cur_win_id}")
 
