@@ -686,7 +686,6 @@ if __name__ == '__main__':
     """ Run widget standalone with `python -m pyfda.plot_widgets.plot_fft_win` """
     import sys
     from pyfda.libs.compat import QApplication
-    from pyfda.libs.pyfda_fft_windows_lib import construct_all_wins_dict
     from pyfda import pyfda_rc as rc
 
     app = QApplication(sys.argv)
