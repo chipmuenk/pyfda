@@ -464,8 +464,6 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
 
         self.all_wins_dict['current']['id'] = cur_win_id
-        fb.fil[0]['wdg_fil']['firwin'] = self.all_wins_dict[cur_win_id]
-        fb.fil[0]['wdg_fil']['firwin'].update({'name': cur_win_id})
 
 # ------------------------------------------------------------------------------
 
