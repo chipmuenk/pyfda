@@ -53,9 +53,9 @@ params = {
             # 'cmsis' : False,  # True, False
             'destination': False  # source/target is 'clipboard' or 'file'
             },
-    'screen': { # screen properties, filled with values in pyfdax.py
-        'ref_dpi': None, 'scaling': None, # dpi for scaling = 1 and scaling factor
-        'height': None, 'width': None}, # height and width in pixels
+    'screen': { # screen properties default values, updated in pyfdax.py
+        'ref_dpi': 96, 'scaling': 1.0, # dpi for scaling = 1 and scaling factor
+        'height': 720, 'width': 1024}, # height and width in pixels
     'FMT_ba': 4,      # number of digits for coefficient table
     'FMT_pz': 5,      # number of digits for Pole/Zero table
     'P_Marker': [mpl_ms, 'r'],  # size and color for poles' marker
