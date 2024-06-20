@@ -1208,7 +1208,7 @@ class Plot_Impz(QWidget):
         t = self.t[N_start:N_end]
         x = self.x[N_start:N_end] * self.scale_i  # obtain same scaling for x as for quantized signals
         y = self.y[N_start:N_end]
-        win = self.ui.qfft_win_select.get_window(self.ui.N)
+
         if self.cmplx:
             x_r = x.real
             x_i = x.imag
@@ -1230,8 +1230,7 @@ class Plot_Impz(QWidget):
         # log. scale for stimulus / response time domain:
         if self.ui.but_log_time.isChecked():
             bottom_t = self.ui.bottom_t
-            win = np.maximum(20 * np.log10(
-                abs(self.ui.qfft_win_select.get_window(self.ui.N))), self.ui.bottom_t)
+
             x_r = np.maximum(20 * np.log10(abs(x_r)), self.ui.bottom_t)
             y_r = np.maximum(20 * np.log10(abs(y_r)), self.ui.bottom_t)
 
@@ -1301,6 +1300,12 @@ class Plot_Impz(QWidget):
             l_r += [lbl_y_r]
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
+            if self.ui.but_log_time.isChecked():
+                win = np.maximum(
+                    20 * np.log10(abs(self.ui.qfft_win_select.get_window(self.ui.N))),
+                    self.ui.bottom_t)
+            else:
+                win = self.ui.qfft_win_select.get_window(self.ui.N)
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
                 label=self.ui.all_wins_dict['current']['id'])[0])
