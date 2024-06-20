@@ -119,7 +119,6 @@ def main():
     # scr_size = app.primaryScreen().size()  # pixel resolution, type QSize()
     screen_resolution = app.desktop().screenGeometry()
     avail_geometry = app.desktop().availableGeometry()
-    # avail_size = app.desktop().availableSize()
     pixel_ratio = app.desktop().devicePixelRatio()
     height, width = screen_resolution.height(), screen_resolution.width()
     scaling = ldpi / ref_dpi
@@ -169,7 +168,8 @@ def main():
     mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
     # set main window on desktop to full size
     # mainw.setGeometry(0, 0, width, height) # top L / top R, dx, dy
-    mainw.setGeometry(app.desktop().availableGeometry())
+    # mainw.setGeometry(app.desktop().availableGeometry().size())
+    mainw.resize(app.desktop().availableGeometry().size())
     # Give the keyboard input focus to this widget if this widget
     # or one of its parents is the active window:
 #    mainw.setFocus()
