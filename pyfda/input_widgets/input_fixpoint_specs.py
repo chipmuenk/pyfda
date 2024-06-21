@@ -825,7 +825,7 @@ class Input_Fixpoint_Specs(QWidget):
         Wrapper around `self.fx_filt_ui.init_filter()` to catch errors.
         Initialize fix-point filter, reset registers and overflow counters
 
-        TODO: - Update the `fxqc_dict` containing all quantization information
+        TODO: - Update the `'fxq'` dict entries containing all quantization information
 
         Returns
         -------
