@@ -107,13 +107,14 @@ class Input_Specs(QWidget):
         its parent widget (`input_specs`) to prevent infinite loops.
 
         """
-        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f"Stopped infinite loop:\n\tPropagate = {propagate}\
             #               \n{first_item(dict_sig)}")
             return
 
-        elif 'specs_changed' in dict_sig:
+        logger.warning(f"SIG_RX: {first_item(dict_sig)}")
+
+        if 'specs_changed' in dict_sig:
             if dict_sig['specs_changed'] == 'f_sort':
                 # sort and update the frequency widgets
                 self.f_specs.sort_dict_freqs()
