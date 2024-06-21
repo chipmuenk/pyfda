@@ -10,6 +10,7 @@
 Widget for displaying and modifying filter coefficients
 """
 import sys
+import copy
 
 from pyfda.libs.compat import (
     Qt, QtCore, QWidget, QLineEdit, QApplication, QIcon, QSize, QTableWidget,
@@ -248,7 +249,7 @@ class ItemDelegate(QStyledItemDelegate):
         # store new data in self.ba and ba_q
         self.parent.ba[index.column()][index.row()] = data
         self.parent.ba_q[index.column()][index.row()] = data_q
-        # logger.error(f"data_q: {data_q}")
+        # logger.error(f"fb.fil[0]['ba']: {fb.fil[0]['ba']}")
         qstyle_widget(self.parent.ui.but_apply, 'changed')
         qstyle_widget(self.parent.ui.but_undo, 'changed')
         # this is needed to adapt text width to e.g. complex number representation
@@ -653,7 +654,7 @@ class Input_Coeffs(QWidget):
         while the coefficient list `self.ba` is a list of two float ndarrays to allow
         for different lengths of b and a subarrays while adding / deleting items.
         """
-        self.ba = list(fb.fil[0]['ba']).copy()
+        self.ba = copy.deepcopy(fb.fil[0]['ba'])
 
         # set quantization UI from dictionary, update quantized coeff. display and
         # overflow counter, and refresh table
