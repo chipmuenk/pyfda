@@ -1752,6 +1752,11 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if type(fb.fil[0]['ba']) in {list, tuple}:
                 logger.warning(f"fb.fil[0]['ba'] is of type '{type(fb.fil[0]['ba'])}', should be ndarray!")
 
+            if fil_dict['ba'][1][0] != 1:
+                logger.error(
+                    f"The coefficient a[0] = {fil_dict['ba'][1][0]} needs to be 1, "
+                    "expect the unexpected!")
+
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
             zpk = sig.tf2zpk(fil_dict['ba'][0], fil_dict['ba'][1])  # (b, a)
@@ -1781,7 +1786,17 @@ def fil_convert(fil_dict: dict, format_in) -> None:
 
     # eliminate complex coefficients created by numerical inaccuracies
     # `tol` is specified in multiples of machine eps
+    # for complex coefficients, 'if_close' is False and the array remains unchanged
     fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100)
+
+    # for poles / zeros the same can happen, only that they *are* usually complex
+    # valued and need to be checked / converted individually. Complex numbers with
+    # very small imaginary parts cannot be displayed by current numexpr versions
+    # TODO:
+    # if any(np.is_complex(fil_dict['zpk'])):
+    #     for c in range[3]:
+    #         for r in range(len(fil_dict[0])):
+    #             fil_dict['zpk'][r][c] = np.real_if_close(fil_dict['zpk'][r][c]).astype(complex)
 
 
 # ------------------------------------------------------------------------------
