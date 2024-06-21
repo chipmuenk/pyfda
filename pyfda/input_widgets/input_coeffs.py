@@ -439,9 +439,6 @@ class Input_Coeffs(QWidget):
         # by the `ItemDelegate.initStyleOption()` method
 
         a = np.concatenate(([0.], self.ba[1][1:]))
-        # self.ba[1][0] = 0  # Is this safe?
-        # a = self.ba[1]
-        # logger.error(f"a: {a[1].dtype}")
 
         # Float format: Set ba_q = ba, overflows are all = 0
         if not fb.fil[0]['fx_sim']:
