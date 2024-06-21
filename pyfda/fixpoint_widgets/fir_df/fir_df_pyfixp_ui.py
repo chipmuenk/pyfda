@@ -43,7 +43,7 @@ class FIR_DF_pyfixp_UI(QWidget):
         super().__init__()
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b>")
-        self.description = "Standard FIR topology, suitable for most use cases."
+        self.description = "Standard FIR topology without pipeling."
         self.img_name = "fir_df.png"
 
         self.cmb_wq_accu_items = [
