@@ -402,7 +402,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.sig_tx.connect(self.process_sig_rx)
         self.ui.wdg_wq_coeffs_b.sig_tx.connect(self.process_sig_rx)
 
-        self.ui.but_quant.clicked.connect(self.quant_coeffs_save)
+        self.ui.but_quant.clicked.connect(self.quant_coeffs_apply)
 
         self.ui.sig_tx.connect(self.sig_tx)
 
@@ -472,7 +472,7 @@ class Input_Coeffs(QWidget):
         self.ui.wdg_wq_coeffs_a.update_ovfl_cnt()
 
 # ------------------------------------------------------------------------------
-    def quant_coeffs_save(self):
+    def quant_coeffs_apply(self):
         """
         Triggered by pushing "Quantize button":
 
