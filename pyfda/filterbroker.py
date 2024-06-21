@@ -232,7 +232,7 @@ fil_tree = freeze_hierarchical({
 # which can be modified by input widgets and design routines
 # ------------------------------------------------------------------------------
 fil_ref = {
-    '_id': [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
+    "_id": [], # a list with the keyword 'pyfda' and the version, e.g. ['pyfda', 1]
     # amplitude specs (linear units)
     "A_PB": 0.2056717652757185,
     "A_PB2": 0.01,
@@ -383,22 +383,19 @@ fil_ref = {
     "timestamp": 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
     # parameter(s) of dynamically instantiated filter widget
-    'wdg_fil': {
+    "wdg_fil": {
         # Equiripple FIR filters
-        'equiripple': {'grid_density': 16},
+        "equiripple": {"grid_density": 16},
         # Windowed FIR filters
-        'firwin':
-            {'id': 'hann', # Window id
-             'fn_name': 'hann',  # function name or array with values
-             'par': [],    # set of list of window parameters
-             'info': "",   # Docstring for the window
+        "firwin":
+            {"id": "hann", # Window id
+             "name": "Hann",  # display name
+             "par": []    # set of list of window parameters
             }
         },
 
     # Parameters for spectral analysis window function
     "win_fft": {
-        "fn_name": "kaiser",  # window function name or array with values
-        "info": "",  # Docstring for the window
         "name": "Kaiser",  # display name
         "par": [  # list of parameters
             {
