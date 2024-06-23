@@ -267,18 +267,19 @@ class Firwin(QWidget):
             logger.warning("Updating from all_wins_dict")
 
             self.cur_win_id = self.all_wins_dict['current']['id']
-            self._store_dict()
+            self.filter_params2dict()
 
         self.qfft_win_select.set_window_name(self.cur_win_id)
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
-    def _store_dict(self):
+    def filter_params2dict(self):
         """
         Store window and parameter settings from current window of `self.all_wins_dict`
         to filter dictionary fb.fil[0]['wdg_fil']['firwin'].
         """
+        logger.warning("filter_params2dict")
         fb.fil[0]['wdg_fil']['firwin'] =\
             {'par': self.all_wins_dict[self.cur_win_id]['par'],
              'id': self.all_wins_dict[self.cur_win_id]['id']
@@ -329,7 +330,7 @@ class Firwin(QWidget):
             fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
-        self._store_dict()
+        self.filter_params2dict()
 
 # ------------------------------------------------------------------------------
     def firwin(self, numtaps, cutoff, window=None, pass_zero=True,
