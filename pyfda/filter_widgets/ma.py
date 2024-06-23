@@ -194,11 +194,11 @@ near ``f_S/2`` (highpass).
         self.chk_norm.clicked.connect(self._update_UI)
         #----------------------------------------------------------------------
 
-        self._load_dict() # get initial / last setting from dictionary
+        self.dict2filter_params() # get initial / last setting from dictionary
         self._update_UI()
 
 
-    def _load_dict(self):
+    def dict2filter_params(self):
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
         corresponding UI elements. load_dict() is called upon initialization

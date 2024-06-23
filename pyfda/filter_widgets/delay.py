@@ -101,7 +101,7 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 #         # fires when edited line looses focus or when RETURN is pressed
 #         #----------------------------------------------------------------------
 # 
-#         self._load_dict() # get initial / last setting from dictionary
+#         self.dict2filter_params() # get initial / last setting from dictionary
 #         self._update_UI()
 # =============================================================================
         
@@ -123,10 +123,10 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
 # =============================================================================
 
 
-    def _load_dict(self):
+    def dict2filter_params(self):
         """
         Reload parameter(s) from filter dictionary (if they exist) and set 
-        corresponding UI elements. _load_dict() is called upon initialization
+        corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
         if 'wdg_fil' in fb.fil[0] and 'delay' in fb.fil[0]['wdg_fil']:

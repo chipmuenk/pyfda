@@ -119,7 +119,7 @@ class Firwin(QWidget):
 
         self.construct_UI()
         # get initial / last setting from dictionary, updating self.all_wins_dict
-        self._load_dict()
+        self.dict2filter_params()
 
 # ------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -231,10 +231,10 @@ class Firwin(QWidget):
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
-    def _load_dict(self):
+    def dict2filter_params(self):
         """
         Reload window selection and parameters from filter dictionary
-        and set UI elements accordingly. _load_dict() is called upon
+        and set UI elements accordingly. dict2filter_params() is called upon
         initialization and when the filter is loaded from disk.
 
         Structure of fb.fil[0]['wdg_fil']:

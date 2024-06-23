@@ -198,7 +198,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
-        self._load_dict() # get initial / last setting from dictionary
+        self.dict2filter_params() # get initial / last setting from dictionary
 
     def ui2dict(self):
         """
@@ -214,10 +214,10 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self.emit({'filt_changed': 'equiripple'})
 
 
-    def _load_dict(self):
+    def dict2filter_params(self):
         """
         Reload parameter(s) from filter dictionary (if they exist) and set
-        corresponding UI elements. _load_dict() is called upon initialization
+        corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
         if 'equiripple' in fb.fil[0]['wdg_fil']\
