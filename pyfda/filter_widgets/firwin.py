@@ -128,6 +128,7 @@ class Firwin(QWidget):
         - FFT window widget
         - qfft_win_select
         """
+        logger.warning(pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
             logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
 
@@ -137,9 +138,12 @@ class Firwin(QWidget):
                 self.hide_fft_wdg()
                 return
             else:
-                if 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']:
+                if 'view_changed' in dict_sig\
+                    and 'fft_win_type' in dict_sig['view_changed']:
                     # local connection to FFT window widget and qfft_win_select
+                    # to update the widgets
                     self.emit(dict_sig, sig_name='sig_tx_local')
+                    self.filter_params2dict()
                     # global connection to upper hierarchies
                     # send notification that filter design has changed
                     self.emit({'filt_changed': 'firwin'})
