@@ -123,7 +123,7 @@ class Input_Specs(QWidget):
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> reload filter parameters and update_UI
-            # self.update_UI(dict_sig)
+            self.update_UI(dict_sig)
             self.sel_fil.load_dict()
             # Update state of "DESIGN FILTER" button
             # It is disabled for "Manual_IIR" and "Manual_FIR" filter classes
