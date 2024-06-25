@@ -149,44 +149,45 @@ class QFFTWinSelector(QWidget):
         self.cmb_win_par_1.currentIndexChanged.connect(self.ui2dict_params)
 
 # ------------------------------------------------------------------------------
-    def set_window_name(self, win_name: str = "") -> bool:
+    def set_window_name(self, win_id: str = "") -> bool:
         """
-        Select and set a window function object from its string `win_name` and update the
+        Select and set a window function object from its string `win_id` and update the
         `all_wins_dict` dictionary correspondingly with:
 
-        all_wins_dict['current']['id']       # win_name: new current window name (str)
+        all_wins_dict['current']['id']       # win_id: new current window id (str)
 
         Additionally, the following class attributes are updated / reset:
 
         self.win_fnct = win_fnct            # handle to windows functionn
 
-        Also, update the keys 'par' and 'id' of `fb.fil[0]['wdg_fil']['firwin']`
+        Also, update the keys 'par' and 'id' of `fb.fil[0][self.key_fil]`
 
         The above is only updated when the window type has been changed compared to
-        `all_wins_dict['current']['id']` !
+        `self.cur_dict['id']` !
 
         Parameters
         ----------
-        win_name : str
-            Name of the window, which will be looked up in `self.all_wins_dict`. If it is
-            "", use `self.all_wins_dict['current']['id']` instead
+        win_id : str
+            Id of the window, which will be looked up in `self.all_wins_dict`. If empty,
+            use `self.cur_dict['id']` instead.
 
         Returns
         -------
         win_err : bool
-            Error flag; `True` when `win_name` could not be resolved
+            Error flag; `True` when `win_id` could not be resolved
         """
-        if win_name == "":
-            cur_win_name = self.all_wins_dict['current']['id']
+        if win_id == "":
+            # cur_win_id = self.all_wins_dict['current']['id']
+            cur_win_id = self.cur_dict['id']
 
-        elif win_name not in self.all_wins_dict:
+        elif win_id not in self.all_wins_dict:
             logger.warning(
-                f'Unknown window name "{win_name}", using rectangular window instead.')
-            cur_win_name = "rectangular"
+                f'Unknown window id "{win_id}", using rectangular window instead.')
+            cur_win_id = "rectangular"
         else:
-            cur_win_name = win_name
+            cur_win_id = win_id
 
-        fn_name = self.all_wins_dict[cur_win_name]['fn_name']
+        fn_name = self.all_wins_dict[cur_win_id]['fn_name']
 
         # --------------------------------------
         # get attribute fn_name from submodule (default: sig.windows) and
@@ -218,27 +219,28 @@ class QFFTWinSelector(QWidget):
                 win_err = True
 
         if win_err:
+            # an eror occurred, fall back to rectangular window
             win_fnct = getattr(sig.windows, 'boxcar', None)
-            cur_win_name = "rectangular"
-            n_par = 0
-
-        self.all_wins_dict.update({'cur_win_name': cur_win_name})
-        self.win_fnct = win_fnct  # handle to windows function
+            self.cur_dict['id'] = "rectangular"
+            self.cur_dict['par'] = []
+        else:
+            # self.all_wins_dict.update({'cur_win_name': cur_win_id})
+            self.win_fnct = win_fnct  # handle to windows function
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
-    def get_window(self, N: int, win_name: str = None, sym: bool = False) -> np.array:
+    def get_window(self, N: int, win_id: str = None, sym: bool = False) -> np.array:
         """
-        Calculate or retrieve from cache the selected window function with `N` points.
+        Calculate the selected window function with `N` points.
 
         Parameters
         ----------
         N : int
             Number of data points
 
-        win_name : str, optional
-            Name of the window. If specified (default is None), this will be used to
+        win_id : str, optional
+            Id of the window. If specified (default is None), this will be used to
             obtain the window function, its parameters and tool tips etc. via
             `set_window_name()`. If not, the previous setting are used.
 
@@ -261,24 +263,28 @@ class QFFTWinSelector(QWidget):
         self.err = False
         logger.warning("get window")
 
-        if win_name is None or win_name == self.all_wins_dict['current']['id']:
-            win_name = self.all_wins_dict['current']['id']
-            # window name and length are unchanged, use stored window function
+        # if win_id is None or win_id == self.all_wins_dict['current']['id']:
+        #     win_id = self.all_wins_dict['current']['id']
+        #     self.cur_dict['id']
 
-        fn_name = self.all_wins_dict[win_name]['fn_name']
-        n_par = len(self.all_wins_dict[win_name]['par'])
+        # window name is empty, use window function from filter dict
+        if win_id is None:
+            win_id = self.cur_dict['id']
+
+        fn_name = self.all_wins_dict[win_id]['fn_name']
+        n_par = len(self.all_wins_dict[win_id]['par'])
 
         try:
             if fn_name == 'dpss':
-                w = scipy.signal.windows.dpss(N, self.all_wins_dict[win_name]['par'][0]['val'],
+                w = scipy.signal.windows.dpss(N, self.all_wins_dict[win_id]['par'][0]['val'],
                                               sym=sym)
             elif n_par == 0:
                 w = self.win_fnct(N, sym=sym)
             elif n_par == 1:
-                w = self.win_fnct(N, self.all_wins_dict[win_name]['par'][0]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_id]['par'][0]['val'], sym=sym)
             elif n_par == 2:
-                w = self.win_fnct(N, self.all_wins_dict[win_name]['par'][0]['val'],
-                             self.all_wins_dict[win_name]['par'][1]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_id]['par'][0]['val'],
+                             self.all_wins_dict[win_id]['par'][1]['val'], sym=sym)
             else:
                 logger.error(
                     "{0:d} parameters are not supported for windows at the moment!"
@@ -306,22 +312,24 @@ class QFFTWinSelector(QWidget):
         """
         The `win_dict` dictionary has been updated somewhere else, now update the window
         selection widget and make corresponding parameter widgets visible if
-        `self.all_wins_dict['current']['id']` is different from current combo box entry:
+        `self.cur_dict['id']` is different from current combo box entry:
 
-        - set FFT window type combobox from `self.all_wins_dict['current']['id']`
+        - set FFT window type combobox from `self.cur_dict['id']`
         - use `ui2win_dict()` to update parameter widgets for new window type
           from `self.all_wins_dict` without emitting a signal
         """
-        if qget_cmb_box(self.cmb_win_fft, data=True) == self.all_wins_dict['current']['id']:
+        if qget_cmb_box(self.cmb_win_fft, data=True) == self.cur_dict['id']:
             return
         else:
-            qset_cmb_box(self.cmb_win_fft, self.all_wins_dict['current']['id'], data=True)
+            qset_cmb_box(self.cmb_win_fft, self.cur_dict['id'], data=True)
             self.ui2win_dict()
 
 # ------------------------------------------------------------------------------
     def dict2ui_params(self):
         """
         Set parameter values from `win_dict`
+
+        TODO: take params from self.cur_dict?
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         n_par = len(self.all_wins_dict[cur_win_id]['par'])
@@ -342,11 +350,11 @@ class QFFTWinSelector(QWidget):
     def ui2dict_params(self):
         """
         Read out window parameter widget(s) when editing is finished and
-        update win_dict.
+        update self.cur_dict and self.all_wins_dict with the parameter values.
 
         Emit 'view_changed': 'fft_win_par'
         """
-        cur_win_id = self.all_wins_dict['current']['id']  # current window id / key
+        cur_win_id = self.cur_dict['id']  # current window id / key
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 1:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
@@ -361,6 +369,7 @@ class QFFTWinSelector(QWidget):
                     param = self.all_wins_dict[cur_win_id]['par'][1]['max']
                 self.led_win_par_1.setText(str(param))
             self.all_wins_dict[cur_win_id]['par'][1]['val'] = param
+            self.cur_dict['par'][1]['val'] = param
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
@@ -375,6 +384,7 @@ class QFFTWinSelector(QWidget):
                     param = self.all_wins_dict[cur_win_id]['par'][0]['max']
                 self.led_win_par_0.setText(str(param))
             self.all_wins_dict[cur_win_id]['par'][0]['val'] = param
+            self.cur_dict['par'][0]['val'] = param
 
         self.emit({'view_changed': 'fft_win_par'})
 
@@ -395,15 +405,16 @@ class QFFTWinSelector(QWidget):
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
         - set tooltipps and parameter values from dict
+        - update `cur_dict` and `all_wins_dict`
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         err = self.set_window_name(cur_win_id)
         logger.warning(f"{self.objectName()}: cmb_win_fft = {cur_win_id}")
-        logger.warning(f"cur_win_id = {self.all_wins_dict['current']['id']}")
+        logger.warning(f"cur_win_id = {self.cur_dict['id']}")
         # if selected window does not exist (`err = True`) or produces errors, fall back
-        # to 'cur_win_name'
+        # to 'cur_win_id'
         if err:
-            cur_win_id = self.all_wins_dict['current']['id']
+            cur_win_id = self.cur_dict['id']
             qset_cmb_box(self.cmb_win_fft, cur_win_id, data=True)
 
         # update visibility and values of parameter widgets:
@@ -456,7 +467,8 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
                 self.led_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
 
-        self.all_wins_dict['current']['id'] = cur_win_id
+        self.cur_dict['id'] = cur_win_id
+        self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
 # ------------------------------------------------------------------------------
 
