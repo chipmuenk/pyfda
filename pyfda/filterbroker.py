@@ -283,6 +283,35 @@ fil_ref = {
     "f_max": 1.0,
     "f_s_scale": 1,
     "fc": "Ellip",  # filter class
+    # Parameters for spectral analysis window function
+    "fft_win": {
+        "id": "kaiser",  # display name
+        "par": [  # list of parameters
+            {
+                "max": 30,
+                "min": 0,
+                "name": "&beta;",
+                "name_tex": "$\\beta$",
+                # 'name_tex': r'$\beta$',
+                "tooltip": ("<span>Shape parameter; lower values reduce main lobe width, "
+                            "higher values reduce side lobe level, typ. in the range "
+                            "5 ... 20.</span>"),
+                "val": 10
+            }
+        ],
+        "win_len": 1024
+    },
+    "filter_widgets": {
+        # Equiripple FIR filters
+        "equiripple": {"grid_density": 16},
+        # Windowed FIR filters
+        "firwin":
+            {"id": "hann", # Window id
+             "name": "Hann",  # display name
+             "par": []    # set of list of window parameters
+            }
+        },
+
     "fo": "man",  # filter order, manual or min
     "freqSpecsRange": [
         0,
@@ -383,6 +412,7 @@ fil_ref = {
     "timestamp": 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
     # parameter(s) of dynamically instantiated filter widget
+
     "wdg_fil": {
         # Equiripple FIR filters
         "equiripple": {"grid_density": 16},
@@ -394,24 +424,6 @@ fil_ref = {
             }
         },
 
-    # Parameters for spectral analysis window function
-    "win_fft": {
-        "name": "Kaiser",  # display name
-        "par": [  # list of parameters
-            {
-                "max": 30,
-                "min": 0,
-                "name": "&beta;",
-                "name_tex": "$\\beta$",
-                # 'name_tex': r'$\beta$',
-                "tooltip": ("<span>Shape parameter; lower values reduce main lobe width, "
-                            "higher values reduce side lobe level, typ. in the range "
-                            "5 ... 20.</span>"),
-                "val": 10
-            }
-        ],
-        "win_len": 1024
-    },
     # causal zeros/poles/gain
     "zpk": [
         [
