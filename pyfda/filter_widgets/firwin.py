@@ -172,7 +172,7 @@ class Firwin(QWidget):
         self.all_wins_dict['current']['id'] = self.cur_win_id
 
         # instantiate FFT window with freshly created windows dict
-        self.win_viewer = Plot_FFT_win(
+        self.win_viewer = Plot_FFT_win(fb.fil[0]['filter_widgets']['firwin'],
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
             title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window

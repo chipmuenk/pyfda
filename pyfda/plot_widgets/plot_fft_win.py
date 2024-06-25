@@ -50,6 +50,10 @@ class Plot_FFT_win(QDialog):
     parent : class instance
         reference to parent
 
+    cur_win_dict : dict
+        Dictionary keeping the current window and its parameters. This is usually
+        a sub-dictionary of `fb.fil[0]`.
+
     app : str
         String specifying the target application, 'fir' for windowed fir filter design,
         'spec' for general spectral analysis and 'stft' for short-time fourier transform
@@ -79,15 +83,16 @@ class Plot_FFT_win(QDialog):
     sig_tx = pyqtSignal(object)  # outgoing
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, app: str = 'spec', all_wins_dict: dict = {}, sym: bool = False,
-                 title: str = 'pyFDA Window Viewer', ignore_close_event: bool = True,
-                 object_name: str = "plot_fft_win"
+    def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
+                 sym: bool = False, title: str = 'pyFDA Window Viewer', 
+                 ignore_close_event: bool = True, object_name: str = "plot_fft_win"
                  ) -> None:
         super().__init__()
         self.setObjectName(object_name)
         # make window stay on top
         qwindow_stay_on_top(self, True)
 
+        self.cur_win_dict = cur_win_dict
         self.app = app
         self.sym = sym
         self.ignore_close_event = ignore_close_event

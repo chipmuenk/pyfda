@@ -251,7 +251,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(
+        self.qfft_win_select = QFFTWinSelector(fb.fil[0]['fft_win']
             app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
