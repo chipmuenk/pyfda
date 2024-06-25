@@ -283,7 +283,8 @@ class Firwin(QWidget):
         Store window and parameter settings from current window of `self.all_wins_dict`
         to filter dictionary fb.fil[0]['wdg_fil']['firwin'].
         """
-        logger.warning("filter_params2dict")
+        logger.warning(f"filter_params2dict: self.cur_win_id: {self.cur_win_id}\n"
+                       f" self.cur_win_id]['id']: {self.all_wins_dict[self.cur_win_id]['id']}")
         fb.fil[0]['wdg_fil']['firwin'] =\
             {'par': self.all_wins_dict[self.cur_win_id]['par'],
              'id': self.all_wins_dict[self.cur_win_id]['id']
