@@ -246,9 +246,9 @@ class Input_Coeffs_UI(QWidget):
         layH_buttons_coeffs1.addWidget(self.butClear)
         layH_buttons_coeffs1.addWidget(self.but_undo)
         layH_buttons_coeffs1.addWidget(self.but_apply)
+        layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
         layH_buttons_coeffs1.addWidget(self.butToTable)
         layH_buttons_coeffs1.addWidget(self.butFromTable)
-        layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
         layH_buttons_coeffs1.addWidget(self.but_csv_options)
         layH_buttons_coeffs1.addStretch()
 
