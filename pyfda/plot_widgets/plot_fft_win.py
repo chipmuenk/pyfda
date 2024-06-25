@@ -113,17 +113,20 @@ class Plot_FFT_win(QDialog):
         self.tbl_cols = 6
         self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
 
-        if all_wins_dict == {}:
-            # construct window selection combo box and all_wins_dict from reference
-            # dict and suitable entries (specified by 'app')
-            self.qfft_win_select = QFFTWinSelector(
-                app=self.app, objectName=self.objectName() + '_cmb')
-            # construct combo box from passed dictionary
-        else:
-            self.qfft_win_select = QFFTWinSelector(
-                all_wins_dict=all_wins_dict, app=self.app,
-                objectName=self.objectName() + '_cmb')
+        # if all_wins_dict == {}:
+        #     # construct window selection combo box and all_wins_dict from reference
+        #     # dict and suitable entries (specified by 'app')
+        #     self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
+        #         app=self.app, objectName=self.objectName() + '_cmb')
+        #     # construct combo box from passed dictionary
+        # else:
+        #     self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
+        #         all_wins_dict=all_wins_dict, app=self.app,
+        #         objectName=self.objectName() + '_cmb')
 
+        self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
+            all_wins_dict=all_wins_dict, app=self.app,
+            objectName=self.objectName() + '_cmb')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         self._construct_UI()

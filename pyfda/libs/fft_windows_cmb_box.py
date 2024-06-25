@@ -39,10 +39,13 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, app='spec', all_wins_dict={}, objectName=""):
+    def __init__(self, cur_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
+                 objectName: str = ""):
         super().__init__()
 
         self.setObjectName(objectName)
+        # key for storing / retrieving filter data from `fb.fil[0]['filter_widgets']`
+        self.cur_dict = cur_dict
         self.err = False  # error flag for window calculation
 
         if all_wins_dict == {}:
