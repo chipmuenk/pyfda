@@ -208,7 +208,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                       return_type='int', sign='pos' )
         self.led_remez_1.setText(str(self.grid_density))
 
-        fb.fil[0]['wdg_fil']['equiripple'] = {'grid_density': self.grid_density}
+        fb.fil[0]['filter_widgets']['equiripple'] = {'grid_density': self.grid_density}
 
         # sig_tx -> select_filter -> filter_specs
         self.emit({'filt_changed': 'equiripple'})
@@ -220,12 +220,12 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'equiripple' in fb.fil[0]['wdg_fil']\
-                and 'grid_density' in fb.fil[0]['wdg_fil']['equiripple']:
-            self.grid_density = fb.fil[0]['wdg_fil']['equiripple']['grid_density']
+        if 'equiripple' in fb.fil[0]['filter_widgets']\
+                and 'grid_density' in fb.fil[0]['filter_widgets']['equiripple']:
+            self.grid_density = fb.fil[0]['filter_widgets']['equiripple']['grid_density']
         else:
             self.grid_density = 16
-            fb.fil[0]['wdg_fil']['equiripple'] = {'grid_density': 16}
+            fb.fil[0]['filter_widgets']['equiripple'] = {'grid_density': 16}
 
         self.led_remez_1.setText(str(self.grid_density))
 

@@ -6,6 +6,8 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
+# TODO: wdg_fil, current, copy only par vals to all_filter_dict <-> fb.fil[0]
+
 """
 Design windowed FIR filters (LP, HP, BP, BS) with fixed order, return
 the filter design in coefficient ('ba') format
@@ -76,7 +78,7 @@ class Firwin(QWidget):
         self.setObjectName(objectName)
         self.ft = 'FIR'
 
-        self.cur_win_id = "kaiser"  # set initial window
+        self.cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']  # set initial window
         self.alg = "ichige"
 
         c = Common()
@@ -170,7 +172,7 @@ class Firwin(QWidget):
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
         # set the current window name / id
-        self.all_wins_dict['current']['id'] = self.cur_win_id
+        # fb.fil[0]['filter_widgets']['firwin']['id'] = self.cur_win_id
 
         # instantiate FFT window with freshly created windows dict
         self.win_viewer = Plot_FFT_win(fb.fil[0]['filter_widgets']['firwin'],
@@ -242,33 +244,28 @@ class Firwin(QWidget):
         and set UI elements accordingly. dict2filter_params() is called upon
         initialization and when the filter is loaded from disk.
 
-        Structure of fb.fil[0]['wdg_fil']:
+        Structure of fb.fil[0]['filter_widgets']['firwin']:
 
         'firwin':
-            {'id': 'Hann', # Window name
-             'fn_name': 'hann',  # function name or array with values
+            {'id': 'hann', # Window id
              'par': [],    # list of window parameters
             }
-        all_wins_dict_ref['current'] =
-            'app': {},  # empty -> not listed for any app
-            'id': 'rectangular',  # placeholder for current window id
-            'par': []  # placeholder for current window parameters
             """
         self.N = fb.fil[0]['N']
-        logger.warning(f"Firwin ['wdg_fil'] =\n:{fb.fil[0]['wdg_fil']}")
+        logger.warning(f"Firwin ['filter_widgets'] =\n:{fb.fil[0]['filter_widgets']}")
 
         try:
             # Get window id from filter dict fb.fil[0]
-            self.cur_win_id = fb.fil[0]['wdg_fil']['firwin']['id']
+            self.cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
             logger.warning(f"curwin = {self.cur_win_id}")
 
-            # Copy all parameters from fb.fil[0] to cur_win_dict
-            for p in range(len(fb.fil[0]['wdg_fil']['firwin']['par'])):
+            # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
+            for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par'])):
                 self.all_wins_dict[self.cur_win_id]['par'][p]['val'] =\
-                    fb.fil[0]['wdg_fil']['firwin']['par'][p]['val']
+                    fb.fil[0]['filter_widgets']['firwin']['par'][p]['val']
         except KeyError as e:
             logger.warning(f"Couldn't load 'firwin' dict!\n{e}")
-            logger.warning(fb.fil[0]['wdg_fil'])
+            logger.warning(fb.fil[0]['filter_widgets'])
             logger.warning("Updating from all_wins_dict")
 
             self.cur_win_id = self.all_wins_dict['current']['id']
@@ -282,11 +279,11 @@ class Firwin(QWidget):
     def filter_params2dict(self):
         """
         Store window and parameter settings from current window of `self.all_wins_dict`
-        to filter dictionary fb.fil[0]['wdg_fil']['firwin'].
+        to filter dictionary fb.fil[0]['filter_widgets']['firwin'].
         """
         logger.warning(f"filter_params2dict: self.cur_win_id: {self.cur_win_id}\n"
                        f" self.cur_win_id]['id']: {self.all_wins_dict[self.cur_win_id]['id']}")
-        fb.fil[0]['wdg_fil']['firwin'] =\
+        fb.fil[0]['filter_widgets']['firwin'] =\
             {'par': self.all_wins_dict[self.cur_win_id]['par'],
              'id': self.all_wins_dict[self.cur_win_id]['id']
              }
@@ -473,7 +470,7 @@ class Firwin(QWidget):
         # http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0]) * 2  # referred to f_Ny
         # delta_A = np.sqrt(A[0] * A[1])
-        if self.all_wins_dict['current']['id'] == "kaiser":
+        if fb.fil[0]['filter_widgets']['firwin']['id'] == "kaiser":
             N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             self.all_wins_dict["kaiser"]["par"][0]["val"] = beta
             self.qfft_win_select.led_win_par_0.setText(str(beta))

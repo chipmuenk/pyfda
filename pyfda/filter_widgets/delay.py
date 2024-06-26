@@ -129,8 +129,8 @@ Obviously, there is no minimum design algorithm or no design algorithm at all :-
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'wdg_fil' in fb.fil[0] and 'delay' in fb.fil[0]['wdg_fil']:
-            wdg_fil_par = fb.fil[0]['wdg_fil']['delay']
+        if 'filter_widgets' in fb.fil[0] and 'delay' in fb.fil[0]['filter_widgets']:
+            wdg_fil_par = fb.fil[0]['filter_widgets']['delay']
             if 'N' in wdg_fil_par:
                 self.N = wdg_fil_par['N']
                 self.led_delay.setText(str(self.N))

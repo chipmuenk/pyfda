@@ -204,8 +204,8 @@ near ``f_S/2`` (highpass).
         corresponding UI elements. load_dict() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'wdg_fil' in fb.fil[0] and 'ma' in fb.fil[0]['wdg_fil']:
-            wdg_fil_par = fb.fil[0]['wdg_fil']['ma']
+        if 'filter_widgets' in fb.fil[0] and 'ma' in fb.fil[0]['filter_widgets']:
+            wdg_fil_par = fb.fil[0]['filter_widgets']['ma']
             if 'delays' in wdg_fil_par:
                 self.delays = wdg_fil_par['delays']
                 self.led_delays.setText(str(self.delays))
@@ -234,9 +234,7 @@ near ``f_S/2`` (highpass).
         Store parameter settings in filter dictionary. Called from _update_UI()
         and _save()
         """
-        if not 'wdg_fil' in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil':{}})
-        fb.fil[0]['wdg_fil'].update({'ma':
+        fb.fil[0]['filter_widgets'].update({'ma':
                                         {'delays':self.delays,
                                          'stages':self.stages,
                                          'normalize':self.chk_norm.isChecked()}
