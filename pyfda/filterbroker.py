@@ -301,15 +301,20 @@ fil_ref = {
         ],
         "win_len": 1024
     },
+    # parameter(s) of dynamically instantiated filter widgets
     "filter_widgets": {
         # Equiripple FIR filters
         "equiripple": {"grid_density": 16},
         # Windowed FIR filters
         "firwin":
             {"id": "hann", # Window id
-             "name": "Hann",  # display name
              "par": []    # set of list of window parameters
-            }
+            },
+        # Moving Average filters
+        "ma":
+            {"delays": 5,
+             "stages": 2,
+             "normalize": True}
         },
 
     "fo": "man",  # filter order, manual or min
@@ -411,18 +416,6 @@ fil_ref = {
     ],
     "timestamp": 1717151329.1387591,  # time when filter was created
     # 'timestamp': time.time(),
-    # parameter(s) of dynamically instantiated filter widget
-
-    "wdg_fil": {
-        # Equiripple FIR filters
-        "equiripple": {"grid_density": 16},
-        # Windowed FIR filters
-        "firwin":
-            {"id": "hann", # Window id
-             "name": "Hann",  # display name
-             "par": []    # set of list of window parameters
-            }
-        },
 
     # causal zeros/poles/gain
     "zpk": [
@@ -457,9 +450,6 @@ fil_undo = [None] * 10
 # When e.g. list is given as the default_factory, an empty list is returned.
 # fil[0] = defaultdict(lambda: 0.123)
 fil[0] = {}
-# Now, copy each key-value pair into the defaultdict
-# for k in fil_ref:
-#     fil[0].update({k: fil_ref[k]})
 
 # Copy fil_ref to fil[0] ... fil[9] to initialize all memories
 for l in range(len(fil)):
