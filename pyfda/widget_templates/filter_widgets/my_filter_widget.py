@@ -126,9 +126,7 @@ poles can be entered manually.
         self.p[1] = safe_eval(self.led_pole2.text(), self.p[1], return_type='cmplx')
         self.led_pole2.setText(str(self.p[1]))
 
-        if not 'wdg_fil' in fb.fil[0]:
-            fb.fil[0].update({'wdg_fil':{}})
-        fb.fil[0]['wdg_fil'].update({'poles':{'p1':self.p[0], 'p2':self.p[1]}
+        fb.fil[0]['filter_widgets'].update({'allpass':{'p1':self.p[0], 'p2':self.p[1]}
                                     })
         
         # sig_tx -> select_filter -> filter_specs   
@@ -141,8 +139,8 @@ poles can be entered manually.
         corresponding UI elements. dict2filter_params() is called upon initialization
         and when the filter is loaded from disk.
         """
-        if 'wdg_fil' in fb.fil[0] and 'poles' in fb.fil[0]['wdg_fil']:
-            wdg_fil_par = fb.fil[0]['wdg_fil']['poles']
+        if 'allpass' in fb.fil[0]['wdg_fil']:
+            wdg_fil_par = fb.fil[0]['filter_widgets']['allpass']
             if 'p1' in wdg_fil_par:
                 self.p1 = wdg_fil_par['p1']
                 self.led_pole1.setText(str(self.p1))
