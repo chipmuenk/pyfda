@@ -177,7 +177,6 @@ class QFFTWinSelector(QWidget):
             Error flag; `True` when `win_id` could not be resolved
         """
         if win_id == "":
-            # cur_win_id = self.all_wins_dict['current']['id']
             cur_win_id = self.cur_dict['id']
 
         elif win_id not in self.all_wins_dict:
@@ -262,10 +261,6 @@ class QFFTWinSelector(QWidget):
         """
         self.err = False
         logger.warning("get window")
-
-        # if win_id is None or win_id == self.all_wins_dict['current']['id']:
-        #     win_id = self.all_wins_dict['current']['id']
-        #     self.cur_dict['id']
 
         # window name is empty, use window function from filter dict
         if win_id is None:
