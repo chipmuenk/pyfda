@@ -225,6 +225,8 @@ class QFFTWinSelector(QWidget):
         else:
             # self.all_wins_dict.update({'cur_win_name': cur_win_id})
             self.win_fnct = win_fnct  # handle to windows function
+            self.cur_dict['id'] = cur_win_id
+            self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
