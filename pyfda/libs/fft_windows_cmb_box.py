@@ -39,13 +39,13 @@ class QFFTWinSelector(QWidget):
 
     from pyfda.libs.pyfda_qt_lib import emit
 
-    def __init__(self, cur_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
+    def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
                  objectName: str = ""):
         super().__init__()
 
         self.setObjectName(objectName)
         # key for storing / retrieving filter data from `fb.fil[0]['filter_widgets']`
-        self.cur_dict = cur_dict
+        self.cur_win_dict = cur_win_dict
         self.err = False  # error flag for window calculation
 
         if all_wins_dict == {}:
@@ -98,7 +98,7 @@ class QFFTWinSelector(QWidget):
         # Construct FFT window type combobox
         self.cmb_win_fft = QComboBox(self)
         qcmb_box_populate(self.cmb_win_fft, self.cmb_win_fft_items,
-                          self.cur_dict['id'])
+                          self.cur_win_dict['id'])
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
@@ -149,7 +149,7 @@ class QFFTWinSelector(QWidget):
     def set_window_name(self, win_id: str = "") -> bool:
         """
         Select and set a window function object from its string `win_id` and update the
-        `cur_dict` dictionary correspondingly.
+        `cur_win_dict` dictionary correspondingly.
 
         Additionally, the following class attributes are updated / reset:
 
@@ -158,13 +158,13 @@ class QFFTWinSelector(QWidget):
         Also, update the keys 'par' and 'id' of `fb.fil[0][self.key_fil]`
 
         The above is only updated when the window type has been changed compared to
-        `self.cur_dict['id']` !
+        `self.cur_win_dict['id']` !
 
         Parameters
         ----------
         win_id : str
             Id of the window, which will be looked up in `self.all_wins_dict`. If empty,
-            use `self.cur_dict['id']` instead.
+            use `self.cur_win_dict['id']` instead.
 
         Returns
         -------
@@ -172,7 +172,7 @@ class QFFTWinSelector(QWidget):
             Error flag; `True` when `win_id` could not be resolved
         """
         if win_id == "":
-            cur_win_id = self.cur_dict['id']
+            cur_win_id = self.cur_win_dict['id']
 
         elif win_id not in self.all_wins_dict:
             logger.warning(
@@ -215,15 +215,15 @@ class QFFTWinSelector(QWidget):
         if win_err:
             # an eror occurred, fall back to rectangular window
             win_fnct = getattr(sig.windows, 'boxcar', None)
-            self.cur_dict['id'] = "rectangular"
-            self.cur_dict['disp_name'] = "Rectangular"
-            self.cur_dict['par'] = []
+            self.cur_win_dict['id'] = "rectangular"
+            self.cur_win_dict['disp_name'] = "Rectangular"
+            self.cur_win_dict['par'] = []
         else:
             # self.all_wins_dict.update({'cur_win_name': cur_win_id})
             self.win_fnct = win_fnct  # handle to windows function
-            self.cur_dict['id'] = cur_win_id
-            self.cur_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
-            self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
+            self.cur_win_dict['id'] = cur_win_id
+            self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
+            self.cur_win_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
@@ -263,7 +263,7 @@ class QFFTWinSelector(QWidget):
 
         # window name is empty, use window function from filter dict
         if win_id is None:
-            win_id = self.cur_dict['id']
+            win_id = self.cur_win_dict['id']
 
         fn_name = self.all_wins_dict[win_id]['fn_name']
         n_par = len(self.all_wins_dict[win_id]['par'])
@@ -306,16 +306,16 @@ class QFFTWinSelector(QWidget):
         """
         The `win_dict` dictionary has been updated somewhere else, now update the window
         selection widget and make corresponding parameter widgets visible if
-        `self.cur_dict['id']` is different from current combo box entry:
+        `self.cur_win_dict['id']` is different from current combo box entry:
 
-        - set FFT window type combobox from `self.cur_dict['id']`
+        - set FFT window type combobox from `self.cur_win_dict['id']`
         - use `ui2win_dict()` to update parameter widgets for new window type
           from `self.all_wins_dict` without emitting a signal
         """
-        if qget_cmb_box(self.cmb_win_fft, data=True) == self.cur_dict['id']:
+        if qget_cmb_box(self.cmb_win_fft, data=True) == self.cur_win_dict['id']:
             return
         else:
-            qset_cmb_box(self.cmb_win_fft, self.cur_dict['id'], data=True)
+            qset_cmb_box(self.cmb_win_fft, self.cur_win_dict['id'], data=True)
             self.ui2win_dict()
 
 # ------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ class QFFTWinSelector(QWidget):
         """
         Set parameter values from `win_dict`
 
-        TODO: take params from self.cur_dict?
+        TODO: take params from self.cur_win_dict?
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         n_par = len(self.all_wins_dict[cur_win_id]['par'])
@@ -344,7 +344,7 @@ class QFFTWinSelector(QWidget):
     def ui2dict_params(self):
         """
         Read out window parameter widget(s) when editing is finished and
-        update self.cur_dict and self.all_wins_dict with the parameter values.
+        update self.cur_win_dict and self.all_wins_dict with the parameter values.
 
         Emit 'view_changed': 'fft_win_par'
         """
@@ -363,7 +363,7 @@ class QFFTWinSelector(QWidget):
                     param = self.all_wins_dict[cur_win_id]['par'][1]['max']
                 self.led_win_par_1.setText(str(param))
             self.all_wins_dict[cur_win_id]['par'][1]['val'] = param
-            self.cur_dict['par'][1]['val'] = param
+            self.cur_win_dict['par'][1]['val'] = param
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
@@ -378,7 +378,7 @@ class QFFTWinSelector(QWidget):
                     param = self.all_wins_dict[cur_win_id]['par'][0]['max']
                 self.led_win_par_0.setText(str(param))
             self.all_wins_dict[cur_win_id]['par'][0]['val'] = param
-            self.cur_dict['par'][0]['val'] = param
+            self.cur_win_dict['par'][0]['val'] = param
 
         self.emit({'view_changed': 'fft_win_par'})
 
@@ -399,16 +399,16 @@ class QFFTWinSelector(QWidget):
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
         - set tooltipps and parameter values from dict
-        - update `cur_dict` and `all_wins_dict`
+        - update `cur_win_dict` and `all_wins_dict`
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         err = self.set_window_name(cur_win_id)
         logger.warning(f"{self.objectName()}: cmb_win_fft = {cur_win_id}")
-        logger.warning(f"cur_win_id = {self.cur_dict['id']}")
+        logger.warning(f"cur_win_id = {self.cur_win_dict['id']}")
         # if selected window does not exist (`err = True`) or produces errors, fall back
         # to 'cur_win_id'
         if err:
-            cur_win_id = self.cur_dict['id']
+            cur_win_id = self.cur_win_dict['id']
             qset_cmb_box(self.cmb_win_fft, cur_win_id, data=True)
 
         # update visibility and values of parameter widgets:
@@ -461,9 +461,9 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
                 self.led_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
 
-        self.cur_dict['id'] = cur_win_id
-        self.cur_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
-        self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
+        self.cur_win_dict['id'] = cur_win_id
+        self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
+        self.cur_win_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
 # ------------------------------------------------------------------------------
 
