@@ -593,8 +593,8 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setVisible(self.but_log_f.isChecked())
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
-        cur_id = self.all_wins_dict['current']['id']
-        cur_name = self.all_wins_dict[cur_id]['disp_name']
+        cur_id = self.cur_win_dict['id']
+        cur_name = self.cur_win_dict['disp_name']
         cur_win_d = self.all_wins_dict[cur_id]
         param_txt = ""
         if len(cur_win_d['par']) > 0:
@@ -657,7 +657,7 @@ class Plot_FFT_win(QDialog):
         """
         Update the text info box for the window
         """
-        cur_id = self.all_wins_dict['current']['id']
+        cur_id = self.cur_win_dict['id']
         if 'info' in self.all_wins_dict[cur_id]:
             self.txtInfoBox.setText(self.all_wins_dict[cur_id]['info'])
         else:

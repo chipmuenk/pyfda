@@ -251,12 +251,12 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(fb.fil[0]['fft_win']
+        self.qfft_win_select = QFFTWinSelector(fb.fil[0]['fft_win'],
             app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 
         # instantiate FFT window with default windows dict
-        self.win_viewer = Plot_FFT_win(
+        self.win_viewer = Plot_FFT_win(fb.fil[0]['fft_win'],
             app='spec', all_wins_dict=self.all_wins_dict, sym=False,
             title="pyFDA Spectral Window Viewer", object_name="impz_win_viewer")
         # hide window initially, this is modeless i.e. a non-blocking popup window

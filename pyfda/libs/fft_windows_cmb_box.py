@@ -56,9 +56,6 @@ class QFFTWinSelector(QWidget):
             for k, v in all_wins_dict_ref.items():
                 if app in v['app']:
                     self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
-                elif k != 'current':  # remove unneeded keys except 'current
-                    logger.warning(f"removing key {k}")
-                    self.all_wins_dict.pop(k)
         else:
             # construct combobox data from passed dict
             self.all_wins_dict = all_wins_dict
@@ -101,7 +98,7 @@ class QFFTWinSelector(QWidget):
         # Construct FFT window type combobox
         self.cmb_win_fft = QComboBox(self)
         qcmb_box_populate(self.cmb_win_fft, self.cmb_win_fft_items,
-                          self.all_wins_dict['current']['id'])
+                          self.cur_dict['id'])
 
         # Variant of FFT window type (not implemented yet)
         self.cmb_win_fft_variant = QComboBox(self)
@@ -152,9 +149,7 @@ class QFFTWinSelector(QWidget):
     def set_window_name(self, win_id: str = "") -> bool:
         """
         Select and set a window function object from its string `win_id` and update the
-        `all_wins_dict` dictionary correspondingly with:
-
-        all_wins_dict['current']['id']       # win_id: new current window id (str)
+        `cur_dict` dictionary correspondingly.
 
         Additionally, the following class attributes are updated / reset:
 
@@ -221,11 +216,13 @@ class QFFTWinSelector(QWidget):
             # an eror occurred, fall back to rectangular window
             win_fnct = getattr(sig.windows, 'boxcar', None)
             self.cur_dict['id'] = "rectangular"
+            self.cur_dict['disp_name'] = "Rectangular"
             self.cur_dict['par'] = []
         else:
             # self.all_wins_dict.update({'cur_win_name': cur_win_id})
             self.win_fnct = win_fnct  # handle to windows function
             self.cur_dict['id'] = cur_win_id
+            self.cur_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
             self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
         return win_err  # error flag, UI (window combo box) needs to be updated
@@ -351,7 +348,7 @@ class QFFTWinSelector(QWidget):
 
         Emit 'view_changed': 'fft_win_par'
         """
-        cur_win_id = self.cur_dict['id']  # current window id / key
+        cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)  # current window id / key
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 1:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
@@ -465,6 +462,7 @@ class QFFTWinSelector(QWidget):
                 self.led_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
 
         self.cur_dict['id'] = cur_win_id
+        self.cur_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
         self.cur_dict['par'] = self.all_wins_dict[cur_win_id]['par']
 
 # ------------------------------------------------------------------------------

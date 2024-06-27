@@ -49,13 +49,6 @@ rectangular_info =\
     and a large ripple in the passband.
     </span>'''
 all_wins_dict_ref = {
-    'current': {
-        'app': {},  # empty -> not listed for any app
-        #'disp_name': 'None',
-        #'fn_name': 'None',  # placeholder for current window function name
-        'id': 'rectangular',  # placeholder for current window id
-        'par': []  # placeholder for current window parameters
-    },
     'boxcar': {
         'app': ['fir', 'spec', 'stft', 'all'],
         'disp_name': 'Boxcar',

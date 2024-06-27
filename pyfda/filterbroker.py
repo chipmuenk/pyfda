@@ -308,6 +308,7 @@ fil_ref = {
         # Windowed FIR filters
         "firwin":
             {"id": "hann", # Window id
+             "disp_name": "Hann", # display name
              "par": []    # set of list of window parameters
             },
         # Moving Average filters

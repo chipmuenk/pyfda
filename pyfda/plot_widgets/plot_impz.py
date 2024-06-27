@@ -1308,8 +1308,8 @@ class Plot_Impz(QWidget):
                 win = self.ui.qfft_win_select.get_window(self.ui.N)
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
-                label=self.ui.all_wins_dict['current']['id'])[0])
-            l_r += [self.ui.all_wins_dict['current']['id']]
+                label=fb.fil[0]['fft_win']['disp_name'])[0])
+            l_r += [fb.fil[0]['fft_win']['disp_name']]
         # --------------- LEGEND (real part) ----------------------------------
         if self.plt_time_enabled:
             self.ax_r.legend(h_r, l_r, loc='best', fontsize='small', fancybox=True,
@@ -1653,12 +1653,12 @@ class Plot_Impz(QWidget):
                 freq_resp = True  # calculate frequency response from impulse response
                 scale_impz = self.ui.N * self.ui.all_wins_dict['cgain']\
                     * self.stim_wdg.ui.scale_impz
-                if self.ui.all_wins_dict['current']['id'] not in\
+                if fb.fil[0]['fft_win']['id'] not in\
                         {'boxcar', 'rectangular'}:
                     logger.warning(
                         f"Use a Boxcar (Rectangular) window for a correctly scaled\n"
                         f"\tFFT of an impulse instead of a "
-                        f"{self.ui.all_wins_dict['current']['id'].capitalize()} window!")
+                        f"{fb.fil[0]['fft_win']['disp_name']} window!")
             else:
                 freq_resp = False
                 scale_impz = 1.
