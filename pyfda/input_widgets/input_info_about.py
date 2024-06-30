@@ -42,7 +42,7 @@ class AboutWindow(QDialog):
     def _construct_UI(self):
         """ initialize the User Interface """
         butClipboard = QPushButton(self)
-        butClipboard.setIcon(QIcon(':/clipboard.svg'))
+        butClipboard.setIcon(QIcon(':/to_clipboard.svg'))
         butClipboard.setToolTip("Copy text to clipboard.")
 
         butAbout = QPushButton(self)

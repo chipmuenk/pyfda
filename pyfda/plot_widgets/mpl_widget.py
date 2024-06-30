@@ -486,7 +486,7 @@ class MplToolbar(NavigationToolbar):
         # --------------------------------------
         self.cb = fb.clipboard
         self.a_cb = self.addAction(
-            QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
+            QIcon(':/to_clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip(
             '<span>Copy figure to clipboard in png format (CTRL+C). '
             'Modifiers:'
