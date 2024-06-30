@@ -116,9 +116,10 @@ class Input_PZ_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>When <b>inactive</b>: Load and save poles, zeros and gain <i>k</i> "
+            "<span><b>Formatted Data</b><br><br>"
+            "When <b>inactive</b>: Import / export poles, zeros and gain <i>k</i> "
             "in float / complex format with full precision.<br><br>"
-            "When <b>active</b>: Load and save in displayed format, e.g. in polar "
+            "When <b>active</b>: Import / export in selected display format, e.g. in polar "
             "coordinates with the selected number of digits etc.</span>"
             )
         q_icon_size = self.but_format.iconSize()
@@ -209,11 +210,23 @@ class Input_PZ_UI(QWidget):
         self.but_file_clipboard.setIconSize(q_icon_size)
         self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
 
-        self.butFromTable = QPushButton(self)
-        self.butFromTable.setIconSize(q_icon_size)
-
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
+        self.butToTable.setIcon(QIcon(':/table_import.svg'))
+        self.butToTable.setToolTip(
+            "<span><b>Import poles / zeros / gain</b> from file or clipboard<br><br>"
+            "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
+            "format with full precision.<br>"
+            "Otherwise, import in display format.</span>")
+        
+        self.butFromTable = QPushButton(self)
+        self.butFromTable.setIconSize(q_icon_size)
+        self.butFromTable.setIcon(QIcon(':/table_export.svg'))
+        self.butFromTable.setToolTip(
+            "<span><b> Export poles / zeros / gain</b> to file or clipboard<br><br>" 
+            "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
+            "forma with full precision.<br>"
+            "Otherwise, export as displayed.</span>")
 
         self.but_csv_options = QPushButton(self)
         self.but_csv_options.setIcon(QIcon(':/settings.svg'))
@@ -322,32 +335,8 @@ class Input_PZ_UI(QWidget):
         """
         self.load_save_clipboard = not self.load_save_clipboard
         if self.load_save_clipboard:
-            self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
-            self.butFromTable.setToolTip(
-                "<span><b> Export poles / zeros / gain to clipboard</b><br><br>" 
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
-                "with full precision.<br>"
-                "Otherwise, export as displayed.</span>")
-            self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-            self.butToTable.setToolTip(
-                "<span><b>Import poles / zeros / gain from clipboard</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
-                "with full precision.<br>"
-                "Otherwise, import in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
         else:
-            self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
-            self.butFromTable.setToolTip(
-                "<span><b>Save poles / zeros / gain to file</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
-                "with full precision.<br>"
-                "Otherwise, save as displayed.</span>")
-            self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
-            self.butToTable.setToolTip(
-                "<span><b>Load poles / zeros / gain from file</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex format "
-                "with full precision.<br>"
-                "Otherwise, load in display format.</span>")
             self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
 
 

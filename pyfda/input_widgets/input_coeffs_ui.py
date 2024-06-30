@@ -141,10 +141,11 @@ class Input_Coeffs_UI(QWidget):
 
         self.but_format = QPushButton(QIcon(':/star.svg'), "", self)
         self.but_format.setToolTip(
-            "<span>When <b>inactive</>: Load and save coefficients in float / complex "
+            "<span><b>Formatted Data</b><br><br>"
+            "When <b>inactive</b>: Import / export coefficients in float / complex "
             "format with full precision.<br><br>"
-            "When <b>active</b>: Load and save coefficients in displayed format, "
-            "i.e. with the selected number of digits in Hex, Binary etc.</span>"
+            "When <b>active</b>: Import / export coefficients in selected display "
+            "format, i.e. with the selected number of digits in Hex, Binary etc.</span>"
             )
         self.but_format.setIconSize(q_icon_size)
         self.but_format.setCheckable(True)
@@ -222,12 +223,24 @@ class Input_Coeffs_UI(QWidget):
         self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
         self.but_file_clipboard.setIconSize(q_icon_size)
         self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
-        # Icon and tooltip are switched between file and clipboard,
-        # depending on CSV options in _set_load_save_icons()
+
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIconSize(q_icon_size)
+        self.butFromTable.setIcon(QIcon(':/table_export.svg'))
+        self.butFromTable.setToolTip(
+            "<span><b>Export coefficients</b> to clipboard or file<br><br>"
+            "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
+            "format with full precision.<br>"
+            "Otherwise, export coefficients as displayed.</span>")
         self.butToTable = QPushButton(self)
         self.butToTable.setIconSize(q_icon_size)
+        self.butToTable.setIcon(QIcon(':/table_import.svg'))
+        self.butToTable.setToolTip(
+            "<span><b>Import coefficients</b> from clipboard or file<br><br>"
+            "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
+            "format with full precision.<br>"
+            "Otherwise, import coefficients in selected display format "
+            "(e.g. 'Hex').</span>")
 
         self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
                                           checked=False)
@@ -353,44 +366,12 @@ class Input_Coeffs_UI(QWidget):
     # ------------------------------------------------------------------------------
     def _set_load_save_icons(self):
         """
-        Set icons / tooltipps for loading and saving data to / from file or
-        clipboard depending on selected options.
+        Set icon for importing / exporting data to / from file or clipboard
         """
         self.load_save_clipboard = not self.load_save_clipboard
         if self.load_save_clipboard:
-            self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
-            self.butFromTable.setToolTip(
-                "<span><b>Export coefficients to clipboard</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex "
-                "format with full precision.<br>"
-                "Otherwise, export coefficients as displayed.</span>")
-
-            self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-            self.butToTable.setToolTip(
-                "<span><b>Import coefficients from clipboard</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex "
-                "format with full precision.<br>"
-                "Otherwise, import coefficients in display format "
-                "(e.g. 'Hex').</span>")
-
             self.but_file_clipboard.setIcon(QIcon(':/clipboard.svg'))
-
         else:
-            self.butFromTable.setIcon(QIcon(':/save_to_disk.svg'))
-            self.butFromTable.setToolTip(
-                "<span><b>Save coefficients to file></b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex "
-                "format with full precision.<br>"
-                "Otherwise, save coefficients as displayed.</span>")
-
-            self.butToTable.setIcon(QIcon(':/load_from_disk.svg'))
-            self.butToTable.setToolTip(
-                "<span><b>Load coefficients from file</b><br><br>"
-                "When the &lt;FORMAT&gt; button is inactive, use float / complex "
-                "format with full precision.<br>"
-                "Otherwise, import coefficients in display format "
-                "(e.g. 'Hex').</span>")
-
             self.but_file_clipboard.setIcon(QIcon(':/file.svg'))
 
 # ------------------------------------------------------------------------------
