@@ -42,6 +42,8 @@
     <file alias="star.svg">images/icons/dark/stars_black_24dp.svg</file>
     <file alias="stop.svg">images/icons/dark/ic_play_arrow_48px.svg</file>
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
+    <file alias="table_export.svg">images/icons/dark/table_export.svg</file>
+    <file alias="table_import.svg">images/icons/dark/table_import.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
     <file alias="ui_level_min.svg">images/icons/dark/density_large.svg</file>
     <file alias="ui_level_mid.svg">images/icons/dark/density_medium.svg</file>
