@@ -383,8 +383,8 @@ class Input_Coeffs(QWidget):
         # wdg.editingFinished() is only emitted for user changes
         self.ui.spnDigits.editingFinished.connect(self.refresh_table)
 
-        self.ui.butFromTable.clicked.connect(self.export_table)
-        self.ui.butToTable.clicked.connect(self._import)
+        self.ui.but_table_export.clicked.connect(self.export_table)
+        self.ui.but_table_import.clicked.connect(self._import)
 
         self.ui.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 

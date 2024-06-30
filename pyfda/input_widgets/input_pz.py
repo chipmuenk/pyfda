@@ -257,8 +257,8 @@ class Input_PZ(QWidget):
         self.ui.butAddCells.clicked.connect(self._add_rows)
         self.ui.butClear.clicked.connect(self._clear_table)
 
-        self.ui.butFromTable.clicked.connect(self.export_table)
-        self.ui.butToTable.clicked.connect(self._import)
+        self.ui.but_table_export.clicked.connect(self.export_table)
+        self.ui.but_table_import.clicked.connect(self._import)
 
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
 

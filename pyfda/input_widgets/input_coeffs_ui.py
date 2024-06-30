@@ -224,18 +224,18 @@ class Input_Coeffs_UI(QWidget):
         self.but_file_clipboard.setIconSize(q_icon_size)
         self.but_file_clipboard.setToolTip("Select between file and clipboard import / export.")
 
-        self.butFromTable = QPushButton(self)
-        self.butFromTable.setIconSize(q_icon_size)
-        self.butFromTable.setIcon(QIcon(':/table_export.svg'))
-        self.butFromTable.setToolTip(
+        self.but_table_export = QPushButton(self)
+        self.but_table_export.setIconSize(q_icon_size)
+        self.but_table_export.setIcon(QIcon(':/table_export.svg'))
+        self.but_table_export.setToolTip(
             "<span><b>Export coefficients</b> to clipboard or file<br><br>"
             "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
             "format with full precision.<br>"
             "Otherwise, export coefficients as displayed.</span>")
-        self.butToTable = QPushButton(self)
-        self.butToTable.setIconSize(q_icon_size)
-        self.butToTable.setIcon(QIcon(':/table_import.svg'))
-        self.butToTable.setToolTip(
+        self.but_table_import = QPushButton(self)
+        self.but_table_import.setIconSize(q_icon_size)
+        self.but_table_import.setIcon(QIcon(':/table_import.svg'))
+        self.but_table_import.setToolTip(
             "<span><b>Import coefficients</b> from clipboard or file<br><br>"
             "When the &lt;FORMATTED DATA&gt; button is inactive, use float / complex "
             "format with full precision.<br>"
@@ -260,8 +260,8 @@ class Input_Coeffs_UI(QWidget):
         layH_buttons_coeffs1.addWidget(self.but_undo)
         layH_buttons_coeffs1.addWidget(self.but_apply)
         layH_buttons_coeffs1.addWidget(self.but_file_clipboard)
-        layH_buttons_coeffs1.addWidget(self.butToTable)
-        layH_buttons_coeffs1.addWidget(self.butFromTable)
+        layH_buttons_coeffs1.addWidget(self.but_table_import)
+        layH_buttons_coeffs1.addWidget(self.but_table_export)
         layH_buttons_coeffs1.addWidget(self.but_csv_options)
         layH_buttons_coeffs1.addStretch()
 
