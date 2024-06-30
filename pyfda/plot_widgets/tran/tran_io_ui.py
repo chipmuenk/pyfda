@@ -116,7 +116,7 @@ class Tran_IO_UI(QWidget):
         self.cmb_file_format = QComboBox()
         qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
                           self.cmb_file_format_init)
-        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'),
                                           checked=False)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "

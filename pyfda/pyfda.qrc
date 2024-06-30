@@ -8,12 +8,11 @@
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
     <file alias="circle-x.svg">images/icons/dark/circle-x.svg</file>    
     <file alias="clipboard.svg">images/icons/dark/clipboard.svg</file>
-    <file alias="download.svg">images/icons/dark/data-transfer-download.svg</file>
+    <file alias="csv_options.svg">images/icons/dark/csv_options.svg</file>    
     <file alias="ellipses_h.svg">images/icons/dark/ellipses_h.svg</file>
     <file alias="ellipses_v.svg">images/icons/dark/ellipses_v.svg</file>
     <file alias="file.svg">images/icons/dark/file.svg</file>
     <file alias="fft.svg">images/icons/fft.svg</file>
-    <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
     <file alias="graph_90.svg">images/icons/dark/graph_90.svg</file>
     <file alias="grid_none.svg">images/icons/dark/grid_none.svg</file>
@@ -22,7 +21,6 @@
      <!--  <file alias="hearing.svg">images/icons/dark/ic_hearing_48px.svg</file>  -->
     <file alias="help.svg">images/icons/dark/ic_help_24px.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
-    <file alias="load_from_disk.svg">images/icons/dark/appbar.disk.download.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
@@ -33,10 +31,7 @@
     <file alias="row_delete.svg">images/icons/dark/appbar.list.delete.svg</file>
     <file alias="row_insert_above.svg">images/icons/dark/appbar.list.add.above.svg</file>
     <file alias="save.svg">images/icons/dark/appbar.disk.svg</file>
-    <file alias="save_to_disk.svg">images/icons/dark/appbar.disk.upload.svg</file>
     <file alias="settings.svg">images/icons/dark/cog.svg</file>
-    <file alias="speaker.svg">images/icons/dark/ic_volume_up_48px.svg</file>
-    <file alias="speaker_90.svg">images/icons/dark/ic_volume_up_48px_90.svg</file>
     <file alias="sort-ascending.svg">images/icons/dark/sort-ascending.svg</file>
     <!-- <file alias="stop.svg">images/icons/dark/ic_stop_48px.svg</file> -->
     <file alias="star.svg">images/icons/dark/stars_black_24dp.svg</file>
@@ -48,10 +43,9 @@
     <file alias="ui_level_min.svg">images/icons/dark/density_large.svg</file>
     <file alias="ui_level_mid.svg">images/icons/dark/density_medium.svg</file>
     <file alias="ui_level_max.svg">images/icons/dark/density_small.svg</file>
-    <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
-    <file alias="pause_w.svg">images/icons/light/ic_pause_48px_white.svg</file>
-    <file alias="play_w.svg">images/icons/light/ic_play_arrow_48px_white.svg</file>
+    <!-- <file alias="pause_w.svg">images/icons/light/ic_pause_48px_white.svg</file> -->
+    <!-- <file alias="play_w.svg">images/icons/light/ic_play_arrow_48px_white.svg</file> -->
 
     <file alias="plot_style-none">images/icons/plot_style-none.png</file>
     <file alias="plot_style-mkr">images/icons/plot_style-mkr.png</file>

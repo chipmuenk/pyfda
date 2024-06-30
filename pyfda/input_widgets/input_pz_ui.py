@@ -229,7 +229,7 @@ class Input_PZ_UI(QWidget):
             "Otherwise, export as displayed.</span>")
 
         self.but_csv_options = QPushButton(self)
-        self.but_csv_options.setIcon(QIcon(':/settings.svg'))
+        self.but_csv_options.setIcon(QIcon(':/csv_options.svg'))
         self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
             "<span>Select CSV format and whether "

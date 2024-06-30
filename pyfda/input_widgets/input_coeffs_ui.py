@@ -242,7 +242,7 @@ class Input_Coeffs_UI(QWidget):
             "Otherwise, import coefficients in selected display format "
             "(e.g. 'Hex').</span>")
 
-        self.but_csv_options = PushButton(self, icon=QIcon(':/settings.svg'),
+        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'),
                                           checked=False)
         # self.but_csv_options.setIconSize(q_icon_size)
         self.but_csv_options.setToolTip(
