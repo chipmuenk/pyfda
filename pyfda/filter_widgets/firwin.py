@@ -224,12 +224,12 @@ class Firwin(QWidget):
         # ----------------------------------------------------------------------
         # SIGNALS & SLOTs
         # ----------------------------------------------------------------------
-        self.cmb_firwin_alg.currentIndexChanged.connect(self._update_fft_window)
+        self.cmb_firwin_alg.currentIndexChanged.connect(self._update_min_alg)
         self.but_fft_wdg.clicked.connect(self.toggle_fft_wdg)
         # ----------------------------------------------------------------------
 
 # ==============================================================================
-    def _update_fft_window(self):
+    def _update_min_alg(self):
         """
         Update UI when min. calc. algorithm has been changed
         """
