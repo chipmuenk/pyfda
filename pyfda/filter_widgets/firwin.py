@@ -78,7 +78,6 @@ class Firwin(QWidget):
         self.setObjectName(objectName)
         self.ft = 'FIR'
 
-        self.cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']  # set initial window
         self.alg = "ichige"
 
         c = Common()
@@ -171,8 +170,6 @@ class Firwin(QWidget):
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         # self.qfft_win_select.setSizeAdjustPolicy(QComboBox.AdjustToContents))
-        # set the current window name / id
-        # fb.fil[0]['filter_widgets']['firwin']['id'] = self.cur_win_id
 
         # instantiate FFT window with freshly created windows dict
         self.win_viewer = Plot_FFT_win(fb.fil[0]['filter_widgets']['firwin'],
@@ -234,7 +231,6 @@ class Firwin(QWidget):
         Update UI when min. calc. algorithm has been changed
         """
         self.alg = str(self.cmb_firwin_alg.currentText())
-        # logger.warning(self.cur_win_id)
         self.emit({'filt_changed': 'firwin'})
 
     # --------------------------------------------------------------------------
@@ -256,22 +252,24 @@ class Firwin(QWidget):
 
         try:
             # Get window id from filter dict fb.fil[0]
-            self.cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
-            logger.warning(f"curwin = {self.cur_win_id}")
+            cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
+            logger.warning(f"curwin = {cur_win_id}")
 
             # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
             for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par'])):
-                self.all_wins_dict[self.cur_win_id]['par'][p]['val'] =\
+                self.all_wins_dict[cur_win_id]['par'][p]['val'] =\
                     fb.fil[0]['filter_widgets']['firwin']['par'][p]['val']
         except KeyError as e:
             logger.warning(f"Couldn't load 'firwin' dict!\n{e}")
             logger.warning(fb.fil[0]['filter_widgets'])
-            logger.warning("Updating from all_wins_dict")
+            logger.warning("Falling back to 'Rectangular' window.")
 
-            self.cur_win_id = self.all_wins_dict['current']['id']
+            fb.fil[0]['filter_widgets']['firwin']['id'] = 'rectangular'
+            fb.fil[0]['filter_widgets']['firwin']['par'] = []
             self.filter_params2dict()
 
-        self.qfft_win_select.set_window_name(self.cur_win_id)
+        self.qfft_win_select.set_window_name(
+            fb.fil[0]['filter_widgets']['firwin']['id'])
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 
@@ -281,11 +279,12 @@ class Firwin(QWidget):
         Store window and parameter settings from current window of `self.all_wins_dict`
         to filter dictionary fb.fil[0]['filter_widgets']['firwin'].
         """
-        logger.warning(f"filter_params2dict: self.cur_win_id: {self.cur_win_id}\n"
-                       f" self.cur_win_id]['id']: {self.all_wins_dict[self.cur_win_id]['id']}")
+        cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
+        logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
+                       f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
         fb.fil[0]['filter_widgets']['firwin'] =\
-            {'par': self.all_wins_dict[self.cur_win_id]['par'],
-             'id': self.all_wins_dict[self.cur_win_id]['id']
+            {'par': self.all_wins_dict[cur_win_id]['par'],
+             'id': self.all_wins_dict[cur_win_id]['id']
              }
 
     # --------------------------------------------------------------------------
