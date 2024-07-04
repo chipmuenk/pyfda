@@ -285,7 +285,7 @@ class Firwin(QWidget):
                        f" self.cur_win_id]['id']: {self.all_wins_dict[self.cur_win_id]['id']}")
         fb.fil[0]['filter_widgets']['firwin'] =\
             {'par': self.all_wins_dict[self.cur_win_id]['par'],
-             'id': self.all_wins_dict[self.cur_win_id]['id']
+             'id': self.cur_win_id
              }
 
     # --------------------------------------------------------------------------
