@@ -307,9 +307,9 @@ fil_ref = {
         "equiripple": {"grid_density": 16},
         # Windowed FIR filters
         "firwin":
-            {"id": "hann", # Window id
-             "disp_name": "Hann", # display name
-             "par": []    # set of list of window parameters
+            {"id": "kaiser", # Window id
+             "disp_name": "Kaiser", # display name
+             "par_val": [10]    # list of window parameters
             },
         # Moving Average filters
         "ma":

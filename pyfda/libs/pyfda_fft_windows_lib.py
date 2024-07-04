@@ -55,7 +55,8 @@ all_wins_dict_ref = {
         'fn_name': 'boxcar',
         'id': 'boxcar',
         'info': rectangular_info,
-        'par': []
+        'par': [],
+        'par_val': []
          },
     'rectangular': {
         'app': ['fir', 'spec', 'all'],
@@ -63,7 +64,8 @@ all_wins_dict_ref = {
         'fn_name': 'boxcar',
         'id': 'rectangular',
         'info': rectangular_info,
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'barthann': {
         'app': ['fir', 'spec', 'all'],
@@ -78,7 +80,8 @@ all_wins_dict_ref = {
             than Bartlett and Hann windows, far sidelobes have lower levels than
             Bartlett and Hamming windows.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
             },
     'bartlett': {
         'app': ['fir', 'spec', 'stft', 'all'],
@@ -86,7 +89,8 @@ all_wins_dict_ref = {
         'fn_name': 'bartlett',
         'id': 'bartlett',
         'info': bartlett_info,
-        'par': []
+        'par': [],
+        'par_val': []
             },
     'blackman': {
         'app': ['fir', 'spec', 'all'],
@@ -106,7 +110,8 @@ all_wins_dict_ref = {
             sidelobes have a fall-off rate of -18 dB/dec.
             Its main lobe width is 12 &pi; / <i>N</i>.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'blackmanharris': {
         'app': ['fir', 'spec', 'all'],
@@ -123,8 +128,9 @@ all_wins_dict_ref = {
             of up to 125, 180 and 230 dB.
             </span>''',
         'par': [{
-            'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
-            'tooltip': '<span>Number of cosine terms</span>'}]
+            'name': 'L', 'name_tex': r'$L$', 'list': ['4', '5', '7', '9'],
+            'tooltip': '<span>Number of cosine terms</span>'}],
+        'par_val': ['4']
         },
     'bohman': {
         'app': ['fir', 'spec', 'all'],
@@ -134,7 +140,8 @@ all_wins_dict_ref = {
         'info':
             '''<span>Sidelobes of the Bohman window drop with 24 dB/oct.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'cosine': {
         'app': ['fir', 'spec', 'all'],
@@ -146,7 +153,8 @@ all_wins_dict_ref = {
             The window is half a cosine period, shifted by &pi;/2.
             For that reason it is also known as "half-cosine" or "sine" window.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'chebwin': {
         'app': ['fir', 'spec', 'all'],
@@ -160,8 +168,9 @@ all_wins_dict_ref = {
             using Chebyshev polynomials.
             </span>''',
         'par': [{
-            'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
-            'tooltip': '<span>Side lobe attenuation in dB.</span>'}]
+            'name': 'a', 'name_tex': r'$a$', 'min': 45, 'max': 300,
+            'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
+        'par_val': [80]
         },
     'dpss': {
         'app': ['fir', 'spec', 'all'],
@@ -180,11 +189,11 @@ all_wins_dict_ref = {
             Slepian window with &beta; = &pi; <i>NW</i> .
             </span>''',
         'par': [{
-             'name': 'NW', 'name_tex': r'$NW$',
-             'val': 3, 'min': 0, 'max': 100,
+             'name': 'NW', 'name_tex': r'$NW$', 'min': 0, 'max': 100,
              'tooltip':
                 '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
-                }]
+                }],
+        'par_val': [3]
         },
     #
     'flattop': {
@@ -198,7 +207,8 @@ all_wins_dict_ref = {
             used frequently in spectrum analyzers and other measurement equipment.
             They are rarely used for FIR filter design.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'general_gaussian': {
         'app': ['spec', 'all'],
@@ -211,13 +221,14 @@ all_wins_dict_ref = {
             <i>p</i> = 0.5 yields the shape of a Laplace distribution.
             </span>''',
         'par': [{
-            'name': 'p', 'name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
+            'name': 'p', 'name_tex': r'$p$', 'min': 0, 'max': 20,
             'tooltip': '<span>Shape parameter p</span>'
             },
             {
-            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
-            }]
+            }],
+        'par_val': [1.5, 5]
         },
     'gaussian': {
         'app': ['spec', 'all'],
@@ -231,8 +242,9 @@ all_wins_dict_ref = {
             of the main lobe increases.
             </span>''',
         'par': [{
-            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
-            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}]
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'min': 0,
+            'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
+        'par_val': [5]
         },
     'hamming': {
         'app': ['fir', 'spec', 'all'],
@@ -249,7 +261,8 @@ all_wins_dict_ref = {
             Mathematically, it is a two-term raised cosine
             window with non-zero endpoints (DC-offset).
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
          },
     'hann': {
         'app': ['fir', 'spec', 'all'],
@@ -268,7 +281,8 @@ all_wins_dict_ref = {
             Mathematically, it is the most simple two-term raised cosine
             or squared sine window.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
             },
     'kaiser': {
         'app': ['fir', 'spec', 'all'],
@@ -283,12 +297,12 @@ all_wins_dict_ref = {
             to the total energy.
             </span>''',
         'par': [{
-            'name': '&beta;', 'name_tex': r'$\beta$',
-            'val': 10, 'min': 0, 'max': 30,
+            'name': '&beta;', 'name_tex': r'$\beta$', 'min': 0, 'max': 30,
             'tooltip':
                 '<span>Shape parameter; lower values reduce  main lobe width, '
                 'higher values reduce side lobe level, typ. in the range '
-                '5 ... 20.</span>'}]
+                '5 ... 20.</span>'}],
+        'par_val': [10]
         },
     'nuttall': {
         'app': ['fir', 'spec', 'all'],
@@ -296,7 +310,8 @@ all_wins_dict_ref = {
         'fn_name': 'nuttall',
         'id': 'nuttall',
         'info': '',
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'parzen': {
         'app': ['fir', 'spec', 'all'],
@@ -315,7 +330,8 @@ all_wins_dict_ref = {
 
             See also: Boxcar and Triangular / Bartlett windows.
             </span>''',
-        'par': []
+        'par': [],
+        'par_val': []
             },
     'triang': {
         'app': ['fir', 'spec', 'stft', 'all'],
@@ -323,7 +339,8 @@ all_wins_dict_ref = {
         'fn_name': 'triang',
         'id': 'triang',
         'info': bartlett_info,
-        'par': []
+        'par': [],
+        'par_val': []
         },
     'tukey': {
         'app': ['spec', 'stft', 'all'],
@@ -345,8 +362,9 @@ all_wins_dict_ref = {
             altered by this window than e.g. by a Hann window.
             </span>''',
         'par': [{
-            'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
-                    'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}]
+            'name': '&alpha;', 'name_tex': r'$\alpha$', 'min': 0, 'max': 1,
+                    'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
+        'par_val': [0.25]
         },
     'ultraspherical': {
         'app': ['fir', 'spec', 'all'],
@@ -354,107 +372,22 @@ all_wins_dict_ref = {
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'id': 'ultraspherical',
         'info':'''<span>
-            Ultraspherical or Gegenbauer window, <i>p</i> = 1 yields a Gaussian
-            window, <i>p</i> = 0.5 yields the shape of a Laplace distribution.
+            Ultraspherical or Gegenbauer window, <i>&mu;</i> = 1 yields a Gaussian
+            window, <i>&mu;</i> = 0.5 yields the shape of a Laplace distribution.
 
-            As this is a three-parameter window (<i>N</i>, &mu;,)
+            This is a three-parameter window (<i>N</i>, &mu;,x_0).
             </span>''',
         'par': [{
-            'name': '&mu;', 'name_tex': r'$\mu$',
-            'val': 0.5, 'min': -0.5, 'max': 10,
+            'name': '&mu;', 'name_tex': r'$\mu$', 'min': -0.5, 'max': 10,
             'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
             },
             {
-            'name': 'x0', 'name_tex': r'$x_0$',
-            'val': 1, 'min': -10, 'max': 10,
+            'name': 'x0', 'name_tex': r'$x_0$', 'min': -10, 'max': 10,
             'tooltip': '<span>Amplitude</span>'}
              ],
+        'par_val': [0.5, 1]
         }
     }
-
-
-# ------------------------------------------------------------------------------
-# def get_valid_windows_list(win_names_list=[], win_dict={}):
-#     """
-#     Return a list of all keys (= window names) from `win_dict` that are contained in the
-#     list of window names 'win_names_list'. It is checked whether each key has a dict as
-#     a value defining the window and whether this dict has a key `fn_name` specifying
-#     the fully qualified name of the window function
-
-#     When `win_dict` is empty, use the global `all_wins_dict_ref` instead.
-
-#     When `win_names_list` is empty, return all valid window names.
-
-#     All window names in 'win_names_list' without a corresponding key in the windows dict
-#     raise a warning.
-
-#     The result is a alphabetically sorted (on the lower-cased names)
-#     list containing the valid window names (strings).
-
-#     This list can be used e.g. for initialization of a combo box.
-
-#     Parameter
-#     ---------
-#     win_names_list: list of str
-#         A list of window names defining the windows available in the constructed
-#         instance, a subset of all the windows defined in `all_wins_dict_ref`
-
-#     win_dict: dict
-
-#     Returns
-#     -------
-#     A validated list of str with window names
-
-#     """
-#     if not win_dict:  # empty dictionary, use global one
-#         win_dict = all_wins_dict_ref
-
-#     if not win_names_list:  # empty list, extract all valid keys
-#         wl = [k for k in win_dict
-#               if type(win_dict[k]) == dict
-#               and "fn_name" in win_dict[k]]
-#     else:
-#         wl = [k for k in win_dict
-#               if k in win_names_list
-#               and type(win_dict[k]) == dict
-#               and "fn_name" in win_dict[k]]
-
-#         for wn in win_names_list:
-#             if wn not in wl:
-#                 logger.warning(
-#                     f'Ignoring window name "{wn}", not found in "all_wins_dict_ref".')
-
-#     return sorted(wl, key=lambda v: (v.lower(), v))
-
-
-# ------------------------------------------------------------------------------
-# def construct_all_wins_dict(win_names_list=[], cur_win_name="Rectangular"):
-#     """
-#     Return a deep copy of `all_wins_dict_ref` with only the keys from `win_names_list`
-#     that specify valid windows. When the latter is empty, put all valid windows from
-#     `all_wins_dict_ref` into the returned subdictionary (which should be a deep copy of
-#     `all_wins_dict_ref` in this case).
-
-#     `cur_win_name` sets the initial value of the `'cur_win_name'` key in the
-#     returned dictionary.
-
-#     Parameters
-#     ----------
-#     win_names_list : list of window names (str), optional
-
-#     cur_win_name : str, optional
-#         Name of initial setting for `cur_win_name` value (current window name),
-#         default: "Rectangular"
-
-#     Returns
-#     -------
-#     win_dict: dict
-#         A dictionary with windows, window functions, docstrings etc
-#     """
-#     awd = copy.deepcopy(all_wins_dict_ref)
-#     all_wins_dict = {k: awd[k] for k in get_valid_windows_list(win_names_list)}
-#     all_wins_dict.update({'cur_win_name': cur_win_name})
-#     return all_wins_dict
 
 
 # -------------------------------------------------------------------------------------
@@ -553,7 +486,6 @@ def ultraspherical(N, alpha=0.5, x_0=1, sym=True):
 class UserWindows(object):
     def __init__(self, parent):
         super(UserWindows, self).__init__(parent)
-
 
 # =======
 # see also:

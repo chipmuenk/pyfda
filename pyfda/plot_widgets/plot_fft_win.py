@@ -598,18 +598,18 @@ class Plot_FFT_win(QDialog):
         cur_win_d = self.all_wins_dict[cur_id]
         param_txt = ""
         if len(cur_win_d['par']) > 0:
-            if type(cur_win_d['par'][0]['val']) in {str}:
-                p1 = cur_win_d['par'][0]['val']
+            if type(cur_win_d['par_val'][0]) in {str}:
+                p1 = cur_win_d['par_val'][0]
             else:
-                p1 = "{0:.3g}".format(cur_win_d['par'][0]['val'])
+                p1 = "{0:.3g}".format(cur_win_d['par_val'][0])
             param_txt = " ({0:s} = {1:s})".format(
                 cur_win_d['par'][0]['name_tex'], p1)
 
         if len(cur_win_d['par']) > 1:
-            if type(cur_win_d['par'][1]['val']) in {str}:
-                p2 = cur_win_d['par'][1]['val']
+            if type(cur_win_d['par_val'][1]) in {str}:
+                p2 = cur_win_d['par_val'][1]
             else:
-                p2 = "{0:.3g}".format(cur_win_d['par'][1]['val'])
+                p2 = "{0:.3g}".format(cur_win_d['par_val'][1])
             param_txt = param_txt[:-1]\
                 + ", {0:s} = {1:s})".format(cur_win_d['par'][1]['name_tex'], p2)
 

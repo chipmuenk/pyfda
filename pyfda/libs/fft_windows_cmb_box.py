@@ -270,15 +270,15 @@ class QFFTWinSelector(QWidget):
 
         try:
             if fn_name == 'dpss':
-                w = scipy.signal.windows.dpss(N, self.all_wins_dict[win_id]['par'][0]['val'],
-                                              sym=sym)
+                w = scipy.signal.windows.dpss(
+                    N, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
             elif n_par == 0:
                 w = self.win_fnct(N, sym=sym)
             elif n_par == 1:
-                w = self.win_fnct(N, self.all_wins_dict[win_id]['par'][0]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_id]['par_val'][0], sym=sym)
             elif n_par == 2:
-                w = self.win_fnct(N, self.all_wins_dict[win_id]['par'][0]['val'],
-                             self.all_wins_dict[win_id]['par'][1]['val'], sym=sym)
+                w = self.win_fnct(N, self.all_wins_dict[win_id]['par_val'][0],
+                             self.all_wins_dict[win_id]['par_val'][1], sym=sym)
             else:
                 logger.error(
                     "{0:d} parameters are not supported for windows at the moment!"
@@ -330,15 +330,15 @@ class QFFTWinSelector(QWidget):
 
         if n_par > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
-                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur_win_id]['par'][0]['val']))
+                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur_win_id]['par_val'][0]))
             else:
-                self.led_win_par_0.setText(str(self.all_wins_dict[cur_win_id]['par'][0]['val']))
+                self.led_win_par_0.setText(str(self.all_wins_dict[cur_win_id]['par_val'][0]))
 
         if n_par > 1:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
-                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
+                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur_win_id]['par_val'][1]))
             else:
-                self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
+                self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par_val'][1]))
 
 # ------------------------------------------------------------------------------
     def ui2dict_params(self):
@@ -355,30 +355,30 @@ class QFFTWinSelector(QWidget):
                 param = qget_cmb_box(self.cmb_win_par_1, data=False)
             else:
                 param = safe_eval(self.led_win_par_1.text(),
-                                  self.all_wins_dict[cur_win_id]['par'][1]['val'],
+                                  self.all_wins_dict[cur_win_id]['par_val'][1],
                                   return_type='float')
                 if param < self.all_wins_dict[cur_win_id]['par'][1]['min']:
                     param = self.all_wins_dict[cur_win_id]['par'][1]['min']
                 elif param > self.all_wins_dict[cur_win_id]['par'][1]['max']:
                     param = self.all_wins_dict[cur_win_id]['par'][1]['max']
                 self.led_win_par_1.setText(str(param))
-            self.all_wins_dict[cur_win_id]['par'][1]['val'] = param
-            self.cur_win_dict['par'][1]['val'] = param
+            self.all_wins_dict[cur_win_id]['par_val'][1] = param
+            self.cur_win_dict['par_val'][1] = param
 
         if len(self.all_wins_dict[cur_win_id]['par']) > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
                 param = qget_cmb_box(self.cmb_win_par_0, data=False)
             else:
                 param = safe_eval(self.led_win_par_0.text(),
-                                  self.all_wins_dict[cur_win_id]['par'][0]['val'],
+                                  self.all_wins_dict[cur_win_id]['par_val'][0],
                                   return_type='float')
                 if param < self.all_wins_dict[cur_win_id]['par'][0]['min']:
                     param = self.all_wins_dict[cur_win_id]['par'][0]['min']
                 elif param > self.all_wins_dict[cur_win_id]['par'][0]['max']:
                     param = self.all_wins_dict[cur_win_id]['par'][0]['max']
                 self.led_win_par_0.setText(str(param))
-            self.all_wins_dict[cur_win_id]['par'][0]['val'] = param
-            self.cur_win_dict['par'][0]['val'] = param
+            self.all_wins_dict[cur_win_id]['par_val'][0] = param
+            self.cur_win_dict['par_val'][0] = param
 
         self.emit({'view_changed': 'fft_win_par'})
 
@@ -431,39 +431,47 @@ class QFFTWinSelector(QWidget):
                 self.cmb_win_par_0.blockSignals(True)
                 self.cmb_win_par_0.clear()
                 self.cmb_win_par_0.addItems(self.all_wins_dict[cur_win_id]['par'][0]['list'])
-                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur_win_id]['par'][0]['val']))
+                qset_cmb_box(self.cmb_win_par_0, str(
+                    self.all_wins_dict[cur_win_id]['par_val'][0]))
                 self.cmb_win_par_0.setToolTip(
                     self.all_wins_dict[cur_win_id]['par'][0]['tooltip'])
                 self.cmb_win_par_0.blockSignals(False)
             else:
                 self.led_win_par_0.setVisible(True)
                 self.cmb_win_par_0.setVisible(False)
+                logger.warning(self.all_wins_dict[cur_win_id])
                 self.led_win_par_0.setText(
-                    str(self.all_wins_dict[cur_win_id]['par'][0]['val']))
+                    str(self.all_wins_dict[cur_win_id]['par_val'][0]))
                 self.led_win_par_0.setToolTip(
                     self.all_wins_dict[cur_win_id]['par'][0]['tooltip'])
 
         if n_par > 1:
             self.lbl_win_par_1.setText(
-                to_html(self.all_wins_dict[cur_win_id]['par'][1]['name'] + " =", frmt='bi'))
+                to_html(
+                    self.all_wins_dict[cur_win_id]['par'][1]['name'] + " =", frmt='bi'))
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
                 self.led_win_par_1.setVisible(False)
                 self.cmb_win_par_1.setVisible(True)
                 self.cmb_win_par_1.blockSignals(True)
                 self.cmb_win_par_1.clear()
-                self.cmb_win_par_1.addItems(self.all_wins_dict[cur_win_id]['par'][1]['list'])
-                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
-                self.cmb_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
+                self.cmb_win_par_1.addItems(
+                    self.all_wins_dict[cur_win_id]['par'][1]['list'])
+                qset_cmb_box(
+                    self.cmb_win_par_1, str(self.all_wins_dict[cur_win_id]['par_val'][1]))
+                self.cmb_win_par_1.setToolTip(
+                    self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
                 self.cmb_win_par_1.blockSignals(False)
             else:
                 self.led_win_par_1.setVisible(True)
                 self.cmb_win_par_1.setVisible(False)
-                self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par'][1]['val']))
-                self.led_win_par_1.setToolTip(self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
+                self.led_win_par_1.setText(
+                    str(self.all_wins_dict[cur_win_id]['par_val'][1]))
+                self.led_win_par_1.setToolTip(
+                    self.all_wins_dict[cur_win_id]['par'][1]['tooltip'])
 
         self.cur_win_dict['id'] = cur_win_id
         self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
-        self.cur_win_dict['par'] = self.all_wins_dict[cur_win_id]['par']
+        self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
 
 # ------------------------------------------------------------------------------
 
