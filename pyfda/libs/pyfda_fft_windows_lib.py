@@ -128,9 +128,9 @@ all_wins_dict_ref = {
             of up to 125, 180 and 230 dB.
             </span>''',
         'par': [{
-            'name': 'L', 'name_tex': r'$L$', 'val': '4', 'list': ['4', '5', '7', '9'],
+            'name': 'L', 'name_tex': r'$L$', 'list': ['4', '5', '7', '9'],
             'tooltip': '<span>Number of cosine terms</span>'}],
-        'par_val': [4]
+        'par_val': ['4']
         },
     'bohman': {
         'app': ['fir', 'spec', 'all'],
@@ -168,7 +168,7 @@ all_wins_dict_ref = {
             using Chebyshev polynomials.
             </span>''',
         'par': [{
-            'name': 'a', 'name_tex': r'$a$', 'val': 80, 'min': 45, 'max': 300,
+            'name': 'a', 'name_tex': r'$a$', 'min': 45, 'max': 300,
             'tooltip': '<span>Side lobe attenuation in dB.</span>'}],
         'par_val': [80]
         },
@@ -189,8 +189,7 @@ all_wins_dict_ref = {
             Slepian window with &beta; = &pi; <i>NW</i> .
             </span>''',
         'par': [{
-             'name': 'NW', 'name_tex': r'$NW$',
-             'val': 3, 'min': 0, 'max': 100,
+             'name': 'NW', 'name_tex': r'$NW$', 'min': 0, 'max': 100,
              'tooltip':
                 '<span>Standardized half bandwidth, <i>NW = BW &middot; N</i> / 2</span>'
                 }],
@@ -222,11 +221,11 @@ all_wins_dict_ref = {
             <i>p</i> = 0.5 yields the shape of a Laplace distribution.
             </span>''',
         'par': [{
-            'name': 'p', 'name_tex': r'$p$', 'val': 1.5, 'min': 0, 'max': 20,
+            'name': 'p', 'name_tex': r'$p$', 'min': 0, 'max': 20,
             'tooltip': '<span>Shape parameter p</span>'
             },
             {
-            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'
             }],
         'par_val': [1.5, 5]
@@ -243,7 +242,7 @@ all_wins_dict_ref = {
             of the main lobe increases.
             </span>''',
         'par': [{
-            'name': '&sigma;', 'name_tex': r'$\sigma$', 'val': 5, 'min': 0,
+            'name': '&sigma;', 'name_tex': r'$\sigma$', 'min': 0,
             'max': 100, 'tooltip': '<span>Standard deviation &sigma;</span>'}],
         'par_val': [5]
         },
@@ -298,13 +297,12 @@ all_wins_dict_ref = {
             to the total energy.
             </span>''',
         'par': [{
-            'name': '&beta;', 'name_tex': r'$\beta$',
-            'val': 10, 'min': 0, 'max': 30,
+            'name': '&beta;', 'name_tex': r'$\beta$', 'min': 0, 'max': 30,
             'tooltip':
                 '<span>Shape parameter; lower values reduce  main lobe width, '
                 'higher values reduce side lobe level, typ. in the range '
                 '5 ... 20.</span>'}],
-        'par_val': []
+        'par_val': [10]
         },
     'nuttall': {
         'app': ['fir', 'spec', 'all'],
@@ -364,7 +362,7 @@ all_wins_dict_ref = {
             altered by this window than e.g. by a Hann window.
             </span>''',
         'par': [{
-            'name': '&alpha;', 'name_tex': r'$\alpha$', 'val': 0.25, 'min': 0, 'max': 1,
+            'name': '&alpha;', 'name_tex': r'$\alpha$', 'min': 0, 'max': 1,
                     'tooltip': '<span>Shape parameter (see window tool tipp)</span>'}],
         'par_val': [0.25]
         },
@@ -380,13 +378,11 @@ all_wins_dict_ref = {
             This is a three-parameter window (<i>N</i>, &mu;,x_0).
             </span>''',
         'par': [{
-            'name': '&mu;', 'name_tex': r'$\mu$',
-            'val': 0.5, 'min': -0.5, 'max': 10,
+            'name': '&mu;', 'name_tex': r'$\mu$', 'min': -0.5, 'max': 10,
             'tooltip': '<span>Shape parameter &mu; or &alpha;</span>'
             },
             {
-            'name': 'x0', 'name_tex': r'$x_0$',
-            'val': 1, 'min': -10, 'max': 10,
+            'name': 'x0', 'name_tex': r'$x_0$', 'min': -10, 'max': 10,
             'tooltip': '<span>Amplitude</span>'}
              ],
         'par_val': [0.5, 1]

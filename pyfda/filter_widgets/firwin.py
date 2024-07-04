@@ -257,8 +257,8 @@ class Firwin(QWidget):
 
             # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
             for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par'])):
-                self.all_wins_dict[cur_win_id]['par'][p]['val'] =\
-                    fb.fil[0]['filter_widgets']['firwin']['par'][p]['val']
+                self.all_wins_dict[cur_win_id]['par_val'][p] =\
+                    fb.fil[0]['filter_widgets']['firwin']['par_val'][p]
         except KeyError as e:
             logger.warning(f"Couldn't load 'firwin' dict!\n{e}")
             logger.warning(fb.fil[0]['filter_widgets'])
