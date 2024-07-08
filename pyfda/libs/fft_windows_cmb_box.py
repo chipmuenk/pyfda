@@ -255,7 +255,7 @@ class QFFTWinSelector(QWidget):
         win_fnct : ndarray
             The window function with `N` data points (should be normalized to 1).
             Additionally, the normalized equivalent noise bandwidth is calculated and
-            stored as `self.all_wins_dict['nenbw']` as well as the 
+            stored as `self.all_wins_dict['nenbw']` as well as the
             correlated gain `self.all_wins_dict['cgain']`.
         """
         self.err = False

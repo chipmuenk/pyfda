@@ -316,7 +316,7 @@ fil_ref = {
     "freq_locked": False, # don't update absolute frequencies when f_S is changed
     "freq_specs_sort": True,  # sort freq. specs in ascending order
     "freq_specs_unit": "f_S",
-    "ft": "IIR",  # filter type 
+    "ft": "IIR",  # filter type
     "fx_base": "dec", # number format for fx display {'dec', 'hex', 'bin', 'oct', 'csd'}
     # string with current fixpoint module and class
     "fx_mod_class_name": "pyfda.fixpoint_widgets.iir_df1.iir_df1_pyfixp_ui",
