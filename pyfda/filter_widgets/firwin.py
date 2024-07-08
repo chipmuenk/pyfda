@@ -244,7 +244,7 @@ class Firwin(QWidget):
 
         'firwin':
             {'id': 'hann', # Window id
-             'par': [],    # list of window parameters
+             'par_val': [],    # list of window parameters
             }
             """
         self.N = fb.fil[0]['N']
@@ -256,7 +256,7 @@ class Firwin(QWidget):
             logger.warning(f"curwin = {cur_win_id}")
 
             # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
-            for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par'])):
+            for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par_val'])):
                 self.all_wins_dict[cur_win_id]['par_val'][p] =\
                     fb.fil[0]['filter_widgets']['firwin']['par_val'][p]
         except KeyError as e:
@@ -265,7 +265,7 @@ class Firwin(QWidget):
             logger.warning("Falling back to 'Rectangular' window.")
 
             fb.fil[0]['filter_widgets']['firwin']['id'] = 'rectangular'
-            fb.fil[0]['filter_widgets']['firwin']['par'] = []
+            fb.fil[0]['filter_widgets']['firwin']['par_val'] = []
             self.filter_params2dict()
 
         self.qfft_win_select.set_window_name(
@@ -283,7 +283,7 @@ class Firwin(QWidget):
         logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
                        f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
         fb.fil[0]['filter_widgets']['firwin'] =\
-            {'par': self.all_wins_dict[self.cur_win_id]['par'],
+            {'par_val': self.all_wins_dict[self.cur_win_id]['par_val'],
              'id': self.cur_win_id
              }
 

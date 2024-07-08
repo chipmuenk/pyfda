@@ -155,7 +155,7 @@ class QFFTWinSelector(QWidget):
 
         self.win_fnct = win_fnct            # handle to windows functionn
 
-        Also, update the keys 'par' and 'id' of `fb.fil[0][self.key_fil]`
+        Also, update the keys 'par_val' and 'id' of `fb.fil[0][self.key_fil]`
 
         The above is only updated when the window type has been changed compared to
         `self.cur_win_dict['id']` !
@@ -217,13 +217,13 @@ class QFFTWinSelector(QWidget):
             win_fnct = getattr(sig.windows, 'boxcar', None)
             self.cur_win_dict['id'] = "rectangular"
             self.cur_win_dict['disp_name'] = "Rectangular"
-            self.cur_win_dict['par'] = []
+            self.cur_win_dict['par_val'] = []
         else:
             # self.all_wins_dict.update({'cur_win_name': cur_win_id})
             self.win_fnct = win_fnct  # handle to windows function
             self.cur_win_dict['id'] = cur_win_id
             self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
-            self.cur_win_dict['par'] = self.all_wins_dict[cur_win_id]['par']
+            self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
 
         return win_err  # error flag, UI (window combo box) needs to be updated
 
@@ -266,7 +266,7 @@ class QFFTWinSelector(QWidget):
             win_id = self.cur_win_dict['id']
 
         fn_name = self.all_wins_dict[win_id]['fn_name']
-        n_par = len(self.all_wins_dict[win_id]['par'])
+        n_par = len(self.all_wins_dict[win_id]['par_val'])
 
         try:
             if fn_name == 'dpss':
@@ -326,7 +326,7 @@ class QFFTWinSelector(QWidget):
         TODO: take params from self.cur_win_dict?
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
-        n_par = len(self.all_wins_dict[cur_win_id]['par'])
+        n_par = len(self.all_wins_dict[cur_win_id]['par_val'])
 
         if n_par > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
@@ -412,7 +412,7 @@ class QFFTWinSelector(QWidget):
             qset_cmb_box(self.cmb_win_fft, cur_win_id, data=True)
 
         # update visibility and values of parameter widgets:
-        n_par = len(self.all_wins_dict[cur_win_id]['par'])
+        n_par = len(self.all_wins_dict[cur_win_id]['par_val'])
 
         self.lbl_win_par_0.setVisible(n_par > 0)
         self.led_win_par_0.setVisible(False)
