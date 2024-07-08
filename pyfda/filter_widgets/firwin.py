@@ -244,6 +244,7 @@ class Firwin(QWidget):
 
         'firwin':
             {'id': 'hann', # Window id
+             'disp_name': 'Hann', # display name
              'par_val': [],    # list of window parameters
             }
             """
@@ -265,6 +266,7 @@ class Firwin(QWidget):
             logger.warning("Falling back to 'Rectangular' window.")
 
             fb.fil[0]['filter_widgets']['firwin']['id'] = 'rectangular'
+            fb.fil[0]['filter_widgets']['firwin']['disp_name'] = 'Rectangular'
             fb.fil[0]['filter_widgets']['firwin']['par_val'] = []
             self.filter_params2dict()
 
@@ -284,6 +286,7 @@ class Firwin(QWidget):
                        f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
         fb.fil[0]['filter_widgets']['firwin'] =\
             {'par_val': self.all_wins_dict[self.cur_win_id]['par_val'],
+             'disp_name': self.all_wins_dict[self.cur_win_id]['disp_name'],
              'id': self.cur_win_id
              }
 

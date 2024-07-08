@@ -594,8 +594,9 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_f.setVisible(self.but_log_f.isChecked())
 
         cur_id = self.cur_win_dict['id']
-        cur_name = self.cur_win_dict['disp_name']
         cur_win_d = self.all_wins_dict[cur_id]
+        cur_name = cur_win_d['disp_name']
+
         param_txt = ""
         if len(cur_win_d['par']) > 0:
             if type(cur_win_d['par_val'][0]) in {str}:

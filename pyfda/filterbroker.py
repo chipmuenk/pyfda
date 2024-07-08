@@ -285,20 +285,9 @@ fil_ref = {
     "fc": "Ellip",  # filter class
     # Parameters for spectral analysis window function
     "fft_win": {
-        "id": "kaiser",  # display name
-        "par": [  # list of parameters
-            {
-                "max": 30,
-                "min": 0,
-                "name": "&beta;",
-                "name_tex": "$\\beta$",
-                # 'name_tex': r'$\beta$',
-                "tooltip": ("<span>Shape parameter; lower values reduce main lobe width, "
-                            "higher values reduce side lobe level, typ. in the range "
-                            "5 ... 20.</span>"),
-                "val": 10
-            }
-        ],
+        "id": "kaiser",  # window id
+        "disp_name": "Kaiser",  # display name
+        "par_val": [10],    # list of window parameters
         "win_len": 1024
     },
     # parameter(s) of dynamically instantiated filter widgets
