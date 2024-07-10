@@ -625,6 +625,9 @@ class Plot_FFT_win(QDialog):
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur_name) + param_txt)
 
+        # plot a line at the first zero
+        if self.tbl_sel[2] and not np.isnan(self.first_zero_f):
+            self.ax_f.axvline(self.first_zero_f, ls='dotted', c='b')
         # plot a line at the max. sidelobe level
         if self.tbl_sel[3] and not np.isnan(self.first_zero_f):
             self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
