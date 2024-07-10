@@ -112,6 +112,22 @@ class Plot_FFT_win(QDialog):
         self.tbl_cols = 6
         self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
 
+        self.tooltips_tbl = [
+            "<span>Normalized Equivalent Noise Bandwidth: The spectrum needs to be "
+            "divided by this factor for correct scaling of noise and other broadband "
+            "signals. 'Normalized' means w.r.t. a rectangular window. A higher NENBW "
+            "means worse SNR.</span>",
+            #
+            "<span>Gain factor for narrowband signals, the amplitude spectrum needs to "
+            "be divided by this factor for correct scaling of spectral lines.</span>",
+            #
+            "<span>Frequency of the first minimum. The smaller this frequency, the "
+            "better the frequency resolution.</span>",
+            #
+            "<span>Relative amplitude of the highest sidelobe. The higher this level, "
+            "the more leakage is produced in spectral analysis. For filter designs, "
+            "high sidelobes create bad stopband attenuations.</span>"
+        ]
 
         self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
             all_wins_dict=all_wins_dict, app=self.app,
@@ -413,6 +429,7 @@ class Plot_FFT_win(QDialog):
                 item = QTableWidgetItem(val)
                 if c % 3 == 0:
                     item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    item.setToolTip(self.tooltips_tbl[r * 2 + c // 3])
                     if self.tbl_sel[r * 2 + c % 3]:
                         item.setCheckState(Qt.Checked)
                     else:
@@ -656,7 +673,7 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0, 2, self.nenbw_unit)
-        self._set_table_item(0, 3, "Scale", font=self.bfont)  # , sel=True)
+        self._set_table_item(0, 3, "Correlated Gain", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 4, "{0:.5g}".format(self.cgain_disp))
         self._set_table_item(0, 5, self.cgain_unit)
 
@@ -664,7 +681,7 @@ class Plot_FFT_win(QDialog):
         self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_f))
         self._set_table_item(1, 2, "f_S")
 
-        self._set_table_item(1, 3, "Sidelobes", font=self.bfont)  # , sel=True)
+        self._set_table_item(1, 3, "Max. Sidelobe", font=self.bfont)  # , sel=True)
         self._set_table_item(1, 4, "{0:.5g}".format(self.sidelobe_level_disp))
         self._set_table_item(1, 5, self.cgain_unit)
 
