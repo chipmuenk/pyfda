@@ -282,11 +282,11 @@ class Firwin(QWidget):
         cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
         # logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
         #                f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
-        fb.fil[0]['filter_widgets']['firwin'] =\
-            {'par_val': self.all_wins_dict[self.cur_win_id]['par_val'],
-             'disp_name': self.all_wins_dict[self.cur_win_id]['disp_name'],
-             'id': self.cur_win_id
+        fb.fil[0]['filter_widgets']['firwin'].update(
+            {'par_val': self.all_wins_dict[cur_win_id]['par_val'],
+             'disp_name': self.all_wins_dict[cur_win_id]['disp_name']
              }
+            )
 
     # --------------------------------------------------------------------------
     def _get_params(self, fil_dict):
