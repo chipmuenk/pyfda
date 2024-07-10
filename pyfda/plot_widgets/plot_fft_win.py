@@ -427,12 +427,13 @@ class Plot_FFT_win(QDialog):
         for r in range(rows):
             for c in range(cols):
                 item = QTableWidgetItem(val)
+                item_num = r * 2 + c // 3
                 if c % 3 == 0:
-                    # Only create a checkbox and a tooltipp in the first 
+                    # Only create a checkbox and a tooltipp in the first
                     # column of each item
                     item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-                    item.setToolTip(self.tooltips_tbl[r * 2 + c // 3])
-                    if self.tbl_sel[r * 2 + c % 3]:
+                    item.setToolTip(self.tooltips_tbl[item_num])
+                    if self.tbl_sel[item_num]:
                         item.setCheckState(Qt.Checked)
                     else:
                         item.setCheckState(Qt.Unchecked)
