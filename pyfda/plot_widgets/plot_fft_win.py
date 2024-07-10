@@ -109,20 +109,9 @@ class Plot_FFT_win(QDialog):
 
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False]
-        #    False, False, False, False]
         self.tbl_cols = 6
         self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
 
-        # if all_wins_dict == {}:
-        #     # construct window selection combo box and all_wins_dict from reference
-        #     # dict and suitable entries (specified by 'app')
-        #     self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
-        #         app=self.app, objectName=self.objectName() + '_cmb')
-        #     # construct combo box from passed dictionary
-        # else:
-        #     self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
-        #         all_wins_dict=all_wins_dict, app=self.app,
-        #         objectName=self.objectName() + '_cmb')
 
         self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
             all_wins_dict=all_wins_dict, app=self.app,
@@ -401,7 +390,7 @@ class Plot_FFT_win(QDialog):
         """
         Create a table with `rows` and `cols`, organized in sets of 3:
         Name (with a checkbox) - value - unit
-        each item.
+        each item. Only called once during construction.
 
         Parameters
         ----------
@@ -465,7 +454,7 @@ class Plot_FFT_win(QDialog):
             self.qfft_win_select.dict2ui()
 
         self.nenbw = self.N_view * np.sum(np.square(self.win_view))\
-            / np.square(np.sum(self.win_view))
+            / np.square(np.sum(self.win_view)) # normalized equiv. noise BW
         self.cgain = np.sum(self.win_view) / self.N_view  # coherent gain
 
         # calculate the FFT of the window with a zero padding factor
