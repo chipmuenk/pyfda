@@ -12,7 +12,7 @@ Create a popup window with FFT window information
 import copy
 import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
-from scipy.signal import argrelextrema
+from scipy.signal import argrelmin
 
 import matplotlib.patches as mpl_patches
 
@@ -483,9 +483,12 @@ class Plot_FFT_win(QDialog):
         if self.but_norm_f.isChecked():
             self.Win /= (self.N_view * self.cgain)
 
-        # calculate frequency of first zero and maximum sidelobe level
-        first_zero = argrelextrema(
-            self.Win[:(self.N_view*self.pad)//2], np.less)
+        # calculate frequency of first zero and maximum sidelobe level,
+        # argrelmin() returns an array with indices of relative minima
+        # first_zero = argrelextrema(
+        #     self.Win[:(self.N_view*self.pad)//2], np.less)
+        first_zero = argrelmin(self.Win[:(self.N_view*self.pad)//2])
+
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
             self.first_zero_f = self.F[first_zero]
