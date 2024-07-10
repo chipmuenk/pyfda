@@ -428,6 +428,8 @@ class Plot_FFT_win(QDialog):
             for c in range(cols):
                 item = QTableWidgetItem(val)
                 if c % 3 == 0:
+                    # Only create a checkbox and a tooltipp in the first 
+                    # column of each item
                     item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.setToolTip(self.tooltips_tbl[r * 2 + c // 3])
                     if self.tbl_sel[r * 2 + c % 3]:
@@ -487,8 +489,6 @@ class Plot_FFT_win(QDialog):
 
         # calculate frequency of first zero and maximum sidelobe level,
         # argrelmin() returns an array with indices of relative minima
-        # first_zero = argrelextrema(
-        #     self.Win[:(self.N_view*self.pad)//2], np.less)
         first_zero = argrelmin(self.Win[:(self.N_view*self.pad)//2])
 
         if np.shape(first_zero)[1] > 0:
