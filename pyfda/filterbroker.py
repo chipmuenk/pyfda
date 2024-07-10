@@ -285,10 +285,10 @@ fil_ref = {
     "fc": "Ellip",  # filter class
     # Parameters for spectral analysis window function
     "fft_win": {
-        "id": "kaiser",  # window id
-        "disp_name": "Kaiser",  # display name
-        "par_val": [10],    # list of window parameters
-        "win_len": 1024
+        "id": "hann",  # window id
+        "disp_name": "Hann",  # display name
+        "par_val": [],    # list of window parameters
+        "win_len": 32  # window length for window viewer
     },
     # parameter(s) of dynamically instantiated filter widgets
     "filter_widgets": {
@@ -298,7 +298,8 @@ fil_ref = {
         "firwin":
             {"id": "kaiser", # Window id
              "disp_name": "Kaiser", # display name
-             "par_val": [10]    # list of window parameters
+             "par_val": [10],    # list of window parameters
+             "win_len": 32  # window length for window viewer
             },
         # Moving Average filters
         "ma":
