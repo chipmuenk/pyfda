@@ -103,7 +103,7 @@ class Plot_FFT_win(QDialog):
         self.bottom_f = -80  # min. value for dB display
         self.bottom_t = -60
         # initial number of data points for visualization
-        self.N_view = 32
+        self.N_view = 32 # self.cur_win_dict['win_len']
 
         self.pad = 16  # zero padding factor for smooth FFT plot
 
@@ -434,6 +434,7 @@ class Plot_FFT_win(QDialog):
                         item.setCheckState(Qt.Checked)
                     else:
                         item.setCheckState(Qt.Unchecked)
+
                 self.tbl_win_props.setItem(r, c, item)
     # https://stackoverflow.com/questions/12366521/pyqt-checkbox-in-qtablewidget
 
@@ -463,6 +464,7 @@ class Plot_FFT_win(QDialog):
         """
         self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
                                 return_type='int')
+        self.cur_win_dict['win_len'] = self.N_view  # store number of view point in dict
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
         self.win_view = self.qfft_win_select.get_window(self.N_view, sym=self.sym)
