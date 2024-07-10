@@ -283,8 +283,8 @@ fil_ref = {
     "f_max": 1.0,
     "f_s_scale": 1,
     "fc": "Ellip",  # filter class
-    # Parameters for spectral analysis window function
-    "fft_win": {
+    # Window parameters for frequency domain analysis of transient signals
+    "tran_freq_win": {
         "id": "hann",  # window id
         "disp_name": "Hann",  # display name
         "par_val": [],    # list of window parameters
