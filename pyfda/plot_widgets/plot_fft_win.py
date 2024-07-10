@@ -626,7 +626,7 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur_name) + param_txt)
 
         # plot a line at the max. sidelobe level
-        if self.tbl_sel[3]:
+        if self.tbl_sel[3] and not np.isnan(self.first_zero_f):
             self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
 
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white",
