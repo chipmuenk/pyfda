@@ -103,7 +103,7 @@ class Plot_FFT_win(QDialog):
         self.bottom_f = -80  # min. value for dB display
         self.bottom_t = -60
         # initial number of data points for visualization
-        self.N_view = 32 # self.cur_win_dict['win_len']
+        self.N_view = self.cur_win_dict['win_len']
 
         self.pad = 16  # zero padding factor for smooth FFT plot
 
