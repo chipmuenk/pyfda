@@ -129,7 +129,7 @@ class Firwin(QWidget):
         - FFT window widget
         - qfft_win_select
         """
-        logger.warning(pprint_log(dict_sig))
+        # logger.warning(pprint_log(dict_sig))
         if dict_sig['id'] == id(self):
             logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
 
@@ -249,12 +249,10 @@ class Firwin(QWidget):
             }
             """
         self.N = fb.fil[0]['N']
-        logger.warning(f"Firwin ['filter_widgets'] =\n:{fb.fil[0]['filter_widgets']}")
 
         try:
             # Get window id from filter dict fb.fil[0]
             cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
-            logger.warning(f"curwin = {cur_win_id}")
 
             # Copy all dynamic parameters from fb.fil[0] to cur_win_dict
             for p in range(len(fb.fil[0]['filter_widgets']['firwin']['par_val'])):
@@ -282,8 +280,8 @@ class Firwin(QWidget):
         to filter dictionary fb.fil[0]['filter_widgets']['firwin'].
         """
         cur_win_id = fb.fil[0]['filter_widgets']['firwin']['id']
-        logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
-                       f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
+        # logger.warning(f"filter_params2dict: cur_win_id: {cur_win_id}\n"
+        #                f" [cur_win_id]['id']: {self.all_wins_dict[cur_win_id]['id']}")
         fb.fil[0]['filter_widgets']['firwin'] =\
             {'par_val': self.all_wins_dict[self.cur_win_id]['par_val'],
              'disp_name': self.all_wins_dict[self.cur_win_id]['disp_name'],
