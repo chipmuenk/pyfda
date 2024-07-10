@@ -126,7 +126,9 @@ class Plot_FFT_win(QDialog):
             #
             "<span>Relative amplitude of the highest sidelobe. The higher this level, "
             "the more leakage is produced in spectral analysis. For filter designs, "
-            "high sidelobes create bad stopband attenuations.</span>"
+            "high sidelobes create bad stopband attenuations.</span>",
+            "<span></span>",
+            "<span></span>"
         ]
 
         self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
