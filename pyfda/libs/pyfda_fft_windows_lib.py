@@ -165,7 +165,8 @@ all_wins_dict_ref = {
         'id': 'chebwin',
         'info':
             '''<span>
-            This window gives the narrowest main lobe width for
+            This one-parameter family of window allows choosing the (constant) sidelobe
+            attenuation <i>a</i>. It gives the narrowest main lobe width for
             a given order <i>M</i> and sidelobe equiripple attenuation <i>a</i>,
             using Chebyshev polynomials.
             </span>''',
@@ -175,7 +176,7 @@ all_wins_dict_ref = {
         'par_val': [80]
         },
     'dpss': {
-        'app': ['spec', 'stft'],
+        'app': ['spec', 'stft', 'fir', 'all'],
         'disp_name': 'DPSS',
         'fn_name': 'dpss',
         'id': 'dpss',
@@ -293,10 +294,15 @@ all_wins_dict_ref = {
         'id': 'kaiser',
         'info':
             '''<span>
-            The Kaiser window is a very good approximation to the
+            The Kaiser or Kaiser-Bessel window is a family of one parameter windows
+            where the &beta; parameter provides an easy control over the trade-off
+            between main-lobe width and side-lobe level. High values give low
+            side-lobe levels but a wide main-lobe width and vice versa.<br><br>
+        
+            It is a very good approximation to the
             Digital Prolate Spheroidal Sequence (DPSS), or Slepian window,
             which maximizes the energy in the main lobe of the window relative
-            to the total energy.
+            to the total energy but is easier to compute.
             </span>''',
         'par': [{
             'name': '&beta;', 'name_tex': r'$\beta$', 'min': 0, 'max': 30,
