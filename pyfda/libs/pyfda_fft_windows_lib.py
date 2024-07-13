@@ -24,7 +24,7 @@ bartlett_info =\
     '''<span>
     The Bartlett and triangular windows are similar, except that the end
     point(s) of the Bartlett window are at zero. Its side lobes fall off with
-    12 dB/oct., the min. side lobe suppression is 26 dB.<br /><br />
+    12 dB/oct. or 40 dB/dec., the min. side lobe suppression is 26 dB.<br /><br />
 
     It can be constructed as the convolution of two rectangular windows,
     hence, its Fourier transform is the product of two (periodic) sinc
@@ -33,20 +33,22 @@ bartlett_info =\
 rectangular_info =\
     '''<span>
     Boxcar or Rectangular window, best suited for analyzing <br />
-    a) coherent signals, i.e. where the window length is an integer number of the 
+    a) <b>coherent signals</b>, i.e. where the window length is an integer number of the
     signal period.<br />
-    b) impulses where the signal length is shorter than the window
-    length (e.g. for the impulse response of a FIR filter).
-    c) noisy sinusoids with a low SNR because this window has the best equivalent
+    b) <b>impulses</b> where the signal length is shorter than the window
+    length (e.g. for the impulse response of a FIR filter).<br />
+    c) <b>noisy sinusoids with low SNR</b> because this window has the best equivalent
     noise bandwidth.<br />
-    For other signals, it
-    has the worst sidelobe suppression (13 dB) of all windows.<br /><br />
+    It should not be used for other signals as it has the worst sidelobe suppression
+    (13 dB) of all windows. Sidelobes decay with only 6 dB/oct. or 20 dB / dec.
+    <br /><br />
 
     When used for FIR filter design, a filter with the least square error
     is returned, created by truncating the sinc-law frequency response after
     <i>N</i> terms and transforming back to the time domain. It has the sharpest
     transition of all windowed FIR filters but the worst stop band attenuation
-    and a large ripple in the passband.
+    and a large ripple in the passband. Attenuation in the stop band grows with
+    only 6 dB/oct. or 20 dB / dec.
     </span>'''
 all_wins_dict_ref = {
     'boxcar': {
@@ -115,7 +117,7 @@ all_wins_dict_ref = {
         },
     'blackmanharris': {
         'app': ['fir', 'spec', 'all'],
-        'disp_name':'Blackmanharris',
+        'disp_name':'Blackman-Harris',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.blackmanharris',
         'id': 'blackmanharris',
         'info':
@@ -173,7 +175,7 @@ all_wins_dict_ref = {
         'par_val': [80]
         },
     'dpss': {
-        'app': ['fir', 'spec', 'all'],
+        'app': ['spec', 'stft'],
         'disp_name': 'DPSS',
         'fn_name': 'dpss',
         'id': 'dpss',
@@ -197,7 +199,7 @@ all_wins_dict_ref = {
         },
     #
     'flattop': {
-        'app': ['spec', 'all'],
+        'app': ['spec'],
         'disp_name': 'Flattop',
         'fn_name': 'flattop',
         'id': 'flattop',
@@ -309,7 +311,11 @@ all_wins_dict_ref = {
         'disp_name': 'Nuttall',
         'fn_name': 'nuttall',
         'id': 'nuttall',
-        'info': '',
+        'info':
+            '''<span>
+            A nuttall window is very similar to a four-term Blackman-Harris window.
+            It gives an excellent constant side-lobe suppression of more
+            than 90 dB while keeping a reasonably narrow main lobe.<br /><br /></span>''',
         'par': [],
         'par_val': []
         },
@@ -343,7 +349,7 @@ all_wins_dict_ref = {
         'par_val': []
         },
     'tukey': {
-        'app': ['spec', 'stft', 'all'],
+        'app': ['spec', 'stft'],
         'disp_name': 'Tukey',
         'fn_name': 'tukey',
         'id': 'tukey',
