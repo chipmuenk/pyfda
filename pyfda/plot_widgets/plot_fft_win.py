@@ -108,27 +108,31 @@ class Plot_FFT_win(QDialog):
         self.pad = 16  # zero padding factor for smooth FFT plot
 
         # initial settings for checkboxes
-        self.tbl_sel = [True, True, False, False]
+        self.tbl_sel = [True, True, False, False, False, False]
         self.tbl_cols = 6
         self.tbl_rows = len(self.tbl_sel) // (self.tbl_cols // 3)
 
         self.tooltips_tbl = [
+            # 0
             "<span>Normalized Equivalent Noise Bandwidth: The spectrum needs to be "
             "divided by this factor for correct scaling of noise and other broadband "
             "signals. 'Normalized' means w.r.t. a rectangular window. A higher NENBW "
             "means worse SNR.</span>",
-            #
+            # 1
             "<span>Gain factor for narrowband signals, the amplitude spectrum needs to "
             "be divided by this factor for correct scaling of spectral lines.</span>",
-            #
+            # 2
             "<span>Frequency of the first minimum. The smaller this frequency, the "
             "better the frequency resolution.</span>",
-            #
+            # 3
+            "<span>3 dB width of main lobe</span>",
+            # 4
+            "<span>Maximum amplitude error for spectral components not on the "
+            "frequency grid.</span>",
+            # 5
             "<span>Relative amplitude of the highest sidelobe. The higher this level, "
             "the more leakage is produced in spectral analysis. For filter designs, "
-            "high sidelobes create bad stopband attenuations.</span>",
-            "<span></span>",
-            "<span></span>"
+            "high sidelobes create bad stopband attenuations.</span>"
         ]
 
         self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
@@ -258,6 +262,15 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
+        self.but_bin_f = QPushButton("bins", default=False, autoDefault=False,
+                                     objectName="but_bin_f")
+        self.but_bin_f.setMaximumWidth(qtext_width(" bins "))
+        self.but_bin_f.setToolTip(
+            "<span>Display frequencies in bins or multiples of <i>f<sub>S</sub></i>."
+            "</span>")
+        self.but_bin_f.setCheckable(True)
+        self.but_bin_f.setChecked(True)
+
         # ----------------------------------------------------------------------
         #               ### frm_controls ###
         #
@@ -289,11 +302,14 @@ class Plot_FFT_win(QDialog):
         layHControls.addWidget(self.lbl_log_bottom_f)
         layHControls.addWidget(self.led_log_bottom_f)
         layHControls.addWidget(self.but_log_f)
+        layHControls.addStretch(1)
+        layHControls.addWidget(QVLine(width=2))
 
         layVControls = QVBoxLayout()
         layVControls.addWidget(self.frmQFFT)
         layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
+        layHControls.addWidget(self.but_bin_f)
 
         self.frm_controls = QFrame(self, objectName="frmControls")
         self.frm_controls.setLayout(layVControls)
@@ -389,6 +405,7 @@ class Plot_FFT_win(QDialog):
         # ----------------------------------------------------------------------
         self.but_log_f.clicked.connect(self.update_view)
         self.but_log_t.clicked.connect(self.update_view)
+        self.but_bin_f.clicked.connect(self.update_view)
         self.led_log_bottom_t.editingFinished.connect(self.update_bottom)
         self.led_log_bottom_f.editingFinished.connect(self.update_bottom)
 
@@ -482,9 +499,12 @@ class Plot_FFT_win(QDialog):
         self.cgain = np.sum(self.win_view) / self.N_view  # coherent gain
 
         # calculate the FFT of the window with a zero padding factor
-        # of `self.pad`
+        # of `self.pad` and create the frequency axis
         self.F = fftfreq(self.N_view * self.pad, d=1. / fb.fil[0]['f_S'])
+        self.k = fftfreq(self.N_view * self.pad, d=1./(self.N_view))
         self.Win = np.abs(fft(self.win_view, self.N_view * self.pad))
+        # calculate the max. amplitude error in the middle of the bin
+        self.max_a_err = self.Win[self.pad // 2] / (self.N_view * self.cgain)
 
         # Correct gain for periodic signals (coherent gain)
         if self.but_norm_f.isChecked():
@@ -497,11 +517,18 @@ class Plot_FFT_win(QDialog):
         if np.shape(first_zero)[1] > 0:
             first_zero = first_zero[0][0]
             self.first_zero_f = self.F[first_zero]
+            self.first_zero_idx = first_zero / float(self.pad)
             self.sidelobe_level = np.max(
                 self.Win[first_zero:(self.N_view*self.pad)//2])
         else:
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
+
+
+        mainlobe_3dB_idx = (
+            np.abs(self.Win[:len(self.F*self.pad)//2] - self.Win[0]/np.sqrt(2))).argmin()
+        self.mainlobe_3dB_freq = self.F[mainlobe_3dB_idx]
+        self.mainlobe_3dB_idx = mainlobe_3dB_idx / float(self.pad)
 
         self.update_view()
 
@@ -528,10 +555,8 @@ class Plot_FFT_win(QDialog):
             num = item.row() * 2 + item.column() // 3
             if item.checkState() == Qt.Checked:
                 self.tbl_sel[num] = True
-                logger.debug('"{0}:{1}" Checked'.format(item.text(), num))
             else:
                 self.tbl_sel[num] = False
-                logger.debug('"{0}:{1}" Unchecked'.format(item.text(), num))
 
         elif item.column() % 3 == 1:  # clicked on value field
             logger.info("{0:s} copied to clipboard.".format(item.text()))
@@ -581,26 +606,54 @@ class Plot_FFT_win(QDialog):
 
         if self.but_half_f.isChecked():
             F = self.F[:len(self.F*self.pad)//2]
+            k = self.k[:len(self.F*self.pad)//2]
             Win = self.Win[:len(self.F*self.pad)//2]
         else:
             F = fftshift(self.F)
+            k = fftshift(self.k)
             Win = fftshift(self.Win)
 
+        if self.but_bin_f.isChecked():
+            self.ax_f.set_xlabel(r"$k \; \rightarrow$")
+            x = k
+        else:
+            self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
+            x = F
+
         if self.but_log_f.isChecked():
-            self.ax_f.plot(F, np.maximum(
+            self.ax_f.plot(x, np.maximum(
                 20 * np.log10(np.abs(Win)), self.bottom_f))
-            self.nenbw_disp = 10 * np.log10(self.nenbw)
+
             self.cgain_disp = 20 * np.log10(self.cgain)
             self.sidelobe_level_disp = 20 * np.log10(self.sidelobe_level)
-            self.nenbw_unit = "dB"
+            self.max_a_err_disp = 20 * np.log10(self.max_a_err)
             self.cgain_unit = "dB"
+            self.max_a_err_unit = "dB"
         else:
-            self.ax_f.plot(F, Win)
-            self.nenbw_disp = self.nenbw
+            self.ax_f.plot(x, Win)
+
             self.cgain_disp = self.cgain
             self.sidelobe_level_disp = self.sidelobe_level
-            self.nenbw_unit = "bins"
+            self.max_a_err_disp = self.max_a_err
             self.cgain_unit = ""
+            self.max_a_err_unit = ""
+
+        if self.but_bin_f.isChecked():
+            self.but_bin_f.setText("bins")
+            self.nenbw_disp = self.nenbw
+            self.nenbw_unit = "bins"
+            self.first_zero_disp = self.first_zero_idx
+            self.first_zero_unit = "bins"
+            self.mainlobe_3dB_disp = self.mainlobe_3dB_idx
+            self.mainlobe_3dB_unit = "bins"
+        else:
+            self.but_bin_f.setText("f_S")
+            self.nenbw_disp = 10 * np.log10(self.nenbw)
+            self.nenbw_unit = "dB"
+            self.first_zero_disp = self.first_zero_f
+            self.first_zero_unit = "f_S"
+            self.mainlobe_3dB_disp = self.mainlobe_3dB_freq
+            self.mainlobe_3dB_unit = "f_S"
 
         self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
@@ -630,13 +683,7 @@ class Plot_FFT_win(QDialog):
 
         self.mplwidget.fig.suptitle(r'{0} Window'.format(cur_name) + param_txt)
 
-        # plot a line at the first zero
-        if self.tbl_sel[2] and not np.isnan(self.first_zero_f):
-            self.ax_f.axvline(self.first_zero_f, ls='dotted', c='b')
-        # plot a line at the max. sidelobe level
-        if self.tbl_sel[3] and not np.isnan(self.first_zero_f):
-            self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
-
+        # white background for plots
         patch = mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white",
                                       lw=0, alpha=0)
         # Info legend for time domain window
@@ -649,17 +696,28 @@ class Plot_FFT_win(QDialog):
         # Info legend for frequency domain window
         labels_f = []
         N_patches = 0
-        if self.tbl_sel[0]:
+        if self.tbl_sel[0]:  # NENBW
             labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp,
                                                            self.nenbw_unit))
             N_patches += 1
-        if self.tbl_sel[1]:
+
+        if self.tbl_sel[1]:  # Correlated gain
             labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.cgain_disp,
                                                            self.cgain_unit))
             N_patches += 1
-        if self.tbl_sel[2]:
-            labels_f.append("1st Zero = {0:.4g}".format(self.first_zero_f))
+
+        if self.tbl_sel[2]:  # first_zero
+            labels_f.append("1st Zero = {0:.4g} {1}".format(self.first_zero_disp,
+                                                            self.first_zero_unit))
             N_patches += 1
+            # plot a line at the first zero
+            if not np.isnan(self.first_zero_f):
+                self.ax_f.axvline(self.first_zero_f, ls='dotted', c='b')
+
+        if self.tbl_sel[5]:  # max. sidelobe
+            # plot a line at the max. sidelobe level
+            if not np.isnan(self.first_zero_f):
+                self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
 
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best',
@@ -681,20 +739,30 @@ class Plot_FFT_win(QDialog):
         else:
             self.txtInfoBox.clear()
 
+        # 0
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
         self._set_table_item(0, 2, self.nenbw_unit)
+        # 1
         self._set_table_item(0, 3, "Correlated Gain", font=self.bfont)  # , sel=True)
         self._set_table_item(0, 4, "{0:.5g}".format(self.cgain_disp))
         self._set_table_item(0, 5, self.cgain_unit)
-
+        # 2
         self._set_table_item(1, 0, "1st Zero", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_f))
-        self._set_table_item(1, 2, "f_S")
-
-        self._set_table_item(1, 3, "Max. Sidelobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 4, "{0:.5g}".format(self.sidelobe_level_disp))
-        self._set_table_item(1, 5, self.cgain_unit)
+        self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_disp))
+        self._set_table_item(1, 2, self.first_zero_unit)
+        # 3
+        self._set_table_item(1, 3, "3dB Width Mainlobe", font=self.bfont)  # , sel=True)
+        self._set_table_item(1, 4, "{0:.5g}".format(self.mainlobe_3dB_disp))
+        self._set_table_item(1, 5, self.mainlobe_3dB_unit)
+        # 4
+        self._set_table_item(2, 0, "Max. Amp. Error", font=self.bfont)  # , sel=True)
+        self._set_table_item(2, 1, "{0:.5g}".format(self.max_a_err_disp))
+        self._set_table_item(2, 2, self.max_a_err_unit)
+        # 5
+        self._set_table_item(2, 3, "Max. Sidelobe", font=self.bfont)  # , sel=True)
+        self._set_table_item(2, 4, "{0:.5g}".format(self.sidelobe_level_disp))
+        self._set_table_item(2, 5, self.cgain_unit)
 
         self.tbl_win_props.resizeColumnsToContents()
         self.tbl_win_props.resizeRowsToContents()
