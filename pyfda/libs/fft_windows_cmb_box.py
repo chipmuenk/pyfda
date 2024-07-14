@@ -403,8 +403,6 @@ class QFFTWinSelector(QWidget):
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         err = self.set_window_name(cur_win_id)
-        logger.warning(f"{self.objectName()}: cmb_win_fft = {cur_win_id}")
-        logger.warning(f"cur_win_id = {self.cur_win_dict['id']}")
         # if selected window does not exist (`err = True`) or produces errors, fall back
         # to 'cur_win_id'
         if err:
@@ -439,7 +437,6 @@ class QFFTWinSelector(QWidget):
             else:
                 self.led_win_par_0.setVisible(True)
                 self.cmb_win_par_0.setVisible(False)
-                logger.warning(self.all_wins_dict[cur_win_id])
                 self.led_win_par_0.setText(
                     str(self.all_wins_dict[cur_win_id]['par_val'][0]))
                 self.led_win_par_0.setToolTip(
