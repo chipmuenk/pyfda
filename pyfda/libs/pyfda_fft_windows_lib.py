@@ -243,9 +243,19 @@ all_wins_dict_ref = {
         'id': 'gaussian',
         'info':
             '''<span>
-            The higher the standard deviation of Gaussian window is set,
-            the lower the max. sidelobe level becomes. At the same time, the width
-            of the main lobe increases.
+            The Gaussian function provides the minimum time-bandwidth product and
+            hence a great compromise between localization in the time and frequency
+            domain.
+
+            A higher standard deviation creates a wider Gaussian distribution in the
+            time domain, yielding a narrower main lobe and higher sidelobe levels in
+            the frequency domain and vice versa.
+
+            When used as a window, it has to be truncated and no longer
+            provides the minimum time-bandwidth product. For &sigma; &gt; 3, the
+            truncation error is sufficiently small for most applications.
+
+            &sigma; = (N -1)/(2a)
             </span>''',
         'par': [{
             'name': '&sigma;', 'name_tex': r'$\sigma$', 'min': 0,
@@ -301,7 +311,7 @@ all_wins_dict_ref = {
             where the &beta; parameter provides an easy control over the trade-off
             between main-lobe width and side-lobe level. High values give low
             side-lobe levels but a wide main-lobe width and vice versa.<br><br>
-        
+
             It is a very good approximation to the
             Digital Prolate Spheroidal Sequence (DPSS), or Slepian window,
             which maximizes the energy in the main lobe of the window relative
