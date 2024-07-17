@@ -714,6 +714,19 @@ class Plot_FFT_win(QDialog):
             if not np.isnan(self.first_zero_f):
                 self.ax_f.axvline(self.first_zero_disp, ls='dotted', c='b')
 
+        if self.tbl_sel[3]:  # 3dB bandwidth
+            labels_f.append("$W_{{3dB}}$ = {0:.3g} {1}".format(self.mainlobe_3dB_disp,
+                                                               self.mainlobe_3dB_unit))
+            N_patches += 1
+            # plot a line at the -3dB bandwidth
+            if not np.isnan(self.mainlobe_3dB_disp):
+                self.ax_f.axvline(self.mainlobe_3dB_disp, ls='dotted', c='b')
+
+        if self.tbl_sel[4]:  # max ampl. error
+            labels_f.append("$A_{{err,max}}$ = {0:.3g} {1}".format(self.max_a_err_disp,
+                                                                   self.max_a_err_unit))
+            N_patches += 1
+
         if self.tbl_sel[5]:  # max. sidelobe
             # plot a line at the max. sidelobe level
             if not np.isnan(self.first_zero_f):
