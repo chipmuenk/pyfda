@@ -499,7 +499,7 @@ class Firwin(QWidget):
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
@@ -511,7 +511,7 @@ class Firwin(QWidget):
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
@@ -520,7 +520,7 @@ class Firwin(QWidget):
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], pass_zero=False, nyq=0.5,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
@@ -535,7 +535,7 @@ class Firwin(QWidget):
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
@@ -544,7 +544,7 @@ class Firwin(QWidget):
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']], nyq=0.5,
                                pass_zero=False,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     def BSmin(self, fil_dict):
         self._get_params(fil_dict)
@@ -557,7 +557,7 @@ class Firwin(QWidget):
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2) / 2
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                               window=self.qfft_win_select.get_window(self.N, sym=True),
+                               window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
 
     def BSman(self, fil_dict):
@@ -567,7 +567,7 @@ class Firwin(QWidget):
             return -1
         self._save(fil_dict,
                    self.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
-                               window=self.qfft_win_select.get_window(self.N, sym=True),
+                               window=self.qfft_win_select.calc_window(self.N, sym=True),
                                pass_zero=True, nyq=0.5))
 
     # ------------------------------------------------------------------------------

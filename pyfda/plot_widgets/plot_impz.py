@@ -859,7 +859,7 @@ class Plot_Impz(QWidget):
         """
         # calculate FFT of stimulus / response
         N = self.ui.N
-        win = self.ui.qfft_win_select.get_window(N) / self.ui.all_wins_dict['cgain']
+        win = self.ui.qfft_win_select.calc_window(N) / self.ui.all_wins_dict['cgain']
         if self.x is None:
             self.X = np.zeros(N)  # dummy result
             logger.warning("Stimulus is 'None', FFT cannot be calculated.")
@@ -1302,10 +1302,10 @@ class Plot_Impz(QWidget):
         if self.ui.chk_win_time.isChecked():
             if self.ui.but_log_time.isChecked():
                 win = np.maximum(
-                    20 * np.log10(abs(self.ui.qfft_win_select.get_window(self.ui.N))),
+                    20 * np.log10(abs(self.ui.qfft_win_select.calc_window(self.ui.N))),
                     self.ui.bottom_t)
             else:
-                win = self.ui.qfft_win_select.get_window(self.ui.N)
+                win = self.ui.qfft_win_select.calc_window(self.ui.N)
             h_r.append(self.ax_r.plot(
                 t, win, c="gray",
                 label=fb.fil[0]['tran_freq_win']['disp_name'])[0])
@@ -1442,7 +1442,7 @@ class Plot_Impz(QWidget):
             # hidden images: https://scipython.com/blog/hidden-images-in-spectrograms/
 
 # =============================================================================
-            win = self.ui.qfft_win_select.get_window(self.ui.time_nfft_spgr)
+            win = self.ui.qfft_win_select.calc_window(self.ui.time_nfft_spgr)
             if False:
                 Sxx, f, t, im = self.ax_s.specgram(
                     s, Fs=fb.fil[0]['f_S'], NFFT=self.ui.time_nfft_spgr,

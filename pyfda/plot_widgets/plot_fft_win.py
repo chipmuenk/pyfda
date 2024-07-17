@@ -61,7 +61,7 @@ class Plot_FFT_win(QDialog):
         in `_construct_UI()`.
 
     sym : bool
-        Passed to `get_window()`:
+        Passed to `calc_window()`:
         When True, generate a symmetric window for use in filter design.
         When False (default), generate a periodic window for use in spectral analysis.
 
@@ -489,7 +489,7 @@ class Plot_FFT_win(QDialog):
         self.cur_win_dict['win_len'] = self.N_view  # store number of view point in dict
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
-        self.win_view = self.qfft_win_select.get_window(self.N_view, sym=self.sym)
+        self.win_view = self.qfft_win_select.calc_window(self.N_view, sym=self.sym)
 
         if self.qfft_win_select.err:
             self.qfft_win_select.dict2ui()
