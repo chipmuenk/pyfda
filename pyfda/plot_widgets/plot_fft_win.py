@@ -633,10 +633,10 @@ class Plot_FFT_win(QDialog):
             self.ax_f.plot(x, Win)
 
             self.cgain_disp = self.cgain
-            self.sidelobe_level_disp = self.sidelobe_level
-            self.max_a_err_disp = self.max_a_err
             self.cgain_unit = ""
-            self.max_a_err_unit = ""
+            self.sidelobe_level_disp = self.sidelobe_level
+            self.max_a_err_disp = (1 - self.max_a_err) * 100
+            self.max_a_err_unit = "%"
 
         if self.but_bin_f.isChecked():
             self.but_bin_f.setText("bins")
