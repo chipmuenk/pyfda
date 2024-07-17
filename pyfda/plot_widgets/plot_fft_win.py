@@ -712,7 +712,7 @@ class Plot_FFT_win(QDialog):
             N_patches += 1
             # plot a line at the first zero
             if not np.isnan(self.first_zero_f):
-                self.ax_f.axvline(self.first_zero_f, ls='dotted', c='b')
+                self.ax_f.axvline(self.first_zero_disp, ls='dotted', c='b')
 
         if self.tbl_sel[5]:  # max. sidelobe
             # plot a line at the max. sidelobe level
