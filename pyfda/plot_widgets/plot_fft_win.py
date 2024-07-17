@@ -486,7 +486,7 @@ class Plot_FFT_win(QDialog):
         """
         self.N_view = safe_eval(self.led_N.text(), self.N_view, sign='pos',
                                 return_type='int')
-        self.cur_win_dict['win_len'] = self.N_view  # store number of view point in dict
+        self.cur_win_dict['win_len'] = self.N_view  # store number of view points in dict
         self.led_N.setText(str(self.N_view))
         self.n = np.arange(self.N_view)
         self.win_view = self.qfft_win_select.calc_window(self.N_view, sym=self.sym)
@@ -616,9 +616,25 @@ class Plot_FFT_win(QDialog):
         if self.but_bin_f.isChecked():
             self.ax_f.set_xlabel(r"$k \; \rightarrow$")
             x = k
+
+            self.but_bin_f.setText("bins")
+            self.nenbw_disp = self.nenbw
+            self.nenbw_unit = "bins"
+            self.first_zero_disp = self.first_zero_idx
+            self.first_zero_unit = "bins"
+            self.mainlobe_3dB_disp = self.mainlobe_3dB_idx
+            self.mainlobe_3dB_unit = "bins"
         else:
             self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
             x = F
+
+            self.but_bin_f.setText("f_S")
+            self.nenbw_disp = 10 * np.log10(self.nenbw)
+            self.nenbw_unit = "dB"
+            self.first_zero_disp = self.first_zero_f
+            self.first_zero_unit = "f_S"
+            self.mainlobe_3dB_disp = self.mainlobe_3dB_freq
+            self.mainlobe_3dB_unit = "f_S"
 
         if self.but_log_f.isChecked():
             self.ax_f.plot(x, np.maximum(
@@ -638,22 +654,6 @@ class Plot_FFT_win(QDialog):
             self.max_a_err_disp = (1 - self.max_a_err) * 100
             self.max_a_err_unit = "%"
 
-        if self.but_bin_f.isChecked():
-            self.but_bin_f.setText("bins")
-            self.nenbw_disp = self.nenbw
-            self.nenbw_unit = "bins"
-            self.first_zero_disp = self.first_zero_idx
-            self.first_zero_unit = "bins"
-            self.mainlobe_3dB_disp = self.mainlobe_3dB_idx
-            self.mainlobe_3dB_unit = "bins"
-        else:
-            self.but_bin_f.setText("f_S")
-            self.nenbw_disp = 10 * np.log10(self.nenbw)
-            self.nenbw_unit = "dB"
-            self.first_zero_disp = self.first_zero_f
-            self.first_zero_unit = "f_S"
-            self.mainlobe_3dB_disp = self.mainlobe_3dB_freq
-            self.mainlobe_3dB_unit = "f_S"
 
         self.led_log_bottom_t.setVisible(self.but_log_t.isChecked())
         self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
