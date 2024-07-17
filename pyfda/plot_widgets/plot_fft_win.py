@@ -697,17 +697,17 @@ class Plot_FFT_win(QDialog):
         labels_f = []
         N_patches = 0
         if self.tbl_sel[0]:  # NENBW
-            labels_f.append("$NENBW$ = {0:.4g} {1}".format(self.nenbw_disp,
+            labels_f.append("$NENBW$ = {0:.3g} {1}".format(self.nenbw_disp,
                                                            self.nenbw_unit))
             N_patches += 1
 
         if self.tbl_sel[1]:  # Correlated gain
-            labels_f.append("$CGAIN$ = {0:.4g} {1}".format(self.cgain_disp,
+            labels_f.append("$CGAIN$ = {0:.3g} {1}".format(self.cgain_disp,
                                                            self.cgain_unit))
             N_patches += 1
 
         if self.tbl_sel[2]:  # first_zero
-            labels_f.append("1st Zero = {0:.4g} {1}".format(self.first_zero_disp,
+            labels_f.append("1$^{{st}}$ Zero = {0:.3g} {1}".format(self.first_zero_disp,
                                                             self.first_zero_unit))
             N_patches += 1
             # plot a line at the first zero
@@ -741,27 +741,27 @@ class Plot_FFT_win(QDialog):
 
         # 0
         self._set_table_item(0, 0, "NENBW", font=self.bfont)  # , sel=True)
-        self._set_table_item(0, 1, "{0:.5g}".format(self.nenbw_disp))
+        self._set_table_item(0, 1, "{0:.4g}".format(self.nenbw_disp))
         self._set_table_item(0, 2, self.nenbw_unit)
         # 1
         self._set_table_item(0, 3, "Correlated Gain", font=self.bfont)  # , sel=True)
-        self._set_table_item(0, 4, "{0:.5g}".format(self.cgain_disp))
+        self._set_table_item(0, 4, "{0:.4g}".format(self.cgain_disp))
         self._set_table_item(0, 5, self.cgain_unit)
         # 2
         self._set_table_item(1, 0, "1st Zero", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 1, "{0:.5g}".format(self.first_zero_disp))
+        self._set_table_item(1, 1, "{0:.4g}".format(self.first_zero_disp))
         self._set_table_item(1, 2, self.first_zero_unit)
         # 3
         self._set_table_item(1, 3, "3dB Width Mainlobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(1, 4, "{0:.5g}".format(self.mainlobe_3dB_disp))
+        self._set_table_item(1, 4, "{0:.4g}".format(self.mainlobe_3dB_disp))
         self._set_table_item(1, 5, self.mainlobe_3dB_unit)
         # 4
         self._set_table_item(2, 0, "Max. Amp. Error", font=self.bfont)  # , sel=True)
-        self._set_table_item(2, 1, "{0:.5g}".format(self.max_a_err_disp))
+        self._set_table_item(2, 1, "{0:.4g}".format(self.max_a_err_disp))
         self._set_table_item(2, 2, self.max_a_err_unit)
         # 5
         self._set_table_item(2, 3, "Max. Sidelobe", font=self.bfont)  # , sel=True)
-        self._set_table_item(2, 4, "{0:.5g}".format(self.sidelobe_level_disp))
+        self._set_table_item(2, 4, "{0:.4g}".format(self.sidelobe_level_disp))
         self._set_table_item(2, 5, self.cgain_unit)
 
         self.tbl_win_props.resizeColumnsToContents()
