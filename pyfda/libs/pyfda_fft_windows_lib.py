@@ -206,9 +206,12 @@ all_wins_dict_ref = {
         'id': 'flattop',
         'info':
             '''<span>
-            Flattop windows give a very low amplitude error, that's why they are
-            used frequently in spectrum analyzers and other measurement equipment.
-            They are rarely used for FIR filter design.
+            Flattop windows are a family of windows with very low amplitude error /
+            passband ripple used frequently in spectrum analyzers and other measurement
+            equipment. Their 3dB bandwidth is approx. 2.5 times larger than that of a
+            Hann window.
+
+            They are 2nd ... 4th-order (3 ... 5 term) cosine windows.
             </span>''',
         'par': [],
         'par_val': []
