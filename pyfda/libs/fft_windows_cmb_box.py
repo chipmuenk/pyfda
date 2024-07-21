@@ -77,7 +77,7 @@ class QFFTWinSelector(QWidget):
         the widgets from the dictionary
 
         """
-        # logger.debug("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
