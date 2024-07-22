@@ -325,8 +325,8 @@ class Plot_FFT_win(QDialog):
         self.mplwidget.layVMainMpl.addWidget(self.frm_controls)
         self.mplwidget.layVMainMpl.setContentsMargins(0, 0, 0, 0)
 
-        self.mplwidget.mplToolbar.a_he.setEnabled(False)  # enable help menu
-        self.mplwidget.mplToolbar.a_he.info = "manual/plot_fft.html"  # TODO: missing!
+        # self.mplwidget.mplToolbar.a_he.setEnabled(False)  # enable help menu
+        self.mplwidget.mplToolbar.a_he.info = "manual/plot_fft_win.html"  # TODO: missing!
         self.mplwidget.mplToolbar.a_ui_num_levels = 3 # number of ui levels
 
         # ----------------------------------------------------------------------
@@ -390,7 +390,9 @@ class Plot_FFT_win(QDialog):
         #
         self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
         self.ax_t = self.ax[0]
+        self.ax_t.minorticks_on()
         self.ax_f = self.ax[1]
+        self.ax_f.minorticks_on()
 
         self.calc_win_draw()  # initial calculation and drawing
 
