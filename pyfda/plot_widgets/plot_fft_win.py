@@ -804,7 +804,8 @@ if __name__ == '__main__':
     app.setStyleSheet(rc.qss_rc)
     fb.clipboard = QApplication.clipboard()  # create clipboard instance
 
-    mainw = Plot_FFT_win(app='spec', ignore_close_event=False)
+    mainw = Plot_FFT_win(app='spec', cur_win_dict=fb.fil[0]['tran_freq_win'],
+                         ignore_close_event=False)
 
     app.setActiveWindow(mainw)
     mainw.show()
