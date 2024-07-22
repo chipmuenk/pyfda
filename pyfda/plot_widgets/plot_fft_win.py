@@ -731,11 +731,16 @@ class Plot_FFT_win(QDialog):
             # plot a line at the max. sidelobe level
             if not np.isnan(self.first_zero_f):
                 self.ax_f.axhline(self.sidelobe_level_disp, ls='dotted', c='b')
+                labels_f.append(
+                    "$A_{{SL,max}}$ = {0:.3g} {1}".format(self.sidelobe_level_disp,
+                                                          self.cgain_unit))
+            N_patches += 1
 
         if N_patches > 0:
             self.ax_f.legend([patch] * N_patches, labels_f, loc='best',
                              fontsize='small', fancybox=True, framealpha=0.7,
                              handlelength=0, handletextpad=0)
+
         np.seterr(**old_settings_seterr)
 
         self.update_info()
