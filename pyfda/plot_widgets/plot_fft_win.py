@@ -85,7 +85,7 @@ class Plot_FFT_win(QDialog):
 
     def __init__(self, cur_win_dict: dict, app: str = 'spec', all_wins_dict: dict = {},
                  sym: bool = False, title: str = 'pyFDA Window Viewer',
-                 ignore_close_event: bool = True, object_name: str = "plot_fft_win"
+                 ignore_close_event: bool = False, object_name: str = "plot_fft_win"
                  ) -> None:
         super().__init__()
         self.setObjectName(object_name)
