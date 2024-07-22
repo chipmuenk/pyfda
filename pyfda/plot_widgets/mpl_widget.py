@@ -636,6 +636,9 @@ class MplToolbar(NavigationToolbar):
 
         if not axes:
             axes = self.mpl_widget.fig.axes
+            logger.error(axes)
+            logger.error(self.a_gr_state)
+
 
         for ax in self.mpl_widget.fig.axes:
             if hasattr(ax, "is_twin"):  # the axis is a twinx() system, suppress the gridlines
