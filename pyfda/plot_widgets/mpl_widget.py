@@ -649,6 +649,8 @@ class MplToolbar(NavigationToolbar):
                     ax.grid(False, which='minor')
                     self.a_gr.setIcon(QIcon(':/grid_coarse.svg'))
                 else:
+                    # needed for figures with 2 subplots for some strange reason
+                    ax.minorticks_on()
                     ax.grid(True, which='major', lw=0.75, ls='-')
                     ax.grid(True, which='minor')
                     self.a_gr.setIcon(QIcon(':/grid_fine.svg'))

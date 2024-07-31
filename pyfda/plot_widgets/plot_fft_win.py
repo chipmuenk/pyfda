@@ -390,10 +390,7 @@ class Plot_FFT_win(QDialog):
         #
         self.ax = self.mplwidget.fig.subplots(nrows=1, ncols=2)
         self.ax_t = self.ax[0]
-        self.ax_t.minorticks_on()
         self.ax_f = self.ax[1]
-        self.ax_f.minorticks_on()
-
         self.calc_win_draw()  # initial calculation and drawing
 
         # ----------------------------------------------------------------------
@@ -526,7 +523,6 @@ class Plot_FFT_win(QDialog):
             self.first_zero_f = np.nan
             self.sidelobe_level = 0
 
-
         mainlobe_3dB_idx = (
             np.abs(self.Win[:len(self.F*self.pad)//2] - self.Win[0]/np.sqrt(2))).argmin()
         self.mainlobe_3dB_freq = self.F[mainlobe_3dB_idx]
@@ -590,7 +586,6 @@ class Plot_FFT_win(QDialog):
         # suppress "divide by zero in log10" warnings
         old_settings_seterr = np.seterr()
         np.seterr(divide='ignore')
-
         self.ax_t.cla()
         self.ax_f.cla()
 
