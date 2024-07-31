@@ -423,6 +423,7 @@ qss_common = """
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
 
+                #medium{font-size: 11pt; font-weight: bold; }
                 #large{font-size: 12pt; font-weight: bold; }
                 #xlarge{font-size: 14pt; font-weight: black;}
 
