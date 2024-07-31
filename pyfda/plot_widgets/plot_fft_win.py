@@ -105,7 +105,7 @@ class Plot_FFT_win(QDialog):
         # initial number of data points for visualization
         self.N_view = self.cur_win_dict['win_len']
 
-        self.pad = 16  # zero padding factor for smooth FFT plot
+        self.pad = 32  # zero padding factor for smooth FFT plot
 
         # initial settings for checkboxes
         self.tbl_sel = [True, True, False, False, False, False]
