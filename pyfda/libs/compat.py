@@ -92,11 +92,11 @@ class QPushButtonRT(QPushButton):
     """
     Subclass QPushButton to render rich text
     """
-    def __init__(self, parent=None, text=None, margin=10):
+    def __init__(self, parent=None, text=None, margin=10, **kwargs):
         if parent is not None:
-            super().__init__(parent)
+            super().__init__(parent, **kwargs)
         else:
-            super().__init__()
+            super().__init__(**kwargs)
         self.__lbl = QLabel(self)
         self.margin = margin
         if text is not None:
