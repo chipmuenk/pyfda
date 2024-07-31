@@ -26,7 +26,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 import pyfda.filterbroker as fb
 
 from pyfda.libs.compat import (
-    Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QCheckBox, QLabel, QLineEdit,
+    Qt, pyqtSignal, QHBoxLayout, QVBoxLayout, QDialog, QLabel, QLineEdit, QPushButtonRT,
     QFrame, QFont, QPushButton, QTextBrowser, QSplitter, QTableWidget, QTableWidgetItem,
     QSizePolicy, QHeaderView)
 import logging
@@ -212,6 +212,7 @@ class Plot_FFT_win(QDialog):
 
         # By default, the enter key triggers the default 'dialog action' in QDialog
         # widgets. This would activate one of the pushbuttons if `default` wasn't False.
+        self.lbl_title_time = QLabel("Time: ", objectName="medium")
         self.but_log_t = QPushButton("dB", default=False, autoDefault=False,
                                      objectName="chk_log_time")
         self.but_log_t.setMaximumWidth(qtext_width(" dB "))
@@ -229,6 +230,7 @@ class Plot_FFT_win(QDialog):
         self.lbl_log_bottom_t = QLabel(to_html("min =", frmt='bi'), self)
         self.lbl_log_bottom_t.setVisible(self.but_log_t.isChecked())
 
+        self.lbl_title_freq = QLabel("Freq: ", objectName="medium")
         self.but_norm_f = QPushButton("Max=1", default=False, autoDefault=False)
         self.but_norm_f.setCheckable(True)
         self.but_norm_f.setChecked(True)
@@ -262,11 +264,11 @@ class Plot_FFT_win(QDialog):
         self.led_log_bottom_f.setToolTip(
             "<span>Minimum display value for log. scale.</span>")
 
-        self.but_bin_f = QPushButton("bins", default=False, autoDefault=False,
-                                     objectName="but_bin_f")
+        self.but_bin_f = QPushButtonRT(self, "<b>&Delta; <i>f</i></b>", margin=5,
+                                       objectName="but_bin_f")
         self.but_bin_f.setMaximumWidth(qtext_width(" bins "))
         self.but_bin_f.setToolTip(
-            "<span>Display frequencies in bins or multiples of <i>f<sub>S</sub></i>."
+            "<span>Display frequencies in bins or multiples of &Delta;<i>f = f<sub>S </sub>/N</i>."
             "</span>")
         self.but_bin_f.setCheckable(True)
         self.but_bin_f.setChecked(True)
@@ -279,37 +281,44 @@ class Plot_FFT_win(QDialog):
         layH_win_select = QHBoxLayout()
         layH_win_select.addWidget(self.qfft_win_select)
         layH_win_select.setContentsMargins(0, 0, 0, 0)
+        layH_win_select.addWidget(self.lbl_N)
+        layH_win_select.addWidget(self.led_N)
         layH_win_select.addStretch(1)
         self.frmQFFT = QFrame(self, objectName="frmQFFT")
         self.frmQFFT.setLayout(layH_win_select)
 
         hline = QHLine()
 
+        layHControls_t = QHBoxLayout()
+        layHControls_t.addWidget(self.lbl_title_time)
+        layHControls_t.addWidget(self.lbl_log_bottom_t)
+        layHControls_t.addWidget(self.led_log_bottom_t)
+        layHControls_t.addWidget(self.but_log_t)
+        layHControls_t.addStretch(5)
+
+        layHControls_f = QHBoxLayout()
+        layHControls_f.addStretch(1)
+        layHControls_f.addWidget(self.lbl_title_freq)
+        layHControls_f.addWidget(self.but_norm_f)
+        layHControls_f.addStretch(1)
+        layHControls_f.addWidget(self.but_half_f)
+        layHControls_f.addStretch(1)
+        layHControls_f.addWidget(self.lbl_log_bottom_f)
+        layHControls_f.addWidget(self.led_log_bottom_f)
+        layHControls_f.addWidget(self.but_log_f)
+        layHControls_f.addWidget(QVLine(width=2))
+        layHControls_f.addWidget(self.but_bin_f)
+        layHControls_f.addStretch(5)
+
         layHControls = QHBoxLayout()
-        layHControls.addWidget(self.lbl_N)
-        layHControls.addWidget(self.led_N)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lbl_log_bottom_t)
-        layHControls.addWidget(self.led_log_bottom_t)
-        layHControls.addWidget(self.but_log_t)
-        layHControls.addStretch(5)
-        layHControls.addWidget(QVLine(width=2))
-        layHControls.addStretch(5)
-        layHControls.addWidget(self.but_norm_f)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.but_half_f)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lbl_log_bottom_f)
-        layHControls.addWidget(self.led_log_bottom_f)
-        layHControls.addWidget(self.but_log_f)
-        layHControls.addStretch(1)
-        layHControls.addWidget(QVLine(width=2))
+        layHControls.addLayout(layHControls_t, stretch=10)
+        layHControls.addWidget(QVLine(width=4), stretch=1)
+        layHControls.addLayout(layHControls_f, stretch=10)
 
         layVControls = QVBoxLayout()
         layVControls.addWidget(self.frmQFFT)
         layVControls.addWidget(hline)
         layVControls.addLayout(layHControls)
-        layHControls.addWidget(self.but_bin_f)
 
         self.frm_controls = QFrame(self, objectName="frmControls")
         self.frm_controls.setLayout(layVControls)
@@ -614,7 +623,7 @@ class Plot_FFT_win(QDialog):
             self.ax_f.set_xlabel(r"$k \; \rightarrow$")
             x = k
 
-            self.but_bin_f.setText("bins")
+            self.but_bin_f.setText("<b>bins</b>")
             self.nenbw_disp = self.nenbw
             self.nenbw_unit = "bins"
             self.first_zero_disp = self.first_zero_idx
@@ -625,7 +634,7 @@ class Plot_FFT_win(QDialog):
             self.ax_f.set_xlabel(fb.fil[0]['plt_fLabel'])
             x = F
 
-            self.but_bin_f.setText("f_S")
+            self.but_bin_f.setText("<b>&Delta; <i>f</i></b>")
             self.nenbw_disp = 10 * np.log10(self.nenbw)
             self.nenbw_unit = "dB"
             self.first_zero_disp = self.first_zero_f
