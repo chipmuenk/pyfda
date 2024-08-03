@@ -428,7 +428,34 @@ class Plot_FFT_win(QDialog):
         self.qfft_win_select.sig_tx.connect(self.update_fft_win)
 
 # ------------------------------------------------------------------------------
+    def save_ui(self):
+        """
+        Save the window type and the number of FFT points to the corresponding
+        section of `fb.fil[0]`, i.e. to `self.cur_win_dict`
 
+        "id": "hann",  # window id
+        "disp_name": "Hann",  # display name
+        "par_val": [],    # list of window parameters
+        "win_len": 32  # window length for window viewer
+        """
+        self.cur_win_dict['win_len'] = self.N_view
+        self.qfft_win_select.ui2win_dict()
+
+
+    # ------------------------------------------------------------------------------
+    def load_ui(self):
+        """
+        Load the window type and the number of FFT points from the corresponding
+        section of `fb.fil[0]`, i.e. from `self.cur_win_dict`.
+        """
+        self.N_view = safe_eval(self.cur_win_dict['win_len'], self.N_view, sign='pos',
+                                return_type='int')  # sanitize value
+        self.led_N.setText(str(self.N_view))  # update ui
+        self.qfft_win_select.dict2ui(force_update=True)
+
+        self.calc_win_draw()
+
+# ------------------------------------------------------------------------------
     def _construct_table(self, rows, cols, val):
         """
         Create a table with `rows` and `cols`, organized in sets of 3:
@@ -482,7 +509,7 @@ class Plot_FFT_win(QDialog):
         """
         (Re-)Calculate the window, its FFT and some characteristic values and update
         the plot of the window and its FFT. This should be triggered when the
-        window type or length or a parameters has been changed.
+        window type or length or a parameter has been changed.
 
         Returns
         -------
