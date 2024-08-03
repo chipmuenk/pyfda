@@ -42,6 +42,7 @@ from scipy.signal import signaltools
 from scipy.special import sinc
 
 import pyfda.filterbroker as fb  # importing filterbroker initializes all its globals
+import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning, qset_cmb_box
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
@@ -175,7 +176,9 @@ class Firwin(QWidget):
         self.win_viewer = Plot_FFT_win(fb.fil[0]['filter_widgets']['firwin'],
             app='fir', all_wins_dict=self.all_wins_dict, sym=True,
             title="pyFDA FIR Window Viewer", object_name="firwin_win_viewer")
+        # create handle to window to hide it during the "quit" dialogue,
         # hide window initially, this is modeless i.e. a non-blocking popup window
+        dirs.firwin_handle = self.win_viewer
         self.win_viewer.hide()
 
         # button for opening FFT window

@@ -326,3 +326,5 @@ before opening another pop-up window! Otherwise, the second window becomes
 unaccessible (?) and pyfda becomes unresponsive.
 """
 csv_options_handle = None
+tran_freq_win_handle = None
+firwin_handle = None

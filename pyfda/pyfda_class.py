@@ -240,10 +240,19 @@ class pyFDA(QMainWindow):
         """
         reimplement QMainWindow.closeEvent() to prompt the user
         """
-        # test for a handle to another pop-up window (CSV options) and close it,
-        # otherwise pyfda cannot be terminated and freezes
+        # test for a handle to other pop-up windows and close them, otherwise
+        # other pop-up windows can block the Messagebox (which has focus) and
+        # pyfda cannot be terminated and freezes
+        tran_freq_win_handle_vis = False
+        fir_win_handle_vis = False
         if not dirs.csv_options_handle is None:
             dirs.csv_options_handle.close()
+        if not dirs.tran_freq_win_handle is None and dirs.tran_freq_win_handle.isVisible():
+            tran_freq_win_handle_vis = True
+            dirs.tran_freq_win_handle.hide()
+        if not dirs.firwin_handle is None and dirs.firwin_handle.isVisible():
+            fir_win_handle_vis = True
+            dirs.firwin_handle.hide()
 
         reply = QMessageBox.question(self, 'Message',
             "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
@@ -254,7 +263,11 @@ class pyFDA(QMainWindow):
             # in a reasonable time
             fb.clipboard.clear()
             event.accept()
-        else:
+        else:  # restore hidden pop-up windows
+            if fir_win_handle_vis:
+                dirs.firwin_handle.show()
+            if tran_freq_win_handle_vis:
+                dirs.tran_freq_win_handle.show()
             event.ignore()
 
 

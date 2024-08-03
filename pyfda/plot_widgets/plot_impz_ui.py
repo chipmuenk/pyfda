@@ -17,6 +17,7 @@ from pyfda.libs.compat import (
 from pyfda.libs.pyfda_lib import to_html, safe_eval, pprint_log
 from pyfda.libs.pyfda_sig_lib import impz_len
 import pyfda.filterbroker as fb
+import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qtext_width, QVLine, PushButton)
 from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
@@ -259,7 +260,9 @@ class PlotImpz_UI(QWidget):
         self.win_viewer = Plot_FFT_win(fb.fil[0]['tran_freq_win'],
             app='spec', all_wins_dict=self.all_wins_dict, sym=False,
             title="pyFDA Spectral Window Viewer", object_name="impz_win_viewer")
+        # create handle to window to hide it during the "quit" dialogue,
         # hide window initially, this is modeless i.e. a non-blocking popup window
+        dirs.tran_freq_win_handle = self.win_viewer
         self.win_viewer.hide()
 
         self.lbl_fx_range = QLabel(to_html("FX Range:", frmt='b'))
