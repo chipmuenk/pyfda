@@ -302,7 +302,7 @@ class QFFTWinSelector(QWidget):
         return w
 
 # ------------------------------------------------------------------------------
-    def dict2ui(self):
+    def dict2ui(self, force_update: bool = False) -> None:
         """
         The `win_dict` dictionary has been updated somewhere else, now update the window
         selection widget and make corresponding parameter widgets visible if
@@ -312,9 +312,8 @@ class QFFTWinSelector(QWidget):
         - use `ui2win_dict()` to update parameter widgets for new window type
           from `self.all_wins_dict` without emitting a signal
         """
-        if qget_cmb_box(self.cmb_win_fft, data=True) == self.cur_win_dict['id']:
-            return
-        else:
+        if qget_cmb_box(self.cmb_win_fft, data=True) != self.cur_win_dict['id']\
+                or force_update:
             qset_cmb_box(self.cmb_win_fft, self.cur_win_dict['id'], data=True)
             self.ui2win_dict()
 
