@@ -257,6 +257,14 @@ class MplWidget(QWidget):
         """
         Toggle the tracking cursor
         """
+        def show_annotation(sel):
+            # 'sel': mplcursors.Selection object
+            sel.annotation.set(ha='left')
+            sel.annotation.set_text(
+                f'{sel.artist.get_label()}\n'
+                f'x = {sel.annotation.xy[0]:.5f}\ny = {sel.annotation.xy[1]:.5f}')
+            # sel.annotation.get_bbox_patch().set(fc="powderblue", alpha=0.9)
+
         if MPL_CURS:
             self.mplToolbar.cursor_enabled = not self.mplToolbar.cursor_enabled
             if self.mplToolbar.cursor_enabled:
@@ -264,13 +272,22 @@ class MplWidget(QWidget):
                     for i in range(len(self.cursors)):
                         self.cursors[i].remove()         # yes, remove them!
                 self.cursors = []
-                for ax in self.fig.axes:
-                    if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
-                                                 "Axes", "Axes3D"}:
-                        self.cursors.append(mplcursors.cursor(ax, hover=True))
+                # for ax in self.fig.axes:
+                #     if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
+                #                                  "Axes", "Axes3D"}:
+                #         self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
+                #         self.cursors[-1].connect("add", show_annotation)
+
+                # Either pass an artist, axis, figure or nothing to select specific objects
+                self.cursors.append(mplcursors.cursor(self.fig, multiple=True, hover=False))
+
             else:
                 for i in range(len(self.cursors)):
                     self.cursors[i].remove()
+                # for s in crs.selections:
+                #     crs.remove_selection(s)
+
+            # self.emit({'mpl_toolbar': 'cursor'})
 
         # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
 
