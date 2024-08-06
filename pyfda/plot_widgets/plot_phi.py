@@ -218,7 +218,7 @@ class Plot_Phi(QWidget):
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        line_phi, = self.ax.plot(F, phi_plt)
+        line_phi = self.ax.plot(F, phi_plt, label=r'$\phi(F)$')
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks

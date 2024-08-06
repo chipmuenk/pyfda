@@ -1092,7 +1092,7 @@ class Plot_Impz(QWidget):
 
         # plot markers (except for 'stem' and 'dots' where they have been plotted already)
         if mkr_fmt and plt_style not in {'stem', 'dots'}:
-            handle_mkr = scatter(x, y, ax=ax, mkr_fmt=mkr_fmt)
+            handle_mkr = scatter(x, y, ax=ax, mkr_fmt=mkr_fmt, label=label)
             # join handles to plot them on top of each other in the legend
             handle = (handle, handle_mkr)
         return handle

@@ -305,7 +305,7 @@ class Plot_PZ(QWidget):
     # --------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
                plt_ax=None, plt_poles=True, style='equal', anaCircleRad=0, lw=2,
-               mps=10, mzs=10, mpc='r', mzc='b', plabel='', zlabel=''):
+               mps=10, mzs=10, mpc='r', mzc='b', plabel='Poles', zlabel='Zeros'):
         """
         Plot the poles and zeros in the complex z-plane either from the
         coefficients (`b,`a) of a discrete transfer function `H`(`z`) (zpk = False)

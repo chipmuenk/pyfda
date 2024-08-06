@@ -509,11 +509,11 @@ class Plot_Hf(QWidget):
 
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
                 if self.chk_show_H_abs.isChecked():
-                    self.ax_i.plot(self.F, self.H_plt_abs)
+                    self.ax_i.plot(self.F, self.H_plt_abs,  label=r'$|H(F)|$')
                 if self.chk_show_H_re.isChecked():
-                    self.ax_i.plot(self.F, self.H_plt_re)
+                    self.ax_i.plot(self.F, self.H_plt_re, label=r'$\Re\{H(F)\}$')
                 if self.chk_show_H_im.isChecked():
-                    self.ax_i.plot(self.F, self.H_plt_im)
+                    self.ax_i.plot(self.F, self.H_plt_im, label=r'$\Im\{H(F)\}$')
 
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)
@@ -685,7 +685,7 @@ class Plot_Hf(QWidget):
                     self.H_plt_abs = np.abs(self.H_c)
                 elif self.unitA == 'W':
                     self.H_plt_abs =  np.abs(self.H_c) * np.abs(self.H_c)
-                self.ax.plot(self.F, self.H_plt_abs, label = '$|H(f)|$')
+                self.ax.plot(self.F, self.H_plt_abs, label = '$|H(F)|$')
             if self.chk_show_H_re.isChecked():
                 if self.unitA == 'dB':
                     self.H_plt_re = np.maximum(20*np.log10(np.abs(self.H_c.real)), self.log_bottom)

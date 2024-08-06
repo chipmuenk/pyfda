@@ -202,7 +202,7 @@ class Plot_tau_g(QWidget):
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
-        line_tau_g, = self.ax.plot(F, tau_g, label="Group Delay")
+        line_tau_g, = self.ax.plot(F, tau_g, label=r"$\tau_g$")
         # ---------------------------------------------------------
 
         self.ax.xaxis.set_minor_locator(
