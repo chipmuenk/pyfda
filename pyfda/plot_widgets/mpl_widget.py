@@ -20,11 +20,8 @@ from matplotlib import rcParams
 from matplotlib import lines
 from matplotlib.pyplot import setp
 
-try:
-    MPL_CURS = True
-    import mplcursors
-except ImportError:
-    MPL_CURS = False
+import mplcursors
+
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
@@ -274,25 +271,25 @@ class MplWidget(QWidget):
         """
         Update the tracking cursors
         """
-        if MPL_CURS:
-            if self.mplToolbar.a_cr.isChecked():
-                if hasattr(self, "cursors"):  # dangling references to old cursors?
-                    for c in self.cursors:
-                        c.remove()         # yes, remove them!
-                self.cursors = []
-
-                # for ax in self.fig.axes:
-                #     if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
-                #                                  "Axes", "Axes3D"}:
-                #         self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
-                #         self.cursors[-1].connect("add", show_annotation)
-                # Either pass an artist, axis, figure or nothing to select specific objects
-                self.cursors.append(mplcursors.cursor(self.fig, multiple=True, hover=False))
-                self.cursors[-1].connect("add", self.show_annotation)
-
-            elif hasattr(self, "cursors"):
+        if self.mplToolbar.a_cr.isChecked():
+            if hasattr(self, "cursors"):  # dangling references to old cursors?
                 for c in self.cursors:
-                    c.remove()
+                    c.remove()         # yes, remove them!
+            self.cursors = []
+
+            for ax in self.fig.axes:
+                if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
+                                             "Axes", "Axes3D"}:
+                    self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
+                    self.cursors[-1].connect("add", self.show_annotation)
+                    logger.warning(ax.__class__.__name__)
+            # Either pass an artist, axis, figure or nothing to select specific objects
+            # self.cursors.append(mplcursors.cursor(self.fig, multiple=True, hover=False))
+            # self.cursors[-1].connect("add", self.show_annotation)
+
+        elif hasattr(self, "cursors"):
+            for c in self.cursors:
+                c.remove()
 
         # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
         # https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
@@ -468,16 +465,15 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         # TRACKING CURSOR:
         # ---------------------------------------------
-        if MPL_CURS:
-            self.a_cr = self.addAction(QIcon(':/map-marker.svg'),
-                                       'Cursor', self.mpl_widget.update_cursors)
-            self.a_cr.setCheckable(True)
-            self.a_cr.setChecked(False)
-            self.a_cr.setToolTip(
-                "<span>Tracking Cursor (Ctrl+T)<br>LM to set, RM to remove cursor. "
-                "When Zoom or Pan is active, double-click to set / remove cursor. 'v' toggles "
-                "visibility. </span>")
-            self.a_cr.setShortcut("Ctrl+T")
+        self.a_cr = self.addAction(QIcon(':/map-marker.svg'),
+                                    'Cursor', self.mpl_widget.update_cursors)
+        self.a_cr.setCheckable(True)
+        self.a_cr.setChecked(False)
+        self.a_cr.setToolTip(
+            "<span>Tracking Cursor (Ctrl+T)<br>LM to set, RM to remove cursor. "
+            "When Zoom or Pan is active, double-click to set / remove cursor. 'v' toggles "
+            "visibility. </span>")
+        self.a_cr.setShortcut("Ctrl+T")
 
         # --------------------------------------
         self.addSeparator()
@@ -535,26 +531,6 @@ class MplToolbar(NavigationToolbar):
                 QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip(self.tr('Edit curves line and axes parameters (Ctrl+E)'))
             self.a_op.setShortcut(self.tr('Ctrl+E'))
-
-#        self.buttons = {}
-
-        # # --------------------------------------
-        # # PRINT COORDINATES (only when mplcursors is not available):
-        # # --------------------------------------
-        # # Add the x,y location widget at the right side of the toolbar
-        # # The stretch factor is 1 which means any resizing of the toolbar
-        # # will resize this label instead of the buttons.
-        # # --------------------------------------
-        # if not MPL_CURS and self.coordinates:
-        #     self.addSeparator()
-        #     self.locLabel = QLabel("", self)
-        #     self.locLabel.setAlignment(
-        #             Qt.AlignRight | Qt.AlignTop)
-        #     self.locLabel.setSizePolicy(
-        #         QSizePolicy(QSizePolicy.Expanding,
-        #                     QSizePolicy.Ignored))
-        #     labelAction = self.addWidget(self.locLabel)
-        #     labelAction.setVisible(True)
 
         # ---------------------------------------------
         # HELP:
