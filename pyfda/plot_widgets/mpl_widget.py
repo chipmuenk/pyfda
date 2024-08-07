@@ -136,7 +136,6 @@ class MplWidget(QWidget):
         #
         self.mplToolbar = MplToolbar(self.canvas, self)
         self.mplToolbar.a_zo_locked = False
-        self.mplToolbar.cursor_enabled = False
         self.mplToolbar.plot_enabled = True
         self.mplToolbar.save_button_states()  # store initial setting of buttons
 
@@ -253,44 +252,50 @@ class MplWidget(QWidget):
         return bbox.expanded(1.0 + pad, 1.0 + pad)
 
 # ----------------------------------------------------------------------------
-    def toggle_cursor(self):
+    def show_annotation(self, sel):
         """
-        Toggle the tracking cursor
-        """
-        def show_annotation(sel):
-            # 'sel': mplcursors.Selection object
-            sel.annotation.set(ha='left')
-            sel.annotation.set_text(
-                f'{sel.artist.get_label()}\n'
-                f'x = {sel.annotation.xy[0]:.5f}\ny = {sel.annotation.xy[1]:.5f}')
-            # sel.annotation.get_bbox_patch().set(fc="powderblue", alpha=0.9)
+        Create annotation string for selected object for mplcursors
 
+        It seems this is interacting with the annotations used for plot legends?
+
+        `sel` is a `mplcursors.Selection()` object, i.e. the selected object for
+        displaying a cursor
+        """
+        # 'sel': mplcursors.Selection object
+        sel.annotation.set(ha='left')
+        sel.annotation.set_text(
+            f'{sel.artist.get_label()}\n'
+            # f'{sel.artist.__class__.__name__}\n'
+            f'x = {sel.annotation.xy[0]:.5f}\ny = {sel.annotation.xy[1]:.5f}')
+        # sel.annotation.get_bbox_patch().set(fc="powderblue", alpha=0.9)
+
+# ----------------------------------------------------------------------------
+    def update_cursors(self):
+        """
+        Update the tracking cursors
+        """
         if MPL_CURS:
-            self.mplToolbar.cursor_enabled = not self.mplToolbar.cursor_enabled
-            if self.mplToolbar.cursor_enabled:
+            if self.mplToolbar.a_cr.isChecked():
                 if hasattr(self, "cursors"):  # dangling references to old cursors?
-                    for i in range(len(self.cursors)):
-                        self.cursors[i].remove()         # yes, remove them!
+                    for c in self.cursors:
+                        c.remove()         # yes, remove them!
                 self.cursors = []
+
                 # for ax in self.fig.axes:
                 #     if ax.__class__.__name__ in {"AxesSubplot", "Axes3DSubplot",
                 #                                  "Axes", "Axes3D"}:
                 #         self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
                 #         self.cursors[-1].connect("add", show_annotation)
-
                 # Either pass an artist, axis, figure or nothing to select specific objects
                 self.cursors.append(mplcursors.cursor(self.fig, multiple=True, hover=False))
+                self.cursors[-1].connect("add", self.show_annotation)
 
-            else:
-                for i in range(len(self.cursors)):
-                    self.cursors[i].remove()
-                # for s in crs.selections:
-                #     crs.remove_selection(s)
-
-            # self.emit({'mpl_toolbar': 'cursor'})
+            elif hasattr(self, "cursors"):
+                for c in self.cursors:
+                    c.remove()
 
         # see https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
-
+        # https://stackoverflow.com/questions/59800059/how-to-use-two-mplcursors-simultaneously-for-a-scatter-plot-of-two-sets
 
 ###############################################################################
 class MplToolbar(NavigationToolbar):
@@ -465,11 +470,13 @@ class MplToolbar(NavigationToolbar):
         # ---------------------------------------------
         if MPL_CURS:
             self.a_cr = self.addAction(QIcon(':/map-marker.svg'),
-                                       'Cursor', self.mpl_widget.toggle_cursor)
+                                       'Cursor', self.mpl_widget.update_cursors)
             self.a_cr.setCheckable(True)
-            self.a_cr.setChecked(True)
+            self.a_cr.setChecked(False)
             self.a_cr.setToolTip(
-                "<span>Tracking Cursor (Ctrl+T), LM to set, RM to remove cursor.</span>")
+                "<span>Tracking Cursor (Ctrl+T)<br>LM to set, RM to remove cursor. "
+                "When Zoom or Pan is active, double-click to set / remove cursor. 'v' toggles "
+                "visibility. </span>")
             self.a_cr.setShortcut("Ctrl+T")
 
         # --------------------------------------
