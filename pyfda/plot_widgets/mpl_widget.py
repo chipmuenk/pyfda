@@ -467,8 +467,9 @@ class MplToolbar(NavigationToolbar):
             self.a_cr = self.addAction(QIcon(':/map-marker.svg'),
                                        'Cursor', self.mpl_widget.toggle_cursor)
             self.a_cr.setCheckable(True)
-            self.a_cr.setChecked(False)
-            self.a_cr.setToolTip('Tracking Cursor (Ctrl+T)')
+            self.a_cr.setChecked(True)
+            self.a_cr.setToolTip(
+                "<span>Tracking Cursor (Ctrl+T), LM to set, RM to remove cursor.</span>")
             self.a_cr.setShortcut("Ctrl+T")
 
         # --------------------------------------
