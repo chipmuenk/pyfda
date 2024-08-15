@@ -20,7 +20,7 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_qt_lib import (
     qcmb_box_populate, qtext_width, QVLine, PushButton)
-from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
+from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.pyfda_rc import params
 
@@ -61,7 +61,7 @@ class PlotImpz_UI(QWidget):
             return
 
         # --- signals coming from the FFT window widget or the FFT window selector
-        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
+        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinCmbBox'}:
             if 'close_event' in dict_sig:   # hide FFT window widget and return
                 self.hide_fft_wdg()
                 return
@@ -252,7 +252,7 @@ class PlotImpz_UI(QWidget):
         self.but_fft_wdg.setCheckable(True)
         self.but_fft_wdg.setChecked(False)
 
-        self.qfft_win_select = QFFTWinSelector(fb.fil[0]['tran_freq_win'],
+        self.qfft_win_select = QFFTWinCmbBox(fb.fil[0]['tran_freq_win'],
             app='spec', objectName='qfft_win_select')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
 

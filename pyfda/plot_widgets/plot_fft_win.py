@@ -19,7 +19,7 @@ import matplotlib.patches as mpl_patches
 from pyfda.libs.pyfda_lib import safe_eval, to_html, pprint_log
 from pyfda.libs.pyfda_qt_lib import (
     qwindow_stay_on_top, qtext_width, QVLine, QHLine)
-from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
+from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # importing filterbroker initializes all its globals:
@@ -57,7 +57,7 @@ class Plot_FFT_win(QDialog):
     app : str
         String specifying the target application, 'fir' for windowed fir filter design,
         'spec' for general spectral analysis and 'stft' for short-time fourier transform
-        windowing. The argument is passed to the constructor of `QFFTWinSelector()`
+        windowing. The argument is passed to the constructor of `QFFTWinCmbBox()`
         in `_construct_UI()`.
 
     sym : bool
@@ -135,7 +135,7 @@ class Plot_FFT_win(QDialog):
             "high sidelobes create bad stopband attenuations.</span>"
         ]
 
-        self.qfft_win_select = QFFTWinSelector(self.cur_win_dict,
+        self.qfft_win_select = QFFTWinCmbBox(self.cur_win_dict,
             all_wins_dict=all_wins_dict, app=self.app,
             objectName=self.objectName() + '_cmb')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict

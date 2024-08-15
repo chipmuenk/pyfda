@@ -25,7 +25,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # =============================================================================
-class QFFTWinSelector(QWidget):
+class QFFTWinCmbBox(QWidget):
     """
     When no dict is passed to the constructor, build a combo box with window types from
     a deep copy of the `all_wins_dict_ref`, restricted to suitable types for `app`
@@ -478,7 +478,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
-    mainw = QFFTWinSelector(app='spec', objectName='TestName')
+    mainw = QFFTWinCmbBox(app='spec', objectName='TestName')
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

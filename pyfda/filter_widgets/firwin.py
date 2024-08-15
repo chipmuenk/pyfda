@@ -45,7 +45,7 @@ import pyfda.filterbroker as fb  # importing filterbroker initializes all its gl
 import pyfda.libs.pyfda_dirs as dirs
 from pyfda.libs.pyfda_lib import fil_save, round_odd, pprint_log
 from pyfda.libs.pyfda_qt_lib import popup_warning, qset_cmb_box
-from pyfda.libs.fft_windows_cmb_box import QFFTWinSelector
+from pyfda.libs.fft_windows_cmb_box import QFFTWinCmbBox
 from pyfda.libs.pyfda_fft_windows_lib import all_wins_dict_ref
 from pyfda.plot_widgets.plot_fft_win import Plot_FFT_win
 from .common import Common, remezord
@@ -135,7 +135,7 @@ class Firwin(QWidget):
             logger.warning(f"Stopped infinite loop:\n{pprint_log(dict_sig)}")
 
         # --- signals coming from the FFT window widget or the qfft_win_select
-        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinSelector'}:
+        if dict_sig['class'] in {'Plot_FFT_win', 'QFFTWinCmbBox'}:
             if 'close_event' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
@@ -166,7 +166,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         # subwidget for selecting window name and entering window parameters (if any)
-        self.qfft_win_select = QFFTWinSelector(fb.fil[0]['filter_widgets']['firwin'],
+        self.qfft_win_select = QFFTWinCmbBox(fb.fil[0]['filter_widgets']['firwin'],
                                                app='fir', objectName='fir_win_qfft')
         self.all_wins_dict = self.qfft_win_select.all_wins_dict
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
