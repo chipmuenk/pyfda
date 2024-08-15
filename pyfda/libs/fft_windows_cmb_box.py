@@ -259,7 +259,6 @@ class QFFTWinSelector(QWidget):
             correlated gain `self.all_wins_dict['cgain']`.
         """
         self.err = False
-        logger.warning("calc window")
 
         # window name is empty, use window function from filter dict
         if win_id is None:
