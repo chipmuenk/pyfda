@@ -228,7 +228,7 @@ class QFFTWinSelector(QWidget):
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
-    def calc_window(self, N: int, win_id: str = None, sym: bool = False) -> np.array:
+    def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.array:
         """
         Calculate the selected window function with `N` points.
 
@@ -261,7 +261,7 @@ class QFFTWinSelector(QWidget):
         self.err = False
 
         # window name is empty, use window function from filter dict
-        if win_id is None:
+        if win_id is "":
             win_id = self.cur_win_dict['id']
 
         fn_name = self.all_wins_dict[win_id]['fn_name']
