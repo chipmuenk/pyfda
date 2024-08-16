@@ -152,19 +152,14 @@ class QFFTWinCmbBox(QWidget):
         Select and set a window function object from its string `win_id` and update the
         `cur_win_dict` dictionary correspondingly.
 
-        Additionally, the following class attributes are updated / reset:
-
-        self.win_fnct = win_fnct            # handle to windows functionn
-
-        Also, update the keys 'par_val' and 'id' of `fb.fil[0][self.key_fil]`
-
-        The above is only updated when the window type has been changed compared to
-        `self.cur_win_dict['id']` !
+        Additionally, update the handle `self.win_fnct` to the window function and
+        the entries for keys 'par_val' and 'id' of 
+            `self.cur_win_dict = fb.fil[0][self.key_fil]`
 
         Parameters
         ----------
         win_id : str
-            Id of the window, which will be looked up in `self.all_wins_dict`. If empty,
+            id of the window, which will be looked up in `self.all_wins_dict`. If empty,
             use `self.cur_win_dict['id']` instead.
 
         Returns
