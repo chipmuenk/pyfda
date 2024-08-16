@@ -191,8 +191,8 @@ class QFFTWinCmbBox(QWidget):
         fnct = mod_fnct[-1]  # last / rightmost part = function name
         if len(mod_fnct) == 1:
             # only one element, no module name given -> use scipy.signal.windows
-            win_fnct = getattr(sig.windows, fnct, None)
-            if not win_fnct:
+            self.win_fnct = getattr(sig.windows, fnct, None)
+            if not self.win_fnct:
                 logger.error(f'No window function "{fn_name}" in scipy.signal.windows, '
                             'using rectangular window instead!')
                 win_err = True
@@ -202,7 +202,7 @@ class QFFTWinCmbBox(QWidget):
             mod_name = fn_name[:fn_name.rfind(".")]
             try:
                 mod = importlib.import_module(mod_name)
-                win_fnct = getattr(mod, fnct, None)
+                self.win_fnct = getattr(mod, fnct, None)
             except ImportError:  # no valid module
                 logger.error(f'Found no valid module "{mod_name}", '
                             'using rectangular window instead!')
@@ -214,17 +214,14 @@ class QFFTWinCmbBox(QWidget):
 
         if win_err:
             # an eror occurred, fall back to rectangular window
-            win_fnct = getattr(sig.windows, 'boxcar', None)
-            self.cur_win_dict['id'] = "rectangular"
-            self.cur_win_dict['disp_name'] = "Rectangular"
-            self.cur_win_dict['par_val'] = []
-        else:
-            # self.all_wins_dict.update({'cur_win_name': cur_win_id})
-            self.win_fnct = win_fnct  # handle to windows function
-            self.cur_win_dict['id'] = cur_win_id
-            self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
-            self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
+            self.win_fnct = getattr(sig.windows, 'boxcar', None)
+            cur_win_id = "rectangular"
 
+        self.cur_win_dict['id'] = cur_win_id
+        self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
+        self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
+
+        logger.error(f"fnct_set: {self.win_fnct}")
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
