@@ -494,7 +494,7 @@ class Firwin(QWidget):
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2  # average calculated F_PB and F_SB
         self._save(fil_dict,
                    self.firwin(self.N, fil_dict['F_C'], nyq=0.5,
-                               window=self.qfft_win_select.get_window(self.N, sym=True)))
+                               window=self.qfft_win_select.calc_window(self.N, sym=True)))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
