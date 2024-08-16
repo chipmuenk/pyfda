@@ -147,6 +147,7 @@ class QFFTWinCmbBox(QWidget):
 
 # ------------------------------------------------------------------------------
     def set_window_name(self, win_id: str = "") -> bool:
+        logger.error(f"set_window_name {win_id}")
         """
         Select and set a window function object from its string `win_id` and update the
         `cur_win_dict` dictionary correspondingly.
@@ -182,6 +183,7 @@ class QFFTWinCmbBox(QWidget):
             cur_win_id = win_id
 
         fn_name = self.all_wins_dict[cur_win_id]['fn_name']
+        logger.error(f"fn_name: {fn_name}")
 
         # --------------------------------------
         # get attribute fn_name from submodule (default: sig.windows) and
@@ -226,6 +228,7 @@ class QFFTWinCmbBox(QWidget):
 
 # ------------------------------------------------------------------------------
     def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.array:
+        logger.error("calc_window")
         """
         Calculate the selected window function with `N` points.
 
@@ -235,7 +238,7 @@ class QFFTWinCmbBox(QWidget):
             Number of data points
 
         win_id : str, optional
-            Id of the window. If specified (default is None), this will be used to
+            Id of the window. If specified (default is ""), this will be used to
             obtain the window function, its parameters and tool tips etc. via
             `set_window_name()`. If not, the previous setting are used.
 
@@ -263,6 +266,9 @@ class QFFTWinCmbBox(QWidget):
 
         fn_name = self.all_wins_dict[win_id]['fn_name']
         n_par = len(self.all_wins_dict[win_id]['par_val'])
+
+        logger.error(f"id: {win_id}, par: {self.all_wins_dict[win_id]['par_val']}, len: {len(self.all_wins_dict[win_id]['par_val'])}")
+        logger.error(f"fnct_calc: {self.win_fnct}")
 
         try:
             if fn_name == 'dpss':
