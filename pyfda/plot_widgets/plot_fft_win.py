@@ -154,6 +154,7 @@ class Plot_FFT_win(QDialog):
         """
         if self.ignore_close_event:
             event.ignore()
+        else:
             self.emit({'close_event': ''})
 
 # ------------------------------------------------------------------------------
