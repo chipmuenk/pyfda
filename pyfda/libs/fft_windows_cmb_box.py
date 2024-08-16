@@ -317,9 +317,7 @@ class QFFTWinCmbBox(QWidget):
 # ------------------------------------------------------------------------------
     def dict2ui_params(self):
         """
-        Set parameter values from `win_dict`
-
-        TODO: take params from self.cur_win_dict?
+        Set parameter values from `cur_win_dict`
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
         n_par = len(self.all_wins_dict[cur_win_id]['par_val'])

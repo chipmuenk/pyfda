@@ -178,7 +178,6 @@ class Plot_FFT_win(QDialog):
 
         elif 'view_changed' in dict_sig and 'fft_win' in dict_sig['view_changed']\
                 or self.needs_calc:
-
             self.calc_win_draw()
             self.needs_calc = False
 
