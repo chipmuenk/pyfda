@@ -256,7 +256,7 @@ class QFFTWinCmbBox(QWidget):
         self.err = False
 
         # window name is empty, use window function from filter dict
-        if win_id is "":
+        if win_id == "":
             win_id = self.cur_win_dict['id']
 
         fn_name = self.all_wins_dict[win_id]['fn_name']
