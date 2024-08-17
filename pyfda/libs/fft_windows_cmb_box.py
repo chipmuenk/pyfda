@@ -77,7 +77,7 @@ class QFFTWinCmbBox(QWidget):
         the widgets from the dictionary
 
         """
-        logger.warning("SIG_RX:\n{0}".format(pprint_log(dict_sig)))
+        logger.warning(f"SIG_RX:{id(self)}\n{pprint_log(dict_sig)}")
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
