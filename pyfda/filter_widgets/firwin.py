@@ -139,8 +139,7 @@ class Firwin(QWidget):
             if 'close_event' in dict_sig:  # hide FFT window windget and return
                 self.hide_fft_wdg()
                 return
-            else:
-                if 'view_changed' in dict_sig\
+            elif 'view_changed' in dict_sig\
                     and 'fft_win_type' in dict_sig['view_changed']:
                     # local connection to FFT window widget and qfft_win_select
                     # to update the widgets
@@ -149,6 +148,10 @@ class Firwin(QWidget):
                     # global connection to upper hierarchies
                     # send notification that filter design has changed
                     self.emit({'filt_changed': 'firwin'})
+            elif 'data_changed' in dict_sig\
+                    and dict_sig['data_changed'] == 'filter_loaded':
+                # update local widgets FFT window widget and qfft_win_select
+                self.emit(dict_sig, sig_name='sig_tx_local')
 
     # --------------------------------------------------------------------------
     def construct_UI(self):

@@ -87,6 +87,8 @@ class QFFTWinCmbBox(QWidget):
                 self.dict2ui_params()
             elif dict_sig['view_changed'] == 'fft_win_type':
                 self.dict2ui()
+        elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+            self.dict2ui()
 
     # --------------------------------------------------------------------------
     def _construct_UI(self):
