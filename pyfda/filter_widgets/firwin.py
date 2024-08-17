@@ -271,8 +271,8 @@ class Firwin(QWidget):
             fb.fil[0]['filter_widgets']['firwin']['par_val'] = []
             self.filter_params2dict()
 
-        self.qfft_win_select.set_window_name(
-            fb.fil[0]['filter_widgets']['firwin']['id'])
+        # self.qfft_win_select.set_window_name(
+        #    fb.fil[0]['filter_widgets']['firwin']['id'])
 
         self.emit({'view_changed': 'fft_win_type'}, sig_name='sig_tx_local')
 

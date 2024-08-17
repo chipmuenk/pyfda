@@ -259,6 +259,8 @@ class QFFTWinCmbBox(QWidget):
         if win_id == "":
             win_id = self.cur_win_dict['id']
 
+        self.set_window_name(win_id)  # set window and window function
+
         fn_name = self.all_wins_dict[win_id]['fn_name']
         n_par = len(self.all_wins_dict[win_id]['par_val'])
 
