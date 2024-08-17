@@ -147,7 +147,7 @@ class QFFTWinCmbBox(QWidget):
 
 # ------------------------------------------------------------------------------
     def set_window_name(self, win_id: str = "") -> bool:
-        logger.error(f"set_window_name {win_id}")
+        logger.error(f"{self.objectName()}: set_window_name({win_id})")
         """
         Select and set a window function object from its string `win_id` and update the
         `cur_win_dict` dictionary correspondingly.
@@ -223,7 +223,7 @@ class QFFTWinCmbBox(QWidget):
 
 # ------------------------------------------------------------------------------
     def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.array:
-        logger.error("calc_window")
+        logger.error(f"{self.objectName()}: calc_window({win_id})")
         """
         Calculate the selected window function with `N` points.
 
@@ -338,7 +338,7 @@ class QFFTWinCmbBox(QWidget):
     def ui2dict_params(self):
         """
         Read out window parameter widget(s) when editing is finished and
-        update self.cur_win_dict and self.all_wins_dict with the parameter values.
+        update `self.cur_win_dict` and `self.all_wins_dict` with the parameter values.
 
         Emit 'view_changed': 'fft_win_par'
         """
@@ -380,8 +380,7 @@ class QFFTWinCmbBox(QWidget):
     def ui2win_dict_emit(self, arg=None) -> None:
         """
         Triggered during initialization and by the window type combo box
-        - read FFT window type combo box and update win_dict using `set_window_name()`,
-          update parameter widgets accordingly
+        - execute `self.ui2win_dict()`
         - emit 'view_changed': 'fft_win_type'
         """
         self.ui2win_dict()
@@ -392,7 +391,7 @@ class QFFTWinCmbBox(QWidget):
         """
         - read FFT window type combo box and update win_dict using `set_window_name()`
         - determine number of parameters and make lineedit or combobox fields visible
-        - set tooltipps and parameter values from dict
+        - set tooltipps and parameter values from `self.all_wins_dict` 
         - update `cur_win_dict` and `all_wins_dict`
         """
         cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
