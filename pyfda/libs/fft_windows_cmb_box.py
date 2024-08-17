@@ -321,20 +321,20 @@ class QFFTWinCmbBox(QWidget):
         """
         Set parameter values from `cur_win_dict`
         """
-        cur_win_id = qget_cmb_box(self.cmb_win_fft, data=True)
-        n_par = len(self.all_wins_dict[cur_win_id]['par_val'])
+        cur_win_id = self.cur_win_dict['id']
+        n_par = len(self.cur_win_dict['par_val'])
 
         if n_par > 0:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][0]:
-                qset_cmb_box(self.cmb_win_par_0, str(self.all_wins_dict[cur_win_id]['par_val'][0]))
+                qset_cmb_box(self.cmb_win_par_0, str(self.cur_win_dict['par_val'][0]))
             else:
-                self.led_win_par_0.setText(str(self.all_wins_dict[cur_win_id]['par_val'][0]))
+                self.led_win_par_0.setText(str(self.cur_win_dict['par_val'][0]))
 
         if n_par > 1:
             if 'list' in self.all_wins_dict[cur_win_id]['par'][1]:
-                qset_cmb_box(self.cmb_win_par_1, str(self.all_wins_dict[cur_win_id]['par_val'][1]))
+                qset_cmb_box(self.cmb_win_par_1, str(self.cur_win_dict['par_val'][1]))
             else:
-                self.led_win_par_1.setText(str(self.all_wins_dict[cur_win_id]['par_val'][1]))
+                self.led_win_par_1.setText(str(self.cur_win_dict['par_val'][1]))
 
 # ------------------------------------------------------------------------------
     def ui2dict_params(self):
