@@ -181,6 +181,15 @@ class Plot_FFT_win(QDialog):
             self.calc_win_draw()
             self.needs_calc = False
 
+        # elif 'view_changed' in dict_sig:
+        #     if dict_sig['view_changed'] == 'fft_win_par':
+        #         self.dict2ui_params()
+        #     elif dict_sig['view_changed'] == 'fft_win_type':
+        #         self.dict2ui()
+
+        # elif 'data_changed' in dict_sig and dict_sig['data_changed'] == 'filter_loaded':
+        #     self.dict2ui()
+
         elif  'mpl_toolbar' in dict_sig:
             if 'home' in dict_sig['mpl_toolbar']:
                 self.update_view()

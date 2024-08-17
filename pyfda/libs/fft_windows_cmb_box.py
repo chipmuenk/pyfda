@@ -64,7 +64,7 @@ class QFFTWinCmbBox(QWidget):
                 if 'disp_name' in v and 'info' in v:
                     self.cmb_win_fft_items.append((k, v['disp_name'], v['info']))
 
-        self.win_fnct = None  # handle to windows function
+        # self.win_fnct = None  # handle to window function
 
         self._construct_UI()
         self.set_window_name()  # initialize win_dict
