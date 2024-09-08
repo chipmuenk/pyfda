@@ -462,9 +462,9 @@ def restore_fil():
         undo_step -= 1
         undo_ptr = (undo_ptr + UNDO_LEN - 1) % UNDO_LEN
 
-def redo():
+def store_fil():
     """
-    Store current filter to undo memory `fil_undo`
+    Store current global dict `fb.fil[0]` to undo memory `fil_undo`
     """
     global undo_step
     global undo_ptr

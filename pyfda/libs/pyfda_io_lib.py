@@ -1691,7 +1691,7 @@ def load_filter(self, all_filters=False) -> int:
         fb.fil[0] = fb_temp  # only assign one slice
 
     # --- Sanitize keys by comparing to reference dict -----------------------
-    fb.redo()  # backup current filter fb.fil[0]
+    fb.store_fil()  # backup current filter fb.fil[0]
     try:
         key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
         key_errs[0].sort()  # keys missing in the loaded dict
