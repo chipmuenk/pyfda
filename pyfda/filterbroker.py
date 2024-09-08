@@ -446,14 +446,12 @@ fil[0] = {}
 for l in range(len(fil)):
     fil[l] = copy.deepcopy(fil_ref)
 
-def undo():
+def restore_fil():
     """
-    Restore current filter from undo memory `fil_undo`
+    Restore current global dict `fb.fil[0]` from undo memory `fil_undo`
     """
     global undo_step
     global undo_ptr
-
-    # TODO: Limit undo memory to UNDO_LEN, implement circular buffer
 
     # undo buffer is empty, don't copy anything
     if undo_step < 1:
