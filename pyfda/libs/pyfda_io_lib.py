@@ -1691,7 +1691,7 @@ def load_filter(self, all_filters=False) -> int:
         fb.fil[0] = fb_temp  # only assign one slice
 
     # --- Sanitize keys by comparing to reference dict -----------------------
-    fb.redo()  # backup current filter fb.fil[0]
+    fb.store_fil()  # backup current filter fb.fil[0]
     try:
         key_errs = compare_dictionaries(fb.fil_ref, fb.fil[0])
         key_errs[0].sort()  # keys missing in the loaded dict
@@ -1728,16 +1728,16 @@ def load_filter(self, all_filters=False) -> int:
                 or (np.shape(fb.fil[0]['ba'][0]) != 2
                     and np.shape(fb.fil[0]['ba'])[1] < 3):
             logger.error("Missing key 'ba' or wrong data type!")
-            fb.undo()
+            fb.restore_fil()
             return -1
         elif 'zpk' not in fb.fil[0]:
             logger.error("Missing key 'zpk'!")
-            fb.undo()
+            fb.restore_fil()
             return -1
         elif 'sos' not in fb.fil[0]\
                 or type(fb.fil[0]['sos']) not in {list, np.ndarray}:
             logger.error("Missing key 'sos' or wrong data type!")
-            fb.undo()
+            fb.restore_fil()
             return -1
 
         if type(fb.fil[0]['ba']) == np.ndarray:
@@ -1773,7 +1773,7 @@ def load_filter(self, all_filters=False) -> int:
 
     except Exception as e:
         logger.error(f"Unexpected error:\n{e}")
-        fb.undo()
+        fb.restore_fil()
         return -1
 
 
