@@ -23,9 +23,6 @@ logger = logging.getLogger(__name__)
 
 # from scipy.signal import group_delay
 
-# TODO: Anticausal filter have no group delay. But is a filter with
-#       'baA' always anticausal or maybe just acausal?
-
 # Dict containing class name : display name
 classes = {'Plot_tau_g': 'tau_g'}
 
@@ -158,10 +155,6 @@ class Plot_tau_g(QWidget):
                                              verbose=self.chkWarnings.isChecked(),
                                              alg=self.cmbAlgorithm.currentData())
             #                                   self.chkWarnings.isChecked())
-
-        # Zero phase filters have no group delay (Causal+AntiCausal)
-        if 'baA' in fb.fil[0]:
-            self.tau_g = np.zeros(self.tau_g.size)
 
 # ------------------------------------------------------------------------------
     def draw(self):

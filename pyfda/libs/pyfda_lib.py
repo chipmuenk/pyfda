@@ -1932,25 +1932,6 @@ def calc_Hcomplex(fil_dict, worN, wholeF, fs=2*np.pi):
     # standard call to signal freqz
     W, H = sig.freqz(bc, ac, worN=worN, whole=wholeF, fs=fs)
 
-    # test for NonCausal filter
-    if ('rpk' in fil_dict):
-        # Grab causal, anticausal ba's from dictionary
-        ba = fil_dict['baA'][0]
-        aa = fil_dict['baA'][1]
-        ba = ba.conjugate()
-        aa = aa.conjugate()
-
-        # Evaluate transfer function of anticausal half on the same freq grid.
-        # This is done by conjugating a and b prior to the call, and conjugating
-        # h after the call.
-
-        wa, ha = sig.freqz(ba, aa, worN=worN, whole=True, fs=fs)
-        ha = ha.conjugate()
-
-        # Total transfer function is the product of causal response and antiCausal
-        # response
-        H = H * ha
-
     return (W, H)
 
 
