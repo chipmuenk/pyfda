@@ -477,5 +477,62 @@ def store_fil():
     undo_ptr = (undo_ptr + 1) % UNDO_LEN
     fil_undo[undo_ptr] = copy.deepcopy(fil[0])
 
+def key_list_to_dict(keys: list) -> dict:
+    """
+    Convert a list of keys (str) to access a nested dict that can be read or written to
+    and return that dict.
+
+    The nested dict is always based on `fb.fil[0]`. In order to set or get the value
+    of the nested dict, use the key for the lowest nesting level on the returned
+    dict `d`, i.e. `d[keys[-1]] = arg` resp. `arg = d[keys[-1]]`.
+    """
+    if len(keys) == 0:
+        raise KeyError("List of keys was empty!")
+    elif len(keys) == 1:
+        d = fil[0]
+    elif len(keys) == 2:
+        d = fil[0][keys[0]]
+    elif len(keys) == 3:
+        d = fil[0][keys[0]][keys[1]]
+    else:
+        raise KeyError(
+            "Creating dicts nested more than 3 keys deep is not supported yet!")
+    return d
+
+    # stack = []
+    # current_dict = {}
+    # for key in keys:
+    #     if len(stack) == len(keys) - 1:
+    #         stack[-1][prev_key] = key
+    #     else:
+    #         new_dict = {}
+    #         current_dict[key] = new_dict
+    #         stack.append(current_dict)
+    #         current_dict = new_dict
+    #         prev_key = key
+    # return stack[0]
+
+def set_fil_dict(keys: list, arg, store_fil: bool = True) -> None:
+    """
+    - Set the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]` to `arg`, nested keys
+      are passed as a list of strings, e.g. `keys=['fxq', 'QACC']` accesses
+      `fb.fil[0]['fxq']['QACC']`.
+    - Store the old state of `fb.fil[0]` before making any changes when
+      `store_fil == True`.
+    """
+    if store_fil:
+        store_fil()
+    key_list_to_dict(keys)[keys[-1]] = arg
+
+def get_fil_dict(keys: list):
+    """
+    Get the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]`, nested keys are passed as
+    a list of strings `keys`, e.g. `keys=['fxq', 'QACC']` accesses
+    `fb.fil[0]['fxq']['QACC']`.
+    """
+    return key_list_to_dict(keys)[keys[-1]]
+
+
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
+
