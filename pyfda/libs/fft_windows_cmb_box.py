@@ -44,7 +44,7 @@ class QFFTWinCmbBox(QWidget):
         super().__init__()
 
         self.setObjectName(objectName)
-        # key for storing / retrieving filter data from `fb.fil[0]['filter_widgets']`
+        # key for storing / retrieving filter data from `fb.fil[0]['filter_widgets']`:
         self.cur_win_dict = cur_win_dict
         self.err = False  # error flag for window calculation
 
@@ -217,6 +217,7 @@ class QFFTWinCmbBox(QWidget):
             cur_win_id = "rectangular"
 
         self.cur_win_dict['id'] = cur_win_id
+        # fb.set_fil_dict(fil_key+'id', cur_win_id)
         self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
         self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
 
