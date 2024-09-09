@@ -13,11 +13,12 @@ from pyfda.libs.compat import (
     QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal)
 
 import numpy as np
-import pyfda.filterbroker as fb
+import scipy.signal as sig
+from pyfda.filterbroker import get_fil_dict, set_fil_dict
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from matplotlib.ticker import AutoMinorLocator
-from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log
+from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.libs.pyfda_qt_lib import qget_cmb_box, PushButton
 
 import logging
@@ -158,7 +159,9 @@ class Plot_Phi(QWidget):
         (Re-)Calculate the complex frequency response H(f)
         """
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
-        self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], wholeF=True)
+        self.W, self.H_cmplx = sig.freqz(
+            get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), worN=params['N_FFT'],
+            whole=True, fs=2*np.pi)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
         self.H_cmplx = np.nan_to_num(self.H_cmplx)
@@ -180,21 +183,21 @@ class Plot_Phi(QWidget):
 
         self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
 
-        f_max_2 = fb.fil[0]['f_max'] / 2.
+        f_max_2 = get_fil_dict(['f_max']) / 2.
 
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
         F = self.W * f_max_2 / np.pi
 
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+        if get_fil_dict(['freqSpecsRangeType']) == 'sym':
             # shift H and F by f_S/2
             H = np.fft.fftshift(self.H_cmplx)
             F -= f_max_2
-        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+        elif get_fil_dict(['freqSpecsRangeType']) == 'half':
             # only use the first half of H and F
             H = self.H_cmplx[0:params['N_FFT']//2]
             F = F[0:params['N_FFT']//2]
-        else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+        else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
             # use H and F as calculated
             H = self.H_cmplx
 
@@ -208,8 +211,8 @@ class Plot_Phi(QWidget):
         else:
             y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
-        fb.fil[0]['plt_phiLabel'] = y_str
-        fb.fil[0]['plt_phiUnit'] = self.unitPhi
+        set_fil_dict(['plt_phiLabel'], y_str)
+        set_fil_dict(['plt_phiUnit'], self.unitPhi)
 
         if self.but_wrap.isChecked():
             phi_plt = np.angle(H) * scale
@@ -224,9 +227,9 @@ class Plot_Phi(QWidget):
         self.ax.xaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.yaxis.set_minor_locator(AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Phase Frequency Response')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
         self.ax.set_ylabel(y_str)
-        self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
+        self.ax.set_xlim(get_fil_dict(['freqSpecsRange']))
 
         self.redraw()
 
