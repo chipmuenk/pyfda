@@ -349,14 +349,6 @@ class Input_Info(QWidget):
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
 
-            # 'rpk' means nonCausal filter
-            if 'rpk' in fb.fil[0]:
-                antiC = True
-                bbA = fb.fil[0]['baA'][0]
-                aaA = fb.fil[0]['baA'][1]
-                bbA = bbA.conjugate()
-                aaA = aaA.conjugate()
-
             f_S = fb.fil[0]['f_S']
 
             f_lbls = []

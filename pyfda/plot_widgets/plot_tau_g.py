@@ -12,7 +12,7 @@ Widget for plotting the group delay
 from matplotlib.ticker import AutoMinorLocator
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_rc import params
-import pyfda.filterbroker as fb
+from pyfda.filterbroker import get_fil_dict
 import numpy as np
 from pyfda.libs.pyfda_qt_lib import qcmb_box_populate
 from pyfda.libs.pyfda_sig_lib import group_delay
@@ -22,9 +22,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 # from scipy.signal import group_delay
-
-# TODO: Anticausal filter have no group delay. But is a filter with
-#       'baA' always anticausal or maybe just acausal?
 
 # Dict containing class name : display name
 classes = {'Plot_tau_g': 'tau_g'}
@@ -141,15 +138,15 @@ class Plot_tau_g(QWidget):
         """
         (Re-)Calculate the complex frequency response H(f)
         """
-        bb = fb.fil[0]['ba'][0]
-        aa = fb.fil[0]['ba'][1]
+        bb = get_fil_dict(['ba', 0])
+        aa = get_fil_dict(['ba', 1])
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         # scipy: self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'],
         #                                           whole = True)
 
-        if fb.fil[0]['creator'][0] == 'sos':  # one of 'sos', 'zpk', 'ba'
-            self.W, self.tau_g = group_delay(fb.fil[0]['sos'], nfft=params['N_FFT'],
+        if get_fil_dict(['creator', 0]) == 'sos':  # one of 'sos', 'zpk', 'ba'
+            self.W, self.tau_g = group_delay(get_fil_dict(['sos']), nfft=params['N_FFT'],
                                              sos=True, whole=True,
                                              verbose=self.chkWarnings.isChecked(),
                                              alg=self.cmbAlgorithm.currentData())
@@ -158,10 +155,6 @@ class Plot_tau_g(QWidget):
                                              verbose=self.chkWarnings.isChecked(),
                                              alg=self.cmbAlgorithm.currentData())
             #                                   self.chkWarnings.isChecked())
-
-        # Zero phase filters have no group delay (Causal+AntiCausal)
-        if 'baA' in fb.fil[0]:
-            self.tau_g = np.zeros(self.tau_g.size)
 
 # ------------------------------------------------------------------------------
     def draw(self):
@@ -175,30 +168,30 @@ class Plot_tau_g(QWidget):
         """
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
-        f_max_2 = fb.fil[0]['f_max'] / 2.
+        f_max_2 = get_fil_dict(['f_max']) / 2.
         F = self.W * f_max_2 / np.pi
 
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+        if get_fil_dict(['freqSpecsRangeType']) == 'sym':
             # shift tau_g and F by f_S/2
             tau_g = np.fft.fftshift(self.tau_g)
             F -= f_max_2
-        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+        elif get_fil_dict(['freqSpecsRangeType']) == 'half':
             # only use the first half of H and F
             tau_g = self.tau_g[0:params['N_FFT']//2]
             F = F[0:params['N_FFT']//2]
-        else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+        else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
             # use H and F as calculated
             tau_g = self.tau_g
 
         # ================ Main Plotting Routine =========================
         # ===  clear the axes and (re)draw the plot
 
-        if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
+        if get_fil_dict(['freq_specs_unit']) in {'f_S', 'f_Ny'}:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $'
         else:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega})$'\
-                + ' in ' + fb.fil[0]['plt_tUnit'] + r' $ \rightarrow $'
-            tau_g = tau_g / fb.fil[0]['f_S']
+                + ' in ' + get_fil_dict(['plt_tUnit']) + r' $ \rightarrow $'
+            tau_g = tau_g / get_fil_dict(['f_S'])
 
         # ---------------------------------------------------------
         self.ax.clear()  # need to clear, doesn't overwrite
@@ -210,12 +203,12 @@ class Plot_tau_g(QWidget):
         self.ax.yaxis.set_minor_locator(
             AutoMinorLocator())  # enable minor ticks
         self.ax.set_title(r'Group Delay $ \tau_g$')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
         self.ax.set_ylabel(tau_str)
         # widen y-limits to suppress numerical inaccuracies when tau_g = constant
         self.ax.set_ylim(
             [max(np.nanmin(tau_g)-0.5, 0), np.nanmax(tau_g) + 0.5])
-        self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
+        self.ax.set_xlim(get_fil_dict(['freqSpecsRange']))
 
         self.redraw()
 

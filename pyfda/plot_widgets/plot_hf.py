@@ -15,15 +15,17 @@ can be overlayed.
 from pyfda.libs.compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit,
                                QFrame, QHBoxLayout, QGridLayout, pyqtSlot, pyqtSignal)
 import numpy as np
+import scipy.signal as sig
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
 import matplotlib.ticker as ticker
 from matplotlib.ticker import AutoMinorLocator
 
 import pyfda.filterbroker as fb
+from pyfda.filterbroker import get_fil_dict
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
-from pyfda.libs.pyfda_lib import calc_Hcomplex, pprint_log, safe_eval, to_html
+from pyfda.libs.pyfda_lib import pprint_log, safe_eval, to_html
 from pyfda.libs.pyfda_qt_lib import PushButton, qtext_width, qcmb_box_populate
 
 import logging
@@ -327,7 +329,8 @@ class Plot_Hf(QWidget):
 
         def _plot_specs():
             # upper limits:
-            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **hatch_borders)
+            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr,
+                    **hatch_borders)
             if A_lim_upl:
                 ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **hatch)
             if A_lim_upc:
@@ -335,7 +338,8 @@ class Plot_Hf(QWidget):
             if A_lim_upr:
                 ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **hatch)
             # lower limits:
-            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **hatch_borders)
+            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor,
+                    **hatch_borders)
             if A_lim_lol:
                 ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **hatch)
             if A_lim_loc:
@@ -349,7 +353,7 @@ class Plot_Hf(QWidget):
             exp = 2.
 
         if self.unitA == 'dB':
-            if fb.fil[0]['ft'] == "FIR":
+            if get_fil_dict(['ft']) == "FIR":
                 A_PB_max  = dB(1 + self.A_PB)
                 A_PB2_max = dB(1 + self.A_PB2)
             else: # IIR dB
@@ -364,7 +368,7 @@ class Plot_Hf(QWidget):
             A_SB2 = dB(self.A_SB2)
             A_SB_maxx = max(A_SB, A_SB2) + 10
         else: # 'V' or 'W'
-            if fb.fil[0]['ft'] == "FIR":
+            if get_fil_dict(['ft']) == "FIR":
                 A_PB_max  = (1 + self.A_PB)**exp
                 A_PB2_max = (1 + self.A_PB2)**exp
             else: # IIR lin
@@ -381,9 +385,9 @@ class Plot_Hf(QWidget):
 
         F_max = self.f_max/2
         F_PB  = self.F_PB
-        F_SB  = fb.fil[0]['F_SB'] * self.f_max
-        F_SB2 = fb.fil[0]['F_SB2'] * self.f_max
-        F_PB2 = fb.fil[0]['F_PB2'] * self.f_max
+        F_SB  = get_fil_dict(['F_SB']) * self.f_max
+        F_SB2 = get_fil_dict(['F_SB2']) * self.f_max
+        F_PB2 = get_fil_dict(['F_PB2']) * self.f_max
 
         F_lim_upl = F_lim_lol = []  # left side limits, lower and upper
         A_lim_upl = A_lim_lol = []
@@ -394,7 +398,7 @@ class Plot_Hf(QWidget):
         F_lim_upr = F_lim_lor = []  # right side limits, lower and upper
         A_lim_upr = A_lim_lor = []
 
-        if fb.fil[0]['rt'] == 'LP':
+        if get_fil_dict(['rt']) == 'LP':
             F_lim_upl = [0,        F_PB,     F_PB]
             A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
             F_lim_lol = F_lim_upl
@@ -403,7 +407,7 @@ class Plot_Hf(QWidget):
             F_lim_upr = [F_SB,     F_SB, F_max]
             A_lim_upr = [A_SB_maxx, A_SB, A_SB]
 
-        if fb.fil[0]['rt'] == 'HP':
+        if get_fil_dict(['rt']) == 'HP':
             F_lim_upl = [0,    F_SB, F_SB]
             A_lim_upl = [A_SB, A_SB, A_SB_maxx]
 
@@ -412,7 +416,7 @@ class Plot_Hf(QWidget):
             F_lim_lor = F_lim_upr
             A_lim_lor = [A_PB_minx, A_PB_min, A_PB_min]
 
-        if fb.fil[0]['rt'] == 'BS':
+        if get_fil_dict(['rt']) == 'BS':
             F_lim_upl = [0,        F_PB,     F_PB]
             A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
             F_lim_lol = F_lim_upl
@@ -426,7 +430,7 @@ class Plot_Hf(QWidget):
             F_lim_lor = F_lim_upr
             A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
-        if fb.fil[0]['rt'] == 'BP':
+        if get_fil_dict(['rt']) == 'BP':
             F_lim_upl = [0,    F_SB, F_SB]
             A_lim_upl = [A_SB, A_SB, A_SB_maxx]
 
@@ -438,7 +442,7 @@ class Plot_Hf(QWidget):
             F_lim_upr = [F_SB2,    F_SB2, F_max]
             A_lim_upr = [A_SB_maxx, A_SB2, A_SB2]
 
-        if fb.fil[0]['rt'] == 'HIL':
+        if get_fil_dict(['rt']) == 'HIL':
             F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
             A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
 
@@ -454,9 +458,9 @@ class Plot_Hf(QWidget):
 
         _plot_specs()  # plot specs in the range 0 ... f_S/2
 
-        if fb.fil[0]['freqSpecsRangeType'] != 'half':
+        if get_fil_dict(['freqSpecsRangeType']) != 'half':
             # add plot limits for other half of the spectrum
-            if fb.fil[0]['freqSpecsRangeType'] == 'sym':  # frequency axis +/- f_S/2
+            if get_fil_dict(['freqSpecsRangeType']) == 'sym':  # frequency axis +/- f_S/2
                 F_lim_upl = -F_lim_upl
                 F_lim_lol = -F_lim_lol
                 F_lim_upc = -F_lim_upc
@@ -507,7 +511,7 @@ class Plot_Hf(QWidget):
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
                 self.ax_i.add_patch(rect)
 
-                self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
+                self.ax_i.set_xlim(get_fil_dict(['freqSpecsRange']))
                 if self.chk_show_H_abs.isChecked():
                     self.ax_i.plot(self.F, self.H_plt_abs,  label=r'$|H(F)|$')
                 if self.chk_show_H_re.isChecked():
@@ -552,10 +556,10 @@ class Plot_Hf(QWidget):
             self.ax_p.is_twin = True  # mark this as 'twin' to suppress second grid in mpl_widget
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
-            if fb.fil[0]['plt_phiUnit'] == 'rad':
+            if get_fil_dict(['plt_phiUnit']) == 'rad':
                 phi_str += ' in rad ' + r'$\rightarrow $'
                 scale = 1.
-            elif fb.fil[0]['plt_phiUnit'] == 'rad/pi':
+            elif get_fil_dict(['plt_phiUnit']) == 'rad/pi':
                 phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
                 scale = 1./ np.pi
             else:
@@ -577,7 +581,9 @@ class Plot_Hf(QWidget):
         (Re-)Calculate the complex frequency response H_cmplx(W) (complex)
         for W = 0 ... 2 pi:
         """
-        self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
+        self.W, self.H_cmplx = sig.freqz(
+            get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), worN=params['N_FFT'],
+            whole=True, fs=2*np.pi)
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -599,8 +605,8 @@ class Plot_Hf(QWidget):
 
         # Get corners for spec display from the parameters of the target specs subwidget
         try:
-            param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
-                                    [fb.fil[0]['fc']][fb.fil[0]['fo']]['tspecs'][1]['amp']
+            param_list = fb.fil_tree[get_fil_dict(['rt'])][get_fil_dict(['ft'])]\
+                                    [get_fil_dict(['fc'])][get_fil_dict(['fo'])]['tspecs'][1]['amp']
         except KeyError:
             param_list = []
 
@@ -609,12 +615,12 @@ class Plot_Hf(QWidget):
         PB = [l for l in param_list if 'A_PB' in l]
 
         if SB:
-            A_min = min([fb.fil[0][l] for l in SB])
+            A_min = min([get_fil_dict([l]) for l in SB])
         else:
             A_min = 5e-4
 
         if PB:
-            A_max = max([fb.fil[0][l] for l in PB])
+            A_max = max([get_fil_dict([l]) for l in PB])
         else:
             A_max = 1
 
@@ -622,7 +628,7 @@ class Plot_Hf(QWidget):
             self.calc_hf()
 
         if self.cmb_units_a.currentText() == 'Auto':
-            self.unitA = fb.fil[0]['amp_specs_unit']
+            self.unitA = get_fil_dict(['amp_specs_unit'])
         else:
             self.unitA = self.cmb_units_a.currentText()
 
@@ -638,37 +644,37 @@ class Plot_Hf(QWidget):
 
         self.specs = self.but_specs.isChecked()
 
-        self.f_max = fb.fil[0]['f_max']
+        self.f_max = get_fil_dict(['f_max'])
 
-        self.F_PB = fb.fil[0]['F_PB'] * self.f_max
-        self.f_maxB = fb.fil[0]['F_SB'] * self.f_max
+        self.F_PB = get_fil_dict(['F_PB']) * self.f_max
+        self.f_maxB = get_fil_dict(['F_SB']) * self.f_max
 
-        self.A_PB  = fb.fil[0]['A_PB']
-        self.A_PB2 = fb.fil[0]['A_PB2']
-        self.A_SB  = fb.fil[0]['A_SB']
-        self.A_SB2 = fb.fil[0]['A_SB2']
+        self.A_PB  = get_fil_dict(['A_PB'])
+        self.A_PB2 = get_fil_dict(['A_PB2'])
+        self.A_SB  = get_fil_dict(['A_SB'])
+        self.A_SB2 = get_fil_dict(['A_SB2'])
 
-        f_lim = fb.fil[0]['freqSpecsRange']
+        f_lim = get_fil_dict(['freqSpecsRange'])
 
         # ========= select frequency range to be displayed =====================
         # === shift, scale and select: W -> F, H_cplx -> H_c
         self.F = self.W / (2 * np.pi) * self.f_max
 
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+        if get_fil_dict(['freqSpecsRangeType']) == 'sym':
             # shift H and F by f_S/2
             self.H_c = np.fft.fftshift(self.H_cmplx)
             self.F -= self.f_max/2.
-        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+        elif get_fil_dict(['freqSpecsRangeType']) == 'half':
             # only use the first half of H and F
             self.H_c = self.H_cmplx[0:params['N_FFT']//2]
             self.F = self.F[0:params['N_FFT']//2]
-        else:  # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+        else:  # get_fil_dict(['freqSpecsRangeType']) == 'whole'
             # use H and F as calculated
             self.H_c = self.H_cmplx
 
         # remove linear phase if button is checked
         if self.but_zerophase.isChecked():
-            self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
+            self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * get_fil_dict(["N"])/2.)
 
         H_str = r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'
 
@@ -741,7 +747,7 @@ class Plot_Hf(QWidget):
             self.ax.set_ylim(A_lim)
             # logger.warning("set limits")
 
-            self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax.set_xlabel(get_fil_dict(['plt_fLabel']))
             self.ax.set_ylabel(H_str)
 
             title_str = ""

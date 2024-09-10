@@ -67,7 +67,7 @@ __all__ = ['cmp_version', 'mod_version',
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd', 'ceil_even', 'floor_even',
-           'to_html', 'calc_Hcomplex']
+           'to_html']
 
 PY32_64 = struct.calcsize("P") * 8  # yields 32 or 64, depending on 32 or 64 bit Python
 
@@ -1885,73 +1885,6 @@ def floor_even(x) -> int:
     Return the largest even integer not larger than x. x can be integer or float.
     """
     return round_even(x-1)
-
-
-# ------------------------------------------------------------------------------
-def calc_Hcomplex(fil_dict, worN, wholeF, fs=2*np.pi):
-    """
-    A wrapper around `signal.freqz()` for calculating the complex frequency
-    response H(f) for antiCausal systems as well. The filter coefficients are
-    are extracted from the filter dictionary.
-
-    Parameters
-    ----------
-
-    fil_dict: dict
-        dictionary with filter data (coefficients etc.)
-
-    worN: {None, int or array-like}
-        number of points or frequencies where the frequency response is calculated
-
-    wholeF: bool
-        when True, calculate frequency response from 0 ... f_S, otherwise
-        calculate between 0 ... f_S/2
-
-    fs: float
-        sampling frequency, used for calculation of the frequency vector.
-        The default is 2*pi
-
-    Returns
-    -------
-
-    w: ndarray
-        The frequencies at which h was computed, in the same units as fs.
-        By default, w is normalized to the range [0, pi) (radians/sample).
-
-    h: ndarray
-        The frequency response, as complex numbers.
-
-    Examples
-    --------
-
-    """
-    # causal poles/zeros
-    bc = fil_dict['ba'][0]
-    ac = fil_dict['ba'][1]
-
-    # standard call to signal freqz
-    W, H = sig.freqz(bc, ac, worN=worN, whole=wholeF, fs=fs)
-
-    # test for NonCausal filter
-    if ('rpk' in fil_dict):
-        # Grab causal, anticausal ba's from dictionary
-        ba = fil_dict['baA'][0]
-        aa = fil_dict['baA'][1]
-        ba = ba.conjugate()
-        aa = aa.conjugate()
-
-        # Evaluate transfer function of anticausal half on the same freq grid.
-        # This is done by conjugating a and b prior to the call, and conjugating
-        # h after the call.
-
-        wa, ha = sig.freqz(ba, aa, worN=worN, whole=True, fs=fs)
-        ha = ha.conjugate()
-
-        # Total transfer function is the product of causal response and antiCausal
-        # response
-        H = H * ha
-
-    return (W, H)
 
 
 # ------------------------------------------------------------------------------

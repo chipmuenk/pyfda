@@ -52,7 +52,7 @@ base_dir = ""  #: Project base directory
 # State of filter design: 'ok', 'changed', 'error', 'failed', 'active'
 design_filt_state = 'changed'
 
-UNDO_LEN = 10  # depth of circular undo buffer
+UNDO_LEN = 20  # depth of circular undo buffer
 undo_step = 0  # number of undo steps, limited to UNDO_LEN
 undo_ptr = 0  # pointer to current undo memory % UNDO_LEN
 
@@ -486,6 +486,7 @@ def key_list_to_dict(keys: list) -> dict:
     of the nested dict, use the key for the lowest nesting level on the returned
     dict `d`, i.e. `d[keys[-1]] = arg` resp. `arg = d[keys[-1]]`.
     """
+    global fil
     if len(keys) == 0:
         raise KeyError("List of keys was empty!")
     elif len(keys) == 1:
@@ -512,15 +513,15 @@ def key_list_to_dict(keys: list) -> dict:
     #         prev_key = key
     # return stack[0]
 
-def set_fil_dict(keys: list, arg, store_fil: bool = True) -> None:
+def set_fil_dict(keys: list, arg, backup: bool = True) -> None:
     """
     - Set the value of `fb.fil[0]["key_0"]["key_1"]...["key_n]` to `arg`, nested keys
       are passed as a list of strings, e.g. `keys=['fxq', 'QACC']` accesses
       `fb.fil[0]['fxq']['QACC']`.
     - Store the old state of `fb.fil[0]` before making any changes when
-      `store_fil == True`.
+      `backup == True`.
     """
-    if store_fil:
+    if backup:
         store_fil()
     key_list_to_dict(keys)[keys[-1]] = arg
 
@@ -531,7 +532,6 @@ def get_fil_dict(keys: list):
     `fb.fil[0]['fxq']['QACC']`.
     """
     return key_list_to_dict(keys)[keys[-1]]
-
 
 # Comparing nested dicts
 # https://stackoverflow.com/questions/27265939/comparing-python-dictionaries-and-nested-dictionaries
