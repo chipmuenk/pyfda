@@ -68,11 +68,11 @@ params = {
           }
 
 mpl_params_dark = {
-            'mpl_hatch': {                          # hatched area for specs
+            'mpl_hatch': {                         # hatched area for specs
                          'facecolor': 'none',
                          'hatch': '/',
-                         'edgecolor': '#808080',    # same as figure.edgecolor
-                         'lw': 0.0},                # no border around hatched area
+                         'edgecolor': '#808080',   # same as figure.edgecolor
+                         'lw': 0.0},               # no border around hatched area
 
             'mpl_stimuli': {                       # style for stimulus signals
                           'mfc': 'w', 'mec': 'w',  # marker face + edge color
@@ -85,18 +85,18 @@ mpl_params_dark = {
 # fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'],
 # 'lw':0.0}
 mpl_params_light = {
-            'mpl_hatch': {                          # hatched area for specs
+            'mpl_hatch': {                         # hatched area for specs
                          'facecolor': 'none',
                          'hatch': '/',
-                         'edgecolor': '#808080',    # same as figure.edgecolor
-                         'lw': 0.0},                # no border around hatched area
+                         'edgecolor': '#808080',   # same as figure.edgecolor
+                         'lw': 0.0},               # no border around hatched area
 
-            'mpl_stimuli': {                         # style for stimulus signals
+            'mpl_stimuli': {                       # style for stimulus signals
                           'mfc': 'k', 'mec': 'k',  # marker face + edge color
                           'ms': mpl_ms,            # marker size
                           'alpha': 0.25,           # transparency (marker + stem)
-                          'markerfmt': '*',         # marker symbol
-                          'lw': '2'}              # stem linewidth
+                          'markerfmt': '*',        # marker symbol
+                          'lw': '2'}               # stem linewidth
                     }
 
 # Dictionary with translations between short method names and long names for
