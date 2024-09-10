@@ -242,23 +242,30 @@ qss_dark = """
         border: none;  /* dummy, needed to force using non-system widget rendering */
         color: white;
         }
-    /* setting any properties here removes all default styles ...
-    QCheckBox::indicator{}
-    */
 
-    QLineEdit{background: #222222;
+    QLineEdit{background: #444444;
                 border-style: outset;
-                border-width: 2px;
+                border-width: 1px;
                 border-color: darkgrey;
                 color: white;
     }
-    QLineEdit:disabled{background-color:darkgrey;}
+    QLineEdit:disabled{background-color:darkgrey;color: lightgray}
 
+    /*
     QComboBox{background-color:#444444}
     QComboBox QAbstractItemView {
         background-color: #555555;
         border: 2px solid darkgray;
         selection-background-color: red;
+    }*/
+
+    /* Style for the combobox itself */
+    QSpinBox, QComboBox{background-color: #222222; border: 1px solid darkgray; padding: 1px;}
+    /* Style for dropdown items */
+    QComboBox QAbstractItemView {
+        background-color: #222222;
+        border: 1px solid darkgray;
+        selection-background-color: orange;
     }
     QMessageBox{background-color:#444444}
 
@@ -266,13 +273,14 @@ qss_dark = """
 
     QPushButton{background-color: qlineargradient(
                 x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #222222, stop: 0.5 darkgrey, stop: 1.0 black);
+                stop: 0 darkgray, stop: 1.0 black);
                 }
     QPushButton:disabled{color:darkgrey;}
+    QPushButton {border: native; border-radius:-1px;}
 
     QPushButton[state="normal"]{background-color: qlineargradient(
                 x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #222222, stop: 0.5 darkgray, stop: 1.0 black);
+                stop: 0 darkgray, stop: 1.0 black);
                 }
 
     NavigationToolbar2QT{background-color:#555555}
@@ -298,18 +306,32 @@ qss_light = """
     QLineEdit{background: white; border-color: darkgrey;}
     QLineEdit:disabled{background-color:lightgrey; color:blue;}
 
+    /* Style for the spinbo< and combobox itself */
+    QSpinBox, QComboBox{background-color: lightgray; border: 1px solid gray; padding: 1px;}
+    /* Style for dropdown items */
+    QComboBox QAbstractItemView {
+        background-color: white;
+        border: 1px solid darkgray;
+        selection-background-color: orange;
+    }
+
+    /* Style for editable text field in combobox*/
+    /* QComboBox::editable QLineEdit {background-color: white; border: none;} */
+
     QPushButton{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 lightblue);
     }
     QPushButton:disabled{color:darkgrey;}
 
     QPushButton[state="normal"]{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 lightblue);
         }
 
     QMessageBox{background-color: #EEEEEE}
+
+    QPlainTextEdit{background-color: white}
 
     /* NavigationToolbar2QT{background-color:#555555} */
     """
@@ -507,12 +529,14 @@ qss_common = """
                     stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
                     color: white;}
 
-                QPushButton:pressed {background-color:red; color:white}
+                /* Highlight button when pressed from checked / not checked state */
+                QPushButton:pressed:checked, QPushButton:pressed:!checked
+                    {background-color:orange; color:white}
 
                 QPushButton:checked{
-                    background-color:lightblue; color:black;font-weight: bold;}
+                    background-color:lightblue; color:black; font-weight: bold;}
                 QPushButtonRT:checked{
-                    background-color:lightblue; color:black;font-weight: bold;}
+                    background-color:lightblue; color:black; font-weight: bold;}
 
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
