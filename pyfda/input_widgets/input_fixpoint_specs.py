@@ -409,7 +409,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip(
             "Create Verilog or VHDL netlist for fixpoint filter.")
-        self.butExportHDL.setText("Create HDL")
+        self.butExportHDL.setText("-> Verilog")
 
         # Wrap qfrmt combobox and HDL buttons sim and convert in one layout
         layH_fx_btns = QHBoxLayout()
