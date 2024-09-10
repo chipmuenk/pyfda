@@ -124,6 +124,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',  # 'stix',
           'mathtext.default'          : 'it',
+          'mathtext.fallback'         : 'cm',
           'font.size'                 : 10, # TODO: set this depending on resolution
           'legend.fontsize'           : 'medium',
           'axes.labelsize'            : 'medium',
@@ -144,15 +145,6 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'hatch.color'               : '#808080',
           'hatch.linewidth'           : 0.5
           }
-
-mpl_rc_33 = {'mathtext.fallback'      : 'cm'}  # new since mpl 3.3
-mpl_rc_32 = {'mathtext.fallback_to_cm': True}  # deprecated since mpl 3.3
-
-if cmp_version('matplotlib', '3.3') < 0:
-    mpl_rc.update(mpl_rc_32)  # lower than matplotlib 3.3
-else:
-    mpl_rc.update(mpl_rc_33)
-
 
 # dark theme for matplotlib widgets
 mpl_rc_dark = {
