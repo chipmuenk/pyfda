@@ -223,23 +223,28 @@ else:
 # dark QSS theme
 # ---------------
 qss_dark = """
-    .QWidget{color:white; background-color: black } /* background of application */
-    QFrame{color:white;}
-    QTextEdit{color: white; background-color: #444444;}
+    QWidget{color:white;}  /* nearly all widgets are derived from this */
+    /* background of QWidget and QFrame widgets, not of derived widgets: */
+    .QWidget, .QFrame{background-color: black;}
+    QTabWidget::pane{background-color: #555555;} /* background of tab widget content */
+
+    QScrollArea{color:white; background-color: #222222;}
+
+    QTextEdit{background-color: #444444;}
+
+    QTableView{alternate-background-color:#222222;
+        background-color:#444444; gridline-color: white;}
+    QHeaderView{background-color:#222222;}
+    QHeaderView::section{background-color:#111111;}
+    QHeaderView::section:checked{background-color:blue;}
+
     QCheckBox{
         border: none;  /* dummy, needed to force using non-system widget rendering */
         color: white;
         }
-    QCheckBox::indicator{
-     /* setting any properties here removes all default styles ... */
-       }
-
-
-    QScrollArea{background-color: #222222}
-    QScrollArea > QWidget > QWidget{background-color: #222222}
-
-    /* background of tab content */
-    .QTabWidget::pane{color: white; background-color: #555555;}
+    /* setting any properties here removes all default styles ...
+    QCheckBox::indicator{}
+    */
 
     QLineEdit{background: #222222;
                 border-style: outset;
@@ -249,52 +254,65 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:darkgrey;}
 
-    QPushButton{
-         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-         color: black;
-                    }
-
-    QTableView{alternate-background-color:#222222;
-        background-color:#444444; gridline-color: white;}
-    QHeaderView{background-color:#222222;}
-    QHeaderView::section{background-color:#111111;}
-    QTableWidget QTableCornerButton::section{background-color:#444444;}
-    QHeaderView::section:checked{background-color:rgb(190,1,1);}
-
-    QComboBox QListView {color:black}
+    QComboBox{background-color:#444444}
+    QComboBox QAbstractItemView {
+        background-color: #555555;
+        border: 2px solid darkgray;
+        selection-background-color: red;
+    }
     QMessageBox{background-color:#444444}
+
+    QPlainTextEdit{background-color: black}
+
+    QPushButton{background-color: qlineargradient(
+                x1: 0, y1: 0, x2: 0, y2: 1,
+                stop: 0 #222222, stop: 0.5 darkgrey, stop: 1.0 black);
+                }
+    QPushButton:disabled{color:darkgrey;}
+
+    QPushButton[state="normal"]{background-color: qlineargradient(
+                x1: 0, y1: 0, x2: 0, y2: 1,
+                stop: 0 #222222, stop: 0.5 darkgray, stop: 1.0 black);
+                }
+
+    NavigationToolbar2QT{background-color:#555555}
             """
 # ---------------
 # light QSS theme
 # ---------------
 qss_light = """
-    .QWidget, .QFrame{color:black; background-color: white;}
+    QWidget{color:black;}  /* nearly all widgets are derived from this */
+    /* background of QWidget and QFrame widgets, not of derived widgets: */
+    .QWidget, .QFrame{background-color: white;}
+    QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
 
     QScrollArea{color:black; background-color:white;}
-    QScrollArea > QWidget > QWidget{color:black; background-color: white;}
 
     QTextEdit{background-color: white;}
 
-    QTableWidget{color:black; background-color:white;}
-
-    .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
+    QTableView{alternate-background-color:#cccccc;
+        background-color:#F0F0F0; gridline-color: white;}
+    QHeaderView::section{background-color:darkgray; color:white;}
+    QHeaderView::section:checked{background-color:blue; color:white;}
 
     QLineEdit{background: white; border-color: darkgrey;}
     QLineEdit:disabled{background-color:lightgrey; color:blue;}
 
-    QPushButton{
-         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-                    }
-    QPushButton:disabled{color:darkgrey; }
+    QPushButton{background-color: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+    }
+    QPushButton:disabled{color:darkgrey;}
 
-    QHeaderView::section{background-color:darkgray; color:white;}
-    QHeaderView::section:checked{background-color:rgb(190,1,1); color:white;}
+    QPushButton[state="normal"]{background-color: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+        }
 
     QMessageBox{background-color: #EEEEEE}
-    """
 
+    /* NavigationToolbar2QT{background-color:#555555} */
+    """
 
 # common layout settings for QTabWidget
 qss_tab_bar = """
@@ -459,6 +477,10 @@ qss_common = """
 
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
 
+                /* Table Corner Button */
+                QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
+                QTableView QTableCornerButton::section:pressed{background-color:red;}
+
                 QPushButton
                 {
                 /*
@@ -469,11 +491,6 @@ qss_common = """
                 padding-left: 5px; padding-right: 3px; # destroys button shape
                  */
                  }
-
-                QPushButton[state="normal"]{background-color: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-                    color: black;}
 
                 QPushButton[state="changed"]{background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
@@ -490,7 +507,7 @@ qss_common = """
                     stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
                     color: white;}
 
-                QPushButton:pressed {background-color:black; color:white}
+                QPushButton:pressed {background-color:red; color:white}
 
                 QPushButton:checked{
                     background-color:lightblue; color:black;font-weight: bold;}
