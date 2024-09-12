@@ -269,7 +269,7 @@ class Input_Specs(QWidget):
         self.cmb_filter_save.currentIndexChanged.connect(self._save_filter)
         self.led_info.editingFinished.connect(self._save_info2dict)
         self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.butQuit.clicked.connect(self.quit_program)  # emit 'quit_program'
+        self.butQuit.clicked.connect(self.quit_program)  # emit 'close_event'
         # ----------------------------------------------------------------------
 
         self.update_UI()  # first time initialization
@@ -514,9 +514,9 @@ class Input_Specs(QWidget):
 # ------------------------------------------------------------------------------
     def quit_program(self):
         """
-        When <QUIT> button is pressed, send 'quit_program'
+        When <QUIT> button is pressed, send 'close_event'
         """
-        self.emit({'quit_program': ''})
+        self.emit({'close_event': ''})
 
 
 # ------------------------------------------------------------------------------

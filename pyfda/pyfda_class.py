@@ -214,11 +214,11 @@ class pyFDA(QMainWindow):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx:
-        - trigger close event in response to 'quit_program' emitted in another subwidget:
+        - trigger close event in response to 'close_event' emitted in another subwidget:
 
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if 'quit_program' in dict_sig:
+        if 'close_event' in dict_sig:
             self.close()
 
 #==============================================================================
