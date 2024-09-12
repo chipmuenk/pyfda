@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------------------
 if cmp_version("amaranth", "0.3") >= 0:
-    from amaranth import Signal, signed, Cat, Module, Repl
+    from amaranth import Signal, signed, Cat, Module
 
     def requant(mod: Module, sig_i: Signal, QI: dict, QO: dict) -> Signal:
         """
