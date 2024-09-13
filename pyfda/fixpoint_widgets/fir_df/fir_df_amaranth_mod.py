@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
     stimulus = Q_I.fixp(np.ones(20), out_frmt='qint')
     sim.add_process(process)
-    sim.run()
+    # sim.run()
     # This remembers sreg from last run!
     stimulus = np.zeros(20)
     sim.add_process(process)
