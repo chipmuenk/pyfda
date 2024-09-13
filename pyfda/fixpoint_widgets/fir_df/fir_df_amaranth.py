@@ -118,6 +118,17 @@ class FIR_DF_amaranth(object):
         # with Simulator(m) as sim:
         self.sim.add_clock(1/48000)
 
+        # TODO:
+        # see https://github.com/RobertBaruch/amaranth-tutorial/blob/main/7_simulating.md
+        # - provide run control outside fxfilter using
+        #   Processes may be passive or active. When an active process runs out of things
+        #   to tell the simulator to do, it asks the simulator to finish. In effect, it
+        #   controls the endpoint of the simulator. The simulation ends when all active
+        #   processes are done. A passive process, on the other hand, doesn't ask the
+        #   simulator to finish.
+        #   By default, processes added with add_process and add_sync_process are active.
+        #   A process can change its mode using `yield Active()`` or `yield Passive()`.
+
     # ---------------------------------------------------------
     def process(self):
         """
