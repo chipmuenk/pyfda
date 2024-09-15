@@ -16,10 +16,10 @@ Default parameters, paths etc. are also defined at the end of the file.
 Importing pyfda_rc runs the module once, defining all module variables
 which are global (similar to class variables).
 """
-
 from pyfda import qrc_resources  # contains all icons
 
 from pyfda.libs.pyfda_lib import CRLF, cmp_version
+import pyfda.filterbroker as fb
 from cycler import cycler
 import matplotlib.font_manager
 
@@ -586,6 +586,11 @@ qss_common = """
 
             """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
+
+
+THEME = fb.conf_settings['THEME']
+print(f"\nprTHEME: {THEME}\n")
+logger.info(f"\nTHEME: {THEME}\n")
 
 if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)

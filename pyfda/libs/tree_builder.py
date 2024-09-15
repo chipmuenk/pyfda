@@ -135,7 +135,7 @@ class Tree_Builder(object):
     """
 
     def __init__(self):
-        logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
+        logger.info(f"Reading config file: '{dirs.USER_CONF_DIR_FILE}'\n")
 
         self.REQ_VERSION = 4  # required version for config file
         self.parse_conf_file()
@@ -238,6 +238,9 @@ class Tree_Builder(object):
         :[Fixpoint Widgets]:
             Store (user) fixpoint widgets in `fb.fixpoint_classes`
 
+        :[Config Params]
+            Store configuration parameters in `fb.fil[0]['conf_params']
+
         Parameters
         ----------
         None
@@ -248,6 +251,9 @@ class Tree_Builder(object):
 
         """
         def read_conf_file():
+            """
+            Read configuration file to `self.conf`
+            """
             self.conf.clear()
             self.conf.read(dirs.USER_CONF_DIR_FILE)
             sect = ""
@@ -386,6 +392,13 @@ class Tree_Builder(object):
                         fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
 
                     fb.filter_classes[c].update({'fix': list(fix_wdg)})
+
+            # ------------------------------------------------------------------
+            # Parsing [Config Settings]
+            # ------------------------------------------------------------------
+            self.conf_settings = self.parse_conf_section("Config Settings")
+            if self.conf_settings:
+                logger.info(self.conf_settings)
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:

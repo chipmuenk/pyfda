@@ -227,6 +227,14 @@ fil_tree = freeze_hierarchical({
     })
 
 # -----------------------------------------------------------------------------
+# Dictionary containing configuration settings for pyfda which can be modified
+# in the [Config Settings] of `pyfda.conf`
+# ------------------------------------------------------------------------------
+
+conf_settings = {
+    'THEME': 'light'}
+
+# -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
 # auxiliary information, the initial definition here is copied into fil[0] ... [9]
 # which can be modified by input widgets and design routines
