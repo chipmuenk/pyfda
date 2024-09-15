@@ -156,7 +156,7 @@ def main():
         # for Pythonw.exe, sometimes the icon is just blank. The following
         # instructions tell Windows that pythonw is merely hosting other applications.
         import ctypes
-        myappid = u'chipmuenk.pyfda.v0.8'
+        myappid = u'chipmuenk.pyfda.v0.9'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # set taskbar icon
