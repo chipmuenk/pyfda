@@ -163,9 +163,6 @@ class Tree_Builder(object):
             - `fb.fil_tree` :
 
         """
-
-        # self.parse_conf_file()
-
         fil_tree = {}
 
         for fc in fb.filter_classes:  # iterate over all previously found filter
@@ -209,7 +206,7 @@ class Tree_Builder(object):
 
         - Try to find and import the modules specified in the corresponding sections
 
-        - Extract and import the classes defined in each module and give back an 
+        - Extract and import the classes defined in each module and give back an
           OrderedDict with the successfully imported classes and their options
           (like fully qualified module names, display name, associated fixpoint
           widgets etc.).
@@ -247,12 +244,12 @@ class Tree_Builder(object):
 
         Returns
         -------
-        None, but `self.conf` contains the parsed configuration file.
+        None, but `xxx` contains the parsed configuration file.
 
         """
         def read_conf_file():
             """
-            Read configuration file to `self.conf`
+            Read configuration file and print its sections.
             """
             self.conf.clear()
             self.conf.read(dirs.USER_CONF_DIR_FILE)
@@ -316,6 +313,7 @@ class Tree_Builder(object):
             logger.info("Found {0} entries in [Common]".format(len(self.commons)))
 
             if not read_conf_version():
+                # update configuration files and try again
                 dirs.update_conf_files(logger)
                 read_conf_file()
                 self.commons = self.parse_conf_section("Common")
@@ -340,6 +338,26 @@ class Tree_Builder(object):
                 logger.info("User directory(s):\n\t{0}\n".format(dirs.USER_DIRS))
             else:
                 logger.info("No valid user directory specified.")
+
+            # ------------------------------------------------------------------
+            # Parsing [Config Settings]
+            # ------------------------------------------------------------------
+            conf_settings = self.parse_conf_section("Config Settings")
+            if conf_settings:
+                logger.info(conf_settings)
+                for k in conf_settings:
+                    if k in fb.conf_settings:
+                        fb.conf_settings[k] = conf_settings[k]
+                    else:
+                        logger.warning(
+                            f"Ignoring unknown entry '[{k}]' in configuration file "
+                            "'pyfda.conf'")
+
+            ###########################################################################
+            #
+            # This part needs a running application as Qt widgets are instantiated
+            #
+            ###########################################################################
 
             # ------------------------------------------------------------------
             # Parsing [Input Widgets]
@@ -392,13 +410,6 @@ class Tree_Builder(object):
                         fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
 
                     fb.filter_classes[c].update({'fix': list(fix_wdg)})
-
-            # ------------------------------------------------------------------
-            # Parsing [Config Settings]
-            # ------------------------------------------------------------------
-            self.conf_settings = self.parse_conf_section("Config Settings")
-            if self.conf_settings:
-                logger.info(self.conf_settings)
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
