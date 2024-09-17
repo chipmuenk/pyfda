@@ -197,25 +197,12 @@ class Tree_Builder(object):
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
     # --------------------------------------------------------------------------
-    def parse_conf_file(self):
+    def parse_conf_file(self) -> None:
         """
         Parse the configuration file `pyfda.conf` (specified in
         ``dirs.USER_CONF_DIR_FILE``). This is run only once at instantiation.
 
-        This is performed using :func:`build_class_dict()` which calls
-        :func:`parse_conf_section()`:
-
-        - Try to find and import the modules specified in the corresponding sections
-
-        - Extract and import the classes defined in each module and give back an
-          OrderedDict with the successfully imported classes and their options
-          (like fully qualified module names, display name, associated fixpoint
-          widgets etc.).
-
-        - Information for each  section is stored in globally
-          accessible OrderdDicts like`fb.filter_classes`.
-
-        The following sections are analyzed:
+        The following sections are analyzed here:
 
         :[Commons]:
             Try to find user directories; if they exist add them to
@@ -224,20 +211,7 @@ class Tree_Builder(object):
         :[Config Settings]
             Store settings in `fb.conf_settings`
 
-        For the other sections, OrderedDicts are returned with the class names
-        as keys and dictionaries with options as values.
-
-        :[Input Widgets]:
-            Store (user) input widgets in `fb.input_classes`
-
-        :[Plot Widgets]:
-            Store (user) plot widgets in `fb.plot_classes`
-
-        :[Filter Widgets]:
-            Store (user) filter widgets in `fb.filter_classes`
-
-        :[Fixpoint Widgets]:
-            Store (user) fixpoint widgets in `fb.fixpoint_classes`
+        The other sections are processed in :func:`build_widget_tree()`.
 
         Parameters
         ----------
@@ -245,8 +219,7 @@ class Tree_Builder(object):
 
         Returns
         -------
-        None, but `fb.xxx` contains the parsed configuration file sections
-
+        None
         """
         def read_conf_file():
             """
@@ -372,7 +345,46 @@ class Tree_Builder(object):
     # --------------------------------------------------------------------------
     def build_widget_tree(self):
         """
-        This part needs a running application as Qt widgets are instantiated
+        This part needs a running application as Qt widgets are instantiated to ensure
+        they exist and run without error.
+
+        The following sections are processed here, creating OrderedDicts in `fb` with
+        widget class names as keys and dictionaries with options as values.
+
+        This is performed using :func:`build_class_dict()` which calls
+        :func:`parse_conf_section()`:
+
+        - Try to find and import the modules specified in the corresponding sections
+
+        - Extract and import the classes defined in each module and give back an
+          OrderedDict with the successfully imported classes and their options
+          (like fully qualified module names, display name, associated fixpoint
+          widgets etc.).
+
+        - Information for each  section is stored in globally
+          accessible OrderdDicts like `fb.filter_classes`.
+
+        The following sections are processed here:
+
+        :[Input Widgets]:
+            Store (user) input widgets in `fb.input_classes`
+
+        :[Plot Widgets]:
+            Store (user) plot widgets in `fb.plot_classes`
+
+        :[Filter Widgets]:
+            Store (user) filter widgets in `fb.filter_classes`
+
+        :[Fixpoint Widgets]:
+            Store (user) fixpoint widgets in `fb.fixpoint_classes`
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None, but `fb.xxx` contains the parsed configuration file sections
         """
 
         # ------------------------------------------------------------------
