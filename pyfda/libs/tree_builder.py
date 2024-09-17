@@ -143,60 +143,6 @@ class Tree_Builder(object):
         self.init_filters()
 
     # --------------------------------------------------------------------------
-    def init_filters(self):
-        """
-        Run at startup to populate global dictionaries and lists:
-
-        - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-          in the global dict ``fb.filter_classes`` and store them in the filter
-          tree dict ``fil_tree`` with the hierarchy
-
-            **rt-ft-fc-fo-subwidget:params** .
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None, but populates the following global attributes:
-
-            - `fb.fil_tree` :
-
-        """
-        fil_tree = {}
-
-        for fc in fb.filter_classes:  # iterate over all previously found filter
-                                      # classes fc
-
-            # instantiate a global instance ff.fil_inst() of filter class fc
-            err_code = ff.fil_factory.create_fil_inst(fc)
-            if err_code > 0:
-                logger.warning(
-                    'Skipping filter class "{0:s}" due to import error {1:d}'
-                    .format(fc, err_code))
-                continue  # continue with next entry in fb.filter_classes
-
-            # add attributes from dict to fil_tree for filter class fc
-            fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
-
-            # merge additional rt_dict (optional) into filter tree
-            if hasattr(ff.fil_inst, 'rt_dict_add'):
-                fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
-                merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
-
-        # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
-        fb.fil_tree = freeze_hierarchical(fil_tree)
-
-        # Test Immutatbility
-#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
-#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
-#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
-#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
-
-        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
-
-    # --------------------------------------------------------------------------
     def parse_conf_file(self) -> None:
         """
         Parse the configuration file `pyfda.conf` (specified in
@@ -634,6 +580,60 @@ class Tree_Builder(object):
                         .format(num_imports, section, imported_classes))
         logger.debug(classes_dict)
         return classes_dict
+
+    # --------------------------------------------------------------------------
+    def init_filters(self):
+        """
+        Run at startup to populate global dictionaries and lists:
+
+        - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
+          in the global dict ``fb.filter_classes`` and store them in the filter
+          tree dict ``fil_tree`` with the hierarchy
+
+            **rt-ft-fc-fo-subwidget:params** .
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None, but populates the following global attributes:
+
+            - `fb.fil_tree` :
+
+        """
+        fil_tree = {}
+
+        for fc in fb.filter_classes:  # iterate over all previously found filter
+                                      # classes fc
+
+            # instantiate a global instance ff.fil_inst() of filter class fc
+            err_code = ff.fil_factory.create_fil_inst(fc)
+            if err_code > 0:
+                logger.warning(
+                    'Skipping filter class "{0:s}" due to import error {1:d}'
+                    .format(fc, err_code))
+                continue  # continue with next entry in fb.filter_classes
+
+            # add attributes from dict to fil_tree for filter class fc
+            fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
+
+            # merge additional rt_dict (optional) into filter tree
+            if hasattr(ff.fil_inst, 'rt_dict_add'):
+                fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
+                merge_dicts_hierarchically(fil_tree, fil_tree_add, mode='add1')
+
+        # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):
+        fb.fil_tree = freeze_hierarchical(fil_tree)
+
+        # Test Immutability
+#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
+#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
+#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
+
+        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
     # --------------------------------------------------------------------------
     def build_fil_tree(self, fc, rt_dict, fil_tree=None):
