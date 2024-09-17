@@ -139,6 +139,7 @@ class Tree_Builder(object):
 
         self.REQ_VERSION = 4  # required version for config file
         self.parse_conf_file()
+        self.build_widget_tree()
         self.init_filters()
 
     # --------------------------------------------------------------------------
@@ -220,6 +221,9 @@ class Tree_Builder(object):
             Try to find user directories; if they exist add them to
             `dirs.USER_DIRS` and `sys.path`
 
+        :[Config Settings]
+            Store settings in `fb.conf_settings`
+
         For the other sections, OrderedDicts are returned with the class names
         as keys and dictionaries with options as values.
 
@@ -235,16 +239,13 @@ class Tree_Builder(object):
         :[Fixpoint Widgets]:
             Store (user) fixpoint widgets in `fb.fixpoint_classes`
 
-        :[Config Params]
-            Store configuration parameters in `fb.fil[0]['conf_params']
-
         Parameters
         ----------
         None
 
         Returns
         -------
-        None, but `xxx` contains the parsed configuration file.
+        None, but `fb.xxx` contains the parsed configuration file sections
 
         """
         def read_conf_file():
@@ -353,64 +354,6 @@ class Tree_Builder(object):
                             f"Ignoring unknown entry '[{k}]' in configuration file "
                             "'pyfda.conf'")
 
-            ###########################################################################
-            #
-            # This part needs a running application as Qt widgets are instantiated
-            #
-            ###########################################################################
-
-            # ------------------------------------------------------------------
-            # Parsing [Input Widgets]
-            # ------------------------------------------------------------------
-            fb.input_classes = self.build_class_dict("Input Widgets", "input_widgets")
-            # ------------------------------------------------------------------
-            # Parsing [Plot Widgets]
-            # ------------------------------------------------------------------
-            fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
-            # ------------------------------------------------------------------
-            # Parsing [Filter Widgets]
-            # ------------------------------------------------------------------
-            fb.filter_classes = self.build_class_dict("Filter Widgets", "filter_widgets")
-            # currently, option "opt" can only be an association with a fixpoint
-            # widget, so replace key "opt" by key "fix":
-            # Convert to list in any case
-            for c in fb.filter_classes:
-                if 'opt' in fb.filter_classes[c]:
-                    fb.filter_classes[c]['fix'] = fb.filter_classes[c].pop('opt')
-                if 'fix' in fb.filter_classes[c] and\
-                        type(fb.filter_classes[c]['fix']) == str:
-                    fb.filter_classes[c]['fix'] = fb.filter_classes[c]['fix'].split(',')
-            # ------------------------------------------------------------------
-            # Parsing [Fixpoint Filters]
-            # ------------------------------------------------------------------
-            fb.fixpoint_classes = self.build_class_dict(
-                "Fixpoint Widgets", "fixpoint_widgets")
-
-            # First check whether fixpoint options of the filter widgets are
-            # valid fixpoint classes by comparing them to the verified items of
-            # fb.fixpoint_classes:
-            for c in fb.filter_classes:
-                if 'fix' in fb.filter_classes[c]:
-                    for w in fb.filter_classes[c]['fix']:
-                        if w not in fb.fixpoint_classes:
-                            logger.warning(
-                                f'Removing invalid fixpoint module\n\t"{w}" '
-                                f'for filter class "{c}".')
-                            fb.filter_classes[c]['fix'].remove(w)
-            # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
-            # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
-            # into the fb.filter_classes dict
-
-                # collect all fixpoint widgets (keys in fb.fixpoint_classes) which
-                # have the class name c as a value
-                fix_wdg = {k for k, val in fb.fixpoint_classes.items() if c in val['opt']}
-                if len(fix_wdg) > 0:
-                    if 'fix' in fb.filter_classes[c]:
-                        # ... and merge it with the fixpoint options of class c
-                        fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
-
-                    fb.filter_classes[c].update({'fix': list(fix_wdg)})
-
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
             logger.critical('Duplicate section in config file '
@@ -423,6 +366,66 @@ class Tree_Builder(object):
         except configparser.Error as e:
             logger.critical(f'{e} in config file "{dirs.USER_CONF_DIR_FILE}".')
             sys.exit()
+
+        return
+
+    # --------------------------------------------------------------------------
+    def build_widget_tree(self):
+        """
+        This part needs a running application as Qt widgets are instantiated
+        """
+
+        # ------------------------------------------------------------------
+        # Parsing [Input Widgets]
+        # ------------------------------------------------------------------
+        fb.input_classes = self.build_class_dict("Input Widgets", "input_widgets")
+        # ------------------------------------------------------------------
+        # Parsing [Plot Widgets]
+        # ------------------------------------------------------------------
+        fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
+        # ------------------------------------------------------------------
+        # Parsing [Filter Widgets]
+        # ------------------------------------------------------------------
+        fb.filter_classes = self.build_class_dict("Filter Widgets", "filter_widgets")
+        # currently, option "opt" can only be an association with a fixpoint
+        # widget, so replace key "opt" by key "fix":
+        # Convert to list in any case
+        for c in fb.filter_classes:
+            if 'opt' in fb.filter_classes[c]:
+                fb.filter_classes[c]['fix'] = fb.filter_classes[c].pop('opt')
+            if 'fix' in fb.filter_classes[c] and\
+                    type(fb.filter_classes[c]['fix']) == str:
+                fb.filter_classes[c]['fix'] = fb.filter_classes[c]['fix'].split(',')
+        # ------------------------------------------------------------------
+        # Parsing [Fixpoint Filters]
+        # ------------------------------------------------------------------
+        fb.fixpoint_classes = self.build_class_dict(
+            "Fixpoint Widgets", "fixpoint_widgets")
+
+        # First check whether fixpoint options of the filter widgets are
+        # valid fixpoint classes by comparing them to the verified items of
+        # fb.fixpoint_classes:
+        for c in fb.filter_classes:
+            if 'fix' in fb.filter_classes[c]:
+                for w in fb.filter_classes[c]['fix']:
+                    if w not in fb.fixpoint_classes:
+                        logger.warning(
+                            f'Removing invalid fixpoint module\n\t"{w}" '
+                            f'for filter class "{c}".')
+                        fb.filter_classes[c]['fix'].remove(w)
+        # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
+        # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
+        # into the fb.filter_classes dict
+
+            # collect all fixpoint widgets (keys in fb.fixpoint_classes) which
+            # have the class name c as a value
+            fix_wdg = {k for k, val in fb.fixpoint_classes.items() if c in val['opt']}
+            if len(fix_wdg) > 0:
+                if 'fix' in fb.filter_classes[c]:
+                    # ... and merge it with the fixpoint options of class c
+                    fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
+
+                fb.filter_classes[c].update({'fix': list(fix_wdg)})
 
     # --------------------------------------------------------------------------
     def parse_conf_section(self, section):
