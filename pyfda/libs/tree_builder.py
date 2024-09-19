@@ -25,6 +25,7 @@ from .frozendict import freeze_hierarchical
 import logging
 logger = logging.getLogger(__name__)
 
+REQ_VERSION = 4  # required version for config file
 
 # --------------------------------------------------------------------------
 def merge_dicts_hierarchically(d1, d2, path=None, mode='keep1'):
@@ -135,12 +136,7 @@ class Tree_Builder(object):
     """
 
     def __init__(self):
-        logger.info(f"Reading config file: '{dirs.USER_CONF_DIR_FILE}'\n")
-
-        self.REQ_VERSION = 4  # required version for config file
-        self.parse_conf_file()
-        self.build_widget_tree()
-        self.init_filters()
+        logger.info("Instantiating TreeBuilder")
 
     # --------------------------------------------------------------------------
     def parse_conf_file(self) -> None:
@@ -189,12 +185,12 @@ class Tree_Builder(object):
             success = True
             try:
                 conf_ver = int(self.commons['version'][0])
-                if conf_ver != self.REQ_VERSION:
+                if conf_ver != REQ_VERSION:
                     logger.error(
                         "User config file\n\t'{conf_file:s}'\n\thas the wrong version "
                         "'{conf_ver}' (required: '{req_version}')."
                         .format(conf_file=dirs.USER_CONF_DIR_FILE, conf_ver=conf_ver,
-                                req_version=self.REQ_VERSION))
+                                req_version=REQ_VERSION))
                     success = False
             except KeyError:
                 logger.error("No entry 'version' in {0}".format(dirs.USER_CONF_DIR_FILE))
@@ -206,8 +202,7 @@ class Tree_Builder(object):
 
             return success
         # --------------
-
-        # ========= Starting here! =============================================
+        logger.info(f"Reading config file: '{dirs.USER_CONF_DIR_FILE}'\n")
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
@@ -267,7 +262,8 @@ class Tree_Builder(object):
                 logger.info(conf_settings)
                 for k in conf_settings:
                     if k in fb.conf_settings:
-                        fb.conf_settings[k] = conf_settings[k]
+                        # TODO: why are the values lists?
+                        fb.conf_settings[k] = conf_settings[k][0]
                     else:
                         logger.warning(
                             f"Ignoring unknown entry '[{k}]' in configuration file "

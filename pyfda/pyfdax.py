@@ -15,8 +15,13 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
+from pyfda.libs.tree_builder import Tree_Builder
+# initialize the FilterTreeBuilder class and read config file 
+tree_builder = Tree_Builder()
+tree_builder.parse_conf_file()
+
 import pyfda.pyfda_rc as rc
+import pyfda.libs.pyfda_dirs as dirs # initial import constructs file paths
 
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
@@ -27,7 +32,7 @@ matplotlib.use("Qt5Agg")
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 
-from pyfda.libs.compat import (Qt, QtCore, QtGui, QMainWindow, QApplication, QIcon,
+from pyfda.libs.compat import (Qt, QtCore, QMainWindow, QApplication, QIcon,
                      QFont, QFontMetrics)
 
 # from pyfda.libs.pyfda_lib import ANSIcolors as ACol
@@ -88,6 +93,8 @@ def main():
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
+    print(type(rc.qss_rc))
+    print(rc.qss_rc)
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
@@ -134,6 +141,10 @@ def main():
     rc.mpl_rc['font.size'] = fontsize
     rc.params['screen'] = {'ref_dpi': ref_dpi, 'scaling': scaling,
                            'height': height, 'width': width}
+    # initialize the FilterTreeBuilder class:
+    # read config file and construct filter tree from it
+    tree_builder.build_widget_tree()
+    tree_builder.init_filters()
 
     mainw = pyFDA()
     logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
