@@ -93,8 +93,6 @@ def main():
     else:
         logger.warning("No Qt attribute 'AA_EnableHighDpiScaling'.")
     # Instantiate QApplication object, passing command line arguments
-    print(type(rc.qss_rc))
-    print(rc.qss_rc)
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet

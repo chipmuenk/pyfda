@@ -572,9 +572,11 @@ class Tree_Builder(object):
         if num_imports < 1:
             logger.warning("No class could be imported.")
         else:
-            logger.info("Found {0:d} classes in [{1:s}]:\n{2:s}"
-                        .format(num_imports, section, imported_classes))
-        logger.debug(classes_dict)
+            logger.info(
+                f"Found {num_imports} classes in [{section}]:\n\t----------"
+                f"\n{imported_classes}"
+                        )
+        # logger.debug(classes_dict)
         return classes_dict
 
     # --------------------------------------------------------------------------
@@ -599,6 +601,8 @@ class Tree_Builder(object):
             - `fb.fil_tree` :
 
         """
+        logger.info(
+                f"Instantiating filter classes and building filter tree ...\n")
         fil_tree = {}
 
         for fc in fb.filter_classes:  # iterate over all previously found filter
