@@ -246,16 +246,16 @@ qss_dark = """
     QLineEdit{background: #444444;
                 border-style: outset;
                 border-width: 1px;
-                border-color: darkgrey;
+                border-color: #c0c0c0;
                 color: white;
     }
-    QLineEdit:disabled{background-color:darkgrey;color: lightgray}
+    QLineEdit:disabled{background-color:#505050; color: #808080}
 
     /*
     QComboBox{background-color:#444444}
     QComboBox QAbstractItemView {
-        background-color: #555555;
-        border: 2px solid darkgray;
+        background-color: #505050;
+        border: 2px solid #c0c0c0;
         selection-background-color: red;
     }*/
 
@@ -273,14 +273,14 @@ qss_dark = """
 
     QPushButton{background-color: qlineargradient(
                 x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 darkgray, stop: 1.0 black);
+                stop: 0 #C0C0C0, stop: 1.0 #303030);
                 }
-    QPushButton:disabled{color:darkgrey;}
+    QPushButton:disabled{color:#303030;}
     QPushButton {border: native; border-radius:-1px;}
 
     QPushButton[state="normal"]{background-color: qlineargradient(
                 x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 darkgray, stop: 1.0 black);
+                stop: 0 #C0C0C0, stop: 1.0 #303030);
                 }
 
     NavigationToolbar2QT{background-color:#555555}
@@ -300,18 +300,18 @@ qss_light = """
 
     QTableView{alternate-background-color:#cccccc;
         background-color:#F0F0F0; gridline-color: white;}
-    QHeaderView::section{background-color:darkgray; color:white;}
+    QHeaderView::section{background-color:#303030; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    QLineEdit{background: white; border-color: darkgrey;}
-    QLineEdit:disabled{background-color:lightgrey; color:blue;}
+    QLineEdit{background: white; border-color: #303030;}
+    QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
-    /* Style for the spinbo< and combobox itself */
-    QSpinBox, QComboBox{background-color: lightgray; border: 1px solid gray; padding: 1px;}
+    /* Style for the spinbox and combobox itself */
+    QSpinBox, QComboBox{background-color: c0c0c0; border: 1px solid gray; padding: 1px;}
     /* Style for dropdown items */
     QComboBox QAbstractItemView {
         background-color: white;
-        border: 1px solid darkgray;
+        border: 1px solid gray;
         selection-background-color: orange;
     }
 
@@ -320,13 +320,12 @@ qss_light = """
 
     QPushButton{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 lightblue);
+        stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
     }
-    QPushButton:disabled{color:darkgrey;}
 
     QPushButton[state="normal"]{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 lightblue);
+        stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
         }
 
     QMessageBox{background-color: #EEEEEE}
@@ -360,7 +359,7 @@ QTabWidget {
     font-size:10pt;
     font-weight:bold;
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
-                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+                        stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 #C2C7CB);
     border: 1px solid #C4C4C3;
     border-top-left-radius: 0.2em;
  }
@@ -448,7 +447,7 @@ qss_common = """
                 * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: rgba(173, 216, 230, 25%)}
-                * [state="unused"], *[state="u"]{background-color: white; color:darkgrey}
+                * [state="unused"], *[state="u"]{background-color: white; color:#303030}
                 /* semi-transparent red */
                 * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black;
                     font-weight:800;}
@@ -461,7 +460,7 @@ qss_common = """
 
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
-                    border-top: solid darkgrey;
+                    border-top: solid #303030;
                     border-width: 0.1em;
                     margin: 0;
                     padding: 0;
@@ -472,7 +471,7 @@ qss_common = """
                 QTabWidget#input_tabs QTextBrowser
                 {
                     /* background-color: pink; */
-                    border: solid darkgrey;
+                    border: solid #303030;
                     border-width: 0.05em 0 0.05em 0;
                     padding: 0;
                     margin: 0 0 0 0; /* was: 1px 0 0 0 */
@@ -482,7 +481,7 @@ qss_common = """
                 QTabWidget#input_tabs > QFrame QFrame .QFrame
                 {
                     /* background-color:lime; */
-                    border: solid darkgrey;
+                    border: solid #303030;
                     border-width: 0.05em 0 0 0;
                     padding: 0;
                     margin: 0;
@@ -567,7 +566,7 @@ qss_common = """
                     }
 
                 QProgressBar{text-align: center; font-weight: bold;
-                             border: 1px solid darkgrey;}
+                             border: 1px solid #303030;}
                 QProgressBar::chunk{background-color: lightblue;}
 /*
 #GreenProgressBar {
