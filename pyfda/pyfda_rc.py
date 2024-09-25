@@ -251,21 +251,16 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
-    QComboBox{background-color:#444444}
-    QComboBox QAbstractItemView {
-        background-color: #505050;
-        border: 2px solid #c0c0c0;
-        selection-background-color: red;
-    }*/
 
     /* Style for the combobox itself */
-    QSpinBox, QComboBox{background-color: #222222; border: 1px solid darkgray; padding: 1px;}
+    QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa; 
+            padding: 1px; selection-background-color: orange;}
     /* Style for dropdown items */
     QComboBox QAbstractItemView {
         background-color: #222222;
-        border: 1px solid darkgray;
-        selection-background-color: orange;
+        border: 1px solid #808080;
     }
+
     QMessageBox{background-color:#444444}
 
     QPlainTextEdit{background-color: black}
@@ -306,12 +301,12 @@ qss_light = """
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
     /* Style for the spinbox and combobox itself */
-    QSpinBox, QComboBox{background-color: c0c0c0; border: 1px solid gray; padding: 1px;}
+    QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray; 
+            padding: 1px; selection-background-color: orange;}
     /* Style for dropdown items */
     QComboBox QAbstractItemView {
         background-color: white;
         border: 1px solid gray;
-        selection-background-color: orange;
     }
 
     /* Style for editable text field in combobox*/
@@ -500,6 +495,16 @@ qss_common = """
                 /* Table Corner Button */
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
                 QTableView QTableCornerButton::section:pressed{background-color:red;}
+
+                /*QComboBox:item {padding-left: 0px;}*/
+                /*QComboBox QAbstractItemView {padding-left: 1px;}
+                QComboBox::item:selected{background-color: orange; border:none; padding-left: 0px}                                                                                                  
+                QComboBox::indicator{
+                    background-color:transparent;
+                    selection-background-color:transparent;
+                    color:transparent;
+                    selection-color:transparent;
+                }*/
 
                 QPushButton
                 {
