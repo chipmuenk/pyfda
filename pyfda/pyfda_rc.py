@@ -249,9 +249,8 @@ qss_dark = """
                 border-color: #c0c0c0;
                 color: white;
     }
-    QLineEdit:disabled{background-color:#505050; color: #808080}
+    QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
-    /*
     QComboBox{background-color:#444444}
     QComboBox QAbstractItemView {
         background-color: #505050;
