@@ -55,15 +55,16 @@ FILTER_FILE_VERSION = 1
 
 # file filters for the QFileDialog object are constructed from this dict
 file_filters_dict = {
-    'cmsis': 'CMSIS DSP FIR or IIR SOS coefficients',
-    'coe': 'Xilinx FIR coefficients format',
+    'cmsis': 'CMSIS DSP coefficients',
+    'coe': 'Xilinx FIR coefficients',
     'csv': 'Comma / Tab Separated Values',
     'json': 'Javascript Object Notation',
     'mat': 'Matlab-Workspace',
     'npy': 'Binary Numpy Array',
     'npz': 'Zipped Binary Numpy Array',
     'pkl': 'Pickled data',
-    'txt': 'Microsemi FIR coefficient format',
+    'sos': 'Scipy / Matlab SOS coefficients',
+    'txt': 'Microsemi FIR coefficients',
     'vhd': 'VHDL package or architecture',
     'wav': 'WAV audio format',
     'xls': 'Excel Worksheet',
