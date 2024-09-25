@@ -316,6 +316,7 @@ qss_light = """
         x1: 0, y1: 0, x2: 0, y2: 1,
         stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
     }
+    QPushButton:disabled{color:#303030;}
 
     QPushButton[state="normal"]{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
