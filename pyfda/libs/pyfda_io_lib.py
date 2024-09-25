@@ -1185,11 +1185,13 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     #     f"shape{np.shape(data)}\n{data}")
 
     # add file types for coefficients and a description text for messages.
+    # TODO: Add CMSIS export for FIR filters
+    # TODO: Add fixpoint format export for CMSIS / SOS coefficients
     if fkey == 'ba':
         if fb.fil[0]['ft'] == 'FIR':
             file_types += ('coe', 'vhd', 'txt')
         else:
-            file_types += ('cmsis',)
+            file_types += ('cmsis', 'sos')
         description = "Coefficient"
     else:
         description = "Pole / zero"
@@ -1211,7 +1213,8 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
         if file_type == 'csv':
             with open(file_name, 'w', encoding="utf8", newline='') as f:
                 f.write(data)
-        elif file_type in {'coe', 'txt', 'vhd', 'cmsis'}:  # text / string formats
+        # other text / string formats
+        elif file_type in {'coe', 'txt', 'vhd', 'cmsis', 'sos'}:
             with open(file_name, 'w', encoding="utf8") as f:
                 if file_type == 'coe':
                     err = export_coe_xilinx(f)
@@ -1219,8 +1222,8 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_microsemi(f)
                 elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
-                elif file_type == 'cmsis':
-                    err = export_coe_cmsis(f)
+                elif file_type in {'cmsis', 'sos'}:
+                    err = export_coe_cmsis_sos(f, file_type)
                 else:
                     logger.error(f'Unknown file extension "{file_type}')
                     return None
@@ -1554,18 +1557,30 @@ def export_coe_TI(f: TextIO) -> None:
 
 
 # ------------------------------------------------------------------------------
-def export_coe_cmsis(f: TextIO) -> None:
+def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
     """
-    Get coefficients in SOS format and delete 4th column containing the
-    '1.0' of the recursive parts.
+    SOS: Get coefficients in SOS format and export them
+    CMSIS IIR SOS: Get coefficients in SOS format, delete 4th column containing the
+    '1.0' of the recursive parts and export them.
 
     See https://www.keil.com/pack/doc/CMSIS/DSP/html/group__BiquadCascadeDF1.html
     https://dsp.stackexchange.com/questions/79021/iir-design-scipy-cmsis-dsp-coefficient-format
     https://github.com/docPhil99/DSP/blob/master/MatlabSOS2CMSIS.m
 
-    # TODO: check `scipy.signal.zpk2sos` for details concerning sos paring
+    # TODO: check `scipy.signal.zpk2sos` for details concerning sos pairing
+    # TODO: qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])
     """
-    sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+    # check whether a_0 coefficients of all sections are == 1
+    if not np.all(np.isclose(fb.fil[0]['sos'][:, 3], 1.0, atol=1e-8)):
+        logger.warning(
+            "Not all a_0 coefficients are 1.0, results may be wrong!")
+    if file_type == 'cmsis':
+    # delete a_0 coefficients which always should be 1,
+    # invert the sign of recursive coefficients:
+        sos_coeffs = np.delete(fb.fil[0]['sos'], 3, 1)
+        sos_coeffs[:, 3:] = - sos_coeffs[:, 3:]
+    else:
+        sos_coeffs = fb.fil[0]['sos']
 
     delim = params['CSV']['delimiter'].lower()
     if delim == 'auto':  # 'auto' doesn't make sense when exporting
@@ -1574,7 +1589,7 @@ def export_coe_cmsis(f: TextIO) -> None:
 
     text = ""
     for r in range(np.shape(sos_coeffs)[0]):  # number of rows
-        for c in range(5):  # always has 5 columns
+        for c in range(np.shape(sos_coeffs)[1]):  # always has 5 or 6 columns
             text += str(safe_eval(sos_coeffs[r][c], return_type='auto')) + delim
         text = text.rstrip(delim) + cr
     text = text.rstrip(cr)  # delete last CR

@@ -240,7 +240,7 @@ qss_dark = """
 
     QCheckBox{
         border: none;  /* dummy, needed to force using non-system widget rendering */
-        color: white;
+        color: gray;
         }
 
     QLineEdit{background: #444444;
