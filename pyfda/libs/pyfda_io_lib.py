@@ -1570,6 +1570,14 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
     # TODO: check `scipy.signal.zpk2sos` for details concerning sos pairing
     # TODO: qc = fx.Fixed(fb.fil[0]['fxq']['QCB'])
     """
+    if np.ndim(fb.fil[0]['sos']) < 2 or np.shape(fb.fil[0]['sos'])[1] != 6\
+            or np.shape(fb.fil[0]['sos'])[0] < 1:
+        logger.error(f"SOS coefficients have bad shape '{np.shape(fb.fil[0]['sos'])}'!")
+        return True
+    if fb.fil[0]['creator'][0] != 'sos':
+        logger.warning(f"Second-order sections have been calculated from "
+                       f"'{fb.fil[0]['creator'][0]}' format, results may be inaccurate.")
+
     # check whether a_0 coefficients of all sections are == 1
     if not np.all(np.isclose(fb.fil[0]['sos'][:, 3], 1.0, atol=1e-8)):
         logger.warning(
