@@ -292,9 +292,9 @@ qss_light = """
 
     QTextEdit{background-color: white;}
 
-    QTableView{alternate-background-color:#cccccc;
-        background-color:#F0F0F0; gridline-color: white;}
-    QHeaderView::section{background-color:#303030; color:white;}
+    QTableView{alternate-background-color:#C0C0C0;
+        background-color:#F0F0F0; gridline-color: #A0A0A0;}
+    QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
     QLineEdit{background: white; border-color: #303030;}
