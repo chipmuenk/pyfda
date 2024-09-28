@@ -1206,9 +1206,13 @@ class Plot_Impz(QWidget):
             # self.t_interp = np.linspace(self.t[0], self.t[-1], (len(self.t) - 1) * I + 1)
             # self.x_interp = np.interp(self.t_interp, self.t, self.x, left=None, right=None,
             #                      period=None)
-            self.x_interp = sig.resample_poly(self.x, I, 1, axis=0, window=('kaiser', 5.0),
-                                              padtype='line', cval=None)
-            self.t_interp = np.linspace(self.n[0], self.n[-1] + 1, len(self.n) * I, endpoint=False) * fb.fil[0]['T_S']
+            self.x_interp = sig.resample_poly(
+                self.x, I, 1, axis=0, window=('kaiser', 5.0),
+                padtype='line', cval=None)[N_start * I: N_end * I]
+            self.t_interp = np.linspace(
+                self.n[0], self.n[-1] + 1, len(self.n) * I,
+                endpoint=False)[N_start * I: N_end * I] * fb.fil[0]['T_S']
+
 
         t = self.t[N_start:N_end]
         x = self.x[N_start:N_end] * self.scale_i  # obtain same scaling for x as for quantized signals
@@ -1641,7 +1645,7 @@ class Plot_Impz(QWidget):
                 f_max = fb.fil[0]['f_max']
 
             # freqz-based ideal frequency response:
-            F_id, H_id = sig.freqz(get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]), 
+            F_id, H_id = sig.freqz(get_fil_dict(['ba', 0]), get_fil_dict(['ba', 1]),
                                    worN=params['N_FFT'], whole=True, fs=f_max)
 
             # frequency vector for FFT-based frequency plots:
