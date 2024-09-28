@@ -1740,12 +1740,11 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
-            fil_dict['sos'] = []  # don't convert zpk -> SOS due to numerical inaccuracies
-#            try:
-#                fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
-#            except ValueError:
-#                fil_dict['sos'] = []
-#                logger.warning("Complex-valued coefficients, could not convert to SOS.")
+           try:
+               fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
+           except ValueError:
+               fil_dict['sos'] = []
+               logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     elif 'ba' in format_in:  # arg = [b,a]
         if np.all(np.isfinite(fil_dict['ba'])):
@@ -1755,7 +1754,7 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             if fil_dict['ba'][1][0] != 1:
                 logger.error(
                     f"The coefficient a[0] = {fil_dict['ba'][1][0]} needs to be 1, "
-                    "expect the unexpected!")
+                    f"expect the unexpected!")
 
             # TODO: use mpmath.polyroots() here for higher precision
             # https://mpmath.org/doc/current/calculus/polynomials.html
@@ -1773,13 +1772,11 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             raise ValueError(
                 "\t'fil_convert()': Cannot convert coefficients with NaN or Inf elements "
                 "to zpk format!")
-        fil_dict['sos'] = []  # don't convert ba -> SOS due to numerical inaccuracies
-#        if SOS_AVAIL:
-#            try:
-#                fil_dict['sos'] = sig.tf2sos(b,a)
-#            except ValueError:
-#                fil_dict['sos'] = []
-#                logger.warning("Complex-valued coefficients, could not convert to SOS.")
+        try:
+            fil_dict['sos'] = sig.tf2sos(fil_dict['ba'][0], fil_dict['ba'][1])
+        except ValueError:
+            fil_dict['sos'] = []
+            logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
         raise ValueError(f"\t'fil_convert()': Unknown input format {format_in:s}")
