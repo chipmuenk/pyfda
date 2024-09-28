@@ -518,20 +518,23 @@ qss_common = """
                  */
                  }
 
-                QPushButton[state="changed"]{background-color: qlineargradient(
+                QPushButton[state="changed"]{color: white;
+                    background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
                     color: black;}
 
-                QPushButton[state="error"]{background-color: qlineargradient(
+                QPushButton[state="error"]{color: white;
+                    background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
-                    color: white;}
+                    }
 
-                QPushButton[state="ok"]{background-color: qlineargradient(
+                QPushButton[state="ok"]{color: white;
+                    background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
-                    color: white;}
+                    }
 
                 /* Highlight button when pressed from checked / not checked state */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
