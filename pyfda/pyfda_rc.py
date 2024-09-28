@@ -596,8 +596,6 @@ qss_common = """
 
 
 THEME = fb.conf_settings['THEME']
-print(f"\nprTHEME: {THEME}\n")
-logger.info(f"\nTHEME: {THEME}\n")
 
 if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)
