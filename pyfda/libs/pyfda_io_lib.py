@@ -1189,7 +1189,7 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
     # TODO: Add fixpoint format export for CMSIS / SOS coefficients
     if fkey == 'ba':
         if fb.fil[0]['ft'] == 'FIR':
-            file_types += ('coe', 'vhd', 'txt')
+            file_types += ('coe', 'vhd', 'txt', 'cmsis')
         else:
             file_types += ('cmsis', 'sos')
         description = "Coefficient"
@@ -1222,8 +1222,10 @@ def export_fil_data(parent: object, data: str, fkey: str = "", title: str = "Exp
                     err = export_coe_microsemi(f)
                 elif file_type == 'vhd':
                     err = export_coe_vhdl_package(f)
-                elif file_type in {'cmsis', 'sos'}:
+                elif file_type in {'cmsis', 'sos'} and fb.fil[0]['ft'] == 'IIR':
                     err = export_coe_cmsis_sos(f, file_type)
+                elif file_type == 'cmsis' and fb.fil[0]['ft'] == 'FIR':
+                    err = export_coe_cmsis_fir(f)
                 else:
                     logger.error(f'Unknown file extension "{file_type}')
                     return None
@@ -1554,6 +1556,16 @@ def export_coe_TI(f: TextIO) -> None:
     ** not implemented yet **
     """
     pass
+
+
+def export_coe_cmsis_fir(f: TextIO) -> None:
+    """
+    The CMSIS FIR filter function requires the coefficients to be in time reversed
+    order, hence the coefficient array is flipped before exporting.
+    """
+    logger.error("Not implemented yet!")
+    coeffs = fb.fil[0]['ba'][0][::-1]
+    return True
 
 
 # ------------------------------------------------------------------------------
