@@ -1740,11 +1740,16 @@ def fil_convert(fil_dict: dict, format_in) -> None:
             except Exception as e:
                 raise ValueError(e)
         if 'sos' not in format_in:
-           try:
-               fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
-           except ValueError:
+            try:
+               if not np.isscalar(zpk[2]):
+                   k = zpk[2][0]
+               else:
+                   k = zpk[2]
+               fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], k)
+            except ValueError as e:
                fil_dict['sos'] = []
-               logger.warning("Complex-valued coefficients, could not convert to SOS.")
+               logger.warning(
+                   f"Complex-valued coefficients? Could not convert zpk\n{zpk}\n to SOS.\n{e}")
 
     elif 'ba' in format_in:  # arg = [b,a]
         if np.all(np.isfinite(fil_dict['ba'])):
