@@ -31,7 +31,7 @@ from matplotlib import patches, cm
 import logging
 logger = logging.getLogger(__name__)
 
-classes = {'Plot_PZ': 'P / Z'}  #: Dict containing class name : display name
+classes = {'Plot_PZ': 'P/Z'}  #: Dict containing class name : display name
 
 
 class Plot_PZ(QWidget):
@@ -44,7 +44,7 @@ class Plot_PZ(QWidget):
         self.needs_draw = False  # flag whether whether figure needs to be drawn
                                  # with new limits etc. (not implemented yet)
         self.tool_tip = "Pole / zero plan"
-        self.tab_label = "P / Z"
+        self.tab_label = "P/Z"
 
         self.cmb_overlay_items = [
             "<span>Add various overlays to P/Z diagram.</span>",
