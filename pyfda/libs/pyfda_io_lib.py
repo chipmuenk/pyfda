@@ -1586,9 +1586,9 @@ def export_coe_cmsis_sos(f: TextIO, file_type: str) -> None:
             or np.shape(fb.fil[0]['sos'])[0] < 1:
         logger.error(f"SOS coefficients have bad shape '{np.shape(fb.fil[0]['sos'])}'!")
         return True
-    if fb.fil[0]['creator'][0] != 'sos':
+    if fb.fil[0]['creator'][0] == 'ba':
         logger.warning(f"Second-order sections have been calculated from "
-                       f"'{fb.fil[0]['creator'][0]}' format, results may be inaccurate.")
+                       f"'ba' format, results may be inaccurate.")
 
     # check whether a_0 coefficients of all sections are == 1
     if not np.all(np.isclose(fb.fil[0]['sos'][:, 3], 1.0, atol=1e-8)):
