@@ -58,13 +58,13 @@ class FIR_DF_amaranth(object):
     """
     def __init__(self, p):
 
-        logger.info("Instantiating filter")
         self.p = p  # parameter dictionary with coefficients etc.
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         # self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
         # self.Q_acc = fx.Fixed(self.p['QACC'])  # accumulator
         self.Q_O = fx.Fixed(self.p['QO'])  # output
         self.init(p)
+        logger.info("Instantiated fx filter")
 
     # ---------------------------------------------------------
     def init(self, p, zi: iterable = None) -> None:

@@ -45,7 +45,6 @@ class IIR_DF1_pyfixp(object):
     def __init__(self, p):
         self.p = p
 
-        logger.info("Instantiating filter")
         # create various quantizers and initialize / reset them
         self.Q_a = fx.Fixed(self.p['QCA'])  # recursive coeffs
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs.
@@ -56,6 +55,7 @@ class IIR_DF1_pyfixp(object):
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
+        logger.info("Instantiated fx filter")
 
     # ---------------------------------------------------------
     def init(self, p, zi_b: iterable = None, zi_a: iterable = None) -> None:

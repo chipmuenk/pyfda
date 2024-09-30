@@ -45,7 +45,6 @@ class FIR_DF_pyfixp(object):
     def __init__(self, p):
         self.p = p
 
-        logger.info("Instantiating filter")
         # create various quantizers and initialize / reset them
         self.Q_b = fx.Fixed(self.p['QCB'])  # transversal coeffs
         self.Q_mul = fx.Fixed(self.p['QACC'].copy())  # partial products
@@ -53,6 +52,7 @@ class FIR_DF_pyfixp(object):
         self.Q_O = fx.Fixed(self.p['QO'])  # output
 
         self.init(p)
+        logger.info("Instantiated fx filter")
 
     # ---------------------------------------------------------
     def init(self, p, zi: iterable = None) -> None:

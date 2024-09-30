@@ -660,8 +660,8 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
             fx_filt_ui_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
-            logger.info("Instantiating new FX widget\n\t"
-                        f"{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
+            logger.info("Instantiating new FX widget")
+                        # f"\n\t{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
             # set lightblue background with transparency for fixpoint widget

@@ -768,15 +768,16 @@ class Plot_Impz(QWidget):
         self.ui.prg_wdg.setValue(self.ui.N_end)  # 100% reached
         self.t_resp = time.process_time()
 
-        t_sim_str = f"[{(self.t_resp - self.t_start) * 1000:5.4g} ms]: "
-        logger.info(t_sim_str + f"Calculated transient {self.fx_str}response")
-
         self.draw()
         # self.needs_redraw[self.tab_mpl_w.currentIndex()] = False
         self.needs_calc = False
         self.needs_calc_fx = False
-        logger.info('[{0:5.4g} ms]: Plotted transient {1}response'
-                    .format((time.process_time() - self.t_resp)*1000, self.fx_str))
+        logger.info(
+            f'Calc / plot '
+            f'({(self.t_resp - self.t_start) * 1000:5.4g} /'
+            f'{(time.process_time() - self.t_resp) * 1000:5.4g} ms) '
+            f'transient {self.fx_str}response')
+
         self.ui.but_run.setIcon(QIcon(":/play.svg"))
         qstyle_widget(self.ui.but_run, "normal")
         # update Tran_IO ui, depending on complex and fixpoint status
