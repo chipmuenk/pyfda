@@ -376,6 +376,7 @@ class Input_Specs(QWidget):
         widgets via `load_dict()` and via sig_tx: {'data_changed':'filter_loaded'}.
         """
         sel = qget_cmb_box(self.cmb_filter_load)
+        # 'File' selected, update fil[0] from file
         if sel == "file":
             ret = load_filter(self)
             if ret == 0:
@@ -386,6 +387,7 @@ class Input_Specs(QWidget):
             else:
                 logger.error(f'Unknown return code "{ret}"!')
                 return
+        # 'File (all)' selected, update fil[0] ... fil[9] from file
         elif sel == "file_all":
             ret = load_filter(self, all_filters=True)
             if ret == 0:
@@ -396,6 +398,7 @@ class Input_Specs(QWidget):
             else:
                 logger.error(f'Unknown return code "{ret}"!')
                 return
+        # 'Mem <i>', copy fil[i] to fil[0]
         else:
             fb.fil[0] = copy.deepcopy(fb.fil[int(sel)])
             self.load_dict()
