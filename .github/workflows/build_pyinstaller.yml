@@ -84,7 +84,7 @@ jobs:
       #    github.ref_type: tag
       #    github.ref_name: v0.8.0a3
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: main  # enforce using main branch
 
@@ -101,7 +101,7 @@ jobs:
       run: ${{matrix.CMD_BUILD}}
 
     - name: Upload builds as artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.OUT_FILE_NAME}}
         path: ./dist/${{ matrix.OUT_FILE_NAME}}
