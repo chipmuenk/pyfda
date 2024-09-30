@@ -428,8 +428,11 @@ class Tree_Builder(object):
                 logger.warning('Empty section [{0:s}].'.format(section))
 
         except configparser.NoSectionError:
-            logger.warning('No section [{0:s}] in config file "{1:s}".'
-                           .format(section, dirs.USER_CONF_DIR_FILE))
+            logger.warning(
+                f'[WARNING] No section "[{section}]" in config file '
+                f'{dirs.USER_CONF_DIR_FILE}",'
+                f'\n\tConsider creating a new config file using "pyfdax --r".\n'
+                           )
             # configparser.NoOptionError
         except configparser.DuplicateOptionError as e:
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
