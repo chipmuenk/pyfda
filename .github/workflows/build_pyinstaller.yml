@@ -141,7 +141,7 @@ jobs:
         rm: false
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          pyfdax_win.exe/pyfdax_win.exe
-          pyfdax_osx/pyfdax_osx
-          pyfdax_linux/pyfdax_linux
+          dist/pyfdax_win.exe/pyfdax_win.exe
+          dist/pyfdax_osx/pyfdax_osx
+          dist/pyfdax_linux/pyfdax_linux
 
