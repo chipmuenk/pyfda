@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-05-xx)
+## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-09-30)
 
 ### Bugfixes
 
@@ -16,15 +16,20 @@
   [issue \#239](https://github.com/chipmuenk/pyfda/issues/239)
 - Fixed problems when loading / saving windowed and equiripple filters.
 - Fixed problems when loading csv audio files
+- Lots of code clean-up
 
 ### New features
 
 - Provide a simple example of an Amaranth fixpoint filter (needs to be enabled in pyfda.conf) with fixpoint
-  simulation and Verilog export
+  simulation and Verilog export (still buggy)
 - Provide an estimation for the length of the impulse response of IIR filters until -40 dB are
   reached (currently hardcoded)
 - For complex-valued time signals, display single-sided spectra as magnitude
   [issue \#242](https://github.com/chipmuenk/pyfda/issues/242)
+- Dark mode (needs to be set in `pyfda.conf` with `THEME = 'dark'`. When updating an existing installation, 
+  recreate the config file first with `pyfdax -r`
+- New second-order sections export formats 'CMSIS DSP coefficients' and 'Scipy/Matlab SOS coefficients'
+- Add more infos in FFT Window viewer
 
 
 ## [v0.9.0b1](https://github.com/chipmuenk/pyfda/tree/v0.9.0b1) (2024-04-02)
