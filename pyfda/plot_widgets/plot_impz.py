@@ -355,9 +355,9 @@ class Plot_Impz(QWidget):
         - local widgets (impz_ui) and
         - plot_tab_widgets() (global signals)
         """
-        # logger.warning(
-        #     f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
-        #     f"\t{first_item(dict_sig)}")
+        logger.warning(
+            f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
+            f"\t{first_item(dict_sig)}")
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
@@ -558,6 +558,7 @@ class Plot_Impz(QWidget):
         """
         # allow scaling the frequency response from pure impulse (no DC, noise or file)
         # button is only visible for impulse-shaped stimuli
+        logger.info("impz_init")
         self.resize_stim_tab_widget()
         self.ui.but_freq_norm_impz.setEnabled(
             (self.stim_wdg.ui.noi == 0 or

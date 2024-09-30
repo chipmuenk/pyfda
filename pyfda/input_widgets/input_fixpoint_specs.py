@@ -191,8 +191,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         # logger.warning(
         #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-        # logger.warning(
-        #     f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
+        logger.warning(
+            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
