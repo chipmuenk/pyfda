@@ -125,7 +125,8 @@ jobs:
       if: success() && github.ref_type != 'tag'
       uses: pyTooling/Actions/releaser@main
       with:
-        tag: latest
+        # tag: latest
+        tag: ${{ github.ref_name }}
         rm: true
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
