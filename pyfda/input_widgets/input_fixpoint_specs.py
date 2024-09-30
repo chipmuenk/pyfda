@@ -190,9 +190,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
 
         # logger.warning(
-        #     "SIG_RX(): vis={0}\n{1}".format(self.isVisible(), pprint_log(dict_sig)))
-        logger.warning(
-            f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
+        #     f"SIG_RX: vis={self.isVisible()}, fx_sim={fb.fil[0]['fx_sim']}\n{pprint_log(dict_sig)}")
+
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
             return
@@ -660,7 +659,7 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod_class_name = qget_cmb_box(self.cmb_fx_wdg, data=True).rsplit('.', 1)
             fx_mod = importlib.import_module(fx_mod_class_name[0])  # get module
             fx_filt_ui_class = getattr(fx_mod, fx_mod_class_name[1])  # get class
-            logger.info("Instantiating new FX widget")
+            # logger.info("Instantiating new FX widget")
                         # f"\n\t{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
