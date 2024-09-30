@@ -114,7 +114,7 @@ jobs:
     - name: Download all artifacts
       uses: actions/download-artifact@v4.1.7
       with:
-        path: ./
+        path: ./dist
     # not specifying the file names downloads all artifacts. However,
     # an individual directory is created for each file identical to its name
 
