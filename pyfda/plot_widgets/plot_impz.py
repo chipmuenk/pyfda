@@ -775,7 +775,7 @@ class Plot_Impz(QWidget):
         self.needs_calc_fx = False
         logger.info(
             f'Calc / plot '
-            f'({(self.t_resp - self.t_start) * 1000:5.4g} /'
+            f'({(self.t_resp - self.t_start) * 1000:5.4g} / '
             f'{(time.process_time() - self.t_resp) * 1000:5.4g} ms) '
             f'transient {self.fx_str}response')
 
