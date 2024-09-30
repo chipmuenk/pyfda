@@ -77,7 +77,7 @@ class QFFTWinCmbBox(QWidget):
         the widgets from the dictionary
 
         """
-        logger.warning(f"SIG_RX:{id(self)}\n{pprint_log(dict_sig)}")
+        # logger.warning(f"SIG_RX:{id(self)}\n{pprint_log(dict_sig)}")
 
         if dict_sig['id'] == id(self):
             return  # signal has been emitted from same instance
@@ -221,12 +221,12 @@ class QFFTWinCmbBox(QWidget):
         self.cur_win_dict['disp_name'] = self.all_wins_dict[cur_win_id]['disp_name']
         self.cur_win_dict['par_val'] = self.all_wins_dict[cur_win_id]['par_val']
 
-        logger.error(f"fnct_set: {self.win_fnct}")
+        # logger.error(f"fnct_set: {self.win_fnct}")
         return win_err  # error flag, UI (window combo box) needs to be updated
 
 # ------------------------------------------------------------------------------
     def calc_window(self, N: int, win_id: str = "", sym: bool = False) -> np.array:
-        logger.error(f"{self.objectName()}: calc_window({win_id})")
+        # logger.error(f"{self.objectName()}: calc_window({win_id})")
         """
         Calculate the selected window function with `N` points.
 
@@ -268,7 +268,7 @@ class QFFTWinCmbBox(QWidget):
         n_par = len(self.all_wins_dict[win_id]['par_val'])
 
         logger.error(f"id: {win_id}, par: {self.all_wins_dict[win_id]['par_val']}, len: {len(self.all_wins_dict[win_id]['par_val'])}")
-        logger.error(f"fnct_calc: {self.win_fnct}")
+        # logger.error(f"fnct_calc: {self.win_fnct}")
 
         try:
             if fn_name == 'dpss':
