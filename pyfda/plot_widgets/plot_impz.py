@@ -96,7 +96,7 @@ class Plot_Impz(QWidget):
 
         # --------------------------------------------
         # initialize UI and `get_fil_dict(['fx_sim'])` for fixpoint or float simulation
-        self.toggle_fx_settings()
+        self.update_fx_settings()
 
         self.impz_init()  # initial calculation of stimulus and response and drawing
 
@@ -217,7 +217,7 @@ class Plot_Impz(QWidget):
         # ---------------------------------------------------------------------
         self.tab_stim_w.currentChanged.connect(self.resize_stim_tab_widget)
         # --- run control ---
-        self.ui.cmb_sim_select.currentIndexChanged.connect(self.toggle_fx_settings)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.update_fx_settings)
         self.ui.but_run.clicked.connect(self.impz_init)
         self.ui.but_auto_run.clicked.connect(self.calc_auto)
         self.stim_wdg.ui.but_file_io.clicked.connect(self.set_N_to_file_len)
@@ -380,7 +380,7 @@ class Plot_Impz(QWidget):
                 self.needs_calc = True  # force recalculation
                 self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
-                self.toggle_fx_settings()
+                self.update_fx_settings()
                 if fb.fil[0]['fx_sim']:
                     self.needs_calc_fx = True   # fx sim needs recalculation
 
@@ -575,7 +575,7 @@ class Plot_Impz(QWidget):
         self.needs_redraw = [True] * 2
 
         # check for fixpoint setting `get_fil_dict(['fx_sim'])` and update UI if needed
-        self.toggle_fx_settings()
+        self.update_fx_settings()
 
         if type(arg) == bool:
             self.needs_calc = True  # but_run has been pressed -> force run
@@ -790,7 +790,7 @@ class Plot_Impz(QWidget):
             self.emit({'fx_sim': 'finish'})
 
     # --------------------------------------------------------------------------
-    def toggle_fx_settings(self, arg=None):
+    def update_fx_settings(self, arg=None):
         """
         `arg` can be the following arguments, triggered by:
 
