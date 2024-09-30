@@ -605,7 +605,7 @@ class Tree_Builder(object):
 
         """
         logger.info(
-                f"Instantiating filter classes and building filter tree ...\n")
+                f"Instantiating filter classes, building filter tree ...\n")
         fil_tree = {}
 
         for fc in fb.filter_classes:  # iterate over all previously found filter
