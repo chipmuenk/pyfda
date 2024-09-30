@@ -368,8 +368,8 @@ class Plot_Impz(QWidget):
             if dict_sig['fx_sim'] == 'specs_changed':
                 """
                 Fixpoint widget specs have been updated.
-                - set `self.needs_calc_fx = True`.
                 If fixpoint mode is active:
+                - set `self.needs_calc_fx = True`.
                 - Reset error flag
                 - Force recalculation (`self.needs_calc = True`)
                 - Update run button style to 'changed'
@@ -377,11 +377,12 @@ class Plot_Impz(QWidget):
                     initialize fixpoint widget and
                     start simulation via `calc_auto` -> `self.impz_init()`
                 """
-                self.needs_calc_fx = True   # fx sim needs recalculation
                 self.needs_calc = True  # force recalculation
                 self.error = False      # reset error flag
                 # set cmb box for fixpoint / float simulation and update ui:
                 self.toggle_fx_settings()
+                if fb.fil[0]['fx_sim']:
+                    self.needs_calc_fx = True   # fx sim needs recalculation
 
                 qstyle_widget(self.ui.but_run, 'changed')
                 self.ui.but_run.setIcon(QIcon(":/play.svg"))
