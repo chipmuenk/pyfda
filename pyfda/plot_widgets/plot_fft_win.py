@@ -166,8 +166,9 @@ class Plot_FFT_win(QDialog):
         - `self.update_view`:
         - `self.draw`: calculate window and FFT and draw both
         """
-        logger.warning(f"PROCESS_SIG_RX: vis={self.isVisible()}, name={self.objectName()}, "
-                       f"needs_calc={self.needs_calc}\n{pprint_log(dict_sig)}")
+        # logger.warning(f"PROCESS_SIG_RX:\n\tvis={self.isVisible()}, "
+        #                f"name={self.objectName()}, needs_calc={self.needs_calc}"
+        #                f"\n{pprint_log(dict_sig)}")
 
         if dict_sig['id'] == id(self):
             logger.warning("Stopped infinite loop:\n{0}".format(pprint_log(dict_sig)))
