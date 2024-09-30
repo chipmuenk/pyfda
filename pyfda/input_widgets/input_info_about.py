@@ -188,7 +188,6 @@ class AboutWindow(QDialog):
                    "| **User Module Dir** | `{user_dir}` |\n"
                    "| **Home Dir**  |   `{home_dir}` |\n"
                    "| **Temp Dir** | `{temp_dir}` |\n"
-                   "| **Config Dir** | `{conf_dir}` |\n"
                    "| - - - - - - -  | - - - - - - - - -|\n"
                    "| **pyFDA Config** | `{pyfda_conf}` |\n"
                    "| **Log. Config** | `{log_conf}` |\n"
