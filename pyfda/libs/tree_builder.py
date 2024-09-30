@@ -429,9 +429,9 @@ class Tree_Builder(object):
 
         except configparser.NoSectionError:
             logger.warning(
-                f'[WARNING] No section "[{section}]" in config file '
+                f'\n[WARNING] No section "[{section}]" in config file '
                 f'{dirs.USER_CONF_DIR_FILE}",'
-                f'\n\tConsider creating a new config file using "pyfdax --r".\n'
+                f'\n\tconsider creating a new config file using "pyfdax -r".\n'
                            )
             # configparser.NoOptionError
         except configparser.DuplicateOptionError as e:

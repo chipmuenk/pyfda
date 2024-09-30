@@ -357,7 +357,7 @@ class Plot_Impz(QWidget):
         """
         logger.warning(
             f"SIG_RX - needs_calc: {self.needs_calc} | vis: {self.isVisible()}\n"
-            f"{first_item(dict_sig)}")
+            f"\t{first_item(dict_sig)}")
 
         if dict_sig['id'] == id(self):
             # logger.warning(f'Stopped infinite loop: "{first_item(dict_sig)}"')
