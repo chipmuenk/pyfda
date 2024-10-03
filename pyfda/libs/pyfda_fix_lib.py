@@ -1054,7 +1054,7 @@ class Fixed(object):
             """
             # only keep allowed characters incl. 'j' and '+',
             # remove leading zero(s) and convert to lower case
-            y = re.sub(self.FRMT_REGEX[frmt].replace(']', '|j\+]'),
+            y = re.sub(self.FRMT_REGEX[frmt].replace(r']', r'|j\+]'),
                        r'', str(y)).lstrip('0').lower()
 
             # (?!^) : any position other than start of string

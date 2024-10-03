@@ -168,7 +168,7 @@ class Plot_Phi(QWidget):
 
 # ------------------------------------------------------------------------------
     def draw(self):
-        """
+        r"""
         Main entry point:
         Re-calculate \|H(f)\| and draw the figure
         """

@@ -6,7 +6,7 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
+r"""
 Widget for plotting \|H(z)\| in 3D
 """
 from pyfda.libs.compat import (
