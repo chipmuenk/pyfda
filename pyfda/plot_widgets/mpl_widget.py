@@ -11,7 +11,6 @@ Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
 import sys
-from pyfda.libs.pyfda_lib import cmp_version
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.figure import Figure
@@ -49,21 +48,16 @@ for key in pyfda_rc.mpl_rc:
 # ------------------------------------------------------------------------------
 def stems(x, y, ax=None, label=None, mkr_fmt=None, **kwargs):
     """
-    Provide a faster replacement for stem plots under matplotlib < 3.1.0 using
-    vlines (= LineCollection). LineCollection keywords are supported.
+    Provide a more flexible stem plot, passing kwargs to the stem plot elements
     """
     # create a copy of the kwargs dict without 'bottom' key-value pair, provide
     # pop bottom from dict (default = 0), not compatible with vlines
     bottom = kwargs.pop('bottom', 0)
     ax.axhline(bottom, **kwargs)
-    # if cmp_version("matplotlib", "3.1.0") >= 0:
     ml, sl, bl = ax.stem(x, y, bottom=bottom)
     setp(ml, **mkr_fmt)
     setp(bl, **kwargs)
     setp(sl, **kwargs)
-    # else:  # if matplotlib < 3.1.0
-    #     ax.vlines(x, y, bottom, label=label, **kwargs)
-    #     scatter(x, y, ax=ax, label=label, mkr_fmt=mkr_fmt, **kwargs)
 
     if mkr_fmt['marker']:
         handle = (lines.Line2D([], [], **kwargs), lines.Line2D([], [], **mkr_fmt))
@@ -282,7 +276,6 @@ class MplWidget(QWidget):
                                              "Axes", "Axes3D"}:
                     self.cursors.append(mplcursors.cursor(ax, hover=False, multiple=True))
                     self.cursors[-1].connect("add", self.show_annotation)
-                    logger.warning(ax.__class__.__name__)
             # Either pass an artist, axis, figure or nothing to select specific objects
             # self.cursors.append(mplcursors.cursor(self.fig, multiple=True, hover=False))
             # self.cursors[-1].connect("add", self.show_annotation)
