@@ -23,7 +23,6 @@ import markdown
 
 import scipy.signal as sig
 
-from distutils.version import LooseVersion
 import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 import pyfda.libs.pyfda_sig_lib as pyfda_sig_lib
@@ -158,6 +157,10 @@ def cmp_version(mod: str, version: str) -> int:
          :1: version of installed module is higher than specified version
 
     """
+    def versiontuple(v):
+        """Convert strings like "1.2.3" to tuples like (1,2,3) for comparisons."""
+        return tuple(map(int, (v.split("."))))
+
     try:
         if not mod or not mod in MODULES or not MODULES[mod].values():
             return -2
@@ -167,9 +170,9 @@ def cmp_version(mod: str, version: str) -> int:
             if inst_ver == '':
                 return -2
 
-        if LooseVersion(inst_ver) > LooseVersion(version):
+        if versiontuple(inst_ver) > versiontuple(version):
             return 1
-        elif LooseVersion(inst_ver) == LooseVersion(version):
+        elif versiontuple(inst_ver) == versiontuple(version):
             return 0
         else:
             return -1
@@ -188,7 +191,7 @@ def mod_version(mod: str = "") -> str:
     """
     if mod:
         if mod in MODULES:
-            return LooseVersion(list(MODULES[mod].values())[0])
+            return list(MODULES[mod].values())[0]
         else:
             return ""
     else:
