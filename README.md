@@ -47,7 +47,7 @@ Binaries can be downloaded under [Releases](https://github.com/chipmuenk/pyfda/r
 
 Self-extracting archives for **64 bit Windows**, **OS X** and **Ubuntu Linux** are created with **[pyInstaller](https://www.pyinstaller.org/)**. The archives self-extract to a temporary directory that is automatically deleted when pyfda is terminated (except when it crashes), they don't modify the system except for two ASCII configuration files and a log file. No additional software / libraries need to be installed, there is no interaction with existing python installations and you can simply overwrite or delete the executables when updating. After downloading the Linux archive, you need to make it executable (`chmod 775 pyfda_linux`).
 
-Binaries for **Linux** are created as Flatpaks as well **(currently defunct)** which can also be downloaded from **[Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
+Binaries for **Linux** are created as Flatpaks as well **(currently broken)** which can also be downloaded from [Flathub](https://flathub.org/apps/details/com.github.chipmuenk.pyfda) **(also broken)**. Many Linux distros have built-in flatpak support, for others it's easy to install with e.g. `sudo apt install flatpak`. For details check the [Flatpak](https://www.flatpak.org/) home page.
 
 ### pip
 
