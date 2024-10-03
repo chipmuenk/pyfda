@@ -73,13 +73,13 @@ file_filters_dict = {
 
 # regex pattern that yields true in a re.search() when only the specified
 #  characters (numeric, "eEjJ(),.+-" and blank / line breaks) are contained
-pattern_num_chars = re.compile('[eEjJ()0-9,\.\+\-\s]+$')
+pattern_num_chars = re.compile(r'[eEjJ()0-9,\.\+\-\s]+$')
 # regex pattern that identifies characters and their position *not* specified
-pattern_no_num = re.compile('(?![eEjJ()0-9,\.\+\-\s])')
+pattern_no_num = re.compile(r'(?![eEjJ()0-9,\.\+\-\s])')
 
 # ------------------------------------------------------------------------------
 def prune_file_ext(file_type: str) -> str:
-    """
+    r"""
     Prune file extension, e.g. 'Text file' from 'Text file (\*.txt)' returned
     by QFileDialog file type description.
 
@@ -112,12 +112,12 @@ def prune_file_ext(file_type: str) -> str:
     - '(' must be escaped as '\\\('
     """
 
-    return re.sub('\([^\)]+\)', '', file_type)
+    return re.sub(r'\([^\)]+\)', '', file_type)
 
 
 # ------------------------------------------------------------------------------
 def extract_file_ext(file_type: str, return_list: bool = False) -> str:
-    """
+    r"""
     Extract list with file extension(s), e.g. '.vhd' from type description
     'VHDL (\*.vhd)' returned by QFileDialog. Depending on the OS, this may be the
     full file type description or just the extension like '(\*.vhd)'.
@@ -142,7 +142,7 @@ def extract_file_ext(file_type: str, return_list: bool = False) -> str:
 
     """
     if "(" in file_type:
-        ext_list = re.findall('\([^\)]+\)', file_type)  # extract '(*.txt)'
+        ext_list = re.findall(r'\([^\)]+\)', file_type)  # extract '(*.txt)'
         file_type_list = [t.strip('(*.)') for t in ext_list]  # remove '(*.)'
         if return_list:
             return file_type_list
@@ -282,7 +282,7 @@ def select_file(parent: object, title: str = "", mode: str = "r",
 # ------------------------------------------------------------------------------
 def qtable2csv(table: object, data: np.ndarray, zpk: bool = False,
                formatted: bool = False) -> str:
-    """
+    r"""
     Transform QTableWidget data to CSV formatted text for export to file or clipboard.
 
     Parameters
@@ -884,7 +884,7 @@ def read_wav_info(file):
 def file2array(file_name: str, file_type: str, fkey: str = "",
                from_clipboard: bool = False, as_str: bool = False
                  )-> np.ndarray:
-    """
+    r"""
     Import data from a file or from clipboard and convert it to a numpy array.
 
     Parameters
@@ -1406,7 +1406,7 @@ def coe_header(title: str) -> str:
 
 # ------------------------------------------------------------------------------
 def export_coe_xilinx(f: TextIO) -> bool:
-    """
+    r"""
     Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
 
@@ -1449,7 +1449,7 @@ def export_coe_xilinx(f: TextIO) -> bool:
 
 # ------------------------------------------------------------------------------
 def export_coe_microsemi(f: TextIO) -> bool:
-    """
+    r"""
     Save FIR filter coefficients in Microsemi coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
     For (anti)symmetric filter only one half of the coefficients must be
@@ -1480,7 +1480,7 @@ def export_coe_microsemi(f: TextIO) -> bool:
 
 # ------------------------------------------------------------------------------
 def export_coe_vhdl_package(f: TextIO) -> bool:
-    """
+    r"""
     Save FIR filter coefficients as a VHDL package '\*.vhd', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """

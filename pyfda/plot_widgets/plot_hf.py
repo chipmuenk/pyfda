@@ -6,7 +6,7 @@
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
 
-"""
+r"""
 The ``Plot_Hf`` class constructs the widget to plot the magnitude
 frequency response \|H(f)\| of the filter either in linear or logarithmic
 scale. Optionally, the magnitude specifications and the phase
@@ -34,7 +34,7 @@ classes = {'Plot_Hf': '|H(f)|'}  #: Dict containing class name : display name
 
 
 class Plot_Hf(QWidget):
-    """
+    r"""
     Widget for plotting \|H(f)\|, frequency specs and the phase
     """
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
@@ -587,7 +587,7 @@ class Plot_Hf(QWidget):
 
 #------------------------------------------------------------------------------
     def draw(self):
-        """
+        r"""
         Re-calculate \|H(f)\| and draw the figure
         """
         self.but_align.setVisible(self.but_phase.isChecked())
