@@ -417,7 +417,7 @@ class Tree_Builder(object):
                             logger.warning(f"Syntax Error in config file\n{e}")
                             val = ""
                     else:
-                        val = re.sub('["\'\[\]]','', val)
+                        val = re.sub(r'["\'\[\]]','', val)
                         val = re.split('; |, |\n|,\n|\r', val)  # TODO: Test
 
                     section_conf_dict.update({i[0]: val})

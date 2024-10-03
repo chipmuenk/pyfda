@@ -901,7 +901,7 @@ def dB(lin: float, power: bool = False) -> float:
 # ------------------------------------------------------------------------------
 def lin2unit(lin_value: float, filt_type: str, amp_label: str,
              unit: str = 'dB') -> float:
-    """
+    r"""
     Convert linear amplitude specification to dB or W, depending on filter
     type ('FIR' or 'IIR') and whether the specifications belong to passband
     or stopband. This is determined by checking whether amp_label contains
@@ -940,7 +940,7 @@ def lin2unit(lin_value: float, filt_type: str, amp_label: str,
 # ------------------------------------------------------------------------------
 def unit2lin(unit_value: float, filt_type: str, amp_label: str,
              unit: str = 'dB') -> float:
-    """
+    r"""
     Convert amplitude specification in dB or W to linear specs:
 
     - Passband:
@@ -1124,7 +1124,7 @@ def comb_bl(t):
 
 # ------------------------------------------------------------------------------
 def H_mag(num, den, z, H_max, H_min=None, log=False, div_by_0='ignore'):
-    """
+    r"""
     Calculate `\|H(z)\|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
     denominator. When ``log == True``, :math:`20 \log_{10} (|H(z)|)` is returned.
