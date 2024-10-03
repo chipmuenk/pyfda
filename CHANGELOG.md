@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.9.1](https://github.com/chipmuenk/pyfda/tree/v0.9.1) (2024-10-03)
+
+### Bugfixes
+
+- Fix Python 3.12 related syntax warnings about invalid escape sequences by using raw strings
+- remove distutils.LooseVersion imports as this is no longer supported by Python 3.12 
+
 ## [v0.9.0](https://github.com/chipmuenk/pyfda/tree/v0.9.0) (2024-09-30)
 
 ### Bugfixes
