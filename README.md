@@ -7,7 +7,7 @@
 <!-- ![Total Github Downloads](https://img.shields.io/github/downloads/chipmuenk/pyfda/total?label=Total%20Github%20Downloads) -->
 <!-- [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) -->
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=main)](https://readthedocs.org/projects/pyfda/)
+[![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=main)](https://readthedocs.org/projects/pyfda/?badge=main)
 [![build_pyinstaller](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml/badge.svg?branch=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml)
 [![build_flatpak](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml/badge.svg?branch=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml)
 
