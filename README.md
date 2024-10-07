@@ -9,7 +9,7 @@
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 [![build_pyinstaller](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml/badge.svg?version=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_pyinstaller.yml?badge=main)
-[![build_flatpak](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml/badge.svg?version=main)](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml?badge=main)
+![build_flatpak](https://github.com/chipmuenk/pyfda/actions/workflows/build_flatpak.yml/badge.svg)
 
 **pyfda** is a tool written in Python / Qt for analyzing and designing discrete time filters with a user-friendly GUI. Fixpoint filter implementations (for some filter types) can be simulated and tested for overflow and quantization behaviour in the time and frequency domain.
 
