@@ -118,8 +118,11 @@ jobs:
         ls artifacts
         echo "*** Show artifacts/pyfda Flatpak folder: ***"
         ls "artifacts/pyfda Flatpak"
-        echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
-        ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
+        # This doesn't work, path / file not found
+        # echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
+        # ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
+        echo "*** Show com.github.chipmuenk.pyfda-x86_64: ***"
+        ls "com.github.chipmuenk.pyfda-x86_64"
 
     # - name: Update GitHub prerelease
     #   if: ${{ github.ref == 'refs/heads/main' }}
