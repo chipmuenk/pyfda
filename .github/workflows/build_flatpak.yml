@@ -73,7 +73,7 @@ jobs:
       run: cat com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Build package
-      uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6
+      uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6.3
       with:
         bundle: com.github.chipmuenk.pyfda.flatpak
         manifest-path: com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
