@@ -17,7 +17,7 @@ jobs:
     name: "Flatpak"
     runs-on: ubuntu-latest
     container:
-      image: bilelmoussaoui/flatpak-github-actions:kde-5.15-21.08
+      image: bilelmoussaoui/flatpak-github-actions:kde-5.15-23.08
       options: --privileged
     steps:
     - name: Infos about github ref and trigger event
