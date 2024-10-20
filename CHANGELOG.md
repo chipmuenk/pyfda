@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.9.2](https://github.com/chipmuenk/pyfda/tree/v0.9.2) (2024-10-20)
+
+### Bugfixes
+
+- Fix "IndexError: list assignment index out of range"
+    File "/home/cmuenker/Daten/design/python/git/pyfda/pyfda/filterbroker.py", line 486, in store_fil
+        fil_undo[undo_ptr] = copy.deepcopy(fil[0])
+    IndexError: list assignment index out of range
+- Fix broken badges on README.md
+- Fix broken build process for ReadTheDocs
+
 ## [v0.9.1](https://github.com/chipmuenk/pyfda/tree/v0.9.1) (2024-10-03)
 
 ### Bugfixes
