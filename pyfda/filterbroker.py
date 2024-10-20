@@ -441,7 +441,7 @@ fil_ref = {
 
   # create empty lists with length 10 for multiple filter designs and undo functions
 fil = [None] * 10
-fil_undo = [None] * 10
+fil_undo = [None] * UNDO_LEN
 
 # https://nedbatchelder.com/text/names.html :
 # define fil[0] as a dict with "built-in" default. The argument defines the default
