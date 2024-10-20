@@ -14,7 +14,7 @@ nose
 mplcursors
 numexpr >= 2.8.8
 markdown
-amaranth_yosys
+amaranth[builtin-yosys]
 # pytest
 # coverage
 # coveralls
