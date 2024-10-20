@@ -66,7 +66,7 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # fetch-depth: 0         # fetch complete history for all branches
           ref: main
