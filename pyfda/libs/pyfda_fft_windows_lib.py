@@ -392,7 +392,8 @@ all_wins_dict_ref = {
         'par_val': [0.25]
         },
     'ultraspherical': {
-        'app': ['fir', 'spec', 'all'],
+        # for some reason, this window crashes pyfda
+        'app': [],
         'disp_name': 'Ultraspherical',
         'fn_name': 'pyfda.libs.pyfda_fft_windows_lib.ultraspherical',
         'id': 'ultraspherical',
