@@ -73,7 +73,7 @@ jobs:
       run: cat com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
 
     - name: Build package
-      uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6.3
+      uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: com.github.chipmuenk.pyfda.flatpak
         manifest-path: com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
@@ -84,7 +84,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: com.github.chipmuenk.pyfda/*
-        name: pyfda Flatpak
+        name: pyfda_Flatpak
 
   Validate_appdata_file:
     name: Validate appdata file
@@ -116,8 +116,8 @@ jobs:
       run: |
         echo "*** Show artifacts folder: ***"
         ls artifacts
-        echo "*** Show artifacts/pyfda Flatpak folder: ***"
-        ls "artifacts/pyfda Flatpak"
+        echo "*** Show artifacts/pyfda_Flatpak folder: ***"
+        ls "artifacts/pyfda_Flatpak"
         # This doesn't work, path / file not found
         # echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
         # ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
