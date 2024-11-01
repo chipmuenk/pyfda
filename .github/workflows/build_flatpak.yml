@@ -79,6 +79,7 @@ jobs:
         manifest-path: com.github.chipmuenk.pyfda/com.github.chipmuenk.pyfda.yaml
         cache: false
         branch: development
+        # Uploaded /__w/pyfda/pyfda/com.github.chipmuenk.pyfda.flatpak
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v4
@@ -118,7 +119,8 @@ jobs:
         ls artifacts
         echo "*** Show artifacts/pyfda_Flatpak folder: ***"
         ls "artifacts/pyfda_Flatpak"
-        # This doesn't work, path / file not found
+        # This doesn't work, path / file not found,
+        # only pyfda_Flatpak.zip is downloaded and expanded, not the flatpak file
         # echo "*** Show artifacts/com.github.chipmuenk.pyfda-x86_64: ***"
         # ls "artifacts/com.github.chipmuenk.pyfda-x86_64"
         echo "*** Show com.github.chipmuenk.pyfda-x86_64: ***"
@@ -144,7 +146,7 @@ jobs:
         rm: false
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
+          artifacts/pyfda_Flatpak/com.github.chipmuenk.pyfda.yaml
           artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
     - name: Update versioned Github release
@@ -155,7 +157,7 @@ jobs:
         rm: false
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          artifacts/pyfda*Flatpak/com.github.chipmuenk.pyfda.yaml
+          artifacts/pyfda_Flatpak/com.github.chipmuenk.pyfda.yaml
           artifacts/com.github.chipmuenk.pyfda-x86_64/*.flatpak
 
 ...
