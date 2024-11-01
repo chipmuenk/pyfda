@@ -293,8 +293,8 @@ fil_ref = {
     "fc": "Ellip",  # filter class
     # Window parameters for frequency domain analysis of transient signals
     "tran_freq_win": {
-        "id": "hann",  # window id
-        "disp_name": "Hann",  # display name
+        "id": "rectangular",  # window id
+        "disp_name": "Rectangular",  # display name
         "par_val": [],    # list of window parameters
         "win_len": 32  # window length for window viewer
     },
