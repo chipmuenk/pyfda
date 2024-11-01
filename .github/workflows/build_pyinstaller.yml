@@ -66,8 +66,8 @@ jobs:
             TARGET: ubuntu
             CMD_BUILD: >
                 pyinstaller pyfdax.spec &&
-                mv dist/pyfdax dist/pyfdax_linux
-            OUT_FILE_NAME: pyfdax_linux
+                mv dist/pyfdax dist/pyfdax_ubuntu
+            OUT_FILE_NAME: pyfdax_ubuntu
             ASSET_MIME: application/x-executable
 
     steps:
@@ -131,7 +131,7 @@ jobs:
         files: |
           ./dist/pyfdax_win.exe/pyfdax_win.exe
           ./dist/pyfdax_osx/pyfdax_osx
-          ./dist/pyfdax_linux/pyfdax_linux
+          ./dist/pyfdax_ubuntu/pyfdax_ubuntu
 
     - name: Update versioned release
       if: success() && github.ref_type == 'tag'
@@ -143,5 +143,5 @@ jobs:
         files: |
           ./dist/pyfdax_win.exe/pyfdax_win.exe
           ./dist/pyfdax_osx/pyfdax_osx
-          ./dist/pyfdax_linux/pyfdax_linux
+          ./dist/pyfdax_ubuntu/pyfdax_ubuntu
 
