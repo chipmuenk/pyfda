@@ -558,6 +558,13 @@ class PlotImpz_UI(QWidget):
         self.but_freq_show_info.setCheckable(True)
         self.but_freq_show_info.setChecked(False)
 
+        self.but_freq_index_k = QPushButton("k", objectName="but_show_index_k")
+        self.but_freq_index_k.setMaximumWidth(qtext_width(" k "))
+        self.but_freq_index_k.setToolTip(
+            "<span>Frequency indices instead of frequencies.</span>")
+        self.but_freq_index_k.setCheckable(True)
+        self.but_freq_index_k.setChecked(fb.fil[0]["tab_yn"]["display_index_k"])
+
         layH_ctrl_freq_0 = QHBoxLayout()
         layH_ctrl_freq_0.addWidget(self.lbl_title_plot_freq)
 
@@ -583,6 +590,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq_1.addStretch(1)
 
         layH_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
+        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addWidget(self.but_freq_index_k)
         layH_ctrl_freq_1.addStretch(1)
         layH_ctrl_freq_1.addWidget(self.but_freq_show_info)
         layH_ctrl_freq_1.addStretch(10)
