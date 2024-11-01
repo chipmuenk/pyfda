@@ -436,7 +436,11 @@ fil_ref = {
             0.0+0.0j,
             0.0+0.0j
         ]
-    ]
+    ],
+    # Tab-specific infos
+    "tab_yn":{
+        "display_index_k": False
+    }
 }
 
   # create empty lists with length 10 for multiple filter designs and undo functions
