@@ -617,7 +617,9 @@ class Plot_Tran_Stim_UI(QWidget):
         """
         Update labels for time / frequency related specs
         """
-        if fb.fil[0]['freq_specs_unit'] == 'k':
+        if False: # fb.fil[0]["tab_yn"]["display_index_k"]: # button 'index_k' is set
+            # doesn't work yet, frequencies are scaled wrongly
+            unit_frmt = None
             f_unit = ''
             t_unit = ''
             self.lblFreq1.setText(self.txtFreq1_k)
@@ -758,7 +760,8 @@ class Plot_Tran_Stim_UI(QWidget):
         self._update_energy_scaling_impz()
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        if fb.fil[0]['freq_specs_unit'] == 'k':
+        if False: # fb.fil[0]["tab_yn"]["display_index_k"]:
+            # doesn't work yet, frequencies are scaled wrongly
             self.f_scale = self.N_FFT
         else:
             self.f_scale = fb.fil[0]['f_S']

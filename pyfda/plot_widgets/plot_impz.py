@@ -246,9 +246,18 @@ class Plot_Impz(QWidget):
         self.ui.but_log_freq.clicked.connect(self.draw)
         self.ui.led_log_bottom_freq.editingFinished.connect(self.draw)
         self.ui.but_freq_norm_impz.clicked.connect(self.draw)
+        self.ui.but_freq_index_k.clicked.connect(self.toggle_index_k)
         self.ui.but_freq_show_info.clicked.connect(self.draw)
         # --- subwidgets
 
+# ------------------------------------------------------------------------------
+    def toggle_index_k(self):
+        """
+        Toggle setting of index_k button in filterbroker, update frequency scaling and call `draw()`
+        """
+        fb.fil[0]["tab_yn"]["display_index_k"] = self.ui.but_freq_index_k.isChecked()
+        self.stim_wdg.ui.normalize_freqs()
+        self.draw()
 # ------------------------------------------------------------------------------
     def toggle_stim_options(self):
         """
@@ -1634,7 +1643,7 @@ class Plot_Impz(QWidget):
 
             F_range = fb.fil[0]['freqSpecsRange']
 
-            if fb.fil[0]['freq_specs_unit'] == 'k':
+            if self.ui.but_freq_index_k.isChecked():
                 """
                 "'<i>k</i>' specifies frequencies w.r.t. " + to_html("f_S", frmt = 'i') +
                 " but plots graphs over the frequency index <i>k</i>.</span>",
