@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.9.3](https://github.com/chipmuenk/pyfda/tree/v0.9.3) (2024-11-xx)
+
+### Bugfixes
+
+- Make rectangular window the default window for spectral analysis
+- Re-enable display of frequency index k in y[n] frequency tab
+- Comment out ultraspherical window as it crashes pyfda
+- Rename pyInstaller archive pyfda_linux to pyfda_ubuntu to make it clear that this file can
+  only be used under Ubuntu (or probably other Debian related distros)
+
 ## [v0.9.2](https://github.com/chipmuenk/pyfda/tree/v0.9.2) (2024-10-20)
 
 ### Bugfixes
