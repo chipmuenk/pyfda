@@ -347,7 +347,7 @@ near ``f_S/2`` (highpass).
         gain = zeros_with_val(len(z), k)
 
         # store in class attributes for the _save method
-        self.zpk = [z,p,gain]
+        self.zpk = np.array([z,p,gain])
         self.b = b
         self._save(fil_dict)
 
