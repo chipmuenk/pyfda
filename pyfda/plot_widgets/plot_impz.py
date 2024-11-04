@@ -335,7 +335,7 @@ class Plot_Impz(QWidget):
             self.set_ui_level(self.mplwidget_t.mplToolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
-                and self.mplwidget_t.mplToolbar.a_en_enabled:
+                and self.mplwidget_t.mplToolbar.plot_enabled:
             self.draw()
         else:
             self.process_sig_rx(dict_sig)
@@ -351,7 +351,7 @@ class Plot_Impz(QWidget):
             self.set_ui_level(self.mplwidget_f.mplToolbar.a_ui_level)
         # redraw plot when it has become enabled
         elif dict_sig['mpl_toolbar'] == 'enable_plot'\
-                and self.mplwidget_f.mplToolbar.a_en_enabled:
+                and self.mplwidget_f.mplToolbar.plot_enabled:
             self.draw()
         else:
             self.process_sig_rx(dict_sig)
