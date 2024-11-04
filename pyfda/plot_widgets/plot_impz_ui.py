@@ -413,7 +413,6 @@ class PlotImpz_UI(QWidget):
 
         layH_ctrl_time_0 = QHBoxLayout()
         layH_ctrl_time_0.addWidget(self.lbl_title_plot_time)
-        # layH_ctrl_time_0.addSpacing(10)
 
         layH_ctrl_time_1 = QHBoxLayout()
         layH_ctrl_time_1.addWidget(self.lbl_plt_time_stim)
@@ -580,19 +579,19 @@ class PlotImpz_UI(QWidget):
         #
         layH_ctrl_freq_1.addSpacing(5)
         layH_ctrl_freq_1.addWidget(self.but_Hf)
-        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addSpacing(5)
         #
         layH_ctrl_freq_1.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq_1.addWidget(self.led_log_bottom_freq)
         layH_ctrl_freq_1.addWidget(self.but_log_freq)
-        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addSpacing(5)
         layH_ctrl_freq_1.addWidget(self.cmb_freq_display)
-        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addSpacing(5)
 
         layH_ctrl_freq_1.addWidget(self.but_freq_norm_impz)
-        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addSpacing(5)
         layH_ctrl_freq_1.addWidget(self.but_freq_index_k)
-        layH_ctrl_freq_1.addStretch(1)
+        layH_ctrl_freq_1.addSpacing(5)
         layH_ctrl_freq_1.addWidget(self.but_freq_show_info)
         layH_ctrl_freq_1.addStretch(10)
         # layH_ctrl_freq_1.setContentsMargins(*params['wdg_margins'])
