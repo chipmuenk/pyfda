@@ -212,6 +212,7 @@ else:
 # QWidget style sheets (QSS)
 # #############################################################################
 
+#  Qxxx, Qyyy match Qxxx and Qyyy
 # .Qxxx{} only matches Qxxx, not its children
 #  Qxxx#mylabel {} only matches Qxxx with object name #mylabel
 #  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
@@ -226,9 +227,14 @@ qss_dark = """
     QWidget{color:white;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: black;}
-    QTabWidget::pane{background-color: #555555;} /* background of tab widget content */
 
-    QScrollArea{color:white; background-color: #222222;}
+     /* The tab _widget_ frame for all TabWidgets */
+    QTabWidget {background: #303030;} /* Background tabs except input tabs */
+    QScrollArea{color:white; background-color:#303030;} /* background of input tabs */
+    QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
+    /* NavigationToolbar needs to have the same color as above */
+    NavigationToolbar2QT{background-color:#606060;}
+    /* QTabBar {background: pink;} */ /* background of Tabs */
 
     QTextEdit{background-color: #444444;}
 
@@ -238,10 +244,8 @@ qss_dark = """
     QHeaderView::section{background-color:#111111;}
     QHeaderView::section:checked{background-color:blue;}
 
-    QCheckBox{
-        border: none;  /* dummy, needed to force using non-system widget rendering */
-        color: gray;
-        }
+    QCheckBox::indicator{border: 2px solid #606060;}
+    QCheckBox::indicator:checked{background-color: lightblue;}
 
     QLineEdit{background: #444444;
                 border-style: outset;
@@ -264,6 +268,8 @@ qss_dark = """
 
     QPlainTextEdit{background-color: black}
 
+    QProgressBar{color: black;}
+
     QPushButton{background-color: qlineargradient(
                 x1: 0, y1: 0, x2: 0, y2: 1,
                 stop: 0 #C0C0C0, stop: 1.0 #303030);
@@ -276,7 +282,19 @@ qss_dark = """
                 stop: 0 #C0C0C0, stop: 1.0 #303030);
                 }
 
-    NavigationToolbar2QT{background-color:#555555}
+    QSplitter::handle:vertical {
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                            stop:0 #303030,
+                            stop:0.5 #808080,
+                            stop:1.0 #303030);
+        }
+
+    QSplitter::handle:horizontal {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #303030,
+                            stop:0.5 #808080,
+                            stop:1.0 #303030);
+        }
             """
 # ---------------
 # light QSS theme
@@ -285,9 +303,11 @@ qss_light = """
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: white;}
+    QTabWidget{background: #F0F0F0;} /* Background tabs except input tabs */
+    QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
     QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
-
-    QScrollArea{color:black; background-color:white;}
+    /* NavigationToolbar needs to have the same color as above */
+    /* NavigationToolbar2QT{background-color:#F0F0F0;} */
 
     QTextEdit{background-color: white;}
 
@@ -318,7 +338,21 @@ qss_light = """
 
     QPlainTextEdit{background-color: white}
 
-    /* NavigationToolbar2QT{background-color:#555555} */
+    QSplitter::handle:vertical {
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                            stop:0 rgba(255, 255, 255, 0),
+                            stop:0.407273 rgba(200, 200, 200, 255),
+                            stop:0.4825 rgba(101, 104, 113, 235),
+                            stop:0.6 rgba(255, 255, 255, 0));
+        }
+
+    QSplitter::handle:horizontal {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+                            stop:0 rgba(255, 255, 255, 0),
+                            stop:0.407273 rgba(200, 200, 200, 255),
+                            stop:0.4825 rgba(101, 104, 113, 235),
+                            stop:0.6 rgba(255, 255, 255, 0));
+        }
     """
 
 # common layout settings for QTabWidget
@@ -327,6 +361,7 @@ qss_tab_bar = """
 QTabWidget {
     padding: 0;
     margin:  0;
+    background: green;
  }
  QTabWidget::pane {
     padding: 0;
@@ -338,7 +373,7 @@ QTabWidget {
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
 
- QTabBar {  font-weight: bold; font-size:11pt; }
+ QTabBar {font-weight: bold; font-size:11pt;}
 
  QTabBar::tab{
     color:black;
@@ -422,8 +457,6 @@ qss_tab_bar_ovlp = """
      margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
  }
 
-
-
 """
 
 # Common qss settings for all themes
@@ -456,7 +489,6 @@ qss_common = """
                 QTabWidget#input_tabs > QFrame QFrame,
                 QTabWidget#input_tabs QTextBrowser
                 {
-                    /* background-color: pink; */
                     border: solid #303030;
                     border-width: 0.05em 0 0.05em 0;
                     padding: 0;
@@ -539,9 +571,7 @@ qss_common = """
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
-                QPushButton:checked{
-                    background-color:lightblue; color:black; font-weight: bold;}
-                QPushButtonRT:checked{
+                QPushButton:checked, QPushButton:checked, QPushButtonRT:checked > QLabel{
                     background-color:lightblue; color:black; font-weight: bold;}
 
                 QLineEdit{background-color:lightblue;
@@ -553,22 +583,11 @@ qss_common = """
                 */
 
                 QSplitter::handle:vertical {
-                    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
-                                        stop:0 rgba(255, 255, 255, 0),
-                                        stop:0.407273 rgba(200, 200, 200, 255),
-                                        stop:0.4825 rgba(101, 104, 113, 235),
-                                        stop:0.6 rgba(255, 255, 255, 0));
                     height: 8px;
                     image: url(':/ellipses_v.svg');
                     }
-
                 QSplitter::handle:horizontal {
-                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-                                        stop:0 rgba(255, 255, 255, 0),
-                                        stop:0.407273 rgba(200, 200, 200, 255),
-                                        stop:0.4825 rgba(101, 104, 113, 235),
-                                        stop:0.6 rgba(255, 255, 255, 0));
-                    width: 0.2em;
+                    width: 8px;
                     image: url(':/ellipses_h.svg');
                     }
 
