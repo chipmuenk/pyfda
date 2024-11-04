@@ -253,9 +253,8 @@ qss_dark = """
 
 
     /* Style for the combobox itself */
-    QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa; 
-            padding: 1px; selection-background-color: orange;}
-    /* Style for dropdown items */
+    QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa;}
+    /* Color style for dropdown items */
     QComboBox QAbstractItemView {
         background-color: #222222;
         border: 1px solid #808080;
@@ -301,16 +300,8 @@ qss_light = """
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
     /* Style for the spinbox and combobox itself */
-    QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray; 
-            padding: 1px; selection-background-color: orange;}
-    /* Style for dropdown items */
-    QComboBox QAbstractItemView {
-        background-color: white;
-        border: 1px solid gray;
-    }
-
-    /* Style for editable text field in combobox*/
-    /* QComboBox::editable QLineEdit {background-color: white; border: none;} */
+    /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
+            padding: 1px; selection-background-color: orange;}*/
 
     QPushButton{background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
@@ -497,15 +488,23 @@ qss_common = """
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
                 QTableView QTableCornerButton::section:pressed{background-color:red;}
 
-                /*QComboBox:item {padding-left: 0px;}*/
-                /*QComboBox QAbstractItemView {padding-left: 1px;}
-                QComboBox::item:selected{background-color: orange; border:none; padding-left: 0px}                                                                                                  
-                QComboBox::indicator{
-                    background-color:transparent;
-                    selection-background-color:transparent;
-                    color:transparent;
-                    selection-color:transparent;
-                }*/
+                QSpinBox, QComboBox{padding-left: 0.2em; padding-right: 1em;}
+
+                QComboBox QAbstractItemView {
+                    border: none;
+                }
+
+                QComboBox::item {
+                    /*padding-left: 0em;
+                    padding-right: 1em;*/
+                    height: 2em;
+                }
+                QComboBox::item:selected {
+                    background-color: orange;
+                }
+                QComboBox::item:checked {
+                    font-weight: bold;
+                }
 
                 QPushButton
                 {
