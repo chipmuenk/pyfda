@@ -14,7 +14,7 @@ from pyfda.libs.compat import (
     pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
     QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate, PushButton
+from pyfda.libs.pyfda_qt_lib import qstyle_widget, qcmb_box_populate
 from pyfda.libs.csv_option_box import CSV_option_box
 from pyfda.libs.pyfda_lib import to_html, first_item
 import pyfda.libs.pyfda_dirs as dirs
