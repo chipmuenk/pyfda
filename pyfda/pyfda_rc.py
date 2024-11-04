@@ -340,19 +340,23 @@ qss_light = """
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
-                            stop:0 rgba(255, 255, 255, 0),
-                            stop:0.407273 rgba(200, 200, 200, 255),
-                            stop:0.4825 rgba(101, 104, 113, 235),
-                            stop:0.6 rgba(255, 255, 255, 0));
+                            stop:0 rgba(200, 200, 200, 0),
+                            stop:0.5 rgba(160, 160, 160, 235),
+                            stop:1.0 rgba(200, 200, 200, 0));
         }
 
     QSplitter::handle:horizontal {
     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
-                            stop:0 rgba(255, 255, 255, 0),
-                            stop:0.407273 rgba(200, 200, 200, 255),
-                            stop:0.4825 rgba(101, 104, 113, 235),
-                            stop:0.6 rgba(255, 255, 255, 0));
+                            stop:0 rgba(200, 200, 200, 0),
+                            stop:0.5 rgba(160, 160, 160, 235),
+                            stop:1.0 rgba(200, 200, 200, 0));
         }
+        /*
+        stop:0 rgba(255, 255, 255, 0),
+        stop:0.4 rgba(200, 200, 200, 255),
+        stop:0.5 rgba(101, 104, 113, 235),
+        stop:0.6 rgba(255, 255, 255, 0));
+        */
     """
 
 # common layout settings for QTabWidget
