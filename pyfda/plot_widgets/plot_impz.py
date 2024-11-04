@@ -84,7 +84,7 @@ class Plot_Impz(QWidget):
         self.fmt_mkr_resp = {'marker': 'o', 'color': 'red', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
         self.fmt_plot_stim = {'color': 'blue', 'linewidth': 2, 'alpha': 0.5}
-        self.fmt_plot_stim_interp = {'color': 'black', 'linewidth': 1, 'alpha': 0.5}
+        self.fmt_plot_stim_interp = {'color': 'grey', 'linewidth': 2, 'alpha': 0.5}
 
         self.fmt_mkr_stim = {'marker': 's', 'color': 'blue', 'alpha': 0.5,
                              'ms': self.fmt_mkr_size}
