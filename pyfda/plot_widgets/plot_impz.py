@@ -490,7 +490,10 @@ class Plot_Impz(QWidget):
             logger.warning("No data loaded, you shouldn't see this message!")
         # File is loaded, copy file length to N_end
         else:
+            # copy number of data points to N, disable N_auto, enable lineedit for N
             self.ui.update_N(N_end = self.file_io_wdg.N)
+            self.ui.but_N_auto.setChecked(False)
+            self.ui.led_N_points.setEnabled(True)
 
     # ------------------------------------------------------------------------------
     def file_io(self) -> None:
