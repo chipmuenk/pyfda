@@ -208,6 +208,9 @@ class PlotImpz_UI(QWidget):
         self.but_N_auto = QPushButtonRT(self, to_html("N =", frmt="bi"), margin=5)
         self.but_N_auto.setCheckable(True)
         self.but_N_auto.setChecked(True)
+        self.but_N_auto.setToolTip(
+            "<span>When activated, calculate number of data points from estimated "
+            "length of impulse response.</span>")
         # self.lbl_N_points = QLabel(to_html("N", frmt='bi') + " =", self)
         self.led_N_points = QLineEdit(self)
         self.led_N_points.setText(str(self.N))
