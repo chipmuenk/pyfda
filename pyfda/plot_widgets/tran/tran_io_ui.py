@@ -199,8 +199,9 @@ class Tran_IO_UI(QWidget):
 
         self.but_normalize = PushButton("Norm")
         self.but_normalize.setToolTip(
-            self.tr("<span>Normalize loaded data to the maximum value below.</span>"))
-        self.but_normalize.setEnabled(False)
+            self.tr("<span>When activated, normalize data to the maximum value below "
+                    "before saving and after loading.</span>"))
+        self.but_normalize.setEnabled(True)
         self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
@@ -208,7 +209,7 @@ class Tran_IO_UI(QWidget):
         self.led_normalize = QLineEdit()
         self.led_normalize.setToolTip(self.tr("Max. value after normalizing"))
         self.led_normalize.setText(str(self.led_normalize_default))
-        self.led_normalize.setEnabled(False)
+        self.led_normalize.setEnabled(True)
         self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
         # self.led_normalize.setFixedWidth(self.but_normalize.sizeHint().width())
 

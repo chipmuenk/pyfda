@@ -129,14 +129,12 @@ class Tran_IO(QWidget):
     def unload_data(self):
         """
         Enable load button and set to normal mode, replace label "Loaded" by "Load",
-        clear loaded data, disable normalize button and emit 'data_changed' signal
+        clear loaded data and emit 'data_changed' signal
         """
         was_loaded = self.ui.but_load.property("state") == "ok"
         self.ui.but_load.setEnabled(True)
         qstyle_widget(self.ui.but_load, "normal")
         self.ui.but_load.setText("Load:")
-        self.ui.but_normalize.setEnabled(False)
-        self.ui.led_normalize.setEnabled(False)
         self.x_file = None
 
         if was_loaded:
@@ -301,8 +299,6 @@ class Tran_IO(QWidget):
         qstyle_widget(self.ui.but_load, "ok")
         self.ui.but_load.setText("Loaded")
         self.ui.but_load.setEnabled(True)
-        self.ui.but_normalize.setEnabled(True)
-        self.ui.led_normalize.setEnabled(True)
 
         if self.file_type == 'wav':
             self.set_f_s_wav(self.f_s_file)  # copy f_s read from wav file info to line edit
@@ -417,6 +413,10 @@ class Tran_IO(QWidget):
             else:
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
+
+        if self.ui.but_normalize.isChecked():
+            # normalize data to 'self.norm' before saving
+            data = data * self.norm / np.max(np.abs(data))
 
         if self.file_type == 'wav':
             # convert to selected data format
