@@ -113,41 +113,8 @@ class Tran_IO_UI(QWidget):
         # ----------------------------------------------------------------------
         # Main Widget
         # ----------------------------------------------------------------------
-        self.cmb_file_format = QComboBox()
-        qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
-                          self.cmb_file_format_init)
-        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'),
-                                          checked=False)
-        self.but_csv_options.setToolTip(
-            "<span>Select CSV format and whether "
-            "to copy to/from clipboard or file.</span>")
-
-        self.but_scale_int = PushButton("Scale Int ", checked=True)
-        self.but_scale_int.setToolTip(
-            "<span>Autoscale integer data when importing and exporting so that "
-            "1.0 represents the max. positive value.</span>")
-        layH_file_fmt_options = QHBoxLayout()
-        layH_file_fmt_options.addWidget(self.but_csv_options)
-        layH_file_fmt_options.addWidget(self.but_scale_int)
-
-        self.but_f_s_wav_auto = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
-        self.but_f_s_wav_auto.setCheckable(True)
-        self.but_f_s_wav_auto.setChecked(True)
-        self.but_f_s_wav_auto.setToolTip(
-            "<span>Copy pyfda sampling frequency to WAV file during export "
-            "when selected.</span>")
-        self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
-        self.led_f_s_wav = QLineEdit(self)
-        self.led_f_s_wav.setMaximumWidth(qtext_width(N_x=8))
-        self.led_f_s_wav.setToolTip(
-            "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
-
-        layH_lbl_led_f_s_wav = QHBoxLayout()
-        layH_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
-        layH_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
 
         # ----------- LOAD ------------------------------------------------------------
-        line1 = QVLine(width=10)
         self.but_select = PushButton("Select", checkable=False, objectName="large")
         self.but_select.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
@@ -197,21 +164,58 @@ class Tran_IO_UI(QWidget):
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
 
-        self.but_normalize = PushButton("Norm")
-        self.but_normalize.setToolTip(
-            self.tr("<span>When activated, normalize data to the maximum value below "
+        self.but_scale_to = PushButton("Scale to")
+        self.but_scale_to.setToolTip(
+            self.tr("<span>When activated, scale maximum of data to the value below "
                     "before saving and after loading.</span>"))
-        self.but_normalize.setEnabled(True)
-        self.but_normalize.setSizePolicy(QSizePolicy.Expanding,
+        self.but_scale_to.setEnabled(True)
+        self.but_scale_to.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
+        line1 = QVLine(width=10)
+
+        # ----------- FILE FORMAT ------------------------------------------- 
+        self.cmb_file_format = QComboBox()
+        qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
+                          self.cmb_file_format_init)
+        self.but_csv_options = PushButton(self, icon=QIcon(':/csv_options.svg'),
+                                          checked=False)
+        self.but_csv_options.setToolTip(
+            "<span>Select CSV format and whether "
+            "to copy to/from clipboard or file.</span>")
+
+        self.but_scale_int = PushButton("Scale Int ", checked=True)
+        self.but_scale_int.setToolTip(
+            "<span>Autoscale integer data when importing and exporting so that "
+            "1.0 represents the max. positive value.</span>")
+        layH_file_fmt_options = QHBoxLayout()
+        layH_file_fmt_options.addWidget(self.but_csv_options)
+        layH_file_fmt_options.addWidget(self.but_scale_int)
+
+        self.but_f_s_wav_auto = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
+        self.but_f_s_wav_auto.setCheckable(True)
+        self.but_f_s_wav_auto.setChecked(True)
+        self.but_f_s_wav_auto.setToolTip(
+            "<span>Copy pyfda sampling frequency to WAV file during export "
+            "when selected.</span>")
+        self.lbl_f_s_wav = QLabel(to_html("f_S =", frmt='bi'))
+        self.led_f_s_wav = QLineEdit(self)
+        self.led_f_s_wav.setMaximumWidth(qtext_width(N_x=8))
+        self.led_f_s_wav.setToolTip(
+            "<span>Manual f_S for import / export of WAV file (must be integer).</span>")
+
+        layH_lbl_led_f_s_wav = QHBoxLayout()
+        layH_lbl_led_f_s_wav.addWidget(self.lbl_f_s_wav)
+        layH_lbl_led_f_s_wav.addWidget(self.led_f_s_wav)
+
         line2 = QVLine(width=1)
-        self.led_normalize = QLineEdit()
-        self.led_normalize.setToolTip(self.tr("Max. value after normalizing"))
-        self.led_normalize.setText(str(self.led_normalize_default))
-        self.led_normalize.setEnabled(True)
-        self.led_normalize.setMaximumWidth(qtext_width(N_x=8))
-        # self.led_normalize.setFixedWidth(self.but_normalize.sizeHint().width())
+        # ----------- SCALE ------------------------------------------------------------
+        self.led_scale_to = QLineEdit()
+        self.led_scale_to.setToolTip(self.tr("Max. value after normalizing"))
+        self.led_scale_to.setText(str(self.led_normalize_default))
+        self.led_scale_to.setEnabled(True)
+        self.led_scale_to.setMaximumWidth(qtext_width(N_x=8))
+        # self.led_scale_to.setFixedWidth(self.but_scale_to.sizeHint().width())
 
         # ----------- SAVE ------------------------------------------------------------
         line3 = QVLine(width=5)
@@ -247,15 +251,7 @@ class Tran_IO_UI(QWidget):
         #-------------------------------
         layG_io_file = QGridLayout()
         i = 0
-        layG_io_file.addWidget(self.cmb_file_format, 0, i)
-        # layG_io_file.addWidget(self.but_csv_options, 1, i)
-        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
-        i += 1
-        layG_io_file.addWidget(self.but_f_s_wav_auto, 0, i)
-        layG_io_file.addLayout(layH_lbl_led_f_s_wav, 1, i)
-        i += 1
-        layG_io_file.addWidget(line1, 0, i, 2, 1)
-        i += 1
+        # ---- LOAD FILE
         layG_io_file.addWidget(self.but_select, 0, i)
         layG_io_file.addWidget(self.but_load, 1, i)
         i += 1
@@ -270,11 +266,23 @@ class Tran_IO_UI(QWidget):
         i+=1
         layG_io_file.addWidget(self.lbl_chan_import, 0, i)
         layG_io_file.addWidget(self.cmb_chan_import, 1, i)
-        i+=1
+        i += 1
+        layG_io_file.addWidget(line1, 0, i, 2, 1)
+        # ---- FILE FORMAT
+        i += 1
+        layG_io_file.addWidget(self.cmb_file_format, 0, i)
+        # layG_io_file.addWidget(self.but_csv_options, 1, i)
+        layG_io_file.addLayout(layH_file_fmt_options, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.but_f_s_wav_auto, 0, i)
+        layG_io_file.addLayout(layH_lbl_led_f_s_wav, 1, i)
+        # ---- SCALE TO
+        i += 1
         layG_io_file.addWidget(line2, 0, i, 2, 1)
         i += 1
-        layG_io_file.addWidget(self.but_normalize, 0, i)
-        layG_io_file.addWidget(self.led_normalize, 1, i)
+        layG_io_file.addWidget(self.but_scale_to, 0, i)
+        layG_io_file.addWidget(self.led_scale_to, 1, i)
+        # ---- SAVE FILE
         i += 1
         layG_io_file.addWidget(line3, 0, i, 2, 1)
         i += 1
