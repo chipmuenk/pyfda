@@ -230,12 +230,13 @@ qss_dark = """
     .QWidget, .QFrame{background-color: black;}
 
      /* The tab _widget_ frame for all TabWidgets */
-    QTabWidget {background: #303030;} /* Background tabs except input tabs */
-    QScrollArea{color:white; background-color:#303030;} /* background of input tabs */
+    QTabWidget {background-color: #303030;} /* Background tabs except input tabs */
+    /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
+    QScrollArea{color:white; background-color:#303030;} 
     QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
     NavigationToolbar2QT{background-color:#606060;}
-    /* QTabBar {background: pink;} */ /* background of Tabs */
+    /* QTabBar {background: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTextEdit{background-color: #444444;}
 
@@ -248,7 +249,7 @@ qss_dark = """
     QCheckBox::indicator{border: 2px solid #606060;}
     QCheckBox::indicator:checked{background-color: lightblue;}
 
-    QLineEdit{background: #444444;
+    QLineEdit{background: #404040;
                 border-style: outset;
                 border-width: 1px;
                 border-color: #c0c0c0;
@@ -266,7 +267,7 @@ qss_dark = """
         border: 1px solid #808080;
     }
 
-    QMessageBox{background-color:#444444}
+    QMessageBox{background-color:#404040;}
 
     QPlainTextEdit{background-color: black}
 
@@ -321,6 +322,7 @@ qss_light = """
 
     QCheckBox::indicator{border: 2px solid #606060;}
     QCheckBox::indicator:checked{background-color: lightblue;}
+
     QLineEdit{background: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
