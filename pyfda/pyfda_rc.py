@@ -224,6 +224,7 @@ else:
 # dark QSS theme
 # ---------------
 qss_dark = """
+    QSplitter{background: #606060;} /* Top Level background */
     QWidget{color:white;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: black;}
@@ -255,6 +256,7 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
+    QDialog{background: #404040}
 
     /* Style for the combobox itself */
     QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa;}
@@ -300,6 +302,7 @@ qss_dark = """
 # light QSS theme
 # ---------------
 qss_light = """
+    QSplitter{background: #F0F0F0;} /* Top Level background */
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: white;}
