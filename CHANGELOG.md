@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.9.4](https://github.com/chipmuenk/pyfda/tree/v0.9.4) (2024-xxx)
+
+### Bugfixes
+
+### Updates
+
+- Change some UI default settings for better usability
+- Add some tool tips
+- Normalize data to given maximum value also before saving in y[n] file tab.
+
 ## [v0.9.3](https://github.com/chipmuenk/pyfda/tree/v0.9.3) (2024-11-04)
 
 ### Bugfixes
