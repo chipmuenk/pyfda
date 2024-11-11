@@ -319,6 +319,8 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
+    QCheckBox::indicator{border: 2px solid #606060;}
+    QCheckBox::indicator:checked{background-color: lightblue;}
     QLineEdit{background: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
