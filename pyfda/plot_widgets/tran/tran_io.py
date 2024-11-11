@@ -93,8 +93,8 @@ class Tran_IO(QWidget):
         self.ui.but_select.clicked.connect(self.load_data_raw)
         self.ui.cmb_chan_import.currentIndexChanged.connect(self.select_chan_normalize)
         self.ui.but_load.clicked.connect(self.load_button_clicked)
-        self.ui.but_normalize.clicked.connect(self.select_chan_normalize)
-        self.ui.led_normalize.editingFinished.connect(self.select_chan_normalize)
+        self.ui.but_scale_to.clicked.connect(self.select_chan_normalize)
+        self.ui.led_scale_to.editingFinished.connect(self.select_chan_normalize)
 
         self.ui.led_nr_loops.editingFinished.connect(self.save_nr_loops)
         self.ui.but_save.clicked.connect(self.save_data)
@@ -259,8 +259,8 @@ class Tran_IO(QWidget):
         `select_chan_normalize()` is triggered by `file2array()` and by signal-slot
         connections
             * self.ui.cmb_chan_import.currentIndexChanged
-            * self.ui.but_normalize.clicked
-            * self.ui.led_normalize.editingFinished
+            * self.ui.but_scale_to.clicked
+            * self.ui.led_scale_to.editingFinished
 
         It processes `self.data_raw` and yields `self.x_file` as a result which
         is assigned as `self.stim_wdg.x_file = self.file_io_wdg.x_file` in the class
@@ -270,7 +270,7 @@ class Tran_IO(QWidget):
           to `data`. Alternatively, assign one channel of `self.data_raw` as real and the
           other as imaginary component of `data`.
 
-        - Scale `data` to the maximum specified by `self.ui.led_normalize` and
+        - Scale `data` to the maximum specified by `self.ui.led_scale_to` and
             assign normalized result to `self.x_file`.
         """
         if not hasattr(self, 'data_raw') or self.data_raw is None:
@@ -318,9 +318,9 @@ class Tran_IO(QWidget):
 
             data = (data - offset_int) / scale_int
 
-        if self.ui.but_normalize.isChecked() == True:
-            self.norm = safe_eval(self.ui.led_normalize.text(), self.norm, return_type="float")
-            self.ui.led_normalize.setText(str(self.norm))
+        if self.ui.but_scale_to.isChecked() == True:
+            self.norm = safe_eval(self.ui.led_scale_to.text(), self.norm, return_type="float")
+            self.ui.led_scale_to.setText(str(self.norm))
             self.x_file = data * self.norm / np.max(np.abs(data))
         else:
             self.x_file = data
@@ -414,7 +414,7 @@ class Tran_IO(QWidget):
                 # create 2D-array from 1D arrays and transpose them to row based form
                 data = np.vstack((data, data_r))
 
-        if self.ui.but_normalize.isChecked():
+        if self.ui.but_scale_to.isChecked():
             # normalize data to 'self.norm' before saving
             data = data * self.norm / np.max(np.abs(data))
 
