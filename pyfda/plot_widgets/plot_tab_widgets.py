@@ -12,7 +12,7 @@ This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it
 kept as a module variable in :mod:`pyfda.filterbroker`.
 """
 import importlib
-from pyfda.libs.compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
+from pyfda.libs.compat import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
 from pyfda.libs.pyfda_lib import pprint_log
 from pyfda.pyfda_rc import params
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------
-class PlotTabWidgets(QTabWidget):
+class PlotTabWidgets(QWidget):
 
     # incoming, connected to input_tab_widget.sig_tx in pyfdax
     sig_rx = pyqtSignal(object)
@@ -61,7 +61,7 @@ class PlotTabWidgets(QTabWidget):
            coming signals with its own name!
         """
         tabWidget = QTabWidget(self)
-        tabWidget.setObjectName("plot_tabs")
+        # tabWidget.setObjectName("plot_tabs")
 
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated plot widgets
