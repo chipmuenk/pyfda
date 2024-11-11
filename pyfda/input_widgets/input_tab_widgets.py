@@ -65,6 +65,7 @@ class InputTabWidgets(QWidget):
            coming signals with its own name!
         """
         tabWidget = QTabWidget(self)
+        # tabWidget.setObjectName("input_tabs")
 
         n_wdg = 0  # number and ...
         inst_wdg_str = ""  # ... full names of successfully instantiated widgets
