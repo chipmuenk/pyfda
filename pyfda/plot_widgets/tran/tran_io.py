@@ -158,7 +158,7 @@ class Tran_IO(QWidget):
 
         self.file_name, self.file_type = io.select_file(
             self, title="Select file for data import", mode="r",
-            file_types=file_type)
+            file_types=("csv", "wav"))
 
         if self.file_name is None:  # operation cancelled, restore previous settings
             self.file_name = file_name_prev
@@ -166,6 +166,9 @@ class Tran_IO(QWidget):
             qset_cmb_box(self.ui.cmb_file_format, self.file_type)
             self.ui.set_ui_visibility()
             return -1
+
+        qset_cmb_box(self.ui.cmb_file_format, self.file_type)
+        self.ui.set_ui_visibility() # in case file type has changed
 
         self.unload_data()  # reset load and normalize button
 
