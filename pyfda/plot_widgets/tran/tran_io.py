@@ -310,7 +310,7 @@ class Tran_IO(QWidget):
             scale_int = 1
             offset_int = 0
 
-            if self.ui.but_scale_int.isChecked() == True:
+            if self.ui.but_int_as_float.isChecked() == True:
                 if io.read_wav_info.sample_format == "int16":
                     scale_int = (1 << 15) - 1
                 elif io.read_wav_info.sample_format == "int24":
@@ -426,7 +426,7 @@ class Tran_IO(QWidget):
         if self.file_type == 'wav':
             # convert to selected data format
             frmt = qget_cmb_box(self.ui.cmb_data_format)
-            scale_int = self.ui.but_scale_int.isChecked()
+            scale_int = self.ui.but_int_as_float.isChecked()
             if frmt not in {'uint8', 'int16', 'int32', 'float32', 'float64'}:
                 logger.error(f"Unsupported format {frmt} for data export.")
                 return -1

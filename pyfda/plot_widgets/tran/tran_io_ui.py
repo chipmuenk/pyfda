@@ -182,13 +182,13 @@ class Tran_IO_UI(QWidget):
             "<span>Select CSV format and whether "
             "to copy to/from clipboard or file.</span>")
 
-        self.but_scale_int = PushButton("Scale Int ", checked=True)
-        self.but_scale_int.setToolTip(
-            "<span>Autoscale integer data when importing and exporting so that "
-            "1.0 represents the max. positive value.</span>")
+        self.but_int_as_float = PushButton("Int2Float ", checked=True)
+        self.but_int_as_float.setToolTip(
+            "<span>Represent <i>W</i> bit integer WAV formats as float when importing "
+            "and exporting so that 1.0 is equivalent to 2<sup>W</sup>.</span>")
         layH_file_fmt_options = QHBoxLayout()
         layH_file_fmt_options.addWidget(self.but_csv_options)
-        layH_file_fmt_options.addWidget(self.but_scale_int)
+        layH_file_fmt_options.addWidget(self.but_int_as_float)
 
         self.but_f_s_wav_auto = QPushButtonRT(self, "<b>Auto <i>f<sub>S</sub></i></b>", margin=5)
         self.but_f_s_wav_auto.setCheckable(True)
@@ -345,7 +345,7 @@ class Tran_IO_UI(QWidget):
         self.led_f_s_wav.setVisible(not is_csv_format)
         self.lbl_data_format.setVisible(not is_csv_format)
         self.cmb_data_format.setVisible(not is_csv_format)
-        self.but_scale_int.setVisible(not is_csv_format)
+        self.but_int_as_float.setVisible(not is_csv_format)
 
         self.led_f_s_wav.setEnabled(not self.but_f_s_wav_auto.isChecked())
 
