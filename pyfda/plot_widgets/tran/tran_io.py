@@ -232,9 +232,11 @@ class Tran_IO(QWidget):
             return -1
 
         elif self.nchans == 1:
+            self.ui.line0.setVisible(False)
             self.ui.lbl_chan_import.setVisible(False)
             self.ui.cmb_chan_import.setVisible(False)
         else:
+            self.ui.line0.setVisible(True)
             self.ui.lbl_chan_import.setVisible(True)
             self.ui.cmb_chan_import.setVisible(True)
 

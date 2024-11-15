@@ -149,6 +149,8 @@ class Tran_IO_UI(QWidget):
         self.frm_f_s.setContentsMargins(0, 0, 0, 0)
         self.frm_f_s.setVisible(False)
 
+        self.line0 = QVLine(width=1)
+        self.line0.setVisible(False)
         self.lbl_chan_import = QLabel(to_html("Column", frmt="b"))
         self.lbl_chan_import.setVisible(False)
         self.cmb_chan_import = QComboBox(self)
@@ -157,9 +159,7 @@ class Tran_IO_UI(QWidget):
             self.cmb_chan_import_init)
         self.cmb_chan_import.setVisible(False)
 
-        layV_chan = QVBoxLayout()
-        layV_chan.addWidget(self.lbl_chan_import)
-        layV_chan.addWidget(self.cmb_chan_import)
+        line1 = QVLine(width=10)
 
         self.lbl_wordlength = QLabel(to_html("W =", frmt="bi"))
         self.lbl_wordlength_value = QLabel("None")
@@ -172,9 +172,7 @@ class Tran_IO_UI(QWidget):
         self.but_scale_to.setSizePolicy(QSizePolicy.Expanding,
                                     QSizePolicy.Expanding)
 
-        line1 = QVLine(width=10)
-
-        # ----------- FILE FORMAT ------------------------------------------- 
+        # ----------- FILE FORMAT -------------------------------------------
         self.cmb_file_format = QComboBox()
         qcmb_box_populate(self.cmb_file_format, self.cmb_file_format_items,
                           self.cmb_file_format_init)
@@ -263,6 +261,8 @@ class Tran_IO_UI(QWidget):
         i += 1
         # row 0 is used by the file name
         layG_io_file.addWidget(self.frm_f_s, 1, i)
+        i += 1
+        layG_io_file.addWidget(self.line0, 0, i, 2, 1)
         i+=1
         layG_io_file.addWidget(self.lbl_chan_import, 0, i)
         layG_io_file.addWidget(self.cmb_chan_import, 1, i)
