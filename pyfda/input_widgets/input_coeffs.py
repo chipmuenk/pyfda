@@ -62,8 +62,8 @@ class ItemDelegate(QStyledItemDelegate):
     - `setModelData()` pass edited data back to model (`self.ba`)
 
     Editing the table triggers `setModelData()` but does not emit a signal outside
-    this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted. 
-    When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in 
+    this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted.
+    When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in
     class `Input_Coeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 

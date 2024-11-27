@@ -671,7 +671,7 @@ class Input_PZ(QWidget):
         self._delete_PZ_pairs()
         self._normalize_gain()
         if changed:
-            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo 
+            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo
             qstyle_widget(self.ui.but_undo, 'changed')   # buttons as changed
         self._refresh_table()
 
@@ -895,12 +895,12 @@ class Input_PZ(QWidget):
         if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
             logger.error(zpk_arr)
             qstyle_widget(self.ui.but_apply, 'error')
-            qstyle_widget(self.ui.but_undo, 'changed')  # 
+            qstyle_widget(self.ui.but_undo, 'changed')  #
             return
         else:
             self.zpk = zpk_arr
             qstyle_widget(self.ui.but_apply, 'changed')
-            qstyle_widget(self.ui.but_undo, 'changed')  # 
+            qstyle_widget(self.ui.but_undo, 'changed')  #
             self._refresh_table()
 
 # ------------------------------------------------------------------------------
