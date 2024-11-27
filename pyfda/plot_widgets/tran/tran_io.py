@@ -9,7 +9,7 @@
 """
 Widget for loading and storing stimulus data from / to transient plotting widget
 """
-from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout
+from pyfda.libs.compat import Qt, QWidget, pyqtSignal, QVBoxLayout, QDialog
 import numpy as np
 
 import pyfda.libs.pyfda_io_lib as io
@@ -17,7 +17,8 @@ import pyfda.filterbroker as fb
 import pyfda.libs.pyfda_dirs as dirs
 
 from pyfda.libs.pyfda_lib import safe_eval, pprint_log, np_shape
-from pyfda.libs.pyfda_qt_lib import emit, qstyle_widget, qget_cmb_box, qset_cmb_box
+from pyfda.libs.pyfda_qt_lib import (
+    emit, qstyle_widget, qget_cmb_box, qset_cmb_box, qwindow_stay_on_top)
 from pyfda.libs.csv_option_box import CSV_option_box
 
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
@@ -26,6 +27,45 @@ from pyfda.plot_widgets.tran.tran_io_ui import Tran_IO_UI
 import logging
 logger = logging.getLogger(__name__)
 
+class QFileDialogPlus(QDialog):
+    """
+    Create a pop-up widget containing QFileDialog and extra widgets
+    """
+    sig_tx = pyqtSignal(object)  # outgoing
+    from pyfda.libs.pyfda_qt_lib import emit
+
+    def __init__(self, parent):
+        super(QFileDialogPlus, self).__init__(parent)
+
+        self._construct_UI()
+        qwindow_stay_on_top(self, True)
+
+# ------------------------------------------------------------------------------
+    def closeEvent(self, event):
+        """
+        Override closeEvent (user has tried to close the window) and send a
+        signal to parent where window closing is registered before actually
+        closing the window.
+        """
+        self.emit({'close_event': ''})
+        event.accept()
+
+    def _construct_UI(self):
+        """ initialize the User Interface """
+        self.setWindowTitle("CSV Options")
+
+        butClose = QPushButton(self)
+        butClose.setText("Close")
+
+        layVMain = QVBoxLayout()
+        # layVMain.setAlignment(Qt.AlignTop) # only affects first widget (intended here)
+        # layVMain.addLayout(lay_grid)
+        layVMain.addWidget(butClose)
+        layVMain.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(layVMain)
+
+        # ============== Signals & Slots ================================
+        butClose.clicked.connect(self.close)
 
 class Tran_IO(QWidget):
     """
