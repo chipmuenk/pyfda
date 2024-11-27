@@ -368,19 +368,19 @@ qss_light = """
 
 # common layout settings for QTabWidget
 qss_tab_bar = """
- /* The tab _widget_ frame; general and for North / West orientation */
+/* The tab _widget_ frame; general and for North / West orientation */
 QTabWidget {
     padding: 0;
     margin:  0;
     background: green;
- }
- QTabWidget::pane {
+    }
+QTabWidget::pane {
     padding: 0;
     margin:  0;
- }
+    }
 
- QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
- .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
+QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
+.QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
 /* Align the tabs on the left hand side, MacOS styles them in the center */
 QTabWidget::tab-bar {alignment: left;}
