@@ -502,6 +502,8 @@ class Input_PZ(QWidget):
         the QLineEdit for setting the gain has to be treated separately.
         """
         fb.fil[0]['N'] = len(self.zpk[0])
+        # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
+        fb.fil[0]['fo'] = 'man'
         if np.any(self.zpk[1]):  # any non-zero poles?
             fb.fil[0]['fc'] = 'Manual_IIR'
         else:
@@ -669,7 +671,7 @@ class Input_PZ(QWidget):
         self._delete_PZ_pairs()
         self._normalize_gain()
         if changed:
-            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo 
+            qstyle_widget(self.ui.but_apply, 'changed')  # mark apply and undo
             qstyle_widget(self.ui.but_undo, 'changed')   # buttons as changed
         self._refresh_table()
 
@@ -893,12 +895,12 @@ class Input_PZ(QWidget):
         if not type(zpk_arr) is np.ndarray:  # an error has ocurred, error string is returned
             logger.error(zpk_arr)
             qstyle_widget(self.ui.but_apply, 'error')
-            qstyle_widget(self.ui.but_undo, 'changed')  # 
+            qstyle_widget(self.ui.but_undo, 'changed')  #
             return
         else:
             self.zpk = zpk_arr
             qstyle_widget(self.ui.but_apply, 'changed')
-            qstyle_widget(self.ui.but_undo, 'changed')  # 
+            qstyle_widget(self.ui.but_undo, 'changed')  #
             self._refresh_table()
 
 # ------------------------------------------------------------------------------

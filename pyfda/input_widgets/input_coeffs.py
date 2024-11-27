@@ -62,8 +62,8 @@ class ItemDelegate(QStyledItemDelegate):
     - `setModelData()` pass edited data back to model (`self.ba`)
 
     Editing the table triggers `setModelData()` but does not emit a signal outside
-    this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted. 
-    When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in 
+    this class, only the `ui.but_apply` and `ui.but_undo` buttons are highlighted.
+    When it is pressed, a signal with `'data_changed':'input_coeffs'` is produced in
     class `Input_Coeffs`. Additionally, a signal is emitted with `'fx_sim': 'specs_changed'`
     """
 
@@ -872,6 +872,8 @@ class Input_Coeffs(QWidget):
         """
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
+        # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
+        fb.fil[0]['fo'] = 'man'
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
         else:
