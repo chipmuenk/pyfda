@@ -232,7 +232,7 @@ qss_dark = """
      /* The tab _widget_ frame for all TabWidgets */
     QTabWidget {background-color: #303030;} /* Background tabs except input tabs */
     /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
-    QScrollArea{color:white; background-color:#303030;} 
+    QScrollArea{color:white; background-color:#303030;}
     QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
     NavigationToolbar2QT{background-color:#606060;}
@@ -535,13 +535,12 @@ qss_common = """
 
                 QSpinBox, QComboBox{padding-left: 0.2em; padding-right: 1em;}
 
+                /*
                 QComboBox QAbstractItemView {
                     border: none;
                 }
 
                 QComboBox::item {
-                    /*padding-left: 0em;
-                    padding-right: 1em;*/
                     height: 2em;
                 }
                 QComboBox::item:selected {
@@ -550,6 +549,7 @@ qss_common = """
                 QComboBox::item:checked {
                     font-weight: bold;
                 }
+                */
 
                 QPushButton
                 {
