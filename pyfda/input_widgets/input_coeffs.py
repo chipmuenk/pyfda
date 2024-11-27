@@ -872,6 +872,8 @@ class Input_Coeffs(QWidget):
         """
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
+        # Switch to manual filter order and 'Manual_IIR' resp. 'Manual_FIR' filter class
+        fb.fil[0]['fo'] = 'man'
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
         else:
