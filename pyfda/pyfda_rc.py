@@ -382,6 +382,8 @@ QTabWidget {
  QTabWidget::pane::left {border-left: 1px solid #C2C7CB;} /* tabs left (west) */
  .QTabWidget::pane::top {border-top: 2px solid #C2C7CB;} /* tabs top (north) */
 
+/* Align the tabs on the left hand side, MacOS styles them in the center */
+QTabWidget::tab-bar {alignment: left;}
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
 
  QTabBar {font-weight: bold; font-size:11pt;}
