@@ -329,6 +329,11 @@ qss_light = """
     QLineEdit{background: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
+    QDialog{background-color: #F0F0F0;}
+    QMessageBox{background-color: #F0F0F0}
+
+    QPlainTextEdit{background-color: white}
+
     /* Style for the spinbox and combobox itself */
     /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
             padding: 1px; selection-background-color: orange;}*/
@@ -344,10 +349,6 @@ qss_light = """
         stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
         }
 
-    QDialog{background-color: #F0F0F0;}
-    QMessageBox{background-color: #F0F0F0}
-
-    QPlainTextEdit{background-color: white}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
