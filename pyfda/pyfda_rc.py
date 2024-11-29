@@ -230,7 +230,7 @@ qss_dark = """
     .QWidget, .QFrame{background-color: black;}
 
      /* The tab _widget_ frame for all TabWidgets */
-    QTabWidget {background-color: #303030;} /* Background tabs except input tabs */
+    QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
     /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:white; background-color:#303030;}
     QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
@@ -257,7 +257,10 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
-    QDialog{background: #404040}
+    QDialog{background-color: #404040;}
+    QMessageBox{background-color:#404040;}
+
+    QPlainTextEdit{background-color: black}
 
     /* Style for the combobox itself */
     QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa;}
@@ -267,9 +270,6 @@ qss_dark = """
         border: 1px solid #808080;
     }
 
-    QMessageBox{background-color:#404040;}
-
-    QPlainTextEdit{background-color: black}
 
     QProgressBar{color: black;}
 
@@ -307,7 +307,10 @@ qss_light = """
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: white;}
-    QTabWidget{background: #F0F0F0;} /* Background tabs except input tabs */
+    
+    /* The tab _widget_ frame for all TabWidgets */
+    QTabWidget{background: #F0F0F0;} /* Background for tabs except input tabs */
+    /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
     QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
@@ -341,7 +344,8 @@ qss_light = """
         stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
         }
 
-    QMessageBox{background-color: #EEEEEE}
+    QDialog{background-color: #F0F0F0;}
+    QMessageBox{background-color: #F0F0F0}
 
     QPlainTextEdit{background-color: white}
 
@@ -551,16 +555,16 @@ qss_common = """
                 }
                 */
 
+                /*
                 QPushButton
                 {
-                /*
                 width: 20px; # not needed
                 height: 15px;# not needed
                 border-radius: 1px; # destroys button shape
                 border-style: outset; # destroys button shape
                 padding-left: 5px; padding-right: 3px; # destroys button shape
-                 */
                  }
+                 */
 
                 QPushButton[state="changed"]{color: white;
                     background-color: qlineargradient(
@@ -607,20 +611,6 @@ qss_common = """
                 QProgressBar{text-align: center; font-weight: bold;
                              border: 1px solid #303030;}
                 QProgressBar::chunk{background-color: lightblue;}
-/*
-#GreenProgressBar {
-    min-height: 12px;
-    max-height: 12px;
-    border: 2px solid #2196F3;
-    border-radius: 6px;
-}
-#GreenProgressBar::chunk {
-    border-radius: 6px;
-    background-color: #009688;
-    width: 10px;
-    margin: 0.5px;
-}
-*/
 
             """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
