@@ -485,8 +485,7 @@ qss_common = """
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: lightblue;}
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
-                /* semi-transparent red */
-                * [state="failed"]{background-color: rgba(255, 0, 0, 50%); color:black;
+                * [state="failed"]{background-color: red; color:white;
                     font-weight:800;}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
@@ -555,21 +554,13 @@ qss_common = """
                 */
 
                 QPushButton[state="changed"]{
-                    background-color: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
-                    color: black;}
+                    background-color: yellow; color: black;}
 
-                QPushButton[state="error"]{color: white;
-                    background-color: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #404040);
-                    }
+                QPushButton[state="error"]{
+                    background-color: red; color: white;}
 
-                QPushButton[state="ok"]{color: white;
-                    background-color: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #404040);
+                QPushButton[state="ok"]{
+                    background-color: green; color: white;
                     }
 
                 /* Highlight button when pressed from checked / not checked state */
