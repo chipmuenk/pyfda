@@ -270,21 +270,19 @@ qss_dark = """
         border: 1px solid orange;
     }
 
-
     QProgressBar{color: black;}
 
-    QPushButton{background-color: qlineargradient(
-                x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #C0C0C0, stop: 1.0 #303030);
-                }
+    QPushButton, QPushButtonRT
+        {background-color:#505050;}
+
     QPushButton:disabled{color:#303030;}
-    QPushButton {border: native; border-radius:-1px;}
+    /*QPushButton {border: native; border-radius:-1px;}*/
 
-    QPushButton[state="normal"]{background-color: qlineargradient(
-                x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #C0C0C0, stop: 1.0 #303030);
+    /* QPushButton[state="normal"],
+    QPushButtonRT[state="normal"] > QLabel
+        {background-color: #303030;
                 }
-
+*/
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -307,7 +305,7 @@ qss_light = """
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: white;}
-    
+
     /* The tab _widget_ frame for all TabWidgets */
     QTabWidget{background: #F0F0F0;} /* Background for tabs except input tabs */
     /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
