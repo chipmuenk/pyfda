@@ -259,10 +259,10 @@ qss_dark = """
 
     /* Style for the spinbox and combobox itself */
     /* QSpinBox, QComboBox{background-color: #202020; border: 1px solid #aaaaaa;} */
-    /* Color of Combobox widget and border / color of selected item */
+    /* Color of Combobox widget and border */
+
     QSpinBox, QComboBox{
         background-color: #202020;
-        selection-background-color: orange;
         border: 1px solid #C0C0C0;
         }
     /* Background color for dropdown items / border color around dropdown menu */
@@ -540,9 +540,11 @@ qss_common = """
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
                 QTableView QTableCornerButton::section:pressed{background-color:red;}
 
+                /* Padding of QSpin/Combobox and color of selected item */
                 QSpinBox, QComboBox{
                     padding-left: 0.2em; padding-right: 1em;
-                    padding-top: 2px; padding-bottom: 2px;}
+                    padding-top: 2px; padding-bottom: 2px;
+                    selection-background-color: orange;}
 
                 QPushButton[state="changed"]{
                     background-color: yellow; color: black;}
