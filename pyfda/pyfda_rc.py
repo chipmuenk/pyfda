@@ -525,8 +525,6 @@ qss_common = """
                     padding: 0.2em 0 0 0;
                     }
 
-                /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
-
                 /* Table Corner Button */
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
                 QTableView QTableCornerButton::section:pressed{background-color:red;}
@@ -548,17 +546,6 @@ qss_common = """
                     font-weight: bold;
                 }
                 */
-
-                /*
-                QPushButton
-                {
-                width: 20px; # not needed
-                height: 15px;# not needed
-                border-radius: 1px; # destroys button shape
-                border-style: outset; # destroys button shape
-                padding-left: 5px; padding-right: 3px; # destroys button shape
-                 }
-                 */
 
                 QPushButton[state="changed"]{color: white;
                     background-color: qlineargradient(
