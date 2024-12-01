@@ -249,12 +249,7 @@ qss_dark = """
     QCheckBox::indicator{border: 2px solid #606060;}
     QCheckBox::indicator:checked{background-color: lightblue;}
 
-    QLineEdit{background: #404040;
-                border-style: outset;
-                border-width: 1px;
-                border-color: #c0c0c0;
-                color: white;
-    }
+    QLineEdit{background-color: #404040; color: white;}
     QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
     QDialog{background-color: #404040;}
