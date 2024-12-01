@@ -224,7 +224,7 @@ else:
 # dark QSS theme
 # ---------------
 qss_dark = """
-    QSplitter{background: #606060;} /* Top Level background */
+    QSplitter{background-color: #606060;} /* Top Level background */
     QWidget{color:white;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: #202020;}
@@ -236,7 +236,7 @@ qss_dark = """
     QTabWidget::pane{background-color: #606060;} /* background of tab widget content */
     /* NavigationToolbar needs to have the same color as above */
     NavigationToolbar2QT{background-color:#606060;}
-    /* QTabBar {background: pink;} */ /* background of Tabs, normally defined by pane */
+    /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
     QTextEdit{background-color: #404040;}
 
@@ -305,13 +305,13 @@ qss_dark = """
 # light QSS theme
 # ---------------
 qss_light = """
-    QSplitter{background: #F0F0F0;} /* Top Level background */
+    QSplitter{background-color: #F0F0F0;} /* Top Level background */
     QWidget{color:black;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
     .QWidget, .QFrame{background-color: white;}
 
     /* The tab _widget_ frame for all TabWidgets */
-    QTabWidget{background: #F0F0F0;} /* Background for tabs except input tabs */
+    QTabWidget{background-color: #F0F0F0;} /* Background for tabs except input tabs */
     /* background of input tabs, here QTabWidget is encompassed by QScrollArea */
     QScrollArea{color:black; background-color:#F0F0F0;} /* background of input tabs */
     QTabWidget::pane{background-color: #F0F0F0;} /* background of tab widget content */
