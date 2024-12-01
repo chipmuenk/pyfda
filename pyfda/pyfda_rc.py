@@ -260,7 +260,6 @@ qss_dark = """
     QPlainTextEdit{background-color: black}
 
     /* Style for the spinbox and combobox itself */
-    /* QSpinBox, QComboBox{background-color: #202020; border: 1px solid #aaaaaa;} */
     /* Color of Combobox widget and border */
 
     QSpinBox, QComboBox{
@@ -385,7 +384,6 @@ qss_tab_bar = """
 QTabWidget {
     padding: 0;
     margin:  0;
-    background: green;
     }
 QTabWidget::pane {
     padding: 0;
