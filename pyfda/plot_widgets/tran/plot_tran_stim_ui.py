@@ -147,7 +147,7 @@ class Plot_Tran_Stim_UI(QWidget):
 
         # combobox tooltip + data / text / tooltip for file I/O usage
         self.cmb_file_io_items = [
-            ("<span>Select data from File I/O widget</span>"),
+            ("<span>Select data from File I/O widget (file needs to be loaded)</span>"),
             ("use", "Use",
              "<span><b>Use</b> "
                 "file I/O data as stimuli (file needs to be loaded).</span>"),
