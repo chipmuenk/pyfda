@@ -174,7 +174,7 @@ mpl_rc_light = {
             'xtick.color'       : 'black',
             'ytick.color'       : 'black',
             'text.color'        : 'black',
-            'grid.color'        : '#222222',
+            'grid.color'        : '#202020',
             'axes.prop_cycle'   : cycler('color', ['r', 'b', 'c', 'm', 'k'])
             }
 
@@ -238,12 +238,12 @@ qss_dark = """
     NavigationToolbar2QT{background-color:#606060;}
     /* QTabBar {background: pink;} */ /* background of Tabs, normally defined by pane */
 
-    QTextEdit{background-color: #444444;}
+    QTextEdit{background-color: #404040;}
 
-    QTableView{alternate-background-color:#222222;
-        background-color:#444444; gridline-color: white;}
-    QHeaderView{background-color:#222222;}
-    QHeaderView::section{background-color:#111111;}
+    QTableView{alternate-background-color:#202020;
+        background-color:#404040; gridline-color: white;}
+    QHeaderView{background-color:#202020;}
+    QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
 
     QCheckBox::indicator{border: 2px solid #606060;}
@@ -266,8 +266,8 @@ qss_dark = """
     QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa;}
     /* Color style for dropdown items */
     QComboBox QAbstractItemView {
-        background-color: #222222;
-        border: 1px solid #808080;
+        background-color: #404040;
+        border: 1px solid orange;
     }
 
 
@@ -576,13 +576,13 @@ qss_common = """
                 QPushButton[state="error"]{color: white;
                     background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
+                    stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #404040);
                     }
 
                 QPushButton[state="ok"]{color: white;
                     background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
+                    stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #404040);
                     }
 
                 /* Highlight button when pressed from checked / not checked state */
