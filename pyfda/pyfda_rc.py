@@ -487,6 +487,7 @@ qss_common = """
                 * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: lightblue;}
+                /* 'unused', e.g. for lineedit fields with some filter designs */
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
                 * [state="failed"]{background-color: red; color:white;
                     font-weight:800;}
