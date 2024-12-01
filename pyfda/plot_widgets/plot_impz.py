@@ -1282,11 +1282,11 @@ class Plot_Impz(QWidget):
                 H_str = H_str + ' in V'
 
         if self.ui.but_fx_range_x.isChecked() and fb.fil[0]['fx_sim']:
-            self.ax_r.axhline(fx_max_x, 0, 1, color='k', linestyle='--')
-            self.ax_r.axhline(fx_min_x, 0, 1, color='k', linestyle='--')
+            self.ax_r.axhline(fx_max_x, 0, 1, linestyle='--')
+            self.ax_r.axhline(fx_min_x, 0, 1, linestyle='--')
         if self.ui.but_fx_range_y.isChecked() and fb.fil[0]['fx_sim']:
-            self.ax_r.axhline(fx_max_y, 0, 1, color='k', linestyle='-.')
-            self.ax_r.axhline(fx_min_y, 0, 1, color='k', linestyle='-.')
+            self.ax_r.axhline(fx_max_y, 0, 1, linestyle='-.')
+            self.ax_r.axhline(fx_min_y, 0, 1, linestyle='-.')
 
         h_r = []  # plot handles (real part)
         h_i = []  # plot handles (imag. part)
