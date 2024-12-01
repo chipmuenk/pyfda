@@ -579,9 +579,7 @@ qss_common = """
                 QPushButton:checked, PushButton:checked, QPushButtonRT:checked > QLabel{
                     background-color:lightblue; color:black; font-weight: bold;}
 
-                QLineEdit{background-color:lightblue;
-                                /* border-style: outset; */
-                                border-width: 0.1em;}
+                QLineEdit{background-color:lightblue; border-width: 0.1em;}
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
