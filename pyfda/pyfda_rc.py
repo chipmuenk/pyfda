@@ -257,9 +257,15 @@ qss_dark = """
 
     QPlainTextEdit{background-color: black}
 
-    /* Style for the combobox itself */
-    QSpinBox, QComboBox{background-color: #222222; border: 1px solid #aaaaaa;}
-    /* Color style for dropdown items */
+    /* Style for the spinbox and combobox itself */
+    /* QSpinBox, QComboBox{background-color: #202020; border: 1px solid #aaaaaa;} */
+    /* Color of Combobox widget and border / color of selected item */
+    QSpinBox, QComboBox{
+        background-color: #202020;
+        selection-background-color: orange;
+        border: 1px solid #C0C0C0;
+        }
+    /* Background color for dropdown items / border color around dropdown menu */
     QComboBox QAbstractItemView {
         background-color: #404040;
         border: 1px solid orange;
