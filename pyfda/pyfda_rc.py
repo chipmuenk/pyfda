@@ -270,6 +270,10 @@ qss_dark = """
         background-color: #404040;
         border: 1px solid orange;
     }
+    /* These break the Combobox layout
+        QComboBox::item:selected {background-color: orange;}
+        QComboBox::item:checked {font-weight: bold;}
+    */
 
     QProgressBar{color: black;}
 
@@ -277,13 +281,12 @@ qss_dark = """
         {background-color:#505050;}
 
     QPushButton:disabled{color:#303030;}
-    /*QPushButton {border: native; border-radius:-1px;}*/
 
     /* QPushButton[state="normal"],
     QPushButtonRT[state="normal"] > QLabel
         {background-color: #303030;
                 }
-*/
+    */
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -292,12 +295,12 @@ qss_dark = """
         }
 
     QSplitter::handle:horizontal {
-    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
                             stop:0 #303030,
                             stop:0.5 #808080,
                             stop:1.0 #303030);
         }
-            """
+    """
 # ---------------
 # light QSS theme
 # ---------------
@@ -512,15 +515,16 @@ qss_common = """
                     margin: 0 0 0 0; /* was: 1px 0 0 0 */
                     }
 
-                /* Frame in frame, e.g. for target specs, only border-top */
+                /* Frame in frame, e.g. for target specs, only border-top - unused?
                 QTabWidget#input_tabs > QFrame QFrame .QFrame
                 {
-                    /* background-color:lime; */
+                    background-color:lime;
                     border: solid #303030;
                     border-width: 0.05em 0 0 0;
                     padding: 0;
                     margin: 0;
                     }
+                */
 
                 QWidget#transparent{background-color:none}
 
@@ -535,23 +539,9 @@ qss_common = """
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
                 QTableView QTableCornerButton::section:pressed{background-color:red;}
 
-                QSpinBox, QComboBox{padding-left: 0.2em; padding-right: 1em;}
-
-                /*
-                QComboBox QAbstractItemView {
-                    border: none;
-                }
-
-                QComboBox::item {
-                    height: 2em;
-                }
-                QComboBox::item:selected {
-                    background-color: orange;
-                }
-                QComboBox::item:checked {
-                    font-weight: bold;
-                }
-                */
+                QSpinBox, QComboBox{
+                    padding-left: 0.2em; padding-right: 1em;
+                    padding-top: 2px; padding-bottom: 2px;}
 
                 QPushButton[state="changed"]{
                     background-color: yellow; color: black;}
@@ -569,8 +559,6 @@ qss_common = """
 
                 QPushButton:checked, PushButton:checked, QPushButtonRT:checked > QLabel{
                     background-color:lightblue; color:black; font-weight: bold;}
-
-                QLineEdit{background-color:lightblue; border-width: 0.1em;}
 
                 /* QSplitter styling adopted from
                 http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
