@@ -251,8 +251,11 @@ qss_dark = """
 
     /* Applies to all widgets */
     * [state="normal"]{background-color: #404040; color: white;} 
-    QLineEdit{background-color: #404040; color: white;}
-    QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
+
+    QLineEdit{background-color: #404040; color: white;  border-color: #A0A0A0;}
+    QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
+    QPushButton:disabled{background-color: #505050; color: #A0A0A0}
+    QComboBox:disabled{background-color: #505050; color: #A0A0A0}
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
@@ -332,8 +335,11 @@ qss_light = """
 
     /* Applies to all widgets */
     * [state="normal"]{background-color: white; border-color: #303030;} 
-    QLineEdit{background: white; border-color: #303030;}
-    QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
+
+    QLineEdit{background-color: white; border-color: #303030;}
+    QLineEdit:disabled{background-color:#C0C0C0; color: white;}
+    QPushButton:disabled{background-color: #C0C0C0; color: white}
+    QComboBox:disabled{background-color: #C0C0C0; color: white}
 
     QDialog{background-color: #F0F0F0;}
     QMessageBox{background-color: #F0F0F0}
