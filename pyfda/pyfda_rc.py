@@ -475,7 +475,6 @@ qss_tab_bar_ovlp = """
 # Common qss settings for all themes
 qss_common = """
                 * [state="changed"]{background-color: yellow}
-                /* fully transparent background using white and alpha = 0 */
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: lightblue;}
                 /* 'unused', e.g. for lineedit fields with some filter designs */
