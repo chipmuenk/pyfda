@@ -257,6 +257,9 @@ qss_dark = """
     QPushButton:disabled{background-color: #505050; color: #A0A0A0}
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
 
+    QPushButton, QPushButtonRT > QLabel{
+            background-color: #505050; color: white; font-weight: bold;}
+         
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
 
@@ -281,16 +284,6 @@ qss_dark = """
 
     QProgressBar{color: black;}
 
-    QPushButton, QPushButtonRT
-        {background-color:#505050;}
-
-    QPushButton:disabled{color:#303030;}
-
-    /* QPushButton[state="normal"],
-    QPushButtonRT[state="normal"] > QLabel
-        {background-color: #303030;
-                }
-    */
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
                             stop:0 #303030,
@@ -330,7 +323,7 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-    QCheckBox::indicator{border: 2px solid #606060;}
+    QCheckBox::indicator{border: 2px solid #808080;}
     QCheckBox::indicator:checked{background-color: lightblue;}
 
     /* Applies to all widgets */
@@ -341,6 +334,9 @@ qss_light = """
     QPushButton:disabled{background-color: #C0C0C0; color: white}
     QComboBox:disabled{background-color: #C0C0C0; color: white}
 
+    QPushButton, QPushButtonRT > QLabel{
+            background-color: #C0C0C0; color: black; font-weight: bold;}
+
     QDialog{background-color: #F0F0F0;}
     QMessageBox{background-color: #F0F0F0}
 
@@ -349,12 +345,6 @@ qss_light = """
     /* Style for the spinbox and combobox itself */
     /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
             padding: 1px; selection-background-color: orange;}*/
-
-    QPushButton{
-            background-color: #C0C0C0; color: black; font-weight: bold;}
-
-    QPushButton[state="normal"], QPushButtonRT[state="normal"] > QLabel{
-            background-color: #C0C0C0; color: black; font-weight: bold;}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
