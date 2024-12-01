@@ -343,7 +343,8 @@ qss_light = """
     }
     QPushButton:disabled{color:#303030;}
 
-    QPushButton[state="normal"]{background-color: qlineargradient(
+    QPushButton[state="normal"], QPushButtonRT[state="normal"] > QLabel{
+    background-color: qlineargradient(
         x1: 0, y1: 0, x2: 0, y2: 1,
         stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
         }
@@ -553,7 +554,7 @@ qss_common = """
                 }
                 */
 
-                QPushButton[state="changed"]{color: white;
+                QPushButton[state="changed"]{
                     background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
@@ -575,7 +576,7 @@ qss_common = """
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
                     {background-color:orange; color:white}
 
-                QPushButton:checked, QPushButton:checked, QPushButtonRT:checked > QLabel{
+                QPushButton:checked, PushButton:checked, QPushButtonRT:checked > QLabel{
                     background-color:lightblue; color:black; font-weight: bold;}
 
                 QLineEdit{background-color:lightblue;
