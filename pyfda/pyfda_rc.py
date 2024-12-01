@@ -344,18 +344,11 @@ qss_light = """
     /* QSpinBox, QComboBox{background-color: #e0e0e0; border: 1px solid gray;
             padding: 1px; selection-background-color: orange;}*/
 
-    QPushButton{background-color: qlineargradient(
-        x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
-    }
-    QPushButton:disabled{color:#303030;}
+    QPushButton{
+            background-color: #C0C0C0; color: black; font-weight: bold;}
 
     QPushButton[state="normal"], QPushButtonRT[state="normal"] > QLabel{
-    background-color: qlineargradient(
-        x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 white, stop: 0.5 #C0C0C0, stop: 1.0 lightblue);
-        }
-
+            background-color: #C0C0C0; color: black; font-weight: bold;}
 
     QSplitter::handle:vertical {
         background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
