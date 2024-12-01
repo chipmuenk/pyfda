@@ -249,6 +249,8 @@ qss_dark = """
     QCheckBox::indicator{border: 2px solid #606060;}
     QCheckBox::indicator:checked{background-color: lightblue;}
 
+    /* Applies to all widgets */
+    * [state="normal"]{background-color: #404040; color: white;} 
     QLineEdit{background-color: #404040; color: white;}
     QLineEdit:disabled{background-color:#505050; color: #A0A0A0}
 
@@ -328,6 +330,8 @@ qss_light = """
     QCheckBox::indicator{border: 2px solid #606060;}
     QCheckBox::indicator:checked{background-color: lightblue;}
 
+    /* Applies to all widgets */
+    * [state="normal"]{background-color: white; border-color: #303030;} 
     QLineEdit{background: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#c0c0c0; color:blue;}
 
@@ -484,7 +488,6 @@ qss_tab_bar_ovlp = """
 qss_common = """
                 * [state="changed"]{background-color: yellow}
                 /* fully transparent background using white and alpha = 0 */
-                * [state="normal"]{background-color: rgba(255, 255, 255, 0)}
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: lightblue;}
                 /* 'unused', e.g. for lineedit fields with some filter designs */
