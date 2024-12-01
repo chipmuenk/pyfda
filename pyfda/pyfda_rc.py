@@ -250,7 +250,7 @@ qss_dark = """
     QCheckBox::indicator:checked{background-color: lightblue;}
 
     /* Applies to all widgets */
-    * [state="normal"]{background-color: #404040; color: white;} 
+    * [state="normal"]{background-color: #404040; color: white;}
 
     QLineEdit{background-color: #404040; color: white;  border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
@@ -259,7 +259,7 @@ qss_dark = """
 
     QPushButton, QPushButtonRT > QLabel{
             background-color: #505050; color: white; font-weight: bold;}
-         
+
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
 
@@ -327,7 +327,7 @@ qss_light = """
     QCheckBox::indicator:checked{background-color: lightblue;}
 
     /* Applies to all widgets */
-    * [state="normal"]{background-color: white; border-color: #303030;} 
+    * [state="normal"]{background-color: white; border-color: #303030;}
 
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
