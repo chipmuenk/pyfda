@@ -470,13 +470,14 @@ qss_tab_bar_ovlp = """
 
 # Common qss settings for all themes
 qss_common = """
-                * [state="changed"]{background-color: yellow}
+                * [state="ok"]{background-color: green; color: white;}
+                * [state="changed"]{background-color: yellow; color: black;}
                 * [state="running"]{background-color: orange; color: white;}
                 * [state="highlight"]{background-color: lightblue;}
                 /* 'unused', e.g. for lineedit fields with some filter designs */
                 * [state="unused"], *[state="u"]{background-color: white; color:#303030}
-                * [state="failed"]{background-color: red; color:white;
-                    font-weight:800;}
+                * [state="failed"], * [state="error"]{
+                    background-color: red; color:white; font-weight:800;}
 
                 QWidget{font-size:10pt; font-family: Tahoma;}
 
@@ -539,15 +540,15 @@ qss_common = """
                     padding-top: 2px; padding-bottom: 2px;
                     selection-background-color: orange;}
 
-                QPushButton[state="changed"]{
-                    background-color: yellow; color: black;}
+                /* QPushButton[state="changed"]{
+                    background-color: yellow; color: black;} */
 
-                QPushButton[state="error"]{
-                    background-color: red; color: white;}
+                /* QPushButton[state="error"]{
+                    background-color: red; color: white;} */
 
-                QPushButton[state="ok"]{
+                /* QPushButton[state="ok"]{
                     background-color: green; color: white;
-                    }
+                    } */
 
                 /* Highlight button when pressed from checked / not checked state */
                 QPushButton:pressed:checked, QPushButton:pressed:!checked
