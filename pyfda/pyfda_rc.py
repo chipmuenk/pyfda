@@ -267,7 +267,7 @@ qss_dark = """
     /* Color of Combobox widget and border */
 
     QSpinBox, QComboBox{
-        background-color: #202020;
+        background-color: #505050;
         border: 1px solid #C0C0C0;
         }
     /* Background color for dropdown items / border color around dropdown menu */
