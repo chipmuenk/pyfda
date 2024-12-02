@@ -151,7 +151,7 @@ mpl_rc_dark = {
             'axes.facecolor'    : 'black',
             'axes.labelcolor'   : 'white',
             'axes.edgecolor'    : 'white',
-            'figure.facecolor'  : '#202020',
+            'figure.facecolor'  : '#303030',
             'figure.edgecolor'  : '#808080',
             'savefig.facecolor' : 'black',
             'savefig.edgecolor' : 'black',
@@ -227,7 +227,7 @@ qss_dark = """
     QSplitter{background-color: #606060;} /* Top Level background */
     QWidget{color:white;}  /* nearly all widgets are derived from this */
     /* background of QWidget and QFrame widgets, not of derived widgets: */
-    .QWidget, .QFrame{background-color: #202020;}
+    .QWidget, .QFrame{background-color: #303030;}
 
      /* The tab _widget_ frame for all TabWidgets */
     QTabWidget {background-color: #303030;} /* Background for tabs except input tabs */
