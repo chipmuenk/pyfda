@@ -246,9 +246,9 @@ qss_dark = """
     QHeaderView::section{background-color:#101010;}
     QHeaderView::section:checked{background-color:blue;}
 
+    /* Applies to all widgets in "normal" state
+    * [state="normal"], * [state=""]{background-color: #A04040; color: white;} */
 
-    /* Applies to all widgets */
-    * [state="normal"]{background-color: #404040; color: white;}
 
     QLineEdit{background-color: #404040; color: white;  border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
@@ -321,9 +321,8 @@ qss_light = """
     QHeaderView::section{background-color:#808080; color:white;}
     QHeaderView::section:checked{background-color:blue; color:white;}
 
-
-    /* Applies to all widgets */
-    * [state="normal"]{background-color: white; border-color: #303030;}
+    /* Applies to all widgets
+    * [state="normal"]{background-color: white; border-color: #303030;} */
 
     QLineEdit{background-color: white; border-color: #303030;}
     QLineEdit:disabled{background-color:#C0C0C0; color: white;}
