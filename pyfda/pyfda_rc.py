@@ -253,8 +253,10 @@ qss_dark = """
     QPushButton:disabled{background-color: #505050; color: #A0A0A0}
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
 
-    QPushButton, QPushButtonRT > QLabel{
+    QPushButton{
             background-color: #505050; color: white; font-weight: bold;}
+    /*QPushButtonRT:!checked > QLabel{
+                    background-color:#505050; color:white; font-weight: bold;}*/
 
     QDialog{background-color: #404040;}
     QMessageBox{background-color:#404040;}
