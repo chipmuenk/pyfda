@@ -238,8 +238,6 @@ qss_dark = """
     NavigationToolbar2QT{background-color:#606060;}
     /* QTabBar {background-color: pink;} */ /* background of Tabs, normally defined by pane */
 
-    QTextEdit{background-color: #404040;}
-
     QTableView{alternate-background-color:#202020;
         background-color:#404040; gridline-color: white;}
     QHeaderView{background-color:#202020;}
@@ -249,8 +247,8 @@ qss_dark = """
     /* Applies to all widgets in "normal" state
     * [state="normal"], * [state=""]{background-color: #A04040; color: white;} */
 
-
-    QLineEdit{background-color: #404040; color: white;  border-color: #A0A0A0;}
+    QTextEdit{background-color: #505050;}
+    QLineEdit{background-color: #505050; color: white;  border-color: #A0A0A0;}
     QLineEdit:disabled{background-color: #505050; color: #A0A0A0}
     QPushButton:disabled{background-color: #505050; color: #A0A0A0}
     QComboBox:disabled{background-color: #505050; color: #A0A0A0}
