@@ -664,6 +664,7 @@ class Input_Fixpoint_Specs(QWidget):
                         # f"\n\t{fx_mod.__name__}.{fx_filt_ui_class.__name__}")
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_filt_ui = fx_filt_ui_class()  # instantiate the fixpoint widget
+            self.fx_filt_ui.setObjectName('fx_filt_ui')
             # and add it to layout:
             self.layH_fx_wdg.addWidget(self.fx_filt_ui, stretch=1)
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -526,10 +526,9 @@ qss_common = """
                     padding: 0.2em 0 0 0;
                     }
 
-                /* Dynamic fixpoint widget TODO: black text doesn't work 
-                    color was rgba(173, 216, 230, 25%) */
-                FX_UI_WQ .QFrame {
-                    background-color: lightblue; color: black}
+                /* Dynamic fixpoint widget */
+                #fx_filt_ui .QFrame {background-color: lightblue;}
+                #fx_filt_ui QFrame {color: black;}
 
                 /* Table Corner Button */
                 QTableView QTableCornerButton::section{background-color:lightblue; border-color: green;}
